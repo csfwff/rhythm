@@ -42,8 +42,7 @@
             <div class="fn-clear ft-smaller">
             ${sloganLabel}
                 <div class="fn-right">
-                    © 2012-present <a href="https://b3log.org" target="_blank">B3log 开源</a> •
-                    <a href="https://b3log.org/sym" target="_blank">Sym</a>
+                    <a href="https://github.com/csfwff/rhythm" target="_blank">Rhythm 社区</a>
                 ${version}
                 </div>
             </div>
