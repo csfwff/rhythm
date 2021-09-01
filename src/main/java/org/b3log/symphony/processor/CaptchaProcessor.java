@@ -232,8 +232,8 @@ public class CaptchaProcessor {
             }
         }
 
-        final String defaultFontName = new JLabel().getFont().getFontName();
-        ret.add(defaultFontName);
+        //final String defaultFontName = new JLabel().getFont().getFontName();
+        //ret.add(defaultFontName);
 
         return ret;
     }

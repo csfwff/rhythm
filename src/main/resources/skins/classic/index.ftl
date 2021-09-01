@@ -122,7 +122,7 @@
                                 </a>
                             </div>
                         </div>
-                        <div class="metro-line fn-flex">
+                        <#--<div class="metro-line fn-flex">
                             <div class="metro-item">
                                 <a class="preview" href="${servePath}/tag/${tag5.tagURI}">
                                     <img src="${tag5.tagIconPath}" alt="${tag5.tagTitle}">
@@ -198,7 +198,7 @@
                                 </a>
                             </#if>
                             </div>
-                        </div>
+                        </div>-->
 
                         <div class="metro-border fn-flex">
                             <div></div>

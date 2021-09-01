@@ -95,7 +95,11 @@
             <tr>
                 <#list shortlist as emoji>
                     <#if emoji != "endOfEmoji">
-                        <td><img alt="${emoji}" src="${staticServePath}/emoji/graphics/${emoji}.png"></td>
+                        <#if emoji == "+1">
+                            <td><img alt="${emoji}" src="${staticServePath}/emoji/graphics/%2B1.png"></td>
+                        <#else>
+                            <td><img alt="${emoji}" src="${staticServePath}/emoji/graphics/${emoji}.png"></td>
+                        </#if>
                     <#else>
                         <td colspan="2"><a href="${servePath}/emoji/index.html">${moreLabel}</a></td>
                     </#if>
