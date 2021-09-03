@@ -30,7 +30,7 @@
         </div>
         <div class="fn-flex-1">
             <div class="footer-nav fn-clear">
-                <a rel="help" href="${servePath}/about">${aboutLabel}</a>
+                <a rel="help" href="${servePath}/article/1630569106133">${aboutLabel}</a>
                 <a href="${servePath}/tag/announcement">${symAnnouncementLabel}</a>
                 <a href="${servePath}/domains">${domainLabel}</a>
                 <a href="${servePath}/tags">${tagLabel}</a>
