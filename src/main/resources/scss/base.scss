@@ -26,6 +26,19 @@
 @import "common";
 
 /* start common business */
+#sendComment {
+  margin: 50px 0 0 0;
+  padding: 20px;
+  border-radius: 3px;
+  background: #fff;
+  box-shadow: 0 1px 4px rgba(0,0,0,.4);
+  border: 0;
+  resize: none;
+  cursor: pointer;
+  width: 100%;
+  box-sizing: border-box;
+}
+
 .article-list .cb-stick {
   position: absolute;
   top: 0;

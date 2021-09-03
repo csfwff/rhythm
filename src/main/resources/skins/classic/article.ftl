@@ -174,6 +174,9 @@
                     </div>
                 </div>
                 </#if>
+                <#if discussionViewable>
+                    <textarea rows="3" placeholder="发表评论，友善是第一原则哦" id="sendComment" readonly="readonly"></textarea>
+                </#if>
             </div>
         </div>
         <div class="main <#if article.articleComments?size == 0> fn-none</#if>">

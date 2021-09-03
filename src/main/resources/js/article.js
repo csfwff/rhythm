@@ -422,6 +422,10 @@ var Comment = {
    * @returns {Boolean}
    */
   init: function () {
+    $("#sendComment").click(function () {
+      Comment._toggleReply()
+    })
+
     if ($(window.location.hash).length === 1) {
       // if (!isNaN(parseInt(window.location.hash.substr(1)))) {
       Comment._bgFade($(window.location.hash))
