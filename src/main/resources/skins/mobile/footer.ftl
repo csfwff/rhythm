@@ -31,12 +31,12 @@
             <a href="https://github.com/csfwff/rhythm" target="_blank">Rhythm 社区</a>
             ${version}
         </div>
-        <#if footerBeiAnHao != ''>
+        <!--<#if footerBeiAnHao != ''>
             <div class="fn-hr5"></div>
             <div>
                 <a href="http://www.miitbeian.gov.cn/" target="_blank">${footerBeiAnHao}</a>
             </div>
-        </#if>
+        </#if>-->
     </div>
 </div>
 <script src="${staticServePath}/js/symbol-defs${miniPostfix}.js?${staticResourceVersion}"></script>

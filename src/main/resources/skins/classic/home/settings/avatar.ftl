@@ -61,6 +61,7 @@
                 <label>30*30px</label>
             </div>
         </div>
+
         <div class="module-header fn-clear" style="margin-top: 50px">
             <h2>直接上传头像（支持 GIF 动图）</h2>
         </div>
@@ -68,10 +69,12 @@
             <div class="fn-clear">
                 <div class="avatar-big" id="avatarURL" data-imageurl="${currentUser.userAvatarURL}"
                      onclick="$('#avatarUpload input').click()"
-                     style="background-image:url('${currentUser.userAvatarURL}?${currentUser.userUpdateTime?c}')"></div> &nbsp; &nbsp;
+                     style="background-image:url('${currentUser.userAvatarURL}?${currentUser.userUpdateTime?c}')"></div>
+                &nbsp; &nbsp;
                 <div class="avatar" id="avatarURLMid" data-imageurl="${currentUser.userAvatarURL}"
                      onclick="$('#avatarUpload input').click()"
-                     style="background-image:url('${currentUser.userAvatarURL}?${currentUser.userUpdateTime?c}')"></div> &nbsp; &nbsp;
+                     style="background-image:url('${currentUser.userAvatarURL}?${currentUser.userUpdateTime?c}')"></div>
+                &nbsp; &nbsp;
                 <div class="avatar-small" id="avatarURLNor" data-imageurl="${currentUser.userAvatarURL}"
                      onclick="$('#avatarUpload input').click()"
                      style="background-image:url('${currentUser.userAvatarURL}?${currentUser.userUpdateTime?c}')"></div>
@@ -158,7 +161,7 @@
         $('#avatarURLMid').css("background-image", 'url(' + uploadKey + ')').data('imageurl', uploadKey);
         $('#avatarURLNor').css("background-image", 'url(' + uploadKey + ')').data('imageurl', uploadKey);
         originalImageURL = uploadKey;
-        $('#image').cropper('destroy').attr('src',originalImageURL).cropper(options);
+        $('#image').cropper('destroy').attr('src', originalImageURL).cropper(options);
 
         Settings.updateAvatar('${csrfToken}');
     }
