@@ -35,6 +35,13 @@
             <div class="wrapper">
                 <div class="content">
                     <div class="list module">
+                        <#if unreadNotificationCnt &gt; 0>
+                            <div onclick="Settings.makeAllNotificationsRead()"
+                                  aria-label="${makeAllAsReadLabel}" class="mark-as-read tooltipped tooltipped-w home-side-read">
+                                ${makeAllAsReadLabel}
+                                <svg><use xlink:href="#check"></use></svg>
+                            </div>
+                        </#if>
                         <#nested>
                     </div>
                 </div>
