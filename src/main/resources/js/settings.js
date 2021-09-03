@@ -193,13 +193,13 @@ var Settings = {
             var isImg = isImage(fileBuf)
 
             if (!isImg) {
-              Util.alert('Image only~')
+              Util.alert('只允许上传图片!')
 
               return
             }
 
-            if (evt.target.result.byteLength > 1024 * 1024) {
-              Util.alert('This image is too large (max 1M)')
+            if (evt.target.result.byteLength > 1024 * 1024 * 20) {
+              Util.alert('图片过大 (最大限制 20M)')
 
               return
             }

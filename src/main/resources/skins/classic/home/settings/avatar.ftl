@@ -23,7 +23,7 @@
         <link rel="stylesheet" href="${staticServePath}/js/lib/cropper/index.css">
         <link rel="stylesheet" href="${staticServePath}/js/lib/cropper/cropper.min.css">
         <div class="module-header fn-clear">
-            <h2>自定义裁剪</h2>
+            <h2>自由裁剪</h2>
         </div>
         <div class="userInfo_box_uploadImg_content_top">
             <input id="inputImage" type="file" name="photoFile">
@@ -89,6 +89,59 @@
 </@home>
 <script src="${staticServePath}/js/lib/jquery/file-upload-9.10.1/jquery.fileupload.min.js"></script>
 <script src="${staticServePath}/js/lib/cropper/cropper.min.js"></script>
+<script>
+    var URL = window.URL || window.webkitURL;
+    var $image = $('#image');
+    var $rotate = $('#userImg_rotate');
+    var $reUpload = $('#userImg_reUpload');
+    var $zoomOut = $('#userImg_zoomOut');
+    var $zoomIn = $('#userImg_zoomIn');
+    var $save = $('#userImg_save');
+    var croppable = false;
+    var $previews = $('.userImg_preview');
+    var options = {
+        aspectRatio: 1,
+        viewMode: 1,
+        built: function () {
+            croppable = true;
+        },
+        build: function (e) {
+            var $clone = $(this).clone();
+
+            $clone.css({
+                display: 'block',
+                width: '100%',
+                minWidth: 0,
+                minHeight: 0,
+                maxWidth: 'none',
+                maxHeight: 'none'
+            });
+
+            $previews.css({
+                width: '100%',
+                overflow: 'hidden'
+            }).html($clone);
+        },
+        crop: function (e) {
+            var imageData = $(this).cropper('getImageData');
+            var previewAspectRatio = e.width / e.height;
+
+            $previews.each(function () {
+                var $preview = $(this);
+                var previewWidth = $preview.width();
+                var previewHeight = previewWidth / previewAspectRatio;
+                var imageScaledRatio = e.width / previewWidth;
+
+                $preview.height(previewHeight).find('img').css({
+                    width: imageData.naturalWidth / imageScaledRatio,
+                    height: imageData.naturalHeight / imageScaledRatio,
+                    marginLeft: -e.x / imageScaledRatio,
+                    marginTop: -e.y / imageScaledRatio
+                });
+            });
+        }
+    };
+</script>
 <script src="${staticServePath}/js/lib/cropper/index.js"></script>
 <script>
     Settings.initUploadAvatar({
@@ -96,11 +149,17 @@
         userId: '${currentUser.oId}',
         maxSize: '${imgMaxSize?c}'
     }, function (data) {
+        updateAvatarByData(data);
+    });
+
+    function updateAvatarByData(data) {
         var uploadKey = data.result.key;
         $('#avatarURL').css("background-image", 'url(' + uploadKey + ')').data('imageurl', uploadKey);
         $('#avatarURLMid').css("background-image", 'url(' + uploadKey + ')').data('imageurl', uploadKey);
         $('#avatarURLNor').css("background-image", 'url(' + uploadKey + ')').data('imageurl', uploadKey);
+        originalImageURL = uploadKey;
+        $('#image').cropper('destroy').attr('src',originalImageURL).cropper(options);
 
         Settings.updateAvatar('${csrfToken}');
-    });
+    }
 </script>
