@@ -60,7 +60,7 @@ public class SitemapProcessor {
         LOGGER.log(Level.DEBUG, "Generating sitemap....");
         sitemapQueryService.genIndex(sitemap);
         sitemapQueryService.genDomains(sitemap);
-        // sitemapQueryService.genArticles(sitemap);
+        sitemapQueryService.genArticles(sitemap);
         final String content = sitemap.toString();
         LOGGER.log(Level.DEBUG, "Generated sitemap");
         renderer.setContent(content);
