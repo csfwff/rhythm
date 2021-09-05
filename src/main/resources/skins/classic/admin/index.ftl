@@ -20,22 +20,6 @@
 <#include "macro-admin.ftl">
 <@admin "index">
 <div class="content admin-index">
-    <div class="module">
-        <div class="module-header">
-            <h2><span class="ft-red">使用须知</span>
-                <div class="fn-right">
-                    ${currentVersionLabel} <span id="version">${version}</span>${commaLabel}
-                    <span id="upgrade">${checkVersionLabel}</span>
-                </div>
-            </h2>
-        </div>
-        <div class="module-panel vditor-reset ft-red fn-content">
-            <ul>
-                <li>Sym 社区版使用 AGPL 开源协议，请务必保证所有代码及其衍生代码开源，并在页脚放置开源库地址</li>
-                <li>企业使用请购买商业授权，详情请看 <a href="https://b3log.org/sym/pricing.html" target="_blank">https://b3log.org/sym/pricing.html</a></li>
-            </ul>
-        </div>
-    </div>
     <div class="module fn-content vditor-reset">
         <ul>
             <li>${onlineVisitorCountLabel} ${onlineVisitorCnt?c}</li>
