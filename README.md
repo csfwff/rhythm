@@ -19,7 +19,9 @@ Rhythm 超级社区系统，超丰富的社区功能，基于 Symphony 社区版
 <img src="https://img.shields.io/github/watchers/csfwff/rhythm?style=flat-square">
 </p>
 
-Rhythm 还在开发中，敬请期待 :)
+### Rhythm 还在开发中，敬请期待 :)
+
+[欢迎访问基于 Rhythm 的程序员社区：摸鱼派](https://pwl.icu)
 
 ## 🚧 TODO List
 1. [ ] 用户角色卡片
