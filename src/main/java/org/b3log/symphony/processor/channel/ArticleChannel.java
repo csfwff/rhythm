@@ -18,11 +18,14 @@
 package org.b3log.symphony.processor.channel;
 
 import freemarker.template.Template;
+import org.apache.commons.lang.RandomStringUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.b3log.latke.Keys;
+import org.b3log.latke.cache.Cache;
+import org.b3log.latke.cache.CacheFactory;
 import org.b3log.latke.http.Session;
 import org.b3log.latke.http.WebSocketChannel;
 import org.b3log.latke.http.WebSocketSession;
@@ -34,6 +37,7 @@ import org.b3log.latke.util.Locales;
 import org.b3log.symphony.model.*;
 import org.b3log.symphony.service.RoleQueryService;
 import org.b3log.symphony.service.UserQueryService;
+import org.b3log.symphony.util.Sessions;
 import org.b3log.symphony.util.Templates;
 import org.json.JSONObject;
 
@@ -182,6 +186,15 @@ public class ArticleChannel implements WebSocketChannel {
                             = roleQueryService.getPermissionsGrantMap(Role.ROLE_ID_C_VISITOR);
                     dataModel.put(Permission.PERMISSIONS, permissions);
                 }
+                Cache SESSION_CACHE = CacheFactory.getCache("sessions");
+                JSONObject csrfTokenValue = SESSION_CACHE.get(user.optString(Keys.OBJECT_ID) + Common.CSRF_TOKEN);
+                if (null == csrfTokenValue) {
+                    csrfTokenValue = new JSONObject();
+                    csrfTokenValue.put(Common.DATA, RandomStringUtils.randomAlphanumeric(12));
+
+                    SESSION_CACHE.put(user.optString(Keys.OBJECT_ID) + Common.CSRF_TOKEN, csrfTokenValue);
+                }
+                dataModel.put(Common.CSRF_TOKEN, csrfTokenValue.optString(Common.DATA));
 
                 final String templateDirName = httpSession.getAttribute(Keys.TEMPLATE_DIR_NAME);
                 final Template template = Templates.getTemplate(templateDirName + "/common/comment.ftl");
