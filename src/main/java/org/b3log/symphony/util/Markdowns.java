@@ -84,7 +84,7 @@ public final class Markdowns {
     /**
      * Lute engine serve path. https://github.com/88250/lute
      */
-    private static final String LUTE_ENGINE_URL = "http://lute.stackoverflow.wiki:8249";
+    private static final String LUTE_ENGINE_URL = "http://localhost:8249";
 
     /**
      * Built-in MD engine options.
