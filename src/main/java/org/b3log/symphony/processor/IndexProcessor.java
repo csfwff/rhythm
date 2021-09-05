@@ -274,8 +274,7 @@ public class IndexProcessor {
             }
         }
 
-        //final AbstractFreeMarkerRenderer renderer = new SkinRenderer(context, "index.ftl");
-        final AbstractFreeMarkerRenderer renderer = new SkinRenderer(context, "index1.ftl");
+        final AbstractFreeMarkerRenderer renderer = new SkinRenderer(context, "index.ftl");
         final Map<String, Object> dataModel = renderer.getDataModel();
 
         final List<JSONObject> recentArticles = articleQueryService.getIndexRecentArticles();
