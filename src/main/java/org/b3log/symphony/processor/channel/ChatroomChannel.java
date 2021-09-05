@@ -54,6 +54,7 @@ public class ChatroomChannel implements WebSocketChannel {
 
         synchronized (SESSIONS) {
             final Iterator<WebSocketSession> i = SESSIONS.iterator();
+            // i 是每个客户端，遍历给他们发送 SESSIONS.size()，也就是在线人数
             while (i.hasNext()) {
                 final WebSocketSession s = i.next();
                 final String msgStr = new JSONObject().put(Common.ONLINE_CHAT_CNT, SESSIONS.size()).put(Common.TYPE, "online").toString();
