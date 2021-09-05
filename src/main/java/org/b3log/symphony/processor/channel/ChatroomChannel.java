@@ -20,12 +20,11 @@ package org.b3log.symphony.processor.channel;
 import org.b3log.latke.http.WebSocketChannel;
 import org.b3log.latke.http.WebSocketSession;
 import org.b3log.latke.ioc.Singleton;
+import org.b3log.latke.model.User;
 import org.b3log.symphony.model.Common;
 import org.json.JSONObject;
 
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -44,12 +43,29 @@ public class ChatroomChannel implements WebSocketChannel {
     public static final Set<WebSocketSession> SESSIONS = Collections.newSetFromMap(new ConcurrentHashMap());
 
     /**
+     * Online user information storage.
+     */
+    public static final Map<WebSocketSession, JSONObject> onlineUsers = new HashMap<>();
+
+    /**
      * Called when the socket connection with the browser is established.
      *
      * @param session session
      */
     @Override
     public void onConnect(final WebSocketSession session) {
+        final String userStr = session.getHttpSession().getAttribute(User.USER);
+        if (null == userStr) {
+            return;
+        }
+
+        final JSONObject user = new JSONObject(userStr);
+        onlineUsers.put(session, user);
+        for (WebSocketSession webSocketSession : onlineUsers.keySet()) {
+            System.out.println(webSocketSession.getId());
+            System.out.println(onlineUsers.get(webSocketSession));
+        }
+
         SESSIONS.add(session);
 
         synchronized (SESSIONS) {
@@ -120,6 +136,8 @@ public class ChatroomChannel implements WebSocketChannel {
      * @param session the specified session
      */
     private void removeSession(final WebSocketSession session) {
+        onlineUsers.remove(session);
+
         SESSIONS.remove(session);
 
         synchronized (SESSIONS) {
