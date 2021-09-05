@@ -20,16 +20,6 @@
 <#include "macro-admin.ftl">
 <@admin "index">
 <div class="content admin-index">
-    <div class="module">
-        <div class="module-header">
-            <h2><span class="ft-red">使用须知</span>
-                <div class="fn-right">
-                    ${currentVersionLabel} <span id="version">${version}</span>${commaLabel}
-                    <span id="upgrade">${checkVersionLabel}</span>
-                </div>
-            </h2>
-        </div>
-    </div>
     <div class="module fn-content vditor-reset">
         <ul>
             <li>${onlineVisitorCountLabel} ${onlineVisitorCnt?c}</li>
