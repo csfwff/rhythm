@@ -234,6 +234,15 @@ var ChatRoomChannel = {
       switch (data.type) {
         case 'online':
           $('#onlineCnt').text(data.onlineChatCnt)
+          $("#chatRoomOnlineCnt").html("");
+          for (var user in data.users) {
+            let userInfo = data.users[user];
+            $("#chatRoomOnlineCnt").append("<a target=\"_blank\" title=\"" + userInfo.userName + "\" data-name=\"" + userInfo.userName + "\"\n" +
+                "href=\"" + userInfo.homePage + "\">\n" +
+                "<img class=\"avatar avatar-small tooltipped__user\" aria-name=\"" + userInfo.userName + "\"\n" +
+                "src=\"" + userInfo.userAvatarURL + "\">\n" +
+                "</a>");
+          }
           break
         case 'msg':
           var avatarPart = '<a rel="nofollow" href="/member/' + data.userName +

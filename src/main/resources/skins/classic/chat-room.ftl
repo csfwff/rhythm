@@ -20,94 +20,99 @@
 <#include "macro-head.ftl">
 <!DOCTYPE html>
 <html>
-    <head>
-        <@head title="${chatRoomLabel} - ${symphonyLabel}">
+<head>
+    <@head title="${chatRoomLabel} - ${symphonyLabel}">
         <meta name="description" content="${chatRoomLabel}"/>
-        </@head>
-        <link rel="stylesheet" href="${staticServePath}/css/index.css?${staticResourceVersion}" />
-        <link rel="canonical" href="${servePath}/community">
-    </head>
-    <body>
-        <#include "header.ftl">
-        <div class="main">
-            <div class="wrapper">
-                <div class="content chat-room">
-                    <div class="module">
-                        <h2 class="sub-head">${chatRoomLabel}</h2>
-                        <div class="fn-content">
-                            <div class="reply">
-                                <#if isLoggedIn>
-                                <div id="chatContent"></div><br>
-                                <div class="fn-clear comment-submit">
-                                    <div class="fn-left online-cnt">${onlineVisitorCountLabel} <span id="onlineCnt"></span></div>
-                                    <div class="tip fn-left" id="chatContentTip"></div>
-                                    <div class="fn-right">
-                                        <button class="green" onclick="ChatRoom.send()">${postLabel}</button>
-                                    </div>
+    </@head>
+    <link rel="stylesheet" href="${staticServePath}/css/index.css?${staticResourceVersion}"/>
+    <link rel="canonical" href="${servePath}/community">
+</head>
+<body>
+<#include "header.ftl">
+<div class="main">
+    <div class="wrapper">
+        <div class="content chat-room">
+            <div class="module">
+                <h2 class="sub-head">${chatRoomLabel}</h2>
+                <div class="fn-content">
+                    <div class="reply">
+                        <#if isLoggedIn>
+                            <div id="chatContent"></div><br>
+                            <div class="fn-clear comment-submit">
+                                <div class="fn-left online-cnt">${onlineVisitorCountLabel} <span id="onlineCnt"></span>
                                 </div>
-                                <#else>
-                                <div class="comment-login">
-                                    <a rel="nofollow" href="javascript:window.scrollTo(0,0);Util.goLogin();">${loginDiscussLabel}</a>
+                                <div class="tip fn-left" id="chatContentTip"></div>
+                                <div class="fn-right">
+                                    <button class="green" onclick="ChatRoom.send()">${postLabel}</button>
                                 </div>
-                                </#if>
                             </div>
-                        </div>
+                            <div id="chatRoomOnlineCnt" class="chats__users">
+                            </div>
+                        <#else>
+                            <div class="comment-login">
+                                <a rel="nofollow"
+                                   href="javascript:window.scrollTo(0,0);Util.goLogin();">${loginDiscussLabel}</a>
+                            </div>
+                        </#if>
                     </div>
-                    <div class="list module" id="comments">
-                        <ul>
-                            <#list messages as msg>
-                            <li class="fn-flex">
-                                <a rel="nofollow" href="${servePath}/member/${msg.userName}">
-                                    <div class="avatar tooltipped tooltipped-n"
-                                         aria-label="${msg.userName}" style="background-image:url('${msg.userAvatarURL}')"></div>
-                                </a>
-                                <div class="fn-flex-1">
-                                    <div class="ft-smaller">
-                                        <a rel="nofollow" href="${servePath}/member/${msg.userName}">
-                                            <span class="ft-gray">${msg.userName}</span>
-                                        </a>
-                                        <span class="ft-fade">
-                                             • ${msg.time}
-                                        </span>
-                                    </div>
-                                    <div class="vditor-reset comment">
-                                        ${msg.content}
-                                    </div>
-                                </div>
-                            </li>
-                            </#list>  
-                        </ul>
-                    </div>
-                </div>
-                <div class="side">
-                    <#include "side.ftl">
                 </div>
             </div>
+            <div class="list module" id="comments">
+                <ul>
+                    <#list messages as msg>
+                        <li class="fn-flex">
+                            <a rel="nofollow" href="${servePath}/member/${msg.userName}">
+                                <div class="avatar tooltipped tooltipped-n"
+                                     aria-label="${msg.userName}"
+                                     style="background-image:url('${msg.userAvatarURL}')"></div>
+                            </a>
+                            <div class="fn-flex-1">
+                                <div class="ft-smaller">
+                                    <a rel="nofollow" href="${servePath}/member/${msg.userName}">
+                                        <span class="ft-gray">${msg.userName}</span>
+                                    </a>
+                                    <span class="ft-fade">
+                                             • ${msg.time}
+                                        </span>
+                                </div>
+                                <div class="vditor-reset comment">
+                                    ${msg.content}
+                                </div>
+                            </div>
+                        </li>
+                    </#list>
+                </ul>
+            </div>
         </div>
-        <#include "footer.ftl">
-        <script>
-            Label.uploadLabel = "${uploadLabel}";
-        </script>
-        <script src="${staticServePath}/js/channel${miniPostfix}.js?${staticResourceVersion}"></script>
-        <script src="${staticServePath}/js/chat-room${miniPostfix}.js?${staticResourceVersion}"></script>
-        <script>
-            Label.addBoldLabel = '${addBoldLabel}';
-            Label.addItalicLabel = '${addItalicLabel}';
-            Label.insertQuoteLabel = '${insertQuoteLabel}';
-            Label.addBulletedLabel = '${addBulletedLabel}';
-            Label.addNumberedListLabel = '${addNumberedListLabel}';
-            Label.addLinkLabel = '${addLinkLabel}';
-            Label.undoLabel = '${undoLabel}';
-            Label.redoLabel = '${redoLabel}';
-            Label.previewLabel = '${previewLabel}';
-            Label.helpLabel = '${helpLabel}';
-            Label.fullscreenLabel = '${fullscreenLabel}';
-            Label.uploadFileLabel = '${uploadFileLabel}';
-            Label.insertEmojiLabel = '${insertEmojiLabel}';
-            ChatRoom.init();
-            // Init [ChatRoom] channel
-            ChatRoomChannel.init("${wsScheme}://${serverHost}:${serverPort}${contextPath}/chat-room-channel");
-            var chatRoomMsgCnt = ${chatRoomMsgCnt};
-        </script>
-    </body>
+        <div class="side">
+            <#include "side.ftl">
+        </div>
+    </div>
+</div>
+<#include "footer.ftl">
+<script>
+    Label.uploadLabel = "${uploadLabel}";
+</script>
+<script src="${staticServePath}/js/channel${miniPostfix}.js?${staticResourceVersion}"></script>
+<script src="${staticServePath}/js/chat-room${miniPostfix}.js?${staticResourceVersion}"></script>
+<script>
+    Label.addBoldLabel = '${addBoldLabel}';
+    Label.addItalicLabel = '${addItalicLabel}';
+    Label.insertQuoteLabel = '${insertQuoteLabel}';
+    Label.addBulletedLabel = '${addBulletedLabel}';
+    Label.addNumberedListLabel = '${addNumberedListLabel}';
+    Label.addLinkLabel = '${addLinkLabel}';
+    Label.undoLabel = '${undoLabel}';
+    Label.redoLabel = '${redoLabel}';
+    Label.previewLabel = '${previewLabel}';
+    Label.helpLabel = '${helpLabel}';
+    Label.fullscreenLabel = '${fullscreenLabel}';
+    Label.uploadFileLabel = '${uploadFileLabel}';
+    Label.insertEmojiLabel = '${insertEmojiLabel}';
+    ChatRoom.init();
+    // Init [ChatRoom] channel
+    ChatRoomChannel.init("${wsScheme}://${serverHost}:${serverPort}${contextPath}/chat-room-channel?user=" + Label.currentUserName);
+    var chatRoomMsgCnt = ${chatRoomMsgCnt};
+</script>
+</body>
 </html>

@@ -42,6 +42,8 @@
                                     <button class="green" onclick="ChatRoom.send()">${postLabel}</button>
                                 </div>
                             </div>
+                            <div id="chatRoomOnlineCnt" class="chats__users">
+                            </div>
                         <#else>
                         <div class="comment-login">
                             <a rel="nofollow" href="javascript:window.scrollTo(0,0);Util.goLogin();">${loginDiscussLabel}</a>
@@ -102,7 +104,7 @@
             Label.insertEmojiLabel = '${insertEmojiLabel}';
             ChatRoom.init();
             // Init [ChatRoom] channel
-            ChatRoomChannel.init("${wsScheme}://${serverHost}:${serverPort}${contextPath}/chat-room-channel");
+            ChatRoomChannel.init("${wsScheme}://${serverHost}:${serverPort}${contextPath}/chat-room-channel?user=" + Label.currentUserName);
             var chatRoomMsgCnt = ${chatRoomMsgCnt};
         </script>
     </body>

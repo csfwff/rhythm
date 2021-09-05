@@ -17,11 +17,14 @@
  */
 package org.b3log.symphony.processor.channel;
 
+import org.b3log.latke.Latkes;
 import org.b3log.latke.http.WebSocketChannel;
 import org.b3log.latke.http.WebSocketSession;
 import org.b3log.latke.ioc.Singleton;
 import org.b3log.latke.model.User;
 import org.b3log.symphony.model.Common;
+import org.b3log.symphony.model.UserExt;
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.util.*;
@@ -54,17 +57,15 @@ public class ChatroomChannel implements WebSocketChannel {
      */
     @Override
     public void onConnect(final WebSocketSession session) {
+        final String userName = session.getParameter("user");
         final String userStr = session.getHttpSession().getAttribute(User.USER);
         if (null == userStr) {
             return;
         }
 
         final JSONObject user = new JSONObject(userStr);
+        user.put(User.USER_NAME, userName);
         onlineUsers.put(session, user);
-        for (WebSocketSession webSocketSession : onlineUsers.keySet()) {
-            System.out.println(webSocketSession.getId());
-            System.out.println(onlineUsers.get(webSocketSession));
-        }
 
         SESSIONS.add(session);
 
@@ -73,7 +74,7 @@ public class ChatroomChannel implements WebSocketChannel {
             // i 是每个客户端，遍历给他们发送 SESSIONS.size()，也就是在线人数
             while (i.hasNext()) {
                 final WebSocketSession s = i.next();
-                final String msgStr = new JSONObject().put(Common.ONLINE_CHAT_CNT, SESSIONS.size()).put(Common.TYPE, "online").toString();
+                final String msgStr = getOnline().toString();
                 s.sendText(msgStr);
             }
         }
@@ -144,9 +145,43 @@ public class ChatroomChannel implements WebSocketChannel {
             final Iterator<WebSocketSession> i = SESSIONS.iterator();
             while (i.hasNext()) {
                 final WebSocketSession s = i.next();
-                final String msgStr = new JSONObject().put(Common.ONLINE_CHAT_CNT, SESSIONS.size()).put(Common.TYPE, "online").toString();
+                final String msgStr = getOnline().toString();
                 s.sendText(msgStr);
             }
         }
+    }
+
+    /**
+     * 获得聊天室在线人数和在线成员信息
+     * @return
+     */
+    private JSONObject getOnline() {
+        // 使用 HashMap 去重
+        Map<String, JSONObject> filteredOnlineUsers = new HashMap<>();
+        for (JSONObject object : onlineUsers.values()) {
+            String name = object.optString(User.USER_NAME);
+            filteredOnlineUsers.put(name, object);
+        }
+
+        JSONArray onlineArray = new JSONArray();
+        for (String user : filteredOnlineUsers.keySet()) {
+            JSONObject object = filteredOnlineUsers.get(user);
+
+            String avatar = object.optString(UserExt.USER_AVATAR_URL);
+            String homePage = Latkes.getStaticServePath() + "/member/" + user;
+
+            JSONObject generated = new JSONObject();
+            generated.put(User.USER_NAME, user);
+            generated.put(UserExt.USER_AVATAR_URL, avatar);
+            generated.put("homePage", homePage);
+            onlineArray.put(generated);
+        }
+
+        JSONObject result = new JSONObject();
+        result.put(Common.ONLINE_CHAT_CNT, filteredOnlineUsers.size());
+        result.put(Common.TYPE, "online");
+        result.put("users", onlineArray);
+
+        return result;
     }
 }
