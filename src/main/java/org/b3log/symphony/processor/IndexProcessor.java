@@ -274,7 +274,8 @@ public class IndexProcessor {
             }
         }
 
-        final AbstractFreeMarkerRenderer renderer = new SkinRenderer(context, "index.ftl");
+        //final AbstractFreeMarkerRenderer renderer = new SkinRenderer(context, "index.ftl");
+        final AbstractFreeMarkerRenderer renderer = new SkinRenderer(context, "index1.ftl");
         final Map<String, Object> dataModel = renderer.getDataModel();
 
         final List<JSONObject> recentArticles = articleQueryService.getIndexRecentArticles();
@@ -283,8 +284,16 @@ public class IndexProcessor {
         final List<JSONObject> perfectArticles = articleQueryService.getIndexPerfectArticles();
         dataModel.put(Common.PERFECT_ARTICLES, perfectArticles);
 
+        final List<JSONObject> niceUsers = userQueryService.getNiceUsers(30);
+        dataModel.put(Common.NICE_USERS, niceUsers);
+
+        final JSONObject result = articleQueryService.getQuestionArticles(0, 1, 10);
+        final List<JSONObject> qaArticles = (List<JSONObject>) result.get(Article.ARTICLES);
+        dataModel.put(Common.QNA,qaArticles);
+
         dataModelService.fillHeaderAndFooter(context, dataModel);
         dataModelService.fillIndexTags(dataModel);
+        //dataModelService.fillSideTags(dataModel);
 
         dataModel.put(Common.SELECTED, Common.INDEX);
     }

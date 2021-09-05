@@ -219,7 +219,7 @@ public class ArticleCache {
         try {
             final Query query = new Query().
                     addSort(Keys.OBJECT_ID, SortDirection.DESCENDING).
-                    setPageCount(1).setPage(1, 36);
+                    setPageCount(1).setPage(1, 10);
             query.setFilter(CompositeFilterOperator.and(
                     new PropertyFilter(Article.ARTICLE_PERFECT, FilterOperator.EQUAL, Article.ARTICLE_PERFECT_C_PERFECT),
                     new PropertyFilter(Article.ARTICLE_SHOW_IN_LIST, FilterOperator.NOT_EQUAL, Article.ARTICLE_SHOW_IN_LIST_C_NOT)));

@@ -1246,6 +1246,48 @@ code .dec {
     }
   }
 
+
+  .tag-metro-item {
+    text-align: center;
+    overflow: hidden;
+    position: relative;
+    margin-right: 15px;
+    margin-bottom: 15px;
+
+    .preview {
+      height: 100%;
+      width: 100%;
+      position: relative;
+      box-sizing: border-box;
+      display: block;
+      transition: all 0.2s ease-out 0s;
+      color: #999;
+      text-decoration: none;
+    }
+
+    .preview:hover {
+      background-color: rgba(0, 0, 0, .02);
+      color: $black-text;
+    }
+
+    .preview img {
+      transition: all 0.2s ease-out 0s;
+      margin-top: 0px;
+      height: 60px;
+      width: 60px;
+    }
+
+    .preview:hover > img {
+      border-radius: 30px;
+    }
+
+    .preview > b {
+      display: block;
+      font-weight: normal;
+    }
+  }
+
+
   &__bottom {
     background-color: rgba(0, 0, 0, .02);
     padding-top: 20px;

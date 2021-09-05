@@ -517,3 +517,20 @@ blockquote {
     padding-right: 61px !important;
   }
 }
+
+.index-user{
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  padding: 15px;
+
+}
+
+.tag-item{
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  margin-right: 15px;
+  margin-bottom: 15px;
+}
