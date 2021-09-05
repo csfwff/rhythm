@@ -30,6 +30,7 @@ import org.b3log.latke.http.RequestContext;
 import org.b3log.latke.http.Session;
 import org.b3log.latke.http.function.Handler;
 import org.b3log.latke.ioc.BeanManager;
+import org.b3log.latke.model.User;
 import org.b3log.latke.util.Locales;
 import org.b3log.latke.util.Requests;
 import org.b3log.latke.util.Stopwatchs;
@@ -108,6 +109,8 @@ public class BeforeRequestHandler implements Handler {
             if (null == user) {
                 return;
             }
+
+            httpSession.setAttribute(User.USER, user.toString());
 
             final String skin = Sessions.isMobile() ? user.optString(UserExt.USER_MOBILE_SKIN) : user.optString(UserExt.USER_SKIN);
             httpSession.setAttribute(Keys.TEMPLATE_DIR_NAME, skin);

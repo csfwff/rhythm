@@ -197,7 +197,7 @@ public class GobangChannel implements WebSocketChannel {
      */
     @Override
     public void onMessage(final Message message) throws JSONException {
-        JSONObject jsonObject = new JSONObject(message);
+        JSONObject jsonObject = new JSONObject(message.text);
         final String player = jsonObject.optString("player");
         final String anti = getAntiPlayer(player);
         JSONObject sendText = new JSONObject();
