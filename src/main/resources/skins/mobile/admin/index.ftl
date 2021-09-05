@@ -20,12 +20,6 @@
 <#include "macro-admin.ftl">
 <@admin "index">
 <div class="wrapper">
-    <div class="vditor-reset ft-red">
-        <ul>
-            <li>Sym 社区版使用 AGPL 开源协议，请务必保证所有代码及其衍生代码开源，并在页脚放置开源库地址</li>
-            <li>企业使用请购买商业授权，详情请看 <a href="https://b3log.org/sym/pricing.html" target="_blank">https://b3log.org/sym/pricing.html</a></li>
-        </ul>
-    </div>
     <div class="fn-hr10"></div>
     <div class="vditor-reset">
         <ul>
