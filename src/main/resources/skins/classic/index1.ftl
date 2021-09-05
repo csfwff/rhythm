@@ -83,7 +83,6 @@ ${HeaderBannerLabel}
         <div class="index-recent fn-flex-1">
             <div style="border-bottom: 1px solid #eee;margin:0px 10px ;">
                 <div style="float:left;font-size:13px;margin:5px 0 10px 0; font-weight:bold;">活跃用户</div>
-                <div style="float:right;font-size:13px;margin:5px 0 0 0;"><a href="${servePath}/perfect">更多</a></div>
                 <div style="clear:both;"></div>
             </div>
             <div class="module-panel">
