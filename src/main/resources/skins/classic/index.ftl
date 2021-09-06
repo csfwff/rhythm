@@ -131,7 +131,7 @@ ${HeaderBannerLabel}
                 <div style="border-bottom: 1px solid #eee;margin:0px 10px ;">
                     <div style="float:left;font-size:13px;margin:5px 0 10px 0; font-weight:bold;">清风明月</div>
                     <#--                    <div style="float:right;font-size:13px;margin:5px 0 0 0;"><a href="${servePath}/perfect">更多</a></div>-->
-                    <a href="https://pwl.icu/article/1630938317106" title="清风明月是什么？" style="float: right; margin: 5px 0 10px 0">
+                    <a href="${servePath}/article/1630938317106" title="清风明月是什么？" style="float: right; margin: 5px 0 10px 0">
                         <svg><use xlink:href="#iconQuestion"></use></svg>
                     </a>
                     <div style="clear:both;"></div>
@@ -164,6 +164,25 @@ ${HeaderBannerLabel}
                 </div>
             </div>
             <div class="index-recent fn-flex-1">
+                <div style="border-bottom: 1px solid #eee;margin:0px 10px ;">
+                    <a href="${servePath}/cr" style="float:left;font-size:13px;margin:5px 0 10px 0; font-weight:bold;">实时聊天室</a>
+                    <div style="clear:both;"></div>
+                </div>
+                <div class="module-panel">
+                    <div class="module-header form">
+                        <input id="breezemoonInput"
+                               type="text"
+                               class="comment__text breezemoon__input"
+                               placeholder="${chatRoomLabel}"/>
+                        <span id="breezemoonPostBtn" class="btn breezemoon__btn" data-csrf="${csrfToken}">${postLabel}</span>
+                    </div>
+                    <div class="module-panel" id="chatRoomIndex">
+                        <ul class="module-list">
+                            <li class="ft-center ft-gray">${chickenEggLabel}</li>
+                        </ul>
+                    </div>
+                </div>
+
                 <div style="border-bottom: 1px solid #eee;margin:0px 10px ;">
                     <div style="float:left;font-size:13px;margin:5px 0 10px 0; font-weight:bold;">标签</div>
                     <div style="float:right;font-size:13px;margin:5px 0 0 0;"><a href="${servePath}/tags">更多</a></div>
