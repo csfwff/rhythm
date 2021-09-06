@@ -107,15 +107,15 @@
     <button onclick="window.location.replace('${forwardURL}')">确定</button>
 </div>
 <div>
-    <a href="https://github.com/88250/symphony">GitHub</a> &nbsp;
-    <a href="https://b3log.org/" target="_blank" rel="noopener">B3log</a>
+    <a href="https://github.com/csfwff/rhythm">GitHub</a> &nbsp;
+    <a href="https://programmingwithlove.stackoverflow.wiki" target="_blank" rel="noopener">用爱发电</a>
 </div>
 <script>
     var S = {
         init: function () {
             S.Drawing.init('.canvas')
             document.body.classList.add('body--ready')
-            var text = 'Sym'
+            var text = 'Rym'
             S.UI.simulate(text)
             S.Drawing.loop(function () {
                 S.Shape.render()
@@ -274,7 +274,7 @@
                         break
 
                     default:
-                        S.Shape.switchShape(S.ShapeBuilder.letter(current[0] === cmd ? 'Sym' : current))
+                        S.Shape.switchShape(S.ShapeBuilder.letter(current[0] === cmd ? 'Rym' : current))
                 }
             }, 2000, sequence.length)
         }
