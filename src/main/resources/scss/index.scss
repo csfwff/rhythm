@@ -1252,6 +1252,7 @@ code .dec {
     overflow: hidden;
     position: relative;
     margin-right: 15px;
+    width: 40px;
     margin-bottom: 15px;
 
     .preview {
@@ -1284,6 +1285,7 @@ code .dec {
     .preview > b {
       display: block;
       font-weight: normal;
+      white-space: nowrap;
     }
   }
 
