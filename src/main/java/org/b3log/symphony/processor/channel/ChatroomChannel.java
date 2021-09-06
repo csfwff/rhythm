@@ -57,15 +57,21 @@ public class ChatroomChannel implements WebSocketChannel {
      */
     @Override
     public void onConnect(final WebSocketSession session) {
-        final String userName = session.getParameter("user");
-        final String userStr = session.getHttpSession().getAttribute(User.USER);
-        if (null == userStr) {
-            return;
+        String type = session.getParameter("type");
+        if (type == null) {
+            type = "";
         }
 
-        final JSONObject user = new JSONObject(userStr);
-        user.put(User.USER_NAME, userName);
-        onlineUsers.put(session, user);
+        if (!type.equals("index")) {
+            final String userName = session.getParameter("user");
+            final String userStr = session.getHttpSession().getAttribute(User.USER);
+            if (null == userStr) {
+                return;
+            }
+            final JSONObject user = new JSONObject(userStr);
+            user.put(User.USER_NAME, userName);
+            onlineUsers.put(session, user);
+        }
 
         SESSIONS.add(session);
 
@@ -137,7 +143,11 @@ public class ChatroomChannel implements WebSocketChannel {
      * @param session the specified session
      */
     private void removeSession(final WebSocketSession session) {
-        onlineUsers.remove(session);
+        try {
+            onlineUsers.remove(session);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
         SESSIONS.remove(session);
 

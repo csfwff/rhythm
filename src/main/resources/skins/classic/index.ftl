@@ -176,8 +176,8 @@ ${HeaderBannerLabel}
                                placeholder="${chatRoomLabel}"/>
                         <span id="chatRoomPostBtn" class="btn breezemoon__btn" data-csrf="${csrfToken}">${postLabel}</span>
                     </div>
-                    <div class="module-panel" id="chatRoomIndex">
-                        <ul class="module-list">
+                    <div class="module-panel">
+                        <ul class="module-list" id="chatRoomIndex">
                             <li class="ft-center ft-gray">${chickenEggLabel}</li>
                         </ul>
                     </div>
@@ -346,6 +346,8 @@ ${HeaderBannerLabel}
             $it.find('.ripple').remove();
         }, 800);
     });
+
+    ChatRoomChannel.init("${wsScheme}://${serverHost}:${serverPort}${contextPath}/chat-room-channel?type=index&user=" + Label.currentUserName);
 </script>
 </body>
 </html>

@@ -280,6 +280,17 @@ var ChatRoomChannel = {
             $('.list').animate({'scrollTop': 0}, 500)
           }
           $('.list li:first').fadeIn(2000)
+
+            // index
+            $("#chatRoomIndex").append("" +
+                "<li>" +
+                "<a href=\"/member/" + data.userName + "\">" +
+                "<span class=\"avatar-small slogan tooltipped tooltipped-se\" aria-label=\"" + data.userName + "\"" +
+                "style=\"background-image: url(" + data.userAvatarURL + ")\"></span>" +
+                "</a>" +
+                "<a href=\"javascript:void(0);\"" +
+                "class=\"title\">" + data.content + "</a>" +
+                "</li>");
           break
       }
     }
