@@ -90,7 +90,7 @@ ${HeaderBannerLabel}
                     <#list niceUsers as user>
 
                         <a rel="nofollow" href="${servePath}/member/${user.userName}">
-                                    <span class="avatar-mid tooltipped tooltipped-se slogan"
+                                    <span class="avatar-middle tooltipped tooltipped-se slogan"
                                           aria-label="${user.userName}"
                                           style="margin-bottom: 15px;background-image:url('${user.userAvatarURL48}')"></span>
                         </a>
@@ -105,7 +105,7 @@ ${HeaderBannerLabel}
             <div class="index-recent fn-flex-1">
                 <div style="border-bottom: 1px solid #eee;margin:0px 10px ;">
                     <div style="float:left;font-size:13px;margin:5px 0 10px 0; font-weight:bold;">问答</div>
-                    <div style="float:right;font-size:13px;margin:5px 0 0 0;"><a href="${servePath}/recent">更多</a></div>
+                    <div style="float:right;font-size:13px;margin:5px 0 0 0;"><a href="${servePath}/qna">更多</a></div>
                     <div style="clear:both;"></div>
                 </div>
                 <div class="module-panel">

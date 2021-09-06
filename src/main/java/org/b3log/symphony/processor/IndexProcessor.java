@@ -283,7 +283,7 @@ public class IndexProcessor {
         final List<JSONObject> perfectArticles = articleQueryService.getIndexPerfectArticles();
         dataModel.put(Common.PERFECT_ARTICLES, perfectArticles);
 
-        final List<JSONObject> niceUsers = userQueryService.getNiceUsers(30);
+        final List<JSONObject> niceUsers = userQueryService.getNiceUsers(56);
         dataModel.put(Common.NICE_USERS, niceUsers);
 
         final JSONObject result = articleQueryService.getQuestionArticles(0, 1, 10);

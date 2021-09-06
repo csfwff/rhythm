@@ -436,6 +436,7 @@ a[class*=" icon-"]:hover {
 /* start avatar */
 .avatar,
 .avatar-small,
+.avatar-middle,
 .avatar-mid,
 .avatar-big {
   border-radius: 3px 3px 3px 3px;
@@ -456,6 +457,12 @@ a[class*=" icon-"]:hover {
 .avatar-small {
   height: 20px;
   width: 20px;
+}
+
+.avatar-middle{
+  height: 40px;
+  width:40px;
+  margin-right: 15px;
 }
 
 .avatar-mid {
