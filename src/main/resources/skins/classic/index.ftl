@@ -170,11 +170,11 @@ ${HeaderBannerLabel}
                 </div>
                 <div class="module-panel">
                     <div class="module-header form">
-                        <input id="breezemoonInput"
+                        <input id="chatRoomInput"
                                type="text"
                                class="comment__text breezemoon__input"
                                placeholder="${chatRoomLabel}"/>
-                        <span id="breezemoonPostBtn" class="btn breezemoon__btn" data-csrf="${csrfToken}">${postLabel}</span>
+                        <span id="chatRoomPostBtn" class="btn breezemoon__btn" data-csrf="${csrfToken}">${postLabel}</span>
                     </div>
                     <div class="module-panel" id="chatRoomIndex">
                         <ul class="module-list">
