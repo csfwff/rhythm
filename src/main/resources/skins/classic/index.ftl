@@ -131,6 +131,9 @@ ${HeaderBannerLabel}
                 <div style="border-bottom: 1px solid #eee;margin:0px 10px ;">
                     <div style="float:left;font-size:13px;margin:5px 0 10px 0; font-weight:bold;">清风明月</div>
                     <#--                    <div style="float:right;font-size:13px;margin:5px 0 0 0;"><a href="${servePath}/perfect">更多</a></div>-->
+                    <a href="https://pwl.icu/article/1630938317106" title="清风明月是什么？" style="float: right; margin: 5px 0 10px 0">
+                        <svg><use xlink:href="#iconQuestion"></use></svg>
+                    </a>
                     <div style="clear:both;"></div>
                 </div>
                 <div class="module-panel">
