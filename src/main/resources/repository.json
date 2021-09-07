@@ -1882,6 +1882,24 @@
           "description": "0：emoji"
         }
       ]
+    },
+    {
+      "name": "chat_room",
+      "description": "聊天室数据永久存储",
+      "keys": [
+        {
+          "name": "oId",
+          "type": "String",
+          "length": 19,
+          "description": "主键"
+        },
+        {
+          "name": "content",
+          "type": "String",
+          "length": 102400,
+          "description": "聊天内容JSON"
+        }
+      ]
     }
   ]
 }

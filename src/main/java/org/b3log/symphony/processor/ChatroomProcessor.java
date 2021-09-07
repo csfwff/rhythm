@@ -28,6 +28,8 @@ import org.b3log.latke.ioc.BeanManager;
 import org.b3log.latke.ioc.Inject;
 import org.b3log.latke.ioc.Singleton;
 import org.b3log.latke.model.User;
+import org.b3log.latke.repository.RepositoryException;
+import org.b3log.latke.repository.Transaction;
 import org.b3log.latke.util.Locales;
 import org.b3log.latke.util.Times;
 import org.b3log.symphony.model.Common;
@@ -36,6 +38,7 @@ import org.b3log.symphony.processor.channel.ChatroomChannel;
 import org.b3log.symphony.processor.middleware.AnonymousViewCheckMidware;
 import org.b3log.symphony.processor.middleware.LoginCheckMidware;
 import org.b3log.symphony.processor.middleware.validate.ChatMsgAddValidationMidware;
+import org.b3log.symphony.repository.ChatRoomRepository;
 import org.b3log.symphony.service.*;
 import org.b3log.symphony.util.*;
 import org.json.JSONObject;
@@ -128,6 +131,9 @@ public class ChatroomProcessor {
     @Inject
     private ArticleQueryService articleQueryService;
 
+    @Inject
+    private ChatRoomRepository chatRoomRepository;
+
     /**
      * Register request handlers.
      */
@@ -189,6 +195,14 @@ public class ChatroomProcessor {
         } catch (Exception e) {
             LOGGER.log(Level.ERROR, "Cannot write ChatRoom message to local storage device.", e);
         }
+
+        final Transaction transaction = chatRoomRepository.beginTransaction();
+        try {
+            chatRoomRepository.add(new JSONObject().put("content", "hello, this is a test"));
+        } catch (RepositoryException e) {
+            e.printStackTrace();
+        }
+        transaction.commit();
 
         final JSONObject pushMsg = JSONs.clone(msg);
         pushMsg.put(Common.TIME, Times.getTimeAgo(msg.optLong(Common.TIME), Locales.getLocale()));
