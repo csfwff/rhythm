@@ -259,10 +259,9 @@ public class ChatroomProcessor {
             final BeanManager beanManager = BeanManager.getInstance();
             final ChatRoomRepository chatRoomRepository = beanManager.getReference(ChatRoomRepository.class);
             List<JSONObject> messageList = chatRoomRepository.getList(new Query()
-                    .select("content")
                     .setPage(page, 10)
                     .addSort(Keys.OBJECT_ID, SortDirection.DESCENDING));
-            List<JSONObject> msgs = messageList.stream().map(msg -> new JSONObject(JSONs.clone(msg).optString("content"))).collect(Collectors.toList());
+            List<JSONObject> msgs = messageList.stream().map(msg -> new JSONObject(msg.optString("content")).put("oId", msg.optString(Keys.OBJECT_ID))).collect(Collectors.toList());
             return msgs.stream().map(msg -> JSONs.clone(msg).put(Common.TIME, Times.getTimeAgo(msg.optLong(Common.TIME), Locales.getLocale()))).collect(Collectors.toList());
         } catch (RepositoryException e) {
             return new LinkedList<>();
