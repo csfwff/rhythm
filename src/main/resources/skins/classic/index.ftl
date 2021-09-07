@@ -104,6 +104,71 @@ ${HeaderBannerLabel}
         <div class="wrapper">
             <div class="index-recent fn-flex-1">
                 <div style="border-bottom: 1px solid #eee;margin:0px 10px ;">
+                    <a href="${servePath}/cr" style="float:left;font-size:13px;margin:5px 0 10px 0; font-weight:bold;">实时聊天室</a>
+                    <div style="clear:both;"></div>
+                </div>
+                <div class="module-panel">
+                    <div class="module-header form">
+                        <input id="chatRoomInput"
+                               type="text"
+                               class="comment__text breezemoon__input"
+                               placeholder="${chatRoomLabel}"/>
+                        <span id="chatRoomPostBtn" class="btn breezemoon__btn" data-csrf="${csrfToken}" onclick="sendChat()">Biu~</span>
+                    </div>
+                    <div class="module-panel">
+                        <ul class="module-list" id="chatRoomIndex">
+                            <#if messages?size != 0>
+                                <#list messages as msg>
+                                    <#if msg_index <= 9>
+                                        <li class="fn-flex">
+                                            <a rel="nofollow" href="${servePath}/member/${msg.userName}">
+                                                <div class="avatar tooltipped tooltipped-n"
+                                                     aria-label="${msg.userName}"
+                                                     style="background-image:url('${msg.userAvatarURL}')"></div>
+                                            </a>
+                                            <div class="fn-flex-1">
+                                                <div class="ft-smaller">
+                                                    <a rel="nofollow" href="${servePath}/member/${msg.userName}">
+                                                        <span class="ft-gray">${msg.userName}</span>
+                                                    </a>
+                                                </div>
+                                                <div class="vditor-reset comment">
+                                                    ${msg.content}
+                                                </div>
+                                            </div>
+                                        </li>
+                                    </#if>
+                                </#list>
+                            <#else>
+                                <li class="ft-center ft-gray" id="emptyChatRoom">${chickenEggLabel}</li>
+                            </#if>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="index-recent fn-flex-1">
+                <div style="border-bottom: 1px solid #eee;margin:0px 10px ;">
+                    <div style="float:left;font-size:13px;margin:5px 0 10px 0; font-weight:bold;">标签</div>
+                    <div style="float:right;font-size:13px;margin:5px 0 0 0;"><a href="${servePath}/tags">更多</a></div>
+                    <div style="clear:both;"></div>
+                </div>
+                <div class="module-panel">
+                    <div class="index-user">
+                        <#list tags as tag>
+                            <#if tag_index <= 20>
+                                <div class="tag-metro-item">
+                                    <a class="preview" href="${servePath}/tag/${tag.tagURI}">
+                                        <img src="${tag.tagIconPath}" alt="${tag.tagTitle}" >
+                                        <b>${tag.tagTitle}</b>
+                                    </a>
+                                </div>
+                            </#if>
+                        </#list>
+                    </div>
+                </div>
+
+                <div style="border-bottom: 1px solid #eee;margin:0px 10px ;">
                     <div style="float:left;font-size:13px;margin:5px 0 10px 0; font-weight:bold;">问答</div>
                     <div style="float:right;font-size:13px;margin:5px 0 0 0;"><a href="${servePath}/qna">更多</a></div>
                     <div style="clear:both;"></div>
@@ -111,26 +176,26 @@ ${HeaderBannerLabel}
                 <div class="module-panel">
                     <ul class="module-list">
                         <#list qna as article>
-                            <li class="fn-flex">
-                                <a rel="nofollow" href="${servePath}/member/${article.articleAuthorName}">
+                            <#if article_index <= 8>
+                                <li class="fn-flex">
+                                    <a rel="nofollow" href="${servePath}/member/${article.articleAuthorName}">
                                     <span class="avatar-small tooltipped tooltipped-se slogan"
                                           aria-label="${article.articleAuthorName}"
                                           style="background-image:url('${article.articleAuthorThumbnailURL20}')"></span>
-                                </a>
-                                <a rel="nofollow" class="title fn-ellipsis fn-flex-1" href="${servePath}${article.articlePermalink}">${article.articleTitleEmoj}</a>
-                                <a class="fn-right count ft-gray ft-smaller" href="${servePath}${article.articlePermalink}"><#if article.articleViewCount < 1000>
-                                        ${article.articleViewCount}<#else>${article.articleViewCntDisplayFormat}</#if></a>
-                            </li>
+                                    </a>
+                                    <a rel="nofollow" class="title fn-ellipsis fn-flex-1" href="${servePath}${article.articlePermalink}">${article.articleTitleEmoj}</a>
+                                    <a class="fn-right count ft-gray ft-smaller" href="${servePath}${article.articlePermalink}"><#if article.articleViewCount < 1000>
+                                            ${article.articleViewCount}<#else>${article.articleViewCntDisplayFormat}</#if></a>
+                                </li>
+                            </#if>
                         </#list>
                     </ul>
                 </div>
-
             </div>
 
             <div class="index-recent fn-flex-1">
                 <div style="border-bottom: 1px solid #eee;margin:0px 10px ;">
                     <div style="float:left;font-size:13px;margin:5px 0 10px 0; font-weight:bold;">清风明月</div>
-                    <#--                    <div style="float:right;font-size:13px;margin:5px 0 0 0;"><a href="${servePath}/perfect">更多</a></div>-->
                     <a href="${servePath}/article/1630938317106" title="清风明月是什么？" style="float: right; margin: 5px 0 10px 0">
                         <svg><use xlink:href="#iconQuestion"></use></svg>
                     </a>
@@ -147,14 +212,16 @@ ${HeaderBannerLabel}
                     <div class="module-panel">
                         <ul class="module-list">
                             <#list sideBreezemoons as item>
-                                <li>
-                                    <a href="${servePath}/member/${item.breezemoonAuthorName}">
+                                <#if item_index <= 12>
+                                    <li>
+                                        <a href="${servePath}/member/${item.breezemoonAuthorName}">
                     <span class="avatar-small slogan tooltipped tooltipped-se" aria-label="${item.breezemoonAuthorName}"
                           style="background-image: url(${item.breezemoonAuthorThumbnailURL48})"></span>
-                                    </a>
-                                    <a href="${servePath}/member/${item.breezemoonAuthorName}/breezemoons/${item.oId}"
-                                       class="title">${item.breezemoonContent}</a>
-                                </li>
+                                        </a>
+                                        <a href="${servePath}/member/${item.breezemoonAuthorName}/breezemoons/${item.oId}"
+                                           class="title">${item.breezemoonContent}</a>
+                                    </li>
+                                </#if>
                             </#list>
                             <#if sideBreezemoons?size == 0>
                                 <li class="ft-center ft-gray">${chickenEggLabel}</li>
@@ -163,171 +230,8 @@ ${HeaderBannerLabel}
                     </div>
                 </div>
             </div>
-            <div class="index-recent fn-flex-1">
-                <div style="border-bottom: 1px solid #eee;margin:0px 10px ;">
-                    <a href="${servePath}/cr" style="float:left;font-size:13px;margin:5px 0 10px 0; font-weight:bold;">实时聊天室</a>
-                    <div style="clear:both;"></div>
-                </div>
-                <div class="module-panel">
-                    <div class="module-header form">
-                        <input id="chatRoomInput"
-                               type="text"
-                               class="comment__text breezemoon__input"
-                               placeholder="${chatRoomLabel}"/>
-                        <span id="chatRoomPostBtn" class="btn breezemoon__btn" data-csrf="${csrfToken}">${postLabel}</span>
-                    </div>
-                    <div class="module-panel">
-                        <ul class="module-list" id="chatRoomIndex">
-                            <li class="ft-center ft-gray">${chickenEggLabel}</li>
-                        </ul>
-                    </div>
-                </div>
-
-                <div style="border-bottom: 1px solid #eee;margin:0px 10px ;">
-                    <div style="float:left;font-size:13px;margin:5px 0 10px 0; font-weight:bold;">标签</div>
-                    <div style="float:right;font-size:13px;margin:5px 0 0 0;"><a href="${servePath}/tags">更多</a></div>
-                    <div style="clear:both;"></div>
-                </div>
-                <div class="module-panel">
-
-                    <div class="index-user">
-                        <#list tags as tag>
-                            <div class="tag-metro-item">
-                                <a class="preview" href="${servePath}/tag/${tag.tagURI}">
-                                    <img src="${tag.tagIconPath}" alt="${tag.tagTitle}" >
-                                    <b>${tag.tagTitle}</b>
-                                </a>
-                            </div>
-                        </#list>
-                    </div>
-                </div>
-            </div>
         </div>
     </div>
-
-    <#--    <div >-->
-    <#--        <div class="wrapper">-->
-    <#--            <div class="fn-flex-1">-->
-    <#--                <div class="metro-line fn-flex">-->
-    <#--                    <div class="metro-item">-->
-    <#--                        <a class="preview" href="${servePath}/tag/${tag0.tagURI}">-->
-    <#--                            <img src="${tag0.tagIconPath}" alt="${tag0.tagTitle}">-->
-    <#--                            <b>${tag0.tagTitle}</b>-->
-    <#--                        </a>-->
-    <#--                    </div>-->
-    <#--                    <div class="metro-item">-->
-    <#--                        <a class="preview" href="${servePath}/tag/${tag1.tagURI}">-->
-    <#--                            <img src="${tag1.tagIconPath}" alt="${tag1.tagTitle}">-->
-    <#--                            <b>${tag1.tagTitle}</b>-->
-    <#--                        </a>-->
-    <#--                    </div>-->
-    <#--                    <div class="metro-item">-->
-    <#--                        <a class="preview" href="${servePath}/tag/${tag2.tagURI}">-->
-    <#--                            <img src="${tag2.tagIconPath}" alt="${tag2.tagTitle}">-->
-    <#--                            <b>${tag2.tagTitle}</b>-->
-    <#--                        </a>-->
-    <#--                    </div>-->
-    <#--                    <div class="metro-item">-->
-    <#--                        <a class="preview" href="${servePath}/tag/${tag3.tagURI}">-->
-    <#--                            <img src="${tag3.tagIconPath}" alt="${tag3.tagTitle}">-->
-    <#--                            <b>${tag3.tagTitle}</b>-->
-    <#--                        </a>-->
-    <#--                    </div>-->
-    <#--                    <div class="metro-item">-->
-    <#--                        <a class="preview" href="${servePath}/tag/${tag4.tagURI}">-->
-    <#--                            <img src="${tag4.tagIconPath}" alt="${tag4.tagTitle}">-->
-    <#--                            <b>${tag4.tagTitle}</b>-->
-    <#--                        </a>-->
-    <#--                    </div>-->
-    <#--                </div>-->
-    <#--                &lt;#&ndash;<div class="metro-line fn-flex">-->
-    <#--                    <div class="metro-item">-->
-    <#--                        <a class="preview" href="${servePath}/tag/${tag5.tagURI}">-->
-    <#--                            <img src="${tag5.tagIconPath}" alt="${tag5.tagTitle}">-->
-    <#--                            <b>${tag5.tagTitle}</b>-->
-    <#--                        </a>-->
-    <#--                    </div>-->
-    <#--                    <div class="metro-item">-->
-    <#--                        <a class="preview" href="${servePath}/tag/${tag6.tagURI}">-->
-    <#--                            <img src="${tag6.tagIconPath}" alt="${tag6.tagTitle}">-->
-    <#--                            <b>${tag6.tagTitle}</b>-->
-    <#--                        </a>-->
-    <#--                    </div>-->
-    <#--                    <div class="metro-item">-->
-    <#--                        <a class="preview" href="${servePath}/tag/${tag7.tagURI}">-->
-    <#--                            <img src="${tag7.tagIconPath}" alt="${tag7.tagTitle}">-->
-    <#--                            <b>${tag7.tagTitle}</b>-->
-    <#--                        </a>-->
-    <#--                    </div>-->
-    <#--                    <div class="metro-item">-->
-    <#--                        <a class="preview" href="${servePath}/tag/${tag8.tagURI}">-->
-    <#--                            <img src="${tag8.tagIconPath}" alt="${tag8.tagTitle}">-->
-    <#--                            <b>${tag8.tagTitle}</b>-->
-    <#--                        </a>-->
-    <#--                    </div>-->
-    <#--                    <div class="metro-item">-->
-    <#--                        <a class="preview" href="${servePath}/tag/${tag9.tagURI}">-->
-    <#--                            <img src="${tag9.tagIconPath}" alt="${tag9.tagTitle}">-->
-    <#--                            <b>${tag9.tagTitle}</b>-->
-    <#--                        </a>-->
-    <#--                    </div>-->
-    <#--                </div>-->
-    <#--                <div class="metro-line fn-flex">-->
-    <#--                    <div class="metro-item">-->
-    <#--                        <a class="preview" href="${servePath}/tag/${tag10.tagURI}">-->
-    <#--                            <img src="${tag10.tagIconPath}" alt="${tag10.tagTitle}">-->
-    <#--                            <b>${tag10.tagTitle}</b>-->
-    <#--                        </a>-->
-    <#--                    </div>-->
-    <#--                    <div class="metro-item">-->
-    <#--                        <a class="preview" href="${servePath}/tag/${tag11.tagURI}">-->
-    <#--                            <img src="${tag11.tagIconPath}" alt="${tag11.tagTitle}">-->
-    <#--                            <b>${tag11.tagTitle}</b>-->
-    <#--                        </a>-->
-    <#--                    </div>-->
-    <#--                    <div class="metro-item">-->
-    <#--                        <a class="preview" href="${servePath}/tag/${tag12.tagURI}">-->
-    <#--                            <img src="${tag12.tagIconPath}" alt="${tag12.tagTitle}">-->
-    <#--                            <b>${tag12.tagTitle}</b>-->
-    <#--                        </a>-->
-    <#--                    </div>-->
-    <#--                    <div class="metro-item">-->
-    <#--                    <#if ADLabel != '' >-->
-    <#--                        <a class="preview" href="${servePath}/about">-->
-    <#--                            <img src="${staticServePath}/emoji/graphics/heart.png" alt="${sponsorLabel}">-->
-    <#--                            <b>${adDeliveryLabel}</b>-->
-    <#--                        </a>-->
-    <#--                    <#else>-->
-    <#--                        <a class="preview" href="${servePath}/about">-->
-    <#--                            <img src="${staticServePath}/emoji/graphics/heart.png" alt="${sponsorLabel}">-->
-    <#--                            <b>${adDeliveryLabel}</b>-->
-    <#--                        </a>-->
-    <#--                    </#if>-->
-    <#--                    </div>-->
-    <#--                    <div class="metro-item">-->
-    <#--                    <#if ADLabel != '' >-->
-    <#--                        <div class="ad">-->
-    <#--                        ${ADLabel}-->
-    <#--                        </div>-->
-    <#--                    <#else>-->
-    <#--                        <a class="preview" href="${servePath}/about">-->
-    <#--                            <img src="${staticServePath}/emoji/graphics/heart.png" alt="${sponsorLabel}">-->
-    <#--                            <b>${adDeliveryLabel}</b>-->
-    <#--                        </a>-->
-    <#--                    </#if>-->
-    <#--                    </div>-->
-    <#--                </div>&ndash;&gt;-->
-
-    <#--                <div class="metro-border fn-flex">-->
-    <#--                    <div></div>-->
-    <#--                    <div class="green"></div>-->
-    <#--                    <div class="yellow"></div>-->
-    <#--                    <div class="red"></div>-->
-    <#--                    <div class="purple"></div>-->
-    <#--                </div>-->
-    <#--            </div>-->
-    <#--        </div>-->
-    <#--    </div>-->
 </div>
 </div>
 <#include "footer.ftl">
@@ -346,6 +250,35 @@ ${HeaderBannerLabel}
             $it.find('.ripple').remove();
         }, 800);
     });
+
+    // 聊天室发送讯息
+    $('#chatRoomInput').bind('keydown',function(event){
+        if (event.keyCode == "13") {
+            sendChat();
+        }
+    });
+
+    function sendChat() {
+        <#if isLoggedIn>
+            var content = $("#chatRoomInput").val();
+            var requestJSONObject = {
+                content: content,
+            };
+            $.ajax({
+                url: Label.servePath + '/chat-room/send',
+                type: 'POST',
+                cache: false,
+                data: JSON.stringify(requestJSONObject),
+                beforeSend: function () {
+                    $("#chatRoomInput").val("")
+                },
+                success: function (result) {
+                }
+            });
+        <#else>
+            window.location.href = "${servePath}/login";
+        </#if>
+    }
 
     ChatRoomChannel.init("${wsScheme}://${serverHost}:${serverPort}${contextPath}/chat-room-channel?type=index&user=" + Label.currentUserName);
 </script>

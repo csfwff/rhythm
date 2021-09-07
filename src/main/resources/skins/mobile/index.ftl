@@ -21,112 +21,159 @@
 <#include "common/sub-nav.ftl">
 <!DOCTYPE html>
 <html>
-    <head>
-        <@head title="${symphonyLabel}">
+<head>
+    <@head title="${symphonyLabel}">
         <meta name="description" content="${symDescriptionLabel}"/>
-        </@head>
-    </head>
-    <body class="index">
-        ${HeaderBannerLabel}
-        <#include "header.ftl">
-        <@subNav '' ''/>
-        <div class="main">
-            <div class="wrapper fn-clear">
-                <div class="module">
-                    <div class="module-header" style="background-color: #97cf76;">
-                        <a href="${servePath}/recent">${latestLabel}</a>
-                    </div>
-                    <div class="module-panel">
-                        <ul class="module-list">
-                            <#list recentArticles as article>
-                            <li<#if !article_has_next> class="last"</#if>>
-                                <a rel="nofollow" href="${servePath}/member/${article.articleAuthorName}">
-                                    <span class="avatar-small tooltipped tooltipped-se slogan"
-                                          aria-label="${article.articleAuthorName}"
-                                          style="background-image:url('${article.articleAuthorThumbnailURL20}')"></span>
-                                </a>
-                                <a rel="nofollow" class="title fn-ellipsis" href="${servePath}${article.articlePermalink}">${article.articleTitleEmoj}</a>
-                                <a class="fn-right count ft-gray ft-smaller" href="${servePath}${article.articlePermalink}"><#if article.articleViewCount < 1000>
-                                    ${article.articleViewCount}<#else>${article.articleViewCntDisplayFormat}</#if></a>
-                            </li>
-                            </#list>
-                        </ul>
-                    </div>
-                </div>
-                <div class="module">
-                    <div class="module-header" style="background-color: #dfb169;">
-                        <a href="${servePath}/perfect">${perfectLabel}</a>
-                    </div>
-                    <div class="module-panel">
-                        <ul class="module-list">
-                            <#list perfectArticles as article>
-                            <li<#if !article_has_next> class="last"</#if>>
-                                <a rel="nofollow" href="${servePath}/member/${article.articleAuthorName}">
-                                    <span class="avatar-small tooltipped tooltipped-se slogan"
-                                          aria-label="${article.articleAuthorName}"
-                                          style="background-image:url('${article.articleAuthorThumbnailURL20}')"></span>
-                                </a>
-                                <a rel="nofollow" class="title fn-ellipsis" href="${servePath}${article.articlePermalink}">${article.articleTitleEmoj}</a>
-                                <a class="fn-right count ft-gray ft-smaller" href="${servePath}${article.articlePermalink}">${article.articleViewCount}</a>
-                            </li>
-                            </#list>
-                        </ul>
-                    </div>
-                </div>
+    </@head>
+</head>
+<body class="index">
+${HeaderBannerLabel}
+<#include "header.ftl">
+<@subNav '' ''/>
+<div class="main">
+    <div class="wrapper fn-clear">
+        <div class="module">
+            <div class="module-header" style="background-color: #97cf76;">
+                <a href="${servePath}/recent">${latestLabel}</a>
             </div>
-        </div>
-        <#if tags?size != 0>
-        <div class="index-wrap">
-            <div class="wrapper">
-                <ul class="tag-desc fn-clear">
-                    <#list tags as tag>
-                    <li>
-                        <a rel="nofollow" href="${servePath}/tag/${tag.tagURI}">
-                            <#if tag.tagIconPath!="">
-                            <img src="${tag.tagIconPath}" alt="${tag.tagTitle}" />
-                            </#if>
-                            ${tag.tagTitle}
-                        </a>
-                    </li>
+            <div class="module-panel">
+                <ul class="module-list">
+                    <#list recentArticles as article>
+                        <li<#if !article_has_next> class="last"</#if>>
+                            <a rel="nofollow" href="${servePath}/member/${article.articleAuthorName}">
+                                    <span class="avatar-small tooltipped tooltipped-se slogan"
+                                          aria-label="${article.articleAuthorName}"
+                                          style="background-image:url('${article.articleAuthorThumbnailURL20}')"></span>
+                            </a>
+                            <a rel="nofollow" class="title fn-ellipsis"
+                               href="${servePath}${article.articlePermalink}">${article.articleTitleEmoj}</a>
+                            <a class="fn-right count ft-gray ft-smaller"
+                               href="${servePath}${article.articlePermalink}"><#if article.articleViewCount < 1000>
+                                    ${article.articleViewCount}<#else>${article.articleViewCntDisplayFormat}</#if></a>
+                        </li>
                     </#list>
                 </ul>
             </div>
         </div>
-        </#if>
-        <div class="fn-hr10"></div>
-        <div class="main">
-            <div class="wrapper">
-                <#if ADLabel != ''>
-                <div class="module">
-                    <div class="module-header" style="background-color: #7ea5c8">
-                        <a href="${servePath}/about">${sponsorLabel}</a>
-                    </div>
-                    <div class="ad module-panel fn-clear">
-                        ${ADLabel}
-                    </div>
+        <div class="module">
+            <div class="module-header" style="background-color: #dfb169;">
+                <a href="${servePath}/perfect">${perfectLabel}</a>
+            </div>
+            <div class="module-panel">
+                <ul class="module-list">
+                    <#list perfectArticles as article>
+                        <li<#if !article_has_next> class="last"</#if>>
+                            <a rel="nofollow" href="${servePath}/member/${article.articleAuthorName}">
+                                    <span class="avatar-small tooltipped tooltipped-se slogan"
+                                          aria-label="${article.articleAuthorName}"
+                                          style="background-image:url('${article.articleAuthorThumbnailURL20}')"></span>
+                            </a>
+                            <a rel="nofollow" class="title fn-ellipsis"
+                               href="${servePath}${article.articlePermalink}">${article.articleTitleEmoj}</a>
+                            <a class="fn-right count ft-gray ft-smaller"
+                               href="${servePath}${article.articlePermalink}">${article.articleViewCount}</a>
+                        </li>
+                    </#list>
+                </ul>
+            </div>
+        </div>
+        <div class="module">
+            <div class="module-header" style="background-color: #69dfac;">
+                <a href="${servePath}/cr">聊天室</a>
+            </div>
+            <div class="module-panel">
+                <div style="margin: 15px 0 5px 0">
+                    <a href="${servePath}/cr">点击加入聊天</a>
                 </div>
-                </#if>
-                <div class="module">
-                    <div class="module-header" style="background-color: #9cd462">
-                        <a href="${servePath}/pre-post">${postArticleLabel}</a>
-                    </div>
-                    <div class="module-panel">
-                        <ul class="module-list">
-                            <li><a class="title" href="${servePath}/activity/daily-checkin">${activityDailyCheckinLabel}</a></li>
-                            <li><a class="title" href="${servePath}/activity/yesterday-liveness-reward">${activityYesterdayLivenessRewardLabel}</a></li>
-                            <li><a class="title" href="${servePath}/activity/1A0001">${activity1A0001Label}</a></li>
-                            <li><a class="title" href="${servePath}/activity/character">${characterLabel}</a></li>
-                        </ul>
-                    </div>
-                </div>
+                <ul class="module-list" id="chatRoomIndex">
+                    <#if messages?size != 0>
+                        <#list messages as msg>
+                            <#if msg_index <= 9>
+                                <li class="fn-flex">
+                                    <a rel="nofollow" href="${servePath}/member/${msg.userName}">
+                                        <div class="avatar tooltipped tooltipped-n"
+                                             aria-label="${msg.userName}"
+                                             style="background-image:url('${msg.userAvatarURL}')"></div>
+                                    </a>
+                                    <div class="fn-flex-1">
+                                        <div class="ft-smaller">
+                                            <a rel="nofollow" href="${servePath}/member/${msg.userName}">
+                                                <span class="ft-gray">${msg.userName}</span>
+                                            </a>
+                                        </div>
+                                        <div class="vditor-reset comment">
+                                            ${msg.content}
+                                        </div>
+                                    </div>
+                                </li>
+                            </#if>
+                        </#list>
+                    <#else>
+                        <li class="ft-center ft-gray" id="emptyChatRoom">${chickenEggLabel}</li>
+                    </#if>
+                </ul>
+            </div>
         </div>
     </div>
-
-    <div class="slogan">
-        ${indexIntroLabel}&nbsp;
-        <a href="https://github.com/88250/symphony" target="_blank">
-            <svg><use xlink:href="#github"></use></svg></a>
+</div>
+<#if tags?size != 0>
+    <div class="index-wrap">
+        <div class="wrapper">
+            <ul class="tag-desc fn-clear">
+                <#list tags as tag>
+                    <li>
+                        <a rel="nofollow" href="${servePath}/tag/${tag.tagURI}">
+                            <#if tag.tagIconPath!="">
+                                <img src="${tag.tagIconPath}" alt="${tag.tagTitle}"/>
+                            </#if>
+                            ${tag.tagTitle}
+                        </a>
+                    </li>
+                </#list>
+            </ul>
+        </div>
     </div>
-    <#include "footer.ftl">
+</#if>
+<div class="fn-hr10"></div>
+<div class="main">
+    <div class="wrapper">
+        <#if ADLabel != ''>
+            <div class="module">
+                <div class="module-header" style="background-color: #7ea5c8">
+                    <a href="${servePath}/about">${sponsorLabel}</a>
+                </div>
+                <div class="ad module-panel fn-clear">
+                    ${ADLabel}
+                </div>
+            </div>
+        </#if>
+        <div class="module">
+            <div class="module-header" style="background-color: #9cd462">
+                <a href="${servePath}/pre-post">${postArticleLabel}</a>
+            </div>
+            <div class="module-panel">
+                <ul class="module-list">
+                    <li><a class="title" href="${servePath}/activity/daily-checkin">${activityDailyCheckinLabel}</a>
+                    </li>
+                    <li><a class="title"
+                           href="${servePath}/activity/yesterday-liveness-reward">${activityYesterdayLivenessRewardLabel}</a>
+                    </li>
+                    <li><a class="title" href="${servePath}/activity/1A0001">${activity1A0001Label}</a></li>
+                    <li><a class="title" href="${servePath}/activity/character">${characterLabel}</a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="slogan">
+    ${indexIntroLabel}&nbsp;
+    <a href="https://github.com/88250/symphony" target="_blank">
+        <svg>
+            <use xlink:href="#github"></use>
+        </svg>
+    </a>
+</div>
+<#include "footer.ftl">
 </body>
 </html>

@@ -282,15 +282,30 @@ var ChatRoomChannel = {
           $('.list li:first').fadeIn(2000)
 
             // index
-            $("#chatRoomIndex").append("" +
-                "<li>" +
-                "<a href=\"/member/" + data.userName + "\">" +
-                "<span class=\"avatar-small slogan tooltipped tooltipped-se\" aria-label=\"" + data.userName + "\"" +
-                "style=\"background-image: url(" + data.userAvatarURL + ")\"></span>" +
-                "</a>" +
-                "<a href=\"javascript:void(0);\"" +
-                "class=\"title\">" + data.content + "</a>" +
+            if ($("#chatRoomIndex").has("#emptyChatRoom").length !== 0) {
+              $("#emptyChatRoom").remove();
+            }
+            $("#chatRoomIndex").prepend("" +
+                "<li class=\"fn-flex\">\n" +
+                "    <a rel=\"nofollow\" href=\"/member/" + data.userName + "\">\n" +
+                "        <div class=\"avatar tooltipped tooltipped-n\"\n" +
+                "             aria-label=\"" + data.userName + "\"\n" +
+                "             style=\"background-image:url('" + data.userAvatarURL + "')\"></div>\n" +
+                "    </a>\n" +
+                "    <div class=\"fn-flex-1\">\n" +
+                "        <div class=\"ft-smaller\">\n" +
+                "            <a rel=\"nofollow\" href=\"/member/" + data.userName + "\">\n" +
+                "                <span class=\"ft-gray\">" + data.userName + "</span>\n" +
+                "            </a>\n" +
+                "        </div>\n" +
+                "        <div class=\"vditor-reset comment\">\n" +
+                "            " + data.content + "\n" +
+                "        </div>\n" +
+                "    </div>\n" +
                 "</li>");
+          if ($("#chatRoomIndex").find("li").length == 11) {
+            $("#chatRoomIndex").find("li").last().remove();
+          }
           break
       }
     }
