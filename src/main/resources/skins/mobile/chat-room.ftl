@@ -75,7 +75,7 @@
                                 </li>
                             </#list>
                         </ul>
-                        <div id="more" onclick="ChatRoom.more()" style="cursor: pointer; color: rgba(0,0,0,0.54); padding: 0 15px">查看更多</div>
+                        <div id="more" onclick="ChatRoom.more()" style="cursor: pointer; color: rgba(0,0,0,0.54); padding: 0 15px"><#if !isLoggedIn>登录后</#if>查看更多</div>
                     </div>
                 </div>
                 <div class="side">
