@@ -957,6 +957,14 @@ public class UserProcessor {
     static void fillHomeUser(final Map<String, Object> dataModel, final JSONObject user, final RoleQueryService roleQueryService) {
         Escapes.escapeHTML(user);
         dataModel.put(User.USER, user);
+        final BeanManager beanManager = BeanManager.getInstance();
+        FollowQueryService followQueryService = beanManager.getReference(FollowQueryService.class);
+        final String userId = user.optString(Keys.OBJECT_ID);
+        dataModel.put(Follow.FOLLOWING_ID, userId);
+        final long followerCnt = followQueryService.getFollowerCount(userId, Follow.FOLLOWING_TYPE_C_USER);
+        dataModel.put("followerCount", followerCnt);
+        final long followingUserCnt = followQueryService.getFollowingCount(userId, Follow.FOLLOWING_TYPE_C_USER);
+        dataModel.put("followingUserCount", followingUserCnt);
 
         final String roleId = user.optString(User.USER_ROLE);
         final JSONObject role = roleQueryService.getRole(roleId);
