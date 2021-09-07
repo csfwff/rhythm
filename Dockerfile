@@ -1,4 +1,4 @@
-FROM maven:3.8-jdk-8-openj9 as MVN_BUILD
+FROM maven:3.8.2-openjdk-8 as MVN_BUILD
 
 WORKDIR /opt/sym/
 ADD . /tmp
