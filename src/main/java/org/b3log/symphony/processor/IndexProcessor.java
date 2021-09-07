@@ -293,9 +293,7 @@ public class IndexProcessor {
         final List<JSONObject> qaArticles = (List<JSONObject>) result.get(Article.ARTICLES);
         dataModel.put(Common.QNA,qaArticles);
 
-        final List<JSONObject> msgs = ChatroomProcessor.messages.stream().
-                map(msg -> JSONs.clone(msg).put(Common.TIME, Times.getTimeAgo(msg.optLong(Common.TIME), Locales.getLocale()))).collect(Collectors.toList());
-        dataModel.put(Common.MESSAGES, msgs);
+        dataModel.put(Common.MESSAGES, ChatroomProcessor.getMessages());
 
         dataModelService.fillHeaderAndFooter(context, dataModel);
         dataModelService.fillIndexTags(dataModel);

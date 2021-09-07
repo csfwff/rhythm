@@ -112,7 +112,6 @@
     ChatRoom.init();
     // Init [ChatRoom] channel
     ChatRoomChannel.init("${wsScheme}://${serverHost}:${serverPort}${contextPath}/chat-room-channel?user=" + Label.currentUserName);
-    var chatRoomMsgCnt = ${chatRoomMsgCnt};
 </script>
 </body>
 </html>

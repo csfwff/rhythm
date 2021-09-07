@@ -28,7 +28,9 @@ import org.b3log.latke.ioc.BeanManager;
 import org.b3log.latke.ioc.Inject;
 import org.b3log.latke.ioc.Singleton;
 import org.b3log.latke.model.User;
+import org.b3log.latke.repository.Query;
 import org.b3log.latke.repository.RepositoryException;
+import org.b3log.latke.repository.SortDirection;
 import org.b3log.latke.repository.Transaction;
 import org.b3log.latke.util.Locales;
 import org.b3log.latke.util.Times;
@@ -39,6 +41,7 @@ import org.b3log.symphony.processor.middleware.AnonymousViewCheckMidware;
 import org.b3log.symphony.processor.middleware.LoginCheckMidware;
 import org.b3log.symphony.processor.middleware.validate.ChatMsgAddValidationMidware;
 import org.b3log.symphony.repository.ChatRoomRepository;
+import org.b3log.symphony.repository.UserRepository;
 import org.b3log.symphony.service.*;
 import org.b3log.symphony.util.*;
 import org.json.JSONObject;
@@ -131,6 +134,9 @@ public class ChatroomProcessor {
     @Inject
     private ArticleQueryService articleQueryService;
 
+    /**
+     * Chat Room Repository.
+     */
     @Inject
     private ChatRoomRepository chatRoomRepository;
 
@@ -179,28 +185,12 @@ public class ChatroomProcessor {
         msg.put(Common.CONTENT, content);
         msg.put(Common.TIME, System.currentTimeMillis());
 
-        messages.addFirst(msg);
-        // final int maxCnt = Symphonys.CHATROOMMSGS_CNT;
-        final int maxCnt = Integer.MAX_VALUE - 1;
-        if (messages.size() > maxCnt) {
-            messages.remove(maxCnt);
-        }
-
-        // 聊天室内容保存到本地
-        try {
-            File file = new File("ChatRoom.tmp");
-            BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(file, true));
-            bufferedWriter.write(msg + "\n");
-            bufferedWriter.close();
-        } catch (Exception e) {
-            LOGGER.log(Level.ERROR, "Cannot write ChatRoom message to local storage device.", e);
-        }
-
+        // 聊天室内容保存到数据库
         final Transaction transaction = chatRoomRepository.beginTransaction();
         try {
-            chatRoomRepository.add(new JSONObject().put("content", "hello, this is a test"));
+            chatRoomRepository.add(new JSONObject().put("content", msg.toString()));
         } catch (RepositoryException e) {
-            e.printStackTrace();
+            LOGGER.log(Level.ERROR, "Cannot save ChatRoom message to the database.", e);
         }
         transaction.commit();
 
@@ -228,17 +218,32 @@ public class ChatroomProcessor {
     public void showChatRoom(final RequestContext context) {
         final AbstractFreeMarkerRenderer renderer = new SkinRenderer(context, "chat-room.ftl");
         final Map<String, Object> dataModel = renderer.getDataModel();
-
-        final List<JSONObject> msgs = messages.stream().
-                map(msg -> JSONs.clone(msg).put(Common.TIME, Times.getTimeAgo(msg.optLong(Common.TIME), Locales.getLocale()))).collect(Collectors.toList());
-        dataModel.put(Common.MESSAGES, msgs);
-        dataModel.put("chatRoomMsgCnt", Symphonys.CHATROOMMSGS_CNT);
-        dataModel.put(Common.ONLINE_CHAT_CNT, SESSIONS.size());
-
+        dataModel.put(Common.MESSAGES, getMessages());
+        dataModel.put(Common.ONLINE_CHAT_CNT, 0);
         dataModelService.fillHeaderAndFooter(context, dataModel);
         dataModelService.fillRandomArticles(dataModel);
         dataModelService.fillSideHotArticles(dataModel);
         dataModelService.fillSideTags(dataModel);
         dataModelService.fillLatestCmts(dataModel);
+    }
+
+    /**
+     * Get all messages from database.
+     *
+     * @return
+     */
+    public static List<JSONObject> getMessages() {
+        try {
+            final BeanManager beanManager = BeanManager.getInstance();
+            final ChatRoomRepository chatRoomRepository = beanManager.getReference(ChatRoomRepository.class);
+            List<JSONObject> messageList = chatRoomRepository.getList(new Query()
+                    .select("content")
+                    .setPage(1, 10)
+                    .addSort(Keys.OBJECT_ID, SortDirection.DESCENDING));
+            List<JSONObject> msgs = messageList.stream().map(msg -> new JSONObject(JSONs.clone(msg).optString("content"))).collect(Collectors.toList());
+            return msgs.stream().map(msg -> JSONs.clone(msg).put(Common.TIME, Times.getTimeAgo(msg.optLong(Common.TIME), Locales.getLocale()))).collect(Collectors.toList());
+        } catch (RepositoryException e) {
+            return new LinkedList<>();
+        }
     }
 }
