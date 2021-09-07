@@ -231,6 +231,51 @@ ${HeaderBannerLabel}
                 </div>
             </div>
         </div>
+
+        <div class="wrapper">
+            <div class="fn-flex-1">
+                <div class="metro-line fn-flex">
+                    <div class="metro-item">
+                        <a class="preview" href="${servePath}/activity/daily-checkin">
+                            <img src="https://pwl.stackoverflow.wiki/2021/09/签到-f95cfc2f.png" alt="每日签到">
+                            <b>每日签到</b>
+                        </a>
+                    </div>
+                    <div class="metro-item">
+                        <a class="preview" href="${servePath}/activity/yesterday-liveness-reward">
+                            <img src="https://pwl.stackoverflow.wiki/2021/09/Reward-401eafa5.png" alt="领取昨日活跃奖励">
+                            <b>领取昨日活跃奖励</b>
+                        </a>
+                    </div>
+                    <div class="metro-item">
+                        <a class="preview" href="${servePath}/cr">
+                            <img src="https://pwl.stackoverflow.wiki/2021/09/多人在线聊天，聊天，群聊-2b7e898f.png" alt="聊天室">
+                            <b>聊天室</b>
+                        </a>
+                    </div>
+                    <div class="metro-item">
+                        <a class="preview" href="${servePath}/activity/eating-snake">
+                            <img src="https://pwl.stackoverflow.wiki/2021/09/snake-b6dbc348.png" alt="贪吃蛇">
+                            <b>贪吃蛇</b>
+                        </a>
+                    </div>
+                    <div class="metro-item">
+                        <a class="preview" href="${servePath}/activity/gobang">
+                            <img src="https://pwl.stackoverflow.wiki/2021/09/围棋-9195fb7f.png" alt="五子棋">
+                            <b>五子棋</b>
+                        </a>
+                    </div>
+                </div>
+
+                <div class="metro-border fn-flex">
+                    <div></div>
+                    <div class="green"></div>
+                    <div class="yellow"></div>
+                    <div class="red"></div>
+                    <div class="purple"></div>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 </div>
