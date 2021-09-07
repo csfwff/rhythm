@@ -40,6 +40,9 @@ import org.b3log.symphony.service.*;
 import org.b3log.symphony.util.*;
 import org.json.JSONObject;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -171,9 +174,20 @@ public class ChatroomProcessor {
         msg.put(Common.TIME, System.currentTimeMillis());
 
         messages.addFirst(msg);
-        final int maxCnt = Symphonys.CHATROOMMSGS_CNT;
+        // final int maxCnt = Symphonys.CHATROOMMSGS_CNT;
+        final int maxCnt = Integer.MAX_VALUE - 1;
         if (messages.size() > maxCnt) {
             messages.remove(maxCnt);
+        }
+
+        // 聊天室内容保存到本地
+        try {
+            File file = new File("ChatRoom.tmp");
+            BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(file, true));
+            bufferedWriter.write(msg + "\n");
+            bufferedWriter.close();
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, "Cannot write ChatRoom message to local storage device.", e);
         }
 
         final JSONObject pushMsg = JSONs.clone(msg);

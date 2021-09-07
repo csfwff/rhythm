@@ -31,11 +31,15 @@ import org.b3log.latke.util.Strings;
 import org.b3log.symphony.cache.DomainCache;
 import org.b3log.symphony.cache.TagCache;
 import org.b3log.symphony.event.*;
+import org.b3log.symphony.processor.ChatroomProcessor;
 import org.b3log.symphony.processor.Router;
 import org.b3log.symphony.service.CronMgmtService;
 import org.b3log.symphony.service.InitMgmtService;
 import org.b3log.symphony.util.Markdowns;
 import org.b3log.symphony.util.Symphonys;
+import org.json.JSONObject;
+
+import java.io.*;
 
 /**
  * Server.
@@ -203,6 +207,24 @@ public final class Server extends BaseServer {
         Stopwatchs.end();
         LOGGER.log(Level.DEBUG, "Stopwatch: {}{}", Strings.LINE_SEPARATOR, Stopwatchs.getTimingStat());
         Stopwatchs.release();
+
+        // 聊天室内容读取
+        try {
+            LOGGER.log(Level.INFO, "Loading ChatRoom histories, please wait a moment...");
+            File file = new File("ChatRoom.tmp");
+            BufferedReader bufferedReader = new BufferedReader(new FileReader(file));
+            String line;
+            while ((line = bufferedReader.readLine()) != null) {
+                try {
+                    ChatroomProcessor.messages.addFirst(new JSONObject(line));
+                } catch (Exception ignored) {
+                }
+            }
+            bufferedReader.close();
+            LOGGER.log(Level.INFO, "ChatRoom messages has been loaded from: " + file.getAbsoluteFile());
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, "Cannot load ChatRoom message from local storage device.", e);
+        }
 
         final Server server = new Server();
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
