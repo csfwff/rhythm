@@ -93,7 +93,7 @@ var ChatRoom = {
         }],
       height: 200,
       counter: 4096,
-      placeholder: 'Say sth...',
+      placeholder: '聊天室历史记录将永久保存，在发送消息前请三思而后行。',
       ctrlEnter: function () {
         ChatRoom.send()
       },
@@ -141,5 +141,54 @@ var ChatRoom = {
       },
     })
   },
+  /**
+   * 获取更多内容
+   * @returns {undefined}
+   */
+  more: function () {
+    page++;
+    $.ajax({
+      url: Label.servePath + '/chat-room/more?page=' + page,
+      type: 'GET',
+      cache: false,
+      success: function(result) {
+        if (result.data.length !== 0) {
+          for (let i in result.data) {
+            let data = result.data[i];
+            let avatarPart = '<a rel="nofollow" href="/member/' + data.userName +
+                '">'
+                + '<div class="avatar tooltipped tooltipped-se" aria-label="' +
+                data.userName
+                + '" style="background-image:url(' + data.userAvatarURL +
+                ')"></div>'
+                + '</a>'
+
+            let namePart = '<a rel="nofollow" href="/member/' + data.userName +
+                '"><span class="ft-gray">' + data.userName +
+                '</span></a> <span class="ft-fade"> • ' + data.time + '</span>'
+
+            let liHTML = '<li class="fn-none">'
+                + '<div class="fn-flex">'
+                + avatarPart
+                + '<div class="fn-flex-1">'
+                + '<div class="ft-smaller">'
+                + namePart
+                + '</div>'
+                + '<div class="vditor-reset comment">'
+                + data.content
+                + '</div>'
+                + '</div>'
+                + '</div>'
+                + '</li>'
+            $('.list ul li:last').after(liHTML);
+            $('.list li:last').slideDown(200)
+          }
+        } else {
+          $("#more").removeAttr("onclick");
+          $("#more").html("已经到底啦！");
+        }
+      }
+    });
+  }
 }
 

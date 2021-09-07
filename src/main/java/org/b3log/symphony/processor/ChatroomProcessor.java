@@ -17,6 +17,7 @@
  */
 package org.b3log.symphony.processor;
 
+import com.sun.org.apache.bcel.internal.generic.RETURN;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -44,8 +45,10 @@ import org.b3log.symphony.repository.ChatRoomRepository;
 import org.b3log.symphony.repository.UserRepository;
 import org.b3log.symphony.service.*;
 import org.b3log.symphony.util.*;
+import org.json.JSONArray;
 import org.json.JSONObject;
 
+import javax.xml.ws.Dispatch;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
@@ -152,6 +155,7 @@ public class ChatroomProcessor {
         final ChatroomProcessor chatroomProcessor = beanManager.getReference(ChatroomProcessor.class);
         Dispatcher.post("/chat-room/send", chatroomProcessor::addChatRoomMsg, loginCheck::handle, chatMsgAddValidationMidware::handle);
         Dispatcher.get("/cr", chatroomProcessor::showChatRoom, anonymousViewCheckMidware::handle);
+        Dispatcher.get("/chat-room/more", chatroomProcessor::getMore, loginCheck::handle);
     }
 
     /**
@@ -218,7 +222,7 @@ public class ChatroomProcessor {
     public void showChatRoom(final RequestContext context) {
         final AbstractFreeMarkerRenderer renderer = new SkinRenderer(context, "chat-room.ftl");
         final Map<String, Object> dataModel = renderer.getDataModel();
-        dataModel.put(Common.MESSAGES, getMessages());
+        dataModel.put(Common.MESSAGES, getMessages(1));
         dataModel.put(Common.ONLINE_CHAT_CNT, 0);
         dataModelService.fillHeaderAndFooter(context, dataModel);
         dataModelService.fillRandomArticles(dataModel);
@@ -228,17 +232,35 @@ public class ChatroomProcessor {
     }
 
     /**
+     * Get more chat room histories.
+     * @param context
+     */
+    public void getMore(final RequestContext context) {
+        try {
+            int page = Integer.parseInt(context.param("page"));
+            List<JSONObject> jsonObject = getMessages(page);
+            JSONObject ret = new JSONObject();
+            ret.put(Keys.CODE, StatusCodes.SUCC);
+            ret.put(Keys.MSG, "");
+            ret.put(Keys.DATA, jsonObject);
+            context.renderJSON(ret);
+        } catch (Exception e) {
+            context.sendStatus(500);
+        }
+    }
+
+    /**
      * Get all messages from database.
      *
      * @return
      */
-    public static List<JSONObject> getMessages() {
+    public static List<JSONObject> getMessages(int page) {
         try {
             final BeanManager beanManager = BeanManager.getInstance();
             final ChatRoomRepository chatRoomRepository = beanManager.getReference(ChatRoomRepository.class);
             List<JSONObject> messageList = chatRoomRepository.getList(new Query()
                     .select("content")
-                    .setPage(1, 10)
+                    .setPage(page, 10)
                     .addSort(Keys.OBJECT_ID, SortDirection.DESCENDING));
             List<JSONObject> msgs = messageList.stream().map(msg -> new JSONObject(JSONs.clone(msg).optString("content"))).collect(Collectors.toList());
             return msgs.stream().map(msg -> JSONs.clone(msg).put(Common.TIME, Times.getTimeAgo(msg.optLong(Common.TIME), Locales.getLocale()))).collect(Collectors.toList());

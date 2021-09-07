@@ -82,6 +82,7 @@
                         </li>
                     </#list>
                 </ul>
+                <div id="more" onclick="ChatRoom.more()" style="cursor: pointer; color: rgba(0,0,0,0.54); padding: 0 15px">查看更多</div>
             </div>
         </div>
         <div class="side">
@@ -112,6 +113,7 @@
     ChatRoom.init();
     // Init [ChatRoom] channel
     ChatRoomChannel.init("${wsScheme}://${serverHost}:${serverPort}${contextPath}/chat-room-channel?user=" + Label.currentUserName);
+    var page = 1;
 </script>
 </body>
 </html>

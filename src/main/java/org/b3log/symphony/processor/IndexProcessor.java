@@ -293,7 +293,7 @@ public class IndexProcessor {
         final List<JSONObject> qaArticles = (List<JSONObject>) result.get(Article.ARTICLES);
         dataModel.put(Common.QNA,qaArticles);
 
-        dataModel.put(Common.MESSAGES, ChatroomProcessor.getMessages());
+        dataModel.put(Common.MESSAGES, ChatroomProcessor.getMessages(1));
 
         dataModelService.fillHeaderAndFooter(context, dataModel);
         dataModelService.fillIndexTags(dataModel);
