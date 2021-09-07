@@ -112,21 +112,38 @@
         </div>
         <div class="fn-hr10"></div>
         <ul class="status fn-flex">
-            <li>
+            <li id="userTags">
                 <strong>${user.userTagCount?c}</strong>
                 <span class="ft-gray">${tagLabel}</span>
             </li>
-            <li>
+            <li id="userArticles">
                 <strong>${user.userArticleCount?c}</strong>
                 <span class="ft-gray">${articleLabel}</span>
             </li>
-            <li>
+            <li id="userComments">
                 <strong>${user.userCommentCount?c}</strong>
                 <span class="ft-gray">${cmtLabel}</span>
+            </li>
+            <li id="userFollower" style="cursor:pointer;">
+                <strong>${followerCount}</strong>
+                <span class="ft-gray">${followersLabel}</span>
+            </li>
+            <li id="userFollowing" style="cursor:pointer;">
+                <strong>${followingUserCount}</strong>
+                <span class="ft-gray">${followingUsersLabel}</span>
             </li>
         </ul>
     </div>
 </div>
+
+<script>
+    document.getElementById("userFollower").addEventListener("click", function () {
+        window.location.href = "${servePath}/member/${user.userName}/followers";
+    });
+    document.getElementById("userFollowing").addEventListener("click", function () {
+        window.location.href = "${servePath}/member/${user.userName}/following/users";
+    });
+</script>
 
 <div id="reportDialog">
     <div class="form fn-clear">
