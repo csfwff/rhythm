@@ -114,6 +114,7 @@
     // Init [ChatRoom] channel
     ChatRoomChannel.init("${wsScheme}://${serverHost}:${serverPort}${contextPath}/chat-room-channel?user=" + Label.currentUserName);
     var page = 1;
+    ChatRoom.more();
 </script>
 </body>
 </html>
