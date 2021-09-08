@@ -1449,3 +1449,14 @@ a[class*=" icon-"]:hover {
   right: 15px;
   border-radius: 0 3px 3px 0;
 }
+
+
+.blur img {
+  -webkit-filter: blur(20px) saturate(1.4);
+  filter:blur(20px) saturate(1.4);
+  transition:all .15s ease-in-out
+}
+.blur img:hover {
+  filter: none;
+  -webkit-filter: none;
+}
