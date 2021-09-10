@@ -132,7 +132,7 @@ ${HeaderBannerLabel}
                                                         <span class="ft-gray">${msg.userName}</span>
                                                     </a>
                                                 </div>
-                                                <div class="vditor-reset comment blur">
+                                                <div class="vditor-reset comment">
                                                     ${msg.content}
                                                 </div>
                                             </div>

@@ -174,7 +174,7 @@ var ChatRoom = {
                 + '<div class="ft-smaller">'
                 + namePart
                 + '</div>'
-                + '<div class="vditor-reset comment">'
+                + '<div class="vditor-reset comment blur">'
                 + data.content
                 + '</div>'
                 + '</div>'

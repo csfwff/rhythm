@@ -75,7 +75,7 @@
                                              • ${msg.time}
                                         </span>
                                 </div>
-                                <div class="vditor-reset comment blur">
+                                <div class="vditor-reset comment">
                                     ${msg.content}
                                 </div>
                             </div>
