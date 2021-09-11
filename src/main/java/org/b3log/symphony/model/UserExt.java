@@ -95,9 +95,14 @@ public final class UserExt {
     public static final String USER_LIST_VIEW_MODE = "userListViewMode";
 
     /**
-     * Key of user breezemoons status
+     * Key of user breezemoons status.
      */
     public static final String USER_BREEZEMOON_STATUS = "userBreezemoonStatus";
+
+    /**
+     * Key of chat room picture status.
+     */
+    public static final String CHAT_ROOM_PICTURE_STATUS = "chatRoomPictureStatus";
 
     /**
      * Key of user point status.
@@ -600,13 +605,14 @@ public final class UserExt {
      * @return {@code true} if it is, returns {@code false} otherwise
      */
     public static boolean isValidMailDomain(final String email) {
-        final String whitelistMailDomains = Symphonys.MAIL_DOMAINS;
+        /* final String whitelistMailDomains = Symphonys.MAIL_DOMAINS;
         if (StringUtils.isBlank(whitelistMailDomains)) {
             return true;
         }
 
         final String domain = StringUtils.substringAfter(email, "@");
-        return StringUtils.containsIgnoreCase(whitelistMailDomains, domain);
+        return StringUtils.containsIgnoreCase(whitelistMailDomains, domain); */
+        return true;
     }
 
     /**

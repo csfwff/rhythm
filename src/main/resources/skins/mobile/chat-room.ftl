@@ -68,7 +68,7 @@
                                          • ${msg.time}
                                     </span>
                                         </div>
-                                        <div class="vditor-reset comment blur">
+                                        <div class="vditor-reset comment<#if 0 == chatRoomPictureStatus> blur</#if>">
                                             ${msg.content}
                                         </div>
                                     </div>
@@ -108,6 +108,7 @@
             ChatRoomChannel.init("${wsScheme}://${serverHost}:${serverPort}${contextPath}/chat-room-channel?user=" + Label.currentUserName);
             var page = 1;
             ChatRoom.more();
+            var chatRoomPictureStatus = "<#if 0 == chatRoomPictureStatus> blur</#if>";
         </script>
     </body>
 </html>

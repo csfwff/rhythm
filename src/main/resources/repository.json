@@ -1541,6 +1541,11 @@
           "description": "0：公开清风明月列表，1：不公开清风明月列表"
         },
         {
+          "name": "chatRoomPictureStatus",
+          "type": "int",
+          "description": "0: 聊天室图片自动模糊，2: 聊天室图片不自动模糊"
+        },
+        {
           "name": "userFollowerStatus",
           "type": "int",
           "description": "0：公开关注者列表，1：不公开关注者列表"

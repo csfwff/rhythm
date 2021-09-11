@@ -267,6 +267,9 @@ public class IndexProcessor {
      * @param context the specified context
      */
     public void showIndex(final RequestContext context) {
+        final AbstractFreeMarkerRenderer renderer = new SkinRenderer(context, "index.ftl");
+        final Map<String, Object> dataModel = renderer.getDataModel();
+
         final JSONObject currentUser = Sessions.getUser();
         if (null != currentUser) {
             // 自定义首页跳转 https://github.com/b3log/symphony/issues/774
@@ -275,10 +278,10 @@ public class IndexProcessor {
                 context.sendRedirect(indexRedirectURL);
                 return;
             }
+            dataModel.put(UserExt.CHAT_ROOM_PICTURE_STATUS, currentUser.optInt(UserExt.CHAT_ROOM_PICTURE_STATUS));
+        } else {
+            dataModel.put(UserExt.CHAT_ROOM_PICTURE_STATUS, UserExt.USER_XXX_STATUS_C_ENABLED);
         }
-
-        final AbstractFreeMarkerRenderer renderer = new SkinRenderer(context, "index.ftl");
-        final Map<String, Object> dataModel = renderer.getDataModel();
 
         final List<JSONObject> recentArticles = articleQueryService.getIndexRecentArticles();
         dataModel.put(Common.RECENT_ARTICLES, recentArticles);

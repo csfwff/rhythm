@@ -101,7 +101,7 @@ ${HeaderBannerLabel}
                                                 <span class="ft-gray">${msg.userName}</span>
                                             </a>
                                         </div>
-                                        <div class="vditor-reset comment blur">
+                                        <div class="vditor-reset comment<#if 0 == chatRoomPictureStatus> blur</#if>">
                                             ${msg.content}
                                         </div>
                                     </div>
@@ -176,4 +176,7 @@ ${HeaderBannerLabel}
 </div>
 <#include "footer.ftl">
 </body>
+<script>
+    var chatRoomPictureStatus = "<#if 0 == chatRoomPictureStatus> blur</#if>";
+</script>
 </html>

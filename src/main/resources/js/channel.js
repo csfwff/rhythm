@@ -264,7 +264,7 @@ var ChatRoomChannel = {
             + '<div class="ft-smaller">'
             + namePart
             + '</div>'
-            + '<div class="vditor-reset comment blur">'
+            + '<div class="vditor-reset comment' + chatRoomPictureStatus + '">'
             + data.content
             + '</div>'
             + '</div>'
@@ -298,7 +298,7 @@ var ChatRoomChannel = {
               "                <span class=\"ft-gray\">" + data.userName + "</span>\n" +
               "            </a>\n" +
               "        </div>\n" +
-              "        <div class=\"vditor-reset comment blur\">\n" +
+              "        <div class=\"vditor-reset comment" + chatRoomPictureStatus + "\">\n" +
               "            " + data.content + "\n" +
               "        </div>\n" +
               "    </div>\n" +

@@ -482,6 +482,7 @@ var Settings = {
           userReplyWatchArticleStatus: $('#userReplyWatchArticleStatus').
             prop('checked'),
           userForwardPageStatus: $('#userForwardPageStatus').prop('checked'),
+          chatRoomPictureStatus: $('#chatRoomPictureStatus').prop('checked')
         }
 
         break

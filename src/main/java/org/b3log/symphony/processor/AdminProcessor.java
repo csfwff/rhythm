@@ -1443,6 +1443,7 @@ public class AdminProcessor {
                 case UserExt.USER_UA_STATUS:
                 case UserExt.USER_JOIN_POINT_RANK:
                 case UserExt.USER_JOIN_USED_POINT_RANK:
+                case UserExt.CHAT_ROOM_PICTURE_STATUS:
                 case UserExt.USER_FORWARD_PAGE_STATUS:
                     user.put(name, Integer.valueOf(value));
                     break;

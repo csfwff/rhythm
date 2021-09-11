@@ -132,7 +132,7 @@ ${HeaderBannerLabel}
                                                         <span class="ft-gray">${msg.userName}</span>
                                                     </a>
                                                 </div>
-                                                <div class="vditor-reset comment blur">
+                                                <div class="vditor-reset comment<#if 0 == chatRoomPictureStatus> blur</#if>">
                                                     ${msg.content}
                                                 </div>
                                             </div>
@@ -326,6 +326,8 @@ ${HeaderBannerLabel}
     }
 
     ChatRoomChannel.init("${wsScheme}://${serverHost}:${serverPort}${contextPath}/chat-room-channel?type=index&user=" + Label.currentUserName);
+
+    var chatRoomPictureStatus = "<#if 0 == chatRoomPictureStatus> blur</#if>";
 </script>
 </body>
 </html>

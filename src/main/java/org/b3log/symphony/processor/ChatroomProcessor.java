@@ -18,6 +18,7 @@
 package org.b3log.symphony.processor;
 
 import com.sun.org.apache.bcel.internal.generic.RETURN;
+import org.apache.commons.lang.StringUtils;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -224,6 +225,12 @@ public class ChatroomProcessor {
         final Map<String, Object> dataModel = renderer.getDataModel();
         dataModel.put(Common.MESSAGES, getMessages(1));
         dataModel.put(Common.ONLINE_CHAT_CNT, 0);
+        final JSONObject currentUser = Sessions.getUser();
+        if (null != currentUser) {
+            dataModel.put(UserExt.CHAT_ROOM_PICTURE_STATUS, currentUser.optInt(UserExt.CHAT_ROOM_PICTURE_STATUS));
+        } else {
+            dataModel.put(UserExt.CHAT_ROOM_PICTURE_STATUS, UserExt.USER_XXX_STATUS_C_ENABLED);
+        }
         dataModelService.fillHeaderAndFooter(context, dataModel);
         dataModelService.fillRandomArticles(dataModel);
         dataModelService.fillSideHotArticles(dataModel);

@@ -69,6 +69,12 @@
                 ${useForwardPageLabel}
             </label>
         </div>
+        <div class="fn-clear">
+            <label>
+                <input id="chatRoomPictureStatus" <#if 0 == currentUser.chatRoomPictureStatus> checked="checked"</#if> type="checkbox" />
+                ${chatRoomPictureStatusLabel}
+            </label>
+        </div>
         <div class="fn-clear"></div>
         <div id="functionTip" class="tip"></div>
         <div class="fn-hr5"></div>
