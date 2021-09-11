@@ -2412,3 +2412,15 @@ only screen and (device-width: 414px) and (device-height: 896px) and (-webkit-de
     padding-bottom: 22px;
   }
 }
+
+
+
+.blur img {
+  -webkit-filter: blur(20px) saturate(1.4);
+  filter:blur(20px) saturate(1.4);
+  transition:all .15s ease-in-out
+}
+.blur img:hover {
+  filter: none;
+  -webkit-filter: none;
+}
