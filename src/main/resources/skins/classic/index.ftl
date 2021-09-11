@@ -243,7 +243,7 @@ ${HeaderBannerLabel}
                     </div>
                     <div class="metro-item">
                         <a class="preview" href="${servePath}/activity/yesterday-liveness-reward">
-                            <img src="https://pwl.stackoverflow.wiki/2021/09/Reward-401eafa5.png" alt="领取昨日活跃奖励">
+                            <img src="https://pwl.stackoverflow.wiki/2021/09/红包-(1)-6e07f7a0.png" alt="领取昨日活跃奖励">
                             <b>领取昨日活跃奖励</b>
                         </a>
                     </div>
