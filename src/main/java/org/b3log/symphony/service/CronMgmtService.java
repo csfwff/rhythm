@@ -24,6 +24,7 @@ import org.b3log.latke.ioc.Inject;
 import org.b3log.latke.service.annotation.Service;
 import org.b3log.latke.util.Stopwatchs;
 import org.b3log.symphony.util.Symphonys;
+import org.b3log.symphony.util.Vocation;
 
 import java.util.concurrent.TimeUnit;
 
@@ -107,6 +108,17 @@ public class CronMgmtService {
      */
     public void start() {
         long delay = 10000;
+
+        Symphonys.SCHEDULED_EXECUTOR_SERVICE.scheduleAtFixedRate(() -> {
+            try {
+                Vocation.refresh();
+            } catch (final Exception e) {
+                LOGGER.log(Level.ERROR, "Executes cron failed", e);
+            } finally {
+                Stopwatchs.release();
+            }
+        }, delay, 30 * 60 * 1000, TimeUnit.MILLISECONDS);
+        delay += 2000;
 
         Symphonys.SCHEDULED_EXECUTOR_SERVICE.scheduleAtFixedRate(() -> {
             try {

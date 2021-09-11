@@ -25,7 +25,7 @@
     <@head title="${symphonyLabel}">
         <meta name="description" content="${symDescriptionLabel}"/>
     </@head>
-    <link rel="stylesheet" href="${staticServePath}/css/index.css?${staticResourceVersion}" />
+    <link rel="stylesheet" href="${staticServePath}/css/index.css?${staticResourceVersion}"/>
     <link rel="canonical" href="${servePath}">
 </head>
 <body class="index">
@@ -48,8 +48,10 @@ ${HeaderBannerLabel}
                                           aria-label="${article.articleAuthorName}"
                                           style="background-image:url('${article.articleAuthorThumbnailURL20}')"></span>
                             </a>
-                            <a rel="nofollow" class="title fn-ellipsis fn-flex-1" href="${servePath}${article.articlePermalink}">${article.articleTitleEmoj}</a>
-                            <a class="fn-right count ft-gray ft-smaller" href="${servePath}${article.articlePermalink}"><#if article.articleViewCount < 1000>
+                            <a rel="nofollow" class="title fn-ellipsis fn-flex-1"
+                               href="${servePath}${article.articlePermalink}">${article.articleTitleEmoj}</a>
+                            <a class="fn-right count ft-gray ft-smaller"
+                               href="${servePath}${article.articlePermalink}"><#if article.articleViewCount < 1000>
                                     ${article.articleViewCount}<#else>${article.articleViewCntDisplayFormat}</#if></a>
                         </li>
                     </#list>
@@ -72,8 +74,10 @@ ${HeaderBannerLabel}
                                           aria-label="${article.articleAuthorName}"
                                           style="background-image:url('${article.articleAuthorThumbnailURL20}')"></span>
                             </a>
-                            <a rel="nofollow" class="title fn-ellipsis fn-flex-1" href="${servePath}${article.articlePermalink}">${article.articleTitleEmoj}</a>
-                            <a class="fn-right count ft-gray ft-smaller" href="${servePath}${article.articlePermalink}"><#if article.articleViewCount < 1000>
+                            <a rel="nofollow" class="title fn-ellipsis fn-flex-1"
+                               href="${servePath}${article.articlePermalink}">${article.articleTitleEmoj}</a>
+                            <a class="fn-right count ft-gray ft-smaller"
+                               href="${servePath}${article.articlePermalink}"><#if article.articleViewCount < 1000>
                                     ${article.articleViewCount}<#else>${article.articleViewCntDisplayFormat}</#if></a>
                         </li>
                     </#list>
@@ -100,141 +104,19 @@ ${HeaderBannerLabel}
             </div>
         </div>
     </div>
-    <div style="background-color:#f6f8fa;padding-top:10px;">
-        <div class="wrapper">
-            <div class="index-recent fn-flex-1">
-                <div style="border-bottom: 1px solid #eee;margin:0px 10px ;">
-                    <a href="${servePath}/cr" style="float:left;font-size:13px;margin:5px 0 10px 0; font-weight:bold;">实时聊天室</a>
-                    <div style="clear:both;"></div>
-                </div>
-                <div class="module-panel">
-                    <div class="module-header form">
-                        <input id="chatRoomInput"
-                               type="text"
-                               class="comment__text breezemoon__input"
-                               placeholder="${chatRoomLabel}"/>
-                        <span id="chatRoomPostBtn" class="btn breezemoon__btn" data-csrf="${csrfToken}" onclick="sendChat()">Biu~</span>
-                    </div>
-                    <div class="module-panel">
-                        <ul class="module-list" id="chatRoomIndex">
-                            <#if messages?size != 0>
-                                <#list messages as msg>
-                                    <#if msg_index <= 9>
-                                        <li class="fn-flex" style='border-bottom: 1px solid #eee;'>
-                                            <a rel="nofollow" href="${servePath}/member/${msg.userName}">
-                                                <div class="avatar tooltipped tooltipped-n"
-                                                     aria-label="${msg.userName}"
-                                                     style="background-image:url('${msg.userAvatarURL}')"></div>
-                                            </a>
-                                            <div class="fn-flex-1">
-                                                <div class="ft-smaller">
-                                                    <a rel="nofollow" href="${servePath}/member/${msg.userName}">
-                                                        <span class="ft-gray">${msg.userName}</span>
-                                                    </a>
-                                                </div>
-                                                <div class="vditor-reset comment<#if 0 == chatRoomPictureStatus> blur</#if>">
-                                                    ${msg.content}
-                                                </div>
-                                            </div>
-                                        </li>
-                                    </#if>
-                                </#list>
-                            <#else>
-                                <li class="ft-center ft-gray" id="emptyChatRoom">${chickenEggLabel}</li>
-                            </#if>
-                        </ul>
-                    </div>
-                </div>
-            </div>
 
-            <div class="index-recent fn-flex-1">
-                <div style="border-bottom: 1px solid #eee;margin:0px 10px ;">
-                    <div style="float:left;font-size:13px;margin:5px 0 10px 0; font-weight:bold;">标签</div>
-                    <div style="float:right;font-size:13px;margin:5px 0 0 0;"><a href="${servePath}/tags">更多</a></div>
-                    <div style="clear:both;"></div>
-                </div>
-                <div class="module-panel">
-                    <div class="index-user">
-                        <#list tags as tag>
-                            <#if tag_index <= 20>
-                                <div class="tag-metro-item">
-                                    <a class="preview" href="${servePath}/tag/${tag.tagURI}">
-                                        <img src="${tag.tagIconPath}" alt="${tag.tagTitle}" >
-                                        <b>${tag.tagTitle}</b>
-                                    </a>
-                                </div>
-                            </#if>
-                        </#list>
-                    </div>
-                </div>
-
-                <div style="border-bottom: 1px solid #eee;margin:0px 10px ;">
-                    <div style="float:left;font-size:13px;margin:5px 0 10px 0; font-weight:bold;">问答</div>
-                    <div style="float:right;font-size:13px;margin:5px 0 0 0;"><a href="${servePath}/qna">更多</a></div>
-                    <div style="clear:both;"></div>
-                </div>
-                <div class="module-panel">
-                    <ul class="module-list">
-                        <#list qna as article>
-                            <#if article_index <= 8>
-                                <li class="fn-flex">
-                                    <a rel="nofollow" href="${servePath}/member/${article.articleAuthorName}">
-                                    <span class="avatar-small tooltipped tooltipped-se slogan"
-                                          aria-label="${article.articleAuthorName}"
-                                          style="background-image:url('${article.articleAuthorThumbnailURL20}')"></span>
-                                    </a>
-                                    <a rel="nofollow" class="title fn-ellipsis fn-flex-1" href="${servePath}${article.articlePermalink}">${article.articleTitleEmoj}</a>
-                                    <a class="fn-right count ft-gray ft-smaller" href="${servePath}${article.articlePermalink}"><#if article.articleViewCount < 1000>
-                                            ${article.articleViewCount}<#else>${article.articleViewCntDisplayFormat}</#if></a>
-                                </li>
-                            </#if>
-                        </#list>
-                    </ul>
-                </div>
-            </div>
-
-            <div class="index-recent fn-flex-1">
-                <div style="border-bottom: 1px solid #eee;margin:0px 10px ;">
-                    <div style="float:left;font-size:13px;margin:5px 0 10px 0; font-weight:bold;">清风明月</div>
-                    <a href="${servePath}/article/1630938317106" title="清风明月是什么？" style="float: right; margin: 5px 0 10px 0">
-                        <svg><use xlink:href="#iconQuestion"></use></svg>
-                    </a>
-                    <div style="clear:both;"></div>
-                </div>
-                <div class="module-panel">
-                    <div class="module-header form">
-                        <input id="breezemoonInput"
-                               type="text"
-                               class="comment__text breezemoon__input"
-                               placeholder="${breezemoonLabel}"/>
-                        <span id="breezemoonPostBtn" class="btn breezemoon__btn" data-csrf="${csrfToken}">${postLabel}</span>
-                    </div>
-                    <div class="module-panel">
-                        <ul class="module-list">
-                            <#list sideBreezemoons as item>
-                                <#if item_index <= 12>
-                                    <li>
-                                        <a href="${servePath}/member/${item.breezemoonAuthorName}">
-                    <span class="avatar-small slogan tooltipped tooltipped-se" aria-label="${item.breezemoonAuthorName}"
-                          style="background-image: url(${item.breezemoonAuthorThumbnailURL48})"></span>
-                                        </a>
-                                        <a href="${servePath}/member/${item.breezemoonAuthorName}/breezemoons/${item.oId}"
-                                           class="title">${item.breezemoonContent}</a>
-                                    </li>
-                                </#if>
-                            </#list>
-                            <#if sideBreezemoons?size == 0>
-                                <li class="ft-center ft-gray">${chickenEggLabel}</li>
-                            </#if>
-                        </ul>
-                    </div>
-                </div>
-            </div>
-        </div>
-
+    <div style="background-color:#f6f8fa;">
         <div class="wrapper">
             <div class="fn-flex-1">
                 <div class="metro-line fn-flex">
+                    <div class="metro-item">
+                        <div style="padding-top: 12%">
+                            <div style="font-size: 13px; color: rgba(101,101,104,0.91)" id="vLine1">距离放假还有 🎉</div>
+                            <div style="font-size: 80px; font-weight: bold; color: #fc7a15" id="vLine2"><span
+                                        id="vDay">?</span><span style="font-size: 30px"> 天</span></div>
+                            <div style="font-size: 10px; color: rgba(161,163,163,0.91)" id="vLine3">我还在编......</div>
+                        </div>
+                    </div>
                     <div class="metro-item">
                         <a class="preview" href="${servePath}/activity/daily-checkin">
                             <img src="https://pwl.stackoverflow.wiki/2021/09/签到-f95cfc2f.png" alt="每日签到">
@@ -273,6 +155,150 @@ ${HeaderBannerLabel}
                     <div class="yellow"></div>
                     <div class="red"></div>
                     <div class="purple"></div>
+                    <div class="green"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div style="background-color:#f6f8fa;padding-top:40px;">
+        <div class="wrapper">
+            <div class="index-recent fn-flex-1">
+                <div style="border-bottom: 1px solid #eee;margin:0px 10px ;">
+                    <a href="${servePath}/cr"
+                       style="float:left;font-size:13px;margin:5px 0 10px 0; font-weight:bold;">实时聊天室</a>
+                    <div style="clear:both;"></div>
+                </div>
+                <div class="module-panel">
+                    <div class="module-header form">
+                        <input id="chatRoomInput"
+                               type="text"
+                               class="comment__text breezemoon__input"
+                               placeholder="${chatRoomLabel}"/>
+                        <span id="chatRoomPostBtn" class="btn breezemoon__btn" data-csrf="${csrfToken}"
+                              onclick="sendChat()">Biu~</span>
+                    </div>
+                    <div class="module-panel">
+                        <ul class="module-list" id="chatRoomIndex">
+                            <#if messages?size != 0>
+                                <#list messages as msg>
+                                    <#if msg_index <= 9>
+                                        <li class="fn-flex" style='border-bottom: 1px solid #eee;'>
+                                            <a rel="nofollow" href="${servePath}/member/${msg.userName}">
+                                                <div class="avatar tooltipped tooltipped-n"
+                                                     aria-label="${msg.userName}"
+                                                     style="background-image:url('${msg.userAvatarURL}')"></div>
+                                            </a>
+                                            <div class="fn-flex-1">
+                                                <div class="ft-smaller">
+                                                    <a rel="nofollow" href="${servePath}/member/${msg.userName}">
+                                                        <span class="ft-gray">${msg.userName}</span>
+                                                    </a>
+                                                </div>
+                                                <div class="vditor-reset comment<#if 0 == chatRoomPictureStatus> blur</#if>">
+                                                    ${msg.content}
+                                                </div>
+                                            </div>
+                                        </li>
+                                    </#if>
+                                </#list>
+                            <#else>
+                                <li class="ft-center ft-gray" id="emptyChatRoom">${chickenEggLabel}</li>
+                            </#if>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="index-recent fn-flex-1">
+                <div style="border-bottom: 1px solid #eee;margin:0px 10px ;">
+                    <div style="float:left;font-size:13px;margin:5px 0 10px 0; font-weight:bold;">标签</div>
+                    <div style="float:right;font-size:13px;margin:5px 0 0 0;"><a href="${servePath}/tags">更多</a>
+                    </div>
+                    <div style="clear:both;"></div>
+                </div>
+                <div class="module-panel">
+                    <div class="index-user">
+                        <#list tags as tag>
+                            <#if tag_index <= 20>
+                                <div class="tag-metro-item">
+                                    <a class="preview" href="${servePath}/tag/${tag.tagURI}">
+                                        <img src="${tag.tagIconPath}" alt="${tag.tagTitle}">
+                                        <b>${tag.tagTitle}</b>
+                                    </a>
+                                </div>
+                            </#if>
+                        </#list>
+                    </div>
+                </div>
+
+                <div style="border-bottom: 1px solid #eee;margin:0px 10px ;">
+                    <div style="float:left;font-size:13px;margin:5px 0 10px 0; font-weight:bold;">问答</div>
+                    <div style="float:right;font-size:13px;margin:5px 0 0 0;"><a href="${servePath}/qna">更多</a>
+                    </div>
+                    <div style="clear:both;"></div>
+                </div>
+                <div class="module-panel">
+                    <ul class="module-list">
+                        <#list qna as article>
+                            <#if article_index <= 8>
+                                <li class="fn-flex">
+                                    <a rel="nofollow" href="${servePath}/member/${article.articleAuthorName}">
+                                    <span class="avatar-small tooltipped tooltipped-se slogan"
+                                          aria-label="${article.articleAuthorName}"
+                                          style="background-image:url('${article.articleAuthorThumbnailURL20}')"></span>
+                                    </a>
+                                    <a rel="nofollow" class="title fn-ellipsis fn-flex-1"
+                                       href="${servePath}${article.articlePermalink}">${article.articleTitleEmoj}</a>
+                                    <a class="fn-right count ft-gray ft-smaller"
+                                       href="${servePath}${article.articlePermalink}"><#if article.articleViewCount < 1000>
+                                            ${article.articleViewCount}<#else>${article.articleViewCntDisplayFormat}</#if></a>
+                                </li>
+                            </#if>
+                        </#list>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="index-recent fn-flex-1">
+                <div style="border-bottom: 1px solid #eee;margin:0px 10px ;">
+                    <div style="float:left;font-size:13px;margin:5px 0 10px 0; font-weight:bold;">清风明月</div>
+                    <a href="${servePath}/article/1630938317106" title="清风明月是什么？"
+                       style="float: right; margin: 5px 0 10px 0">
+                        <svg>
+                            <use xlink:href="#iconQuestion"></use>
+                        </svg>
+                    </a>
+                    <div style="clear:both;"></div>
+                </div>
+                <div class="module-panel">
+                    <div class="module-header form">
+                        <input id="breezemoonInput"
+                               type="text"
+                               class="comment__text breezemoon__input"
+                               placeholder="${breezemoonLabel}"/>
+                        <span id="breezemoonPostBtn" class="btn breezemoon__btn"
+                              data-csrf="${csrfToken}">${postLabel}</span>
+                    </div>
+                    <div class="module-panel">
+                        <ul class="module-list">
+                            <#list sideBreezemoons as item>
+                                <#if item_index <= 12>
+                                    <li>
+                                        <a href="${servePath}/member/${item.breezemoonAuthorName}">
+                    <span class="avatar-small slogan tooltipped tooltipped-se" aria-label="${item.breezemoonAuthorName}"
+                          style="background-image: url(${item.breezemoonAuthorThumbnailURL48})"></span>
+                                        </a>
+                                        <a href="${servePath}/member/${item.breezemoonAuthorName}/breezemoons/${item.oId}"
+                                           class="title">${item.breezemoonContent}</a>
+                                    </li>
+                                </#if>
+                            </#list>
+                            <#if sideBreezemoons?size == 0>
+                                <li class="ft-center ft-gray">${chickenEggLabel}</li>
+                            </#if>
+                        </ul>
+                    </div>
                 </div>
             </div>
         </div>
@@ -297,7 +323,7 @@ ${HeaderBannerLabel}
     });
 
     // 聊天室发送讯息
-    $('#chatRoomInput').bind('keydown',function(event){
+    $('#chatRoomInput').bind('keydown', function (event) {
         if (event.keyCode == "13") {
             sendChat();
         }
@@ -305,29 +331,82 @@ ${HeaderBannerLabel}
 
     function sendChat() {
         <#if isLoggedIn>
-            var content = $("#chatRoomInput").val();
-            var requestJSONObject = {
-                content: content,
-            };
-            $.ajax({
-                url: Label.servePath + '/chat-room/send',
-                type: 'POST',
-                cache: false,
-                data: JSON.stringify(requestJSONObject),
-                beforeSend: function () {
-                    $("#chatRoomInput").val("")
-                },
-                success: function (result) {
-                }
-            });
+        var content = $("#chatRoomInput").val();
+        var requestJSONObject = {
+            content: content,
+        };
+        $.ajax({
+            url: Label.servePath + '/chat-room/send',
+            type: 'POST',
+            cache: false,
+            data: JSON.stringify(requestJSONObject),
+            beforeSend: function () {
+                $("#chatRoomInput").val("")
+            },
+            success: function (result) {
+            }
+        });
         <#else>
-            window.location.href = "${servePath}/login";
+        window.location.href = "${servePath}/login";
         </#if>
     }
 
     ChatRoomChannel.init("${wsScheme}://${serverHost}:${serverPort}${contextPath}/chat-room-channel?type=index&user=" + Label.currentUserName);
 
     var chatRoomPictureStatus = "<#if 0 == chatRoomPictureStatus> blur</#if>";
+</script>
+<script>
+    // 随机一句话
+    function randomPoem() {
+        let maxNum = 5;
+        let num = parseInt(Math.random()*(maxNum-1+1)+1,10)
+        switch (num) {
+            case 1:
+                return "都放假了，有逛摸鱼派的时间，出去玩一玩，它不香吗？";
+                break;
+            case 2:
+                return "是不是打算睡个大懒觉，结果发现熬夜根本停不下来？";
+                break;
+            case 3:
+                return "如果你觉得无聊，就去谈个恋爱吧~"
+                break;
+            case 4:
+                return "虽然放假，但是你还是要敲代码呀，卷起来。"
+                break;
+            case 5:
+                return "上学的时候，放假想上学；上班的时候：不可能，我死在家里。"
+                break;
+        }
+    }
+    // 放假倒计时
+    $.ajax({
+        url: "${servePath}/api/vocation",
+        type: "GET",
+        success: function (result) {
+            let dayName = result.dayName;
+            let type = result.type;
+            if (type === 0 || type === 3) {
+                let vName = result.vName;
+                let vRest = result.vRest;
+                $("#vLine1").html("摸🐟加油！距离" + vName + "还有");
+                if (type === 3) {
+                    $("#vLine1").html("调休不摸🐟，天理难容！距离" + vName + "还有");
+                }
+                $("#vDay").html(vRest);
+                $.ajax({
+                    url: "https://v1.hitokoto.cn/",
+                    type: "GET",
+                    success: function (result) {
+                        $("#vLine3").html(result.hitokoto);
+                    }
+                });
+            } else if (type === 1 || type === 2) {
+                $("#vLine1").html("终于放假咯！今天是" + dayName + " 🏖️");
+                $("#vLine2").html("<span style='font-size:70px'>放假</span>");
+                $("#vLine3").html(randomPoem());
+            }
+        }
+    });
 </script>
 </body>
 </html>

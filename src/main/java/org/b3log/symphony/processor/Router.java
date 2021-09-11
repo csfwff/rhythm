@@ -22,6 +22,7 @@ import org.b3log.latke.ioc.BeanManager;
 import org.b3log.symphony.processor.channel.*;
 import org.b3log.symphony.processor.middleware.AnonymousViewCheckMidware;
 import org.b3log.symphony.processor.middleware.LoginCheckMidware;
+import org.b3log.symphony.util.Vocation;
 
 /**
  * 请求路由映射.
@@ -126,6 +127,9 @@ public final class Router {
         final CityProcessor cityProcessor = beanManager.getReference(CityProcessor.class);
         Dispatcher.group().middlewares(loginCheck::handle).router().get().uris(new String[]{"/city/{city}", "/city/{city}/articles"}).handler(cityProcessor::showCityArticles);
         Dispatcher.get("/city/{city}/users", cityProcessor::showCityUsers, loginCheck::handle);
+        // 假期
+        final Vocation vocation = beanManager.getReference(Vocation.class);
+        Dispatcher.get("/api/vocation", vocation::vocation);
 
         // 管理后台
         AdminProcessor.register();

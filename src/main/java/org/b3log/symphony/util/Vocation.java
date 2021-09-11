@@ -1,0 +1,65 @@
+package org.b3log.symphony.util;
+
+import jodd.http.HttpRequest;
+import jodd.http.HttpResponse;
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.b3log.latke.http.RequestContext;
+import org.b3log.latke.ioc.Singleton;
+import org.json.JSONObject;
+
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
+@Singleton
+public class Vocation {
+    /**
+     * Logger.
+     */
+    private static final Logger LOGGER = LogManager.getLogger(Vocation.class);
+
+    final private static String UA = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/93.0.4577.63 Safari/537.36";
+    final public static JSONObject vocationData = new JSONObject();
+
+    public void vocation(final RequestContext context) {
+        context.renderJSON(vocationData);
+    }
+
+    public static void refresh() {
+        final HttpResponse response = HttpRequest.get("https://timor.tech/api/holiday/info/" + today())
+                .connectionTimeout(30000).timeout(70000).header("User-Agent", UA)
+                .send();
+        if (200 == response.statusCode()) {
+            response.charset("UTF-8");
+            final JSONObject result = new JSONObject(response.bodyText());
+            // 节假日类型，分别表示 0工作日、1周末、2节日、3调休。
+            int type = result.optJSONObject("type").optInt("type");
+            vocationData.put("type", type);
+            // 没有假期显示周几，有的话显示假期，比如周六、国庆节
+            String dayName = result.optJSONObject("type").optString("name");
+            vocationData.put("dayName", dayName);
+            // 如果是工作日或者调休，获取下一个节假日
+            if (type == 0 || type == 3) {
+                final HttpResponse response2 = HttpRequest.get("http://timor.tech/api/holiday/next/" + today() + "?type=Y&week=Y")
+                        .connectionTimeout(30000).timeout(70000).header("User-Agent", UA)
+                        .send();
+                if (200 == response2.statusCode()) {
+                    response2.charset("UTF-8");
+                    final JSONObject result2 = new JSONObject(response2.bodyText());
+                    String vName = result2.optJSONObject("holiday").optString("name"); // 下一个假期的名字
+                    vocationData.put("vName", vName);
+                    int vRest = result2.optJSONObject("holiday").optInt("rest"); // 还有几天放假
+                    vocationData.put("vRest", vRest);
+                }
+            }
+        }
+        LOGGER.log(Level.INFO, "Vocation Date has refreshed. [vocationData=\"" + vocationData + "\"]");
+    }
+
+    private static String today() {
+        Date date = new Date();
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
+        return simpleDateFormat.format(date);
+    }
+}

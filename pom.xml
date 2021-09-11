@@ -246,6 +246,13 @@
             <version>${okio.version}</version>
         </dependency>
 
+        <!-- https://mvnrepository.com/artifact/org.jodd/jodd-http -->
+        <dependency>
+            <groupId>org.jodd</groupId>
+            <artifactId>jodd-http</artifactId>
+            <version>6.0.6</version>
+        </dependency>
+
     </dependencies>
 
     <build>
