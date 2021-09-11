@@ -44,6 +44,10 @@ public class Vocation {
     }
 
     public static void refresh() {
+        vocationData.put("type", -1);
+        vocationData.put("dayName", "");
+        vocationData.put("vName", "");
+        vocationData.put("vRest", -1);
         final HttpResponse response = HttpRequest.get("https://timor.tech/api/holiday/info/" + today())
                 .connectionTimeout(30000).timeout(70000).header("User-Agent", UA)
                 .send();
