@@ -48,6 +48,7 @@ public class Vocation {
         vocationData.put("dayName", "");
         vocationData.put("vName", "");
         vocationData.put("vRest", -1);
+        vocationData.put("wRest", -1);
         final HttpResponse response = HttpRequest.get("https://timor.tech/api/holiday/info/" + today())
                 .connectionTimeout(30000).timeout(70000).header("User-Agent", UA)
                 .send();
@@ -60,17 +61,29 @@ public class Vocation {
             // 没有假期显示周几，有的话显示假期，比如周六、国庆节
             String dayName = result.optJSONObject("type").optString("name");
             vocationData.put("dayName", dayName);
-            // 如果是工作日或者调休，获取下一个节假日
-            if (type == 0 || type == 3) {
-                final HttpResponse response2 = HttpRequest.get("http://timor.tech/api/holiday/next/" + today() + "?type=Y&week=Y")
+            // 如果是周末或者节日，获取距离上班还有多久
+            if (type == 1 || type == 2) {
+                final HttpResponse workday = HttpRequest.get("http://timor.tech/api/holiday/workday/next/" + today())
                         .connectionTimeout(30000).timeout(70000).header("User-Agent", UA)
                         .send();
-                if (200 == response2.statusCode()) {
-                    response2.charset("UTF-8");
-                    final JSONObject result2 = new JSONObject(response2.bodyText());
-                    String vName = result2.optJSONObject("holiday").optString("name"); // 下一个假期的名字
+                if (200 == workday.statusCode()) {
+                    workday.charset("UTF-8");
+                    final JSONObject workdayResult = new JSONObject(workday.bodyText());
+                    int wRest = workdayResult.optJSONObject("workday").optInt("rest");
+                    vocationData.put("wRest", wRest);
+                }
+            }
+            // 如果是工作日或者调休，获取下一个节假日
+            if (type == 0 || type == 3) {
+                final HttpResponse weekend = HttpRequest.get("http://timor.tech/api/holiday/next/" + today() + "?type=Y&week=Y")
+                        .connectionTimeout(30000).timeout(70000).header("User-Agent", UA)
+                        .send();
+                if (200 == weekend.statusCode()) {
+                    weekend.charset("UTF-8");
+                    final JSONObject weekendResult = new JSONObject(weekend.bodyText());
+                    String vName = weekendResult.optJSONObject("holiday").optString("name"); // 下一个假期的名字
                     vocationData.put("vName", vName);
-                    int vRest = result2.optJSONObject("holiday").optInt("rest"); // 还有几天放假
+                    int vRest = weekendResult.optJSONObject("holiday").optInt("rest"); // 还有几天放假
                     vocationData.put("vRest", vRest);
                 }
             }

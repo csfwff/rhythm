@@ -110,9 +110,9 @@ ${HeaderBannerLabel}
             <div class="fn-flex-1">
                 <div class="metro-line fn-flex">
                     <div class="metro-item">
-                        <div style="padding-top: 12%">
+                        <div style="padding-top: 8%">
                             <div style="font-size: 13px; color: rgba(101,101,104,0.91)" id="vLine1">距离放假还有 🎉</div>
-                            <div style="font-size: 80px; font-weight: bold; color: #fc7a15" id="vLine2"><span
+                            <div style="font-size: 90px; font-weight: bold; color: #fc7a15" id="vLine2"><span
                                         id="vDay">?</span><span style="font-size: 30px"> 天</span></div>
                             <div style="font-size: 10px; color: rgba(161,163,163,0.91)" id="vLine3">我还在编......</div>
                         </div>
@@ -388,9 +388,10 @@ ${HeaderBannerLabel}
             if (type === 0 || type === 3) {
                 let vName = result.vName;
                 let vRest = result.vRest;
-                $("#vLine1").html("摸🐟加油！距离" + vName + "还有");
                 if (type === 3) {
-                    $("#vLine1").html("调休不摸🐟，天理难容！距离" + vName + "还有");
+                    $("#vLine1").html("调休不摸🐟，天理难容！<br>距离" + vName + "还有");
+                } else {
+                    $("#vLine1").html("摸 🐟 加油！<br>距离" + vName + "还有");
                 }
                 $("#vDay").html(vRest);
                 $.ajax({
@@ -401,9 +402,18 @@ ${HeaderBannerLabel}
                     }
                 });
             } else if (type === 1 || type === 2) {
-                $("#vLine1").html("终于放假咯！今天是" + dayName + " 🏖️");
-                $("#vLine2").html("<span style='font-size:70px'>放假</span>");
-                $("#vLine3").html(randomPoem());
+                let wRest = result.wRest;
+                if (wRest === 1) {
+                    $("#vLine1").html("😰 今天是" + dayName + "<br><b>假期余额严重不足❗❗❗️</b>");
+                    $("#vLine2").html("<span style='font-size:45px'>明天<br>上班</span>");
+                    $("#vLine2").css("line-height", "30px");
+                    $("#vLine3").html("明天，你就可以见到久违的老板和可爱的同事们了！<b>你开心吗？</b>");
+                    $("#vLine3").css("padding-top", "15px");
+                } else {
+                    $("#vLine1").html("今天是" + dayName + " 🏖️<br>假期余额还有<b>" + wRest + "</b>天！");
+                    $("#vLine2").html("<span style='font-size:75px'>放假</span>");
+                    $("#vLine3").html(randomPoem());
+                }
             }
         }
     });
