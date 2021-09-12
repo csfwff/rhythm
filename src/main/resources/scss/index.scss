@@ -1204,7 +1204,8 @@ code .dec {
 
   .metro-item {
     flex: 1;
-    height: 200px;
+    width: 215px;
+    height: 215px;
     text-align: center;
     overflow: hidden;
     position: relative;
@@ -1214,7 +1215,7 @@ code .dec {
     .preview {
       height: 100%;
       width: 100%;
-      padding-top: 50%;
+      padding-top: 108px;
       position: relative;
       box-sizing: border-box;
       display: block;
