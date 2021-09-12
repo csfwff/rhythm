@@ -178,5 +178,8 @@ ${HeaderBannerLabel}
 </body>
 <script>
     var chatRoomPictureStatus = "<#if 0 == chatRoomPictureStatus> blur</#if>";
+
+    var fishingPiVersion = "${fishingPiVersion}";
+    $("#fs").append('<div class="fn-hr5"></div><div><a href="${servePath}/article/1630856648465">🐟&nbsp;&nbsp;摸鱼派社区，用爱发电 | Beta v' + fishingPiVersion + '</a></div>');
 </script>
 </html>

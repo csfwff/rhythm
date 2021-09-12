@@ -19,7 +19,7 @@
 -->
 <div class="footer">
     <div class="wrapper">
-        <div class="slogan">
+        <div class="slogan" id="fs">
         ${indexIntroLabel} &nbsp; &nbsp;
             <a href="https://github.com/csfwff/rhythm" target="_blank" class="tooltipped tooltipped-n"
                aria-label="${siteCodeLabel}">

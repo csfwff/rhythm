@@ -23,7 +23,7 @@
             ${visionLabel}
         </div>
         <div class="fn-hr5"></div>
-        <div>
+        <div id="fs">
             ${sloganLabel}
         </div>
         <div class="fn-hr5"></div>

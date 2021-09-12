@@ -34,7 +34,7 @@ import org.b3log.latke.service.LangPropsService;
 import org.b3log.latke.util.Locales;
 import org.b3log.latke.util.Paginator;
 import org.b3log.latke.util.Stopwatchs;
-import org.b3log.latke.util.Times;
+import org.b3log.symphony.Server;
 import org.b3log.symphony.model.Article;
 import org.b3log.symphony.model.Common;
 import org.b3log.symphony.model.UserExt;
@@ -297,6 +297,7 @@ public class IndexProcessor {
         dataModel.put(Common.QNA,qaArticles);
 
         dataModel.put(Common.MESSAGES, ChatroomProcessor.getMessages(1));
+        dataModel.put(Common.FISHING_PI_VERSION, Server.FISHING_PI_VERSION);
 
         dataModelService.fillHeaderAndFooter(context, dataModel);
         dataModelService.fillIndexTags(dataModel);

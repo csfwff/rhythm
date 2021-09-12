@@ -702,6 +702,11 @@ public final class Common {
     public static final String VERSION = "version";
 
     /**
+     * Key of Fishing Pi version.
+     */
+    public static final String FISHING_PI_VERSION = "fishingPiVersion";
+
+    /**
      * Key of year.
      */
     public static final String YEAR = "year";

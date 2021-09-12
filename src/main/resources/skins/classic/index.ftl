@@ -31,8 +31,8 @@
 <body class="index">
 ${HeaderBannerLabel}
 <#include "header.ftl">
-<div class="main ">
-    <div class="wrapper">
+<div class="main">
+    <div class="wrapper" style="padding-bottom: 10px">
         <div class="index-recent fn-flex-1">
             <div style="border-bottom: 1px solid #eee;margin:0px 10px ;">
                 <div style="float:left;font-size:13px;margin:5px 0 10px 0; font-weight:bold;">最新</div>
@@ -105,7 +105,7 @@ ${HeaderBannerLabel}
         </div>
     </div>
 
-    <div style="background-color:#f6f8fa;">
+    <div style="background-color:#f6f8fa">
         <div class="wrapper">
             <div class="fn-flex-1">
                 <div class="metro-line fn-flex">
@@ -304,7 +304,6 @@ ${HeaderBannerLabel}
         </div>
     </div>
 </div>
-</div>
 <#include "footer.ftl">
 <script src="${staticServePath}/js/channel${miniPostfix}.js?${staticResourceVersion}"></script>
 <script type="text/javascript">
@@ -357,7 +356,7 @@ ${HeaderBannerLabel}
     // 随机一句话
     function randomPoem() {
         let maxNum = 5;
-        let num = parseInt(Math.random()*(maxNum-1+1)+1,10)
+        let num = parseInt(Math.random() * (maxNum - 1 + 1) + 1, 10)
         switch (num) {
             case 1:
                 return "都放假了，有逛摸鱼派的时间，出去玩一玩，它不香吗？";
@@ -376,6 +375,7 @@ ${HeaderBannerLabel}
                 break;
         }
     }
+
     // 放假倒计时
     $.ajax({
         url: "${servePath}/api/vocation",
@@ -415,6 +415,9 @@ ${HeaderBannerLabel}
             }
         }
     });
+
+    var fishingPiVersion = "${fishingPiVersion}";
+    $("#fs").before('<div><a href="${servePath}/article/1630856648465" class="tooltipped tooltipped-n" aria-label="摸鱼派还在初期建设阶段，并且努力进步中！感谢你成为摸鱼派的一份子。" style="padding: 10px 0 0 0">摸鱼派社区，用爱发电&nbsp;🐟&nbsp;&nbsp;| Beta v' + fishingPiVersion + '</a></div>');
 </script>
 </body>
 </html>
