@@ -26,7 +26,7 @@
 
             <div>
                 <#if isLoggedIn && (currentUser.userName != user.userName)>
-                    <button class="green small" onclick="location.href = '${servePath}/post?type=1&at=${user.userName}&tags=${discussionLabel}'">
+                    <button class="green small" onclick="alert('私信功能正火速开发中，敬请期待～（临时代替：可发布机要贴并@想私信的人进行私聊哦！）')">
                         ${privateMessageLabel}
                     </button>
                 </#if>
