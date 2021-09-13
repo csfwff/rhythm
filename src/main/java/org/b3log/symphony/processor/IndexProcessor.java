@@ -40,11 +40,7 @@ import org.b3log.symphony.model.Common;
 import org.b3log.symphony.model.UserExt;
 import org.b3log.symphony.processor.middleware.AnonymousViewCheckMidware;
 import org.b3log.symphony.processor.middleware.LoginCheckMidware;
-import org.b3log.symphony.service.ArticleQueryService;
-import org.b3log.symphony.service.DataModelService;
-import org.b3log.symphony.service.UserMgmtService;
-import org.b3log.symphony.service.UserQueryService;
-import org.b3log.symphony.util.JSONs;
+import org.b3log.symphony.service.*;
 import org.b3log.symphony.util.Markdowns;
 import org.b3log.symphony.util.Sessions;
 import org.b3log.symphony.util.Symphonys;
@@ -105,6 +101,18 @@ public class IndexProcessor {
      */
     @Inject
     private LangPropsService langPropsService;
+
+    /**
+     * Activity query service.
+     */
+    @Inject
+    private ActivityQueryService activityQueryService;
+
+    /**
+     * Liveness query service.
+     */
+    @Inject
+    private LivenessQueryService livenessQueryService;
 
     /**
      * Register request handlers.
@@ -279,8 +287,21 @@ public class IndexProcessor {
                 return;
             }
             dataModel.put(UserExt.CHAT_ROOM_PICTURE_STATUS, currentUser.optInt(UserExt.CHAT_ROOM_PICTURE_STATUS));
+            // 是否领取过昨日奖励
+            final String userId = currentUser.optString(Keys.OBJECT_ID);
+            dataModel.put("collectedYesterdayLivenessReward",
+                    (
+                            // 没领取过，返回true
+                            (!activityQueryService.isCollectedYesterdayLivenessReward(userId))
+                            // 有奖励，返回true
+                            && livenessQueryService.getYesterdayLiveness(userId) != null
+                    ) ? 0 : 1);
+            dataModel.put("checkedIn", activityQueryService.isCheckedinToday(userId) ? 1 : 0);
         } else {
             dataModel.put(UserExt.CHAT_ROOM_PICTURE_STATUS, UserExt.USER_XXX_STATUS_C_ENABLED);
+            // 是否领取过昨日奖励
+            dataModel.put("collectedYesterdayLivenessReward", 1);
+            dataModel.put("checkedIn", 1);
         }
 
         final List<JSONObject> recentArticles = articleQueryService.getIndexRecentArticles();

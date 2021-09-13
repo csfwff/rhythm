@@ -131,7 +131,9 @@ public class ActivityProcessor {
         Dispatcher.get("/activities", activityProcessor::showActivities);
         Dispatcher.get("/activity/checkin", activityProcessor::showDailyCheckin);
         Dispatcher.get("/activity/daily-checkin", activityProcessor::dailyCheckin, loginCheck::handle);
+        Dispatcher.get("/activity/daily-checkin-api", activityProcessor::dailyCheckinApi, loginCheck::handle);
         Dispatcher.get("/activity/yesterday-liveness-reward", activityProcessor::yesterdayLivenessReward, loginCheck::handle);
+        Dispatcher.get("/activity/yesterday-liveness-reward-api", activityProcessor::yesterdayLivenessRewardApi, loginCheck::handle);
         Dispatcher.get("/activity/1A0001", activityProcessor::show1A0001, csrfMidware::fill);
         Dispatcher.post("/activity/1A0001/bet", activityProcessor::bet1A0001, loginCheck::handle, csrfMidware::check, activity1A0001ValidationMidware::handle);
         Dispatcher.post("/activity/1A0001/collect", activityProcessor::collect1A0001, loginCheck::handle, activity1A0001CollectValidationMidware::handle);
@@ -266,6 +268,18 @@ public class ActivityProcessor {
     }
 
     /**
+     * Daily checkin.
+     *
+     * @param context the specified context
+     */
+    public void dailyCheckinApi(final RequestContext context) {
+        final JSONObject user = Sessions.getUser();
+        final String userId = user.optString(Keys.OBJECT_ID);
+
+        context.renderJSON(new JSONObject().put("sum", activityMgmtService.dailyCheckin(userId)));
+    }
+
+    /**
      * Yesterday liveness reward.
      *
      * @param context the specified context
@@ -278,6 +292,21 @@ public class ActivityProcessor {
         activityMgmtService.yesterdayLivenessReward(userId);
 
         context.sendRedirect(Latkes.getServePath() + "/member/" + user.optString(User.USER_NAME) + "/points");
+    }
+
+    /**
+     * Yesterday liveness reward.
+     *
+     * @param context the specified context
+     */
+    public void yesterdayLivenessRewardApi(final RequestContext context) {
+        final Request request = context.getRequest();
+        final JSONObject user = Sessions.getUser();
+        final String userId = user.optString(Keys.OBJECT_ID);
+
+        int sum = activityMgmtService.yesterdayLivenessRewardApi(userId);
+
+        context.renderJSON(new JSONObject().put("sum", sum));
     }
 
     /**

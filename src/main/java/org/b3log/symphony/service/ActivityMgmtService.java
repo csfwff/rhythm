@@ -273,7 +273,7 @@ public class ActivityMgmtService {
      */
     public synchronized int dailyCheckin(final String userId) {
         if (activityQueryService.isCheckedinToday(userId)) {
-            return Integer.MIN_VALUE;
+            return -1;
         }
 
         final Random random = new Random();
@@ -283,7 +283,7 @@ public class ActivityMgmtService {
         final boolean succ = null != pointtransferMgmtService.transfer(Pointtransfer.ID_C_SYS, userId,
                 Pointtransfer.TRANSFER_TYPE_C_ACTIVITY_CHECKIN, sum, userId, System.currentTimeMillis(), "");
         if (!succ) {
-            return Integer.MIN_VALUE;
+            return -1;
         }
 
         try {
@@ -351,7 +351,7 @@ public class ActivityMgmtService {
             return sum;
         } catch (final Exception e) {
             LOGGER.log(Level.ERROR, "Checkin streak failed", e);
-            return Integer.MIN_VALUE;
+            return -1;
         }
     }
 
@@ -492,6 +492,39 @@ public class ActivityMgmtService {
 
         // Today liveness (activity)
         livenessMgmtService.incLiveness(userId, Liveness.LIVENESS_ACTIVITY);
+    }
+
+    /**
+     * Collects yesterday's liveness reward.
+     *
+     * @param userId the specified user id
+     */
+    public synchronized int yesterdayLivenessRewardApi(final String userId) {
+        if (activityQueryService.isCollectedYesterdayLivenessReward(userId)) {
+            return -1;
+        }
+
+        final JSONObject yesterdayLiveness = livenessQueryService.getYesterdayLiveness(userId);
+        if (null == yesterdayLiveness) {
+            return -1;
+        }
+
+        final int sum = Liveness.calcPoint(yesterdayLiveness);
+
+        if (0 == sum) {
+            return -1;
+        }
+
+        boolean succ = null != pointtransferMgmtService.transfer(Pointtransfer.ID_C_SYS, userId,
+                Pointtransfer.TRANSFER_TYPE_C_ACTIVITY_YESTERDAY_LIVENESS_REWARD, sum, userId, System.currentTimeMillis(), "");
+        if (!succ) {
+            return -1;
+        }
+
+        // Today liveness (activity)
+        livenessMgmtService.incLiveness(userId, Liveness.LIVENESS_ACTIVITY);
+
+        return sum;
     }
 
     /**

@@ -118,15 +118,13 @@ ${HeaderBannerLabel}
                         </div>
                     </div>
                     <div class="metro-item">
-                        <a class="preview" href="${servePath}/activity/yesterday-liveness-reward">
-                            <img src="https://pwl.stackoverflow.wiki/2021/09/红包-(1)-6e07f7a0.png" alt="领取昨日活跃奖励">
-                            <b>领取昨日活跃奖励</b>
+                        <a class="preview" id="yesterday" onclick="yesterday()">
+                            <img id="yesterdayImg" src="https://pwl.stackoverflow.wiki/2021/09/红包-(1)-6e07f7a0.png" alt="领取昨日活跃奖励"><b>领取昨日活跃奖励</b>
                         </a>
                     </div>
                     <div class="metro-item">
-                        <a class="preview" href="${servePath}/activity/daily-checkin">
-                            <img src="https://pwl.stackoverflow.wiki/2021/09/签到-f95cfc2f.png" alt="每日签到">
-                            <b>每日签到</b>
+                        <a class="preview" id="checkIn" onclick="checkIn()">
+                            <img id="checkInImg" src="https://pwl.stackoverflow.wiki/2021/09/签到-(1)-fa104128.png" alt="每日签到"><b>每日签到</b>
                         </a>
                     </div>
                     <div class="metro-item">
@@ -136,15 +134,9 @@ ${HeaderBannerLabel}
                         </a>
                     </div>
                     <div class="metro-item">
-                        <a class="preview" href="${servePath}/activity/eating-snake">
-                            <img src="https://pwl.stackoverflow.wiki/2021/09/snake-b6dbc348.png" alt="贪吃蛇">
-                            <b>贪吃蛇</b>
-                        </a>
-                    </div>
-                    <div class="metro-item">
-                        <a class="preview" href="${servePath}/activity/gobang">
+                        <a class="preview" href="${servePath}/activities">
                             <img src="https://pwl.stackoverflow.wiki/2021/09/围棋-9195fb7f.png" alt="五子棋">
-                            <b>五子棋</b>
+                            <b>好玩</b>
                         </a>
                     </div>
                 </div>
@@ -155,7 +147,6 @@ ${HeaderBannerLabel}
                     <div class="yellow"></div>
                     <div class="red"></div>
                     <div class="purple"></div>
-                    <div class="green"></div>
                 </div>
             </div>
         </div>
@@ -380,6 +371,7 @@ ${HeaderBannerLabel}
     $.ajax({
         url: "${servePath}/api/vocation",
         type: "GET",
+        cache: false,
         success: function (result) {
             let dayName = result.dayName;
             let type = result.type;
@@ -395,6 +387,7 @@ ${HeaderBannerLabel}
                 $.ajax({
                     url: "https://v1.hitokoto.cn/",
                     type: "GET",
+                    cache: false,
                     success: function (result) {
                         $("#vLine3").html(result.hitokoto);
                     }
@@ -418,6 +411,77 @@ ${HeaderBannerLabel}
 
     var fishingPiVersion = "${fishingPiVersion}";
     $("#fs").before('<div><a href="${servePath}/article/1630856648465" class="tooltipped tooltipped-n" aria-label="摸鱼派还在初期建设阶段，并且努力进步中！感谢你成为摸鱼派的一份子。" style="padding: 10px 0 0 0">摸鱼派社区，用爱发电&nbsp;🐟&nbsp;&nbsp;| Beta v' + fishingPiVersion + '</a></div>');
+
+    $(function () {
+        var collectedYesterdayLivenessReward = ${collectedYesterdayLivenessReward};
+        var checkedIn = ${checkedIn};
+        if (collectedYesterdayLivenessReward === 0) {
+            $("#yesterdayImg").addClass("cake");
+        }
+        if (checkedIn === 0) {
+            $("#checkInImg").addClass("cake");
+        }
+    });
+    function yesterday() {
+        $("#yesterday").fadeOut(500, function () {
+            $.ajax({
+                url: "${servePath}/activity/yesterday-liveness-reward-api",
+                type: "GET",
+                cache: false,
+                async: false,
+                success: function(result) {
+                    if (result.sum === -1) {
+                        $("#yesterday").html("<img src='https://pwl.stackoverflow.wiki/2021/09/embarrassed-4112bd37.png'><b>暂时没有昨日奖励可领取呦！明天再来试试吧</b>");
+                        setTimeout(function () {
+                            $("#yesterday").fadeOut(500, function () {
+                                $("#yesterday").html('<img src="https://pwl.stackoverflow.wiki/2021/09/红包-(1)-6e07f7a0.png" alt="领取昨日活跃奖励"><b>领取昨日活跃奖励</b>');
+                                $("#yesterday").fadeIn(500);
+                            });
+                        }, 2000);
+                    } else {
+                        $("#yesterday").html("<img src='https://pwl.stackoverflow.wiki/2021/09/correct-1f5e3258.png'><b>昨日奖励已领取！积分 +" + result.sum + "</b>");
+                        setTimeout(function () {
+                            $("#yesterday").fadeOut(500, function () {
+                                $("#yesterday").html('<img src="https://pwl.stackoverflow.wiki/2021/09/红包-(1)-6e07f7a0.png" alt="领取昨日活跃奖励"><b>领取昨日活跃奖励</b>');
+                                $("#yesterday").fadeIn(500);
+                            });
+                        }, 2000);
+                    }
+                    $("#yesterday").fadeIn(500);
+                }
+            });
+        });
+    }
+    function checkIn() {
+        $("#checkIn").fadeOut(500, function () {
+            $.ajax({
+                url: "${servePath}/activity/daily-checkin-api",
+                type: "GET",
+                cache: false,
+                async: false,
+                success: function(result) {
+                    if (result.sum === -1) {
+                        $("#checkIn").html("<img src='https://pwl.stackoverflow.wiki/2021/09/embarrassed-4112bd37.png'><b>你已经签到过了哦！</b>");
+                        setTimeout(function () {
+                            $("#checkIn").fadeOut(500, function () {
+                                $("#checkIn").html('<img id="checkInImg" src="https://pwl.stackoverflow.wiki/2021/09/签到-(1)-fa104128.png" alt="每日签到"><b>每日签到</b>');
+                                $("#checkIn").fadeIn(500);
+                            });
+                        }, 2000);
+                    } else {
+                        $("#checkIn").html("<img src='https://pwl.stackoverflow.wiki/2021/09/correct-1f5e3258.png'><b>签到成功～ 积分 +" + result.sum + "</b>");
+                        setTimeout(function () {
+                            $("#checkIn").fadeOut(500, function () {
+                                $("#checkIn").html('<img id="checkInImg" src="https://pwl.stackoverflow.wiki/2021/09/签到-(1)-fa104128.png" alt="每日签到"><b>每日签到</b>');
+                                $("#checkIn").fadeIn(500);
+                            });
+                        }, 2000);
+                    }
+                    $("#checkIn").fadeIn(500);
+                }
+            });
+        });
+    }
 </script>
 </body>
 </html>
