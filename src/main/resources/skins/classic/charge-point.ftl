@@ -38,11 +38,12 @@
                         <li>转账时请在备注里填写你的社区用户名</li>
                         <li>如果你忘记填写用户名（扫码转账可能无法输入备注），可以<a href="${servePath}/post?type=1&tags=充值积分&at=admin">点此发帖</a>：
                             <ul>
-                                <li>在内容中 <code>@admin</code></li>
+                                <li>在内容中 <code>@adlered</code></li>
                                 <li>附上交易号末 <code>4</code> 位</li>
                             </ul>
                         </li>
                     </ul>
+                    <img src="https://pwl.stackoverflow.wiki/2021/09/image-7ad4f9b6.png" style="height:600px"/>
                     <h4>充值积分规则</h4>
                     <ul>
                         <li>充值 &nbsp;&nbsp;￥30 将获得 &nbsp;&nbsp;3,000 积分</li>
