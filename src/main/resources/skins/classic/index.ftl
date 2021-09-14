@@ -548,11 +548,13 @@ ${HeaderBannerLabel}
 </script>
 <script src="${staticServePath}/js/lib/tooltips/tooltips.min.js?${staticResourceVersion}"></script>
 <script>
-    var userAddr = "${userAddr}";
-    $.tooltips('您正在使用 VPN 访问摸鱼派，浏览及链接可能会出现问题！<br>建议您将摸鱼派加入 VPN 白名单后访问。', {
-        type: 'warning',
-        duration: 6000
-    });
+    var useVpn = ${useVpn};
+    if (useVpn === 1) {
+        $.tooltips('您正在使用 VPN 访问摸鱼派，连接浏览以及交互可能会出现问题！<br>建议您将摸鱼派加入 VPN 白名单后访问。', {
+            type: 'warning',
+            duration: 6000
+        });
+    }
 </script>
 </body>
 </html>

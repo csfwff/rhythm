@@ -19,6 +19,8 @@ import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class IpUtil {
     /**
@@ -100,6 +102,9 @@ public class IpUtil {
     }
 
     public static boolean isChinaIp(String ip) {
+        if (innerIP(ip)) {
+            return true;
+        }
         if (StringUtils.isEmpty(ip)) {
             return false;
         }
@@ -124,5 +129,12 @@ public class IpUtil {
         }
 
         return false;
+    }
+
+    public static boolean innerIP(String ip) {
+        Pattern reg = Pattern.compile("^(127\\.0\\.0\\.1)|(localhost)|(10\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3})|(172\\.((1[6-9])|(2\\d)|(3[01]))\\.\\d{1,3}\\.\\d{1,3})|(192\\.168\\.\\d{1,3}\\.\\d{1,3})$");
+        Matcher match = reg.matcher(ip);
+
+        return match.find();
     }
 }
