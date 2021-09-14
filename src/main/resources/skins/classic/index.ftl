@@ -150,13 +150,13 @@ ${HeaderBannerLabel}
                             <div style="font-size: 10px; color: rgba(161,163,163,0.91)" id="vLine3">我还在编......</div>
                         </div>
                     </div>
-                    <div class="metro-item">
+                    <div class="metro-item" style="cursor: pointer">
                         <a class="preview" id="yesterday" onclick="yesterday()">
                             <img id="yesterdayImg" src="https://pwl.stackoverflow.wiki/2021/09/红包-(1)-6e07f7a0.png"
                                  alt="领取昨日活跃奖励"><b>领取昨日活跃奖励</b>
                         </a>
                     </div>
-                    <div class="metro-item">
+                    <div class="metro-item" style="cursor: pointer">
                         <a class="preview" id="checkIn" onclick="checkIn()">
                             <img id="checkInImg" src="https://pwl.stackoverflow.wiki/2021/09/签到-(1)-fa104128.png"
                                  alt="每日签到"><b>每日签到</b>
