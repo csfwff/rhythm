@@ -98,6 +98,8 @@ public final class Router {
         UserProcessor.register();
         // 投票
         VoteProcessor.register();
+        // 龙门阵
+        IdleTalkProcessor.register();
 
         final BeanManager beanManager = BeanManager.getInstance();
         final LoginCheckMidware loginCheck = beanManager.getReference(LoginCheckMidware.class);

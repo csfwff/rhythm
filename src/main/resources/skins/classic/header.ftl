@@ -81,7 +81,7 @@
                class="tooltipped tooltipped-w <#if unreadNotificationCount == 0>no-msg<#else>msg</#if>"
                href="${servePath}/notifications" aria-label="${messageLabel}">${unreadNotificationCount}
             </a>
-            <a href="${servePath}/idle-talk" class="tooltipped tooltipped-w" aria-label="摆龙门阵">
+            <a href="${servePath}/idle-talk" class="tooltipped tooltipped-w" aria-label="摆龙门阵（私信）">
                 <svg>
                     <use xlink:href="#idleChat"></use>
                 </svg>

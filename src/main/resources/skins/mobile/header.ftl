@@ -35,6 +35,7 @@
             <a href="${servePath}/member/${currentUser.userName}" title="Home" class="<#if 'adminRole' != userRole>last </#if>nav-avatar">
                 <span class="avatar-small" style="background-image:url('${currentUser.userAvatarURL20}')"></span>
             </a>
+            <a href="${servePath}/idle-talk" title="摆龙门阵（私信）"><svg><use xlink:href="#idleChat"></use></svg></a>
             <a href="${servePath}/activities" title="${activityLabel}"><svg><use xlink:href="#flag"></use></svg></a>
             <#if permissions["commonAddArticle"].permissionGrant>
                 <a href="${servePath}/pre-post" title="${addArticleLabel}"><svg><use xlink:href="#addfile"></use></svg></a>
