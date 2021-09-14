@@ -325,6 +325,8 @@ public class IndexProcessor {
         dataModel.put(Common.TOP_CHECKIN_USERS, users);
         dataModel.put("indexRandomArticles", ArticleProcessor.getRandomArticles(10));
 
+        dataModel.put("userAddr", context.getRequest().getRemoteAddr());
+
         dataModelService.fillHeaderAndFooter(context, dataModel);
         dataModelService.fillIndexTags(dataModel);
         //dataModelService.fillSideTags(dataModel);

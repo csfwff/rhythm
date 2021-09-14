@@ -168,7 +168,7 @@ public final class Server extends BaseServer {
         final String jdbcURL = Latkes.getLocalProperty("jdbc.URL");
         final boolean luteAvailable = Markdowns.LUTE_AVAILABLE;
 
-        LOGGER.log(Level.INFO, "Sym is booting [ver=" + VERSION + ", os=" + Latkes.getOperatingSystemName() +
+        LOGGER.log(Level.INFO, "Rhythm is booting [ver=" + VERSION + ", os=" + Latkes.getOperatingSystemName() +
                 ", isDocker=" + Latkes.isDocker() + ", luteAvailable=" + luteAvailable + ", pid=" + Latkes.currentPID() +
                 ", runtimeDatabase=" + runtimeDatabase + ", runtimeMode=" + Latkes.getRuntimeMode() + ", jdbc.username=" +
                 jdbcUsername + ", jdbc.URL=" + jdbcURL + "]");
