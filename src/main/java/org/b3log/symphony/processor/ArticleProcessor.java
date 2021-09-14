@@ -34,6 +34,7 @@ import org.b3log.latke.ioc.Inject;
 import org.b3log.latke.ioc.Singleton;
 import org.b3log.latke.model.Pagination;
 import org.b3log.latke.model.User;
+import org.b3log.latke.repository.RepositoryException;
 import org.b3log.latke.service.LangPropsService;
 import org.b3log.latke.service.ServiceException;
 import org.b3log.latke.util.Paginator;
@@ -48,11 +49,14 @@ import org.b3log.symphony.processor.middleware.LoginCheckMidware;
 import org.b3log.symphony.processor.middleware.PermissionMidware;
 import org.b3log.symphony.processor.middleware.validate.ArticlePostValidationMidware;
 import org.b3log.symphony.processor.middleware.validate.UserRegisterValidationMidware;
+import org.b3log.symphony.repository.ArticleRepository;
 import org.b3log.symphony.service.*;
 import org.b3log.symphony.util.*;
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 import javax.imageio.ImageIO;
+import javax.xml.ws.Dispatch;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
@@ -222,6 +226,7 @@ public class ArticleProcessor {
         Dispatcher.post("/article/reward", articleProcessor::rewardArticle, loginCheck::handle);
         Dispatcher.post("/article/thank", articleProcessor::thankArticle, loginCheck::handle, permissionMidware::check);
         Dispatcher.post("/article/stick", articleProcessor::stickArticle, loginCheck::handle, permissionMidware::check);
+        Dispatcher.get("/article/random/{size}", articleProcessor::randomArticles);
     }
 
     /**
@@ -1253,5 +1258,47 @@ public class ArticleProcessor {
         }
 
         context.renderJSON(StatusCodes.SUCC).renderMsg(langPropsService.get("stickSuccLabel"));
+    }
+
+    /**
+     * Generate random articles.
+     *
+     * @param context the specified HTTP request context
+     */
+    public void randomArticles(final RequestContext context) {
+        final int size = Integer.parseInt(context.pathVar("size"));
+        if (size > 20) {
+            return;
+        }
+        context.renderJSON(new JSONObject().put("articles", getRandomArticles(size)));
+    }
+
+    public static List<JSONObject> getRandomArticles(int size) {
+        final BeanManager beanManager = BeanManager.getInstance();
+        final ArticleRepository articleRepository = beanManager.getReference(ArticleRepository.class);
+        final ArticleQueryService articleQueryService = beanManager.getReference(ArticleQueryService.class);
+
+        Stopwatchs.start("Load random articles");
+        try {
+            int tried = 0;
+            int arraySize = 0;
+            List<JSONObject> articles = null;
+            while (arraySize < size) {
+                articles = articleRepository.getRandomly(size * 5);
+                arraySize = articles.size();
+                tried++;
+                if (tried > 50) {
+                    return null;
+                }
+            }
+            articleQueryService.organizeArticles(articles);
+            Collections.shuffle(articles);
+            return articles.subList(0, size);
+        } catch (final RepositoryException e) {
+            LOGGER.log(Level.ERROR, "Loads random articles failed", e);
+        } finally {
+            Stopwatchs.end();
+        }
+        return null;
     }
 }

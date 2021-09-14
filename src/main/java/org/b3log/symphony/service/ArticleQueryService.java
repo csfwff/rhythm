@@ -1468,7 +1468,7 @@ public class ArticleQueryService {
 
         article.put(Article.ARTICLE_T_HEAT, viewingCnt);
 
-        final int viewCnt = article.optInt(Article.ARTICLE_VIEW_CNT);
+        int viewCnt = article.optInt(Article.ARTICLE_VIEW_CNT);
         final double views = (double) viewCnt / 1000;
         if (views >= 1) {
             final DecimalFormat df = new DecimalFormat("#.#");

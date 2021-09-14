@@ -310,7 +310,7 @@ public class IndexProcessor {
         final List<JSONObject> perfectArticles = articleQueryService.getIndexPerfectArticles();
         dataModel.put(Common.PERFECT_ARTICLES, perfectArticles);
 
-        final List<JSONObject> niceUsers = userQueryService.getNiceUsers(21);
+        final List<JSONObject> niceUsers = userQueryService.getNiceUsers(30);
         dataModel.put(Common.NICE_USERS, niceUsers);
 
         final JSONObject result = articleQueryService.getQuestionArticles(0, 1, 10);
@@ -323,6 +323,7 @@ public class IndexProcessor {
         // 签到排行
         final List<JSONObject> users = activityQueryService.getTopCheckinUsers(Symphonys.TOP_CNT);
         dataModel.put(Common.TOP_CHECKIN_USERS, users);
+        dataModel.put("indexRandomArticles", ArticleProcessor.getRandomArticles(10));
 
         dataModelService.fillHeaderAndFooter(context, dataModel);
         dataModelService.fillIndexTags(dataModel);

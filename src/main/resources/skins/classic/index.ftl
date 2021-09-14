@@ -61,13 +61,18 @@ ${HeaderBannerLabel}
         </div>
         <div class="index-recent fn-flex-1">
             <div style="border-bottom: 1px solid #eee;margin:0px 10px ;">
-                <div style="float:left;font-size:13px;margin:5px 0 10px 0; font-weight:bold;">优选</div>
-                <div style="float:right;font-size:13px;margin:5px 0 0 0;"><a href="${servePath}/perfect">更多</a></div>
+                <div style="float:left;font-size:13px;margin:5px 0 10px 0; font-weight:bold;">随便看看</div>
+                <div style="float:right;font-size:13px;margin:5px 0 0 0;">
+                    <a onclick="randomArticles()" style="cursor: pointer">
+                        <svg><use xlink:href="#refresh"></use></svg>
+                        换一批
+                    </a>
+                </div>
                 <div style="clear:both;"></div>
             </div>
             <div class="module-panel">
-                <ul class="module-list">
-                    <#list perfectArticles as article>
+                <ul class="module-list" id="randomArticles">
+                    <#list indexRandomArticles as article>
                         <li class="fn-flex">
                             <a rel="nofollow" href="${servePath}/member/${article.articleAuthorName}">
                                     <span class="avatar-small tooltipped tooltipped-se slogan"
@@ -96,7 +101,7 @@ ${HeaderBannerLabel}
                         <a rel="nofollow" href="${servePath}/member/${user.userName}">
                                     <span class="avatar-middle tooltipped tooltipped-se slogan"
                                           aria-label="${user.userName}"
-                                          style="margin-bottom: 15px;background-image:url('${user.userAvatarURL48}')"></span>
+                                          style="background-image:url('${user.userAvatarURL48}');height:30px;width:30px;margin: 0px 10px 10px 0px"></span>
                         </a>
 
                     </#list>
@@ -110,10 +115,10 @@ ${HeaderBannerLabel}
                 <div style="clear:both;"></div>
             </div>
             <div class="module-panel">
-                <ul class="module-list" style="margin-top: 8px">
+                <ul class="module-list" style="margin-top: 5px">
                     <#list topCheckinUsers as user>
-                        <#if user_index < 8>
-                            <li class="fn-flex" style="padding: 6px 15px 6px 15px">
+                        <#if user_index < 9>
+                            <li class="fn-flex" style="padding: 5px 15px 8px 15px">
                                 <a rel="nofollow" href="${servePath}/member/${user.userName}">
                                     <span class="avatar-small tooltipped tooltipped-se slogan"
                                           aria-label="${user.userName}"
@@ -123,7 +128,7 @@ ${HeaderBannerLabel}
                                    href="${servePath}/member/${user.userName}">${user.userName}</a>
                                 <a class="fn-right count ft-gray ft-smaller tooltipped tooltipped-w"
                                    aria-label="${checkinStreakPart0Label}${user.userLongestCheckinStreak}${checkinStreakPart1Label}${user.userCurrentCheckinStreak}${checkinStreakPart2Label}"
-                                   href="${servePath}/member/${user.userName}">${user.userCurrentCheckinStreak}/<span
+                                   href="${servePath}/top/checkin">${user.userCurrentCheckinStreak}/<span
                                             class="ft-red">${user.userLongestCheckinStreak}</span></a>
                             </li>
                         </#if>
@@ -512,6 +517,31 @@ ${HeaderBannerLabel}
                     $("#checkIn").fadeIn(500);
                 }
             });
+        });
+    }
+
+    function randomArticles() {
+        $.ajax({
+            url: "${servePath}/article/random/10",
+            method: "GET",
+            cache: false,
+            async: false,
+            success: function (result) {
+                $("#randomArticles").html('');
+                for (let articleCur in result.articles) {
+                    let article = result.articles[articleCur];
+                    let viewCount = article.articleViewCount;
+                    if (viewCount >= 1000) {
+                        viewCount = article.articleViewCntDisplayFormat;
+                    }
+                    $("#randomArticles").append('<li class="fn-flex">' +
+                    '<a rel="nofollow" href="${servePath}/member/' + article.articleAuthorName + '">' +
+                    '<span class="avatar-small tooltipped tooltipped-se slogan" aria-label="' + article.articleAuthorName + '" style="background-image:url(\'' + article.articleAuthorThumbnailURL20 + '\')"></span></a>' +
+                        '<a rel="nofollow" class="title fn-ellipsis fn-flex-1" href="${servePath}' + article.articlePermalink + '">' + article.articleTitleEmoj + '</a>' +
+                        '<a class="fn-right count ft-gray ft-smaller" href="${servePath}' + article.articlePermalink + '">' + viewCount + '</a>' +
+                        '</li>');
+                }
+            }
         });
     }
 </script>
