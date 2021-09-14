@@ -63,7 +63,7 @@ public final class Server extends BaseServer {
     /**
      * Fishing Pi version.
      */
-    public static final String FISHING_PI_VERSION = "0.1.2";
+    public static final String FISHING_PI_VERSION = "0.1.3";
 
     /**
      * Main.

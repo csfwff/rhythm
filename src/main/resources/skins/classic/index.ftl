@@ -445,7 +445,7 @@ ${HeaderBannerLabel}
     });
 
     var fishingPiVersion = "${fishingPiVersion}";
-    $("#fs").before('<div><a href="${servePath}/article/1630856648465" class="tooltipped tooltipped-n" aria-label="摸鱼派还在初期建设阶段，并且努力进步中！感谢你成为摸鱼派的一份子。" style="padding: 10px 0 0 0">摸鱼派社区，用爱发电&nbsp;🐟&nbsp;&nbsp;| Beta v' + fishingPiVersion + '</a></div>');
+    $("#fs").before('<div><br><a href="${servePath}/article/1630856648465" class="tooltipped tooltipped-n" aria-label="摸鱼派还在初期建设阶段，并且努力进步中！感谢你成为摸鱼派的一份子。" style="padding: 10px 0 0 0">摸鱼派社区，用爱发电&nbsp;🐟&nbsp;&nbsp;| Beta v' + fishingPiVersion + '</a></div>');
 
     $(function () {
         var collectedYesterdayLivenessReward = ${collectedYesterdayLivenessReward};
