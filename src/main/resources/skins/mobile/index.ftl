@@ -55,6 +55,31 @@ ${HeaderBannerLabel}
                 </ul>
             </div>
         </div>
+        <div class="module-panel">
+            <div class="module-header" style="background-color: #69b6df;">
+                <a onclick="randomArticles()" style="cursor: pointer">
+                    <svg><use xlink:href="#refresh"></use></svg>
+                    换一批&nbsp;&nbsp;
+                    随便看看
+                </a>
+            </div>
+            <ul class="module-list" id="randomArticles">
+                <#list indexRandomArticles as article>
+                    <li class="fn-flex">
+                        <a rel="nofollow" href="${servePath}/member/${article.articleAuthorName}">
+                                    <span class="avatar-small tooltipped tooltipped-se slogan"
+                                          aria-label="${article.articleAuthorName}"
+                                          style="background-image:url('${article.articleAuthorThumbnailURL20}')"></span>
+                        </a>
+                        <a rel="nofollow" class="title fn-ellipsis fn-flex-1"
+                           href="${servePath}${article.articlePermalink}">${article.articleTitleEmoj}</a>
+                        <a class="fn-right count ft-gray ft-smaller"
+                           href="${servePath}${article.articlePermalink}"><#if article.articleViewCount < 1000>
+                                ${article.articleViewCount}<#else>${article.articleViewCntDisplayFormat}</#if></a>
+                    </li>
+                </#list>
+            </ul>
+        </div>
         <div class="module">
             <div class="module-header" style="background-color: #dfb169;">
                 <a href="${servePath}/perfect">${perfectLabel}</a>
@@ -181,5 +206,30 @@ ${HeaderBannerLabel}
 
     var fishingPiVersion = "${fishingPiVersion}";
     $("#fs").append('<div class="fn-hr5"></div><div><a href="${servePath}/article/1630856648465">🐟&nbsp;&nbsp;摸鱼派社区，用爱发电 | Beta v' + fishingPiVersion + '</a></div>');
+
+    function randomArticles() {
+        $.ajax({
+            url: "${servePath}/article/random/10",
+            method: "GET",
+            cache: false,
+            async: false,
+            success: function (result) {
+                $("#randomArticles").html('');
+                for (let articleCur in result.articles) {
+                    let article = result.articles[articleCur];
+                    let viewCount = article.articleViewCount;
+                    if (viewCount >= 1000) {
+                        viewCount = article.articleViewCntDisplayFormat;
+                    }
+                    $("#randomArticles").append('<li class="fn-flex">' +
+                        '<a rel="nofollow" href="${servePath}/member/' + article.articleAuthorName + '">' +
+                        '<span class="avatar-small tooltipped tooltipped-se slogan" aria-label="' + article.articleAuthorName + '" style="background-image:url(\'' + article.articleAuthorThumbnailURL20 + '\')"></span></a>' +
+                        '<a rel="nofollow" class="title fn-ellipsis fn-flex-1" href="${servePath}' + article.articlePermalink + '">' + article.articleTitleEmoj + '</a>' +
+                        '<a class="fn-right count ft-gray ft-smaller" href="${servePath}' + article.articlePermalink + '">' + viewCount + '</a>' +
+                        '</li>');
+                }
+            }
+        });
+    }
 </script>
 </html>
