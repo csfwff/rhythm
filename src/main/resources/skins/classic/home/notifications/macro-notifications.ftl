@@ -37,7 +37,7 @@
                     <div class="list module">
                         <#if unreadNotificationCnt &gt; 0>
                             <div onclick="Settings.makeAllNotificationsRead()"
-                                  aria-label="${makeAllAsReadLabel}" class="mark-as-read tooltipped tooltipped-w home-side-read">
+                                  aria-label="${makeAllAsReadLabel}" class="mark-as-read tooltipped tooltipped-es home-side-read">
                                 ${makeAllAsReadLabel}
                                 <svg><use xlink:href="#check"></use></svg>
                             </div>
