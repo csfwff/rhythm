@@ -41,7 +41,6 @@ import org.b3log.symphony.model.UserExt;
 import org.b3log.symphony.processor.middleware.AnonymousViewCheckMidware;
 import org.b3log.symphony.processor.middleware.LoginCheckMidware;
 import org.b3log.symphony.service.*;
-import org.b3log.symphony.util.IpUtil;
 import org.b3log.symphony.util.Markdowns;
 import org.b3log.symphony.util.Sessions;
 import org.b3log.symphony.util.Symphonys;
@@ -325,8 +324,6 @@ public class IndexProcessor {
         final List<JSONObject> users = activityQueryService.getTopCheckinUsers(Symphonys.TOP_CNT);
         dataModel.put(Common.TOP_CHECKIN_USERS, users);
         dataModel.put("indexRandomArticles", ArticleProcessor.getRandomArticles(10));
-
-        dataModel.put("useVpn", IpUtil.isChinaIp(context.getRequest().getRemoteAddr()) ? 0 : 1);
 
         dataModelService.fillHeaderAndFooter(context, dataModel);
         dataModelService.fillIndexTags(dataModel);
