@@ -102,6 +102,34 @@ ${HeaderBannerLabel}
                     </#list>
                 </div>
             </div>
+
+            <div style="border-bottom: 1px solid #eee;margin:0px 10px ;">
+                <div style="float:left;font-size:13px;margin:5px 0 10px 0; font-weight:bold;">签到排行</div>
+                <div style="float:right;font-size:13px;margin:5px 0 0 0;"><a href="${servePath}/top/checkin">更多</a>
+                </div>
+                <div style="clear:both;"></div>
+            </div>
+            <div class="module-panel">
+                <ul class="module-list" style="margin-top: 8px">
+                    <#list topCheckinUsers as user>
+                        <#if user_index < 8>
+                            <li class="fn-flex" style="padding: 6px 15px 6px 15px">
+                                <a rel="nofollow" href="${servePath}/member/${user.userName}">
+                                    <span class="avatar-small tooltipped tooltipped-se slogan"
+                                          aria-label="${user.userName}"
+                                          style="background-image:url('${user.userAvatarURL}')"></span>
+                                </a>
+                                <a rel="nofollow" class="title fn-flex-1 tooltipped tooltipped-w" aria-label="${pointLabel} ${user.userPoint?c}"
+                                   href="${servePath}/member/${user.userName}">${user.userName}</a>
+                                <a class="fn-right count ft-gray ft-smaller tooltipped tooltipped-w"
+                                   aria-label="${checkinStreakPart0Label}${user.userLongestCheckinStreak}${checkinStreakPart1Label}${user.userCurrentCheckinStreak}${checkinStreakPart2Label}"
+                                   href="${servePath}/member/${user.userName}">${user.userCurrentCheckinStreak}/<span
+                                            class="ft-red">${user.userLongestCheckinStreak}</span></a>
+                            </li>
+                        </#if>
+                    </#list>
+                </ul>
+            </div>
         </div>
     </div>
 
@@ -119,12 +147,14 @@ ${HeaderBannerLabel}
                     </div>
                     <div class="metro-item">
                         <a class="preview" id="yesterday" onclick="yesterday()">
-                            <img id="yesterdayImg" src="https://pwl.stackoverflow.wiki/2021/09/红包-(1)-6e07f7a0.png" alt="领取昨日活跃奖励"><b>领取昨日活跃奖励</b>
+                            <img id="yesterdayImg" src="https://pwl.stackoverflow.wiki/2021/09/红包-(1)-6e07f7a0.png"
+                                 alt="领取昨日活跃奖励"><b>领取昨日活跃奖励</b>
                         </a>
                     </div>
                     <div class="metro-item">
                         <a class="preview" id="checkIn" onclick="checkIn()">
-                            <img id="checkInImg" src="https://pwl.stackoverflow.wiki/2021/09/签到-(1)-fa104128.png" alt="每日签到"><b>每日签到</b>
+                            <img id="checkInImg" src="https://pwl.stackoverflow.wiki/2021/09/签到-(1)-fa104128.png"
+                                 alt="每日签到"><b>每日签到</b>
                         </a>
                     </div>
                     <div class="metro-item">
@@ -422,6 +452,7 @@ ${HeaderBannerLabel}
             $("#checkInImg").addClass("cake");
         }
     });
+
     function yesterday() {
         $("#yesterday").fadeOut(500, function () {
             $.ajax({
@@ -429,7 +460,7 @@ ${HeaderBannerLabel}
                 type: "GET",
                 cache: false,
                 async: false,
-                success: function(result) {
+                success: function (result) {
                     if (result.sum === -1) {
                         $("#yesterday").html("<img src='https://pwl.stackoverflow.wiki/2021/09/embarrassed-4112bd37.png'><b>暂时没有昨日奖励可领取呦！明天再来试试吧</b>");
                         setTimeout(function () {
@@ -452,6 +483,7 @@ ${HeaderBannerLabel}
             });
         });
     }
+
     function checkIn() {
         $("#checkIn").fadeOut(500, function () {
             $.ajax({
@@ -459,7 +491,7 @@ ${HeaderBannerLabel}
                 type: "GET",
                 cache: false,
                 async: false,
-                success: function(result) {
+                success: function (result) {
                     if (result.sum === -1) {
                         $("#checkIn").html("<img src='https://pwl.stackoverflow.wiki/2021/09/embarrassed-4112bd37.png'><b>你已经签到过了哦！</b>");
                         setTimeout(function () {
