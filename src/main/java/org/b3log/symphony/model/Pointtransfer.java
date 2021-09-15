@@ -392,6 +392,17 @@ public final class Pointtransfer {
     public static final int TRANSFER_SUM_C_CHANGE_USERNAME = Symphonys.POINT_CHANGE_USERNAME;
 
     /**
+     * Transfer type - 摆龙门阵.
+     */
+    public static final int TRANSFER_TYPE_C_BLMZ = 37;
+
+    /**
+     * Transfer sum - 摆龙门阵.
+     */
+    public static final int TRANSFER_SUM_C_BLMZ = 5;
+
+
+    /**
      * Private constructor.
      */
     private Pointtransfer() {

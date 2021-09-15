@@ -12,10 +12,13 @@ import org.b3log.latke.ioc.BeanManager;
 import org.b3log.latke.ioc.Inject;
 import org.b3log.latke.ioc.Singleton;
 import org.b3log.latke.model.User;
+import org.b3log.latke.util.Ids;
+import org.b3log.symphony.model.Pointtransfer;
 import org.b3log.symphony.model.UserExt;
 import org.b3log.symphony.processor.middleware.CSRFMidware;
 import org.b3log.symphony.processor.middleware.LoginCheckMidware;
 import org.b3log.symphony.service.DataModelService;
+import org.b3log.symphony.service.PointtransferMgmtService;
 import org.b3log.symphony.service.UserQueryService;
 import org.b3log.symphony.util.Sessions;
 import org.b3log.symphony.util.StatusCodes;
@@ -46,6 +49,12 @@ public class IdleTalkProcessor {
      */
     @Inject
     private UserQueryService userQueryService;
+
+    /**
+     * Pointtransfer management service.
+     */
+    @Inject
+    private PointtransferMgmtService pointtransferMgmtService;
 
     /**
      * Messages saved at memory, it won't access database.
@@ -82,7 +91,7 @@ public class IdleTalkProcessor {
     }
 
     private static void saveMessage(String senderId, String receiverId, JSONObject message) {
-        String mapId = String.valueOf(System.currentTimeMillis());
+        String mapId = Ids.genTimeMillisId();
         messages.put(mapId, message);
         senderContext.put(senderId, mapId);
         receiverContext.put(receiverId, mapId);
@@ -130,12 +139,25 @@ public class IdleTalkProcessor {
      *
      * @param context
      */
-    public void sendIdleTalk(final RequestContext context) {
+    public synchronized void sendIdleTalk(final RequestContext context) {
         // From
         final JSONObject currentUser = Sessions.getUser();
         String fromUserId = currentUser.optString(Keys.OBJECT_ID);
         String fromUserName = currentUser.optString(User.USER_NAME);
         String fromUserAvatar = currentUser.optString(UserExt.USER_AVATAR_URL);
+        // Have balance
+        final int balance = currentUser.optInt(UserExt.USER_POINT);
+        if (balance - Pointtransfer.TRANSFER_SUM_C_BLMZ < 0) {
+            context.renderJSON(StatusCodes.ERR).renderMsg("积分余额不足！");
+            return;
+        }
+        final boolean succ = null != pointtransferMgmtService.transfer(fromUserId, Pointtransfer.ID_C_SYS,
+                Pointtransfer.TRANSFER_TYPE_C_BLMZ,
+                Pointtransfer.TRANSFER_SUM_C_BLMZ, "", System.currentTimeMillis(), "摆了个龙门阵");
+        if (!succ) {
+            context.renderJSON(StatusCodes.ERR).renderMsg("积分扣除失败！");
+            return;
+        }
         // To
         final Request request = context.getRequest();
         JSONObject requestJSON = request.getJSON();
@@ -147,10 +169,17 @@ public class IdleTalkProcessor {
         String theme = requestJSON.optString("theme");
         String content = requestJSON.optString("content");
         if (theme.isEmpty() || content.isEmpty()) {
-            context.renderJSON(StatusCodes.ERR);
+            context.renderJSON(StatusCodes.ERR).renderMsg("主题和正文不得为空！");
             return;
         }
-        long time = System.currentTimeMillis();
+        if (theme.length() > 50) {
+            context.renderJSON(StatusCodes.ERR).renderMsg("主题长度不得大于50个字节！");
+            return;
+        }
+        if (content.length() > 20480) {
+            context.renderJSON(StatusCodes.ERR).renderMsg("正文长度不得大于20480个字节！");
+            return;
+        }
         // Storage
         JSONObject message = new JSONObject();
         message.put("fromUserId", fromUserId)
