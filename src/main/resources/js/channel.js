@@ -229,26 +229,6 @@ var IdleTalkChannel = {
 
             let cmd = data.command;
             switch (data.youAre) {
-                case 'receiver':
-                    let html = '' +
-                        '<li id="' + data.mapId + '">\n' +
-                        '    <div class=\'fn-flex\'>\n' +
-                        '        <div class="avatar tooltipped tooltipped-ne"\n' +
-                        '             aria-label="' + cmd.fromUserName + '"\n' +
-                        '             style="background-image:url(\'' + cmd.fromUserAvatar + '\')"></div>\n' +
-                        '        <div class="fn-flex-1">\n' +
-                        '            <h2>\n' +
-                        '                <a href="">来自「' + cmd.fromUserName + '」的龙门阵密信</a>\n' +
-                        '                <p class="ft-fade fn-right">' + timeTrans(parseFloat(data.mapId)) + '</p>\n' +
-                        '            </h2>\n' +
-                        '            <span class="ft-fade vditor-reset">\n' +
-                        '                主题：' + cmd.theme + '\n' +
-                        '            </span>\n' +
-                        '        </div>\n' +
-                        '    </div>\n' +
-                        '</li>';
-                    $("#received").prepend(html);
-                    break;
                 case 'sender':
                     let html2 = '' +
                         '<li id="' + data.mapId + '">\n' +
@@ -260,15 +240,34 @@ var IdleTalkChannel = {
                         '            <h2>\n' +
                         '                <a href="">发送给「' + cmd.toUserName + '」的龙门阵密信</a>\n' +
                         '                <button class="btn fn-right" style="margin-left: 10px" onclick="IdleTalk.revoke(\'' + data.mapId + '\')">撤回</button>\n' +
-                        '                <p class="ft-fade fn-right">' + timeTrans(parseFloat(data.mapId)) + '</p>\n' +
                         '            </h2>\n' +
                         '            <span class="ft-fade vditor-reset">\n' +
-                        '                主题：' + cmd.theme + '\n' +
+                        '                ' + timeTrans(parseFloat(data.mapId)) + ' · 主题：' + cmd.theme + '\n' +
                         '            </span>\n' +
                         '        </div>\n' +
                         '    </div>\n' +
                         '</li>';
                     $("#sent").prepend(html2);
+                    break;
+                case 'receiver':
+                    let html = '' +
+                        '<li id="' + data.mapId + '">\n' +
+                        '    <div class=\'fn-flex\'>\n' +
+                        '        <div class="avatar tooltipped tooltipped-ne"\n' +
+                        '             aria-label="' + cmd.fromUserName + '"\n' +
+                        '             style="background-image:url(\'' + cmd.fromUserAvatar + '\')"></div>\n' +
+                        '        <div class="fn-flex-1">\n' +
+                        '            <h2>\n' +
+                        '                <a href="">来自「' + cmd.fromUserName + '」的龙门阵密信</a>\n' +
+                        '                <button class="red fn-right" onclick="IdleTalk.seek(\'' + data.mapId + '\')">查看并销毁</button>\n' +
+                        '            </h2>\n' +
+                        '            <span class="ft-fade vditor-reset">\n' +
+                        '                ' + timeTrans(parseFloat(data.mapId)) + ' · 主题：' + cmd.theme + '\n' +
+                        '            </span>\n' +
+                        '        </div>\n' +
+                        '    </div>\n' +
+                        '</li>';
+                    $("#received").prepend(html);
                     break;
             }
         }

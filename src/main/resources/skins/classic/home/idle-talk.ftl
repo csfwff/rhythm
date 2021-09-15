@@ -48,34 +48,7 @@
                         <button class="green fn-right" style="margin-top: 15px;" onclick="IdleTalk.send()">确定发信</button>
                     </div>
                 </div>
-                <h3 id="title" style="padding: 20px 0 20px 0">发出但未被阅读的密信</h3>
-                <div class="list">
-                    <ul id="sent">
-                        <#if meSent?? && (meSent?size > 0)>
-                            <#list meSent as sentMessage>
-                                <li id="${sentMessage.mapId}">
-                                    <div class='fn-flex'>
-                                        <div class="avatar tooltipped tooltipped-ne"
-                                             aria-label="${sentMessage.toUserName}"
-                                             style="background-image:url('${sentMessage.toUserAvatar}')"></div>
-                                        <div class="fn-flex-1">
-                                            <h2>
-                                                <a href="">发送给「${sentMessage.toUserName}」的龙门阵密信</a>
-                                                <#assign thisDate=sentMessage.mapId?number?number_to_datetime>
-                                                <button class="btn fn-right" style="margin-left: 10px" onclick="IdleTalk.revoke('${sentMessage.mapId}')">撤回</button>
-                                                <p class="ft-fade fn-right">${thisDate?string("yyyy年MM月dd日 HH:mm:ss")}</p>
-                                            </h2>
-                                            <span class="ft-fade vditor-reset">
-                                                主题：${sentMessage.theme}
-                                            </span>
-                                        </div>
-                                    </div>
-                                </li>
-                            </#list>
-                        </#if>
-                    </ul>
-                </div>
-                <h3 style="padding: 20px 0 20px 0">收到的信柬</h3>
+                <h3 id="title" style="padding: 20px 0 20px 0">收到的信柬</h3>
                 <div class="list">
                     <ul id="received">
                         <#if meReceived?? && (meReceived?size > 0)>
@@ -88,11 +61,37 @@
                                         <div class="fn-flex-1">
                                             <h2>
                                                 <a href="">来自「${receivedMessage.fromUserName}」的龙门阵密信</a>
-                                                <#assign thisDate=receivedMessage.mapId?number?number_to_datetime>
-                                                <p class="ft-fade fn-right">${thisDate?string("yyyy年MM月dd日 HH:mm:ss")}</p>
+                                                <button class="red fn-right" onclick="IdleTalk.seek('${receivedMessage.mapId}')">查看并销毁</button>
                                             </h2>
                                             <span class="ft-fade vditor-reset">
-                                                主题：${receivedMessage.theme}
+                                                <#assign thisDate=receivedMessage.mapId?number?number_to_datetime>
+                                                ${thisDate?string("yyyy年MM月dd日 HH:mm:ss")} · 主题：${receivedMessage.theme}
+                                            </span>
+                                        </div>
+                                    </div>
+                                </li>
+                            </#list>
+                        </#if>
+                    </ul>
+                </div>
+                <h3 style="padding: 20px 0 20px 0">发出但未被阅读的密信</h3>
+                <div class="list">
+                    <ul id="sent">
+                        <#if meSent?? && (meSent?size > 0)>
+                            <#list meSent as sentMessage>
+                                <li id="${sentMessage.mapId}">
+                                    <div class='fn-flex'>
+                                        <div class="avatar tooltipped tooltipped-ne"
+                                             aria-label="${sentMessage.toUserName}"
+                                             style="background-image:url('${sentMessage.toUserAvatar}')"></div>
+                                        <div class="fn-flex-1">
+                                            <h2>
+                                                <a href="">发送给「${sentMessage.toUserName}」的龙门阵密信</a>
+                                                <button class="btn fn-right" style="margin-left: 10px" onclick="IdleTalk.revoke('${sentMessage.mapId}')">撤回</button>
+                                            </h2>
+                                            <span class="ft-fade vditor-reset">
+                                                <#assign thisDate=sentMessage.mapId?number?number_to_datetime>
+                                                ${thisDate?string("yyyy年MM月dd日 HH:mm:ss")} · 主题：${sentMessage.theme}
                                             </span>
                                         </div>
                                     </div>
