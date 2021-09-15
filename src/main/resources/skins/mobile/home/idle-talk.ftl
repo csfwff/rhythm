@@ -31,7 +31,7 @@
                 <div class="fn-hr10"></div>
                 <div class="module">
                     <div class="module-header">
-                        <h2>「龙门阵」</h2>
+                        <h2>龙门阵</h2>
                         <div style="font-size: 12px;line-height: 18px; padding: 15px">
                             阁下可在「摸鱼派」派中摆「龙门阵」输送密信，全程保密托送，陆个时辰对方未读，将会秘密销毁；阅后即焚。<br>
                             —— 即便是这摸鱼派掌门人，也是毫无窃信之法。<br>

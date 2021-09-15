@@ -31,8 +31,8 @@
             <div class="wrapper">
                 <div class="content activity">
                     <div class="module">
-                        <h2>「龙门阵」</h2>
-                        <button type="submit" class="green fn-right">摆「龙门阵」</button>
+                        <h2>龙门阵</h2>
+                        <button class="green fn-right" onclick="send()">摆「龙门阵」</button>
                         <div class="sub-head" style="font-size: 12px;">
                             阁下可在「摸鱼派」派中摆「龙门阵」输送密信，全程保密托送，陆个时辰对方未读，将会秘密销毁；阅后即焚。<br>
                             —— 即便是这摸鱼派掌门人，也是毫无窃信之法。<br>
@@ -91,3 +91,18 @@
         <#include "../footer.ftl">
     </body>
 </html>
+<script>
+    function send() {
+        $.ajax({
+            url: Label.servePath + '/idle-talk/send',
+            type: 'POST',
+            headers: {'csrfToken': Label.csrfToken},
+            cache: false,
+            data: JSON.stringify({
+                userName: "admin",
+            }),
+            success: function (result) {
+            }
+        });
+    }
+</script>
