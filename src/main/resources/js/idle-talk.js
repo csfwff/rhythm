@@ -30,7 +30,7 @@ var IdleTalk = {
                 if (result.code === -1) {
                     alert(result.msg);
                 } else {
-                    $("#" + mapId).append("<div id='seek-" + mapId + "' style='background-color: #F7F7F7;display:none;'>" + result.data + "<br><button class='btn' style='margin: 20px' onclick='$(\"#" + mapId + "\").remove();'>朕已阅，可以销毁了</button></div>");
+                    $("#" + mapId).append("<div id='seek-" + mapId + "' style='background-color: #F7F7F7;display:none;overflow: auto;'>" + result.data + "<br><button class='btn' style='margin: 20px' onclick='$(\"#" + mapId + "\").remove();'>朕已阅，可以销毁了</button></div>");
                     $("#seek-" + mapId).show(200);
                 }
             }

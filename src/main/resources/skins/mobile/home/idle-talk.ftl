@@ -38,53 +38,69 @@
                             顺便偷偷告诉您：<b>要摆出这「龙门阵」，您要花费 5 两积分</b>。
                         </div>
                         <div>
-                            <button type="submit" class="green">摆「龙门阵」</button>
+                            <button onclick="IdleTalk.expand()" class="green">摆「龙门阵」</button>
                         </div>
                     </div>
+                    <div id="sendMessageWindow" style="height: 150px;display: none;">
+                        <div style="height: 130px;">
+                            <input id="userForm" placeholder="收件人用户名" style="behavior:url(#default#savehistory);width: calc(100% - 43px); height: 20px; border: 1px solid #eee; padding: 20px">
+                            <input id="themeForm" placeholder="信柬主题（50字以内）" style="behavior:url(#default#savehistory);width: calc(100% - 43px); height: 20px; border: 1px solid #eee; padding: 20px">
+                        </div>
+                        <div id="messageContent"></div>
+                        <div>
+                            <button class="green fn-right" style="margin-top: 15px;" onclick="IdleTalk.send()">确定发信</button>
+                        </div>
+                    </div>
+                    <h3 id="title" style="padding: 20px 0 20px 0">收到的信柬</h3>
                     <div class="module-panel" style="padding-top: 15px;">
-                        <ul class="module-list">
-                            <li>
-                                <div class='fn-flex'>
-                                    <div class="avatar tooltipped tooltipped-ne"
-                                         aria-label="adlered" style="background-image:url('https://pwl.stackoverflow.wiki/2021/09/1552202503861_1562141298909-67b099fd.jpeg')"></div>
-                                    <div class="fn-flex-1">
-                                        <h2 class="ft-13">
-                                            <a href="">来自「adlered」的龙门阵密信</a>
-                                        </h2>
-                                        <span class="ft-fade vditor-reset">
-                                                哈喽，这是一封测试的龙门阵密信...
+                        <ul id="received" class="module-list">
+                            <#if meReceived?? && (meReceived?size > 0)>
+                                <#list meReceived as receivedMessage>
+                                    <li id="${receivedMessage.mapId}">
+                                        <div class='fn-flex'>
+                                            <div class="avatar tooltipped tooltipped-ne"
+                                                 aria-label="${receivedMessage.fromUserName}"
+                                                 style="background-image:url('${receivedMessage.fromUserAvatar}')"></div>
+                                            <div class="fn-flex-1">
+                                                <h2>
+                                                    <a href="">来自「${receivedMessage.fromUserName}」的龙门阵密信</a>
+                                                    <button class="red fn-right" onclick="IdleTalk.seek('${receivedMessage.mapId}')">查看并销毁</button>
+                                                </h2>
+                                                <span class="ft-fade vditor-reset">
+                                                <#assign thisDate=receivedMessage.mapId?number?number_to_datetime>
+                                                    ${thisDate?string("yyyy年MM月dd日 HH:mm:ss")} · 主题：${receivedMessage.theme}
                                             </span>
-                                    </div>
-                                </div>
-                            </li>
-                            <li>
-                                <div class='fn-flex'>
-                                    <div class="avatar tooltipped tooltipped-ne"
-                                         aria-label="adlered" style="background-image:url('https://pwl.stackoverflow.wiki/2021/09/1552202503861_1562141298909-67b099fd.jpeg')"></div>
-                                    <div class="fn-flex-1">
-                                        <h2 class="ft-13">
-                                            <a href="">来自「adlered」的龙门阵密信</a>
-                                        </h2>
-                                        <span class="ft-fade vditor-reset">
-                                                哈喽，这是一封测试的龙门阵密信...
+                                            </div>
+                                        </div>
+                                    </li>
+                                </#list>
+                            </#if>
+                        </ul>
+                    </div>
+                    <h3 style="padding: 20px 0 20px 0">发出但未被阅读的密信</h3>
+                    <div class="module-panel" style="padding-top: 15px;">
+                        <ul id="sent" class="module-list">
+                            <#if meSent?? && (meSent?size > 0)>
+                                <#list meSent as sentMessage>
+                                    <li id="${sentMessage.mapId}">
+                                        <div class='fn-flex'>
+                                            <div class="avatar tooltipped tooltipped-ne"
+                                                 aria-label="${sentMessage.toUserName}"
+                                                 style="background-image:url('${sentMessage.toUserAvatar}')"></div>
+                                            <div class="fn-flex-1">
+                                                <h2>
+                                                    <a href="">发送给「${sentMessage.toUserName}」的龙门阵密信</a>
+                                                    <button class="btn fn-right" style="margin-left: 10px" onclick="IdleTalk.revoke('${sentMessage.mapId}')">撤回</button>
+                                                </h2>
+                                                <span class="ft-fade vditor-reset">
+                                                <#assign thisDate=sentMessage.mapId?number?number_to_datetime>
+                                                    ${thisDate?string("yyyy年MM月dd日 HH:mm:ss")} · 主题：${sentMessage.theme}
                                             </span>
-                                    </div>
-                                </div>
-                            </li>
-                            <li>
-                                <div class='fn-flex'>
-                                    <div class="avatar tooltipped tooltipped-ne"
-                                         aria-label="adlered" style="background-image:url('https://pwl.stackoverflow.wiki/2021/09/1552202503861_1562141298909-67b099fd.jpeg')"></div>
-                                    <div class="fn-flex-1">
-                                        <h2 class="ft-13">
-                                            <a href="">来自「adlered」的龙门阵密信</a>
-                                        </h2>
-                                        <span class="ft-fade vditor-reset">
-                                                哈喽，这是一封测试的龙门阵密信...
-                                            </span>
-                                    </div>
-                                </div>
-                            </li>
+                                            </div>
+                                        </div>
+                                    </li>
+                                </#list>
+                            </#if>
                         </ul>
                     </div>
                 </div>

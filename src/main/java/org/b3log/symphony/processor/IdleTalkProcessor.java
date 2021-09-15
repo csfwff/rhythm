@@ -198,6 +198,12 @@ public class IdleTalkProcessor {
             messages.remove(mapId);
             senderContext.remove(fromUserId, mapId);
             receiverContext.remove(toUserId, mapId);
+            // 让发送者销毁
+            final JSONObject cmd = new JSONObject();
+            cmd.put(UserExt.USER_T_ID, toUserId);
+            cmd.put(Common.COMMAND, mapId);
+            cmd.put("youAre", "destroyIdleChatMessage");
+            IdleTalkChannel.sendCmd(cmd);
             context.renderJSON(StatusCodes.SUCC);
         } else {
             context.renderJSON(StatusCodes.ERR).renderMsg("你没有撤回该消息的权限！");
