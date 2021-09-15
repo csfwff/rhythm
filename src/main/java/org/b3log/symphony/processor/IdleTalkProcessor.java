@@ -163,7 +163,13 @@ public class IdleTalkProcessor {
         JSONObject requestJSON = request.getJSON();
         String toUserName = requestJSON.optString(User.USER_NAME);
         JSONObject toUser = userQueryService.getUserByName(toUserName);
-        String toUserId = toUser.optString(Keys.OBJECT_ID);
+        String toUserId;
+        try {
+            toUserId = toUser.optString(Keys.OBJECT_ID);
+        } catch (Exception e) {
+            context.renderJSON(StatusCodes.ERR).renderMsg("用户不存在！");
+            return;
+        }
         String toUserAvatar = toUser.optString(UserExt.USER_AVATAR_URL);
         // Content
         String theme = requestJSON.optString("theme");

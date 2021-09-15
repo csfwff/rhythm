@@ -38,6 +38,11 @@
                     —— 即便是这摸鱼派掌门人，也是毫无窃信之法。<br>
                     顺便偷偷告诉您：<b>要摆出这「龙门阵」，您要花费 5 两积分</b>。
                 </div>
+                <div style="height: 130px;">
+                    <input id="userForm" placeholder="收件人用户名" style="width: calc(100% - 43px); height: 20px; border: 1px solid #eee; padding: 20px">
+                    <input id="themeForm" placeholder="信柬主题（50字以内）" style="width: calc(100% - 43px); height: 20px; border: 1px solid #eee; padding: 20px">
+                </div>
+                <div id="messageContent"></div>
                 <h3 style="padding: 20px 0 20px 0">发出但未被阅读的密信</h3>
                 <div class="list">
                     <ul>
