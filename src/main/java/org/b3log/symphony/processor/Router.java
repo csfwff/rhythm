@@ -53,6 +53,8 @@ public final class Router {
         Dispatcher.webSocket("/gobang-game-channel", gobangChannel);
         final UserChannel userChannel = beanManager.getReference(UserChannel.class);
         Dispatcher.webSocket("/user-channel", userChannel);
+        final IdleTalkChannel idleTalkChannel = beanManager.getReference(IdleTalkChannel.class);
+        Dispatcher.webSocket("/idle-talk-channel", idleTalkChannel);
 
         // 注册 HTTP 错误处理
         final ErrorProcessor errorProcessor = beanManager.getReference(ErrorProcessor.class);
