@@ -26,7 +26,7 @@
 
             <div>
                 <#if isLoggedIn && (currentUser.userName != user.userName)>
-                    <button class="green small" onclick="alert('私信功能正火速开发中，敬请期待～（临时代替：可发布机要贴并@想私信的人进行私聊哦！）')">
+                    <button class="green small" onclick="window.location.href = '${servePath}/idle-talk?toUser=${user.userName}'">
                         ${privateMessageLabel}
                     </button>
                 </#if>
