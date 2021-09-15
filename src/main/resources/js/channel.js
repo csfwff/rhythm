@@ -204,6 +204,45 @@ var ArticleListChannel = {
   },
 }
 
+var IdleTalkChannel = {
+  /**
+   * WebSocket instance.
+   *
+   * @type WebSocket
+   */
+  ws: undefined,
+  /**
+   * @description Initializes message channel
+   */
+  init: function (channelServer) {
+    IdleTalkChannel.ws = new ReconnectingWebSocket(channelServer)
+    IdleTalkChannel.ws.reconnectInterval = 10000
+
+    IdleTalkChannel.ws.onopen = function () {
+      setInterval(function () {
+        IdleTalkChannel.ws.send('-hb-')
+      }, 1000 * 60 * 3)
+    }
+
+    IdleTalkChannel.ws.onmessage = function (evt) {
+      var data = JSON.parse(evt.data)
+
+      switch (data.type) {
+        case 'online':
+
+      }
+    }
+
+    IdleTalkChannel.ws.onclose = function () {
+      IdleTalkChannel.ws.close()
+    }
+
+    IdleTalkChannel.ws.onerror = function (err) {
+      console.log('ERROR', err)
+    }
+  },
+}
+
 /**
  * @description Chatroom channel.
  * @static
