@@ -16,8 +16,11 @@ var IdleTalk = {
                 if (result.code === -1) {
                     alert(result.msg);
                 } else {
-                    alert("已成功交给送信人，请静候回信！")
-                    window.location.reload();
+                    IdleTalk.editor.setValue("");
+                    setTimeout(function () {
+                        alert("已成功交给送信人，请静候回信！")
+                        window.location.reload();
+                    }, 100);
                 }
             }
         });
@@ -36,15 +39,14 @@ var IdleTalk = {
             },
             height: 200,
             counter: 4096,
-            placeholder: '信柬内容（最长20480个字）',
-            ctrlEnter: function () {
-                Comment.add(Label.articleOId, Label.csrfToken,
-                    document.getElementById('articleCommentBtn'))
-            },
-            esc: function () {
-                $('.editor-hide').click()
-            },
+            placeholder: '信柬内容（最长20480个字）'
         })
+
+        let toUser = IdleTalk.getUrlPath("toUser");
+        if (toUser !== false) {
+            IdleTalk.expand();
+            $("#userForm").val(toUser);
+        }
     },
 
     getContent: function () {
@@ -60,6 +62,18 @@ var IdleTalk = {
             $("#sendMessageWindow").fadeOut(200);
         }
     },
+
+    getUrlPath: function (variable) {
+        var query = window.location.search.substring(1);
+        var vars = query.split("&");
+        for (var i = 0; i < vars.length; i++) {
+            var pair = vars[i].split("=");
+            if (pair[0] == variable) {
+                return pair[1];
+            }
+        }
+        return (false);
+    }
 }
 
 $(document).ready(function () {

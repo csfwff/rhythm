@@ -39,11 +39,11 @@
                     顺便偷偷告诉您：<b>要摆出这「龙门阵」，您要花费 5 两积分</b>。
                 </div>
                 <div id="sendMessageWindow" style="height: 150px;display: none;">
-                    <div id="messageContent"></div>
                     <div style="height: 130px;">
                         <input id="userForm" placeholder="收件人用户名" style="width: calc(100% - 43px); height: 20px; border: 1px solid #eee; padding: 20px">
                         <input id="themeForm" placeholder="信柬主题（50字以内）" style="width: calc(100% - 43px); height: 20px; border: 1px solid #eee; padding: 20px">
                     </div>
+                    <div id="messageContent"></div>
                     <div>
                         <button class="green fn-right" style="margin-top: 15px;" onclick="IdleTalk.send()">确定发信</button>
                     </div>

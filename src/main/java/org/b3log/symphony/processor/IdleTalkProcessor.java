@@ -170,6 +170,10 @@ public class IdleTalkProcessor {
             context.renderJSON(StatusCodes.ERR).renderMsg("用户不存在！");
             return;
         }
+        if (fromUserId.equals(toUserId)) {
+            context.renderJSON(StatusCodes.ERR).renderMsg("你是怎么想到给自己发信的？");
+            return;
+        }
         String toUserAvatar = toUser.optString(UserExt.USER_AVATAR_URL);
         // Content
         String theme = requestJSON.optString("theme");
