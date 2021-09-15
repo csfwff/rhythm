@@ -1,5 +1,6 @@
 package org.b3log.symphony.processor;
 
+import com.google.common.collect.HashMultimap;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.b3log.latke.Keys;
@@ -20,8 +21,7 @@ import org.b3log.symphony.util.Sessions;
 import org.b3log.symphony.util.StatusCodes;
 import org.json.JSONObject;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 /**
  * 《龙门阵处理器》
@@ -48,9 +48,51 @@ public class IdleTalkProcessor {
     private UserQueryService userQueryService;
 
     /**
-     * Messages storaged at memory, it won't access database.
+     * Messages saved at memory, it won't access database.
+     *
+     * <MapId, message JSON>
      */
     private static final HashMap<String, JSONObject> messages = new HashMap<>();
+
+    /**
+     * Context table map.
+     *
+     * SenderContext: <SenderId, MapId>
+     * ReceiverContext: <ReceiverId, MapId>
+     */
+    private static final HashMultimap<String, String> senderContext = HashMultimap.create();
+    private static final HashMultimap<String, String> receiverContext = HashMultimap.create();
+
+    private static List<JSONObject> getMessagesBySenderId(String senderId) {
+        List<JSONObject> message = new ArrayList<>();
+        Set<String> sender = senderContext.get(senderId);
+        for (String s : sender) {
+            message.add(messages.get(s).put("mapId", s));
+        }
+        return message;
+    }
+
+    private static List<JSONObject> getMessagesByReceiverId(String receiverId) {
+        List<JSONObject> message = new ArrayList<>();
+        Set<String> receiver = receiverContext.get(receiverId);
+        for (String r : receiver) {
+            message.add(messages.get(r).put("mapId", r));
+        }
+        return message;
+    }
+
+    private static void saveMessage(String senderId, String receiverId, JSONObject message) {
+        String mapId = String.valueOf(System.currentTimeMillis());
+        messages.put(mapId, message);
+        senderContext.put(senderId, mapId);
+        receiverContext.put(receiverId, mapId);
+    }
+
+    private static void removeMessage(String mapId, String senderId, String receiverId) {
+        messages.remove(mapId);
+        senderContext.remove(senderId, mapId);
+        receiverContext.remove(receiverId, mapId);
+    }
 
     /**
      * Register request handlers.
@@ -73,6 +115,12 @@ public class IdleTalkProcessor {
     public void showIdleTalk(final RequestContext context) {
         final AbstractFreeMarkerRenderer renderer = new SkinRenderer(context, "home/idle-talk.ftl");
         final Map<String, Object> dataModel = renderer.getDataModel();
+        final JSONObject currentUser = Sessions.getUser();
+        final String userId = currentUser.optString(Keys.OBJECT_ID);
+        List<JSONObject> meSent = getMessagesBySenderId(userId);
+        List<JSONObject> meReceived = getMessagesByReceiverId(userId);
+        dataModel.put("meSent", meSent);
+        dataModel.put("meReceived", meReceived);
 
         dataModelService.fillHeaderAndFooter(context, dataModel);
     }
@@ -103,6 +151,18 @@ public class IdleTalkProcessor {
             return;
         }
         long time = System.currentTimeMillis();
+        // Storage
+        JSONObject message = new JSONObject();
+        message.put("fromUserId", fromUserId)
+                .put("fromUserName", fromUserName)
+                .put("fromUserAvatar", fromUserAvatar);
+        message.put("toUserId", toUserId)
+                .put("toUserName", toUserName)
+                .put("toUserAvatar", toUserAvatar);
+        message.put("theme", theme);
+        message.put("content", content);
+        saveMessage(fromUserId, toUserId, message);
+
         context.renderJSON(StatusCodes.SUCC);
     }
 }
