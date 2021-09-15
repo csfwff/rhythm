@@ -91,18 +91,5 @@
         <#include "../footer.ftl">
     </body>
 </html>
-<script>
-    function send() {
-        $.ajax({
-            url: Label.servePath + '/idle-talk/send',
-            type: 'POST',
-            headers: {'csrfToken': Label.csrfToken},
-            cache: false,
-            data: JSON.stringify({
-                userName: "admin",
-            }),
-            success: function (result) {
-            }
-        });
-    }
-</script>
+<script src="${staticServePath}/js/idle-talk${miniPostfix}.js?${staticResourceVersion}"></script>
+

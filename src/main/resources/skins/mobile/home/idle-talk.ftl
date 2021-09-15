@@ -93,3 +93,4 @@
         <#include "../footer.ftl">
     </body>
 </html>
+<script src="${staticServePath}/js/idle-talk${miniPostfix}.js?${staticResourceVersion}"></script>
