@@ -233,12 +233,14 @@ var IdleTalkChannel = {
                     let html2 = '' +
                         '<li id="' + data.mapId + '">\n' +
                         '    <div class=\'fn-flex\'>\n' +
+                        '<a href="/member/' + cmd.toUserName + '">' +
                         '        <div class="avatar tooltipped tooltipped-ne"\n' +
                         '             aria-label="' + cmd.toUserName + '"\n' +
                         '             style="background-image:url(\'' + cmd.toUserAvatar + '\')"></div>\n' +
+                        '</a>' +
                         '        <div class="fn-flex-1">\n' +
                         '            <h2>\n' +
-                        '                <a href="">发送给「' + cmd.toUserName + '」的龙门阵密信</a>\n' +
+                        '                <a href="/member/' + cmd.toUserName + '">发送给「' + cmd.toUserName + '」的龙门阵密信</a>\n' +
                         '                <button class="btn fn-right" style="margin-left: 10px" onclick="IdleTalk.revoke(\'' + data.mapId + '\')">撤回</button>\n' +
                         '            </h2>\n' +
                         '            <span class="ft-fade vditor-reset">\n' +
@@ -253,12 +255,14 @@ var IdleTalkChannel = {
                     let html = '' +
                         '<li id="' + data.mapId + '">\n' +
                         '    <div class=\'fn-flex\'>\n' +
+                        '<a href="/member/' + cmd.fromUserName + '">' +
                         '        <div class="avatar tooltipped tooltipped-ne"\n' +
                         '             aria-label="' + cmd.fromUserName + '"\n' +
                         '             style="background-image:url(\'' + cmd.fromUserAvatar + '\')"></div>\n' +
+                        '</a>' +
                         '        <div class="fn-flex-1">\n' +
                         '            <h2>\n' +
-                        '                <a href="">来自「' + cmd.fromUserName + '」的龙门阵密信</a>\n' +
+                        '                <a href="/member/' + cmd.fromUserName + '">来自「' + cmd.fromUserName + '」的龙门阵密信</a>\n' +
                         '                <button class="red fn-right" onclick="IdleTalk.seek(\'' + data.mapId + '\')">查看并销毁</button>\n' +
                         '            </h2>\n' +
                         '            <span class="ft-fade vditor-reset">\n' +
