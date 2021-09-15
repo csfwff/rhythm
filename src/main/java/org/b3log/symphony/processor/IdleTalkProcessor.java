@@ -17,6 +17,7 @@ import org.b3log.symphony.model.Common;
 import org.b3log.symphony.model.Notification;
 import org.b3log.symphony.model.Pointtransfer;
 import org.b3log.symphony.model.UserExt;
+import org.b3log.symphony.processor.channel.IdleTalkChannel;
 import org.b3log.symphony.processor.channel.UserChannel;
 import org.b3log.symphony.processor.middleware.CSRFMidware;
 import org.b3log.symphony.processor.middleware.LoginCheckMidware;
@@ -99,12 +100,21 @@ public class IdleTalkProcessor {
         senderContext.put(senderId, mapId);
         receiverContext.put(receiverId, mapId);
         // 发送 WebSocket 通知
-        message.remove("content");
         // 先通知接收者来新消息了
         final JSONObject cmd = new JSONObject();
         cmd.put(UserExt.USER_T_ID, receiverId);
         cmd.put(Common.COMMAND, "newIdleChatMessage");
         UserChannel.sendCmd(cmd);
+        // 再把发信详情发送给双方
+        message.remove("content");
+        cmd.put(Common.COMMAND, message);
+        // 发给接收者
+        cmd.put("youAre", "receiver");
+        IdleTalkChannel.sendCmd(cmd);
+        // 发给发送者
+        cmd.put(UserExt.USER_T_ID, senderId);
+        cmd.put("youAre", "sender");
+        IdleTalkChannel.sendCmd(cmd);
     }
 
     private static void removeMessage(String mapId, String senderId, String receiverId) {

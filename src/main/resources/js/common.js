@@ -1301,11 +1301,8 @@ var Util = {
           Util.setUnreadNotificationCount(true)
           break
         case 'newIdleChatMessage':
-          Util.blingChat();
-          if (window.location.pathname === "/idle-talk") {
-            if (($("#userForm").val() === '') &&($("#themeForm").val() === '') && (IdleTalk.editor.getValue() === '\n')) {
-              window.location.reload();
-            }
+          if (window.location.pathname !== "/idle-talk") {
+            Util.blingChat();
           }
           break;
       }
