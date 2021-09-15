@@ -99,6 +99,8 @@ public class IdleTalkProcessor {
         senderContext.put(senderId, mapId);
         receiverContext.put(receiverId, mapId);
         // 发送 WebSocket 通知
+        message.remove("content");
+        // 先发送
         final JSONObject cmd = new JSONObject();
         cmd.put(UserExt.USER_T_ID, receiverId);
         cmd.put(Common.COMMAND, "newIdleChatMessage");
