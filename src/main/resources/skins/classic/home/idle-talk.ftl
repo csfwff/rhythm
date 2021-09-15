@@ -55,12 +55,14 @@
                             <#list meReceived as receivedMessage>
                                 <li id="${receivedMessage.mapId}">
                                     <div class='fn-flex'>
-                                        <div class="avatar tooltipped tooltipped-ne"
-                                             aria-label="${receivedMessage.fromUserName}"
-                                             style="background-image:url('${receivedMessage.fromUserAvatar}')"></div>
+                                        <a href="${servePath}/member/${receivedMessage.fromUserName}">
+                                            <div class="avatar tooltipped tooltipped-ne"
+                                                 aria-label="${receivedMessage.fromUserName}"
+                                                 style="background-image:url('${receivedMessage.fromUserAvatar}')"></div>
+                                        </a>
                                         <div class="fn-flex-1">
                                             <h2>
-                                                <a href="">来自「${receivedMessage.fromUserName}」的龙门阵密信</a>
+                                                <a href="${servePath}/member/${receivedMessage.fromUserName}">来自「${receivedMessage.fromUserName}」的龙门阵密信</a>
                                                 <button class="red fn-right" onclick="IdleTalk.seek('${receivedMessage.mapId}')">查看并销毁</button>
                                             </h2>
                                             <span class="ft-fade vditor-reset">
@@ -81,12 +83,14 @@
                             <#list meSent as sentMessage>
                                 <li id="${sentMessage.mapId}">
                                     <div class='fn-flex'>
-                                        <div class="avatar tooltipped tooltipped-ne"
-                                             aria-label="${sentMessage.toUserName}"
-                                             style="background-image:url('${sentMessage.toUserAvatar}')"></div>
+                                        <a href="${servePath}/member/${sentMessage.toUserName}">
+                                            <div class="avatar tooltipped tooltipped-ne"
+                                                 aria-label="${sentMessage.toUserName}"
+                                                 style="background-image:url('${sentMessage.toUserAvatar}')"></div>
+                                        </a>
                                         <div class="fn-flex-1">
                                             <h2>
-                                                <a href="">发送给「${sentMessage.toUserName}」的龙门阵密信</a>
+                                                <a href="${servePath}/member/${sentMessage.toUserName}">发送给「${sentMessage.toUserName}」的龙门阵密信</a>
                                                 <button class="btn fn-right" style="margin-left: 10px" onclick="IdleTalk.revoke('${sentMessage.mapId}')">撤回</button>
                                             </h2>
                                             <span class="ft-fade vditor-reset">
