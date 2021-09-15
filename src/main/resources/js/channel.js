@@ -269,6 +269,9 @@ var IdleTalkChannel = {
                         '</li>';
                     $("#received").prepend(html);
                     break;
+                case 'destroyIdleChatMessage':
+                    $("#" + cmd).remove();
+                    break;
             }
         }
 
