@@ -94,3 +94,8 @@
     </body>
 </html>
 <script src="${staticServePath}/js/idle-talk${miniPostfix}.js?${staticResourceVersion}"></script>
+<script src="${staticServePath}/js/channel${miniPostfix}.js?${staticResourceVersion}"></script>
+<script>
+    // Init [IdleTalk] channel
+    IdleTalkChannel.init("${wsScheme}://${serverHost}:${serverPort}${contextPath}/idle-talk-channel");
+</script>

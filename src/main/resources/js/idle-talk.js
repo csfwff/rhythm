@@ -38,10 +38,7 @@ var IdleTalk = {
                     $("#userForm").val("");
                     $("#themeForm").val("");
                     IdleTalk.editor.setValue("");
-                    setTimeout(function () {
-                        alert("已成功交给送信人，请静候回信！")
-                        window.location.reload();
-                    }, 100);
+
                 }
             }
         });

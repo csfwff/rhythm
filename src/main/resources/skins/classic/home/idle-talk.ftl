@@ -50,7 +50,7 @@
                 </div>
                 <h3 id="title" style="padding: 20px 0 20px 0">发出但未被阅读的密信</h3>
                 <div class="list">
-                    <ul>
+                    <ul id="sent">
                         <#if meSent?? && (meSent?size > 0)>
                             <#list meSent as sentMessage>
                                 <li id="${sentMessage.mapId}">
@@ -72,14 +72,12 @@
                                     </div>
                                 </li>
                             </#list>
-                        <#else>
-                            没有找到待对方阅读并销毁的已发送密信。
                         </#if>
                     </ul>
                 </div>
                 <h3 style="padding: 20px 0 20px 0">收到的信柬</h3>
                 <div class="list">
-                    <ul>
+                    <ul id="received">
                         <#if meReceived?? && (meReceived?size > 0)>
                             <#list meReceived as receivedMessage>
                                 <li id="${receivedMessage.mapId}">
@@ -100,8 +98,6 @@
                                     </div>
                                 </li>
                             </#list>
-                        <#else>
-                            你没有收到任何信柬。
                         </#if>
                     </ul>
                 </div>

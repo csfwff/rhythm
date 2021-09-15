@@ -106,6 +106,7 @@ public class IdleTalkProcessor {
         cmd.put(Common.COMMAND, "newIdleChatMessage");
         UserChannel.sendCmd(cmd);
         // 再把发信详情发送给双方
+        cmd.put("mapId", mapId);
         message.remove("content");
         cmd.put(Common.COMMAND, message);
         // 发给接收者
