@@ -23,6 +23,7 @@ import org.apache.logging.log4j.Logger;
 import org.b3log.latke.ioc.Inject;
 import org.b3log.latke.service.annotation.Service;
 import org.b3log.latke.util.Stopwatchs;
+import org.b3log.symphony.processor.IdleTalkProcessor;
 import org.b3log.symphony.util.Symphonys;
 import org.b3log.symphony.util.Vocation;
 
@@ -108,6 +109,17 @@ public class CronMgmtService {
      */
     public void start() {
         long delay = 10000;
+
+        Symphonys.SCHEDULED_EXECUTOR_SERVICE.scheduleAtFixedRate(() -> {
+            try {
+                IdleTalkProcessor.cleanValidatedMessages();
+            } catch (final Exception e) {
+                LOGGER.log(Level.ERROR, "Executes cron failed", e);
+            } finally {
+                Stopwatchs.release();
+            }
+        }, delay, 60 * 1000, TimeUnit.MILLISECONDS);
+        delay += 2000;
 
         Symphonys.SCHEDULED_EXECUTOR_SERVICE.scheduleAtFixedRate(() -> {
             try {
