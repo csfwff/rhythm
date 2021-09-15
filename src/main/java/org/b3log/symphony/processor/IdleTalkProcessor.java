@@ -24,8 +24,7 @@ import org.b3log.symphony.processor.middleware.LoginCheckMidware;
 import org.b3log.symphony.service.DataModelService;
 import org.b3log.symphony.service.PointtransferMgmtService;
 import org.b3log.symphony.service.UserQueryService;
-import org.b3log.symphony.util.Sessions;
-import org.b3log.symphony.util.StatusCodes;
+import org.b3log.symphony.util.*;
 import org.json.JSONObject;
 
 import java.util.*;
@@ -136,6 +135,41 @@ public class IdleTalkProcessor {
         Dispatcher.get("/idle-talk", idleTalkProcessor::showIdleTalk, loginCheck::handle, csrfMidware::fill);
         Dispatcher.post("/idle-talk/send", idleTalkProcessor::sendIdleTalk, loginCheck::handle, csrfMidware::check);
         Dispatcher.get("/idle-talk/revoke", idleTalkProcessor::revoke, loginCheck::handle, csrfMidware::check);
+        Dispatcher.get("/idle-talk/seek", idleTalkProcessor::seek, loginCheck::handle, csrfMidware::check);
+    }
+
+    /**
+     * seek a message and remove.
+     *
+     * @param context
+     */
+    public void seek(final RequestContext context) {
+        JSONObject user = Sessions.getUser();
+        if (user == null) {
+            context.renderJSON(StatusCodes.ERR).renderMsg("无法获取用户信息！");
+            return;
+        }
+        String mapId = context.param("mapId");
+        JSONObject message = messages.get(mapId);
+        String fromUserId = message.optString("fromUserId");
+        String toUserId = message.optString("toUserId");
+        if (toUserId.equals(user.optString(Keys.OBJECT_ID))) {
+            // 渲染消息
+            String content = message.optString("content");
+            content = Emotions.toAliases(content);
+            content = Emotions.convert(content);
+            content = Markdowns.toHTML(content);
+            content = Markdowns.clean(content, "");
+            content = MediaPlayers.renderAudio(content);
+            content = MediaPlayers.renderVideo(content);
+            // 删除消息
+            messages.remove(mapId);
+            senderContext.remove(fromUserId, mapId);
+            receiverContext.remove(toUserId, mapId);
+            context.renderJSON(StatusCodes.SUCC).renderData(content);
+        } else {
+            context.renderJSON(StatusCodes.ERR).renderMsg("你没有查看该消息的权限！");
+        }
     }
 
     /**

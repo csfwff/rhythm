@@ -20,6 +20,22 @@ var IdleTalk = {
         }
     },
 
+    seek: function (mapId) {
+        $.ajax({
+            url: Label.servePath + '/idle-talk/seek?mapId=' + mapId,
+            type: 'GET',
+            headers: {'csrfToken': Label.csrfToken},
+            cache: false,
+            success: function (result) {
+                if (result.code === -1) {
+                    alert(result.msg);
+                } else {
+                    alert(result.data);
+                }
+            }
+        });
+    },
+
     send: function () {
         $.ajax({
             url: Label.servePath + '/idle-talk/send',
