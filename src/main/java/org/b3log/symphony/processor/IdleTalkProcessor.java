@@ -125,6 +125,16 @@ public class IdleTalkProcessor {
     }
 
     /**
+     * Return true if the user has unread chat message.
+     *
+     * @param userId
+     * @return
+     */
+    public static boolean hasUnreadChatMessage(String userId) {
+        return receiverContext.get(userId).size() != 0;
+    }
+
+    /**
      * Shows Idle Talk index.
      *
      * @param context
@@ -186,7 +196,7 @@ public class IdleTalkProcessor {
         // Content
         String theme = requestJSON.optString("theme");
         String content = requestJSON.optString("content");
-        if (theme.isEmpty() || content.isEmpty()) {
+        if (theme.isEmpty() || content.equals("\n")) {
             context.renderJSON(StatusCodes.ERR).renderMsg("主题和正文不得为空！");
             return;
         }
