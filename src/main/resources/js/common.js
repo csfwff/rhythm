@@ -29,6 +29,8 @@
  * @static
  */
 var Util = {
+  bling: undefined,
+
   LazyLoadImage: function () {
     var loadImg = function (it) {
       var testImage = document.createElement('img')
@@ -1297,6 +1299,14 @@ var Util = {
         case 'refreshNotification':
           Util.setUnreadNotificationCount(true)
           break
+        case 'newIdleChatMessage':
+          Util.blingChat();
+          if (window.location.pathname === "/idle-talk") {
+            if (($("#userForm").val() === '') &&($("#themeForm").val() === '') && (IdleTalk.editor.getValue() === '\n')) {
+              window.location.reload();
+            }
+          }
+          break;
       }
     }
 
@@ -1307,6 +1317,27 @@ var Util = {
     userChannel.onerror = function (err) {
       console.log('ERROR', err)
     }
+  },
+  /**
+   * @description 让聊天图标闪烁
+   */
+  blingChat: function () {
+    $("#idleTalkIconContainer").html("<use xlink:href=\"#redIdleChat\"></use>");
+    setTimeout(function () {
+      $("#idleTalkIconContainer").html("<use xlink:href=\"#idleChat\"></use>");
+    }, 1000);
+    bling = setInterval(function () {
+      $("#idleTalkIconContainer").html("<use xlink:href=\"#redIdleChat\"></use>");
+      setTimeout(function () {
+        $("#idleTalkIconContainer").html("<use xlink:href=\"#idleChat\"></use>");
+      }, 1000);
+    }, 2000);
+  },
+  /**
+   * @description 终止闪烁聊天图标
+   */
+  pauseBling: function () {
+    clearInterval(bling);
   },
   /**
    * @description 设置导航状态

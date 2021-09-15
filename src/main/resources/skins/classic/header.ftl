@@ -82,7 +82,7 @@
                href="${servePath}/notifications" aria-label="${messageLabel}">${unreadNotificationCount}
             </a>
             <a href="${servePath}/idle-talk" class="tooltipped tooltipped-w" aria-label="摆龙门阵（私信）">
-                <svg>
+                <svg id="idleTalkIconContainer">
                     <use xlink:href="#idleChat"></use>
                 </svg>
             </a>

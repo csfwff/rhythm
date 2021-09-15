@@ -40,8 +40,8 @@
                 </div>
                 <div id="sendMessageWindow" style="height: 150px;display: none;">
                     <div style="height: 130px;">
-                        <input id="userForm" placeholder="收件人用户名" style="width: calc(100% - 43px); height: 20px; border: 1px solid #eee; padding: 20px">
-                        <input id="themeForm" placeholder="信柬主题（50字以内）" style="width: calc(100% - 43px); height: 20px; border: 1px solid #eee; padding: 20px">
+                        <input id="userForm" placeholder="收件人用户名" style="behavior:url(#default#savehistory);width: calc(100% - 43px); height: 20px; border: 1px solid #eee; padding: 20px">
+                        <input id="themeForm" placeholder="信柬主题（50字以内）" style="behavior:url(#default#savehistory);width: calc(100% - 43px); height: 20px; border: 1px solid #eee; padding: 20px">
                     </div>
                     <div id="messageContent"></div>
                     <div>
