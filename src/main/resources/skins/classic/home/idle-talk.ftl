@@ -71,7 +71,7 @@
                     <ul>
                         <#if meReceived?? && (meReceived?size > 0)>
                             <#list meReceived as receivedMessage>
-                                <li>
+                                <li id="${receivedMessage.mapId}">
                                     <div class='fn-flex'>
                                         <div class="avatar tooltipped tooltipped-ne"
                                              aria-label="${receivedMessage.fromUserName}"
