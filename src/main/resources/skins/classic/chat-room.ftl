@@ -57,7 +57,7 @@
                     </div>
                 </div>
             </div>
-            <div class="list module" id="comments">
+            <div class="list module" id="comments" style="height: 100%">
                 <ul>
                     <#list messages as msg>
                         <li class="fn-flex">
@@ -112,7 +112,7 @@
     Label.insertEmojiLabel = '${insertEmojiLabel}';
     ChatRoom.init();
     // Init [ChatRoom] channel
-    ChatRoomChannel.init("${wsScheme}://${serverHost}:${serverPort}${contextPath}/chat-room-channel?user=" + Label.currentUserName);
+    ChatRoomChannel.init("${wsScheme}://${serverHost}:${serverPort}${contextPath}/chat-room-channel");
     var page = 1;
     ChatRoom.more();
     var chatRoomPictureStatus = "<#if 0 == chatRoomPictureStatus> blur</#if>";

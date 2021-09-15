@@ -29,13 +29,13 @@
 var ChatRoom = {
   init: function () {
     // 聊天窗口高度设置
-    if ($.ua.device.type !== 'mobile') {
+    /* if ($.ua.device.type !== 'mobile') {
       $('.list').
         height($('.side').height() -
           $('.chat-room .module:first').outerHeight() - 20)
     } else {
       $('.list').height($(window).height() - 173)
-    }
+    } */
 
     // 没用登录就不需要编辑器初始化了
     if ($('#chatContent').length === 0) {

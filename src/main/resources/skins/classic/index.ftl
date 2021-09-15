@@ -374,7 +374,7 @@ ${HeaderBannerLabel}
         </#if>
     }
 
-    ChatRoomChannel.init("${wsScheme}://${serverHost}:${serverPort}${contextPath}/chat-room-channel?type=index&user=" + Label.currentUserName);
+    ChatRoomChannel.init("${wsScheme}://${serverHost}:${serverPort}${contextPath}/chat-room-channel?type=index");
 
     var chatRoomPictureStatus = "<#if 0 == chatRoomPictureStatus> blur</#if>";
 </script>

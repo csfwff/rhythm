@@ -43,6 +43,8 @@ public class IdleTalkProcessor {
     @Inject
     private LangPropsService langPropsService;
 
+
+
     /**
      * Register request handlers.
      */
