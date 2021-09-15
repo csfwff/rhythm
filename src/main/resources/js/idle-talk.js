@@ -1,6 +1,25 @@
 var IdleTalk = {
     editor: undefined,
 
+    revoke: function (mapId) {
+        let c = confirm("确定要撤回这封信吗？对方将无法再打开这封信，同时你的积分将不会被退还。")
+        if (c === true) {
+            $.ajax({
+                url: Label.servePath + '/idle-talk/revoke?mapId=' + mapId,
+                type: 'GET',
+                headers: {'csrfToken': Label.csrfToken},
+                cache: false,
+                success: function (result) {
+                    if (result.code === -1) {
+                        alert(result.msg);
+                    } else {
+                        $("#" + mapId).remove();
+                    }
+                }
+            });
+        }
+    },
+
     send: function () {
         $.ajax({
             url: Label.servePath + '/idle-talk/send',

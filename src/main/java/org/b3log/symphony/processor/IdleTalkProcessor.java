@@ -122,6 +122,32 @@ public class IdleTalkProcessor {
         final IdleTalkProcessor idleTalkProcessor = beanManager.getReference(IdleTalkProcessor.class);
         Dispatcher.get("/idle-talk", idleTalkProcessor::showIdleTalk, loginCheck::handle, csrfMidware::fill);
         Dispatcher.post("/idle-talk/send", idleTalkProcessor::sendIdleTalk, loginCheck::handle, csrfMidware::check);
+        Dispatcher.get("/idle-talk/revoke", idleTalkProcessor::revoke, loginCheck::handle, csrfMidware::check);
+    }
+
+    /**
+     * Revoke a message.
+     *
+     * @param context
+     */
+    public void revoke(final RequestContext context) {
+        JSONObject user = Sessions.getUser();
+        if (user == null) {
+            context.renderJSON(StatusCodes.ERR).renderMsg("无法获取用户信息！");
+            return;
+        }
+        String mapId = context.param("mapId");
+        JSONObject message = messages.get(mapId);
+        String fromUserId = message.optString("fromUserId");
+        String toUserId = message.optString("toUserId");
+        if (fromUserId.equals(user.optString(Keys.OBJECT_ID))) {
+            messages.remove(mapId);
+            senderContext.remove(fromUserId, mapId);
+            receiverContext.remove(toUserId, mapId);
+            context.renderJSON(StatusCodes.SUCC);
+        } else {
+            context.renderJSON(StatusCodes.ERR).renderMsg("你没有撤回该消息的权限！");
+        }
     }
 
     /**

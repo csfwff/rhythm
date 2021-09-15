@@ -62,6 +62,7 @@
                                             <h2>
                                                 <a href="">发送给「${sentMessage.toUserName}」的龙门阵密信</a>
                                                 <#assign thisDate=sentMessage.mapId?number?number_to_datetime>
+                                                <button class="btn fn-right" style="margin-left: 10px" onclick="IdleTalk.revoke('${sentMessage.mapId}')">撤回</button>
                                                 <p class="ft-fade fn-right">${thisDate?string("yyyy年MM月dd日 HH:mm:ss")}</p>
                                             </h2>
                                             <span class="ft-fade vditor-reset">
