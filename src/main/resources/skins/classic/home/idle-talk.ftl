@@ -38,7 +38,7 @@
                     —— 即便是这摸鱼派掌门人，也是毫无窃信之法。<br>
                     顺便偷偷告诉您：<b>要摆出这「龙门阵」，您要花费 5 两积分</b>。
                 </div>
-                <h3 style="padding: 20px 0 20px 0">发出的密信</h3>
+                <h3 style="padding: 20px 0 20px 0">发出但未被阅读的密信</h3>
                 <div class="list">
                     <ul>
                         <#if meSent?? && (meSent?size > 0)>
