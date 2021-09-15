@@ -32,18 +32,23 @@
         <div class="content activity">
             <div class="module">
                 <h2>龙门阵</h2>
-                <button class="green fn-right" onclick="IdleTalk.send()">摆「龙门阵」</button>
+                <button class="green fn-right" onclick="IdleTalk.expand()">摆「龙门阵」</button>
                 <div class="sub-head" style="font-size: 12px;">
                     阁下可在「摸鱼派」派中摆「龙门阵」输送密信，全程保密托送，陆个时辰对方未读，将会秘密销毁；阅后即焚。<br>
                     —— 即便是这摸鱼派掌门人，也是毫无窃信之法。<br>
                     顺便偷偷告诉您：<b>要摆出这「龙门阵」，您要花费 5 两积分</b>。
                 </div>
-                <div style="height: 130px;">
-                    <input id="userForm" placeholder="收件人用户名" style="width: calc(100% - 43px); height: 20px; border: 1px solid #eee; padding: 20px">
-                    <input id="themeForm" placeholder="信柬主题（50字以内）" style="width: calc(100% - 43px); height: 20px; border: 1px solid #eee; padding: 20px">
+                <div id="sendMessageWindow" style="height: 150px;display: none;">
+                    <div id="messageContent"></div>
+                    <div style="height: 130px;">
+                        <input id="userForm" placeholder="收件人用户名" style="width: calc(100% - 43px); height: 20px; border: 1px solid #eee; padding: 20px">
+                        <input id="themeForm" placeholder="信柬主题（50字以内）" style="width: calc(100% - 43px); height: 20px; border: 1px solid #eee; padding: 20px">
+                    </div>
+                    <div>
+                        <button class="green fn-right" style="margin-top: 15px;" onclick="IdleTalk.send()">确定发信</button>
+                    </div>
                 </div>
-                <div id="messageContent"></div>
-                <h3 style="padding: 20px 0 20px 0">发出但未被阅读的密信</h3>
+                <h3 id="title" style="padding: 20px 0 20px 0">发出但未被阅读的密信</h3>
                 <div class="list">
                     <ul>
                         <#if meSent?? && (meSent?size > 0)>

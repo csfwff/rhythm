@@ -49,7 +49,17 @@ var IdleTalk = {
 
     getContent: function () {
         return IdleTalk.editor.getValue()
-    }
+    },
+
+    expand: function () {
+        if ($("#sendMessageWindow").is(":hidden")) {
+            $("#title").css("padding", "230px 0 20px 0");
+            $("#sendMessageWindow").fadeIn(200);
+        } else {
+            $("#title").css("padding", "20px 0 20px 0");
+            $("#sendMessageWindow").fadeOut(200);
+        }
+    },
 }
 
 $(document).ready(function () {
