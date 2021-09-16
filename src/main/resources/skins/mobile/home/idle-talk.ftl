@@ -23,6 +23,14 @@
     <head>
         <@head title="龙门阵 - ${symphonyLabel}">
         </@head>
+        <style>
+            h2 {
+                font-size: 1em;
+            }
+            div .fn-flex-1 > span {
+                font-size: 1em;
+            }
+        </style>
     </head>
     <body>
         <#include "../header.ftl">
