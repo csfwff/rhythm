@@ -33,6 +33,7 @@ import org.b3log.symphony.service.UserQueryService;
 import org.json.JSONObject;
 
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -65,6 +66,11 @@ public class UserChannel implements WebSocketChannel {
     public static final Map<String, Set<WebSocketSession>> SESSIONS = new ConcurrentHashMap();
 
     /**
+     * Online time count.
+     */
+    private static final Map<String, JSONObject> userOnline = new HashMap<>();
+
+    /**
      * Called when the socket connection with the browser is established.
      *
      * @param session session
@@ -80,6 +86,14 @@ public class UserChannel implements WebSocketChannel {
 
         final String userId = user.optString(Keys.OBJECT_ID);
         // 开始记录在线时间
+        if (!userOnline.containsKey(userId)) {
+            JSONObject onlineUser = new JSONObject();
+            // 当前时间戳
+            onlineUser.put("timeStamp", System.currentTimeMillis());
+            // 用户之前的在线时间
+            onlineUser.put("onlineMinute", userQueryService.getOnlineMinute(userId));
+            userOnline.put(userId, onlineUser);
+        }
 
         final Set<WebSocketSession> userSessions = SESSIONS.getOrDefault(userId, Collections.newSetFromMap(new ConcurrentHashMap()));
         userSessions.add(session);
@@ -184,7 +198,16 @@ public class UserChannel implements WebSocketChannel {
         userSessions.remove(session);
         if (userSessions.isEmpty()) {
             // 停止记录在线时间
-
+            if (userOnline.containsKey(userId)) {
+                JSONObject onlineUser = userOnline.get(userId);
+                long timeStamp = onlineUser.optLong("timeStamp");
+                int onlineMinute = onlineUser.optInt("onlineMinute");
+                long onlineTime = System.currentTimeMillis() - timeStamp;
+                int calcOnlineMinutes = (int) onlineTime / 1000 / 60;
+                onlineMinute = onlineMinute + calcOnlineMinutes;
+                userMgmtService.setOnlineMinute(userId, onlineMinute);
+                userOnline.remove(userId);
+            }
             userMgmtService.updateOnlineStatus(userId, ip, false, true);
             return;
         }
