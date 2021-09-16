@@ -117,3 +117,4 @@
     Util.initSearch('${algoliaAppId}', '${algoliaSearchKey}', '${algoliaIndex}')
 </script>
 </#if>
+<script src="${staticServePath}/js/lib/tooltips/tooltips.min.js?${staticResourceVersion}"></script>
