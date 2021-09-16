@@ -228,13 +228,12 @@
 
   #articleToC {
     position: fixed;
-    top: 48px;
+    top: 60px;
     width: 20%;
-    z-index: 79;
+    z-index: 0;
     right: 0;
     height: 100%;
     border-radius: 0;
-    background-color: $blue-lighter;
 
     .module-panel {
       overflow: auto;
