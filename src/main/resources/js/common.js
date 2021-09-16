@@ -1298,11 +1298,13 @@ var Util = {
 
       switch (data.command) {
         case 'refreshNotification':
-          Util.setUnreadNotificationCount(true)
+          Util.setUnreadNotificationCount(true);
+          Util.notice("default", 3000, "你有一条新的通知！<a href='/notifications'>点击查看</a>");
           break
         case 'newIdleChatMessage':
           if (window.location.pathname !== "/idle-talk") {
             Util.blingChat();
+            Util.notice("warning", 3000, "叮咚！你收到了一条私信。<a href='/idle-talk'>点击查看</a>");
           }
           break;
       }
