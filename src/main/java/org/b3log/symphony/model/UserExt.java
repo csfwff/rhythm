@@ -105,6 +105,11 @@ public final class UserExt {
     public static final String CHAT_ROOM_PICTURE_STATUS = "chatRoomPictureStatus";
 
     /**
+     * Key of user online minute.
+     */
+    public static final String ONLINE_MINUTE = "onlineMinute";
+
+    /**
      * Key of user point status.
      */
     public static final String USER_POINT_STATUS = "userPointStatus";

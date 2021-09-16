@@ -632,6 +632,34 @@ public class UserMgmtService {
     }
 
     /**
+     * Set an online minute.
+     *
+     * @param userId user id.
+     * @param minute online minute.
+     * @throws ServiceException an normal exception.
+     */
+    public void setOnlineMinute(final String userId, int minute) {
+        final Transaction transaction = userRepository.beginTransaction();
+
+        try {
+            final JSONObject user = userRepository.get(userId);
+            if (null == user) {
+                return;
+            }
+            user.put(UserExt.ONLINE_MINUTE, minute);
+            userRepository.update(userId, user, UserExt.ONLINE_MINUTE);
+
+            transaction.commit();
+        } catch (final RepositoryException e) {
+            if (transaction.isActive()) {
+                transaction.rollback();
+            }
+
+            LOGGER.log(Level.ERROR, "Set online minute [id=" + userId + ", minute=" + minute + "] failed", e);
+        }
+    }
+
+    /**
      * Updates the specified user by the given user id.
      *
      * @param userId the given user id

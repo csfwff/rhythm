@@ -23,11 +23,13 @@ import org.b3log.latke.http.Session;
 import org.b3log.latke.http.WebSocketChannel;
 import org.b3log.latke.http.WebSocketSession;
 import org.b3log.latke.ioc.BeanManager;
+import org.b3log.latke.ioc.Inject;
 import org.b3log.latke.ioc.Singleton;
 import org.b3log.latke.model.User;
 import org.b3log.symphony.model.Common;
 import org.b3log.symphony.model.UserExt;
 import org.b3log.symphony.service.UserMgmtService;
+import org.b3log.symphony.service.UserQueryService;
 import org.json.JSONObject;
 
 import java.util.Collections;
@@ -44,6 +46,18 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 @Singleton
 public class UserChannel implements WebSocketChannel {
+
+    /**
+     * User management service.
+     */
+    @Inject
+    private UserMgmtService userMgmtService;
+
+    /**
+     * User query service.
+     */
+    @Inject
+    private UserQueryService userQueryService;
 
     /**
      * Session set.
@@ -65,6 +79,7 @@ public class UserChannel implements WebSocketChannel {
         }
 
         final String userId = user.optString(Keys.OBJECT_ID);
+
         final Set<WebSocketSession> userSessions = SESSIONS.getOrDefault(userId, Collections.newSetFromMap(new ConcurrentHashMap()));
         userSessions.add(session);
 

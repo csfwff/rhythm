@@ -710,4 +710,19 @@ public class UserQueryService {
 
         return Latkes.getContextPath() + "/login?goto=" + to;
     }
+
+    public int getOnlineMinute(final String userId) {
+        try {
+            final Query query = new Query()
+                    .setFilter(new PropertyFilter(Keys.OBJECT_ID, FilterOperator.EQUAL, userId))
+                    .select(UserExt.ONLINE_MINUTE);
+            JSONObject result = userRepository.get(query);
+            final List<JSONObject> results = (List<JSONObject>) result.opt(Keys.RESULTS);
+            return results.get(0).optInt(UserExt.ONLINE_MINUTE);
+        } catch (final RepositoryException e) {
+            LOGGER.log(Level.ERROR, "Gets online minute failed", e);
+
+            return 0;
+        }
+    }
 }
