@@ -161,13 +161,13 @@ public class UserChannel implements WebSocketChannel {
 
         Set<WebSocketSession> userSessions = SESSIONS.get(userId);
         if (null == userSessions) {
-            userMgmtService.updateOnlineStatus(userId, ip, false, false);
+            userMgmtService.updateOnlineStatus(userId, ip, false, true);
             return;
         }
 
         userSessions.remove(session);
         if (userSessions.isEmpty()) {
-            userMgmtService.updateOnlineStatus(userId, ip, false, false);
+            userMgmtService.updateOnlineStatus(userId, ip, false, true);
             return;
         }
     }
