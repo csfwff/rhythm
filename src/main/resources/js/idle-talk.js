@@ -21,7 +21,7 @@ var IdleTalk = {
     destroy: function (mapId) {
         $("#" + mapId).remove();
         if ($("#received").find("li")[0] === undefined && $("#received").find(".nope")[0] === undefined) {
-            $("#received").append('<div class="nope">没有收到任何来信</div>');
+            $("#received").append('<div class="nope"><svg><use xlink:href="#nope"></use></svg> 没有收到任何来信</div>');
         }
     },
 
@@ -39,7 +39,7 @@ var IdleTalk = {
                     } else {
                         $("#" + mapId).remove();
                         if ($("#sent").find("li")[0] === undefined && $("#sent").find(".nope")[0] === undefined) {
-                            $("#sent").append('<div class="nope">没有未读的发信</div>');
+                            $("#sent").append('<div class="nope"><svg><use xlink:href="#nope"></use></svg> 没有未读的发信</div>');
                         }
                         Util.notice("success", 3000, "撤回成功。");
                     }

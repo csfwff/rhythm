@@ -32,9 +32,9 @@
         <div class="content activity">
             <div class="module">
                 <div style="background-color: #F7F7F7;padding: 25px;">
-                    <h2>龙门阵</h2>
+                    <h2><svg style="width: 30px; height: 30px;"><use xlink:href="#dragon"></use></svg> 龙门阵</h2>
                     <br>
-                    <button class="green fn-right" onclick="IdleTalk.expand()">摆「龙门阵」</button>
+                    <button class="green fn-right" onclick="IdleTalk.expand()"><svg style="width: 18px; height: 18px;"><use xlink:href="#taiJi"></use></svg> 摆「龙门阵」</button>
                     <div style="font-size: 1em;">
                         阁下可在「摸鱼派」派中摆「龙门阵」输送密信，全程保密托送，陆个时辰对方未读，将会秘密销毁；阅后即焚。<br>
                         —— 即便是这摸鱼派掌门人，也是毫无窃信之法。<br>
@@ -77,7 +77,7 @@
                                 </li>
                             </#list>
                             <#else>
-                                <div class="nope">没有收到任何来信</div>
+                                <div class="nope"><svg><use xlink:href="#nope"></use></svg> 没有收到任何来信</div>
                         </#if>
                     </ul>
                 </div>
@@ -107,7 +107,7 @@
                                 </li>
                             </#list>
                             <#else>
-                                <div class="nope">没有未读的发信</div>
+                                <div class="nope"><svg><use xlink:href="#nope"></use></svg> 没有未读的发信</div>
                         </#if>
                     </ul>
                 </div>

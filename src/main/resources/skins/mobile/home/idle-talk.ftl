@@ -39,14 +39,14 @@
                 <div class="fn-hr10"></div>
                 <div class="module">
                     <div class="module-header">
-                        <h2>龙门阵</h2>
+                        <h2><svg style="width: 25px; height: 25px;"><use xlink:href="#dragon"></use></svg> 龙门阵</h2>
                         <div style="font-size: 12px;line-height: 18px; padding: 15px">
                             阁下可在「摸鱼派」派中摆「龙门阵」输送密信，全程保密托送，陆个时辰对方未读，将会秘密销毁；阅后即焚。<br>
                             —— 即便是这摸鱼派掌门人，也是毫无窃信之法。<br>
                             顺便偷偷告诉您：<b>要摆出这「龙门阵」，您要花费 5 两积分</b>。
                         </div>
                         <div>
-                            <button onclick="IdleTalk.expand()" class="green">摆「龙门阵」</button>
+                            <button onclick="IdleTalk.expand()" class="green"><svg style="width: 16px; height: 16px;"><use xlink:href="#taiJi"></use></svg> 摆「龙门阵」</button>
                         </div>
                     </div>
                     <div id="sendMessageWindow" style="height: 150px;display: none;">
@@ -85,7 +85,7 @@
                                     </li>
                                 </#list>
                                 <#else>
-                                    <div class="nope">没有收到任何来信</div>
+                                    <div class="nope"><svg><use xlink:href="#nope"></use></svg> 没有收到任何来信</div>
                             </#if>
                         </ul>
                     </div>
@@ -115,7 +115,7 @@
                                     </li>
                                 </#list>
                                 <#else>
-                                    <div class="nope">没有未读的发信</div>
+                                    <div class="nope"><svg><use xlink:href="#nope"></use></svg> 没有未读的发信</div>
                             </#if>
                         </ul>
                     </div>
