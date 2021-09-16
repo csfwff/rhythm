@@ -868,7 +868,7 @@
         {
           "name": "dataId",
           "type": "String",
-          "length": 19,
+          "length": 128,
           "description": "数据实体 id"
         },
         {

@@ -325,7 +325,7 @@ public class CommentMgmtService {
 
             if (Comment.COMMENT_ANONYMOUS_C_PUBLIC == comment.optInt(Comment.COMMENT_ANONYMOUS)) {
                 final boolean succ = null != pointtransferMgmtService.transfer(senderId, receiverId,
-                        Pointtransfer.TRANSFER_TYPE_C_COMMENT_REWARD, rewardPoint, rewardId, System.currentTimeMillis(), "");
+                        Pointtransfer.TRANSFER_TYPE_C_COMMENT_REWARD, rewardPoint, rewardId + "-" + comment.optString(Comment.COMMENT_ON_ARTICLE_ID), System.currentTimeMillis(), "");
 
                 if (!succ) {
                     throw new ServiceException(langPropsService.get("transferFailLabel"));

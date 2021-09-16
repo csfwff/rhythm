@@ -346,7 +346,6 @@ public class PointtransferQueryService {
                         desTemplate = desTemplate.replace("{article}", articleRewardLink);
                         break;
                     case Pointtransfer.TRANSFER_TYPE_C_COMMENT_REWARD:
-                        final JSONObject reward14 = rewardRepository.get(dataId);
                         JSONObject user14;
                         if ("14In".equals(typeStr)) {
                             user14 = userRepository.get(fromId);
@@ -355,7 +354,13 @@ public class PointtransferQueryService {
                         }
                         final String userLink14 = UserExt.getUserLink(user14);
                         desTemplate = desTemplate.replace("{user}", userLink14);
-                        final String articleId14 = reward14.optString(Reward.DATA_ID);
+                        final String articleId14;
+                        try {
+                            articleId14 = dataId.split("-")[1];
+                        } catch (Exception e) {
+                            desTemplate = langPropsService.get("removedLabel");
+                            break;
+                        }
                         final JSONObject article14 = articleRepository.get(articleId14);
                         if (null == article14) {
                             desTemplate = langPropsService.get("removedLabel");
