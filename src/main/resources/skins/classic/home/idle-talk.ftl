@@ -31,12 +31,15 @@
     <div class="wrapper">
         <div class="content activity">
             <div class="module">
-                <h2>龙门阵</h2>
-                <button class="green fn-right" onclick="IdleTalk.expand()">摆「龙门阵」</button>
-                <div class="sub-head" style="font-size: 12px;">
-                    阁下可在「摸鱼派」派中摆「龙门阵」输送密信，全程保密托送，陆个时辰对方未读，将会秘密销毁；阅后即焚。<br>
-                    —— 即便是这摸鱼派掌门人，也是毫无窃信之法。<br>
-                    顺便偷偷告诉您：<b>要摆出这「龙门阵」，您要花费 5 两积分</b>。
+                <div style="background-color: #F7F7F7;padding: 25px;">
+                    <h2>龙门阵</h2>
+                    <br>
+                    <button class="green fn-right" onclick="IdleTalk.expand()">摆「龙门阵」</button>
+                    <div style="font-size: 1em;">
+                        阁下可在「摸鱼派」派中摆「龙门阵」输送密信，全程保密托送，陆个时辰对方未读，将会秘密销毁；阅后即焚。<br>
+                        —— 即便是这摸鱼派掌门人，也是毫无窃信之法。<br>
+                        顺便偷偷告诉您：<b>要摆出这「龙门阵」，您要花费 5 两积分</b>。
+                    </div>
                 </div>
                 <div id="sendMessageWindow" style="height: 150px;display: none;">
                     <div style="height: 130px;">
