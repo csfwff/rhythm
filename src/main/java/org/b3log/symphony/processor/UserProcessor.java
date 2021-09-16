@@ -965,6 +965,8 @@ public class UserProcessor {
         dataModel.put("followerCount", followerCnt);
         final long followingUserCnt = followQueryService.getFollowingCount(userId, Follow.FOLLOWING_TYPE_C_USER);
         dataModel.put("followingUserCount", followingUserCnt);
+        UserQueryService userQueryService = beanManager.getReference(UserQueryService.class);
+        dataModel.put(UserExt.ONLINE_MINUTE, userQueryService.getOnlineMinute(userId));
 
         final String roleId = user.optString(User.USER_ROLE);
         final JSONObject role = roleQueryService.getRole(roleId);

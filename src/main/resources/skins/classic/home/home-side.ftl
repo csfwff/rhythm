@@ -108,7 +108,7 @@
             <span class="ft-gray">${checkinStreakPart2Label}</span>
         </div>
         </div>
-        <ul class="status fn-flex">
+        <ul class="status fn-flex" style="padding-bottom: 0">
             <li id="userTags">
                 <strong>${user.userTagCount?c}</strong>
                 <span class="ft-gray">${tagLabel}</span>
@@ -128,6 +128,12 @@
             <li id="userFollowing" style="cursor:pointer;">
                 <strong>${followingUserCount}</strong>
                 <span class="ft-gray">${followingUsersLabel}</span>
+            </li>
+        </ul>
+        <ul class="status fn-flex" style="padding-top: 0">
+            <li id="onlineMinute" style="cursor:pointer;">
+                <strong>${onlineMinute} 分钟</strong>
+                <span class="ft-gray">在线时间</span>
             </li>
         </ul>
     </div>
