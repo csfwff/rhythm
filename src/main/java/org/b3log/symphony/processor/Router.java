@@ -134,6 +134,9 @@ public final class Router {
         // 假期
         final Vocation vocation = beanManager.getReference(Vocation.class);
         Dispatcher.get("/api/vocation", vocation::vocation);
+        // 举报
+        final ReportProcessor reportProcessor = beanManager.getReference(ReportProcessor.class);
+        Dispatcher.post("/report", reportProcessor::report, loginCheck::handle);
 
         // 管理后台
         AdminProcessor.register();
