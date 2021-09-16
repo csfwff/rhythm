@@ -364,7 +364,7 @@ public final class Sessions {
 
         final BeanManager beanManager = BeanManager.getInstance();
         final UserMgmtService userMgmtService = beanManager.getReference(UserMgmtService.class);
-        userMgmtService.updateOnlineStatus(userId, "", false, true);
+        //userMgmtService.updateOnlineStatus(userId, "", false, true);
     }
 
     /**
@@ -464,7 +464,7 @@ public final class Sessions {
             final String token = cookieJSONObject.optString(Keys.TOKEN);
             final String password = StringUtils.substringBeforeLast(token, COOKIE_ITEM_SEPARATOR);
             if (userPassword.equals(password)) {
-                userMgmtService.updateOnlineStatus(userId, ip, true, true);
+                //userMgmtService.updateOnlineStatus(userId, ip, true, true);
 
                 SESSION_CACHE.put(userId, ret);
 
