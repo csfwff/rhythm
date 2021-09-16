@@ -177,7 +177,7 @@ public class UserChannel implements WebSocketChannel {
      *
      * @param session the specified session
      */
-    private void removeSession(final WebSocketSession session) {
+    private synchronized void removeSession(final WebSocketSession session) {
         final Session httpSession = session.getHttpSession();
         final String userStr = httpSession.getAttribute(User.USER);
         if (null == userStr) {
