@@ -1461,6 +1461,28 @@ var Util = {
       })
     })
   },
+  /**
+   * @description 通知
+   * options 说明
+   * 参数名	默认值	类型	参数说明
+   * type	success	{String}	提示框的类型，可填写参数 default, success, warning, danger
+   * duration	3000	{Number}	设置提示框消失时间，默认 3000 毫秒
+   * callback	function()	{Function}	提示框关闭时所调用的回调法。
+   */
+  notice: function (type, duration, text, callback) {
+    if (callback !== undefined) {
+      $.tooltips(text, {
+        type: type,
+        duration: duration,
+        callback: callback
+      });
+    } else {
+      $.tooltips(text, {
+        type: type,
+        duration: duration
+      });
+    }
+  },
 }
 /**
  * @description 数据验证

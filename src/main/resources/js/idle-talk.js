@@ -35,12 +35,13 @@ var IdleTalk = {
                 cache: false,
                 success: function (result) {
                     if (result.code === -1) {
-                        alert(result.msg);
+                        Util.notice("danger", 3000, result.msg);
                     } else {
                         $("#" + mapId).remove();
                         if ($("#sent").find("li")[0] === undefined && $("#sent").find(".nope")[0] === undefined) {
                             $("#sent").append('<div class="nope">没有未读的发信</div>');
                         }
+                        Util.notice("success", 3000, "撤回成功。");
                     }
                 }
             });
@@ -55,7 +56,7 @@ var IdleTalk = {
             cache: false,
             success: function (result) {
                 if (result.code === -1) {
-                    alert(result.msg);
+                    Util.notice("danger", 3000, result.msg);
                 } else {
                     $("#" + mapId).append("<div id='seek-" + mapId + "' style='background-color: #F7F7F7;display:none;overflow: auto;padding: 20px;'>" + result.data + "<br><button class='green' onclick='IdleTalk.destroy(" + mapId + ")'>朕已阅，可以销毁了</button></div>");
                     $("#seek-" + mapId).show(200);
@@ -77,12 +78,12 @@ var IdleTalk = {
             }),
             success: function (result) {
                 if (result.code === -1) {
-                    alert(result.msg);
+                    Util.notice("danger", 3000, result.msg);
                 } else {
                     $("#userForm").val("");
                     $("#themeForm").val("");
                     IdleTalk.editor.setValue("");
-
+                    Util.notice("success", 3000, "信柬已发送，请静候佳音！");
                 }
             }
         });
