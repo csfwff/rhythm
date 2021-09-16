@@ -79,6 +79,7 @@ public class UserChannel implements WebSocketChannel {
         }
 
         final String userId = user.optString(Keys.OBJECT_ID);
+        // 开始记录在线时间
 
         final Set<WebSocketSession> userSessions = SESSIONS.getOrDefault(userId, Collections.newSetFromMap(new ConcurrentHashMap()));
         userSessions.add(session);
@@ -182,6 +183,8 @@ public class UserChannel implements WebSocketChannel {
 
         userSessions.remove(session);
         if (userSessions.isEmpty()) {
+            // 停止记录在线时间
+
             userMgmtService.updateOnlineStatus(userId, ip, false, true);
             return;
         }
