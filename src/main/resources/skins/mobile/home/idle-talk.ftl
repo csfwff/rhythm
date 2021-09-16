@@ -74,7 +74,7 @@
                                             <div class="fn-flex-1">
                                                 <h2>
                                                     <a href="${servePath}/member/${receivedMessage.fromUserName}">来自「${receivedMessage.fromUserName}」的龙门阵密信</a>
-                                                    <button class="red fn-right" onclick="IdleTalk.seek('${receivedMessage.mapId}')">查看并销毁</button>
+                                                    <button class="red fn-right" onclick="IdleTalk.seek('${receivedMessage.mapId}', '${receivedMessage.fromUserName}', '${receivedMessage.theme}')">查看并销毁</button>
                                                 </h2>
                                                 <span class="ft-fade vditor-reset">
                                                 <#assign thisDate=receivedMessage.mapId?number?number_to_datetime>
