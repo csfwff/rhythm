@@ -18,6 +18,13 @@
 var IdleTalk = {
     editor: undefined,
 
+    destroy: function (mapId) {
+        $("#" + mapId).remove();
+        if ($("#received").find("li")[0] === undefined && $("#received").find(".nope")[0] === undefined) {
+            $("#received").append('<div class="nope">没有收到任何来信</div>');
+        }
+    },
+
     revoke: function (mapId) {
         let c = confirm("确定要撤回这封信吗？对方将无法再打开这封信，同时你的积分将不会被退还。")
         if (c === true) {
@@ -31,6 +38,9 @@ var IdleTalk = {
                         alert(result.msg);
                     } else {
                         $("#" + mapId).remove();
+                        if ($("#sent").find("li")[0] === undefined && $("#sent").find(".nope")[0] === undefined) {
+                            $("#sent").append('<div class="nope">没有未读的发信</div>');
+                        }
                     }
                 }
             });
@@ -47,7 +57,7 @@ var IdleTalk = {
                 if (result.code === -1) {
                     alert(result.msg);
                 } else {
-                    $("#" + mapId).append("<div id='seek-" + mapId + "' style='background-color: #F7F7F7;display:none;overflow: auto;padding: 20px;'>" + result.data + "<br><button class='green' onclick='$(\"#" + mapId + "\").remove();'>朕已阅，可以销毁了</button></div>");
+                    $("#" + mapId).append("<div id='seek-" + mapId + "' style='background-color: #F7F7F7;display:none;overflow: auto;padding: 20px;'>" + result.data + "<br><button class='green' onclick='IdleTalk.destroy(" + mapId + ")'>朕已阅，可以销毁了</button></div>");
                     $("#seek-" + mapId).show(200);
                 }
             }

@@ -250,6 +250,9 @@ var IdleTalkChannel = {
                         '    </div>\n' +
                         '</li>';
                     $("#sent").prepend(html2);
+                    if ($("#sent").find(".nope")[0] !== undefined) {
+                        $("#sent").find(".nope")[0].remove();
+                    }
                     break;
                 case 'receiver':
                     let html = '' +
@@ -272,9 +275,18 @@ var IdleTalkChannel = {
                         '    </div>\n' +
                         '</li>';
                     $("#received").prepend(html);
+                    if ($("#received").find(".nope")[0] !== undefined) {
+                        $("#received").find(".nope")[0].remove();
+                    }
                     break;
                 case 'destroyIdleChatMessage':
                     $("#" + cmd).remove();
+                    if ($("#received").find("li")[0] === undefined && $("#received").find(".nope")[0] === undefined) {
+                        $("#received").append('<div class="nope">没有收到任何来信</div>');
+                    }
+                    if ($("#sent").find("li")[0] === undefined && $("#sent").find(".nope")[0] === undefined) {
+                        $("#sent").append('<div class="nope">没有未读的发信</div>');
+                    }
                     break;
             }
         }

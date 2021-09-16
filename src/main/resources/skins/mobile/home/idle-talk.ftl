@@ -84,10 +84,12 @@
                                         </div>
                                     </li>
                                 </#list>
+                                <#else>
+                                    <div class="nope">没有收到任何来信</div>
                             </#if>
                         </ul>
                     </div>
-                    <h3 style="padding: 20px 0 20px 0">发出但未被阅读的密信</h3>
+                    <h3 style="padding: 40px 0 20px 0">发出但未被阅读的密信</h3>
                     <div class="module-panel" style="padding-top: 15px;">
                         <ul id="sent" class="module-list">
                             <#if meSent?? && (meSent?size > 0)>
@@ -112,6 +114,8 @@
                                         </div>
                                     </li>
                                 </#list>
+                                <#else>
+                                    <div class="nope">没有未读的发信</div>
                             </#if>
                         </ul>
                     </div>
