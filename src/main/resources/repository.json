@@ -1647,6 +1647,11 @@
           "type": "String",
           "length": 255,
           "description": "自定义首页跳转 https://github.com/b3log/symphony/issues/774"
+        },
+        {
+          "name": "onlineMinute",
+          "type": "int",
+          "description": "在线时间（分钟）"
         }
       ]
     },
