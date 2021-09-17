@@ -1057,6 +1057,11 @@ code .dec {
   background-color: #f1f7fe;
 }
 
+.chat-room #comments li img {
+  max-height: 400px;
+  max-width: 600px;
+}
+
 /* end chatroom */
 
 /* start index */
@@ -1456,4 +1461,9 @@ code .dec {
     -webkit-transform: rotate(0deg);
     transform: rotate(0deg);
   }
+}
+
+/* index chatroom */
+#chatRoomIndex li img {
+  max-height: 400px;
 }
