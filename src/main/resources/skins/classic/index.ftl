@@ -545,5 +545,39 @@ ${HeaderBannerLabel}
         });
     }
 </script>
+<script>
+    // img preview
+    var fixDblclick = null
+    $('#chatRoomIndex').on('dblclick', '.vditor-reset img', function () {
+        clearTimeout(fixDblclick)
+        if ($(this).hasClass('emoji')) {
+            return
+        }
+        window.open($(this).attr('src'))
+    }).on('click', '.vditor-reset img', function (event) {
+        clearTimeout(fixDblclick)
+        if ($(this).hasClass('emoji')) {
+            return
+        }
+        var $it = $(this),
+            it = this
+        fixDblclick = setTimeout(function () {
+            var top = it.offsetTop,
+                left = it.offsetLeft
+
+            $('body').
+            append('<div class="img-preview" onclick="$(this).remove()"><img style="transform: translate3d(' +
+                Math.max(0, left) + 'px, ' +
+                Math.max(0, (top - $(window).scrollTop())) + 'px, 0)" src="' +
+                ($it.attr('src').split('?imageView2')[0]) +
+                '"></div>')
+
+            $('.img-preview').css({
+                'background-color': '#fff',
+                'position': 'fixed',
+            })
+        }, 100)
+    })
+</script>
 </body>
 </html>
