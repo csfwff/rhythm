@@ -98,6 +98,10 @@ var ChatRoom = {
         ChatRoom.send()
       },
     })
+
+    // 限制图片大小
+    $("#comments>ul>li>.fn-flex-1>.comment").find("img").css("max-height", "400px");
+    $("#comments>ul>li>.fn-flex-1>.comment").find("img").css("max-width", "600px");
   },
   /**
    * 发送聊天内容
