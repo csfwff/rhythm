@@ -2427,3 +2427,13 @@ only screen and (device-width: 414px) and (device-height: 896px) and (-webkit-de
   filter: none;
   -webkit-filter: none;
 }
+
+/* index chatroom */
+#chatRoomIndex li img {
+  max-height: 400px;
+}
+
+.chat-room li img {
+  max-height: 400px;
+  max-width: 600px;
+}
