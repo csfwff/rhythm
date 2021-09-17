@@ -1263,6 +1263,9 @@ a[class*=" icon-"]:hover {
   margin-bottom: .25em;
   background-size: contain;
   vertical-align: text-top;
+  -webkit-filter: none !important;
+  filter: none !important;
+  transition: none !important;
 }
 
 /* end emoji */
