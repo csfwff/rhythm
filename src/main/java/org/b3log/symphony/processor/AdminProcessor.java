@@ -442,7 +442,13 @@ public class AdminProcessor {
     public void makeReportHandled(final RequestContext context) {
         final String reportId = context.pathVar("reportId");
         final Request request = context.getRequest();
-        reportMgmtService.makeReportHandled(reportId);
+        final JSONObject currentUser = userQueryService.getCurrentUser(request);
+        final String adminUserId = currentUser.optString(Keys.OBJECT_ID);
+        if (reportId.equals(adminUserId)) {
+            context.sendRedirect(Latkes.getServePath() + "/admin/reports");
+            return;
+        }
+        reportMgmtService.makeReportHandled(adminUserId, reportId);
         operationMgmtService.addOperation(Operation.newOperation(request, Operation.OPERATION_CODE_C_MAKE_REPORT_HANDLED, reportId));
 
         context.sendRedirect(Latkes.getServePath() + "/admin/reports");
