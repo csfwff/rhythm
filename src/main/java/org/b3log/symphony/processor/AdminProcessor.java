@@ -448,7 +448,7 @@ public class AdminProcessor {
             context.sendRedirect(Latkes.getServePath() + "/admin/reports");
             return;
         }
-        reportMgmtService.makeReportHandled(adminUserId, reportId);
+        reportMgmtService.makeReportHandled(reportId);
         operationMgmtService.addOperation(Operation.newOperation(request, Operation.OPERATION_CODE_C_MAKE_REPORT_HANDLED, reportId));
 
         context.sendRedirect(Latkes.getServePath() + "/admin/reports");
