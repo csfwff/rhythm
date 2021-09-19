@@ -68,7 +68,7 @@ var IdleTalk = {
                 if (result.code === -1) {
                     Util.notice("danger", 3000, result.msg);
                 } else {
-                    $("#" + mapId).append("<div id='seek-" + mapId + "' style='background-color: #F7F7F7;display:none;overflow: auto;padding: 20px;'>" + result.data + "<br><button class='btn' style='margin-right: 10px' onclick='IdleTalk.reply(\"" + fromUserName + "\", \"" + theme + "\")'>回复</button><button class='green' onclick='IdleTalk.destroy(" + mapId + ")'>朕已阅，可以销毁了</button></div>");
+                    $("#" + mapId).append("<div id='seek-" + mapId + "' style='background-color: #F7F7F7;display:none;overflow: auto;padding: 20px;'>" + result.data + "<br><button class='btn' style='margin-right: 10px' onclick='IdleTalk.reply(\"" + fromUserName + "\", \"" + theme + "\")'>回复</button><button class='green' onclick='IdleTalk.destroy(" + mapId + ")'>已阅，可以销毁了</button></div>");
                     $("#seek-" + mapId).show(200);
                 }
             }
