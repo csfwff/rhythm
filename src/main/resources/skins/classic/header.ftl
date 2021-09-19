@@ -103,7 +103,7 @@
                data-url="${servePath}/member/${currentUser.userName}">
                 <span class="avatar-small" style="background-image:url('${currentUser.userAvatarURL20}')"></span>
             </a>
-            <div class="module person-list" id="personListPanel">
+            <div class="module person-list" id="personListPanel" style="right: 13px">
                 <ul>
                     <li>
                         <a href="${servePath}/member/${currentUser.userName}">${goHomeLabel}</a>
