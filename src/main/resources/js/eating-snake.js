@@ -334,6 +334,7 @@ var EatingSnake = {
                     return;
                 } else {
                     $("#tip").addClass("error").removeClass('succ').html('<ul><li>' + result.msg + '</li></ul>');
+                    Util.alert(result.msg);
                 }
 
                 $("#tip").show();
