@@ -214,10 +214,13 @@ var GobangChannel = {
                     Gobang.drawChessMan(resp.posX,resp.posY,5,"red");
                     if(resp.result != null && resp.result != ""){
                         Util.alert(resp.result);
-                        document.getElementById("gobangCanvas").removeEventListener("click",Gobang.moveChess);
-                        $(".side button.green").show();
-                        $(".side button.red").hide();
-                        $(".side ul").prepend('<li>GG</li>');
+                        setTimeout(function () {
+                            window.location.reload();
+                        }, 3000);
+                        // document.getElementById("gobangCanvas").removeEventListener("click",Gobang.moveChess);
+                        // $(".side button.green").show();
+                        // $(".side button.red").hide();
+                        // $(".side ul").prepend('<li>GG</li>');
                     }
                     break;
                 case 3:
