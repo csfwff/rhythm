@@ -46,7 +46,7 @@ ${HeaderBannerLabel}
                             position: absolute;
                             top: 0;
                             left: 0;
-                            border-width: 11px 13px 14px 13px;
+                            border-width: 10px 10px 13px 10px;
                             border-color: #999 transparent transparent #999;
                             border-style: solid;
                             margin-left: 5px;
@@ -129,7 +129,7 @@ ${HeaderBannerLabel}
         </div>
         <div class="index-recent fn-flex-1">
             <div style="border-bottom: 1px solid #eee;margin:0px 10px ;">
-                <div style="float:left;font-size:13px;margin:5px 0 10px 0; font-weight:bold;">活跃用户</div>
+                <div style="float:left;font-size:13px;margin:5px 0 10px 0; font-weight:bold;">活跃成员</div>
                 <div style="clear:both;"></div>
             </div>
             <div class="module-panel">
@@ -153,7 +153,7 @@ ${HeaderBannerLabel}
             <div class="module-panel">
                 <ul class="module-list">
                     <#list topCheckinUsers as user>
-                        <#if user_index < 9>
+                        <#if user_index < 5>
                             <li class="fn-flex rank">
                                 <#if user_index == 0 || user_index == 1 || user_index == 2>
                                 <span
@@ -164,7 +164,7 @@ ${HeaderBannerLabel}
                                             <#elseif user_index == 2>
                                                 style="border-color: #d9822b transparent transparent #d9822b;"
                                         </#if>
-                                        class="cb-stick tooltipped tooltipped-e" aria-label="管理置顶">
+                                        class="cb-stick tooltipped tooltipped-e" aria-label="第${user_index + 1}名">
                                     <span class="icon-pin-rank">${user_index + 1}</span>
                                     </#if>
                                 </span>
@@ -185,6 +185,48 @@ ${HeaderBannerLabel}
                     </#list>
                 </ul>
             </div>
+
+            <div style="border-bottom: 1px solid #eee;margin:10px 10px 0 10px;">
+                <div style="float:left;font-size:13px;margin:5px 0 10px 0; font-weight:bold;">在线时间排行</div>
+                <div style="float:right;font-size:13px;margin:5px 0 0 0;"><a href="${servePath}/top/online">更多</a>
+                </div>
+                <div style="clear:both;"></div>
+            </div>
+            <div class="module-panel">
+                <ul class="module-list">
+                    <#list onlineTopUsers as user>
+                        <#if user_index < 5>
+                            <li class="fn-flex rank">
+                                <#if user_index == 0 || user_index == 1 || user_index == 2>
+                                <span
+                                        <#if user_index == 0>
+                                            style="border-color: #ffab10 transparent transparent #ffab10;"
+                                        <#elseif user_index == 1>
+                                            style="border-color: #c0c0c0 transparent transparent #c0c0c0;"
+                                        <#elseif user_index == 2>
+                                            style="border-color: #d9822b transparent transparent #d9822b;"
+                                        </#if>
+                                        class="cb-stick tooltipped tooltipped-e" aria-label="第${user_index + 1}名">
+                                    <span class="icon-pin-rank">${user_index + 1}</span>
+                                    </#if>
+                                </span>
+                                <a rel="nofollow" href="${servePath}/member/${user.userName}">
+                                    <span class="avatar-small tooltipped tooltipped-se slogan"
+                                          aria-label="${user.userName}"
+                                          style="background-image:url('${user.userAvatarURL}')"></span>
+                                </a>
+                                <a rel="nofollow" class="title fn-flex-1 tooltipped tooltipped-w"
+                                   aria-label="${pointLabel} ${user.userPoint?c}"
+                                   href="${servePath}/member/${user.userName}">${user.userName}</a>
+                                <a class="fn-right count ft-gray ft-smaller tooltipped tooltipped-w"
+                                   aria-label="在线时长共计 ${user.onlineMinute} 分钟"
+                                   href="${servePath}/top/online">${user.onlineMinute} 分钟</a>
+                            </li>
+                        </#if>
+                    </#list>
+                </ul>
+            </div>
+
         </div>
     </div>
 
