@@ -62,78 +62,6 @@
         <#include "header.ftl">
         <div class="article-body">
             <div class="wrapper">
-                <div class="article-info fn-flex">
-                    <a rel="author" href="${servePath}/member/${article.articleAuthorName}"><div
-                        class="avatar-mid tooltipped tooltipped-se" aria-label="${article.articleAuthorName}" style="background-image:url('${article.articleAuthorThumbnailURL48}')"></div></a>
-                    <div class="fn-flex-1 fn-ellipsis">
-                        <a rel="author" href="${servePath}/member/${article.articleAuthorName}" class="ft-gray"><strong class="ft-gray">${article.articleAuthorName}</strong></a>
-                        <#if 0 == article.articleAuthor.userUAStatus>
-                            <span id="articltVia" class="ft-fade" data-ua="${article.articleUA}"></span>
-                        </#if>
-                        <br/>
-                        <#if "" != article.articleAuthorIntro>
-                            <span class="ft-gray">${article.articleAuthorIntro}</span>
-                        <#else>
-                            <span class="ft-gray">${symphonyLabel} <#if article.articleAnonymous == 0>${article.articleAuthor.userNo?c}<#else>?</#if> ${numMemberLabel}</span>
-                        </#if>
-                        <br/>
-                        <#list article.articleTagObjs as articleTag>
-                            <a rel="tag" class="tag" href="${servePath}/tag/${articleTag.tagURI}">${articleTag.tagTitle}</a>&nbsp;
-                        </#list>
-                        <span class="ft-gray">
-                                •&nbsp;
-                                <a rel="nofollow" class="ft-gray" href="#comments">
-                                    <b class="article-level<#if article.articleCommentCount lt 40>${(article.articleCommentCount/10)?int}<#else>4</#if>">${article.articleCommentCount}</b> ${cmtLabel}</a>
-                                &nbsp;•&nbsp;
-                                <span class="article-level<#if article.articleViewCount lt 400>${(article.articleViewCount/100)?int}<#else>4</#if>">
-                                <#if article.articleViewCount < 1000>
-                                ${article.articleViewCount}
-                                <#else>
-                                ${article.articleViewCntDisplayFormat}
-                                </#if>
-                                </span>
-                                ${viewLabel}
-                            <#if article.articleQnAOfferPoint != 0>
-                                &nbsp;•&nbsp;
-                                <span class="article-level<#if article.articleQnAOfferPoint lt 400>${(article.articleQnAOfferPoint/100)?int}<#else>4</#if>">${article.articleQnAOfferPoint?c}</span>
-                                ${qnaOfferLabel}
-                            </#if>
-                             &nbsp;•&nbsp;
-                        ${article.timeAgo}
-                                <#if "" != article.articleCity>
-                                &nbsp;•&nbsp; <a href="${servePath}/city/${article.articleCity}" target="_blank" rel="nofollow"><span class="ft-green">${article.articleCity}</span></a>
-                                </#if>
-                            </span>
-                    </div>
-
-                    <div class="article-actions action-btns">
-                        <#if "" != article.articleToC>
-                            <span onclick="Article.toggleToc()" aria-label="${ToCLabel}"
-                                  class="tooltipped tooltipped-n"><svg class="ft-red icon-unordered-list"><use xlink:href="#unordered-list"></use></svg></span> &nbsp;
-                        </#if>
-
-                        <#if permissions["commonViewArticleHistory"].permissionGrant && article.articleRevisionCount &gt; 1>
-                            <span onclick="Article.revision('${article.oId}')" aria-label="${historyLabel}"
-                                  class="tooltipped tooltipped-n"><svg class="icon-history"><use xlink:href="#history"></use></svg></span> &nbsp;
-                        </#if>
-
-                        <#if article.isMyArticle && permissions["commonStickArticle"].permissionGrant>
-                            <a class="tooltipped tooltipped-n" aria-label="${stickLabel}"
-                               href="javascript:Article.stick('${article.oId}')"><svg class="icon-chevron-up"><use xlink:href="#chevron-up"></use></svg></a> &nbsp;
-                        </#if>
-                        <#if article.isMyArticle && 3 != article.articleType && permissions["commonUpdateArticle"].permissionGrant>
-                            <a href="${servePath}/update?id=${article.oId}" aria-label="${editLabel}"
-                               class="tooltipped tooltipped-n"><svg class="icon-edit"><use xlink:href="#edit"></use></svg></a> &nbsp;
-                        </#if>
-                        <span aria-label="${reportLabel}" class="tooltipped tooltipped-n"
-                              onclick="$('#reportDialog').data('type', 0).data('id', '${article.oId}').dialog('open')"
-                        ><svg><use xlink:href="#icon-report"></use></svg></span> &nbsp;
-                        <#if permissions["articleUpdateArticleBasic"].permissionGrant>
-                            <a class="tooltipped tooltipped-n" href="${servePath}/admin/article/${article.oId}" aria-label="${adminLabel}"><svg class="icon-setting"><use xlink:href="#setting"></use></svg></a> &nbsp;
-                        </#if>
-                    </div>
-                </div>
-
                 <h1 class="article-title" itemprop="name">
                     <@icon article.articlePerfect article.articleType></@icon>
                     ${article.articleTitleEmoj}
@@ -174,9 +102,80 @@
                     </div>
                 </div>
                 </#if>
+                <div class="article-info fn-flex">
+                    <a rel="author" href="${servePath}/member/${article.articleAuthorName}"><div
+                                class="avatar-mid tooltipped tooltipped-se" aria-label="${article.articleAuthorName}" style="background-image:url('${article.articleAuthorThumbnailURL48}')"></div></a>
+                    <div class="fn-flex-1 fn-ellipsis">
+                        <a rel="author" href="${servePath}/member/${article.articleAuthorName}" class="ft-gray"><strong class="ft-gray">${article.articleAuthorName}</strong></a>
+                        <#if 0 == article.articleAuthor.userUAStatus>
+                            <span id="articltVia" class="ft-fade" data-ua="${article.articleUA}"></span>
+                        </#if>
+                        <br/>
+                        <#if "" != article.articleAuthorIntro>
+                            <span class="ft-gray">${article.articleAuthorIntro}</span>
+                        <#else>
+                            <span class="ft-gray">${symphonyLabel} <#if article.articleAnonymous == 0>${article.articleAuthor.userNo?c}<#else>?</#if> ${numMemberLabel}</span>
+                        </#if>
+                        <br/>
+                        <#list article.articleTagObjs as articleTag>
+                            <a rel="tag" class="tag" href="${servePath}/tag/${articleTag.tagURI}">${articleTag.tagTitle}</a>&nbsp;
+                        </#list>
+                        <span class="ft-gray">
+                                •&nbsp;
+                                <a rel="nofollow" class="ft-gray" href="#comments">
+                                    <b class="article-level<#if article.articleCommentCount lt 40>${(article.articleCommentCount/10)?int}<#else>4</#if>">${article.articleCommentCount}</b> ${cmtLabel}</a>
+                                &nbsp;•&nbsp;
+                                <span class="article-level<#if article.articleViewCount lt 400>${(article.articleViewCount/100)?int}<#else>4</#if>">
+                                <#if article.articleViewCount < 1000>
+                                    ${article.articleViewCount}
+                                <#else>
+                                    ${article.articleViewCntDisplayFormat}
+                                </#if>
+                                </span>
+                                ${viewLabel}
+                            <#if article.articleQnAOfferPoint != 0>
+                                &nbsp;•&nbsp;
+                                <span class="article-level<#if article.articleQnAOfferPoint lt 400>${(article.articleQnAOfferPoint/100)?int}<#else>4</#if>">${article.articleQnAOfferPoint?c}</span>
+                                ${qnaOfferLabel}
+                            </#if>
+                             &nbsp;•&nbsp;
+                        ${article.timeAgo}
+                            <#if "" != article.articleCity>
+                                &nbsp;•&nbsp; <a href="${servePath}/city/${article.articleCity}" target="_blank" rel="nofollow"><span class="ft-green">${article.articleCity}</span></a>
+                            </#if>
+                            </span>
+                    </div>
+
+                    <div class="article-actions action-btns">
+                        <#if "" != article.articleToC>
+                            <span onclick="Article.toggleToc()" aria-label="${ToCLabel}"
+                                  class="tooltipped tooltipped-n"><svg class="ft-red icon-unordered-list"><use xlink:href="#unordered-list"></use></svg></span> &nbsp;
+                        </#if>
+
+                        <#if permissions["commonViewArticleHistory"].permissionGrant && article.articleRevisionCount &gt; 1>
+                            <span onclick="Article.revision('${article.oId}')" aria-label="${historyLabel}"
+                                  class="tooltipped tooltipped-n"><svg class="icon-history"><use xlink:href="#history"></use></svg></span> &nbsp;
+                        </#if>
+
+                        <#if article.isMyArticle && permissions["commonStickArticle"].permissionGrant>
+                            <a class="tooltipped tooltipped-n" aria-label="${stickLabel}"
+                               href="javascript:Article.stick('${article.oId}')"><svg class="icon-chevron-up"><use xlink:href="#chevron-up"></use></svg></a> &nbsp;
+                        </#if>
+                        <#if article.isMyArticle && 3 != article.articleType && permissions["commonUpdateArticle"].permissionGrant>
+                            <a href="${servePath}/update?id=${article.oId}" aria-label="${editLabel}"
+                               class="tooltipped tooltipped-n"><svg class="icon-edit"><use xlink:href="#edit"></use></svg></a> &nbsp;
+                        </#if>
+                        <span aria-label="${reportLabel}" class="tooltipped tooltipped-n"
+                              onclick="$('#reportDialog').data('type', 0).data('id', '${article.oId}').dialog('open')"
+                        ><svg><use xlink:href="#icon-report"></use></svg></span> &nbsp;
+                        <#if permissions["articleUpdateArticleBasic"].permissionGrant>
+                            <a class="tooltipped tooltipped-n" href="${servePath}/admin/article/${article.oId}" aria-label="${adminLabel}"><svg class="icon-setting"><use xlink:href="#setting"></use></svg></a> &nbsp;
+                        </#if>
+                    </div>
+                </div>
             </div>
         </div>
-        <div class="main <#if article.articleComments?size == 0> fn-none</#if>">
+        <div class="main">
             <div class="wrapper" id="articleCommentsPanel">
                 <#if article.offered>
                 <div class="module nice">
