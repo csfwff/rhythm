@@ -174,9 +174,6 @@
                     </div>
                 </div>
                 </#if>
-                <#if discussionViewable>
-                    <textarea rows="3" placeholder="发表评论，友善是第一原则哦" id="sendComment" readonly="readonly"></textarea>
-                </#if>
             </div>
         </div>
         <div class="main <#if article.articleComments?size == 0> fn-none</#if>">
@@ -279,6 +276,20 @@
                         </span>
                     </div>
                     <div class="list">
+                        <div class="comment__reply">
+                            <#if isLoggedIn>
+                                    <div class="fn__flex">
+                                        <span class="avatar" style="background-image: url('${currentUser.userAvatarURL20}');"></span>
+                                        <span class="reply__text fn-flex-1 commentToggleEditorBtn" onclick="Comment._toggleReply();">请输入回帖内容
+                                            ...
+                                        </span>
+                                    </div>
+                                <#else>
+                                    <div class="reply__text fn-flex-1 commentToggleEditorBtn" onclick="Util.goLogin();">登录参与讨论
+                                        ...
+                                    </div>
+                            </#if>
+                        </div>
                         <ul>
                             <#assign notificationCmtIds = "">
                             <#list article.articleComments as comment>
@@ -484,10 +495,10 @@
             </div>
         </#if>
 
-        <#if discussionViewable>
+        <!--<#if discussionViewable>
         <span class="radio-btn" onclick="Comment._toggleReply()"
               data-hasPermission="${permissions['commonAddComment'].permissionGrant?c}">${cmtLabel}</span>
-        </#if>
+        </#if>-->
 
         <#if isLoggedIn && discussionViewable && article.articleCommentable>
         <div class="editor-panel">

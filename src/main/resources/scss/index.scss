@@ -72,7 +72,6 @@
 
   .main {
     min-height: inherit;
-    background-color: rgba(0, 0, 0, .02);
   }
 
   .article-body {
@@ -1466,4 +1465,17 @@ code .dec {
 /* index chatroom */
 #chatRoomIndex li img {
   max-height: 400px;
+}
+
+.comment__reply {
+  padding: 15px;
+
+  .reply__text {
+    color: #4285f4;
+    cursor: pointer;
+    border: 1px solid #eee;
+    line-height: 37px;
+    border-radius: 3px;
+    padding: 0 10px;
+  }
 }
