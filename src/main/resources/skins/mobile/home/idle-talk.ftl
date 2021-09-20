@@ -55,6 +55,7 @@
                     <div id="sendMessageWindow" style="height: 150px;display: none;">
                         <div style="height: 130px;">
                             <input id="userForm" placeholder="收件人用户名" style="behavior:url(#default#savehistory);width: calc(100% - 43px); height: 20px; border: 1px solid #eee; padding: 20px">
+                            <div id="chatUsernameSelectedPanel" class="completed-panel" style="height:170px;display:none;left:auto;top:auto;cursor:pointer;"></div>
                             <input id="themeForm" placeholder="私信主题（50字以内）" style="behavior:url(#default#savehistory);width: calc(100% - 43px); height: 20px; border: 1px solid #eee; padding: 20px">
                         </div>
                         <div id="messageContent"></div>

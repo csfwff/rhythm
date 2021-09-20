@@ -122,9 +122,16 @@ var IdleTalk = {
         }
 
         $("#userForm").on('input', function () {
+            $("#chatUsernameSelectedPanel").html("");
+            $("#chatUsernameSelectedPanel").show();
             let users = Util.getAtUsers($("#userForm").val());
-            for (let i = 0; i < users.length; i++) {
-                console.log(users[i]);
+            if (users.length === 0 || $("#userForm").val() === "") {
+                $("#chatUsernameSelectedPanel").hide();
+            } else {
+                for (let i = 0; i < users.length; i++) {
+                    let user = users[i];
+                    $("#chatUsernameSelectedPanel").append("<a onclick=\"IdleTalk.fillUsername('" + user.username + "')\"><img src='" + user.avatar + "' style='height:20px;width:20px;'> " + user.username + "</a>");
+                }
             }
         });
     },
@@ -157,6 +164,8 @@ var IdleTalk = {
 
     fillUsername: function (username) {
         $("#userForm").val(username);
+        $("#chatUsernameSelectedPanel").html("");
+        $("#chatUsernameSelectedPanel").hide();
     }
 }
 
