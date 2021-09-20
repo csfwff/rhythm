@@ -47,6 +47,7 @@ import org.b3log.symphony.model.*;
 import org.b3log.symphony.processor.middleware.PermissionMidware;
 import org.b3log.symphony.processor.middleware.validate.UserRegister2ValidationMidware;
 import org.b3log.symphony.processor.middleware.validate.UserRegisterValidationMidware;
+import org.b3log.symphony.repository.ReportRepository;
 import org.b3log.symphony.service.*;
 import org.b3log.symphony.util.Escapes;
 import org.b3log.symphony.util.Sessions;
@@ -308,6 +309,12 @@ public class AdminProcessor {
     private OperationQueryService operationQueryService;
 
     /**
+     * Report repository.
+     */
+    @Inject
+    private ReportRepository reportRepository;
+
+    /**
      * Register request handlers.
      */
     public static void register() {
@@ -444,10 +451,17 @@ public class AdminProcessor {
         final Request request = context.getRequest();
         final JSONObject currentUser = userQueryService.getCurrentUser(request);
         final String adminUserId = currentUser.optString(Keys.OBJECT_ID);
-        if (reportId.equals(adminUserId)) {
-            context.sendRedirect(Latkes.getServePath() + "/admin/reports");
-            return;
+        try {
+            final JSONObject report = reportRepository.get(reportId);
+            final String reporterId = report.optString(Report.REPORT_USER_ID);
+            if (reporterId.equals(adminUserId)) {
+                context.sendRedirect(Latkes.getServePath() + "/admin/reports");
+                return;
+            }
+        } catch (final Exception e) {
+            LOGGER.log(Level.ERROR, "Makes report [id=" + reportId + "] as ignored failed", e);
         }
+
         reportMgmtService.makeReportHandled(reportId);
         operationMgmtService.addOperation(Operation.newOperation(request, Operation.OPERATION_CODE_C_MAKE_REPORT_HANDLED, reportId));
 
