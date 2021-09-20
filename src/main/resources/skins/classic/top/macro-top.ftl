@@ -42,6 +42,11 @@
         <link rel="canonical" href="${servePath}/top/link">
             </@head>
         </#if>
+        <#if type == "online">
+            <@head title="在线时间排行 - ${symphonyLabel}">
+                <link rel="canonical" href="${servePath}/top/online">
+            </@head>
+        </#if>
         <link rel="stylesheet" href="${staticServePath}/css/index.css?${staticResourceVersion}" />
         <link rel="stylesheet" href="${staticServePath}/css/responsive.css?${staticResourceVersion}" />
     </head>

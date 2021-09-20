@@ -38,6 +38,10 @@
             <@head title="${linkRankLabel} - ${symphonyLabel}">
             </@head>
         </#if>
+        <#if type == "online">
+            <@head title="在线时间排行 - ${symphonyLabel}">
+            </@head>
+        </#if>
     </head>
     <body>
         <#include "../header.ftl">
