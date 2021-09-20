@@ -24,11 +24,11 @@
         </a>
     </h1>
     <div class="nav-tabs">
-        <#list domains as domain>
+        <!--<#list domains as domain>
         <a pjax-title="${domain.domainTitle} - ${domainLabel} - ${symphonyLabel}"
            href="${servePath}/domain/${domain.domainURI}"<#if selected?? && selected == domain.domainURI>
            class="current"</#if>>${domain.domainIconPath} ${domain.domainTitle}</a>
-        </#list>
+        </#list>-->
         <a pjax-title="${latestLabel} - ${symphonyLabel}"
            href="${servePath}/recent"<#if selected?? && 'recent' == selected> class="current"</#if>>
             <svg>

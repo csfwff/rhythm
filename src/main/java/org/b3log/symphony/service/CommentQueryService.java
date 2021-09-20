@@ -668,6 +668,47 @@ public class CommentQueryService {
     }
 
     /**
+     * Gets the article commentors with the specified article id, page number and page size.
+     *
+     * @param articleId      the specified article id
+     * @return comments, return an empty list if not found
+     */
+    public List<JSONObject> getArticleCommentors(final String articleId) {
+        final Query query = new Query().
+                setFilter(new PropertyFilter(Comment.COMMENT_ON_ARTICLE_ID, FilterOperator.EQUAL, articleId)).
+                addSort(Keys.OBJECT_ID, SortDirection.DESCENDING).
+                select(Comment.COMMENT_AUTHOR_ID);
+
+        try {
+            Stopwatchs.start("Query comments");
+            JSONObject result;
+            try {
+                result = commentRepository.get(query);
+            } finally {
+                Stopwatchs.end();
+            }
+            final List<JSONObject> ret = (List<JSONObject>) result.opt(Keys.RESULTS);
+            final HashSet<String> hashRet = new HashSet<>();
+            for (JSONObject r : ret) {
+                hashRet.add(r.optString(Comment.COMMENT_AUTHOR_ID));
+            }
+
+            final List<JSONObject> fRet = new ArrayList<>();
+            for (String h : hashRet) {
+                fRet.add(userQueryService.getUser(h));
+            }
+
+            return (List<JSONObject>)fRet;
+        } catch (final RepositoryException e) {
+            LOGGER.log(Level.ERROR, "Gets article [" + articleId + "] commentors failed", e);
+
+            return Collections.emptyList();
+        } finally {
+            Stopwatchs.end();
+        }
+    }
+
+    /**
      * Gets comments by the specified request json object.
      *
      * @param requestJSONObject the specified request json object, for example,

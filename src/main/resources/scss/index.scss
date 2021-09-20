@@ -1718,3 +1718,42 @@ code .dec {
 .ft__smaller {
   font-size: 12px;
 }
+
+.article__participant {
+  float: left;
+  cursor: pointer;
+  width: 42px;
+  height: 38px;
+  padding-top: 3px;
+  box-sizing: border-box;
+
+  .avatar-small {
+    border-radius: 18px;
+    height: 32px;
+    width: 32px;
+  }
+}
+
+.fn__space5 {
+  width: 5px;
+  display: inline-block;
+}
+
+.fn__pointer {
+  cursor: pointer;
+}
+
+.article__meta .meta__more {
+  float: right;
+  margin: 0 15px 0 0;
+  cursor: pointer;
+  height: 38px;
+}
+
+.ft-a-title:hover {
+  color: var(--text-color)!important;
+}
+.ft-a-title {
+  color: var(--layer-color)!important;
+  text-decoration: none;
+}

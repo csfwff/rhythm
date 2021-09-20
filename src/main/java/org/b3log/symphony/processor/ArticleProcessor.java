@@ -791,6 +791,7 @@ public class ArticleProcessor {
         // Load comments
         final List<JSONObject> articleComments = commentQueryService.getArticleComments(articleId, pageNum, pageSize, cmtViewMode);
         article.put(Article.ARTICLE_T_COMMENTS, (Object) articleComments);
+        article.put("commentors", (Object) commentQueryService.getArticleCommentors(articleId));
 
         // Fill comment thank
         Stopwatchs.start("Fills comment thank");

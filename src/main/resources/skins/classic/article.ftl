@@ -106,57 +106,9 @@
                 </div>
             </div>
         </#if>
-        <div class="article-info fn-flex">
-            <a rel="author" href="${servePath}/member/${article.articleAuthorName}">
-                <div
-                        class="avatar-mid tooltipped tooltipped-se" aria-label="${article.articleAuthorName}"
-                        style="background-image:url('${article.articleAuthorThumbnailURL48}')"></div>
-            </a>
-            <div class="fn-flex-1 fn-ellipsis">
-                <a rel="author" href="${servePath}/member/${article.articleAuthorName}" class="ft-gray"><strong
-                            class="ft-gray">${article.articleAuthorName}</strong></a>
-                <#if 0 == article.articleAuthor.userUAStatus>
-                    <span id="articltVia" class="ft-fade" data-ua="${article.articleUA}"></span>
-                </#if>
-                <br/>
-                <#if "" != article.articleAuthorIntro>
-                    <span class="ft-gray">${article.articleAuthorIntro}</span>
-                <#else>
-                    <span class="ft-gray">${symphonyLabel} <#if article.articleAnonymous == 0>${article.articleAuthor.userNo?c}<#else>?</#if> ${numMemberLabel}</span>
-                </#if>
-                <br/>
-                <#list article.articleTagObjs as articleTag>
-                    <a rel="tag" class="tag"
-                       href="${servePath}/tag/${articleTag.tagURI}">${articleTag.tagTitle}</a>&nbsp;
-                </#list>
-                <span class="ft-gray">
-                                •&nbsp;
-                                <a rel="nofollow" class="ft-gray" href="#comments">
-                                    <b class="article-level<#if article.articleCommentCount lt 40>${(article.articleCommentCount/10)?int}<#else>4</#if>">${article.articleCommentCount}</b> ${cmtLabel}</a>
-                                &nbsp;•&nbsp;
-                                <span class="article-level<#if article.articleViewCount lt 400>${(article.articleViewCount/100)?int}<#else>4</#if>">
-                                <#if article.articleViewCount < 1000>
-                                    ${article.articleViewCount}
-                                <#else>
-                                    ${article.articleViewCntDisplayFormat}
-                                </#if>
-                                </span>
-                                ${viewLabel}
-                    <#if article.articleQnAOfferPoint != 0>
-                        &nbsp;•&nbsp;
-                        <span class="article-level<#if article.articleQnAOfferPoint lt 400>${(article.articleQnAOfferPoint/100)?int}<#else>4</#if>">${article.articleQnAOfferPoint?c}</span>
-                        ${qnaOfferLabel}
-                    </#if>
-                             &nbsp;•&nbsp;
-                        ${article.timeAgo}
-                    <#if "" != article.articleCity>
-                        &nbsp;•&nbsp; <a href="${servePath}/city/${article.articleCity}" target="_blank" rel="nofollow"><span
-                                class="ft-green">${article.articleCity}</span></a>
-                    </#if>
-                            </span>
-            </div>
 
-            <div class="article-actions action-btns">
+        <div class="article-tail">
+            <div class="article-actions action-btns fn-right">
                 <#if "" != article.articleToC>
                     <span onclick="Article.toggleToc()" aria-label="${ToCLabel}"
                           class="tooltipped tooltipped-n"><svg class="ft-red icon-unordered-list"><use
@@ -197,105 +149,99 @@
                     </a> &nbsp;
                 </#if>
             </div>
-        </div>
-
-        <div class="article-tail">
             <div class="fn-flex">
                 <ul class="tag-desc fn-flex-1 tag-desc--right">
-                    <li data-id="1356773609282">
-                        <a href="https://ld246.com/tag/python" pjax-title="Python - 标签 - 链滴">
-                            <div alt="Python"
-                                 style="background-image: url(&quot;https://b3logfile.com/tag/Python-SF1cilt.png?imageView2/2/w/96/h/96/q/100&quot;);"></div>
-                            Python
-                        </a>
-                        <div>
-                            <div class="vditor-reset ft__smaller"><p><a
-                                            href="https://link.ld246.com/forward?goto=https%3A%2F%2Fwww.python.org"
-                                            target="_blank" rel="nofollow ugc">Python</a>
-                                    是一种面向对象、直译式电脑编程语言，具有近二十年的发展历史，成熟且稳定。它包含了一组完善而且容易理解的标准库，能够轻松完成很多常见的任务。它的语法简捷和清晰，尽量使用无异义的英语单词，与其它大多数程序设计语言使用大括号不一样，它使用缩进来定义语句块。
-                                </p></div>
-                            <span class="fn-right ft__fade">
-                <span class="article-level0">493</span>
-                引用
-                •
-                <span class="article-level0">654</span>
-                回帖
-                •
-                <span class="article-level3">336</span>
-                关注
-        </span>
-                        </div>
-                    </li>
-                    <li data-id="1513669964542">
-                        <a href="https://ld246.com/tag/numpy" pjax-title="numpy - 标签 - 链滴">
-                            numpy
-                        </a>
-                        <div style="width: auto;min-width: auto;white-space: nowrap;">
-                            <div class="vditor-reset ft__smaller"></div>
-                            <span class="fn-right ft__fade">
-                <span class="article-level0">9</span>
-                引用
-        </span>
-                        </div>
-                    </li>
+                    <#list article.articleTagObjs as articleTag>
+                        <li data-id="${articleTag.oId}">
+                            <a href="${servePath}/tag/${articleTag.tagURI}">
+                                <#if articleTag.tagIconPath != "">
+                                    <div alt="${articleTag.tagTitle}"
+                                         style="background-image: url('${articleTag.tagIconPath}');"></div>
+                                </#if>
+                                ${articleTag.tagTitle}
+                            </a>
+                            <div style="width: auto;min-width: auto;white-space: nowrap;">
+                                <div class="vditor-reset ft__smaller">
+                                    <p>${articleTag.tagDescription}</p>
+                                </div>
+                                <span class="fn-right ft__fade">
+                            <span class="article-level0">${articleTag.tagReferenceCount}</span>
+                            引用
+                            </span>
+                            </div>
+                        </li>
+                    </#list>
                 </ul>
             </div>
             <div id="articleActionPanel" class="comment__action"></div>
             <div class="article__meta">
                 <div>
-                    <a rel="author" href="https://ld246.com/member/zyk">
-                        <div class="avatar fn__left tooltipped-user" aria-name="zyk"
-                             style="background-image: url(&quot;https://b3logfile.com/avatar/1564022649893_1609852959761.jpeg?imageView2/1/w/96/h/96/format/jpg/interlace/0/q/100&quot;);"></div>
+                    <a rel="author" href="${servePath}/member/${article.articleAuthorName}">
+                        <div class="avatar fn__left tooltipped-user" aria-name="${article.articleAuthorName}"
+                             style="background-image: url('${article.articleAuthorThumbnailURL48}');"></div>
                     </a>
-                    <div class="article__titles">
-                        <span class="tooltipped tooltipped-ne" aria-label="捐赠者">
-                            <svg version="1.1" xmlns="http://www.w3.org/2000/svg" width="32" height="32"
-                                 viewBox="0 0 32 32"> <path fill="#ea4aaa"
-                                                            d="M16.15 26.254q3.606-3.23 5.333-4.883t3.756-3.906 2.817-3.981 0.789-3.38q0-2.404-1.615-3.981t-4.019-1.577q-1.878 0-3.493 1.052t-2.216 2.704h-3.005q-0.601-1.653-2.216-2.704t-3.493-1.052q-2.404 0-4.019 1.577t-1.615 3.981q0 1.653 0.789 3.38t2.817 3.981 3.756 3.906 5.333 4.883l0.15 0.15zM23.211 1.315q3.756 0 6.272 2.554t2.516 6.235q0 2.178-0.826 4.244t-3.042 4.62-4.019 4.282-5.784 5.333l-2.329 2.103-2.329-2.028q-5.183-4.657-7.474-6.986t-4.244-5.484-1.953-6.085q0-3.681 2.516-6.235t6.272-2.554q4.357 0 7.211 3.38 2.854-3.38 7.211-3.38z"></path> </svg>
-                        </span>
-                    </div>
                 </div>
                 <div class="fn__flex-1">
-                    <div id="articleMeta" class="fn__clear">
-                    <span class="tooltipped-w tooltipped meta__more articleParticipantsBtn ft-a-title" aria-label="更多"
-                          style="display: none;">
-                        <svg class="fn__deg"><use xlink:href="#iconChevronDown"></use></svg>
-                    </span>
-                        <a rel="author" href="https://ld246.com/member/zyk"
+                    <div id="articleMeta" class="fn__clear" style="height: auto;">
+                        <a rel="author" href="${servePath}/member/${article.articleAuthorName}"
                            class="article__stats article__stats--a tooltipped tooltipped-e"
-                           aria-label="2021-09-18 11:39:41">
-                            <span class="article__cnt">zyk</span>
-                            <time>2 天前</time>
-                            <span class="via" data-ua="">via Mac OS</span>
+                           aria-label="${article.oId?number?number_to_datetime}">
+                            <span class="article__cnt">${article.articleAuthorName}</span>
+                            <time>${article.timeAgo}</time>
+                            <#if 0 == article.articleAuthor.userUAStatus>
+                                <span id="articltVia" class="via" data-ua="${article.articleUA}"></span>
+                            </#if>
                         </a>
-
-                        <a href="https://ld246.com/city/景德镇" target="_blank" rel="nofollow"
-                           class="article__stats article__stats--a">
-                            <span class="article__cnt">景德镇</span>
-                            位置
-                        </a>
-
-                        <div id="articleStats">
-
-
-                        </div>
-
-
                         <div class="article__stats">
-                    <span class="article__cnt">
-                        1
-                    </span>
-                            操作
+                            <span class="article__cnt">
+                            ${article.articleCommentCount}
+                            </span>
+                            ${cmtLabel}
                         </div>
-
-
+                        <div id="articleStats">
+                            <div class="article__stats fn__pointer usersInteracts article__stats--a">
+                                <span class="article__cnt">${article.thankedCnt}</span>
+                                <span class="fn__flex-inline">
+                                感谢
+                                <span class="fn__space5"></span><svg><use xlink:href="#iconHeart"></use></svg>
+                                </span>
+                            </div>
+                            <div class="article__stats fn__pointer usersInteracts article__stats--a">
+                                <span id="articleFollowCnt" class="article__cnt">${article.articleWatchCnt}</span>
+                                关注
+                            </div>
+                            <div class="article__stats fn__pointer usersInteracts article__stats--a">
+                                <span id="articleCollectCnt" class="article__cnt">${article.articleCollectCnt}</span>
+                                收藏
+                            </div>
+                            <div class="article__stats fn__pointer usersInteracts article__stats--a">
+                                <span id="articleGoodCnt" class="article__cnt">${article.articleGoodCnt}</span>
+                                点赞
+                            </div>
+                        </div>
+                        <br>
+                        <br>
+                        <br>
+                        <#list article.commentors as user>
+                            <a target="_blank" href="${servePath}/member/${user.userName}">
+                                <div class="article__participant">
+                                    <div class="avatar-small tooltipped-w tooltipped" aria-label="${user.userName}" style="background-image: url('${user.userAvatarURL}');"></div>
+                                </div>
+                            </a>
+                        </#list>
+                        <!--<span class="tooltipped__w tooltipped meta__more articleParticipantsBtn ft-a-title" aria-label="更多">
+                        <svg class="fn__deg"><use xlink:href="#iconChevronDown"></use></svg>
+                        </span>-->
                     </div>
                     <div class="fn__clear article__view">
-                    <span class="fn__flex-inline tooltipped__n tooltipped" aria-label="总访问计数">
-                    <svg><use xlink:href="#iconTop"></use></svg>
-                    9
-
-                </span>
+                    <span class="fn__flex-inline tooltipped__n tooltipped-n tooltipped" aria-label="总访问计数">
+                        <svg><use xlink:href="#iconTop"></use></svg>
+                        <#if article.articleViewCount < 1000>
+                            ${article.articleViewCount}
+                        <#else>
+                            ${article.articleViewCntDisplayFormat}
+                        </#if>
+                    </span>
                     </div>
                 </div>
             </div>

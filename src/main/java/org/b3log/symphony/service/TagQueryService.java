@@ -121,19 +121,11 @@ public class TagQueryService {
 
         final String[] tagTitles = tagsStr.split(",");
         for (final String tagTitle : tagTitles) {
-            final JSONObject tag = new JSONObject();
-            tag.put(Tag.TAG_TITLE, tagTitle);
-
-            final String uri = tagRepository.getURIByTitle(tagTitle);
-            if (null != uri) {
-                tag.put(Tag.TAG_URI, uri);
-            } else {
-                tag.put(Tag.TAG_URI, tagTitle);
+            try {
+                final JSONObject tag = tagRepository.getByTitle(tagTitle);
+                ret.add(tag);
+            } catch (RepositoryException ignored) {
             }
-
-            Tag.fillDescription(tag);
-
-            ret.add(tag);
         }
 
         return ret;
