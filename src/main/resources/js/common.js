@@ -32,6 +32,33 @@ var Util = {
   bling: undefined,
   isBlinging: false,
 
+  getAtUsers: function (key) {
+    var atUsers = [];
+    $.ajax({
+      url: Label.servePath + '/users/names',
+      type: 'POST',
+      async: false,
+      data: JSON.stringify({name: key}),
+      success: function (result) {
+        if (result.code === 0) {
+          for (var i = 0; i < result.data.length; i++) {
+            atUsers.push({
+              value: '@' + result.data[i].userName + " ",
+              html: '<img src="' + result.data[i].userAvatarURL +
+                  '"/>' +
+                  result.data[i].userName,
+              avatar: result.data[i].userAvatarURL,
+              username: result.data[i].userName
+            });
+          }
+        } else {
+          alert(result.msg);
+        }
+      },
+    });
+    return atUsers;
+  },
+
   LazyLoadImage: function () {
     var loadImg = function (it) {
       var testImage = document.createElement('img')
