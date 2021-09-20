@@ -38,7 +38,7 @@
                          data-placeholder="<#if !article?? && 1 == articleType>${addDiscussionEditorPlaceholderLabel}</#if>${addArticleEditorPlaceholderLabel}"></div>
                     <textarea class="fn-none"><#if article??>${article.articleContent?html}</#if><#if at??>@${at}</#if></textarea>
                 </div>
-                <div class="tags-wrap">
+                <div class="tags-wrap tag_selection">
                     <div class="tags-input fn-flex"><span class="tags-selected"></span>
                     <input class="fn-flex-1" id="articleTags" type="text" tabindex="3"<#if requisite> readonly disabled</#if>
                            value="<#if article??>${article.articleTags}<#else>${tags}</#if>" placeholder="${tagLabel}（${tagSeparatorTipLabel}）" autocomplete="off" />

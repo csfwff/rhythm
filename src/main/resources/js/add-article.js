@@ -129,103 +129,109 @@ var AddArticle = {
    * @it [Bom] 触发事件的元素
    */
   add: function (csrfToken, it) {
-    if (Validate.goValidate({
-      target: $('#addArticleTip'),
-      data: [
-        {
-          'type': 'string',
-          'max': 256,
-          'msg': Label.articleTitleErrorLabel,
-          'target': $('#articleTitle'),
-        }],
-    })) {
-      var articleType = parseInt(
-        $('input[type=\'radio\'][name=\'articleType\']:checked').val())
+    if ($('.tags-input .tag .text').length === 0) {
+      $('#addArticleTip').
+      addClass('error').
+      html('<ul><li>为了让你的文章更好地被归类和展示，请至少填写一个标签哦 :)</li></ul>')
+    } else {
+      if (Validate.goValidate({
+        target: $('#addArticleTip'),
+        data: [
+          {
+            'type': 'string',
+            'max': 256,
+            'msg': Label.articleTitleErrorLabel,
+            'target': $('#articleTitle'),
+          }],
+      })) {
+        var articleType = parseInt(
+            $('input[type=\'radio\'][name=\'articleType\']:checked').val())
 
-      if (articleType !== 5) {
-        // 打赏区启用后积分不能为空
-        if ($('#articleRewardPoint').data('orval')
-          && !/^\+?[1-9][0-9]*$/.test($('#articleRewardPoint').val())) {
-          $('#addArticleTip').addClass('error').html('<ul><li>'
-            + Label.articleRewardPointErrorLabel + '</li></ul>')
-          return false
+        if (articleType !== 5) {
+          // 打赏区启用后积分不能为空
+          if ($('#articleRewardPoint').data('orval')
+              && !/^\+?[1-9][0-9]*$/.test($('#articleRewardPoint').val())) {
+            $('#addArticleTip').addClass('error').html('<ul><li>'
+                + Label.articleRewardPointErrorLabel + '</li></ul>')
+            return false
+          }
         }
-      }
 
-      var articleTags = ''
-      $('.tags-input .tag .text').each(function () {
-        articleTags += $(this).text() + ','
-      })
+        var articleTags = ''
+        $('.tags-input .tag .text').each(function () {
+          articleTags += $(this).text() + ','
+        })
 
-      var requestJSONObject = {
-        articleTitle: $('#articleTitle').val().replace(/(^\s*)|(\s*$)/g, ''),
-        articleContent: this.editor.getValue(),
-        articleTags: articleTags,
-        articleCommentable: $('#articleCommentable').prop('checked'),
-        articleNotifyFollowers: $('#articleNotifyFollowers').prop('checked'),
-        articleType: articleType,
-        articleShowInList: Boolean($('#articleShowInList').prop('checked'))
-          ? 1
-          : 0,
-      }
+        var requestJSONObject = {
+          articleTitle: $('#articleTitle').val().replace(/(^\s*)|(\s*$)/g, ''),
+          articleContent: this.editor.getValue(),
+          articleTags: articleTags,
+          articleCommentable: $('#articleCommentable').prop('checked'),
+          articleNotifyFollowers: $('#articleNotifyFollowers').prop('checked'),
+          articleType: articleType,
+          articleShowInList: Boolean($('#articleShowInList').prop('checked'))
+              ? 1
+              : 0,
+        }
 
-      if (articleType !== 5) {
-        requestJSONObject.articleRewardContent = this.rewardEditor.getValue()
-        requestJSONObject.articleRewardPoint = $('#articleRewardPoint').
+        if (articleType !== 5) {
+          requestJSONObject.articleRewardContent = this.rewardEditor.getValue()
+          requestJSONObject.articleRewardPoint = $('#articleRewardPoint').
           val().
           replace(/(^\s*)|(\s*$)/g, '')
-        requestJSONObject.articleAnonymous = $('#articleAnonymous').
+          requestJSONObject.articleAnonymous = $('#articleAnonymous').
           prop('checked')
-      } else {
-        requestJSONObject.articleQnAOfferPoint = $('#articleAskPoint').
+        } else {
+          requestJSONObject.articleQnAOfferPoint = $('#articleAskPoint').
           val().
           replace(/(^\s*)|(\s*$)/g, '')
-      }
+        }
 
-      var url = Label.servePath + '/article', type = 'POST'
+        var url = Label.servePath + '/article', type = 'POST'
 
-      if (3 === parseInt(requestJSONObject.articleType)) { // 如果是“思绪”
-        requestJSONObject.articleContent = JSON.parse(
-          window.localStorage.postData).thoughtContent
-      }
+        if (3 === parseInt(requestJSONObject.articleType)) { // 如果是“思绪”
+          requestJSONObject.articleContent = JSON.parse(
+              window.localStorage.postData).thoughtContent
+        }
 
-      if (Label.articleOId) {
-        url = url + '/' + Label.articleOId
-        type = 'PUT'
-      }
+        if (Label.articleOId) {
+          url = url + '/' + Label.articleOId
+          type = 'PUT'
+        }
 
-      $.ajax({
-        url: url,
-        type: type,
-        headers: {'csrfToken': csrfToken},
-        cache: false,
-        data: JSON.stringify(requestJSONObject),
-        beforeSend: function () {
-          $(it).attr('disabled', 'disabled').css('opacity', '0.3')
-        },
-        error: function (jqXHR, textStatus, errorThrown) {
-          $('#addArticleTip').
+        $.ajax({
+          url: url,
+          type: type,
+          headers: {'csrfToken': csrfToken},
+          cache: false,
+          data: JSON.stringify(requestJSONObject),
+          beforeSend: function () {
+            $(it).attr('disabled', 'disabled').css('opacity', '0.3')
+          },
+          error: function (jqXHR, textStatus, errorThrown) {
+            $('#addArticleTip').
             addClass('error').
             html('<ul><li>' + errorThrown + '</li></ul>')
-        },
-        success: function (result, textStatus) {
-          $(it).removeAttr('disabled').css('opacity', '1')
-          if (0 === result.code) {
-            window.location.href = Label.servePath + '/article/' +
-              result.articleId
-            localStorage.removeItem('postData')
-            AddArticle.editor.clearCache()
-            AddArticle.rewardEditor.clearCache()
-          } else {
-            $('#addArticleTip').
+          },
+          success: function (result, textStatus) {
+            $(it).removeAttr('disabled').css('opacity', '1')
+            if (0 === result.code) {
+              window.location.href = Label.servePath + '/article/' +
+                  result.articleId
+              localStorage.removeItem('postData')
+              AddArticle.editor.clearCache()
+              AddArticle.rewardEditor.clearCache()
+            } else {
+              $('#addArticleTip').
               addClass('error').
               html('<ul><li>' + result.msg + '</li></ul>')
-          }
-        },
-        complete: function () {
-          $(it).removeAttr('disabled').css('opacity', '1')
-        },
-      })
+            }
+          },
+          complete: function () {
+            $(it).removeAttr('disabled').css('opacity', '1')
+          },
+        })
+      }
     }
   },
   /**
