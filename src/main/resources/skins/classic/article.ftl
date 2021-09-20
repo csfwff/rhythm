@@ -178,7 +178,7 @@
                 <div>
                     <a rel="author" href="${servePath}/member/${article.articleAuthorName}">
                         <div class="avatar fn__left tooltipped-user" aria-name="${article.articleAuthorName}"
-                             style="background-image: url('${article.articleAuthorThumbnailURL48}');"></div>
+                             style="background-image: url('${article.articleAuthorThumbnailURL210}');"></div>
                     </a>
                 </div>
                 <div class="fn__flex-1">

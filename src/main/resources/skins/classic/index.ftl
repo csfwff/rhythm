@@ -80,7 +80,7 @@ ${HeaderBannerLabel}
                             <a rel="nofollow" href="${servePath}/member/${article.articleAuthorName}">
                                     <span class="avatar-small tooltipped tooltipped-se slogan"
                                           aria-label="${article.articleAuthorName}"
-                                          style="background-image:url('${article.articleAuthorThumbnailURL20}')"></span>
+                                          style="background-image:url('${article.articleAuthorThumbnailURL210}')"></span>
                             </a>
                             <a rel="nofollow" class="title fn-ellipsis fn-flex-1"
                                href="${servePath}${article.articlePermalink}">${article.articleTitleEmoj}</a>
@@ -114,7 +114,7 @@ ${HeaderBannerLabel}
                                 <a rel="nofollow" href="${servePath}/member/${article.articleAuthorName}">
                                     <span class="avatar-small tooltipped tooltipped-se slogan"
                                           aria-label="${article.articleAuthorName}"
-                                          style="background-image:url('${article.articleAuthorThumbnailURL20}')"></span>
+                                          style="background-image:url('${article.articleAuthorThumbnailURL210}')"></span>
                                 </a>
                                 <a rel="nofollow" class="title fn-ellipsis fn-flex-1"
                                    href="${servePath}${article.articlePermalink}">${article.articleTitleEmoj}</a>
@@ -364,7 +364,7 @@ ${HeaderBannerLabel}
                                     <a rel="nofollow" href="${servePath}/member/${article.articleAuthorName}">
                                     <span class="avatar-small tooltipped tooltipped-se slogan"
                                           aria-label="${article.articleAuthorName}"
-                                          style="background-image:url('${article.articleAuthorThumbnailURL20}')"></span>
+                                          style="background-image:url('${article.articleAuthorThumbnailURL210}')"></span>
                                     </a>
                                     <a rel="nofollow" class="title fn-ellipsis fn-flex-1"
                                        href="${servePath}${article.articlePermalink}">${article.articleTitleEmoj}</a>
@@ -628,7 +628,7 @@ ${HeaderBannerLabel}
                     }
                     $("#randomArticles").append('<li class="fn-flex">' +
                         '<a rel="nofollow" href="${servePath}/member/' + article.articleAuthorName + '">' +
-                        '<span class="avatar-small tooltipped tooltipped-se slogan" aria-label="' + article.articleAuthorName + '" style="background-image:url(\'' + article.articleAuthorThumbnailURL20 + '\')"></span></a>' +
+                        '<span class="avatar-small tooltipped tooltipped-se slogan" aria-label="' + article.articleAuthorName + '" style="background-image:url(\'' + article.articleAuthorThumbnailURL210 + '\')"></span></a>' +
                         '<a rel="nofollow" class="title fn-ellipsis fn-flex-1" href="${servePath}' + article.articlePermalink + '">' + article.articleTitleEmoj + '</a>' +
                         '<a class="fn-right count ft-gray ft-smaller" href="${servePath}' + article.articlePermalink + '">' + viewCount + '</a>' +
                         '</li>');
