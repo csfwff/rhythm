@@ -22,105 +22,114 @@
 <#include "common/title-icon.ftl">
 <!DOCTYPE html>
 <html>
-    <head>
-        <@head title="${article.articleTitleEmojUnicode} - ${symphonyLabel}">
-        <meta name="keywords" content="<#list article.articleTagObjs as articleTag>${articleTag.tagTitle}<#if articleTag?has_next>,</#if></#list>" />
+<head>
+    <@head title="${article.articleTitleEmojUnicode} - ${symphonyLabel}">
+        <meta name="keywords"
+              content="<#list article.articleTagObjs as articleTag>${articleTag.tagTitle}<#if articleTag?has_next>,</#if></#list>"/>
         <meta name="description" content="${article.articlePreviewContent}"/>
         <#if 1 == article.articleStatus || 1 == article.articleAuthor.userStatus || 1 == article.articleType>
-        <meta name="robots" content="NOINDEX,NOFOLLOW" />
+            <meta name="robots" content="NOINDEX,NOFOLLOW"/>
         </#if>
-        </@head>
-        <link rel="stylesheet" href="${staticServePath}/js/lib/compress/article.min.css?${staticResourceVersion}">
-        <link rel="stylesheet" href="${staticServePath}/css/index.css?${staticResourceVersion}" />
-        <link rel="canonical" href="${servePath}${article.articlePermalink}?p=${paginationCurrentPageNum}&m=${userCommentViewMode}">
-        <#if articlePrevious??>
-            <link rel="prev" title="${articlePrevious.articleTitleEmojUnicode}" href="${servePath}${articlePrevious.articlePermalink}">
-        </#if>
-        <#if articleNext??>
-            <link rel="next" title="${articleNext.articleTitleEmojUnicode}" href="${servePath}${articleNext.articlePermalink}">
-        </#if>
-        <!-- Open Graph -->
-        <meta property="og:locale" content="zh_CN" />
-        <meta property="og:type" content="article" />
-        <meta property="og:title" content="${article.articleTitle} - ${symphonyLabel}" />
-        <meta property="og:description" content="${article.articlePreviewContent}" />
-        <meta property="og:image" content="${article.articleAuthorThumbnailURL210}" />
-        <meta property="og:url" content="${servePath}${article.articlePermalink}" />
-        <meta property="og:site_name" content="${symphonyLabel}" />
-        <!-- Twitter Card -->
-        <meta name="twitter:card" content="summary" />
-        <meta name="twitter:description" content="${article.articlePreviewContent}" />
-        <meta name="twitter:title" content="${article.articleTitle} - ${symphonyLabel}" />
-        <meta name="twitter:image" content="${article.articleAuthorThumbnailURL210}" />
-        <meta name="twitter:url" content="${servePath}${article.articlePermalink}" />
-        <meta name="twitter:site" content="@B3logOS" />
-        <meta name="twitter:creator" content="@B3logOS" />
-    </head>
-    <body itemscope itemtype="http://schema.org/Product" class="article">
-        <img itemprop="image" class="fn-none"  src="${article.articleAuthorThumbnailURL210}" />
-        <p itemprop="description" class="fn-none">"${article.articlePreviewContent}"</p>
-        <#include "header.ftl">
-        <div class="article-body">
-            <div class="wrapper">
-                <h1 class="article-title" itemprop="name">
-                    <@icon article.articlePerfect article.articleType></@icon>
-                    ${article.articleTitleEmoj}
-                </h1>
+    </@head>
+    <link rel="stylesheet" href="${staticServePath}/js/lib/compress/article.min.css?${staticResourceVersion}">
+    <link rel="stylesheet" href="${staticServePath}/css/index.css?${staticResourceVersion}"/>
+    <link rel="canonical"
+          href="${servePath}${article.articlePermalink}?p=${paginationCurrentPageNum}&m=${userCommentViewMode}">
+    <#if articlePrevious??>
+        <link rel="prev" title="${articlePrevious.articleTitleEmojUnicode}"
+              href="${servePath}${articlePrevious.articlePermalink}">
+    </#if>
+    <#if articleNext??>
+        <link rel="next" title="${articleNext.articleTitleEmojUnicode}"
+              href="${servePath}${articleNext.articlePermalink}">
+    </#if>
+    <!-- Open Graph -->
+    <meta property="og:locale" content="zh_CN"/>
+    <meta property="og:type" content="article"/>
+    <meta property="og:title" content="${article.articleTitle} - ${symphonyLabel}"/>
+    <meta property="og:description" content="${article.articlePreviewContent}"/>
+    <meta property="og:image" content="${article.articleAuthorThumbnailURL210}"/>
+    <meta property="og:url" content="${servePath}${article.articlePermalink}"/>
+    <meta property="og:site_name" content="${symphonyLabel}"/>
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary"/>
+    <meta name="twitter:description" content="${article.articlePreviewContent}"/>
+    <meta name="twitter:title" content="${article.articleTitle} - ${symphonyLabel}"/>
+    <meta name="twitter:image" content="${article.articleAuthorThumbnailURL210}"/>
+    <meta name="twitter:url" content="${servePath}${article.articlePermalink}"/>
+    <meta name="twitter:site" content="@B3logOS"/>
+    <meta name="twitter:creator" content="@B3logOS"/>
+</head>
+<body itemscope itemtype="http://schema.org/Product" class="article">
+<img itemprop="image" class="fn-none" src="${article.articleAuthorThumbnailURL210}"/>
+<p itemprop="description" class="fn-none">"${article.articlePreviewContent}"</p>
+<#include "header.ftl">
+<div class="article-body">
+    <div class="wrapper">
+        <h1 class="article-title" itemprop="name">
+            <@icon article.articlePerfect article.articleType></@icon>
+            ${article.articleTitleEmoj}
+        </h1>
 
-                <#if "" != article.articleAudioURL>
-                    <div id="articleAudio" data-url="${article.articleAudioURL}"
-                         data-author="${article.articleAuthorName}" class="aplayer"></div>
-                </#if>
-                <#if 3 != article.articleType>
-                    <div class="vditor-reset article-content">
-                        ${article.articleContent}
-                    </div>
-                    <#else>
-                        <div id="thoughtProgress"><span class="bar"></span>
-                            <svg class="icon-video">
-                                <use xlink:href="#video"></use>
-                            </svg>
-                        </div>
-                        <div class="vditor-reset article-content" id="articleThought" data-author="${article.articleAuthorName}"
-                             data-link="${servePath}${article.articlePermalink}"></div>
-                </#if>
+        <#if "" != article.articleAudioURL>
+            <div id="articleAudio" data-url="${article.articleAudioURL}"
+                 data-author="${article.articleAuthorName}" class="aplayer"></div>
+        </#if>
+        <#if 3 != article.articleType>
+            <div class="vditor-reset article-content">
+                ${article.articleContent}
+            </div>
+        <#else>
+            <div id="thoughtProgress"><span class="bar"></span>
+                <svg class="icon-video">
+                    <use xlink:href="#video"></use>
+                </svg>
+            </div>
+            <div class="vditor-reset article-content" id="articleThought" data-author="${article.articleAuthorName}"
+                 data-link="${servePath}${article.articlePermalink}"></div>
+        </#if>
 
-                <#if 0 < article.articleRewardPoint>
-                <div id="articleRewardContent">
+        <#if 0 < article.articleRewardPoint>
+            <div id="articleRewardContent">
                     <span class="icon-points <#if article.rewarded> ft-red<#else> ft-blue</#if>"
-                    <#if !article.rewarded>onclick="Article.reward(${article.oId})"</#if>>
+                          <#if !article.rewarded>onclick="Article.reward(${article.oId})"</#if>>
                     ${article.rewardedCnt} ${rewardLabel}</span>
 
-                    <div class="vditor-reset">
+                <div class="vditor-reset">
                     <#if !article.rewarded>
-                         <span>
+                        <span>
                             ${rewardTipLabel?replace("{articleId}", article.oId)?replace("{point}", article.articleRewardPoint)}
                         </span>
-                        <#else>
-                            ${article.articleRewardContent}
+                    <#else>
+                        ${article.articleRewardContent}
                     </#if>
-                    </div>
                 </div>
+            </div>
+        </#if>
+        <div class="article-info fn-flex">
+            <a rel="author" href="${servePath}/member/${article.articleAuthorName}">
+                <div
+                        class="avatar-mid tooltipped tooltipped-se" aria-label="${article.articleAuthorName}"
+                        style="background-image:url('${article.articleAuthorThumbnailURL48}')"></div>
+            </a>
+            <div class="fn-flex-1 fn-ellipsis">
+                <a rel="author" href="${servePath}/member/${article.articleAuthorName}" class="ft-gray"><strong
+                            class="ft-gray">${article.articleAuthorName}</strong></a>
+                <#if 0 == article.articleAuthor.userUAStatus>
+                    <span id="articltVia" class="ft-fade" data-ua="${article.articleUA}"></span>
                 </#if>
-                <div class="article-info fn-flex">
-                    <a rel="author" href="${servePath}/member/${article.articleAuthorName}"><div
-                                class="avatar-mid tooltipped tooltipped-se" aria-label="${article.articleAuthorName}" style="background-image:url('${article.articleAuthorThumbnailURL48}')"></div></a>
-                    <div class="fn-flex-1 fn-ellipsis">
-                        <a rel="author" href="${servePath}/member/${article.articleAuthorName}" class="ft-gray"><strong class="ft-gray">${article.articleAuthorName}</strong></a>
-                        <#if 0 == article.articleAuthor.userUAStatus>
-                            <span id="articltVia" class="ft-fade" data-ua="${article.articleUA}"></span>
-                        </#if>
-                        <br/>
-                        <#if "" != article.articleAuthorIntro>
-                            <span class="ft-gray">${article.articleAuthorIntro}</span>
-                        <#else>
-                            <span class="ft-gray">${symphonyLabel} <#if article.articleAnonymous == 0>${article.articleAuthor.userNo?c}<#else>?</#if> ${numMemberLabel}</span>
-                        </#if>
-                        <br/>
-                        <#list article.articleTagObjs as articleTag>
-                            <a rel="tag" class="tag" href="${servePath}/tag/${articleTag.tagURI}">${articleTag.tagTitle}</a>&nbsp;
-                        </#list>
-                        <span class="ft-gray">
+                <br/>
+                <#if "" != article.articleAuthorIntro>
+                    <span class="ft-gray">${article.articleAuthorIntro}</span>
+                <#else>
+                    <span class="ft-gray">${symphonyLabel} <#if article.articleAnonymous == 0>${article.articleAuthor.userNo?c}<#else>?</#if> ${numMemberLabel}</span>
+                </#if>
+                <br/>
+                <#list article.articleTagObjs as articleTag>
+                    <a rel="tag" class="tag"
+                       href="${servePath}/tag/${articleTag.tagURI}">${articleTag.tagTitle}</a>&nbsp;
+                </#list>
+                <span class="ft-gray">
                                 •&nbsp;
                                 <a rel="nofollow" class="ft-gray" href="#comments">
                                     <b class="article-level<#if article.articleCommentCount lt 40>${(article.articleCommentCount/10)?int}<#else>4</#if>">${article.articleCommentCount}</b> ${cmtLabel}</a>
@@ -133,124 +142,270 @@
                                 </#if>
                                 </span>
                                 ${viewLabel}
-                            <#if article.articleQnAOfferPoint != 0>
-                                &nbsp;•&nbsp;
-                                <span class="article-level<#if article.articleQnAOfferPoint lt 400>${(article.articleQnAOfferPoint/100)?int}<#else>4</#if>">${article.articleQnAOfferPoint?c}</span>
-                                ${qnaOfferLabel}
-                            </#if>
+                    <#if article.articleQnAOfferPoint != 0>
+                        &nbsp;•&nbsp;
+                        <span class="article-level<#if article.articleQnAOfferPoint lt 400>${(article.articleQnAOfferPoint/100)?int}<#else>4</#if>">${article.articleQnAOfferPoint?c}</span>
+                        ${qnaOfferLabel}
+                    </#if>
                              &nbsp;•&nbsp;
                         ${article.timeAgo}
-                            <#if "" != article.articleCity>
-                                &nbsp;•&nbsp; <a href="${servePath}/city/${article.articleCity}" target="_blank" rel="nofollow"><span class="ft-green">${article.articleCity}</span></a>
-                            </#if>
+                    <#if "" != article.articleCity>
+                        &nbsp;•&nbsp; <a href="${servePath}/city/${article.articleCity}" target="_blank" rel="nofollow"><span
+                                class="ft-green">${article.articleCity}</span></a>
+                    </#if>
                             </span>
+            </div>
+
+            <div class="article-actions action-btns">
+                <#if "" != article.articleToC>
+                    <span onclick="Article.toggleToc()" aria-label="${ToCLabel}"
+                          class="tooltipped tooltipped-n"><svg class="ft-red icon-unordered-list"><use
+                                    xlink:href="#unordered-list"></use></svg></span> &nbsp;
+                </#if>
+
+                <#if permissions["commonViewArticleHistory"].permissionGrant && article.articleRevisionCount &gt; 1>
+                    <span onclick="Article.revision('${article.oId}')" aria-label="${historyLabel}"
+                          class="tooltipped tooltipped-n"><svg class="icon-history"><use
+                                    xlink:href="#history"></use></svg></span> &nbsp;
+                </#if>
+
+                <#if article.isMyArticle && permissions["commonStickArticle"].permissionGrant>
+                    <a class="tooltipped tooltipped-n" aria-label="${stickLabel}"
+                       href="javascript:Article.stick('${article.oId}')">
+                        <svg class="icon-chevron-up">
+                            <use xlink:href="#chevron-up"></use>
+                        </svg>
+                    </a> &nbsp;
+                </#if>
+                <#if article.isMyArticle && 3 != article.articleType && permissions["commonUpdateArticle"].permissionGrant>
+                    <a href="${servePath}/update?id=${article.oId}" aria-label="${editLabel}"
+                       class="tooltipped tooltipped-n">
+                        <svg class="icon-edit">
+                            <use xlink:href="#edit"></use>
+                        </svg>
+                    </a> &nbsp;
+                </#if>
+                <span aria-label="${reportLabel}" class="tooltipped tooltipped-n"
+                      onclick="$('#reportDialog').data('type', 0).data('id', '${article.oId}').dialog('open')"
+                ><svg><use xlink:href="#icon-report"></use></svg></span> &nbsp;
+                <#if permissions["articleUpdateArticleBasic"].permissionGrant>
+                    <a class="tooltipped tooltipped-n" href="${servePath}/admin/article/${article.oId}"
+                       aria-label="${adminLabel}">
+                        <svg class="icon-setting">
+                            <use xlink:href="#setting"></use>
+                        </svg>
+                    </a> &nbsp;
+                </#if>
+            </div>
+        </div>
+
+        <div class="article-tail">
+            <div class="fn-flex">
+                <ul class="tag-desc fn-flex-1 tag-desc--right">
+                    <li data-id="1356773609282">
+                        <a href="https://ld246.com/tag/python" pjax-title="Python - 标签 - 链滴">
+                            <div alt="Python"
+                                 style="background-image: url(&quot;https://b3logfile.com/tag/Python-SF1cilt.png?imageView2/2/w/96/h/96/q/100&quot;);"></div>
+                            Python
+                        </a>
+                        <div>
+                            <div class="vditor-reset ft__smaller"><p><a
+                                            href="https://link.ld246.com/forward?goto=https%3A%2F%2Fwww.python.org"
+                                            target="_blank" rel="nofollow ugc">Python</a>
+                                    是一种面向对象、直译式电脑编程语言，具有近二十年的发展历史，成熟且稳定。它包含了一组完善而且容易理解的标准库，能够轻松完成很多常见的任务。它的语法简捷和清晰，尽量使用无异义的英语单词，与其它大多数程序设计语言使用大括号不一样，它使用缩进来定义语句块。
+                                </p></div>
+                            <span class="fn-right ft__fade">
+                <span class="article-level0">493</span>
+                引用
+                •
+                <span class="article-level0">654</span>
+                回帖
+                •
+                <span class="article-level3">336</span>
+                关注
+        </span>
+                        </div>
+                    </li>
+                    <li data-id="1513669964542">
+                        <a href="https://ld246.com/tag/numpy" pjax-title="numpy - 标签 - 链滴">
+                            numpy
+                        </a>
+                        <div style="width: auto;min-width: auto;white-space: nowrap;">
+                            <div class="vditor-reset ft__smaller"></div>
+                            <span class="fn-right ft__fade">
+                <span class="article-level0">9</span>
+                引用
+        </span>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+            <div id="articleActionPanel" class="comment__action"></div>
+            <div class="article__meta">
+                <div>
+                    <a rel="author" href="https://ld246.com/member/zyk">
+                        <div class="avatar fn__left tooltipped-user" aria-name="zyk"
+                             style="background-image: url(&quot;https://b3logfile.com/avatar/1564022649893_1609852959761.jpeg?imageView2/1/w/96/h/96/format/jpg/interlace/0/q/100&quot;);"></div>
+                    </a>
+                    <div class="article__titles">
+                        <span class="tooltipped tooltipped-ne" aria-label="捐赠者">
+                            <svg version="1.1" xmlns="http://www.w3.org/2000/svg" width="32" height="32"
+                                 viewBox="0 0 32 32"> <path fill="#ea4aaa"
+                                                            d="M16.15 26.254q3.606-3.23 5.333-4.883t3.756-3.906 2.817-3.981 0.789-3.38q0-2.404-1.615-3.981t-4.019-1.577q-1.878 0-3.493 1.052t-2.216 2.704h-3.005q-0.601-1.653-2.216-2.704t-3.493-1.052q-2.404 0-4.019 1.577t-1.615 3.981q0 1.653 0.789 3.38t2.817 3.981 3.756 3.906 5.333 4.883l0.15 0.15zM23.211 1.315q3.756 0 6.272 2.554t2.516 6.235q0 2.178-0.826 4.244t-3.042 4.62-4.019 4.282-5.784 5.333l-2.329 2.103-2.329-2.028q-5.183-4.657-7.474-6.986t-4.244-5.484-1.953-6.085q0-3.681 2.516-6.235t6.272-2.554q4.357 0 7.211 3.38 2.854-3.38 7.211-3.38z"></path> </svg>
+                        </span>
                     </div>
+                </div>
+                <div class="fn__flex-1">
+                    <div id="articleMeta" class="fn__clear">
+                    <span class="tooltipped-w tooltipped meta__more articleParticipantsBtn ft-a-title" aria-label="更多"
+                          style="display: none;">
+                        <svg class="fn__deg"><use xlink:href="#iconChevronDown"></use></svg>
+                    </span>
+                        <a rel="author" href="https://ld246.com/member/zyk"
+                           class="article__stats article__stats--a tooltipped tooltipped-e"
+                           aria-label="2021-09-18 11:39:41">
+                            <span class="article__cnt">zyk</span>
+                            <time>2 天前</time>
+                            <span class="via" data-ua="">via Mac OS</span>
+                        </a>
 
-                    <div class="article-actions action-btns">
-                        <#if "" != article.articleToC>
-                            <span onclick="Article.toggleToc()" aria-label="${ToCLabel}"
-                                  class="tooltipped tooltipped-n"><svg class="ft-red icon-unordered-list"><use xlink:href="#unordered-list"></use></svg></span> &nbsp;
-                        </#if>
+                        <a href="https://ld246.com/city/景德镇" target="_blank" rel="nofollow"
+                           class="article__stats article__stats--a">
+                            <span class="article__cnt">景德镇</span>
+                            位置
+                        </a>
 
-                        <#if permissions["commonViewArticleHistory"].permissionGrant && article.articleRevisionCount &gt; 1>
-                            <span onclick="Article.revision('${article.oId}')" aria-label="${historyLabel}"
-                                  class="tooltipped tooltipped-n"><svg class="icon-history"><use xlink:href="#history"></use></svg></span> &nbsp;
-                        </#if>
+                        <div id="articleStats">
 
-                        <#if article.isMyArticle && permissions["commonStickArticle"].permissionGrant>
-                            <a class="tooltipped tooltipped-n" aria-label="${stickLabel}"
-                               href="javascript:Article.stick('${article.oId}')"><svg class="icon-chevron-up"><use xlink:href="#chevron-up"></use></svg></a> &nbsp;
-                        </#if>
-                        <#if article.isMyArticle && 3 != article.articleType && permissions["commonUpdateArticle"].permissionGrant>
-                            <a href="${servePath}/update?id=${article.oId}" aria-label="${editLabel}"
-                               class="tooltipped tooltipped-n"><svg class="icon-edit"><use xlink:href="#edit"></use></svg></a> &nbsp;
-                        </#if>
-                        <span aria-label="${reportLabel}" class="tooltipped tooltipped-n"
-                              onclick="$('#reportDialog').data('type', 0).data('id', '${article.oId}').dialog('open')"
-                        ><svg><use xlink:href="#icon-report"></use></svg></span> &nbsp;
-                        <#if permissions["articleUpdateArticleBasic"].permissionGrant>
-                            <a class="tooltipped tooltipped-n" href="${servePath}/admin/article/${article.oId}" aria-label="${adminLabel}"><svg class="icon-setting"><use xlink:href="#setting"></use></svg></a> &nbsp;
-                        </#if>
+
+                        </div>
+
+
+                        <div class="article__stats">
+                    <span class="article__cnt">
+                        1
+                    </span>
+                            操作
+                        </div>
+
+
+                    </div>
+                    <div class="fn__clear article__view">
+                    <span class="fn__flex-inline tooltipped__n tooltipped" aria-label="总访问计数">
+                    <svg><use xlink:href="#iconTop"></use></svg>
+                    9
+
+                </span>
                     </div>
                 </div>
             </div>
         </div>
-        <div class="main">
-            <div class="wrapper" id="articleCommentsPanel">
-                <#if article.offered>
-                <div class="module nice">
-                    <div class="module-header">
-                        <svg class="ft-blue"><use xlink:href="#iconAdopt"></use></svg>
-                        ${adoptLabel}
-                    </div>
-                    <div class="module-panel list comments">
-                        <ul>
-                            <li>
-                                <div class="fn-flex">
-                                <a rel="nofollow" href="${servePath}/member/${article.articleOfferedComment.commentAuthorName}">
+    </div>
+</div>
+<div class="main">
+    <div class="wrapper" id="articleCommentsPanel">
+        <#if article.offered>
+            <div class="module nice">
+                <div class="module-header">
+                    <svg class="ft-blue">
+                        <use xlink:href="#iconAdopt"></use>
+                    </svg>
+                    ${adoptLabel}
+                </div>
+                <div class="module-panel list comments">
+                    <ul>
+                        <li>
+                            <div class="fn-flex">
+                                <a rel="nofollow"
+                                   href="${servePath}/member/${article.articleOfferedComment.commentAuthorName}">
                                     <div class="avatar tooltipped tooltipped-se"
-                                         aria-label="${article.articleOfferedComment.commentAuthorName}" style="background-image:url('${article.articleOfferedComment.commentAuthorThumbnailURL}')"></div>
+                                         aria-label="${article.articleOfferedComment.commentAuthorName}"
+                                         style="background-image:url('${article.articleOfferedComment.commentAuthorThumbnailURL}')"></div>
                                 </a>
-                                    <div class="fn-flex-1">
-                                        <div class="fn-clear comment-info ft-smaller">
+                                <div class="fn-flex-1">
+                                    <div class="fn-clear comment-info ft-smaller">
                                             <span class="fn-left">
-                                                <a rel="nofollow" href="${servePath}/member/${article.articleOfferedComment.commentAuthorName}" class="ft-gray"><span class="ft-gray">${article.articleOfferedComment.commentAuthorName}</span></a>
+                                                <a rel="nofollow"
+                                                   href="${servePath}/member/${article.articleOfferedComment.commentAuthorName}"
+                                                   class="ft-gray"><span
+                                                            class="ft-gray">${article.articleOfferedComment.commentAuthorName}</span></a>
                                                 <span class="ft-fade">• ${article.articleOfferedComment.timeAgo}</span>
 
                                                 <#if article.articleOfferedComment.rewardedCnt gt 0>
                                                     <#assign hasRewarded = isLoggedIn && article.articleOfferedComment.commentAuthorId != currentUser.oId && article.articleOfferedComment.rewarded>
-                                                <span aria-label="<#if hasRewarded>${thankedLabel}<#else>${thankLabel} ${article.articleOfferedComment.rewardedCnt}</#if>"
-                                                      class="tooltipped tooltipped-n rewarded-cnt <#if hasRewarded>ft-red<#else>ft-fade</#if>">
-                                                    <svg class="fn-text-top"><use xlink:href="#heart"></use></svg> ${article.articleOfferedComment.rewardedCnt}
+                                                    <span aria-label="<#if hasRewarded>${thankedLabel}<#else>${thankLabel} ${article.articleOfferedComment.rewardedCnt}</#if>"
+                                                          class="tooltipped tooltipped-n rewarded-cnt <#if hasRewarded>ft-red<#else>ft-fade</#if>">
+                                                    <svg class="fn-text-top"><use
+                                                                xlink:href="#heart"></use></svg> ${article.articleOfferedComment.rewardedCnt}
                                                 </span>
                                                 </#if>
-                                                <#if 0 == article.articleOfferedComment.commenter.userUAStatus><span class="cmt-via ft-fade" data-ua="${article.articleOfferedComment.commentUA}"></span></#if>
+                                                <#if 0 == article.articleOfferedComment.commenter.userUAStatus><span
+                                                    class="cmt-via ft-fade"
+                                                    data-ua="${article.articleOfferedComment.commentUA}"></span></#if>
                                             </span>
-                                            <a class="ft-a-title fn-right tooltipped tooltipped-nw" aria-label="${goCommentLabel}"
-                                               href="javascript:Comment.goComment('${servePath}/article/${article.oId}?p=${article.articleOfferedComment.paginationCurrentPageNum}&m=${userCommentViewMode}#${article.articleOfferedComment.oId}')"><svg><use xlink:href="#down"></use></svg></a>
-                                        </div>
-                                        <div class="vditor-reset comment">
-                                            ${article.articleOfferedComment.commentContent}
-                                        </div>
+                                        <a class="ft-a-title fn-right tooltipped tooltipped-nw"
+                                           aria-label="${goCommentLabel}"
+                                           href="javascript:Comment.goComment('${servePath}/article/${article.oId}?p=${article.articleOfferedComment.paginationCurrentPageNum}&m=${userCommentViewMode}#${article.articleOfferedComment.oId}')">
+                                            <svg>
+                                                <use xlink:href="#down"></use>
+                                            </svg>
+                                        </a>
+                                    </div>
+                                    <div class="vditor-reset comment">
+                                        ${article.articleOfferedComment.commentContent}
                                     </div>
                                 </div>
-                            </li>
-                        </ul>
-                    </div>
+                            </div>
+                        </li>
+                    </ul>
                 </div>
-                </#if>
-                <#if article.articleNiceComments?size != 0>
-                <div class="module nice">
-                    <div class="module-header">
-                        <svg class="ft-blue"><use xlink:href="#thumbs-up"></use></svg>
-                        ${niceCommentsLabel}
-                    </div>
-                    <div class="module-panel list comments">
-                        <ul>
+            </div>
+        </#if>
+        <#if article.articleNiceComments?size != 0>
+            <div class="module nice">
+                <div class="module-header">
+                    <svg class="ft-blue">
+                        <use xlink:href="#thumbs-up"></use>
+                    </svg>
+                    ${niceCommentsLabel}
+                </div>
+                <div class="module-panel list comments">
+                    <ul>
                         <#list article.articleNiceComments as comment>
                             <li>
                                 <div class="fn-flex">
                                     <a rel="nofollow" href="${servePath}/member/${comment.commentAuthorName}">
                                         <div class="avatar tooltipped tooltipped-se"
-                                             aria-label="${comment.commentAuthorName}" style="background-image:url('${comment.commentAuthorThumbnailURL}')"></div>
+                                             aria-label="${comment.commentAuthorName}"
+                                             style="background-image:url('${comment.commentAuthorThumbnailURL}')"></div>
                                     </a>
                                     <div class="fn-flex-1">
                                         <div class="fn-clear comment-info ft-smaller">
                                             <span class="fn-left">
-                                                <a rel="nofollow" href="${servePath}/member/${comment.commentAuthorName}" class="ft-gray"><span class="ft-gray">${comment.commentAuthorName}</span></a>
+                                                <a rel="nofollow"
+                                                   href="${servePath}/member/${comment.commentAuthorName}"
+                                                   class="ft-gray"><span
+                                                            class="ft-gray">${comment.commentAuthorName}</span></a>
                                                 <span class="ft-fade">• ${comment.timeAgo}</span>
 
                                                 <#if comment.rewardedCnt gt 0>
-                                                <#assign hasRewarded = isLoggedIn && comment.commentAuthorId != currentUser.oId && comment.rewarded>
-                                                <span aria-label="<#if hasRewarded>${thankedLabel}<#else>${thankLabel} ${comment.rewardedCnt}</#if>"
-                                                      class="tooltipped tooltipped-n rewarded-cnt <#if hasRewarded>ft-red<#else>ft-fade</#if>">
-                                                    <svg class="fn-text-top"><use xlink:href="#heart"></use></svg> ${comment.rewardedCnt}
+                                                    <#assign hasRewarded = isLoggedIn && comment.commentAuthorId != currentUser.oId && comment.rewarded>
+                                                    <span aria-label="<#if hasRewarded>${thankedLabel}<#else>${thankLabel} ${comment.rewardedCnt}</#if>"
+                                                          class="tooltipped tooltipped-n rewarded-cnt <#if hasRewarded>ft-red<#else>ft-fade</#if>">
+                                                    <svg class="fn-text-top"><use
+                                                                xlink:href="#heart"></use></svg> ${comment.rewardedCnt}
                                                 </span>
                                                 </#if>
-                                                <#if 0 == comment.commenter.userUAStatus><span class="cmt-via ft-fade" data-ua="${comment.commentUA}"></span></#if>
+                                                <#if 0 == comment.commenter.userUAStatus><span class="cmt-via ft-fade"
+                                                                                               data-ua="${comment.commentUA}"></span></#if>
                                             </span>
-                                            <a class="ft-a-title fn-right tooltipped tooltipped-nw" aria-label="${goCommentLabel}"
-                                               href="javascript:Comment.goComment('${servePath}/article/${article.oId}?p=${comment.paginationCurrentPageNum}&m=${userCommentViewMode}#${comment.oId}')"><svg><use xlink:href="#down"></use></svg></a>
+                                            <a class="ft-a-title fn-right tooltipped tooltipped-nw"
+                                               aria-label="${goCommentLabel}"
+                                               href="javascript:Comment.goComment('${servePath}/article/${article.oId}?p=${comment.paginationCurrentPageNum}&m=${userCommentViewMode}#${comment.oId}')">
+                                                <svg>
+                                                    <use xlink:href="#down"></use>
+                                                </svg>
+                                            </a>
                                         </div>
                                         <div class="vditor-reset comment">
                                             ${comment.commentContent}
@@ -260,335 +415,375 @@
                             </li>
                         </#list>
                     </ul>
-                    </div>
                 </div>
-                </#if>
+            </div>
+        </#if>
 
-                <#if pjax><!---- pjax {#comments} start ----></#if>
-                <div class="module comments" id="comments">
-                    <div class="comments-header module-header">
-                        <span class="article-cmt-cnt">${article.articleCommentCount} ${cmtLabel}</span>
-                        <span class="fn-right<#if article.articleComments?size == 0> fn-none</#if>">
-                            <a class="tooltipped tooltipped-nw" href="javascript:Comment.exchangeCmtSort(${userCommentViewMode})"
-                               aria-label="<#if 0 == userCommentViewMode>${changeToLabel}${realTimeLabel}${cmtViewModeLabel}<#else>${changeToLabel}${traditionLabel}${cmtViewModeLabel}</#if>"><span class="icon-<#if 0 == userCommentViewMode>sortasc<#else>time</#if>"></span></a>&nbsp;
-                            <a class="tooltipped tooltipped-nw" href="javascript:Comment._bgFade($('#bottomComment'))" aria-label="${jumpToBottomCommentLabel}"><svg><use xlink:href="#chevron-down"></use></svg></a>
+        <#if pjax><!---- pjax {#comments} start ----></#if>
+        <div class="module comments" id="comments">
+            <div class="comments-header module-header">
+                <span class="article-cmt-cnt">${article.articleCommentCount} ${cmtLabel}</span>
+                <span class="fn-right<#if article.articleComments?size == 0> fn-none</#if>">
+                            <a class="tooltipped tooltipped-nw"
+                               href="javascript:Comment.exchangeCmtSort(${userCommentViewMode})"
+                               aria-label="<#if 0 == userCommentViewMode>${changeToLabel}${realTimeLabel}${cmtViewModeLabel}<#else>${changeToLabel}${traditionLabel}${cmtViewModeLabel}</#if>"><span
+                                        class="icon-<#if 0 == userCommentViewMode>sortasc<#else>time</#if>"></span></a>&nbsp;
+                            <a class="tooltipped tooltipped-nw" href="javascript:Comment._bgFade($('#bottomComment'))"
+                               aria-label="${jumpToBottomCommentLabel}"><svg><use
+                                            xlink:href="#chevron-down"></use></svg></a>
                         </span>
-                    </div>
-                    <div class="list">
-                        <div class="comment__reply">
-                            <#if isLoggedIn>
-                                    <div class="fn__flex">
-                                        <span class="avatar" style="background-image: url('${currentUser.userAvatarURL20}');"></span>
-                                        <span class="reply__text fn-flex-1 commentToggleEditorBtn" onclick="Comment._toggleReply();">请输入回帖内容
+            </div>
+            <div class="list">
+                <div class="comment__reply">
+                    <#if isLoggedIn>
+                        <div class="fn__flex">
+                            <span class="avatar"
+                                  style="background-image: url('${currentUser.userAvatarURL20}');"></span>
+                            <span class="reply__text fn-flex-1 commentToggleEditorBtn"
+                                  onclick="Comment._toggleReply();">请输入回帖内容
                                             ...
                                         </span>
-                                    </div>
-                                <#else>
-                                    <div class="reply__text fn-flex-1 commentToggleEditorBtn" onclick="Util.goLogin();">登录参与讨论
-                                        ...
-                                    </div>
-                            </#if>
                         </div>
-                        <ul>
-                            <#assign notificationCmtIds = "">
-                            <#list article.articleComments as comment>
-                            <#assign notificationCmtIds = notificationCmtIds + comment.oId>
-                            <#if comment_has_next><#assign notificationCmtIds = notificationCmtIds + ","></#if>
-                            <#include 'common/comment.ftl' />
-                            </#list>
-                        </ul>
-                        <div id="bottomComment"></div>
-                    </div>
-                    <@pagination url="${servePath}${article.articlePermalink}" query="m=${userCommentViewMode}#comments" pjaxTitle="${article.articleTitle} - ${symphonyLabel}" />
+                    <#else>
+                        <div class="reply__text fn-flex-1 commentToggleEditorBtn" onclick="Util.goLogin();">登录参与讨论
+                            ...
+                        </div>
+                    </#if>
                 </div>
-                <#if pjax><!---- pjax {#comments} end ----></#if>
+                <ul>
+                    <#assign notificationCmtIds = "">
+                    <#list article.articleComments as comment>
+                        <#assign notificationCmtIds = notificationCmtIds + comment.oId>
+                        <#if comment_has_next><#assign notificationCmtIds = notificationCmtIds + ","></#if>
+                        <#include 'common/comment.ftl' />
+                    </#list>
+                </ul>
+                <div id="bottomComment"></div>
+            </div>
+            <@pagination url="${servePath}${article.articlePermalink}" query="m=${userCommentViewMode}#comments" pjaxTitle="${article.articleTitle} - ${symphonyLabel}" />
+        </div>
+        <#if pjax><!---- pjax {#comments} end ----></#if>
+    </div>
+</div>
+<div class="wrapper article-footer">
+    <#if sideRelevantArticles?size != 0>
+        <div class="module">
+            <div class="module-header">
+                <h2>
+                    ${relativeArticleLabel}
+                </h2>
+            </div>
+            <div class="module-panel">
+                <ul class="module-list">
+                    <#list sideRelevantArticles as relevantArticle>
+                        <li<#if !relevantArticle_has_next> class="last"</#if>>
+                            <a rel="nofollow" href="${servePath}/member/${relevantArticle.articleAuthorName}">
+                                <span class="avatar-small slogan tooltipped tooltipped-se"
+                                      aria-label="${relevantArticle.articleAuthorName}"
+                                      style="background-image:url('${relevantArticle.articleAuthorThumbnailURL20}')"></span>
+                            </a>
+                            <a rel="nofollow" class="title fn-ellipsis"
+                               href="${servePath}${relevantArticle.articlePermalink}">${relevantArticle.articleTitleEmoj}</a>
+                        </li>
+                    </#list>
+                </ul>
             </div>
         </div>
-        <div class="wrapper article-footer">
-            <#if sideRelevantArticles?size != 0>
-                <div class="module">
-                    <div class="module-header">
-                        <h2>
-                        ${relativeArticleLabel}
-                        </h2>
-                    </div>
-                    <div class="module-panel">
-                        <ul class="module-list">
-                            <#list sideRelevantArticles as relevantArticle>
-                                <li<#if !relevantArticle_has_next> class="last"</#if>>
-                                    <a rel="nofollow" href="${servePath}/member/${relevantArticle.articleAuthorName}">
-                                    <span class="avatar-small slogan tooltipped tooltipped-se" aria-label="${relevantArticle.articleAuthorName}" style="background-image:url('${relevantArticle.articleAuthorThumbnailURL20}')"></span>
-                                    </a>
-                                    <a rel="nofollow" class="title fn-ellipsis" href="${servePath}${relevantArticle.articlePermalink}">${relevantArticle.articleTitleEmoj}</a>
-                                </li>
-                            </#list>
-                        </ul>
-                    </div>
-                </div>
-            </#if>
+    </#if>
 
-            <#if sideRandomArticles?size != 0>
-                <div class="module">
-                    <div class="module-header">
-                        <h2>
-                        ${randomArticleLabel}
-                        </h2>
-                    </div>
-                    <div class="module-panel">
-                        <ul class="module-list">
-                            <#list sideRandomArticles as randomArticle>
-                                <li<#if !randomArticle_has_next> class="last"</#if>>
-                                    <a rel="nofollow" href="${servePath}/member/${randomArticle.articleAuthorName}">
+    <#if sideRandomArticles?size != 0>
+        <div class="module">
+            <div class="module-header">
+                <h2>
+                    ${randomArticleLabel}
+                </h2>
+            </div>
+            <div class="module-panel">
+                <ul class="module-list">
+                    <#list sideRandomArticles as randomArticle>
+                        <li<#if !randomArticle_has_next> class="last"</#if>>
+                            <a rel="nofollow" href="${servePath}/member/${randomArticle.articleAuthorName}">
                                     <span class="avatar-small slogan tooltipped tooltipped-se"
                                           aria-label="${randomArticle.articleAuthorName}"
                                           style="background-image:url('${randomArticle.articleAuthorThumbnailURL20}')"></span>
-                                    </a>
-                                    <a class="title fn-ellipsis" rel="nofollow" href="${servePath}${randomArticle.articlePermalink}">${randomArticle.articleTitleEmoj}</a>
-                                </li>
-                            </#list>
-                        </ul>
-                    </div>
-                </div>
-            </#if>
-
-            <#if ADLabel!="">
-                <div class="module">
-                    <div class="module-header">
-                        <h2>
-                        ${sponsorLabel}
-                            <a href="${servePath}/about" class="fn-right ft-13 ft-gray" target="_blank">${wantPutOnLabel}</a>
-                        </h2>
-                    </div>
-                    <div class="module-panel ad fn-clear">
-                    ${ADLabel}
-                    </div>
-                </div>
-            </#if>
-        </div>
-
-        <div id="heatBar" class="tooltipped tooltipped-s" aria-label="${postActivityLabel}">
-            <i class="heat" style="width:${article.articleHeat*3}px"></i>
-        </div>
-        <div id="revision"><div id="revisions"></div></div>
-        <div id="reportDialog">
-            <div class="form fn-clear">
-                <div class="fn-clear"><label><input type="radio" value="0" name="report" checked> ${spamADLabel}</label></div>
-                <div class="fn-clear"><label><input type="radio" value="1" name="report"> ${pornographicLabel}</label></div>
-                <div class="fn-clear"><label><input type="radio" value="2" name="report"> ${violationOfRegulationsLabel}</label></div>
-                <div class="fn-clear"><label><input type="radio" value="3" name="report"> ${allegedlyInfringingLabel}</label></div>
-                <div class="fn-clear"><label><input type="radio" value="4" name="report"> ${personalAttacksLabel}</label></div>
-                <div class="fn-clear"><label><input type="radio" value="49" name="report"> ${miscLabel}</label></div>
-                <br>
-                <textarea id="reportTextarea" placeholder="${reportContentLabel}" rows="3"></textarea><br><br>
-                <button onclick="Comment.report(this)" class="fn-right green">${reportLabel}</button>
+                            </a>
+                            <a class="title fn-ellipsis" rel="nofollow"
+                               href="${servePath}${randomArticle.articlePermalink}">${randomArticle.articleTitleEmoj}</a>
+                        </li>
+                    </#list>
+                </ul>
             </div>
         </div>
-        <#include "footer.ftl">
-        <div class="share fn-none">
+    </#if>
+
+    <#if ADLabel!="">
+        <div class="module">
+            <div class="module-header">
+                <h2>
+                    ${sponsorLabel}
+                    <a href="${servePath}/about" class="fn-right ft-13 ft-gray" target="_blank">${wantPutOnLabel}</a>
+                </h2>
+            </div>
+            <div class="module-panel ad fn-clear">
+                ${ADLabel}
+            </div>
+        </div>
+    </#if>
+</div>
+
+<div id="heatBar" class="tooltipped tooltipped-s" aria-label="${postActivityLabel}">
+    <i class="heat" style="width:${article.articleHeat*3}px"></i>
+</div>
+<div id="revision">
+    <div id="revisions"></div>
+</div>
+<div id="reportDialog">
+    <div class="form fn-clear">
+        <div class="fn-clear"><label><input type="radio" value="0" name="report" checked> ${spamADLabel}</label></div>
+        <div class="fn-clear"><label><input type="radio" value="1" name="report"> ${pornographicLabel}</label></div>
+        <div class="fn-clear"><label><input type="radio" value="2" name="report"> ${violationOfRegulationsLabel}</label>
+        </div>
+        <div class="fn-clear"><label><input type="radio" value="3" name="report"> ${allegedlyInfringingLabel}</label>
+        </div>
+        <div class="fn-clear"><label><input type="radio" value="4" name="report"> ${personalAttacksLabel}</label></div>
+        <div class="fn-clear"><label><input type="radio" value="49" name="report"> ${miscLabel}</label></div>
+        <br>
+        <textarea id="reportTextarea" placeholder="${reportContentLabel}" rows="3"></textarea><br><br>
+        <button onclick="Comment.report(this)" class="fn-right green">${reportLabel}</button>
+    </div>
+</div>
+<#include "footer.ftl">
+<div class="share fn-none">
             <span id="thankArticle" aria-label="${thankLabel}"
                   class="tooltipped tooltipped-e<#if article.thanked> ft-red<#else> ft-blue</#if>"
             <#if permissions["commonThankArticle"].permissionGrant>
                 <#if !article.thanked>
                     onclick="Article.thankArticle('${article.oId}', ${article.articleAnonymous})"
                 </#if>
-                <#else>
-                    onclick="Article.permissionTip(Label.noPermissionLabel)"
-            </#if>><svg><use xlink:href="#heart"></use></svg> <span class="ft-13">${article.thankedCnt}</span></span>
-            <div id="qrCode" class="fn-none"
-                 data-shareurl="${servePath}${article.articlePermalink}<#if isLoggedIn>?r=${currentUser.userName}</#if>"></div>
-            <span class="tooltipped tooltipped-e" aria-label="share to wechat" data-type="wechat"><svg class="icon-wechat"><use xlink:href="#wechat"></use></svg></span>
-            <span class="tooltipped tooltipped-e" aria-label="share to weibo" data-type="weibo"><svg class="icon-weibo"><use xlink:href="#weibo"></use></svg></span>
-            <span class="tooltipped tooltipped-e" aria-label="share to twitter" data-type="twitter"><svg class="icon-twitter"><use xlink:href="#twitter"></use></svg></span>
-            <span class="tooltipped tooltipped-e" aria-label="share to google" data-type="google"><svg class="icon-google"><use xlink:href="#google"></use></svg></span>
-            <span class="tooltipped tooltipped-e" data-type="copy"
-                  aria-label="${copyLabel}"
-                  id="shareClipboard"><svg class="icon-link"><use xlink:href="#link"></use></svg></span>
-            <input type="text" class="article-clipboard"
-                   value="${servePath}${article.articlePermalink}<#if isLoggedIn>?r=${currentUser.userName}</#if>"/>
-        </div>
-        <div class="article-header">
-            <h1 aria-label="${symphonyLabel}" class="tooltipped tooltipped-s">
-                <a href="${servePath}">
-                    <svg><use xlink:href="#logo-white"></use></svg>
-                </a>
-            </h1>
-            <h2 class="fn-ellipsis fn-pointer" onclick="Util.goTop()">
-                ${article.articleTitleEmojUnicode}
-            </h2>
-            <div class="user-nav">
-                <#if "" != article.articleToC>
-                    <span onclick="Article.toggleToc()" aria-label="${ToCLabel}"
-                          class="tooltipped tooltipped-w"><svg class="ft-red icon-unordered-list"><use xlink:href="#unordered-list"></use></svg></span>
-                </#if>
-                <#if permissions["commonViewArticleHistory"].permissionGrant && article.articleRevisionCount &gt; 1>
-                    <span onclick="Article.revision('${article.oId}')" aria-label="${historyLabel}"
-                          class="tooltipped tooltipped-w"><svg class="icon-history"><use xlink:href="#history"></use></svg></span>
-                </#if>
+            <#else>
+                onclick="Article.permissionTip(Label.noPermissionLabel)"
+                    </#if>><svg><use xlink:href="#heart"></use></svg> <span
+                        class="ft-13">${article.thankedCnt}</span></span>
+    <div id="qrCode" class="fn-none"
+         data-shareurl="${servePath}${article.articlePermalink}<#if isLoggedIn>?r=${currentUser.userName}</#if>"></div>
+    <span class="tooltipped tooltipped-e" aria-label="share to wechat" data-type="wechat"><svg class="icon-wechat"><use
+                    xlink:href="#wechat"></use></svg></span>
+    <span class="tooltipped tooltipped-e" aria-label="share to weibo" data-type="weibo"><svg class="icon-weibo"><use
+                    xlink:href="#weibo"></use></svg></span>
+    <span class="tooltipped tooltipped-e" aria-label="share to twitter" data-type="twitter"><svg class="icon-twitter"><use
+                    xlink:href="#twitter"></use></svg></span>
+    <span class="tooltipped tooltipped-e" aria-label="share to google" data-type="google"><svg class="icon-google"><use
+                    xlink:href="#google"></use></svg></span>
+    <span class="tooltipped tooltipped-e" data-type="copy"
+          aria-label="${copyLabel}"
+          id="shareClipboard"><svg class="icon-link"><use xlink:href="#link"></use></svg></span>
+    <input type="text" class="article-clipboard"
+           value="${servePath}${article.articlePermalink}<#if isLoggedIn>?r=${currentUser.userName}</#if>"/>
+</div>
+<div class="article-header">
+    <h1 aria-label="${symphonyLabel}" class="tooltipped tooltipped-s">
+        <a href="${servePath}">
+            <svg>
+                <use xlink:href="#logo-white"></use>
+            </svg>
+        </a>
+    </h1>
+    <h2 class="fn-ellipsis fn-pointer" onclick="Util.goTop()">
+        ${article.articleTitleEmojUnicode}
+    </h2>
+    <div class="user-nav">
+        <#if "" != article.articleToC>
+            <span onclick="Article.toggleToc()" aria-label="${ToCLabel}"
+                  class="tooltipped tooltipped-w"><svg class="ft-red icon-unordered-list"><use
+                            xlink:href="#unordered-list"></use></svg></span>
+        </#if>
+        <#if permissions["commonViewArticleHistory"].permissionGrant && article.articleRevisionCount &gt; 1>
+            <span onclick="Article.revision('${article.oId}')" aria-label="${historyLabel}"
+                  class="tooltipped tooltipped-w"><svg class="icon-history"><use
+                            xlink:href="#history"></use></svg></span>
+        </#if>
 
-                <#if articlePrevious??>
-                    <a rel="prev" class="tooltipped tooltipped-w" aria-label="${prevPostLabel}: ${articlePrevious.articleTitleEmojUnicode}"
-                       href="${servePath}${articlePrevious.articlePermalink}">
-                        <svg><use xlink:href="#chevron-left"></use></svg></a>
-                </#if>
+        <#if articlePrevious??>
+            <a rel="prev" class="tooltipped tooltipped-w"
+               aria-label="${prevPostLabel}: ${articlePrevious.articleTitleEmojUnicode}"
+               href="${servePath}${articlePrevious.articlePermalink}">
+                <svg>
+                    <use xlink:href="#chevron-left"></use>
+                </svg>
+            </a>
+        </#if>
 
-                <#if articleNext??>
-                    <a rel="next" class="tooltipped tooltipped-w" aria-label="${nextPostLabel}: ${articleNext.articleTitleEmojUnicode}"
-                       href="${servePath}${articleNext.articlePermalink}">
-                        <svg><use xlink:href="#chevron-right"></use></svg>
-                    </a>
-                </#if>
+        <#if articleNext??>
+            <a rel="next" class="tooltipped tooltipped-w"
+               aria-label="${nextPostLabel}: ${articleNext.articleTitleEmojUnicode}"
+               href="${servePath}${articleNext.articlePermalink}">
+                <svg>
+                    <use xlink:href="#chevron-right"></use>
+                </svg>
+            </a>
+        </#if>
 
-                <span class="tooltipped tooltipped-w<#if isLoggedIn && 0 == article.articleVote> ft-red</#if>" aria-label="${upLabel}"
+        <span class="tooltipped tooltipped-w<#if isLoggedIn && 0 == article.articleVote> ft-red</#if>"
+              aria-label="${upLabel}"
                 <#if permissions["commonGoodArticle"].permissionGrant>
                     onclick="Article.voteUp('${article.oId}', 'article', this)"
                     <#else>
                         onclick="Article.permissionTip(Label.noPermissionLabel)"
-                </#if>><svg class="icon-thumbs-up"><use xlink:href="#thumbs-up"></use></svg> ${article.articleGoodCnt}</span>
+                </#if>><svg class="icon-thumbs-up"><use
+                        xlink:href="#thumbs-up"></use></svg> ${article.articleGoodCnt}</span>
 
-                <span  class="tooltipped tooltipped-w<#if isLoggedIn && 1 == article.articleVote> ft-red</#if>" aria-label="${downLabel}"
+        <span class="tooltipped tooltipped-w<#if isLoggedIn && 1 == article.articleVote> ft-red</#if>"
+              aria-label="${downLabel}"
                 <#if permissions["commonBadArticle"].permissionGrant>
                     onclick="Article.voteDown('${article.oId}', 'article', this)"
                 <#else>
                     onclick="Article.permissionTip(Label.noPermissionLabel)"
-                </#if>><svg class="icon-thumbs-down"><use xlink:href="#thumbs-down"></use></svg> ${article.articleBadCnt}</span>
+                </#if>><svg class="icon-thumbs-down"><use
+                        xlink:href="#thumbs-down"></use></svg> ${article.articleBadCnt}</span>
 
-                <#if isLoggedIn && isFollowing>
-                    <span class="tooltipped tooltipped-w ft-red" aria-label="${uncollectLabel}"
+        <#if isLoggedIn && isFollowing>
+            <span class="tooltipped tooltipped-w ft-red" aria-label="${uncollectLabel}"
                     <#if permissions["commonFollowArticle"].permissionGrant>
                         onclick="Util.unfollow(this, '${article.oId}', 'article', ${article.articleCollectCnt})"
                         <#else>
                             onclick="Article.permissionTip(Label.noPermissionLabel)"
-                    </#if>><svg class="icon-star"><use xlink:href="#star"></use></svg> ${article.articleCollectCnt}</span>
-                    <#else>
-                        <span class="tooltipped tooltipped-w" aria-label="${collectLabel}"
+                    </#if>><svg class="icon-star"><use
+                            xlink:href="#star"></use></svg> ${article.articleCollectCnt}</span>
+        <#else>
+            <span class="tooltipped tooltipped-w" aria-label="${collectLabel}"
                         <#if permissions["commonFollowArticle"].permissionGrant>
                             onclick="Util.follow(this, '${article.oId}', 'article', ${article.articleCollectCnt})"
                             <#else>
                                 onclick="Article.permissionTip(Label.noPermissionLabel)"
-                        </#if>><svg class="icon-star"><use xlink:href="#star"></use></svg> ${article.articleCollectCnt}</span>
-                </#if>
+                    </#if>><svg class="icon-star"><use
+                            xlink:href="#star"></use></svg> ${article.articleCollectCnt}</span>
+        </#if>
 
-                <#if isLoggedIn && isWatching>
-                    <span class="tooltipped tooltipped-w ft-red" aria-label="${unfollowLabel}"
+        <#if isLoggedIn && isWatching>
+            <span class="tooltipped tooltipped-w ft-red" aria-label="${unfollowLabel}"
                     <#if permissions["commonWatchArticle"].permissionGrant>
                         onclick="Util.unfollow(this, '${article.oId}', 'article-watch', ${article.articleWatchCnt})"
                         <#else>
                             onclick="Article.permissionTip(Label.noPermissionLabel)"
                     </#if>><svg class="icon-view"><use xlink:href="#view"></use></svg> ${article.articleWatchCnt}</span>
-                    <#else>
-                        <span class="tooltipped tooltipped-w" aria-label="${followLabel}"
+        <#else>
+            <span class="tooltipped tooltipped-w" aria-label="${followLabel}"
                         <#if permissions["commonWatchArticle"].permissionGrant>
                             onclick="Util.follow(this, '${article.oId}', 'article-watch', ${article.articleWatchCnt})"
                             <#else>
                                 onclick="Article.permissionTip(Label.noPermissionLabel)"
-                        </#if>><svg class="icon-view"><use xlink:href="#view"></use></svg> ${article.articleWatchCnt}</span>
-                </#if>
-            </div>
-        </div>
-
-        <#if "" != article.articleToC && 3 != article.articleType>
-            <div class="module" id="articleToC">
-                <div class="module-panel">
-                    ${article.articleToC}
-                </div>
-            </div>
+                    </#if>><svg class="icon-view"><use xlink:href="#view"></use></svg> ${article.articleWatchCnt}</span>
         </#if>
+    </div>
+</div>
 
-        <!--<#if discussionViewable>
+<#if "" != article.articleToC && 3 != article.articleType>
+    <div class="module" id="articleToC">
+        <div class="module-panel">
+            ${article.articleToC}
+        </div>
+    </div>
+</#if>
+
+<!--<#if discussionViewable>
         <span class="radio-btn" onclick="Comment._toggleReply()"
               data-hasPermission="${permissions['commonAddComment'].permissionGrant?c}">${cmtLabel}</span>
         </#if>-->
 
-        <#if isLoggedIn && discussionViewable && article.articleCommentable>
-        <div class="editor-panel">
-            <div class="editor-bg"></div>
-            <div class="wrapper">
-                <div style="width: 100%">
-                    <div class="fn-flex">
-                        <div id="replyUseName" class="fn-flex-1 fn-ellipsis"></div>
-                        <span class="tooltipped tooltipped-w fn-pointer editor-hide" onclick="Comment._toggleReply()" aria-label="${cancelLabel}"> <svg><use xlink:href="#chevron-down"></use></svg></span>
-                    </div>
-                    <div class="article-comment-content">
-                        <div id="commentContent"></div>
-                        <br>
-                        <div class="comment-submit fn-clear">
-                            <#if permissions["commonAddCommentAnonymous"].permissionGrant>
-                                <label class="cmt-anonymous">${anonymousLabel}<input type="checkbox" id="commentAnonymous"></label>
-                            </#if>
-                            <label class="cmt-anonymous">${onlyArticleAuthorVisibleLabel}<input type="checkbox" id="commentVisible"></label>
-                            <div class="fn-right">
-                                <div class="tip fn-left" id="addCommentTip"></div> &nbsp; &nbsp;
-                                <a class="fn-pointer ft-a-title" href="javascript:Comment._toggleReply()">${cancelLabel}</a> &nbsp; &nbsp;
-                                <button id="articleCommentBtn" class="green" onclick="Comment.add('${article.oId}', '${csrfToken}', this)">${submitLabel}</button>
-                            </div>
+<#if isLoggedIn && discussionViewable && article.articleCommentable>
+    <div class="editor-panel">
+        <div class="editor-bg"></div>
+        <div class="wrapper">
+            <div style="width: 100%">
+                <div class="fn-flex">
+                    <div id="replyUseName" class="fn-flex-1 fn-ellipsis"></div>
+                    <span class="tooltipped tooltipped-w fn-pointer editor-hide" onclick="Comment._toggleReply()"
+                          aria-label="${cancelLabel}"> <svg><use xlink:href="#chevron-down"></use></svg></span>
+                </div>
+                <div class="article-comment-content">
+                    <div id="commentContent"></div>
+                    <br>
+                    <div class="comment-submit fn-clear">
+                        <#if permissions["commonAddCommentAnonymous"].permissionGrant>
+                            <label class="cmt-anonymous">${anonymousLabel}<input type="checkbox" id="commentAnonymous"></label>
+                        </#if>
+                        <label class="cmt-anonymous">${onlyArticleAuthorVisibleLabel}<input type="checkbox"
+                                                                                            id="commentVisible"></label>
+                        <div class="fn-right">
+                            <div class="tip fn-left" id="addCommentTip"></div> &nbsp; &nbsp;
+                            <a class="fn-pointer ft-a-title" href="javascript:Comment._toggleReply()">${cancelLabel}</a>
+                            &nbsp; &nbsp;
+                            <button id="articleCommentBtn" class="green"
+                                    onclick="Comment.add('${article.oId}', '${csrfToken}', this)">${submitLabel}</button>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-        <div id="thoughtProgressPreview"></div>
-        </#if>
-        <script src="${staticServePath}/js/lib/compress/article-libs.min.js?${staticResourceVersion}"></script>
-        <script src="${staticServePath}/js/channel${miniPostfix}.js?${staticResourceVersion}"></script>
-        <script src="${staticServePath}/js/article${miniPostfix}.js?${staticResourceVersion}"></script>
-        <script>
-            Label.commentErrorLabel = "${commentErrorLabel}";
-            Label.symphonyLabel = "${symphonyLabel}";
-            Label.rewardConfirmLabel = "${rewardConfirmLabel?replace('{point}', article.articleRewardPoint)}";
-            Label.thankArticleConfirmLabel = "${thankArticleConfirmLabel?replace('{point}', pointThankArticle)}";
-            Label.thankSentLabel = "${thankSentLabel}";
-            Label.articleOId = "${article.oId}";
-            Label.articleTitle = "${article.articleTitle}";
-            Label.recordDeniedLabel = "${recordDeniedLabel}";
-            Label.recordDeviceNotFoundLabel = "${recordDeviceNotFoundLabel}";
-            Label.csrfToken = "${csrfToken}";
-            Label.notAllowCmtLabel = "${notAllowCmtLabel}";
-            Label.upLabel = "${upLabel}";
-            Label.downLabel = "${downLabel}";
-            Label.confirmRemoveLabel = "${confirmRemoveLabel}";
-            Label.removedLabel = "${removedLabel}";
-            Label.uploadLabel = "${uploadLabel}";
-            Label.userCommentViewMode = ${userCommentViewMode};
-            Label.stickConfirmLabel = "${stickConfirmLabel}";
-            Label.audioRecordingLabel = '${audioRecordingLabel}';
-            Label.uploadingLabel = '${uploadingLabel}';
-            Label.copiedLabel = '${copiedLabel}';
-            Label.copyLabel = '${copyLabel}';
-            Label.noRevisionLabel = "${noRevisionLabel}";
-            Label.thankedLabel = "${thankedLabel}";
-            Label.thankLabel = "${thankLabel}";
-            Label.isAdminLoggedIn = ${isAdminLoggedIn?c};
-            Label.adminLabel = '${adminLabel}';
-            Label.thankSelfLabel = '${thankSelfLabel}';
-            Label.replyLabel = '${replyLabel}';
-            Label.articleAuthorName = '${article.articleAuthorName}';
-            Label.referenceLabel = '${referenceLabel}';
-            Label.goCommentLabel = '${goCommentLabel}';
-            Label.addBoldLabel = '${addBoldLabel}';
-            Label.addItalicLabel = '${addItalicLabel}';
-            Label.insertQuoteLabel = '${insertQuoteLabel}';
-            Label.addBulletedLabel = '${addBulletedLabel}';
-            Label.addNumberedListLabel = '${addNumberedListLabel}';
-            Label.addLinkLabel = '${addLinkLabel}';
-            Label.undoLabel = '${undoLabel}';
-            Label.redoLabel = '${redoLabel}';
-            Label.previewLabel = '${previewLabel}';
-            Label.helpLabel = '${helpLabel}';
-            Label.fullscreenLabel = '${fullscreenLabel}';
-            Label.uploadFileLabel = '${uploadFileLabel}';
-            Label.commonUpdateCommentPermissionLabel = '${commonUpdateCommentPermissionLabel}';
-            Label.insertEmojiLabel = '${insertEmojiLabel}';
-            Label.commonAtUser = '${permissions["commonAtUser"].permissionGrant?c}';
-            Label.noPermissionLabel = '${noPermissionLabel}';
-            Label.rewardLabel = '${rewardLabel}';
-            Label.articleChannel = "${wsScheme}://${serverHost}:${serverPort}${contextPath}/article-channel?articleId=${article.oId}&articleType=${article.articleType}";
-            <#if isLoggedIn>
-                Label.currentUserName = '${currentUser.userName}';
-                Label.notificationCmtIds = '${notificationCmtIds}';
-            </#if>
-            <#if 3 == article.articleType>
-                Article.playThought('${article.articleContent}');
-            </#if>
-        </script>
-    </body>
+    </div>
+    <div id="thoughtProgressPreview"></div>
+</#if>
+<script src="${staticServePath}/js/lib/compress/article-libs.min.js?${staticResourceVersion}"></script>
+<script src="${staticServePath}/js/channel${miniPostfix}.js?${staticResourceVersion}"></script>
+<script src="${staticServePath}/js/article${miniPostfix}.js?${staticResourceVersion}"></script>
+<script>
+    Label.commentErrorLabel = "${commentErrorLabel}";
+    Label.symphonyLabel = "${symphonyLabel}";
+    Label.rewardConfirmLabel = "${rewardConfirmLabel?replace('{point}', article.articleRewardPoint)}";
+    Label.thankArticleConfirmLabel = "${thankArticleConfirmLabel?replace('{point}', pointThankArticle)}";
+    Label.thankSentLabel = "${thankSentLabel}";
+    Label.articleOId = "${article.oId}";
+    Label.articleTitle = "${article.articleTitle}";
+    Label.recordDeniedLabel = "${recordDeniedLabel}";
+    Label.recordDeviceNotFoundLabel = "${recordDeviceNotFoundLabel}";
+    Label.csrfToken = "${csrfToken}";
+    Label.notAllowCmtLabel = "${notAllowCmtLabel}";
+    Label.upLabel = "${upLabel}";
+    Label.downLabel = "${downLabel}";
+    Label.confirmRemoveLabel = "${confirmRemoveLabel}";
+    Label.removedLabel = "${removedLabel}";
+    Label.uploadLabel = "${uploadLabel}";
+    Label.userCommentViewMode = ${userCommentViewMode};
+    Label.stickConfirmLabel = "${stickConfirmLabel}";
+    Label.audioRecordingLabel = '${audioRecordingLabel}';
+    Label.uploadingLabel = '${uploadingLabel}';
+    Label.copiedLabel = '${copiedLabel}';
+    Label.copyLabel = '${copyLabel}';
+    Label.noRevisionLabel = "${noRevisionLabel}";
+    Label.thankedLabel = "${thankedLabel}";
+    Label.thankLabel = "${thankLabel}";
+    Label.isAdminLoggedIn = ${isAdminLoggedIn?c};
+    Label.adminLabel = '${adminLabel}';
+    Label.thankSelfLabel = '${thankSelfLabel}';
+    Label.replyLabel = '${replyLabel}';
+    Label.articleAuthorName = '${article.articleAuthorName}';
+    Label.referenceLabel = '${referenceLabel}';
+    Label.goCommentLabel = '${goCommentLabel}';
+    Label.addBoldLabel = '${addBoldLabel}';
+    Label.addItalicLabel = '${addItalicLabel}';
+    Label.insertQuoteLabel = '${insertQuoteLabel}';
+    Label.addBulletedLabel = '${addBulletedLabel}';
+    Label.addNumberedListLabel = '${addNumberedListLabel}';
+    Label.addLinkLabel = '${addLinkLabel}';
+    Label.undoLabel = '${undoLabel}';
+    Label.redoLabel = '${redoLabel}';
+    Label.previewLabel = '${previewLabel}';
+    Label.helpLabel = '${helpLabel}';
+    Label.fullscreenLabel = '${fullscreenLabel}';
+    Label.uploadFileLabel = '${uploadFileLabel}';
+    Label.commonUpdateCommentPermissionLabel = '${commonUpdateCommentPermissionLabel}';
+    Label.insertEmojiLabel = '${insertEmojiLabel}';
+    Label.commonAtUser = '${permissions["commonAtUser"].permissionGrant?c}';
+    Label.noPermissionLabel = '${noPermissionLabel}';
+    Label.rewardLabel = '${rewardLabel}';
+    Label.articleChannel = "${wsScheme}://${serverHost}:${serverPort}${contextPath}/article-channel?articleId=${article.oId}&articleType=${article.articleType}";
+    <#if isLoggedIn>
+    Label.currentUserName = '${currentUser.userName}';
+    Label.notificationCmtIds = '${notificationCmtIds}';
+    </#if>
+    <#if 3 == article.articleType>
+    Article.playThought('${article.articleContent}');
+    </#if>
+</script>
+</body>
 </html>
