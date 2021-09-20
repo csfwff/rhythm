@@ -1226,7 +1226,7 @@ public class ArticleQueryService {
         try {
             Stopwatchs.start("Query index recent articles");
             try {
-                final int fetchSize = 10;
+                final int fetchSize = 12;
                 Query query = new Query().
                         setFilter(CompositeFilterOperator.and(
                                 new PropertyFilter(Article.ARTICLE_TYPE, FilterOperator.NOT_EQUAL, Article.ARTICLE_TYPE_C_DISCUSSION),
