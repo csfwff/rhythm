@@ -93,7 +93,7 @@ var IdleTalk = {
                     $("#userForm").val("");
                     $("#themeForm").val("");
                     IdleTalk.editor.setValue("");
-                    Util.notice("success", 3000, "信柬已发送，请静候佳音！");
+                    Util.notice("success", 3000, "私信已发送，请静候佳音！");
                 }
             }
         });
@@ -112,7 +112,7 @@ var IdleTalk = {
             },
             height: 200,
             counter: 4096,
-            placeholder: '信柬内容（最长20480个字）'
+            placeholder: '私信内容（最长20480个字）'
         })
 
         let toUser = IdleTalk.getUrlPath("toUser");
@@ -120,6 +120,13 @@ var IdleTalk = {
             IdleTalk.expand();
             $("#userForm").val(toUser);
         }
+
+        $("#userForm").on('input', function () {
+            let users = Util.getAtUsers($("#userForm").val());
+            for (let i = 0; i < users.length; i++) {
+                console.log(users[i]);
+            }
+        });
     },
 
     getContent: function () {
@@ -146,6 +153,10 @@ var IdleTalk = {
             }
         }
         return (false);
+    },
+
+    fillUsername: function (username) {
+        $("#userForm").val(username);
     }
 }
 

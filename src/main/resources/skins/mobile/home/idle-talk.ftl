@@ -55,14 +55,14 @@
                     <div id="sendMessageWindow" style="height: 150px;display: none;">
                         <div style="height: 130px;">
                             <input id="userForm" placeholder="收件人用户名" style="behavior:url(#default#savehistory);width: calc(100% - 43px); height: 20px; border: 1px solid #eee; padding: 20px">
-                            <input id="themeForm" placeholder="信柬主题（50字以内）" style="behavior:url(#default#savehistory);width: calc(100% - 43px); height: 20px; border: 1px solid #eee; padding: 20px">
+                            <input id="themeForm" placeholder="私信主题（50字以内）" style="behavior:url(#default#savehistory);width: calc(100% - 43px); height: 20px; border: 1px solid #eee; padding: 20px">
                         </div>
                         <div id="messageContent"></div>
                         <div>
                             <button class="green fn-right" style="margin-top: 15px;" onclick="IdleTalk.send()">确定发信</button>
                         </div>
                     </div>
-                    <h3 id="title" style="padding: 20px 0 20px 0">收到的信柬</h3>
+                    <h3 id="title" style="padding: 20px 0 20px 0">收到的私信</h3>
                     <div class="module-panel" style="padding-top: 15px;">
                         <ul id="received" class="module-list">
                             <#if meReceived?? && (meReceived?size > 0)>
@@ -134,3 +134,8 @@
     // Init [IdleTalk] channel
     IdleTalkChannel.init("${wsScheme}://${serverHost}:${serverPort}${contextPath}/idle-talk-channel");
 </script>
+<#if meReceived?size == 0 && meSent?size == 0>
+    <script>
+        IdleTalk.expand()
+    </script>
+</#if>

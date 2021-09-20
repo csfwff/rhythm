@@ -47,7 +47,10 @@
                 <div id="sendMessageWindow" style="height: 150px;display: none;">
                     <div style="height: 130px;">
                         <input id="userForm" placeholder="收件人用户名" style="behavior:url(#default#savehistory);width: calc(100% - 43px); height: 20px; border: 1px solid #eee; padding: 20px">
-                        <input id="themeForm" placeholder="信柬主题（50字以内）" style="behavior:url(#default#savehistory);width: calc(100% - 43px); height: 20px; border: 1px solid #eee; padding: 20px">
+                        <div id="chatUsernameSelectedPanel" class="completed-panel" style="height:170px;display:none;left:auto;top:auto;">
+                            <a onclick="IdleTalk.fillUsername('adlered')">adlered</a>
+                        </div>
+                        <input id="themeForm" placeholder="私信主题（50字以内）" style="behavior:url(#default#savehistory);width: calc(100% - 43px); height: 20px; border: 1px solid #eee; padding: 20px">
                     </div>
                     <div id="messageContent"></div>
                     <div>
@@ -127,3 +130,8 @@
     // Init [IdleTalk] channel
     IdleTalkChannel.init("${wsScheme}://${serverHost}:${serverPort}${contextPath}/idle-talk-channel");
 </script>
+<#if meReceived?size == 0 && meSent?size == 0>
+    <script>
+        IdleTalk.expand()
+    </script>
+</#if>
