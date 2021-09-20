@@ -22,4 +22,5 @@
     <span>♠</span> <a href="${servePath}/top/balance">${wealthRankLabel}</a>
     <span class="ft-red">♥</span>  <a href="${servePath}/top/consumption">${consumptionRankLabel}</a>
     <span>♣</span> <a href="${servePath}/top/checkin">${checkinTopLabel}</a>
+    <span class="ft-red">♦</span> <a href="${servePath}/top/online">在线时间排行</a>
 </div>

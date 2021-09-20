@@ -21,7 +21,7 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <@head title="龙门阵 - ${symphonyLabel}">
+        <@head title="私信 - ${symphonyLabel}">
         </@head>
         <style>
             h2 {
@@ -39,14 +39,17 @@
                 <div class="fn-hr10"></div>
                 <div class="module">
                     <div class="module-header">
-                        <h2><svg style="width: 25px; height: 25px;"><use xlink:href="#dragon"></use></svg> 龙门阵</h2>
+                        <h2><svg style="width: 20px; height: 20px;"><use xlink:href="#idleChat"></use></svg> 私信</h2>
                         <div style="font-size: 12px;line-height: 18px; padding: 15px">
-                            阁下可在「摸鱼派」派中摆「龙门阵」输送密信，全程保密托送，陆个时辰对方未读，将会秘密销毁；阅后即焚。<br>
-                            —— 即便是这摸鱼派掌门人，也是毫无窃信之法。<br>
-                            顺便偷偷告诉您：<b>要摆出这「龙门阵」，您要花费 5 两积分</b>。
+                            您的私信内容经过加密，只有发信双方可以得知发信的具体内容，其他人无法知晓（包括管理员）<br>
+                            一旦以下情况之一发生，您的私信会被「双向销毁」：<br>
+                            1. 收信人查看信件正文；<br>
+                            2. 发信人撤回信件；<br>
+                            3. 信件超过12小时未读。<br><br>
+                            <b>积分花费：5积分/条</b>
                         </div>
                         <div>
-                            <button onclick="IdleTalk.expand()" class="green"><svg style="width: 16px; height: 16px;"><use xlink:href="#taiJi"></use></svg> 摆「龙门阵」</button>
+                            <button onclick="IdleTalk.expand()" class="green">新建私信</button>
                         </div>
                     </div>
                     <div id="sendMessageWindow" style="height: 150px;display: none;">
@@ -73,7 +76,7 @@
                                             </a>
                                             <div class="fn-flex-1">
                                                 <h2>
-                                                    <a href="${servePath}/member/${receivedMessage.fromUserName}">来自「${receivedMessage.fromUserName}」的龙门阵密信</a>
+                                                    <a href="${servePath}/member/${receivedMessage.fromUserName}">来自「${receivedMessage.fromUserName}」的私信</a>
                                                     <button class="red fn-right" onclick="IdleTalk.seek('${receivedMessage.mapId}', '${receivedMessage.fromUserName}', '${receivedMessage.theme}')">查看并销毁</button>
                                                 </h2>
                                                 <span class="ft-fade vditor-reset">
@@ -103,7 +106,7 @@
                                             </a>
                                             <div class="fn-flex-1">
                                                 <h2>
-                                                    <a href="${servePath}/member/${sentMessage.toUserName}">发送给「${sentMessage.toUserName}」的龙门阵密信</a>
+                                                    <a href="${servePath}/member/${sentMessage.toUserName}">发送给「${sentMessage.toUserName}」的私信</a>
                                                     <button class="btn fn-right" style="margin-left: 10px" onclick="IdleTalk.revoke('${sentMessage.mapId}')">撤回</button>
                                                 </h2>
                                                 <span class="ft-fade vditor-reset">

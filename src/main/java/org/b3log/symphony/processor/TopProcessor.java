@@ -92,6 +92,7 @@ public class TopProcessor {
         Dispatcher.get("/top/balance", topProcessor::showBalance, anonymousViewCheckMidware::handle);
         Dispatcher.get("/top/consumption", topProcessor::showConsumption, anonymousViewCheckMidware::handle);
         Dispatcher.get("/top/checkin", topProcessor::showCheckin, anonymousViewCheckMidware::handle);
+        Dispatcher.get("/top/online", topProcessor::showOnline, anonymousViewCheckMidware::handle);
     }
 
     /**
@@ -175,6 +176,24 @@ public class TopProcessor {
         final Map<String, Object> dataModel = renderer.getDataModel();
         final List<JSONObject> users = activityQueryService.getTopCheckinUsers(Symphonys.TOP_CNT);
         dataModel.put(Common.TOP_CHECKIN_USERS, users);
+
+        dataModelService.fillHeaderAndFooter(context, dataModel);
+        dataModelService.fillRandomArticles(dataModel);
+        dataModelService.fillSideHotArticles(dataModel);
+        dataModelService.fillSideTags(dataModel);
+        dataModelService.fillLatestCmts(dataModel);
+    }
+
+    /**
+     * Shows online ranking list.
+     *
+     * @param context the specified context
+     */
+    public void showOnline(final RequestContext context) {
+        final AbstractFreeMarkerRenderer renderer = new SkinRenderer(context, "top/online.ftl");
+        final Map<String, Object> dataModel = renderer.getDataModel();
+        final List<JSONObject> users = activityQueryService.getTopOnlineTimeUsers(Symphonys.TOP_CNT);
+        dataModel.put("onlineTopUsers", users);
 
         dataModelService.fillHeaderAndFooter(context, dataModel);
         dataModelService.fillRandomArticles(dataModel);

@@ -21,7 +21,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <@head title="龙门阵 - ${symphonyLabel}">
+    <@head title="私信 - ${symphonyLabel}">
     </@head>
     <link rel="stylesheet" href="${staticServePath}/css/index.css?${staticResourceVersion}"/>
 </head>
@@ -32,13 +32,16 @@
         <div class="content activity">
             <div class="module">
                 <div style="background-color: #F7F7F7;padding: 25px;">
-                    <h2><svg style="width: 30px; height: 30px;"><use xlink:href="#dragon"></use></svg> 龙门阵</h2>
+                    <h2><svg style="width: 20px; height: 20px;"><use xlink:href="#idleChat"></use></svg> 私信</h2>
                     <br>
-                    <button class="green fn-right" onclick="IdleTalk.expand()"><svg style="width: 18px; height: 18px;"><use xlink:href="#taiJi"></use></svg> 摆「龙门阵」</button>
+                    <button class="green fn-right" onclick="IdleTalk.expand()">新建私信</button>
                     <div style="font-size: 1em;">
-                        阁下可在「摸鱼派」派中摆「龙门阵」输送密信，全程保密托送，陆个时辰对方未读，将会秘密销毁；阅后即焚。<br>
-                        —— 即便是这摸鱼派掌门人，也是毫无窃信之法。<br>
-                        顺便偷偷告诉您：<b>要摆出这「龙门阵」，您要花费 5 两积分</b>。
+                        您的私信内容经过加密，只有发信双方可以得知发信的具体内容，其他人无法知晓（包括管理员）<br>
+                        一旦以下情况之一发生，您的私信会被「双向销毁」：<br>
+                        1. 收信人查看信件正文；<br>
+                        2. 发信人撤回信件；<br>
+                        3. 信件超过12小时未读。<br><br>
+                        <b>积分花费：5积分/条</b>
                     </div>
                 </div>
                 <div id="sendMessageWindow" style="height: 150px;display: none;">
@@ -51,7 +54,7 @@
                         <button class="green fn-right" style="margin-top: 15px;" onclick="IdleTalk.send()">确定发信</button>
                     </div>
                 </div>
-                <h3 id="title" style="padding: 20px 0 20px 0">收到的信柬</h3>
+                <h3 id="title" style="padding: 20px 0 20px 0">收到的私信</h3>
                 <div class="list">
                     <ul id="received">
                         <#if meReceived?? && (meReceived?size > 0)>
@@ -65,7 +68,7 @@
                                         </a>
                                         <div class="fn-flex-1">
                                             <h2>
-                                                <a href="${servePath}/member/${receivedMessage.fromUserName}">来自「${receivedMessage.fromUserName}」的龙门阵密信</a>
+                                                <a href="${servePath}/member/${receivedMessage.fromUserName}">来自「${receivedMessage.fromUserName}」的私信</a>
                                                 <button class="red fn-right" onclick="IdleTalk.seek('${receivedMessage.mapId}', '${receivedMessage.fromUserName}', '${receivedMessage.theme}')">查看并销毁</button>
                                             </h2>
                                             <span class="ft-fade vditor-reset">
@@ -81,7 +84,7 @@
                         </#if>
                     </ul>
                 </div>
-                <h3 style="padding: 40px 0 20px 0">发出但未被阅读的密信</h3>
+                <h3 style="padding: 40px 0 20px 0">发出但未被阅读的私信</h3>
                 <div class="list">
                     <ul id="sent">
                         <#if meSent?? && (meSent?size > 0)>
@@ -95,7 +98,7 @@
                                         </a>
                                         <div class="fn-flex-1">
                                             <h2>
-                                                <a href="${servePath}/member/${sentMessage.toUserName}">发送给「${sentMessage.toUserName}」的龙门阵密信</a>
+                                                <a href="${servePath}/member/${sentMessage.toUserName}">发送给「${sentMessage.toUserName}」的私信</a>
                                                 <button class="btn fn-right" style="margin-left: 10px" onclick="IdleTalk.revoke('${sentMessage.mapId}')">撤回</button>
                                             </h2>
                                             <span class="ft-fade vditor-reset">

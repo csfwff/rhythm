@@ -32,7 +32,7 @@
 ${HeaderBannerLabel}
 <#include "header.ftl">
 <div class="main">
-    <div class="wrapper" style="padding-bottom: 10px">
+    <div class="wrapper" style="padding-bottom: 20px">
         <div class="index-recent fn-flex-1">
             <div style="border-bottom: 1px solid #eee;margin:0px 10px ;">
                 <div style="float:left;font-size:13px;margin:5px 0 10px 0; font-weight:bold;">最新</div>
@@ -41,8 +41,42 @@ ${HeaderBannerLabel}
             </div>
             <div class="module-panel">
                 <ul class="module-list">
+                    <style>
+                        .cb-stick {
+                            position: absolute;
+                            top: 0;
+                            left: 0;
+                            border-width: 10px 10px 13px 10px;
+                            border-color: #999 transparent transparent #999;
+                            border-style: solid;
+                            margin-left: 5px;
+                            z-index: 100;
+                        }
+
+                        .icon-pin {
+                            position: absolute;
+                            top: -9px;
+                            left: -11px;
+                            color: #FFF;
+                        }
+
+                        .icon-pin-rank {
+                            position: absolute;
+                            top: -11px;
+                            left: -9px;
+                            color: #FFF;
+                        }
+
+                        .rank {
+                            padding: 7px 15px 8px 15px !important;
+                        }
+                    </style>
                     <#list recentArticles as article>
                         <li class="fn-flex">
+                            <#if article.articleStick != 0>
+                                <span class="cb-stick tooltipped tooltipped-e" aria-label="管理置顶"><svg class="icon-pin"><use
+                                                xlink:href="#pin"></use></svg></span>
+                            </#if>
                             <a rel="nofollow" href="${servePath}/member/${article.articleAuthorName}">
                                     <span class="avatar-small tooltipped tooltipped-se slogan"
                                           aria-label="${article.articleAuthorName}"
@@ -64,7 +98,9 @@ ${HeaderBannerLabel}
                 <div style="float:left;font-size:13px;margin:5px 0 10px 0; font-weight:bold;">随便看看</div>
                 <div style="float:right;font-size:13px;margin:5px 0 0 0;">
                     <a onclick="randomArticles()" style="cursor: pointer">
-                        <svg><use xlink:href="#refresh"></use></svg>
+                        <svg>
+                            <use xlink:href="#refresh"></use>
+                        </svg>
                         换一批
                     </a>
                 </div>
@@ -93,19 +129,17 @@ ${HeaderBannerLabel}
         </div>
         <div class="index-recent fn-flex-1">
             <div style="border-bottom: 1px solid #eee;margin:0px 10px ;">
-                <div style="float:left;font-size:13px;margin:5px 0 10px 0; font-weight:bold;">活跃用户</div>
+                <div style="float:left;font-size:13px;margin:5px 0 10px 0; font-weight:bold;">活跃成员</div>
                 <div style="clear:both;"></div>
             </div>
             <div class="module-panel">
                 <div class="index-user">
                     <#list niceUsers as user>
-
                         <a rel="nofollow" href="${servePath}/member/${user.userName}">
                                     <span class="avatar-middle tooltipped tooltipped-se slogan"
                                           aria-label="${user.userName}"
                                           style="background-image:url('${user.userAvatarURL48}');height:30px;width:30px;margin: 0px 10px 10px 0px"></span>
                         </a>
-
                     </#list>
                 </div>
             </div>
@@ -117,16 +151,30 @@ ${HeaderBannerLabel}
                 <div style="clear:both;"></div>
             </div>
             <div class="module-panel">
-                <ul class="module-list" style="margin-top: 5px">
+                <ul class="module-list">
                     <#list topCheckinUsers as user>
-                        <#if user_index < 9>
-                            <li class="fn-flex" style="padding: 5px 15px 8px 15px">
+                        <#if user_index < 5>
+                            <li class="fn-flex rank">
+                                <#if user_index == 0 || user_index == 1 || user_index == 2>
+                                <span
+                                        <#if user_index == 0>
+                                                style="border-color: #ffab10 transparent transparent #ffab10;"
+                                            <#elseif user_index == 1>
+                                                style="border-color: #c0c0c0 transparent transparent #c0c0c0;"
+                                            <#elseif user_index == 2>
+                                                style="border-color: #d9822b transparent transparent #d9822b;"
+                                        </#if>
+                                        class="cb-stick tooltipped tooltipped-e" aria-label="第${user_index + 1}名">
+                                    <span class="icon-pin-rank">${user_index + 1}</span>
+                                    </#if>
+                                </span>
                                 <a rel="nofollow" href="${servePath}/member/${user.userName}">
                                     <span class="avatar-small tooltipped tooltipped-se slogan"
                                           aria-label="${user.userName}"
                                           style="background-image:url('${user.userAvatarURL}')"></span>
                                 </a>
-                                <a rel="nofollow" class="title fn-flex-1 tooltipped tooltipped-w" aria-label="${pointLabel} ${user.userPoint?c}"
+                                <a rel="nofollow" class="title fn-flex-1 tooltipped tooltipped-w"
+                                   aria-label="${pointLabel} ${user.userPoint?c}"
                                    href="${servePath}/member/${user.userName}">${user.userName}</a>
                                 <a class="fn-right count ft-gray ft-smaller tooltipped tooltipped-w"
                                    aria-label="${checkinStreakPart0Label}${user.userLongestCheckinStreak}${checkinStreakPart1Label}${user.userCurrentCheckinStreak}${checkinStreakPart2Label}"
@@ -137,6 +185,48 @@ ${HeaderBannerLabel}
                     </#list>
                 </ul>
             </div>
+
+            <div style="border-bottom: 1px solid #eee;margin:10px 10px 0 10px;">
+                <div style="float:left;font-size:13px;margin:5px 0 10px 0; font-weight:bold;">在线时间排行</div>
+                <div style="float:right;font-size:13px;margin:5px 0 0 0;"><a href="${servePath}/top/online">更多</a>
+                </div>
+                <div style="clear:both;"></div>
+            </div>
+            <div class="module-panel">
+                <ul class="module-list">
+                    <#list onlineTopUsers as user>
+                        <#if user_index < 5>
+                            <li class="fn-flex rank">
+                                <#if user_index == 0 || user_index == 1 || user_index == 2>
+                                <span
+                                        <#if user_index == 0>
+                                            style="border-color: #ffab10 transparent transparent #ffab10;"
+                                        <#elseif user_index == 1>
+                                            style="border-color: #c0c0c0 transparent transparent #c0c0c0;"
+                                        <#elseif user_index == 2>
+                                            style="border-color: #d9822b transparent transparent #d9822b;"
+                                        </#if>
+                                        class="cb-stick tooltipped tooltipped-e" aria-label="第${user_index + 1}名">
+                                    <span class="icon-pin-rank">${user_index + 1}</span>
+                                    </#if>
+                                </span>
+                                <a rel="nofollow" href="${servePath}/member/${user.userName}">
+                                    <span class="avatar-small tooltipped tooltipped-se slogan"
+                                          aria-label="${user.userName}"
+                                          style="background-image:url('${user.userAvatarURL}')"></span>
+                                </a>
+                                <a rel="nofollow" class="title fn-flex-1 tooltipped tooltipped-w"
+                                   aria-label="${pointLabel} ${user.userPoint?c}"
+                                   href="${servePath}/member/${user.userName}">${user.userName}</a>
+                                <a class="fn-right count ft-gray ft-smaller tooltipped tooltipped-w"
+                                   aria-label="在线时长共计 ${user.onlineMinute} 分钟"
+                                   href="${servePath}/top/online">${user.onlineMinute} 分钟</a>
+                            </li>
+                        </#if>
+                    </#list>
+                </ul>
+            </div>
+
         </div>
     </div>
 
@@ -311,7 +401,7 @@ ${HeaderBannerLabel}
                     <div class="module-panel">
                         <ul class="module-list">
                             <#list sideBreezemoons as item>
-                                <#if item_index <= 12>
+                                <#if item_index <= 13>
                                     <li>
                                         <a href="${servePath}/member/${item.breezemoonAuthorName}">
                     <span class="avatar-small slogan tooltipped tooltipped-se" aria-label="${item.breezemoonAuthorName}"
@@ -524,7 +614,7 @@ ${HeaderBannerLabel}
 
     function randomArticles() {
         $.ajax({
-            url: "${servePath}/article/random/10",
+            url: "${servePath}/article/random/12",
             method: "GET",
             cache: false,
             async: false,
@@ -537,8 +627,8 @@ ${HeaderBannerLabel}
                         viewCount = article.articleViewCntDisplayFormat;
                     }
                     $("#randomArticles").append('<li class="fn-flex">' +
-                    '<a rel="nofollow" href="${servePath}/member/' + article.articleAuthorName + '">' +
-                    '<span class="avatar-small tooltipped tooltipped-se slogan" aria-label="' + article.articleAuthorName + '" style="background-image:url(\'' + article.articleAuthorThumbnailURL20 + '\')"></span></a>' +
+                        '<a rel="nofollow" href="${servePath}/member/' + article.articleAuthorName + '">' +
+                        '<span class="avatar-small tooltipped tooltipped-se slogan" aria-label="' + article.articleAuthorName + '" style="background-image:url(\'' + article.articleAuthorThumbnailURL20 + '\')"></span></a>' +
                         '<a rel="nofollow" class="title fn-ellipsis fn-flex-1" href="${servePath}' + article.articlePermalink + '">' + article.articleTitleEmoj + '</a>' +
                         '<a class="fn-right count ft-gray ft-smaller" href="${servePath}' + article.articlePermalink + '">' + viewCount + '</a>' +
                         '</li>');
@@ -567,8 +657,7 @@ ${HeaderBannerLabel}
             var top = it.offsetTop,
                 left = it.offsetLeft
 
-            $('body').
-            append('<div class="img-preview" onclick="$(this).remove()"><img style="transform: translate3d(' +
+            $('body').append('<div class="img-preview" onclick="$(this).remove()"><img style="transform: translate3d(' +
                 Math.max(0, left) + 'px, ' +
                 Math.max(0, (top - $(window).scrollTop())) + 'px, 0)" src="' +
                 ($it.attr('src').split('?imageView2')[0]) +

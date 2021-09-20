@@ -354,7 +354,7 @@ public final class Pointtransfer {
     /**
      * Transfer sum - Activity - Start Gobang.
      */
-    public static final int TRANSFER_SUM_C_ACTIVITY_GOBANG_START = Symphonys.POINT_ACTIVITY_GOBANG;
+    public static final int TRANSFER_SUM_C_ACTIVITY_GOBANG_START = 20;
 
     /**
      * Transfer type - Update Comment Outcome.

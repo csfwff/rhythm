@@ -240,7 +240,7 @@ var IdleTalkChannel = {
                         '</a>' +
                         '        <div class="fn-flex-1">\n' +
                         '            <h2>\n' +
-                        '                <a href="/member/' + cmd.toUserName + '">发送给「' + cmd.toUserName + '」的龙门阵密信</a>\n' +
+                        '                <a href="/member/' + cmd.toUserName + '">发送给「' + cmd.toUserName + '」的私信</a>\n' +
                         '                <button class="btn fn-right" style="margin-left: 10px" onclick="IdleTalk.revoke(\'' + data.mapId + '\')">撤回</button>\n' +
                         '            </h2>\n' +
                         '            <span class="ft-fade vditor-reset">\n' +
@@ -265,7 +265,7 @@ var IdleTalkChannel = {
                         '</a>' +
                         '        <div class="fn-flex-1">\n' +
                         '            <h2>\n' +
-                        '                <a href="/member/' + cmd.fromUserName + '">来自「' + cmd.fromUserName + '」的龙门阵密信</a>\n' +
+                        '                <a href="/member/' + cmd.fromUserName + '">来自「' + cmd.fromUserName + '」的私信</a>\n' +
                         '                <button class="red fn-right" onclick="IdleTalk.seek(\'' + data.mapId + '\', \'' + cmd.fromUserName + '\', \'' + cmd.theme + '\')">查看并销毁</button>\n' +
                         '            </h2>\n' +
                         '            <span class="ft-fade vditor-reset">\n' +

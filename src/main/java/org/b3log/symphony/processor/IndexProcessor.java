@@ -321,9 +321,13 @@ public class IndexProcessor {
         dataModel.put(Common.FISHING_PI_VERSION, Server.FISHING_PI_VERSION);
 
         // 签到排行
-        final List<JSONObject> users = activityQueryService.getTopCheckinUsers(Symphonys.TOP_CNT);
+        final List<JSONObject> users = activityQueryService.getTopCheckinUsers(5);
         dataModel.put(Common.TOP_CHECKIN_USERS, users);
-        dataModel.put("indexRandomArticles", ArticleProcessor.getRandomArticles(10));
+        // 在线时间排行
+        final List<JSONObject> onlineTopUsers = activityQueryService.getTopOnlineTimeUsers(3);
+        dataModel.put("onlineTopUsers", onlineTopUsers);
+        // 随机文章
+        dataModel.put("indexRandomArticles", ArticleProcessor.getRandomArticles(12));
 
         dataModelService.fillHeaderAndFooter(context, dataModel);
         dataModelService.fillIndexTags(dataModel);

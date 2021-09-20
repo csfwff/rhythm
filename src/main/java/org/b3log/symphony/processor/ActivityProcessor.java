@@ -44,8 +44,10 @@ import org.b3log.symphony.util.Sessions;
 import org.b3log.symphony.util.StatusCodes;
 import org.b3log.symphony.util.Symphonys;
 import org.json.JSONObject;
+import pers.adlered.simplecurrentlimiter.main.SimpleCurrentLimiter;
 
 import java.util.Calendar;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -114,6 +116,16 @@ public class ActivityProcessor {
      */
     @Inject
     private LangPropsService langPropsService;
+
+    /**
+     * Record if eating snake game is started.
+     */
+    final static HashMap<String, Long> EATING_SNAKE_STARTED = new HashMap<>();
+
+    /**
+     * Record play times in eating snake game.
+     */
+    final static SimpleCurrentLimiter EATING_SNAKE_CURRENT_LIMITER = new SimpleCurrentLimiter(12 * 60 * 60, 5);
 
     /**
      * Register request handlers.
@@ -464,10 +476,14 @@ public class ActivityProcessor {
         final Request request = context.getRequest();
         final JSONObject currentUser = Sessions.getUser();
         final String fromId = currentUser.optString(Keys.OBJECT_ID);
-
-        final JSONObject ret = activityMgmtService.startEatingSnake(fromId);
-
-        context.renderJSON(ret);
+        if (EATING_SNAKE_CURRENT_LIMITER.access(fromId)) {
+            EATING_SNAKE_STARTED.put(fromId, System.currentTimeMillis());
+            final JSONObject ret = activityMgmtService.startEatingSnake(fromId);
+            context.renderJSON(ret);
+        } else {
+            context.renderJSON(StatusCodes.ERR);
+            context.renderMsg("每12个小时只能玩5次哦！休息一下吧。");
+        }
     }
 
     /**
@@ -481,8 +497,30 @@ public class ActivityProcessor {
             requestJSONObject = context.requestJSON();
             final int score = requestJSONObject.optInt("score");
             final JSONObject user = Sessions.getUser();
-            final JSONObject ret = activityMgmtService.collectEatingSnake(user.optString(Keys.OBJECT_ID), score);
-            context.renderJSON(ret);
+            final String userId = user.optString(Keys.OBJECT_ID);
+
+            if (EATING_SNAKE_STARTED.containsKey(userId)) {
+                long startedTime = EATING_SNAKE_STARTED.get(userId);
+                EATING_SNAKE_STARTED.remove(userId);
+                // 用户有点击游戏开始的记录，反作弊第一步通过
+                if (score > 4) {
+                    if (((System.currentTimeMillis() - startedTime) / 1000) > 10) {
+                        // 分数大于4时，游戏时间超过十秒，反作弊第二步通过
+                        final JSONObject ret = activityMgmtService.collectEatingSnake(userId, score);
+                        context.renderJSON(ret);
+                        return;
+                    }
+                } else {
+                    // 分数小于4时，反作弊第二步直接通过
+                    final JSONObject ret = activityMgmtService.collectEatingSnake(userId, score);
+                    context.renderJSON(ret);
+                    return;
+                }
+            }
+
+            LOGGER.log(Level.ERROR, "User " + user.optString(User.USER_NAME) + " haven't started the snake game but uploaded a score...");
+            context.renderJSON(StatusCodes.ERR);
+            context.renderMsg("您的刷分行为已被记录！如这是您的第一次行为，我们仅对您作为警告，请诚实游戏哦 :)");
         } catch (final Exception e) {
             LOGGER.log(Level.ERROR, "Collects eating snake game failed", e);
             context.renderCodeMsg(StatusCodes.ERR, "err....");

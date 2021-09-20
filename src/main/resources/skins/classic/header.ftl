@@ -81,7 +81,7 @@
                class="tooltipped tooltipped-w <#if unreadNotificationCount == 0>no-msg<#else>msg</#if>"
                href="${servePath}/notifications" aria-label="${messageLabel}">${unreadNotificationCount}
             </a>
-            <a href="${servePath}/idle-talk" class="tooltipped tooltipped-w" aria-label="摆龙门阵（私信）">
+            <a href="${servePath}/idle-talk" class="tooltipped tooltipped-w" aria-label="私信">
                 <#if hasUnreadChatMessage?? && hasUnreadChatMessage>
                     <script>
                         setTimeout(function () {
@@ -103,13 +103,16 @@
                data-url="${servePath}/member/${currentUser.userName}">
                 <span class="avatar-small" style="background-image:url('${currentUser.userAvatarURL20}')"></span>
             </a>
-            <div class="module person-list" id="personListPanel">
+            <div class="module person-list" id="personListPanel" style="right: 13px">
                 <ul>
                     <li>
                         <a href="${servePath}/member/${currentUser.userName}">${goHomeLabel}</a>
                     </li>
                     <li>
                         <a href="${servePath}/settings">${settingsLabel}</a>
+                    </li>
+                    <li>
+                        <a href="${servePath}/charge/point"><span class="ft-red">❤</span>️ ${chargePointLabel}</a>
                     </li>
                     <li>
                         <a href="${servePath}/settings/help">${helpLabel}</a>

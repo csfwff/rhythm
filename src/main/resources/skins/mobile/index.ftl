@@ -37,9 +37,30 @@ ${HeaderBannerLabel}
                 <a href="${servePath}/recent">${latestLabel}</a>
             </div>
             <div class="module-panel">
+                <style>
+                    .cb-stick {
+                        position: absolute;
+                        top: 0;
+                        left: 0;
+                        border-width: 10px 10px 10px 10px;
+                        border-color: #999 transparent transparent #999;
+                        border-style: solid;
+                    }
+
+                    .icon-pin {
+                        position: absolute;
+                        top: -9px;
+                        left: -11px;
+                        color: #FFF;
+                    }
+                </style>
                 <ul class="module-list">
                     <#list recentArticles as article>
                         <li<#if !article_has_next> class="last"</#if>>
+                            <#if article.articleStick != 0>
+                                <span class="cb-stick tooltipped tooltipped-e" aria-label="管理置顶"><svg class="icon-pin"><use
+                                                xlink:href="#pin"></use></svg></span>
+                            </#if>
                             <a rel="nofollow" href="${servePath}/member/${article.articleAuthorName}">
                                     <span class="avatar-small tooltipped tooltipped-se slogan"
                                           aria-label="${article.articleAuthorName}"
@@ -185,6 +206,7 @@ ${HeaderBannerLabel}
                     </li>
                     <li><a class="title" href="${servePath}/activity/1A0001">${activity1A0001Label}</a></li>
                     <li><a class="title" href="${servePath}/activity/character">${characterLabel}</a></li>
+                    <li><a class="title" href="${servePath}/charge/point"><span class="ft-red">❤</span>️ ${chargePointLabel}</a></li>
                 </ul>
             </div>
         </div>
@@ -209,7 +231,7 @@ ${HeaderBannerLabel}
 
     function randomArticles() {
         $.ajax({
-            url: "${servePath}/article/random/10",
+            url: "${servePath}/article/random/12",
             method: "GET",
             cache: false,
             async: false,

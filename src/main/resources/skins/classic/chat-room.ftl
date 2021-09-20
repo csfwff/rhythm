@@ -62,7 +62,7 @@
                     <#list messages as msg>
                         <li class="fn-flex">
                             <a rel="nofollow" href="${servePath}/member/${msg.userName}">
-                                <div class="avatar tooltipped tooltipped-n"
+                                <div class="avatar tooltipped tooltipped-s"
                                      aria-label="${msg.userName}"
                                      style="background-image:url('${msg.userAvatarURL}')"></div>
                             </a>
