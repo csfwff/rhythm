@@ -201,22 +201,19 @@
                         <div id="articleStats">
                             <div class="article__stats fn__pointer usersInteracts article__stats--a">
                                 <span class="article__cnt">${article.thankedCnt}</span>
-                                <span class="fn__flex-inline">
-                                感谢
-                                <span class="fn__space5"></span><svg><use xlink:href="#iconHeart"></use></svg>
-                                </span>
-                            </div>
-                            <div class="article__stats fn__pointer usersInteracts article__stats--a">
-                                <span id="articleFollowCnt" class="article__cnt">${article.articleWatchCnt}</span>
-                                关注
-                            </div>
-                            <div class="article__stats fn__pointer usersInteracts article__stats--a">
-                                <span id="articleCollectCnt" class="article__cnt">${article.articleCollectCnt}</span>
-                                收藏
+                                <span class="fn__flex-inline">感谢<svg><use xlink:href="#iconHeart"></use></svg></span>
                             </div>
                             <div class="article__stats fn__pointer usersInteracts article__stats--a">
                                 <span id="articleGoodCnt" class="article__cnt">${article.articleGoodCnt}</span>
                                 点赞
+                            </div>
+                            <div class="article__stats usersInteracts article__stats--a">
+                                <span id="articleFollowCnt" class="article__cnt">${article.articleWatchCnt}</span>
+                                关注
+                            </div>
+                            <div class="article__stats usersInteracts article__stats--a">
+                                <span id="articleCollectCnt" class="article__cnt">${article.articleCollectCnt}</span>
+                                收藏
                             </div>
                         </div>
                         <br>
@@ -229,9 +226,6 @@
                                 </div>
                             </a>
                         </#list>
-                        <!--<span class="tooltipped__w tooltipped meta__more articleParticipantsBtn ft-a-title" aria-label="更多">
-                        <svg class="fn__deg"><use xlink:href="#iconChevronDown"></use></svg>
-                        </span>-->
                     </div>
                     <div class="fn__clear article__view">
                     <span class="fn__flex-inline tooltipped__n tooltipped-n tooltipped" aria-label="总访问计数">
