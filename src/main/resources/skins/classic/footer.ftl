@@ -21,12 +21,6 @@
     <div class="wrapper">
         <div class="slogan" id="fs">
         ${indexIntroLabel} &nbsp; &nbsp;
-            <a href="https://github.com/csfwff/rhythm" target="_blank" class="tooltipped tooltipped-n"
-               aria-label="${siteCodeLabel}">
-                <svg class="icon-github">
-                    <use xlink:href="#github"></use>
-                </svg>
-            </a> &nbsp;
         </div>
         <div class="fn-flex-1">
             <div class="footer-nav fn-clear">
