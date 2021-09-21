@@ -192,18 +192,18 @@
                                 <span id="articltVia" class="via" data-ua="${article.articleUA}"></span>
                             </#if>
                         </a>
-                        <div class="article__stats">
+                        <div class="article__stats usersInteracts article__stats--a">
                             <span class="article__cnt">
                             ${article.articleCommentCount}
                             </span>
                             ${cmtLabel}
                         </div>
                         <div id="articleStats">
-                            <div class="article__stats fn__pointer usersInteracts article__stats--a">
+                            <div class="article__stats usersInteracts article__stats--a">
                                 <span class="article__cnt">${article.thankedCnt}</span>
                                 <span class="fn__flex-inline">感谢<svg><use xlink:href="#iconHeart"></use></svg></span>
                             </div>
-                            <div class="article__stats fn__pointer usersInteracts article__stats--a">
+                            <div class="article__stats usersInteracts article__stats--a">
                                 <span id="articleGoodCnt" class="article__cnt">${article.articleGoodCnt}</span>
                                 点赞
                             </div>
