@@ -458,7 +458,7 @@ public final class Symphonys {
     /**
      * 写字活动奖励积分值.
      */
-    public static final int POINT_ACTIVITY_CHAR = getInt("pointActivityCharacter");
+    public static final int POINT_ACTIVITY_CHAR = 10;
 
     /**
      * 数据导出所需积分值.
