@@ -142,9 +142,7 @@ public class ActivityProcessor {
         Dispatcher.post("/activity/character/submit", activityProcessor::submitCharacter, loginCheck::handle);
         Dispatcher.get("/activities", activityProcessor::showActivities);
         Dispatcher.get("/activity/checkin", activityProcessor::showDailyCheckin);
-        Dispatcher.get("/activity/daily-checkin", activityProcessor::dailyCheckin, loginCheck::handle);
         Dispatcher.get("/activity/daily-checkin-api", activityProcessor::dailyCheckinApi, loginCheck::handle);
-        Dispatcher.get("/activity/yesterday-liveness-reward", activityProcessor::yesterdayLivenessReward, loginCheck::handle);
         Dispatcher.get("/activity/yesterday-liveness-reward-api", activityProcessor::yesterdayLivenessRewardApi, loginCheck::handle);
         Dispatcher.get("/activity/1A0001", activityProcessor::show1A0001, csrfMidware::fill);
         Dispatcher.post("/activity/1A0001/bet", activityProcessor::bet1A0001, loginCheck::handle, csrfMidware::check, activity1A0001ValidationMidware::handle);
@@ -271,6 +269,7 @@ public class ActivityProcessor {
      *
      * @param context the specified context
      */
+    @Deprecated
     public void dailyCheckin(final RequestContext context) {
         final JSONObject user = Sessions.getUser();
         final String userId = user.optString(Keys.OBJECT_ID);
@@ -296,6 +295,7 @@ public class ActivityProcessor {
      *
      * @param context the specified context
      */
+    @Deprecated
     public void yesterdayLivenessReward(final RequestContext context) {
         final Request request = context.getRequest();
         final JSONObject user = Sessions.getUser();
