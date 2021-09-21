@@ -199,10 +199,9 @@ ${HeaderBannerLabel}
             </div>
             <div class="module-panel">
                 <ul class="module-list">
-                    <li><a class="title" href="${servePath}/activity/daily-checkin">${activityDailyCheckinLabel}</a>
+                    <li><a class="title" style="text-decoration: none" id="checkIn" onclick="checkIn()">每日签到</a>
                     </li>
-                    <li><a class="title"
-                           href="${servePath}/activity/yesterday-liveness-reward">${activityYesterdayLivenessRewardLabel}</a>
+                    <li><a class="title" style="text-decoration: none" id="yesterday" onclick="yesterday()">领取昨日活跃奖励</a>
                     </li>
                     <li><a class="title" href="${servePath}/activity/1A0001">${activity1A0001Label}</a></li>
                     <li><a class="title" href="${servePath}/activity/character">${characterLabel}</a></li>
@@ -250,6 +249,70 @@ ${HeaderBannerLabel}
                         '</li>');
                 }
             }
+        });
+    }
+
+    function yesterday() {
+        $("#yesterday").fadeOut(500, function () {
+            $.ajax({
+                url: "${servePath}/activity/yesterday-liveness-reward-api",
+                type: "GET",
+                cache: false,
+                async: false,
+                headers: {'csrfToken': '${csrfToken}'},
+                success: function (result) {
+                    if (result.sum === -1) {
+                        $("#yesterday").html("暂时没有昨日奖励可领取呦！明天再来试试吧");
+                        setTimeout(function () {
+                            $("#yesterday").fadeOut(500, function () {
+                                $("#yesterday").html('领取昨日活跃奖励');
+                                $("#yesterday").fadeIn(500);
+                            });
+                        }, 2000);
+                    } else {
+                        $("#yesterday").html("昨日奖励已领取！积分 +" + result.sum);
+                        setTimeout(function () {
+                            $("#yesterday").fadeOut(500, function () {
+                                $("#yesterday").html('领取昨日活跃奖励');
+                                $("#yesterday").fadeIn(500);
+                            });
+                        }, 2000);
+                    }
+                    $("#yesterday").fadeIn(500);
+                }
+            });
+        });
+    }
+
+    function checkIn() {
+        $("#checkIn").fadeOut(500, function () {
+            $.ajax({
+                url: "${servePath}/activity/daily-checkin-api",
+                type: "GET",
+                cache: false,
+                async: false,
+                headers: {'csrfToken': '${csrfToken}'},
+                success: function (result) {
+                    if (result.sum === -1) {
+                        $("#checkIn").html("你已经签到过了哦！");
+                        setTimeout(function () {
+                            $("#checkIn").fadeOut(500, function () {
+                                $("#checkIn").html('每日签到');
+                                $("#checkIn").fadeIn(500);
+                            });
+                        }, 2000);
+                    } else {
+                        $("#checkIn").html("签到成功～ 积分 +" + result.sum);
+                        setTimeout(function () {
+                            $("#checkIn").fadeOut(500, function () {
+                                $("#checkIn").html('每日签到');
+                                $("#checkIn").fadeIn(500);
+                            });
+                        }, 2000);
+                    }
+                    $("#checkIn").fadeIn(500);
+                }
+            });
         });
     }
 </script>

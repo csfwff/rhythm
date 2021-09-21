@@ -556,6 +556,7 @@ ${HeaderBannerLabel}
                 type: "GET",
                 cache: false,
                 async: false,
+                headers: {'csrfToken': '${csrfToken}'},
                 success: function (result) {
                     if (result.sum === -1) {
                         $("#yesterday").html("<img src='https://pwl.stackoverflow.wiki/2021/09/embarrassed-4112bd37.png'><b>暂时没有昨日奖励可领取呦！明天再来试试吧</b>");
@@ -587,6 +588,7 @@ ${HeaderBannerLabel}
                 type: "GET",
                 cache: false,
                 async: false,
+                headers: {'csrfToken': '${csrfToken}'},
                 success: function (result) {
                     if (result.sum === -1) {
                         $("#checkIn").html("<img src='https://pwl.stackoverflow.wiki/2021/09/embarrassed-4112bd37.png'><b>你已经签到过了哦！</b>");
