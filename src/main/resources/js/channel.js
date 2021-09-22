@@ -359,11 +359,14 @@ var ChatRoomChannel = {
                     }
                     break
                 case 'msg':
-                    let liHTML = ChatRoom.renderMessage(data.userName, data.userAvatarURL, data.time, data.content, data.oId, Label.currentUser);
-                    $('#chats').prepend(liHTML);
-                    $('#chats>div.fn-none').show(200);
-                    $('#chats>div.fn-none').removeClass("fn-none");
-                    ChatRoom.resetMoreBtnListen();
+                    // Chatroom
+                    if ($("#chatRoomIndex").length === 0) {
+                        let liHTML = ChatRoom.renderMessage(data.userName, data.userAvatarURL, data.time, data.content, data.oId, Label.currentUser);
+                        $('#chats').prepend(liHTML);
+                        $('#chats>div.fn-none').show(200);
+                        $('#chats>div.fn-none').removeClass("fn-none");
+                        ChatRoom.resetMoreBtnListen();
+                    }
 
                     // index
                     if ($("#chatRoomIndex").has("#emptyChatRoom").length !== 0) {

@@ -148,6 +148,7 @@ public class ChatroomProcessor {
         Dispatcher.post("/chat-room/send", chatroomProcessor::addChatRoomMsg, loginCheck::handle, chatMsgAddValidationMidware::handle);
         Dispatcher.get("/cr", chatroomProcessor::showChatRoom, anonymousViewCheckMidware::handle);
         Dispatcher.get("/chat-room/more", chatroomProcessor::getMore, loginCheck::handle);
+        Dispatcher.get("/cr/raw/{id}", chatroomProcessor::getChatRaw, anonymousViewCheckMidware::handle);
     }
 
     /**
@@ -166,12 +167,6 @@ public class ChatroomProcessor {
     public synchronized void addChatRoomMsg(final RequestContext context) {
         final JSONObject requestJSONObject = (JSONObject) context.attr(Keys.REQUEST);
         String content = requestJSONObject.optString(Common.CONTENT);
-
-        content = shortLinkQueryService.linkArticle(content);
-        content = Emotions.convert(content);
-        content = Markdowns.toHTML(content);
-        content = Markdowns.clean(content, "");
-
         final JSONObject currentUser = Sessions.getUser();
         final String userName = currentUser.optString(User.USER_NAME);
 
@@ -192,6 +187,7 @@ public class ChatroomProcessor {
         }
         transaction.commit();
 
+        msg = msg.put(Common.CONTENT, processMarkdown(msg.optString(Common.CONTENT)));
         final JSONObject pushMsg = JSONs.clone(msg);
         pushMsg.put(Common.TIME, new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(msg.optLong(Common.TIME)));
         ChatroomChannel.notifyChat(pushMsg);
@@ -232,6 +228,26 @@ public class ChatroomProcessor {
     }
 
     /**
+     * Show chat message raw.
+     *
+     * @param context the specified context
+     */
+    public void getChatRaw(final RequestContext context) {
+        final AbstractFreeMarkerRenderer renderer = new SkinRenderer(context, "raw.ftl");
+        final Map<String, Object> dataModel = renderer.getDataModel();
+        String id = context.pathVar("id");
+        Query query = new Query().setFilter(new PropertyFilter(Keys.OBJECT_ID, FilterOperator.EQUAL, id));
+        try {
+            JSONObject object = chatRoomRepository.getFirst(query);
+            String content = new JSONObject(object.optString("content")).optString("content");
+            dataModel.put("raw", content);
+        } catch (RepositoryException e) {
+            context.renderCodeMsg(StatusCodes.ERR, "Invalid chat id.");
+            return;
+        }
+    }
+
+    /**
      * Get more chat room histories.
      * @param context
      */
@@ -262,9 +278,22 @@ public class ChatroomProcessor {
                     .setPage(page, 10)
                     .addSort(Keys.OBJECT_ID, SortDirection.DESCENDING));
             List<JSONObject> msgs = messageList.stream().map(msg -> new JSONObject(msg.optString("content")).put("oId", msg.optString(Keys.OBJECT_ID))).collect(Collectors.toList());
-            return msgs.stream().map(msg -> JSONs.clone(msg).put(Common.TIME, new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(msg.optLong(Common.TIME)))).collect(Collectors.toList());
+            msgs = msgs.stream().map(msg -> JSONs.clone(msg).put(Common.TIME, new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(msg.optLong(Common.TIME)))).collect(Collectors.toList());
+            msgs = msgs.stream().map(msg -> JSONs.clone(msg.put("content", processMarkdown(msg.optString("content"))))).collect(Collectors.toList());
+            return msgs;
         } catch (RepositoryException e) {
             return new LinkedList<>();
         }
+    }
+
+    private static String processMarkdown(String content) {
+        final BeanManager beanManager = BeanManager.getInstance();
+        final ShortLinkQueryService shortLinkQueryService = beanManager.getReference(ShortLinkQueryService.class);
+        content = shortLinkQueryService.linkArticle(content);
+        content = Emotions.convert(content);
+        content = Markdowns.toHTML(content);
+        content = Markdowns.clean(content, "");
+
+        return content;
     }
 }
