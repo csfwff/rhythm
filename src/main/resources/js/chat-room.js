@@ -209,7 +209,13 @@ var ChatRoom = {
       $("details[open]").on('click', function() {
         $("details[open]").removeAttr("open");
       });
+      $(".chatAt").on('click', function () {
+        let atUser = $(this).attr("data-name");
+        ChatRoom.editor.setValue(atUser);
+        ChatRoom.editor.focus();
+      });
     });
+
   },
   /**
    * 渲染聊天室消息
@@ -233,7 +239,7 @@ var ChatRoom = {
         '                        ···\n' +
         '                    </summary>\n' +
         '                    <details-menu class="fn__layer">\n' +
-        '                        <span class="chatAt item" data-name="@' + userName + ' ">@'+ userName + '</span>\n' +
+        '                        <span class="chatAt item" data-name="@' + userName + '　">@'+ userName + '</span>\n' +
         '                        <a href="/cr/raw/' + oId + '" target="_blank" class="item">查看 Markdown</a>\n' +
         '                    </details-menu>\n' +
         '                </details>\n' +
