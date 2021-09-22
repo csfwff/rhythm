@@ -283,8 +283,9 @@ ${HeaderBannerLabel}
         <div class="wrapper">
             <div class="index-recent fn-flex-1">
                 <div style="border-bottom: 1px solid #eee;margin:0px 10px ;">
-                    <a href="${servePath}/cr"
-                       style="float:left;font-size:13px;margin:5px 0 10px 0; font-weight:bold;">实时聊天室</a>
+                    <div style="float:left;font-size:13px;margin:5px 0 10px 0; font-weight:bold;">聊天室</div>
+                    <div style="float:right;font-size:13px;margin:5px 0 0 0;"><a href="${servePath}/cr">进入完整版聊天室</a>
+                    </div>
                     <div style="clear:both;"></div>
                 </div>
                 <div class="module-panel">
@@ -292,7 +293,7 @@ ${HeaderBannerLabel}
                         <input id="chatRoomInput"
                                type="text"
                                class="comment__text breezemoon__input"
-                               placeholder="${chatRoomLabel}"/>
+                               placeholder="简单聊聊 (高级功能请访问完整版聊天室哦)"/>
                         <span id="chatRoomPostBtn" class="btn breezemoon__btn" data-csrf="${csrfToken}"
                               onclick="sendChat()">Biu~</span>
                     </div>
