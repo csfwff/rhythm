@@ -86,13 +86,7 @@
             ChatRoom.init();
             // Init [ChatRoom] channel
             ChatRoomChannel.init("${wsScheme}://${serverHost}:${serverPort}${contextPath}/chat-room-channel");
-            var page = 1;
-            // init messages
-            let messageList = "";
-            <#list messages as msg>
-            messageList += ChatRoom.renderMessage("${msg.userName}", "${msg.userAvatarURL}", "${msg.time}", "${msg.content}", "${msg.oId}", Label.currentUser);
-            </#list>
-            $("#chats").prepend(messageList);
+            var page = 0;
             ChatRoom.more();
             var chatRoomPictureStatus = "<#if 0 == chatRoomPictureStatus> blur</#if>";
         </script>

@@ -363,6 +363,7 @@ var ChatRoomChannel = {
                     $('#chats').prepend(liHTML);
                     $('#chats>div.fn-none').show(200);
                     $('#chats>div.fn-none').removeClass("fn-none");
+                    ChatRoom.resetMoreBtnListen();
 
                     // index
                     if ($("#chatRoomIndex").has("#emptyChatRoom").length !== 0) {

@@ -192,6 +192,7 @@ var ChatRoom = {
             $('#chats').append(liHtml);
             $('#chats>div.fn-none').show(200);
             $('#chats>div.fn-none').removeClass("fn-none");
+            ChatRoom.resetMoreBtnListen();
           }
         } else {
           $("#more").removeAttr("onclick");
@@ -201,10 +202,19 @@ var ChatRoom = {
     });
   },
   /**
+   * 监听点击更多按钮关闭事件
+   */
+  resetMoreBtnListen: function () {
+    $("details").on('click', function () {
+      $("details[open]").on('click', function() {
+        $("details[open]").removeAttr("open");
+      });
+    });
+  },
+  /**
    * 渲染聊天室消息
    */
   renderMessage: function (userName, userAvatarURL, time, content, oId, currentUser) {
-    console.log("Load message:" + userName + "\n" + userAvatarURL + "\n" + time +  "\n" + content + "\n" + oId + "\n" + currentUser);
     let newHTML = '' +
         '<div class="fn-none"><div id="chatroom' + oId + '" class="fn__flex chats__item">\n' +
         '    <a href="/member/' + userName + '">\n' +
@@ -220,7 +230,7 @@ var ChatRoom = {
         '                <span class="fn__space5"></span>\n' +
         '                <details class="details action__item fn__flex-center">\n' +
         '                    <summary>\n' +
-        '                        @\n' +
+        '                        ···\n' +
         '                    </summary>\n' +
         '                    <details-menu class="fn__layer">\n' +
         '                        <span class="chatAt item" data-name="@' + userName + ' ">@'+ userName + '</span>\n' +

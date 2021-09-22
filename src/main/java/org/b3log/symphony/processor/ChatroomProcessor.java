@@ -40,16 +40,10 @@ import org.b3log.symphony.processor.middleware.AnonymousViewCheckMidware;
 import org.b3log.symphony.processor.middleware.LoginCheckMidware;
 import org.b3log.symphony.processor.middleware.validate.ChatMsgAddValidationMidware;
 import org.b3log.symphony.repository.ChatRoomRepository;
-import org.b3log.symphony.repository.UserRepository;
 import org.b3log.symphony.service.*;
 import org.b3log.symphony.util.*;
-import org.json.JSONArray;
 import org.json.JSONObject;
-
-import javax.xml.ws.Dispatch;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
+import java.text.SimpleDateFormat;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -199,7 +193,7 @@ public class ChatroomProcessor {
         transaction.commit();
 
         final JSONObject pushMsg = JSONs.clone(msg);
-        pushMsg.put(Common.TIME, Times.getTimeAgo(msg.optLong(Common.TIME), Locales.getLocale()));
+        pushMsg.put(Common.TIME, new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(msg.optLong(Common.TIME)));
         ChatroomChannel.notifyChat(pushMsg);
 
         context.renderJSON(StatusCodes.SUCC);
@@ -268,7 +262,7 @@ public class ChatroomProcessor {
                     .setPage(page, 10)
                     .addSort(Keys.OBJECT_ID, SortDirection.DESCENDING));
             List<JSONObject> msgs = messageList.stream().map(msg -> new JSONObject(msg.optString("content")).put("oId", msg.optString(Keys.OBJECT_ID))).collect(Collectors.toList());
-            return msgs.stream().map(msg -> JSONs.clone(msg).put(Common.TIME, Times.getTimeAgo(msg.optLong(Common.TIME), Locales.getLocale()))).collect(Collectors.toList());
+            return msgs.stream().map(msg -> JSONs.clone(msg).put(Common.TIME, new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(msg.optLong(Common.TIME)))).collect(Collectors.toList());
         } catch (RepositoryException e) {
             return new LinkedList<>();
         }
