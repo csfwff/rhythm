@@ -357,7 +357,11 @@ var ChatRoomChannel = {
                             "src=\"" + userInfo.userAvatarURL + "\">\n" +
                             "</a>");
                     }
-                    break
+                    break;
+                case 'revoke':
+                    $("#chatroom" + data.oId).remove();
+                    $("#chatindex" + data.oId).remove();
+                    break;
                 case 'msg':
                     // Chatroom
                     if ($("#chatRoomIndex").length === 0) {
@@ -373,7 +377,7 @@ var ChatRoomChannel = {
                         $("#emptyChatRoom").remove();
                     }
                     $("#chatRoomIndex").prepend("" +
-                        "<li class=\"fn-flex\" style='display: none; border-bottom: 1px solid #eee;'>\n" +
+                        "<li class=\"fn-flex\" id=\"chatindex" + data.oId + "\" style='display: none; border-bottom: 1px solid #eee;'>\n" +
                         "    <a rel=\"nofollow\" href=\"/member/" + data.userName + "\">\n" +
                         "        <div class=\"avatar tooltipped tooltipped-n\"\n" +
                         "             aria-label=\"" + data.userName + "\"\n" +
@@ -394,7 +398,7 @@ var ChatRoomChannel = {
                         $("#chatRoomIndex li:last").remove();
                     }
                     $("#chatRoomIndex li:first").slideDown(200);
-                    break
+                    break;
             }
         }
 

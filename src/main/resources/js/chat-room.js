@@ -93,7 +93,7 @@ var ChatRoom = {
         }],
       height: 200,
       counter: 4096,
-      placeholder: '聊天室历史记录将永久保存，在发送消息前请三思而后行。',
+      placeholder: '聊天室历史记录将永久保存，每天一次撤回机会；在发送消息前请三思而后行，友善是第一原则。',
       ctrlEnter: function () {
         ChatRoom.send()
       },
@@ -226,6 +226,24 @@ var ChatRoom = {
       }, 500);
     });
 
+  },
+  /**
+   * 撤回聊天室消息
+   * @param oId
+   */
+  revoke: function (oId) {
+    $.ajax({
+      url: Label.servePath + '/chat-room/revoke/' + oId,
+      type: 'DELETE',
+      cache: false,
+      success: function(result) {
+        if (0 === result.code) {
+          Util.alert(result.msg);
+        } else {
+          Util.alert(result.msg);
+        }
+      }
+    });
   },
   /**
    * 渲染聊天室消息

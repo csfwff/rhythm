@@ -123,7 +123,9 @@ public class ChatroomChannel implements WebSocketChannel {
      *                }
      */
     public static void notifyChat(final JSONObject message) {
-        message.put(Common.TYPE, "msg");
+        if (!message.has(Common.TYPE)) {
+            message.put(Common.TYPE, "msg");
+        }
         final String msgStr = message.toString();
 
         synchronized (SESSIONS) {

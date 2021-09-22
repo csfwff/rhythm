@@ -34,6 +34,7 @@ import org.b3log.latke.repository.*;
 import org.b3log.latke.util.Locales;
 import org.b3log.latke.util.Times;
 import org.b3log.symphony.model.Common;
+import org.b3log.symphony.model.Role;
 import org.b3log.symphony.model.UserExt;
 import org.b3log.symphony.processor.channel.ChatroomChannel;
 import org.b3log.symphony.processor.middleware.AnonymousViewCheckMidware;
@@ -149,6 +150,7 @@ public class ChatroomProcessor {
         Dispatcher.get("/cr", chatroomProcessor::showChatRoom, anonymousViewCheckMidware::handle);
         Dispatcher.get("/chat-room/more", chatroomProcessor::getMore, loginCheck::handle);
         Dispatcher.get("/cr/raw/{id}", chatroomProcessor::getChatRaw, anonymousViewCheckMidware::handle);
+        Dispatcher.delete("/chat-room/revoke/{oId}", chatroomProcessor::revokeMessage, loginCheck::handle);
     }
 
     /**
@@ -262,6 +264,36 @@ public class ChatroomProcessor {
             context.renderJSON(ret);
         } catch (Exception e) {
             context.sendStatus(500);
+        }
+    }
+
+    /**
+     * 撤回消息（直接删除）
+     * @param context
+     */
+    public void revokeMessage(final RequestContext context) {
+        try {
+            String removeMessageId = context.pathVar("oId");
+            JSONObject message = chatRoomRepository.get(removeMessageId);
+            JSONObject currentUser = Sessions.getUser();
+
+            String msgUser = new JSONObject(message.optString("content")).optString(User.USER_NAME);
+            String curUser = currentUser.optString(User.USER_NAME);
+            boolean isAdmin = Role.ROLE_ID_C_ADMIN.equals(currentUser.optString(User.USER_ROLE));
+
+            if (msgUser.equals(curUser) || isAdmin) {
+                final Transaction transaction = chatRoomRepository.beginTransaction();
+                chatRoomRepository.remove(removeMessageId);
+                transaction.commit();
+                context.renderJSON(StatusCodes.SUCC).renderMsg("撤回成功，下次发消息一定要三思哦！");
+                JSONObject jsonObject = new JSONObject();
+                jsonObject.put(Common.TYPE, "revoke");
+                jsonObject.put("oId", removeMessageId);
+                ChatroomChannel.notifyChat(jsonObject);
+                return;
+            }
+        } catch (Exception e) {
+            context.renderJSON(StatusCodes.ERR).renderMsg("撤回失败，请联系 @adlered。");
         }
     }
 

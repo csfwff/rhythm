@@ -135,7 +135,7 @@ ${HeaderBannerLabel}
                     <#if messages?size != 0>
                         <#list messages as msg>
                             <#if msg_index <= 9>
-                                <li class="fn-flex">
+                                <li class="fn-flex" id="chatindex${msg.oId}">
                                     <a rel="nofollow" href="${servePath}/member/${msg.userName}">
                                         <div class="avatar tooltipped tooltipped-n"
                                              aria-label="${msg.userName}"
