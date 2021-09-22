@@ -94,7 +94,12 @@
     ChatRoomChannel.init("${wsScheme}://${serverHost}:${serverPort}${contextPath}/chat-room-channel");
     var page = 0;
     ChatRoom.more();
+    ChatRoom.more();
     var chatRoomPictureStatus = "<#if 0 == chatRoomPictureStatus> blur</#if>";
+
+    $("#more").hover(function () {
+        ChatRoom.more();
+    });
 </script>
 </body>
 </html>

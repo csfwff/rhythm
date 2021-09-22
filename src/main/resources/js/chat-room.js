@@ -184,6 +184,7 @@ var ChatRoom = {
       url: Label.servePath + '/chat-room/more?page=' + page,
       type: 'GET',
       cache: false,
+      async: false,
       success: function(result) {
         if (result.data.length !== 0) {
           for (let i in result.data) {
