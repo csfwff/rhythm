@@ -1944,3 +1944,7 @@ code .dec {
 .fn__layer a:hover {
   text-decoration: underline;
 }
+
+.chats__item--me {
+  flex-direction: row-reverse;
+}

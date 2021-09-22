@@ -214,6 +214,16 @@ var ChatRoom = {
         ChatRoom.editor.setValue(atUser);
         ChatRoom.editor.focus();
       });
+      setTimeout(function () {
+        $("details[open]").on('click', function() {
+          $("details[open]").removeAttr("open");
+        });
+        $(".chatAt").on('click', function () {
+          let atUser = $(this).attr("data-name");
+          ChatRoom.editor.setValue(atUser);
+          ChatRoom.editor.focus();
+        });
+      }, 500);
     });
 
   },
@@ -221,8 +231,14 @@ var ChatRoom = {
    * 渲染聊天室消息
    */
   renderMessage: function (userName, userAvatarURL, time, content, oId, currentUser) {
+    let meTag1 = "";
+    let meTag2 = "";
+    if (currentUser === userName) {
+      meTag1 = " chats__item--me";
+      meTag2 = "<a onclick=\"ChatRoom.revoke(" + oId + ")\" class=\"item\">撤回</a>\n";
+    }
     let newHTML = '' +
-        '<div class="fn-none"><div id="chatroom' + oId + '" class="fn__flex chats__item">\n' +
+        '<div class="fn-none"><div id="chatroom' + oId + '" class="fn__flex chats__item' + meTag1 + '">\n' +
         '    <a href="/member/' + userName + '">\n' +
         '        <div class="avatar tooltipped__user" aria-name="' + userName + '" style="background-image: url(\'' + userAvatarURL + '\');"></div>\n' +
         '    </a>\n' +
@@ -241,6 +257,7 @@ var ChatRoom = {
         '                    <details-menu class="fn__layer">\n' +
         '                        <span class="chatAt item" data-name="@' + userName + '　">@'+ userName + '</span>\n' +
         '                        <a href="/cr/raw/' + oId + '" target="_blank" class="item">查看 Markdown</a>\n' +
+        meTag2 +
         '                    </details-menu>\n' +
         '                </details>\n' +
         '        </div>\n' +
