@@ -219,8 +219,10 @@ public class ChatroomProcessor {
         final JSONObject currentUser = Sessions.getUser();
         if (null != currentUser) {
             dataModel.put(UserExt.CHAT_ROOM_PICTURE_STATUS, currentUser.optInt(UserExt.CHAT_ROOM_PICTURE_STATUS));
+            dataModel.put("level3Permitted", DataModelService.hasPermission(currentUser.optString(User.USER_ROLE), 3));
         } else {
             dataModel.put(UserExt.CHAT_ROOM_PICTURE_STATUS, UserExt.USER_XXX_STATUS_C_ENABLED);
+            dataModel.put("level3Permitted", false);
         }
         dataModelService.fillHeaderAndFooter(context, dataModel);
         dataModelService.fillRandomArticles(dataModel);
@@ -281,7 +283,17 @@ public class ChatroomProcessor {
             String curUser = currentUser.optString(User.USER_NAME);
             boolean isAdmin = Role.ROLE_ID_C_ADMIN.equals(currentUser.optString(User.USER_ROLE));
 
-            if (msgUser.equals(curUser) || isAdmin) {
+            if (isAdmin) {
+                final Transaction transaction = chatRoomRepository.beginTransaction();
+                chatRoomRepository.remove(removeMessageId);
+                transaction.commit();
+                context.renderJSON(StatusCodes.SUCC).renderMsg("撤回成功。");
+                JSONObject jsonObject = new JSONObject();
+                jsonObject.put(Common.TYPE, "revoke");
+                jsonObject.put("oId", removeMessageId);
+                ChatroomChannel.notifyChat(jsonObject);
+                return;
+            } else if (msgUser.equals(curUser)) {
                 final Transaction transaction = chatRoomRepository.beginTransaction();
                 chatRoomRepository.remove(removeMessageId);
                 transaction.commit();

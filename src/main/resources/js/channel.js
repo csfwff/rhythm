@@ -365,7 +365,7 @@ var ChatRoomChannel = {
                 case 'msg':
                     // Chatroom
                     if ($("#chatRoomIndex").length === 0) {
-                        let liHTML = ChatRoom.renderMessage(data.userName, data.userAvatarURL, data.time, data.content, data.oId, Label.currentUser);
+                        let liHTML = ChatRoom.renderMessage(data.userName, data.userAvatarURL, data.time, data.content, data.oId, Label.currentUser, Label.level3Permitted);
                         $('#chats').prepend(liHTML);
                         $('#chats>div.fn-none').show(200);
                         $('#chats>div.fn-none').removeClass("fn-none");

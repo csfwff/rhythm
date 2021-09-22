@@ -83,6 +83,7 @@
             Label.uploadFileLabel = '${uploadFileLabel}';
             Label.insertEmojiLabel = '${insertEmojiLabel}';
             Label.currentUser = '<#if currentUser??>${currentUser.userName}</#if>';
+            Label.level3Permitted = ${level3Permitted?string("true", "false")};
             ChatRoom.init();
             // Init [ChatRoom] channel
             ChatRoomChannel.init("${wsScheme}://${serverHost}:${serverPort}${contextPath}/chat-room-channel");

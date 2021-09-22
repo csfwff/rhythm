@@ -536,4 +536,28 @@ public class DataModelService {
     private void fillSysInfo(final Map<String, Object> dataModel) {
         dataModel.put(Common.VERSION, Server.VERSION);
     }
+
+    /**
+     * True if the user has the permission
+     * @param userRole
+     * @param level
+     * 1 : Admin only
+     * 2 : Admin and OP
+     * 3 : Admin and OP and AssisOP
+     * @return
+     */
+    public static boolean hasPermission(String userRole, int level) {
+        switch (level) {
+            case 1:
+                return Role.ROLE_ID_C_ADMIN.equals(userRole);
+            case 2:
+                return Role.ROLE_ID_C_ADMIN.equals(userRole) ||
+                        "1630552921050".equals(userRole);
+            case 3:
+                return Role.ROLE_ID_C_ADMIN.equals(userRole) ||
+                        "1630552921050".equals(userRole) ||
+                        "1630631382235".equals(userRole);
+        }
+        return false;
+    }
 }
