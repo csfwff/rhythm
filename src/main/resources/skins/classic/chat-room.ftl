@@ -88,13 +88,14 @@
     Label.fullscreenLabel = '${fullscreenLabel}';
     Label.uploadFileLabel = '${uploadFileLabel}';
     Label.insertEmojiLabel = '${insertEmojiLabel}';
+    Label.currentUser = '<#if currentUser??>${currentUser.userName}</#if>';
     ChatRoom.init();
     // Init [ChatRoom] channel
     ChatRoomChannel.init("${wsScheme}://${serverHost}:${serverPort}${contextPath}/chat-room-channel");
     var page = 1;
     // init messages
     <#list messages as msg>
-    $('.list ul').append(ChatRoom.renderMessage("${msg.userName}", "${msg.userAvatarURL}", "${msg.time}", "${msg.content}", "${msg.oId}"));
+    $('.list ul').append(ChatRoom.renderMessage("${msg.userName}", "${msg.userAvatarURL}", "${msg.time}", "${msg.content}", "${msg.oId}", Label.currentUser));
     </#list>
     ChatRoom.more();
     var chatRoomPictureStatus = "<#if 0 == chatRoomPictureStatus> blur</#if>";

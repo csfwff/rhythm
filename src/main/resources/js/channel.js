@@ -359,7 +359,7 @@ var ChatRoomChannel = {
                     }
                     break
                 case 'msg':
-                    let liHTML = ChatRoom.renderMessage(data.userName, data.userAvatarURL, data.time, data.content, data.oId);
+                    let liHTML = ChatRoom.renderMessage(data.userName, data.userAvatarURL, data.time, data.content, data.oId, Label.currentUser);
                     if ($('.list ul li').length === 0) {
                         $('.list ul').html(liHTML)
                     } else {

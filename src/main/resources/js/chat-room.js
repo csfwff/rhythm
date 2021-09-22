@@ -188,7 +188,7 @@ var ChatRoom = {
         if (result.data.length !== 0) {
           for (let i in result.data) {
             let data = result.data[i];
-            let liHtml = ChatRoom.renderMessage(data.userName, data.userAvatarURL, data.time, data.content, data.oId);
+            let liHtml = ChatRoom.renderMessage(data.userName, data.userAvatarURL, data.time, data.content, data.oId, Label.currentUser);
             $('.list ul li:last').after(liHtml);
             $('.list li:last').slideDown(200)
           }
@@ -202,7 +202,8 @@ var ChatRoom = {
   /**
    * 渲染聊天室消息
    */
-  renderMessage: function (userName, userAvatarURL, time, content, oId) {
+  renderMessage: function (userName, userAvatarURL, time, content, oId, currentUser) {
+    console.log("Load message:" + userName + "\n" + userAvatarURL + "\n" + time +  "\n" + content + "\n" + oId + "\n" + currentUser);
     let avatarPart = '<a rel="nofollow" href="/member/' + userName +
         '">'
         + '<div class="avatar tooltipped tooltipped-se" aria-label="' +
