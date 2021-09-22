@@ -44,6 +44,8 @@ import org.b3log.symphony.repository.ChatRoomRepository;
 import org.b3log.symphony.service.*;
 import org.b3log.symphony.util.*;
 import org.json.JSONObject;
+import pers.adlered.simplecurrentlimiter.main.SimpleCurrentLimiter;
+
 import java.text.SimpleDateFormat;
 import java.util.LinkedList;
 import java.util.List;
@@ -75,6 +77,11 @@ public class ChatroomProcessor {
      * Chat messages.
      */
     public static LinkedList<JSONObject> messages = new LinkedList<>();
+
+    /**
+     * 24h / 1
+     */
+    final private static SimpleCurrentLimiter userRevokeLimiter = new SimpleCurrentLimiter((24 * 60 * 60), 1);
 
     /**
      * Data model service.
@@ -281,7 +288,7 @@ public class ChatroomProcessor {
 
             String msgUser = new JSONObject(message.optString("content")).optString(User.USER_NAME);
             String curUser = currentUser.optString(User.USER_NAME);
-            boolean isAdmin = Role.ROLE_ID_C_ADMIN.equals(currentUser.optString(User.USER_ROLE));
+            boolean isAdmin = DataModelService.hasPermission(currentUser.optString(User.USER_ROLE), 3);
 
             if (isAdmin) {
                 final Transaction transaction = chatRoomRepository.beginTransaction();
@@ -294,15 +301,19 @@ public class ChatroomProcessor {
                 ChatroomChannel.notifyChat(jsonObject);
                 return;
             } else if (msgUser.equals(curUser)) {
-                final Transaction transaction = chatRoomRepository.beginTransaction();
-                chatRoomRepository.remove(removeMessageId);
-                transaction.commit();
-                context.renderJSON(StatusCodes.SUCC).renderMsg("撤回成功，下次发消息一定要三思哦！");
-                JSONObject jsonObject = new JSONObject();
-                jsonObject.put(Common.TYPE, "revoke");
-                jsonObject.put("oId", removeMessageId);
-                ChatroomChannel.notifyChat(jsonObject);
-                return;
+                if (userRevokeLimiter.access(curUser)) {
+                    final Transaction transaction = chatRoomRepository.beginTransaction();
+                    chatRoomRepository.remove(removeMessageId);
+                    transaction.commit();
+                    context.renderJSON(StatusCodes.SUCC).renderMsg("撤回成功，下次发消息一定要三思哦！");
+                    JSONObject jsonObject = new JSONObject();
+                    jsonObject.put(Common.TYPE, "revoke");
+                    jsonObject.put("oId", removeMessageId);
+                    ChatroomChannel.notifyChat(jsonObject);
+                    return;
+                } else {
+                    context.renderJSON(StatusCodes.ERR).renderMsg("撤回失败，你每天只有一次撤回的机会！");
+                }
             }
         } catch (Exception e) {
             context.renderJSON(StatusCodes.ERR).renderMsg("撤回失败，请联系 @adlered。");
