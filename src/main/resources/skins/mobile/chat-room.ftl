@@ -52,8 +52,8 @@
                     </div>
                     <br/>
                     <div class="list" style="height: 100%">
-                        <ul>
-                        </ul>
+                        <div id="chats">
+                        </div>
                         <div id="more" onclick="ChatRoom.more()" style="cursor: pointer; color: rgba(0,0,0,0.54); padding: 0 15px"><#if !isLoggedIn>登录后</#if>查看更多</div>
                     </div>
                 </div>
@@ -88,9 +88,11 @@
             ChatRoomChannel.init("${wsScheme}://${serverHost}:${serverPort}${contextPath}/chat-room-channel");
             var page = 1;
             // init messages
+            let messageList = "";
             <#list messages as msg>
-            $('.list ul').append(ChatRoom.renderMessage("${msg.userName}", "${msg.userAvatarURL}", "${msg.time}", "${msg.content}", "${msg.oId}", Label.currentUser));
+            messageList += ChatRoom.renderMessage("${msg.userName}", "${msg.userAvatarURL}", "${msg.time}", "${msg.content}", "${msg.oId}", Label.currentUser);
             </#list>
+            $("#chats").prepend(messageList);
             ChatRoom.more();
             var chatRoomPictureStatus = "<#if 0 == chatRoomPictureStatus> blur</#if>";
         </script>

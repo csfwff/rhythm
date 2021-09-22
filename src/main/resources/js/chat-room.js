@@ -189,8 +189,9 @@ var ChatRoom = {
           for (let i in result.data) {
             let data = result.data[i];
             let liHtml = ChatRoom.renderMessage(data.userName, data.userAvatarURL, data.time, data.content, data.oId, Label.currentUser);
-            $('.list ul li:last').after(liHtml);
-            $('.list li:last').slideDown(200)
+            $('#chats').append(liHtml);
+            $('#chats>div.fn-none').show(200);
+            $('#chats>div.fn-none').removeClass("fn-none");
           }
         } else {
           $("#more").removeAttr("onclick");
@@ -204,33 +205,33 @@ var ChatRoom = {
    */
   renderMessage: function (userName, userAvatarURL, time, content, oId, currentUser) {
     console.log("Load message:" + userName + "\n" + userAvatarURL + "\n" + time +  "\n" + content + "\n" + oId + "\n" + currentUser);
-    let avatarPart = '<a rel="nofollow" href="/member/' + userName +
-        '">'
-        + '<div class="avatar tooltipped tooltipped-se" aria-label="' +
-        userName
-        + '" style="background-image:url(' + userAvatarURL +
-        ')"></div>'
-        + '</a>'
+    let newHTML = '' +
+        '<div class="fn-none"><div id="chatroom' + oId + '" class="fn__flex chats__item">\n' +
+        '    <a href="/member/' + userName + '">\n' +
+        '        <div class="avatar tooltipped__user" aria-name="' + userName + '" style="background-image: url(\'' + userAvatarURL + '\');"></div>\n' +
+        '    </a>\n' +
+        '    <div class="chats__content">\n' +
+        '        <div class="chats__arrow"></div>\n' +
+        '        <div class="vditor-reset ft__smaller">\n' +
+        '            ' + content + '\n' +
+        '        </div>\n' +
+        '        <div class="ft__smaller ft__fade fn__right">\n' +
+        '            ' + time + '\n' +
+        '                <span class="fn__space5"></span>\n' +
+        '                <details class="details action__item fn__flex-center">\n' +
+        '                    <summary>\n' +
+        '                        @\n' +
+        '                    </summary>\n' +
+        '                    <details-menu class="fn__layer">\n' +
+        '                        <span class="chatAt item" data-name="@' + userName + ' ">@'+ userName + '</span>\n' +
+        '                        <a href="/cr/raw/' + oId + '" target="_blank" class="item">查看 Markdown</a>\n' +
+        '                    </details-menu>\n' +
+        '                </details>\n' +
+        '        </div>\n' +
+        '    </div>\n' +
+        '</div></div>';
 
-    let namePart = '<a rel="nofollow" href="/member/' + userName +
-        '"><span class="ft-gray">' + userName +
-        '</span></a> <span class="ft-fade"> • ' + time + '</span>'
-
-    let liHTML = '<li id="' + oId + '">'
-        + '<div class="fn-flex">'
-        + avatarPart
-        + '<div class="fn-flex-1">'
-        + '<div class="ft-smaller">'
-        + namePart
-        + '</div>'
-        + '<div class="vditor-reset comment' + chatRoomPictureStatus + '">'
-        + content
-        + '</div>'
-        + '</div>'
-        + '</div>'
-        + '</li>'
-
-    return liHTML;
+    return newHTML;
   }
 }
 

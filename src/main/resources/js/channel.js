@@ -360,16 +360,9 @@ var ChatRoomChannel = {
                     break
                 case 'msg':
                     let liHTML = ChatRoom.renderMessage(data.userName, data.userAvatarURL, data.time, data.content, data.oId, Label.currentUser);
-                    if ($('.list ul li').length === 0) {
-                        $('.list ul').html(liHTML)
-                    } else {
-                        $('.list ul li:first').before(liHTML)
-                    }
-
-                    if ($('.list').scrollTop() < $('li').outerHeight() * 2) {
-                        $('.list').animate({'scrollTop': 0}, 500)
-                    }
-                    $('.list li:first').slideDown(200)
+                    $('#chats').prepend(liHTML);
+                    $('#chats>div.fn-none').show(200);
+                    $('#chats>div.fn-none').removeClass("fn-none");
 
                     // index
                     if ($("#chatRoomIndex").has("#emptyChatRoom").length !== 0) {
