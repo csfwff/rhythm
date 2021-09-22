@@ -188,32 +188,8 @@ var ChatRoom = {
         if (result.data.length !== 0) {
           for (let i in result.data) {
             let data = result.data[i];
-            let avatarPart = '<a rel="nofollow" href="/member/' + data.userName +
-                '">'
-                + '<div class="avatar tooltipped tooltipped-se" aria-label="' +
-                data.userName
-                + '" style="background-image:url(' + data.userAvatarURL +
-                ')"></div>'
-                + '</a>'
-
-            let namePart = '<a rel="nofollow" href="/member/' + data.userName +
-                '"><span class="ft-gray">' + data.userName +
-                '</span></a> <span class="ft-fade"> • ' + data.time + '</span>'
-
-            let liHTML = '<li class="fn-none">'
-                + '<div class="fn-flex">'
-                + avatarPart
-                + '<div class="fn-flex-1">'
-                + '<div class="ft-smaller">'
-                + namePart
-                + '</div>'
-                + '<div class="vditor-reset comment' + chatRoomPictureStatus + '">'
-                + data.content
-                + '</div>'
-                + '</div>'
-                + '</div>'
-                + '</li>'
-            $('.list ul li:last').after(liHTML);
+            let liHtml = ChatRoom.renderMessage(data.userName, data.userAvatarURL, data.time, data.content, data.oId);
+            $('.list ul li:last').after(liHtml);
             $('.list li:last').slideDown(200)
           }
         } else {
@@ -222,6 +198,38 @@ var ChatRoom = {
         }
       }
     });
+  },
+  /**
+   * 渲染聊天室消息
+   */
+  renderMessage: function (userName, userAvatarURL, time, content, oId) {
+    let avatarPart = '<a rel="nofollow" href="/member/' + userName +
+        '">'
+        + '<div class="avatar tooltipped tooltipped-se" aria-label="' +
+        userName
+        + '" style="background-image:url(' + userAvatarURL +
+        ')"></div>'
+        + '</a>'
+
+    let namePart = '<a rel="nofollow" href="/member/' + userName +
+        '"><span class="ft-gray">' + userName +
+        '</span></a> <span class="ft-fade"> • ' + time + '</span>'
+
+    let liHTML = '<li id="' + oId + '">'
+        + '<div class="fn-flex">'
+        + avatarPart
+        + '<div class="fn-flex-1">'
+        + '<div class="ft-smaller">'
+        + namePart
+        + '</div>'
+        + '<div class="vditor-reset comment' + chatRoomPictureStatus + '">'
+        + content
+        + '</div>'
+        + '</div>'
+        + '</div>'
+        + '</li>'
+
+    return liHTML;
   }
 }
 

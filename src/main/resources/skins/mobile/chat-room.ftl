@@ -53,27 +53,6 @@
                     <br/>
                     <div class="list" style="height: 100%">
                         <ul>
-                            <#list messages as msg>
-                                <li class="fn-flex">
-                                    <a rel="nofollow" href="${servePath}/member/${msg.userName}">
-                                        <div class="avatar tooltipped tooltipped-n"
-                                             aria-label="${msg.userName}" style="background-image:url('${msg.userAvatarURL}')"></div>
-                                    </a>
-                                    <div class="fn-flex-1">
-                                        <div class="ft-smaller">
-                                            <a rel="nofollow" href="${servePath}/member/${msg.userName}">
-                                                <span class="ft-gray">${msg.userName}</span>
-                                            </a>
-                                            <span class="ft-fade">
-                                         • ${msg.time}
-                                    </span>
-                                        </div>
-                                        <div class="vditor-reset comment<#if 0 == chatRoomPictureStatus> blur</#if>">
-                                            ${msg.content}
-                                        </div>
-                                    </div>
-                                </li>
-                            </#list>
                         </ul>
                         <div id="more" onclick="ChatRoom.more()" style="cursor: pointer; color: rgba(0,0,0,0.54); padding: 0 15px"><#if !isLoggedIn>登录后</#if>查看更多</div>
                     </div>
@@ -107,6 +86,10 @@
             // Init [ChatRoom] channel
             ChatRoomChannel.init("${wsScheme}://${serverHost}:${serverPort}${contextPath}/chat-room-channel");
             var page = 1;
+            // init messages
+            <#list messages as msg>
+            $('.list ul').append(ChatRoom.renderMessage("${msg.userName}", "${msg.userAvatarURL}", "${msg.time}", "${msg.content}", "${msg.oId}"));
+            </#list>
             ChatRoom.more();
             var chatRoomPictureStatus = "<#if 0 == chatRoomPictureStatus> blur</#if>";
         </script>

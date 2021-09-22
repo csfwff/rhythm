@@ -359,31 +359,7 @@ var ChatRoomChannel = {
                     }
                     break
                 case 'msg':
-                    var avatarPart = '<a rel="nofollow" href="/member/' + data.userName +
-                        '">'
-                        + '<div class="avatar tooltipped tooltipped-se" aria-label="' +
-                        data.userName
-                        + '" style="background-image:url(' + data.userAvatarURL +
-                        ')"></div>'
-                        + '</a>'
-
-                    var namePart = '<a rel="nofollow" href="/member/' + data.userName +
-                        '"><span class="ft-gray">' + data.userName +
-                        '</span></a> <span class="ft-fade"> • ' + data.time + '</span>'
-
-                    var liHTML = '<li class="fn-none">'
-                        + '<div class="fn-flex">'
-                        + avatarPart
-                        + '<div class="fn-flex-1">'
-                        + '<div class="ft-smaller">'
-                        + namePart
-                        + '</div>'
-                        + '<div class="vditor-reset comment' + chatRoomPictureStatus + '">'
-                        + data.content
-                        + '</div>'
-                        + '</div>'
-                        + '</div>'
-                        + '</li>'
+                    let liHTML = ChatRoom.renderMessage(data.userName, data.userAvatarURL, data.time, data.content, data.oId);
                     if ($('.list ul li').length === 0) {
                         $('.list ul').html(liHTML)
                     } else {

@@ -30,10 +30,7 @@ import org.b3log.latke.ioc.BeanManager;
 import org.b3log.latke.ioc.Inject;
 import org.b3log.latke.ioc.Singleton;
 import org.b3log.latke.model.User;
-import org.b3log.latke.repository.Query;
-import org.b3log.latke.repository.RepositoryException;
-import org.b3log.latke.repository.SortDirection;
-import org.b3log.latke.repository.Transaction;
+import org.b3log.latke.repository.*;
 import org.b3log.latke.util.Locales;
 import org.b3log.latke.util.Times;
 import org.b3log.symphony.model.Common;
@@ -184,16 +181,18 @@ public class ChatroomProcessor {
         final JSONObject currentUser = Sessions.getUser();
         final String userName = currentUser.optString(User.USER_NAME);
 
-        final JSONObject msg = new JSONObject();
+        final long time = System.currentTimeMillis();
+        JSONObject msg = new JSONObject();
         msg.put(User.USER_NAME, userName);
         msg.put(UserExt.USER_AVATAR_URL, currentUser.optString(UserExt.USER_AVATAR_URL));
         msg.put(Common.CONTENT, content);
-        msg.put(Common.TIME, System.currentTimeMillis());
+        msg.put(Common.TIME, time);
 
         // 聊天室内容保存到数据库
         final Transaction transaction = chatRoomRepository.beginTransaction();
         try {
-            chatRoomRepository.add(new JSONObject().put("content", msg.toString()));
+            String oId = chatRoomRepository.add(new JSONObject().put("content", msg.toString()));
+            msg.put("oId", oId);
         } catch (RepositoryException e) {
             LOGGER.log(Level.ERROR, "Cannot save ChatRoom message to the database.", e);
         }
