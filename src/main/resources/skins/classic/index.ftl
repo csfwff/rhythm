@@ -294,6 +294,7 @@ ${HeaderBannerLabel}
                                type="text"
                                class="comment__text breezemoon__input"
                                placeholder="简单聊聊 (高级功能请访问完整版聊天室哦)"/>
+                        <div id="chatUsernameSelectedPanel" class="completed-panel" style="height:170px;display:none;left:auto;top:auto;cursor:pointer;"></div>
                         <span id="chatRoomPostBtn" class="btn breezemoon__btn" data-csrf="${csrfToken}"
                               onclick="sendChat()">Biu~</span>
                     </div>
@@ -441,9 +442,43 @@ ${HeaderBannerLabel}
     // 聊天室发送讯息
     $('#chatRoomInput').bind('keydown', function (event) {
         if (event.keyCode == "13") {
+            $("#chatUsernameSelectedPanel").hide();
             sendChat();
         }
     });
+
+    $("#chatRoomInput").on('input', function () {
+        $("#chatUsernameSelectedPanel").html("");
+
+        let value = $("#chatRoomInput").val()
+        let users;
+        if (value == '@') {
+            $("#chatUsernameSelectedPanel").show();
+            users = Util.getAtUsers('');
+        } else if (value.startsWith('@')) {
+            $("#chatUsernameSelectedPanel").show();
+            value = value.substring(1)
+            users = Util.getAtUsers(value);
+        } else {
+            $("#chatUsernameSelectedPanel").hide();
+        }
+        if (users.length === 0 || $("#chatRoomInput").val() === "") {
+            $("#chatUsernameSelectedPanel").hide();
+        } else {
+            for (let i = 0; i < users.length; i++) {
+                let user = users[i];
+                $("#chatUsernameSelectedPanel").append("<a onclick=\"fillUsername('" + user.username + "')\"><img src='" + user.avatar + "' style='height:20px;width:20px;'> " + user.username + "</a>");
+            }
+        }
+    });
+
+
+
+    function fillUsername(username) {
+        $("#chatRoomInput").val('@' + username + ' ');
+        $("#chatUsernameSelectedPanel").html("");
+        $("#chatUsernameSelectedPanel").hide();
+    }
 
     function sendChat() {
         <#if isLoggedIn>
