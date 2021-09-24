@@ -47,11 +47,48 @@
                                     </#if>
                                     <div class="fn-flex-1">
                                         <div class="fn-clear">
-                                            <h3 class="fn-left"><a rel="tag" class="ft-a-title" href="${servePath}/tag/${tag.tagURI}">${tag.tagTitle}</a></h3>
-                                            <span class="ft-gray fn-right">
-                                                ${referenceLabel} ${tag.tagReferenceCount?c} &nbsp;
-                                                ${cmtLabel} ${tag.tagCommentCount?c}
-                                            </span>
+                                            <h3 ><a rel="tag" class="ft-a-title" href="${servePath}/tag/${tag.tagURI}">${tag.tagTitle}</a></h3>
+                                            <div style="color:rgba(0,0,0,0.54);font-size: 12px; float: left">
+                                                <span >${referenceLabel}</span>
+                                                <span class="article-level<#if tag.tagReferenceCount lt 100>0
+                                                                           <#elseif tag.tagReferenceCount gte 100 && tag.tagReferenceCount lt 500>1
+                                                                           <#elseif tag.tagReferenceCount gte 500 && tag.tagReferenceCount lt 1000>2
+                                                                           <#elseif tag.tagReferenceCount gte 1000 && tag.tagReferenceCount lt 2000>3
+                                                                           <#else>4</#if>">
+                                                    ${tag.tagReferenceCount?c} &nbsp;&nbsp;
+                                                </span>
+                                                <span>${cmtLabel}</span>
+                                                <span class="article-level<#if tag.tagCommentCount lt 100>0
+                                                                           <#elseif tag.tagCommentCount gte 100 && tag.tagCommentCount lt 500>1
+                                                                           <#elseif tag.tagCommentCount gte 500 && tag.tagCommentCount lt 1000>2
+                                                                           <#elseif tag.tagCommentCount gte 1000 && tag.tagCommentCount lt 2000>3
+                                                                           <#else>4</#if>">
+                                                     ${tag.tagCommentCount?c}&nbsp;&nbsp;
+                                                </span>
+                                                <span>${followLabel}</span>
+                                                <span id= "tag-follow-count${tag.oId}" class="article-level<#if tag.tagFollowerCount lt 100>0
+                                                                           <#elseif tag.tagFollowerCount gte 100 && tag.tagFollowerCount lt 500>1
+                                                                           <#elseif tag.tagFollowerCount gte 500 && tag.tagFollowerCount lt 1000>2
+                                                                           <#elseif tag.tagFollowerCount gte 1000 && tag.tagFollowerCount lt 2000>3
+                                                                           <#else>4</#if>">
+                                                     ${tag.tagFollowerCount?c}
+                                                </span>
+                                            </div>
+                                            <div class="fn-right">
+                                                    <#if isLoggedIn>
+                                                        <button id= "btn-follow${tag.oId}" class="btn mid" onclick="follow('${tag.oId}', ${tag.isFollowing?c})">
+                                                            <#if isLoggedIn && tag.isFollowing>
+                                                                ${unfollowLabel}
+                                                            <#else>
+                                                                ${followLabel}
+                                                            </#if>
+                                                        </button>
+                                                    <#else>
+                                                        <button id= "btn-follow${tag.oId}" class="btn mid" onclick="follow('${tag.oId}', 'false')">
+                                                            ${followLabel}
+                                                        </button>
+                                                    </#if>
+                                            </div>
                                         </div>
                                         <div class="vditor-reset">${tag.tagDescription}</div>
                                     </div>
@@ -89,3 +126,50 @@
         <#include "footer.ftl">
     </body>
 </html>
+<script>
+    function follow(id,isFollowing) {
+        if (!Label.isLoggedIn) {
+            Util.needLogin()
+        }
+
+        var requestJSONObject = {
+            followingId: id,
+        }
+
+        let path
+
+        if (isFollowing) {
+            path = '/unfollow/tag';
+        } else {
+            path = '/follow/tag';
+        }
+
+        $.ajax({
+            url: Label.servePath + path,
+            type: 'POST',
+            cache: false,
+            data: JSON.stringify(requestJSONObject),
+            success: function (result, textStatus) {
+                if (0 === result.code) {
+                    var btn = $('#btn-follow'+ id).attr('onclick', 'follow(\'' + id + '\', ' +!isFollowing + ')')
+                    var personCnt = document.getElementById("ftc").innerHTML
+                    var tagCnt = document.getElementById("tag-follow-count"+id).innerHTML
+                    if (isFollowing) {
+                        btn.html(Label.followLabel)
+                        //个人信息 followingTagCnt - 1
+                        $('#ftc').html(--personCnt)
+                        $("#tag-follow-count"+id).html(--tagCnt)
+                    } else {
+                        $('#btn-follow'+ id).html(Label.unfollowLabel)
+                        //个人信息 followingTagCnt + 1
+                        $('#ftc').html(++personCnt)
+                        $("#tag-follow-count"+id).html(++tagCnt)
+                    }
+
+                }
+            },
+            complete: function () {
+            },
+        });
+    }
+</script>

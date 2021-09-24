@@ -150,6 +150,18 @@ public class TagProcessor {
         dataModel.put(Common.COLD_TAGS, coldTags);
 
         dataModelService.fillHeaderAndFooter(context, dataModel);
+
+        final boolean isLoggedIn = (Boolean) dataModel.get(Common.IS_LOGGED_IN);
+        if (isLoggedIn) {
+            final JSONObject currentUser = Sessions.getUser();
+            final String followerId = currentUser.optString(Keys.OBJECT_ID);
+            trendTags.forEach(tag -> {
+                final String tagId = tag.optString(Keys.OBJECT_ID);
+                final boolean isFollowing = followQueryService.isFollowing(followerId, tagId, Follow.FOLLOWING_TYPE_C_TAG);
+                tag.put("isFollowing", isFollowing);
+            });
+        }
+
     }
 
     /**
