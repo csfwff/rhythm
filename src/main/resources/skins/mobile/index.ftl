@@ -79,8 +79,8 @@ ${HeaderBannerLabel}
         <div class="module-panel">
             <div class="module-header" style="background-color: #69b6df;">
                 <a onclick="randomArticles()" style="cursor: pointer">
-                    <svg><use xlink:href="#refresh"></use></svg>
-                    换一批&nbsp;&nbsp;
+                    <svg id="randomArticlesRefreshSvg"><use xlink:href="#refresh"></use></svg>
+                    换点别的&nbsp;&nbsp;
                     随便看看
                 </a>
             </div>
@@ -227,29 +227,37 @@ ${HeaderBannerLabel}
 
     var fishingPiVersion = "${fishingPiVersion}";
 
+    var loading = false;
+    var rotate = new Rotate("randomArticlesRefreshSvg");
     function randomArticles() {
-        $.ajax({
-            url: "${servePath}/article/random/12",
-            method: "GET",
-            cache: false,
-            async: false,
-            success: function (result) {
-                $("#randomArticles").html('');
-                for (let articleCur in result.articles) {
-                    let article = result.articles[articleCur];
-                    let viewCount = article.articleViewCount;
-                    if (viewCount >= 1000) {
-                        viewCount = article.articleViewCntDisplayFormat;
+        if (!loading) {
+            loading = true;
+            rotate.submit();
+            $.ajax({
+                url: "${servePath}/article/random/12",
+                method: "GET",
+                cache: false,
+                async: false,
+                success: function (result) {
+                    $("#randomArticles").html('');
+                    for (let articleCur in result.articles) {
+                        let article = result.articles[articleCur];
+                        let viewCount = article.articleViewCount;
+                        if (viewCount >= 1000) {
+                            viewCount = article.articleViewCntDisplayFormat;
+                        }
+                        $("#randomArticles").append('<li class="fn-flex">' +
+                            '<a rel="nofollow" href="${servePath}/member/' + article.articleAuthorName + '">' +
+                            '<span class="avatar-small tooltipped tooltipped-se slogan" aria-label="' + article.articleAuthorName + '" style="background-image:url(\'' + article.articleAuthorThumbnailURL210 + '\')"></span></a>' +
+                            '<a rel="nofollow" class="title fn-ellipsis fn-flex-1" href="${servePath}' + article.articlePermalink + '">' + article.articleTitleEmoj + '</a>' +
+                            '<a class="fn-right count ft-gray ft-smaller" href="${servePath}' + article.articlePermalink + '">' + viewCount + '</a>' +
+                            '</li>');
                     }
-                    $("#randomArticles").append('<li class="fn-flex">' +
-                        '<a rel="nofollow" href="${servePath}/member/' + article.articleAuthorName + '">' +
-                        '<span class="avatar-small tooltipped tooltipped-se slogan" aria-label="' + article.articleAuthorName + '" style="background-image:url(\'' + article.articleAuthorThumbnailURL210 + '\')"></span></a>' +
-                        '<a rel="nofollow" class="title fn-ellipsis fn-flex-1" href="${servePath}' + article.articlePermalink + '">' + article.articleTitleEmoj + '</a>' +
-                        '<a class="fn-right count ft-gray ft-smaller" href="${servePath}' + article.articlePermalink + '">' + viewCount + '</a>' +
-                        '</li>');
                 }
-            }
-        });
+            });
+            rotate.stop();
+            loading = false;
+        }
     }
 
     function yesterday() {

@@ -97,11 +97,11 @@ ${HeaderBannerLabel}
             <div style="border-bottom: 1px solid #eee;margin:0px 10px ;">
                 <div style="float:left;font-size:13px;margin:5px 0 10px 0; font-weight:bold;">随便看看</div>
                 <div style="float:right;font-size:13px;margin:5px 0 0 0;">
-                    <a onclick="randomArticles()" style="cursor: pointer">
+                    <a onclick="randomArticles()" style="cursor: pointer; color: #c8383a; text-decoration: none;">
                         <svg id="randomArticlesRefreshSvg">
-                            <use xlink:href="#refresh"></use>
+                            <use xlink:href="#refreshQ"></use>
                         </svg>
-                        刷新
+                        换点别的
                     </a>
                 </div>
                 <div style="clear:both;"></div>
