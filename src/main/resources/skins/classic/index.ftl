@@ -659,8 +659,10 @@ ${HeaderBannerLabel}
                 url: "${servePath}/article/random/12",
                 method: "GET",
                 cache: false,
-                async: false,
+                async: true,
                 success: function (result) {
+                    rotate.stop();
+                    loading = false;
                     $("#randomArticles").html('');
                     for (let articleCur in result.articles) {
                         let article = result.articles[articleCur];
@@ -677,8 +679,6 @@ ${HeaderBannerLabel}
                     }
                 }
             });
-            rotate.stop();
-            loading = false;
         }
     }
 </script>
