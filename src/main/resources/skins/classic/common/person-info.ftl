@@ -35,7 +35,7 @@
     <div class="module-panel tooltipped tooltipped-s" aria-label="${todayActivityLabel} ${liveness}%">
         <ul class="status fn-flex">
             <li class="fn-pointer" onclick="window.location.href = '${servePath}/member/${currentUser.userName}/following/tags'">
-                <strong>${currentUser.followingTagCnt?c}</strong>
+                <strong id="ftc">${currentUser.followingTagCnt?c}</strong>
                 <span class="ft-gray">${followingTagsLabel}</span>
             </li>
             <li class="fn-pointer" onclick="window.location.href = '${servePath}/member/${currentUser.userName}/following/users'">
