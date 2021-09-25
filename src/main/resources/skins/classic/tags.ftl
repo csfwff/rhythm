@@ -75,7 +75,6 @@
                                                 </span>
                                             </div>
                                             <div class="fn-right">
-                                                    <#if isLoggedIn>
                                                         <button id= "btn-follow${tag.oId}" class="btn mid" onclick="follow('${tag.oId}', ${tag.isFollowing?c})">
                                                             <#if isLoggedIn && tag.isFollowing>
                                                                 ${unfollowLabel}
@@ -83,11 +82,6 @@
                                                                 ${followLabel}
                                                             </#if>
                                                         </button>
-                                                    <#else>
-                                                        <button id= "btn-follow${tag.oId}" class="btn mid" onclick="follow('${tag.oId}', 'false')">
-                                                            ${followLabel}
-                                                        </button>
-                                                    </#if>
                                             </div>
                                         </div>
                                         <div class="vditor-reset">${tag.tagDescription}</div>
