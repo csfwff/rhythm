@@ -1873,3 +1873,45 @@ var Audio = {
     Audio.wavFileBlob = Audio.recorderObj.buildWavFileBlob()
   },
 }
+function Rotate() {
+  let pause = false;
+
+  this.submit = function (id) {
+    let rotate = 0;
+    let styleSave;
+    let pool;
+
+    if (pool === undefined) {
+      styleSave = document.getElementById(id).getAttribute("style");
+      if (styleSave !== null && styleSave !== undefined && styleSave !== "") {
+        if (!styleSave.endsWith(";")) {
+          styleSave = styleSave + ";";
+        }
+      } else {
+        styleSave = "";
+      }
+      pool = setInterval(function () {
+        rotate += 5;
+        if (rotate > 360) {
+          rotate = 0;
+        }
+        document.getElementById(id).setAttribute("style", styleSave + "-webkit-transform: rotate(" + rotate + "deg);");
+        if (rotate === 0 || rotate === 180) {
+          if (pause) {
+            clearInterval(pool);
+            document.getElementById(id).setAttribute("style", styleSave);
+          }
+        }
+      }, 30);
+    }
+  }
+
+  this.stop = function () {
+    pause = true;
+  }
+
+  String.prototype.endWith = function (endStr) {
+    const d = this.length - endStr.length;
+    return (d >= 0 && this.lastIndexOf(endStr) === d);
+  }
+}

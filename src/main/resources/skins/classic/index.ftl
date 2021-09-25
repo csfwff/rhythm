@@ -98,10 +98,10 @@ ${HeaderBannerLabel}
                 <div style="float:left;font-size:13px;margin:5px 0 10px 0; font-weight:bold;">随便看看</div>
                 <div style="float:right;font-size:13px;margin:5px 0 0 0;">
                     <a onclick="randomArticles()" style="cursor: pointer">
-                        <svg>
+                        <svg id="randomArticlesRefreshSvg">
                             <use xlink:href="#refresh"></use>
                         </svg>
-                        换一批
+                        来点别的
                     </a>
                 </div>
                 <div style="clear:both;"></div>
@@ -650,6 +650,8 @@ ${HeaderBannerLabel}
     }
 
     function randomArticles() {
+        let rotate = new Rotate();
+        rotate.submit("randomArticlesRefreshSvg");
         $.ajax({
             url: "${servePath}/article/random/12",
             method: "GET",
@@ -672,6 +674,7 @@ ${HeaderBannerLabel}
                 }
             }
         });
+        rotate.stop();
     }
 </script>
 <script>
