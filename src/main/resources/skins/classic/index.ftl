@@ -97,11 +97,11 @@ ${HeaderBannerLabel}
             <div style="border-bottom: 1px solid #eee;margin:0px 10px ;">
                 <div style="float:left;font-size:13px;margin:5px 0 10px 0; font-weight:bold;">随便看看</div>
                 <div style="float:right;font-size:13px;margin:5px 0 0 0;">
-                    <a onclick="randomArticles()" style="cursor: pointer">
-                        <svg>
-                            <use xlink:href="#refresh"></use>
+                    <a onclick="randomArticles()" style="cursor: pointer; color: #c8383a; text-decoration: none;">
+                        <svg id="randomArticlesRefreshSvg">
+                            <use xlink:href="#refreshQ"></use>
                         </svg>
-                        换一批
+                        换点别的
                     </a>
                 </div>
                 <div style="clear:both;"></div>
@@ -649,29 +649,37 @@ ${HeaderBannerLabel}
         });
     }
 
+    var loading = false;
+    var rotate = new Rotate("randomArticlesRefreshSvg");
     function randomArticles() {
-        $.ajax({
-            url: "${servePath}/article/random/12",
-            method: "GET",
-            cache: false,
-            async: false,
-            success: function (result) {
-                $("#randomArticles").html('');
-                for (let articleCur in result.articles) {
-                    let article = result.articles[articleCur];
-                    let viewCount = article.articleViewCount;
-                    if (viewCount >= 1000) {
-                        viewCount = article.articleViewCntDisplayFormat;
+        if (!loading) {
+            loading = true;
+            rotate.submit();
+            $.ajax({
+                url: "${servePath}/article/random/12",
+                method: "GET",
+                cache: false,
+                async: true,
+                success: function (result) {
+                    rotate.stop();
+                    loading = false;
+                    $("#randomArticles").html('');
+                    for (let articleCur in result.articles) {
+                        let article = result.articles[articleCur];
+                        let viewCount = article.articleViewCount;
+                        if (viewCount >= 1000) {
+                            viewCount = article.articleViewCntDisplayFormat;
+                        }
+                        $("#randomArticles").append('<li class="fn-flex">' +
+                            '<a rel="nofollow" href="${servePath}/member/' + article.articleAuthorName + '">' +
+                            '<span class="avatar-small tooltipped tooltipped-se slogan" aria-label="' + article.articleAuthorName + '" style="background-image:url(\'' + article.articleAuthorThumbnailURL210 + '\')"></span></a>' +
+                            '<a rel="nofollow" class="title fn-ellipsis fn-flex-1" href="${servePath}' + article.articlePermalink + '">' + article.articleTitleEmoj + '</a>' +
+                            '<a class="fn-right count ft-gray ft-smaller" href="${servePath}' + article.articlePermalink + '">' + viewCount + '</a>' +
+                            '</li>');
                     }
-                    $("#randomArticles").append('<li class="fn-flex">' +
-                        '<a rel="nofollow" href="${servePath}/member/' + article.articleAuthorName + '">' +
-                        '<span class="avatar-small tooltipped tooltipped-se slogan" aria-label="' + article.articleAuthorName + '" style="background-image:url(\'' + article.articleAuthorThumbnailURL210 + '\')"></span></a>' +
-                        '<a rel="nofollow" class="title fn-ellipsis fn-flex-1" href="${servePath}' + article.articlePermalink + '">' + article.articleTitleEmoj + '</a>' +
-                        '<a class="fn-right count ft-gray ft-smaller" href="${servePath}' + article.articlePermalink + '">' + viewCount + '</a>' +
-                        '</li>');
                 }
-            }
-        });
+            });
+        }
     }
 </script>
 <script>

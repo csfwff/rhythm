@@ -206,27 +206,9 @@ var ChatRoom = {
    * 监听点击更多按钮关闭事件
    */
   resetMoreBtnListen: function () {
-    $("details").on('click', function () {
-      $("details[open]").on('click', function() {
-        $("details[open]").removeAttr("open");
-      });
-      $(".chatAt").on('click', function () {
-        let atUser = $(this).attr("data-name");
-        ChatRoom.editor.setValue(atUser);
-        ChatRoom.editor.focus();
-      });
-      setTimeout(function () {
-        $("details[open]").on('click', function() {
-          $("details[open]").removeAttr("open");
-        });
-        $(".chatAt").on('click', function () {
-          let atUser = $(this).attr("data-name");
-          ChatRoom.editor.setValue(atUser);
-          ChatRoom.editor.focus();
-        });
-      }, 500);
+    $("body").not("details-menu").click(function() {
+      $("details[open]").removeAttr("open");
     });
-
   },
   /**
    * 撤回聊天室消息
@@ -245,6 +227,13 @@ var ChatRoom = {
         }
       }
     });
+  },
+  /**
+   * 艾特某个人
+   */
+  at: function (userName) {
+    ChatRoom.editor.setValue("@" + userName + "  ");
+    ChatRoom.editor.focus();
   },
   /**
    * 渲染聊天室消息
@@ -277,7 +266,7 @@ var ChatRoom = {
         '                        ···\n' +
         '                    </summary>\n' +
         '                    <details-menu class="fn__layer">\n' +
-        '                        <span class="chatAt item" data-name="@' + userName + '　">@'+ userName + '</span>\n' +
+        '                        <a onclick=\"ChatRoom.at(\'' + userName + '\')\" class="item">@'+ userName + '</a>\n' +
         '                        <a href="/cr/raw/' + oId + '" target="_blank" class="item">查看 Markdown</a>\n' +
         meTag2 +
         '                    </details-menu>\n' +
