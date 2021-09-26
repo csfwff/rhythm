@@ -63,6 +63,36 @@
                 </#if>
             </div>
             </#if>
+        <#elseif 38 == notification.dataType>
+            <#if notification.deleted>
+                <div class="fn-flex-1">
+                    <div class="fn-flex">
+                        <h2 class="fn-flex-1">
+                            ${notification.description}
+                        </h2>
+                        <span class="ft-gray">
+                    ${notification.createTime?string('yyyy-MM-dd HH:mm')}
+                </span>
+                    </div>
+                </div>
+            <#else>
+                <a target="_blank" rel="nofollow" href="${servePath}/member/${notification.userName}">
+                    <div class="avatar tooltipped tooltipped-se" aria-label="${notification.userName}" style="background-image:url('${notification.userAvatarURL}')"></div>
+                </a>
+                <div class="fn-flex-1">
+                    <div class="fn-flex">
+                        <h2 class="fn-flex-1">
+                            <div><a style="color: black" target="_blank" rel="nofollow" href="${servePath}/member/${notification.userName}">${notification.userName}</a> 在 <a style="color: black" href="${servePath}/cr"> 聊天室 </a> @了你 </div>
+                        </h2>
+                        <span class="ft-gray">
+                        ${notification.createTime?string('yyyy-MM-dd HH:mm')}
+                    </span>
+                    </div>
+                    <div class="vditor-reset comment">
+                        ${notification.content}
+                    </div>
+                </div>
+            </#if>
         <#else>
         <a target="_blank" rel="nofollow" href="${servePath}/member/${notification.userName}">
             <div class="avatar tooltipped tooltipped-se" aria-label="${notification.userName}" style="background-image:url('${notification.thumbnailURL}')"></div>

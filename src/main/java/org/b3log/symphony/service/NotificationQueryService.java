@@ -30,6 +30,7 @@ import org.b3log.latke.service.LangPropsService;
 import org.b3log.latke.service.annotation.Service;
 import org.b3log.latke.util.Stopwatchs;
 import org.b3log.symphony.model.*;
+import org.b3log.symphony.processor.ChatroomProcessor;
 import org.b3log.symphony.repository.*;
 import org.b3log.symphony.util.Emotions;
 import org.b3log.symphony.util.Symphonys;
@@ -38,6 +39,7 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Notification query service.
@@ -125,6 +127,10 @@ public class NotificationQueryService {
      */
     @Inject
     private TagQueryService tagQueryService;
+
+
+    @Inject
+    private ChatRoomService chatRoomService;
 
     /**
      * Gets a notification by the specified id.
@@ -803,6 +809,7 @@ public class NotificationQueryService {
         filters.add(new PropertyFilter(Notification.NOTIFICATION_USER_ID, FilterOperator.EQUAL, userId));
         final List<Filter> subFilters = new ArrayList<>();
         subFilters.add(new PropertyFilter(Notification.NOTIFICATION_DATA_TYPE, FilterOperator.EQUAL, Notification.DATA_TYPE_C_AT));
+        subFilters.add(new PropertyFilter(Notification.NOTIFICATION_DATA_TYPE, FilterOperator.EQUAL, Notification.DATA_TYPE_C_CHAT_ROOM_AT));
         subFilters.add(new PropertyFilter(Notification.NOTIFICATION_DATA_TYPE, FilterOperator.EQUAL, Notification.DATA_TYPE_C_ARTICLE_NEW_FOLLOWER));
         subFilters.add(new PropertyFilter(Notification.NOTIFICATION_DATA_TYPE, FilterOperator.EQUAL, Notification.DATA_TYPE_C_ARTICLE_NEW_WATCHER));
         subFilters.add(new PropertyFilter(Notification.NOTIFICATION_DATA_TYPE, FilterOperator.EQUAL, Notification.DATA_TYPE_C_COMMENT_VOTE_UP));
@@ -831,6 +838,24 @@ public class NotificationQueryService {
                 atNotification.put(Common.CREATE_TIME, new Date(notification.optLong(Keys.OBJECT_ID)));
 
                 switch (dataType) {
+                    case Notification.DATA_TYPE_C_CHAT_ROOM_AT:
+                        final JSONObject chatMsg = chatRoomService.getChatMsg(dataId);
+                        if (Objects.isNull(chatMsg)) {
+                            description = langPropsService.get("removedLabel");
+                            atNotification.put(Common.DESCRIPTION, description);
+                            atNotification.put("deleted", true);
+                            rslts.add(atNotification);
+                            continue;
+                        } else {
+                            final JSONObject msg = new JSONObject(chatMsg.optString(Common.CONTENT));
+                            atNotification.put(Common.CONTENT, msg.optString(Common.CONTENT));
+                            atNotification.put(UserExt.USER_AVATAR_URL, msg.optString(UserExt.USER_AVATAR_URL));
+                            atNotification.put(Common.CREATE_TIME, new Date(msg.optLong((Common.TIME))));
+                            atNotification.put(User.USER_NAME, msg.optString(User.USER_NAME));
+                            atNotification.put("deleted", false);
+                        }
+                        rslts.add(atNotification);
+                        break;
                     case Notification.DATA_TYPE_C_AT:
                         final JSONObject comment = commentQueryService.getCommentById(dataId);
                         if (null != comment) {

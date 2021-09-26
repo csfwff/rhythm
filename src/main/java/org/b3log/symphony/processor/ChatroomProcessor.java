@@ -17,7 +17,6 @@
  */
 package org.b3log.symphony.processor;
 
-import com.sun.org.apache.bcel.internal.generic.RETURN;
 import org.apache.commons.lang.StringUtils;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
@@ -25,16 +24,15 @@ import org.apache.logging.log4j.Logger;
 import org.b3log.latke.Keys;
 import org.b3log.latke.http.Dispatcher;
 import org.b3log.latke.http.RequestContext;
+import org.b3log.latke.http.WebSocketSession;
 import org.b3log.latke.http.renderer.AbstractFreeMarkerRenderer;
 import org.b3log.latke.ioc.BeanManager;
 import org.b3log.latke.ioc.Inject;
 import org.b3log.latke.ioc.Singleton;
 import org.b3log.latke.model.User;
 import org.b3log.latke.repository.*;
-import org.b3log.latke.util.Locales;
-import org.b3log.latke.util.Times;
 import org.b3log.symphony.model.Common;
-import org.b3log.symphony.model.Role;
+import org.b3log.symphony.model.Notification;
 import org.b3log.symphony.model.UserExt;
 import org.b3log.symphony.processor.channel.ChatroomChannel;
 import org.b3log.symphony.processor.middleware.AnonymousViewCheckMidware;
@@ -44,15 +42,24 @@ import org.b3log.symphony.repository.ChatRoomRepository;
 import org.b3log.symphony.service.*;
 import org.b3log.symphony.util.*;
 import org.json.JSONObject;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
 import pers.adlered.simplecurrentlimiter.main.SimpleCurrentLimiter;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-import static org.b3log.symphony.processor.channel.ChatroomChannel.SESSIONS;
 
 /**
  * Chatroom processor.
@@ -73,6 +80,10 @@ public class ChatroomProcessor {
      */
     private static final Logger LOGGER = LogManager.getLogger(ChatroomProcessor.class);
 
+    private static final Pattern AT_USER_PATTERN = Pattern.compile("(@)([a-zA-Z0-9 ]+)");
+
+
+    private static final String PARTICIPANTS = "participants";
     /**
      * Chat messages.
      */
@@ -203,6 +214,21 @@ public class ChatroomProcessor {
 
         context.renderJSON(StatusCodes.SUCC);
 
+
+        try {
+            final List<JSONObject> atUsers = atUsers(msg.optString(Common.CONTENT), userName);
+            if (Objects.nonNull(atUsers) && !atUsers.isEmpty()) {
+                for (JSONObject user : atUsers) {
+                    final JSONObject notification = new JSONObject();
+                    notification.put(Notification.NOTIFICATION_USER_ID, user.optString("oId"));
+                    notification.put(Notification.NOTIFICATION_DATA_ID, msg.optString("oId"));
+                    notificationMgmtService.addChatRoomAtNotification(notification);
+                }
+            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, "notify user failed", e);
+        }
+
         try {
             final String userId = currentUser.optString(Keys.OBJECT_ID);
             final JSONObject user = userQueryService.getUser(userId);
@@ -211,6 +237,48 @@ public class ChatroomProcessor {
         } catch (final Exception e) {
             LOGGER.log(Level.ERROR, "Update user latest comment time failed", e);
         }
+    }
+
+    public List<JSONObject> atUsers(String content, String currentUser) {
+        final Document document = Jsoup.parse(content);
+        final Elements elements = document.select("p");
+        if (elements.isEmpty()) return new ArrayList<>();
+        List<JSONObject> users = new ArrayList<>();
+        final Set<String> userNames = new HashSet<>();
+        for (Element element : elements) {
+            String text = element.text();
+            if (StringUtils.isBlank(text) || !text.contains("@")) {
+                continue;
+            }
+            final Matcher matcher = AT_USER_PATTERN.matcher(text);
+
+
+            while (matcher.find()) {
+                String userName;
+                String raw = matcher.group(2);
+                //认为raw文本直到遇到空格 为用户名称
+                raw = raw.trim();
+                final int blank = raw.indexOf(" ");
+                if (blank < 0) {
+                    userName = raw;
+                } else {
+                    userName = raw.substring(0, text.indexOf(" "));
+                }
+                if (userName.equals(PARTICIPANTS)) {
+                    //需要@所有在聊天室中的成员
+                    final Map<WebSocketSession, JSONObject> onlineUsers = ChatroomChannel.onlineUsers;
+                    return onlineUsers.values().stream().filter(x -> !x.optString(User.USER_NAME).equals(currentUser)).collect(Collectors.toList());
+                }
+                userNames.add(userName);
+            }
+            userNames.forEach(name -> {
+                final JSONObject user = userQueryService.getUserByName(name);
+                if (Objects.nonNull(user)) {
+                    users.add(user);
+                }
+            });
+        }
+        return users;
     }
 
     /**
@@ -260,6 +328,7 @@ public class ChatroomProcessor {
 
     /**
      * Get more chat room histories.
+     *
      * @param context
      */
     public void getMore(final RequestContext context) {
@@ -278,6 +347,7 @@ public class ChatroomProcessor {
 
     /**
      * 撤回消息（直接删除）
+     *
      * @param context
      */
     public void revokeMessage(final RequestContext context) {
