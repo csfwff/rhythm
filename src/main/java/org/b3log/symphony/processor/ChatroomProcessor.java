@@ -239,7 +239,7 @@ public class ChatroomProcessor {
         }
     }
 
-    public List<JSONObject> atUsers(String content, String currentUser) {
+    private List<JSONObject> atUsers(String content, String currentUser) {
         final Document document = Jsoup.parse(content);
         final Elements elements = document.select("p");
         if (elements.isEmpty()) return new ArrayList<>();
@@ -262,7 +262,7 @@ public class ChatroomProcessor {
                 if (blank < 0) {
                     userName = raw;
                 } else {
-                    userName = raw.substring(0, text.indexOf(" "));
+                    userName = raw.substring(0, blank);
                 }
                 if (userName.equals(PARTICIPANTS)) {
                     //需要@所有在聊天室中的成员
