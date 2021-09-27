@@ -23,6 +23,11 @@
         <div class="user-name">
             <div id="userNicknameDom"><b>${user.userNickname}</b></div>
             <div class="ft-gray">${user.userName}</div>
+            <div>
+                <span class="tooltipped tooltipped-n" aria-label="${roleLabel}">
+                    <span class="<#if user.roleName == '管理员'>color_admin<#elseif user.roleName == 'OP'>color_op<#elseif user.roleName == '协警'>color_police<#elseif user.roleName == '超级会员'>color_svip<#elseif user.roleName == '成员'>color_vip<#else>offline</#if>">${user.roleName}</span>
+                </span>
+            </div>
 
             <div>
                 <#if isLoggedIn && (currentUser.userName != user.userName)>
@@ -32,10 +37,9 @@
                 </#if>
                 <#if (isLoggedIn && ("adminRole" == currentUser.userRole || currentUser.userName == user.userName)) || 0 == user.userOnlineStatus>
                     <span class="tooltipped tooltipped-n" aria-label="<#if user.userOnlineFlag>${onlineLabel}<#else>${offlineLabel}</#if>">
-                        <span class="<#if user.userOnlineFlag>online<#else>offline</#if>"><svg><use xlink:href="#logo"></use></svg></span>
+                        <span class="<#if user.userOnlineFlag>online<#else>offline</#if>"><#if user.userOnlineFlag>在线<#else>离线</#if></span>
                     </span>
                 </#if>
-                <span class="tooltipped tooltipped-n offline" aria-label="${roleLabel}"> ${user.roleName}</span>
                 <#if permissions["userAddPoint"].permissionGrant ||
                         permissions["userAddUser"].permissionGrant ||
                         permissions["userExchangePoint"].permissionGrant ||
