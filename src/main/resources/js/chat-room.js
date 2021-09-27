@@ -255,7 +255,7 @@ var ChatRoom = {
         '    </a>\n' +
         '    <div class="chats__content">\n' +
         '        <div class="chats__arrow"></div>\n' +
-        '        <div class="vditor-reset ft__smaller">\n' +
+        '        <div class="vditor-reset ft__smaller ' + Label.chatRoomPictureStatus + '">\n' +
         '            ' + content + '\n' +
         '        </div>\n' +
         '        <div class="ft__smaller ft__fade fn__right">\n' +
