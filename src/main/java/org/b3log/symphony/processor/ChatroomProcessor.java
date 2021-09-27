@@ -271,13 +271,13 @@ public class ChatroomProcessor {
                 }
                 userNames.add(userName);
             }
-            userNames.forEach(name -> {
-                final JSONObject user = userQueryService.getUserByName(name);
-                if (Objects.nonNull(user)) {
-                    users.add(user);
-                }
-            });
         }
+        userNames.forEach(name -> {
+            final JSONObject user = userQueryService.getUserByName(name);
+            if (Objects.nonNull(user)) {
+                users.add(user);
+            }
+        });
         return users;
     }
 
