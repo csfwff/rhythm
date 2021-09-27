@@ -117,7 +117,10 @@ var IdleTalk = {
 
         let toUser = IdleTalk.getUrlPath("toUser");
         if (toUser !== false) {
-            IdleTalk.expand();
+            if ($("#sendMessageWindow").is(":hidden")) {
+                $("#title").css("padding", "230px 0 20px 0");
+                $("#sendMessageWindow").fadeIn(200);
+            }
             $("#userForm").val(toUser);
         }
 
