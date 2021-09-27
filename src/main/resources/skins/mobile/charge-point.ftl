@@ -65,19 +65,53 @@
                 <ul>
                     <li class="fn__flex">
                         <div class="ft-nowrap">
-                            2021-09-19<br>
-                            <span class="ft-gray">10:26</span>
+                            2021-09-27<br>
+                            <span class="ft-gray">12:14:37</span>
                         </div>
                         <span class="fn__space5"></span>
                         <span class="fn__space5"></span>
                         <div class="ft__gray fn__flex-1">
-                            这是第一条捐助哦，是我自己给我自己的 :)
+                            社区很棒！大佬加油
                         </div>
                         <span class="fn__space5"></span>
                         <span class="fn__space5"></span>
-                        <b class="ft__original7" style="width: 90px">10086 RMB</b>
+                        <b class="ft__original7" style="width: 90px">20.00 RMB</b>
                         <div class="ft__gray" style="width: 70px;text-align: right">
-                            <a href="https://pwl.icu/member/adlered" class="tooltipped__user">adlered</a>
+                            <a href="https://pwl.icu/member/FreerKnight" class="tooltipped__user">FreerKnight</a>
+                        </div>
+                    </li>
+                    <li class="fn__flex">
+                        <div class="ft-nowrap">
+                            2021-09-23<br>
+                            <span class="ft-gray">12:42:16</span>
+                        </div>
+                        <span class="fn__space5"></span>
+                        <span class="fn__space5"></span>
+                        <div class="ft__gray fn__flex-1">
+                            没有填写捐助信息 :)
+                        </div>
+                        <span class="fn__space5"></span>
+                        <span class="fn__space5"></span>
+                        <b class="ft__original7" style="width: 90px">10.00 RMB</b>
+                        <div class="ft__gray" style="width: 70px;text-align: right">
+                            <a href="https://pwl.icu/member/camden" class="tooltipped__user">camden</a>
+                        </div>
+                    </li>
+                    <li class="fn__flex">
+                        <div class="ft-nowrap">
+                            2021-09-23<br>
+                            <span class="ft-gray">12:37:05</span>
+                        </div>
+                        <span class="fn__space5"></span>
+                        <span class="fn__space5"></span>
+                        <div class="ft__gray fn__flex-1">
+                            没有填写捐助信息 :)
+                        </div>
+                        <span class="fn__space5"></span>
+                        <span class="fn__space5"></span>
+                        <b class="ft__original7" style="width: 90px">7.71 RMB</b>
+                        <div class="ft__gray" style="width: 70px;text-align: right">
+                            <a href="https://pwl.icu/member/camden" class="tooltipped__user">camden</a>
                         </div>
                     </li>
                 </ul>
