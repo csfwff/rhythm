@@ -212,6 +212,11 @@ public final class Notification {
      */
     public static final int DATA_TYPE_C_POINT_REPORT_HANDLED = 36;
 
+    /**
+     * Data type - @ from chat room.
+     */
+    public static final int DATA_TYPE_C_CHAT_ROOM_AT = 38;
+
     //// Transient ////
     /**
      * Key of unread notification count.
