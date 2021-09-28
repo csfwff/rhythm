@@ -655,6 +655,7 @@ ${HeaderBannerLabel}
         if (!loading) {
             loading = true;
             rotate.submit();
+            $("#randomArticles").fadeOut(500);
             $.ajax({
                 url: "${servePath}/article/random/12",
                 method: "GET",
@@ -677,6 +678,7 @@ ${HeaderBannerLabel}
                             '<a class="fn-right count ft-gray ft-smaller" href="${servePath}' + article.articlePermalink + '">' + viewCount + '</a>' +
                             '</li>');
                     }
+                    $("#randomArticles").fadeIn(500);
                 }
             });
         }

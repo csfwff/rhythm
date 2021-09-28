@@ -78,7 +78,7 @@ ${HeaderBannerLabel}
         </div>
         <div class="module-panel">
             <div class="module-header" style="background-color: #69b6df;">
-                <a onclick="randomArticles()" style="cursor: pointer">
+                <a onclick="randomArticles()" style="text-decoration: none;">
                     <svg id="randomArticlesRefreshSvg"><use xlink:href="#refresh"></use></svg>
                     换点别的&nbsp;&nbsp;
                     随便看看
@@ -235,6 +235,7 @@ ${HeaderBannerLabel}
         if (!loading) {
             loading = true;
             rotate.submit();
+            $("#randomArticles").fadeOut(500);
             $.ajax({
                 url: "${servePath}/article/random/12",
                 method: "GET",
@@ -257,6 +258,7 @@ ${HeaderBannerLabel}
                             '<a class="fn-right count ft-gray ft-smaller" href="${servePath}' + article.articlePermalink + '">' + viewCount + '</a>' +
                             '</li>');
                     }
+                    $("#randomArticles").fadeIn(500);
                 }
             });
         }

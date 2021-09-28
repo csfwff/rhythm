@@ -90,13 +90,13 @@
     Label.insertEmojiLabel = '${insertEmojiLabel}';
     Label.currentUser = '<#if currentUser??>${currentUser.userName}</#if>';
     Label.level3Permitted = ${level3Permitted?string("true", "false")};
+    Label.chatRoomPictureStatus = "<#if 0 == chatRoomPictureStatus> blur</#if>";
     ChatRoom.init();
     // Init [ChatRoom] channel
     ChatRoomChannel.init("${wsScheme}://${serverHost}:${serverPort}${contextPath}/chat-room-channel");
     var page = 0;
     ChatRoom.more();
     ChatRoom.more();
-    var chatRoomPictureStatus = "<#if 0 == chatRoomPictureStatus> blur</#if>";
 
     $("#more").hover(function () {
         ChatRoom.more();
