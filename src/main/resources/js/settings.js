@@ -503,6 +503,11 @@ var Settings = {
         }
 
         break
+      case 'system':
+        requestJSONObject = {
+          systemTitle: $('#newSystemTitle').val(),
+        }
+        break
       case 'deactivate':
         break
       default:

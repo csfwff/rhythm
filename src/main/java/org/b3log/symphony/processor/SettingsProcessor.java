@@ -183,6 +183,12 @@ public class SettingsProcessor {
     private PointtransferMgmtService pointtransferMgmtService;
 
     /**
+     * System Settings service.
+     */
+    @Inject
+    private SystemSettingsService settingsService;
+
+    /**
      * Register request handlers.
      */
     public static void register() {
@@ -203,6 +209,7 @@ public class SettingsProcessor {
         Dispatcher.post("/settings/geo/status", settingsProcessor::updateGeoStatus, loginCheck::handle, csrfMidware::check);
         Dispatcher.post("/settings/privacy", settingsProcessor::updatePrivacy, loginCheck::handle, csrfMidware::check);
         Dispatcher.post("/settings/function", settingsProcessor::updateFunction, loginCheck::handle, csrfMidware::check);
+        Dispatcher.post("/settings/system", settingsProcessor::updateSystem, loginCheck::handle, csrfMidware::check);
         Dispatcher.post("/settings/profiles", settingsProcessor::updateProfiles, loginCheck::handle, csrfMidware::check, updateProfilesValidationMidware::handle);
         Dispatcher.post("/settings/avatar", settingsProcessor::updateAvatar, loginCheck::handle, csrfMidware::check, updateProfilesValidationMidware::handle);
         Dispatcher.post("/settings/password", settingsProcessor::updatePassword, loginCheck::handle, csrfMidware::check, updatePasswordValidationMidware::handle);
@@ -601,6 +608,39 @@ public class SettingsProcessor {
         } catch (final ServiceException e) {
             context.renderMsg(e.getMessage());
         }
+    }
+
+    /**
+     * Updates user system settings.
+     *
+     * @param context the specified context
+     */
+    public void updateSystem(final RequestContext context) {
+        context.renderJSON(StatusCodes.ERR);
+        final Request request = context.getRequest();
+
+
+        JSONObject requestJSONObject;
+        try {
+            requestJSONObject = context.requestJSON();
+            request.setAttribute(Keys.REQUEST, requestJSONObject);
+        } catch (final Exception e) {
+            LOGGER.warn(e.getMessage());
+
+            requestJSONObject = new JSONObject();
+        }
+
+        String systemTitle = requestJSONObject.optString(SystemSettings.SYSTEM_TITLE);
+
+        final JSONObject settings = new JSONObject();
+        settings.put(SystemSettings.SYSTEM_TITLE, systemTitle);
+        try {
+            settingsService.setSystemSettings(settings);
+            context.renderJSON(StatusCodes.SUCC);
+        } catch (Exception e) {
+            context.renderMsg(e.getMessage());
+        }
+
     }
 
     /**

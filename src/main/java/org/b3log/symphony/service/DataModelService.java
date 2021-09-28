@@ -136,6 +136,11 @@ public class DataModelService {
     @Inject
     private BreezemoonQueryService breezemoonQueryService;
 
+
+
+    @Inject
+    private SystemSettingsService settingsService;
+
     /**
      * Fills relevant articles.
      *
@@ -268,7 +273,7 @@ public class DataModelService {
         fillSideBreezemoons(dataModel);
         fillDomainNav(dataModel);
         fillPermission(dataModel);
-
+        fillSystemSettings(dataModel);
         dataModel.put(Common.CSRF_TOKEN, Sessions.getCSRFToken(context));
     }
 
@@ -464,6 +469,43 @@ public class DataModelService {
         Stopwatchs.start("Fills lang");
         try {
             dataModel.putAll(langPropsService.getAll(Locales.getLocale()));
+        } finally {
+            Stopwatchs.end();
+        }
+    }
+
+    /**
+     * Fills the system settings.
+     *
+     * @param dataModel the specified data model
+     */
+    private void fillSystemSettings(final Map<String, Object> dataModel) {
+        Stopwatchs.start("Fills system settings");
+        try {
+            final boolean loggedIn = Sessions.isLoggedIn();
+            if (loggedIn) {
+                final JSONObject currentUser = Sessions.getUser();
+                if (Objects.isNull(currentUser)) {
+                    dataModel.put("hasSystemTitle", false);
+                } else {
+                    final JSONObject systemSettings = settingsService.getByUsrId(currentUser.optString(Keys.OBJECT_ID));
+                    if (Objects.isNull(systemSettings)) {
+                        dataModel.put("hasSystemTitle", false);
+                        return;
+                    }
+                    final String settingsJson = systemSettings.optString(SystemSettings.SETTINGS);
+                    final JSONObject settings = new JSONObject(settingsJson);
+                    final String systemTitle = settings.optString(SystemSettings.SYSTEM_TITLE);
+                    if (StringUtils.isBlank(systemTitle)) {
+                        dataModel.put("hasSystemTitle", false);
+                    } else {
+                        dataModel.put("hasSystemTitle", true);
+                        dataModel.put("systemTitle", systemTitle);
+                    }
+                }
+            } else {
+                dataModel.put("hasSystemTitle", false);
+            }
         } finally {
             Stopwatchs.end();
         }

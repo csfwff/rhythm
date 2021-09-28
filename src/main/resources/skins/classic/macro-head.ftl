@@ -21,7 +21,11 @@
 <meta charset="utf-8" />
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" />
+<#if hasSystemTitle>
+<title>${systemTitle}</title>
+<#else>
 <title>${title}</title>
+</#if>
 <#nested>
 <link rel="preconnect" href="${staticServePath}">
 <meta name="copyright" content="B3log" />

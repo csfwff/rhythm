@@ -85,20 +85,22 @@ ${HeaderBannerLabel}
                 </a>
             </div>
             <ul class="module-list" id="randomArticles">
-                <#list indexRandomArticles as article>
-                    <li class="fn-flex">
-                        <a rel="nofollow" href="${servePath}/member/${article.articleAuthorName}">
+                <#if indexRandomArticles??>
+                    <#list indexRandomArticles as article>
+                        <li class="fn-flex">
+                            <a rel="nofollow" href="${servePath}/member/${article.articleAuthorName}">
                                     <span class="avatar-small tooltipped tooltipped-se slogan"
                                           aria-label="${article.articleAuthorName}"
                                           style="background-image:url('${article.articleAuthorThumbnailURL210}')"></span>
-                        </a>
-                        <a rel="nofollow" class="title fn-ellipsis fn-flex-1"
-                           href="${servePath}${article.articlePermalink}">${article.articleTitleEmoj}</a>
-                        <a class="fn-right count ft-gray ft-smaller"
-                           href="${servePath}${article.articlePermalink}"><#if article.articleViewCount < 1000>
-                                ${article.articleViewCount}<#else>${article.articleViewCntDisplayFormat}</#if></a>
-                    </li>
-                </#list>
+                            </a>
+                            <a rel="nofollow" class="title fn-ellipsis fn-flex-1"
+                               href="${servePath}${article.articlePermalink}">${article.articleTitleEmoj}</a>
+                            <a class="fn-right count ft-gray ft-smaller"
+                               href="${servePath}${article.articlePermalink}"><#if article.articleViewCount < 1000>
+                                    ${article.articleViewCount}<#else>${article.articleViewCntDisplayFormat}</#if></a>
+                        </li>
+                    </#list>
+                </#if>
             </ul>
         </div>
         <div class="module">
