@@ -51,6 +51,7 @@
                                 <a href="${servePath}/settings/data"<#if 'data' == type> class="current"</#if>>${dataLabel}</a>
                                 <a href="${servePath}/settings/i18n"<#if 'i18n' == type> class="current"</#if>>${i18nLabel}</a>
                                 <a href="${servePath}/settings/help"<#if 'help' == type> class="current"</#if>>${helpLabel}</a>
+                                <a href="${servePath}/settings/system"<#if 'system' == type> class="current"</#if>>${systemLabel}</a>
                             </nav>
                         </div>
                     </div>

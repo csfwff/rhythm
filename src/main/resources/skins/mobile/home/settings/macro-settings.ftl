@@ -52,7 +52,10 @@
                     ${dataLabel}
                     <#elseif type == "help">
                     ${helpLabel}
+                    <#elseif type == "system">
+                    ${systemLabel}
                     </#if>
+
                     <svg class="fn-right"><use xlink:href="#chevron-down"></use></svg>
                 </div>
                 <div class="fn-hr5"></div>
@@ -68,6 +71,7 @@
                     <li<#if 'i18n' == type> class="fn-none"</#if>><a href="${servePath}/settings/i18n">${i18nLabel}</a></li>
                     <li<#if 'data' == type> class="fn-none"</#if>><a href="${servePath}/settings/data">${dataLabel}</a></li>
                     <li<#if 'help' == type> class="current"</#if>><a href="${servePath}/settings/help">${helpLabel}</a></li>
+                    <li<#if 'system' == type> class="current"</#if>><a href="${servePath}/settings/system">${systemLabel}</a></li>
                 </ul>
             </div>
             <div class="wrapper">

@@ -1910,6 +1910,30 @@
           "description": "聊天内容JSON"
         }
       ]
+    },
+    {
+      "name": "system_settings",
+      "description": "用户系统设置",
+      "keys": [
+        {
+          "name": "oId",
+          "type": "String",
+          "length": 19,
+          "description": "主键"
+        },
+        {
+          "name": "userId",
+          "type": "String",
+          "length": 19,
+          "description": "用户id"
+        },
+        {
+          "name": "settings",
+          "type": "String",
+          "length": 4096,
+          "description": "系统设置JSON"
+        }
+      ]
     }
   ]
 }
