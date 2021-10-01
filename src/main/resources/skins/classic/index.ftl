@@ -345,7 +345,15 @@ ${HeaderBannerLabel}
                                 <div class="tag-metro-item">
                                     <a class="preview" href="${servePath}/tag/${tag.tagURI}">
                                         <img src="${tag.tagIconPath}" alt="${tag.tagTitle}">
-                                        <b>${tag.tagTitle}</b>
+                                        <span style="white-space: nowrap;">
+                                        <#if tag.tagTitle?length gt 3>
+                                            <marquee width="100%" height="100%" scrollamount="1" scrolldelay="100" truespeed>
+                                                    ${tag.tagTitle}
+                                                </marquee>
+                                        <#else>
+                                            ${tag.tagTitle}
+                                        </#if>
+                                        </span>
                                     </a>
                                 </div>
                             </#if>
