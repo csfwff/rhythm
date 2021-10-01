@@ -426,6 +426,9 @@ ${HeaderBannerLabel}
     </div>
 </div>
 <#include "footer.ftl">
+<script>
+    Label.chatRoomPictureStatus = "<#if 0 == chatRoomPictureStatus> blur</#if>";
+</script>
 <script src="${staticServePath}/js/channel${miniPostfix}.js?${staticResourceVersion}"></script>
 <script type="text/javascript">
     // tag click

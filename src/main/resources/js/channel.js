@@ -390,7 +390,7 @@ var ChatRoomChannel = {
                         "                <span class=\"ft-gray\">" + data.userName + "</span>\n" +
                         "            </a>\n" +
                         "        </div>\n" +
-                        "        <div class=\"vditor-reset comment" + Label.chatRoomPictureStatus + "\">\n" +
+                        "        <div class=\"vditor-reset comment " + Label.chatRoomPictureStatus + "\">\n" +
                         "            " + data.content + "\n" +
                         "        </div>\n" +
                         "    </div>\n" +
