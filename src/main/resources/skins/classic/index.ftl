@@ -75,11 +75,11 @@ ${HeaderBannerLabel}
                     <#list recentArticles as article>
                         <li class="fn-flex">
                             <#if article.articleStick != 0>
-                                <span class="cb-stick tooltipped tooltipped-e" aria-label="管理置顶"><svg class="icon-pin"><use
+                                <span class="cb-stick" aria-label="管理置顶"><svg class="icon-pin"><use
                                                 xlink:href="#pin"></use></svg></span>
                             </#if>
                             <a rel="nofollow" href="${servePath}/member/${article.articleAuthorName}">
-                                    <span class="avatar-small tooltipped tooltipped-se slogan"
+                                    <span class="avatar-small slogan"
                                           aria-label="${article.articleAuthorName}"
                                           style="background-image:url('${article.articleAuthorThumbnailURL210}')"></span>
                             </a>
@@ -113,7 +113,7 @@ ${HeaderBannerLabel}
                         <#list indexRandomArticles as article>
                             <li class="fn-flex">
                                 <a rel="nofollow" href="${servePath}/member/${article.articleAuthorName}">
-                                    <span class="avatar-small tooltipped tooltipped-se slogan"
+                                    <span class="avatar-small slogan"
                                           aria-label="${article.articleAuthorName}"
                                           style="background-image:url('${article.articleAuthorThumbnailURL210}')"></span>
                                 </a>
@@ -136,8 +136,9 @@ ${HeaderBannerLabel}
             <div class="module-panel">
                 <div class="index-user">
                     <#list niceUsers as user>
-                        <a class="niceUsersElement fn-hidden" rel="nofollow" href="${servePath}/member/${user.userName}">
-                                    <span class="avatar-middle tooltipped tooltipped-se slogan"
+                        <a class="niceUsersElement fn-hidden" rel="nofollow"
+                           href="${servePath}/member/${user.userName}">
+                                    <span class="avatar-middle slogan"
                                           aria-label="${user.userName}"
                                           style="background-image:url('${user.userAvatarURL48}');height:30px;width:30px;margin: 0px 10px 10px 0px"></span>
                         </a>
@@ -165,19 +166,19 @@ ${HeaderBannerLabel}
                                         <#elseif user_index == 2>
                                             style="border-color: #d9822b transparent transparent #d9822b;"
                                         </#if>
-                                        class="cb-stick tooltipped tooltipped-e" aria-label="第${user_index + 1}名">
+                                        class="cb-stick" aria-label="第${user_index + 1}名">
                                     <span class="icon-pin-rank">${user_index + 1}</span>
                                     </#if>
                                 </span>
                                 <a rel="nofollow" href="${servePath}/member/${user.userName}">
-                                    <span class="avatar-small tooltipped tooltipped-se slogan"
+                                    <span class="avatar-small slogan"
                                           aria-label="${user.userName}"
                                           style="background-image:url('${user.userAvatarURL}')"></span>
                                 </a>
-                                <a rel="nofollow" class="title fn-flex-1 tooltipped tooltipped-w"
+                                <a rel="nofollow" class="title fn-flex-1"
                                    aria-label="${pointLabel} ${user.userPoint?c}"
                                    href="${servePath}/member/${user.userName}">${user.userName}</a>
-                                <a class="fn-right count ft-gray ft-smaller tooltipped tooltipped-w"
+                                <a class="fn-right count ft-gray ft-smaller"
                                    aria-label="${checkinStreakPart0Label}${user.userLongestCheckinStreak}${checkinStreakPart1Label}${user.userCurrentCheckinStreak}${checkinStreakPart2Label}"
                                    href="${servePath}/top/checkin">${user.userCurrentCheckinStreak}/<span
                                             class="ft-red">${user.userLongestCheckinStreak}</span></a>
@@ -207,19 +208,19 @@ ${HeaderBannerLabel}
                                         <#elseif user_index == 2>
                                             style="border-color: #d9822b transparent transparent #d9822b;"
                                         </#if>
-                                        class="cb-stick tooltipped tooltipped-e" aria-label="第${user_index + 1}名">
+                                        class="cb-stick" aria-label="第${user_index + 1}名">
                                     <span class="icon-pin-rank">${user_index + 1}</span>
                                     </#if>
                                 </span>
                                 <a rel="nofollow" href="${servePath}/member/${user.userName}">
-                                    <span class="avatar-small tooltipped tooltipped-se slogan"
+                                    <span class="avatar-small slogan"
                                           aria-label="${user.userName}"
                                           style="background-image:url('${user.userAvatarURL}')"></span>
                                 </a>
-                                <a rel="nofollow" class="title fn-flex-1 tooltipped tooltipped-w"
+                                <a rel="nofollow" class="title fn-flex-1"
                                    aria-label="${pointLabel} ${user.userPoint?c}"
                                    href="${servePath}/member/${user.userName}">${user.userName}</a>
-                                <a class="fn-right count ft-gray ft-smaller tooltipped tooltipped-w"
+                                <a class="fn-right count ft-gray ft-smaller"
                                    aria-label="在线时长共计 ${user.onlineMinute} 分钟"
                                    href="${servePath}/top/online">${user.onlineMinute} 分钟</a>
                             </li>
@@ -295,7 +296,8 @@ ${HeaderBannerLabel}
                                type="text"
                                class="comment__text breezemoon__input"
                                placeholder="简单聊聊 (高级功能请访问完整版聊天室哦)"/>
-                        <div id="chatUsernameSelectedPanel" class="completed-panel" style="height:170px;display:none;left:auto;top:auto;cursor:pointer;"></div>
+                        <div id="chatUsernameSelectedPanel" class="completed-panel"
+                             style="height:170px;display:none;left:auto;top:auto;cursor:pointer;"></div>
                         <span id="chatRoomPostBtn" class="btn breezemoon__btn" data-csrf="${csrfToken}"
                               onclick="sendChat()">Biu~</span>
                     </div>
@@ -304,9 +306,10 @@ ${HeaderBannerLabel}
                             <#if messages?size != 0>
                                 <#list messages as msg>
                                     <#if msg_index <= 9>
-                                        <li class="fn-flex" id="chatindex${msg.oId}" style='border-bottom: 1px solid #eee;'>
+                                        <li class="fn-flex" id="chatindex${msg.oId}"
+                                            style='border-bottom: 1px solid #eee;'>
                                             <a rel="nofollow" href="${servePath}/member/${msg.userName}">
-                                                <div class="avatar tooltipped tooltipped-n"
+                                                <div class="avatar"
                                                      aria-label="${msg.userName}"
                                                      style="background-image:url('${msg.userAvatarURL}')"></div>
                                             </a>
@@ -347,7 +350,8 @@ ${HeaderBannerLabel}
                                         <img src="${tag.tagIconPath}" alt="${tag.tagTitle}">
                                         <span style="white-space: nowrap;">
                                         <#if tag.tagTitle?length gt 3>
-                                            <marquee width="100%" height="100%" scrollamount="1" scrolldelay="100" truespeed>
+                                            <marquee width="100%" height="100%" scrollamount="1" scrolldelay="100"
+                                                     truespeed>
                                                     ${tag.tagTitle}
                                                 </marquee>
                                         <#else>
@@ -373,7 +377,7 @@ ${HeaderBannerLabel}
                             <#if article_index <= 8>
                                 <li class="fn-flex">
                                     <a rel="nofollow" href="${servePath}/member/${article.articleAuthorName}">
-                                    <span class="avatar-small tooltipped tooltipped-se slogan"
+                                    <span class="avatar-small slogan"
                                           aria-label="${article.articleAuthorName}"
                                           style="background-image:url('${article.articleAuthorThumbnailURL210}')"></span>
                                     </a>
@@ -415,7 +419,7 @@ ${HeaderBannerLabel}
                                 <#if item_index <= 13>
                                     <li>
                                         <a href="${servePath}/member/${item.breezemoonAuthorName}">
-                    <span class="avatar-small slogan tooltipped tooltipped-se" aria-label="${item.breezemoonAuthorName}"
+                    <span class="avatar-small slogan" aria-label="${item.breezemoonAuthorName}"
                           style="background-image: url(${item.breezemoonAuthorThumbnailURL48})"></span>
                                         </a>
                                         <a href="${servePath}/member/${item.breezemoonAuthorName}/breezemoons/${item.oId}"
@@ -483,7 +487,6 @@ ${HeaderBannerLabel}
             }
         }
     });
-
 
 
     function fillUsername(username) {
@@ -663,6 +666,7 @@ ${HeaderBannerLabel}
 
     var loading = false;
     var rotate = new Rotate("randomArticlesRefreshSvg");
+
     function randomArticles() {
         if (!loading) {
             loading = true;
@@ -685,7 +689,7 @@ ${HeaderBannerLabel}
                         }
                         $("#randomArticles").append('<li class="fn-flex">' +
                             '<a rel="nofollow" href="${servePath}/member/' + article.articleAuthorName + '">' +
-                            '<span class="avatar-small tooltipped tooltipped-se slogan" aria-label="' + article.articleAuthorName + '" style="background-image:url(\'' + article.articleAuthorThumbnailURL210 + '\')"></span></a>' +
+                            '<span class="avatar-small slogan" aria-label="' + article.articleAuthorName + '" style="background-image:url(\'' + article.articleAuthorThumbnailURL210 + '\')"></span></a>' +
                             '<a rel="nofollow" class="title fn-ellipsis fn-flex-1" href="${servePath}' + article.articlePermalink + '">' + article.articleTitleEmoj + '</a>' +
                             '<a class="fn-right count ft-gray ft-smaller" href="${servePath}' + article.articlePermalink + '">' + viewCount + '</a>' +
                             '</li>');
@@ -742,8 +746,117 @@ ${HeaderBannerLabel}
             }, speed * (i + 1));
         }
     }
+
     elementFadeOut(".niceUsersElement", 20);
     elementFadeOut(".topCheckInUsersElement", 90);
+</script>
+<div id="userCard" style="position: absolute; z-index: 130; left: 851px; right: auto; top: 134px; display: none;">
+    <div class="user-card">
+        <div>
+            <a href="https://ld246.com/member/fangly">
+                <div class="avatar-mid-card" style="background-image: url(https://b3logfile.com/avatar/1613811419517.png?imageView2/1/w/128/h/128/format/jpg/interlace/0/q/100);"></div>
+            </a>
+
+            <div class="user-card__meta">
+                <div class="fn__ellipsis">
+                    <a class="user-card__name" href="https://ld246.com/member/fangly"><b></b></a>
+                    <a class="ft-gray ft-smaller" href="https://ld246.com/member/fangly"><b>fangly</b></a>
+                </div>
+
+                <div class="user-card__info vditor-reset">
+                    订阅码 TynzmJ9
+                </div>
+
+                <div class="user-card__icons fn__flex">
+                    <div class="fn__flex-1">
+                            <span class="user-card__icon--disabled tooltipped__n tooltipped" aria-label="最近登录时间 18 分钟前">
+                        <svg><use xlink:href="#icon-podcast"></use></svg>
+                    </span>
+
+                        <a href="https://ld246.com/article/1531283103334" class="tooltipped__n tooltipped"
+                           aria-label="会员（点击查看说明）">
+                            <svg>
+                                <use xlink:href="#iconUser"></use>
+                            </svg>
+                        </a>
+
+
+                        <a href="https://ld246.com/member/fangly/points" class="tooltipped tooltipped__n"
+                           aria-label="7363 积分">
+                            <svg>
+                                <use xlink:href="#iconPoints"></use>
+                            </svg>
+                        </a>
+
+                        <a href="https://ld246.com/activity/checkin" class="tooltipped tooltipped__n"
+                           aria-label="连续签到 28 天">
+                            <svg>
+                                <use xlink:href="#icon-check"></use>
+                            </svg>
+                        </a>
+
+                        <a href="https://ld246.com/city/上海" class="tooltipped tooltipped__n" rel="nofollow"
+                           aria-label="上海">
+                            <svg>
+                                <use xlink:href="#icon-local"></use>
+                            </svg>
+                        </a>
+
+
+                        <a href="https://ld246.com/subscribe/siyuan" target="_blank"
+                           class="vditor-tooltipped__n vditor-tooltipped" aria-label="订阅者">
+                            <svg version="1.1" xmlns="http://www.w3.org/2000/svg" width="32" height="32"
+                                 viewBox="0 0 32 32" style="color:#f3a92f">
+                                <path d="M2.288 12.643l23.487 12.853c0.286 0.153 0.477 0.45 0.477 0.791 0 0.082-0.011 0.161-0.032 0.237l0.001-0.006c-0.119 0.395-0.479 0.678-0.905 0.678-0.004 0-0.009 0-0.013 0h-19.439c-0.958 0-1.766-0.684-1.885-1.595l-1.691-12.956z"></path>
+                                <path d="M29.676 12.643l-1.691 12.957c-0.119 0.911-0.927 1.594-1.884 1.594h-19.442c-0.004 0-0.009 0-0.013 0-0.425 0-0.785-0.281-0.903-0.668l-0.002-0.007c-0.019-0.070-0.031-0.15-0.031-0.232 0-0.341 0.191-0.638 0.472-0.788l0.005-0.002 23.487-12.853z"></path>
+                                <path d="M15.413 8.369l10.394 15.921c0.378 0.579 0.407 1.317 0.076 1.924-0.328 0.591-0.948 0.985-1.66 0.985 0 0-0.001 0-0.001 0h-17.617c-0.694 0-1.331-0.378-1.661-0.985-0.144-0.26-0.229-0.569-0.229-0.899 0-0.382 0.114-0.736 0.31-1.033l-0.004 0.007 10.394-15.921z"></path>
+                                <path d="M15.396 8.403l11.659 15.921c0.401 0.579 0.432 1.317 0.081 1.924-0.361 0.594-1.005 0.985-1.741 0.985-0.008 0-0.017 0-0.025 0h-9.344l-0.63-18.83z"></path>
+                                <path d="M13.868 6.478c0 0.946 0.767 1.712 1.712 1.712s1.712-0.767 1.712-1.712v0c0-0.945-0.766-1.712-1.712-1.712s-1.712 0.766-1.712 1.712v0zM28.577 10.818c0 0.945 0.766 1.712 1.712 1.712s1.712-0.766 1.712-1.712v0c0-0.945-0.766-1.712-1.712-1.712s-1.712 0.766-1.712 1.712v0zM0 10.822c0 0.945 0.766 1.712 1.712 1.712s1.712-0.766 1.712-1.712v0c0-0.945-0.766-1.712-1.712-1.712s-1.712 0.766-1.712 1.712v0z"></path>
+                            </svg>
+                        </a>
+                    </div>
+
+                    <div class="fn__shrink">
+                        <a class="green small btn" href="https://ld246.com/chats/fangly" rel="nofollow">
+                            聊天
+                        </a>
+                        <button class="follow small" id="userCardFollowUser" data-oid="1613811419517"
+                                data-type="follow">
+                            关注
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    var cardLock = false;
+    $(".avatar, .avatar-small, .avatar-middle, .avatar-mid, .avatar-big").hover(function () {
+        $("#userCard").hide();
+        $("#userCard").css("left", $(this).offset().left);
+        let top = $(this).offset().top - 110;
+        if (top < 50) {
+            top = $(this).offset().top + 60;
+        }
+        $("#userCard").css("top", top + "px");
+        $("#userCard").show();
+    }, function (event) {
+        setTimeout(function () {
+            let el = $(event.toElement);
+            if ($(el).parents("#userCard").length === 0) {
+                if (!cardLock) {
+                    $("#userCard").hide();
+                }
+            }
+        }, 500);
+    });
+    $("#userCard").hover(function () {
+        cardLock = true;
+    }, function () {
+        cardLock = false;
+        $("#userCard").hide();
+    });
 </script>
 </body>
 </html>
