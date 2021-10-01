@@ -136,7 +136,7 @@ ${HeaderBannerLabel}
             <div class="module-panel">
                 <div class="index-user">
                     <#list niceUsers as user>
-                        <a rel="nofollow" href="${servePath}/member/${user.userName}">
+                        <a class="niceUsersElement fn-hidden" rel="nofollow" href="${servePath}/member/${user.userName}">
                                     <span class="avatar-middle tooltipped tooltipped-se slogan"
                                           aria-label="${user.userName}"
                                           style="background-image:url('${user.userAvatarURL48}');height:30px;width:30px;margin: 0px 10px 10px 0px"></span>
@@ -155,7 +155,7 @@ ${HeaderBannerLabel}
                 <ul class="module-list">
                     <#list topCheckinUsers as user>
                         <#if user_index < 5>
-                            <li class="fn-flex rank">
+                            <li class="fn-flex rank topCheckInUsersElement fn-hidden">
                                 <#if user_index == 0 || user_index == 1 || user_index == 2>
                                 <span
                                         <#if user_index == 0>
@@ -197,7 +197,7 @@ ${HeaderBannerLabel}
                 <ul class="module-list">
                     <#list onlineTopUsers as user>
                         <#if user_index < 5>
-                            <li class="fn-flex rank">
+                            <li class="fn-flex rank topCheckInUsersElement fn-hidden">
                                 <#if user_index == 0 || user_index == 1 || user_index == 2>
                                 <span
                                         <#if user_index == 0>
@@ -720,6 +720,22 @@ ${HeaderBannerLabel}
             })
         }, 100)
     })
+</script>
+<script>
+    // 渐变输出
+    function elementFadeOut(element, speed) {
+        let fadePicList = $(element);
+        for (i = 0; i < fadePicList.length; i++) {
+            let element = $(fadePicList[i]);
+            setTimeout(function () {
+                element.css("display", "none");
+                element.removeClass("fn-hidden");
+                element.fadeIn(500);
+            }, speed * (i + 1));
+        }
+    }
+    elementFadeOut(".niceUsersElement", 20);
+    elementFadeOut(".topCheckInUsersElement", 90);
 </script>
 </body>
 </html>
