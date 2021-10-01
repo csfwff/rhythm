@@ -849,7 +849,7 @@ ${HeaderBannerLabel}
                     $("#userCard").hide();
                 }
             }
-        }, 500);
+        }, 200);
     });
     $("#userCard").hover(function () {
         cardLock = true;
