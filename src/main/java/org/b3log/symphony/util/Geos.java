@@ -30,6 +30,8 @@ import org.json.JSONObject;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Geography utilities.
@@ -52,6 +54,11 @@ public final class Geos {
     }
 
     /**
+     * The cache of ip locates relationship.
+     */
+    private static final Map<String, JSONObject> ipLocatesCache = new HashMap<>();
+
+    /**
      * Gets country, province and city of the specified IP.
      *
      * @param ip the specified IP
@@ -64,6 +71,10 @@ public final class Geos {
      * </pre>, returns {@code null} if not found
      */
     public static JSONObject getAddress(final String ip) {
+        if (ipLocatesCache.containsKey(ip)) {
+            return ipLocatesCache.get(ip);
+        }
+
         final String ak = Symphonys.BAIDU_LBS_AK;
         if (StringUtils.isBlank(ak) || !Strings.isIPv4(ip)) {
             return null;
@@ -100,6 +111,7 @@ public final class Geos {
             ret.put(Common.COUNTRY, "中国");
             ret.put(Common.PROVINCE, province);
             ret.put(Common.CITY, city);
+            ipLocatesCache.put(ip, ret);
 
             return ret;
         } catch (final Exception e) {
