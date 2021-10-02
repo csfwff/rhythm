@@ -759,7 +759,11 @@ ${HeaderBannerLabel}
         }
 
         // 设置位置
-        $("#userCard").css("left", $(this).offset().left);
+        let left = $(this).offset().left;
+        if (left + 350 > $(document.body).width()) {
+            left = left - 350;
+        }
+        $("#userCard").css("left", left);
         let top = $(this).offset().top - 110;
         if (top < 50) {
             top = $(this).offset().top + 60;
