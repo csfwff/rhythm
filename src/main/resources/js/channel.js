@@ -399,6 +399,7 @@ var ChatRoomChannel = {
                         $("#chatRoomIndex li:last").remove();
                     }
                     $("#chatRoomIndex li:first").slideDown(200);
+                    Util.listenUserCard();
                     break;
             }
         }
