@@ -51,7 +51,7 @@
         <div class="fn-flex-1">
             <div class="fn-flex">
                 <a rel="nofollow" href="${servePath}/member/${article.articleAuthorName}"><div
-                    class="avatar" style="background-image:url('${article.articleAuthorThumbnailURL48}')"></div></a>
+                    class="avatar" aria-label="${article.articleAuthorName}" style="background-image:url('${article.articleAuthorThumbnailURL48}')"></div></a>
 
                 <div class="fn-ellipsis ft-fade ft-smaller list-info">
                     <a rel="nofollow" class="author" href="${servePath}/member/${article.articleAuthorName}">

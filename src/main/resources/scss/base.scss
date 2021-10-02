@@ -77,7 +77,7 @@
   cursor: pointer;
 }
 
-.tooltipped::after {
+/*.tooltipped::after {
   position: absolute;
   z-index: 1000000;
   display: none;
@@ -112,7 +112,7 @@
   content: "";
   border: 5px solid transparent;
   opacity: 0
-}
+}*/
 
 @-webkit-keyframes tooltip-appear {
   from {
