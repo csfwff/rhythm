@@ -1244,6 +1244,78 @@ var Util = {
    * @description 初识化前台页面
    */
   init: function (isLoggedIn) {
+    // 初始化用户卡片
+    let cardHtml = '' +
+        '<div id="userCard" style="position: absolute; z-index: 130; right: auto; display: none;">\n' +
+        '    <div class="user-card">\n' +
+        '        <div>\n' +
+        '            <a href="https://ld246.com/member/fangly">\n' +
+        '                <div class="avatar-mid-card" style="background-image: url(https://b3logfile.com/avatar/1613811419517.png?imageView2/1/w/128/h/128/format/jpg/interlace/0/q/100);"></div>\n' +
+        '            </a>\n' +
+        '            <div class="user-card__meta">\n' +
+        '                <div class="fn__ellipsis">\n' +
+        '                    <a class="user-card__name" href="https://ld246.com/member/fangly"><b></b></a>\n' +
+        '                    <a class="ft-gray ft-smaller" href="https://ld246.com/member/fangly"><b>fangly</b></a>\n' +
+        '                </div>\n' +
+        '                <div class="user-card__info vditor-reset">\n' +
+        '                    订阅码 TynzmJ9\n' +
+        '                </div>\n' +
+        '                <div class="user-card__icons fn__flex">\n' +
+        '                    <div class="fn__flex-1">\n' +
+        '                            <span class="user-card__icon--disabled tooltipped__n tooltipped" aria-label="最近登录时间 18 分钟前">\n' +
+        '                        <svg><use xlink:href="#icon-podcast"></use></svg>\n' +
+        '                    </span>\n' +
+        '                        <a href="https://ld246.com/article/1531283103334" class="tooltipped__n tooltipped"\n' +
+        '                           aria-label="会员（点击查看说明）">\n' +
+        '                            <svg>\n' +
+        '                                <use xlink:href="#iconUser"></use>\n' +
+        '                            </svg>\n' +
+        '                        </a>\n' +
+        '                        <a href="https://ld246.com/member/fangly/points" class="tooltipped tooltipped__n"\n' +
+        '                           aria-label="7363 积分">\n' +
+        '                            <svg>\n' +
+        '                                <use xlink:href="#iconPoints"></use>\n' +
+        '                            </svg>\n' +
+        '                        </a>\n' +
+        '                        <a href="https://ld246.com/activity/checkin" class="tooltipped tooltipped__n"\n' +
+        '                           aria-label="连续签到 28 天">\n' +
+        '                            <svg>\n' +
+        '                                <use xlink:href="#icon-check"></use>\n' +
+        '                            </svg>\n' +
+        '                        </a>\n' +
+        '                        <a href="https://ld246.com/city/上海" class="tooltipped tooltipped__n" rel="nofollow"\n' +
+        '                           aria-label="上海">\n' +
+        '                            <svg>\n' +
+        '                                <use xlink:href="#icon-local"></use>\n' +
+        '                            </svg>\n' +
+        '                        </a>\n' +
+        '                        <a href="https://ld246.com/subscribe/siyuan" target="_blank"\n' +
+        '                           class="vditor-tooltipped__n vditor-tooltipped" aria-label="订阅者">\n' +
+        '                            <svg version="1.1" xmlns="http://www.w3.org/2000/svg" width="32" height="32"\n' +
+        '                                 viewBox="0 0 32 32" style="color:#f3a92f">\n' +
+        '                                <path d="M2.288 12.643l23.487 12.853c0.286 0.153 0.477 0.45 0.477 0.791 0 0.082-0.011 0.161-0.032 0.237l0.001-0.006c-0.119 0.395-0.479 0.678-0.905 0.678-0.004 0-0.009 0-0.013 0h-19.439c-0.958 0-1.766-0.684-1.885-1.595l-1.691-12.956z"></path>\n' +
+        '                                <path d="M29.676 12.643l-1.691 12.957c-0.119 0.911-0.927 1.594-1.884 1.594h-19.442c-0.004 0-0.009 0-0.013 0-0.425 0-0.785-0.281-0.903-0.668l-0.002-0.007c-0.019-0.070-0.031-0.15-0.031-0.232 0-0.341 0.191-0.638 0.472-0.788l0.005-0.002 23.487-12.853z"></path>\n' +
+        '                                <path d="M15.413 8.369l10.394 15.921c0.378 0.579 0.407 1.317 0.076 1.924-0.328 0.591-0.948 0.985-1.66 0.985 0 0-0.001 0-0.001 0h-17.617c-0.694 0-1.331-0.378-1.661-0.985-0.144-0.26-0.229-0.569-0.229-0.899 0-0.382 0.114-0.736 0.31-1.033l-0.004 0.007 10.394-15.921z"></path>\n' +
+        '                                <path d="M15.396 8.403l11.659 15.921c0.401 0.579 0.432 1.317 0.081 1.924-0.361 0.594-1.005 0.985-1.741 0.985-0.008 0-0.017 0-0.025 0h-9.344l-0.63-18.83z"></path>\n' +
+        '                                <path d="M13.868 6.478c0 0.946 0.767 1.712 1.712 1.712s1.712-0.767 1.712-1.712v0c0-0.945-0.766-1.712-1.712-1.712s-1.712 0.766-1.712 1.712v0zM28.577 10.818c0 0.945 0.766 1.712 1.712 1.712s1.712-0.766 1.712-1.712v0c0-0.945-0.766-1.712-1.712-1.712s-1.712 0.766-1.712 1.712v0zM0 10.822c0 0.945 0.766 1.712 1.712 1.712s1.712-0.766 1.712-1.712v0c0-0.945-0.766-1.712-1.712-1.712s-1.712 0.766-1.712 1.712v0z"></path>\n' +
+        '                            </svg>\n' +
+        '                        </a>\n' +
+        '                    </div>\n' +
+        '                    <div class="fn__shrink">\n' +
+        '                        <a class="green small btn" href="https://ld246.com/chats/fangly" rel="nofollow">\n' +
+        '                            聊天\n' +
+        '                        </a>\n' +
+        '                        <button class="follow small" id="userCardFollowUser" data-oid="1613811419517"\n' +
+        '                                data-type="follow">\n' +
+        '                            关注\n' +
+        '                        </button>\n' +
+        '                    </div>\n' +
+        '                </div>\n' +
+        '            </div>\n' +
+        '        </div>\n' +
+        '    </div>\n' +
+        '</div>';
+    $("body").append(cardHtml);
     //禁止 IE7 以下浏览器访问
     this._kill()
     // 导航
