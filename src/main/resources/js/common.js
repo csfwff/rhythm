@@ -1245,11 +1245,14 @@ var Util = {
    */
   init: function (isLoggedIn) {
     // 初始化用户卡片
-    let cardHtml = '' +
-        '<div id="userCard" style="position: absolute; z-index: 130; right: auto; display: none;">' +
-        '</div>';
-    $("body").append(cardHtml);
-    Util.listenUserCard();
+    $.ua.set(navigator.userAgent);
+    if ($.ua.device.type !== 'mobile') {
+      let cardHtml = '' +
+          '<div id="userCard" style="position: absolute; z-index: 130; right: auto; display: none;">' +
+          '</div>';
+      $("body").append(cardHtml);
+      Util.listenUserCard();
+    }
     //禁止 IE7 以下浏览器访问
     this._kill()
     // 导航
