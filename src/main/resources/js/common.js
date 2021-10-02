@@ -1369,13 +1369,13 @@ var Util = {
         }
         html += '            <div class="user-card__icons fn__flex">\n' +
             '                <div class="fn__flex-1">\n' +
-            '                    <a href="https://pwl.icu/article/1630575841478" class="tooltipped__n tooltipped"\n' +
+            '                    <a href="https://pwl.icu/article/1630575841478" class="tooltipped__n tooltipped-new"\n' +
             '                       aria-label="' + userRole + '">\n' +
             '                        <svg>\n' +
             '                            <use xlink:href="#iconUser"></use>\n' +
             '                        </svg>\n' +
             '                    </a>\n' +
-            '                    <a href="' + Label.servePath + '/member/' + userName + '/points" class="tooltipped tooltipped__n"\n' +
+            '                    <a href="' + Label.servePath + '/member/' + userName + '/points" class="tooltipped-new tooltipped__n"\n' +
             '                       aria-label="' + userPoint + ' 积分">\n' +
             '                        <svg>\n' +
             '                            <use xlink:href="#iconPoints"></use>\n' +
@@ -1383,7 +1383,7 @@ var Util = {
             '                    </a>\n';
         if (userCity !== "") {
           html += '' +
-              '<a href="' + Label.servePath + '/city/' + userCity + '" class="tooltipped tooltipped__n" rel="nofollow"\n' +
+              '<a href="' + Label.servePath + '/city/' + userCity + '" class="tooltipped-new tooltipped__n" rel="nofollow"\n' +
               '   aria-label="' + userCity + '">\n' +
               '    <svg>\n' +
               '        <use xlink:href="#icon-local"></use>\n' +
