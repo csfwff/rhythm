@@ -112,6 +112,7 @@ public class BeforeRequestHandler implements Handler {
             }
 
             httpSession.setAttribute(User.USER, user.toString());
+            httpSession.setAttribute(Common.IP, request.getRemoteAddr());
 
             final String skin = Sessions.isMobile() ? user.optString(UserExt.USER_MOBILE_SKIN) : user.optString(UserExt.USER_SKIN);
             httpSession.setAttribute(Keys.TEMPLATE_DIR_NAME, skin);
