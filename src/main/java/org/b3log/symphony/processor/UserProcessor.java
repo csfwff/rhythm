@@ -187,7 +187,7 @@ public class UserProcessor {
         Dispatcher.get("/member/{userName}/points", userProcessor::showHomePoints, anonymousViewCheckMidware::handle, userCheckMidware::handle);
         Dispatcher.post("/users/names", userProcessor::listNames);
         Dispatcher.get("/users/emotions", userProcessor::getFrequentEmotions);
-        Dispatcher.get("/user/{userName}", userProcessor::getUserInfo);
+        Dispatcher.get("/user/{userName}", userProcessor::getUserInfo, csrfMidware::check);
     }
 
     /**

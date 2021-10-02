@@ -756,21 +756,44 @@ ${HeaderBannerLabel}
         // 加载用户信息
         if ($(this).attr("aria-label") !== undefined) {
             let username = $(this).attr("aria-label");
-
+            // 请求数据
+            let data;
+            $.ajax({
+                url: "${servePath}/user/" + username,
+                type: "GET",
+                cache: false,
+                async: false,
+                headers: {'csrfToken': '${csrfToken}'},
+                success: function (result) {
+                    data = result;
+                }
+            });
+            let followerCount = data.followerCount;
+            let followingUserCount = data.followingUserCount;
+            let oId = data.oId;
+            let onlineMinute = data.onlineMinute;
+            let userAvatarURL = data.userAvatarURL;
+            let userCity = data.userCity;
+            let userIntro = data.userIntro;
+            let userName = data.userName;
+            let userNickname = data.userNickname;
+            let userOnlineFlag = data.userOnlineFlag;
+            let userPoint = data.userPoint;
+            let userURL = data.userURL;
             // 组合内容
             let html = "" +
                 '<div class="user-card">\n' +
                 '    <div>\n' +
-                '        <a href="https://ld246.com/member/fangly">\n' +
-                '            <div class="avatar-mid-card" style="background-image: url(https://b3logfile.com/avatar/1613811419517.png?imageView2/1/w/128/h/128/format/jpg/interlace/0/q/100);"></div>\n' +
+                '        <a href="${servePath}/member/' + userName + '">\n' +
+                '            <div class="avatar-mid-card" style="background-image: url(' + userAvatarURL + ');"></div>\n' +
                 '        </a>\n' +
                 '        <div class="user-card__meta">\n' +
                 '            <div class="fn__ellipsis">\n' +
-                '                <a class="user-card__name" href="https://ld246.com/member/fangly"><b></b></a>\n' +
-                '                <a class="ft-gray ft-smaller" href="https://ld246.com/member/fangly"><b>fangly</b></a>\n' +
+                '                <a class="user-card__name" href="${servePath}/member/' + userName + '"><b>' + userNickname + '</b></a>\n' +
+                '                <a class="ft-gray ft-smaller" href="${servePath}/member/' + userName + '"><b>' + userName + '</b></a>\n' +
                 '            </div>\n' +
                 '            <div class="user-card__info vditor-reset">\n' +
-                '                订阅码 TynzmJ9\n' +
+                '                ' + userIntro + '\n' +
                 '            </div>\n' +
                 '            <div class="user-card__icons fn__flex">\n' +
                 '                <div class="fn__flex-1">\n' +
