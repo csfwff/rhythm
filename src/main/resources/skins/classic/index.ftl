@@ -756,6 +756,66 @@ ${HeaderBannerLabel}
         // 加载用户信息
         if ($(this).attr("aria-label") !== undefined) {
             let username = $(this).attr("aria-label");
+
+            // 组合内容
+            let html = "" +
+                '<div class="user-card">\n' +
+                '    <div>\n' +
+                '        <a href="https://ld246.com/member/fangly">\n' +
+                '            <div class="avatar-mid-card" style="background-image: url(https://b3logfile.com/avatar/1613811419517.png?imageView2/1/w/128/h/128/format/jpg/interlace/0/q/100);"></div>\n' +
+                '        </a>\n' +
+                '        <div class="user-card__meta">\n' +
+                '            <div class="fn__ellipsis">\n' +
+                '                <a class="user-card__name" href="https://ld246.com/member/fangly"><b></b></a>\n' +
+                '                <a class="ft-gray ft-smaller" href="https://ld246.com/member/fangly"><b>fangly</b></a>\n' +
+                '            </div>\n' +
+                '            <div class="user-card__info vditor-reset">\n' +
+                '                订阅码 TynzmJ9\n' +
+                '            </div>\n' +
+                '            <div class="user-card__icons fn__flex">\n' +
+                '                <div class="fn__flex-1">\n' +
+                '                        <span class="user-card__icon--disabled tooltipped__n tooltipped" aria-label="最近登录时间 18 分钟前">\n' +
+                '                    <svg><use xlink:href="#icon-podcast"></use></svg>\n' +
+                '                </span>\n' +
+                '                    <a href="https://ld246.com/article/1531283103334" class="tooltipped__n tooltipped"\n' +
+                '                       aria-label="会员（点击查看说明）">\n' +
+                '                        <svg>\n' +
+                '                            <use xlink:href="#iconUser"></use>\n' +
+                '                        </svg>\n' +
+                '                    </a>\n' +
+                '                    <a href="https://ld246.com/member/fangly/points" class="tooltipped tooltipped__n"\n' +
+                '                       aria-label="7363 积分">\n' +
+                '                        <svg>\n' +
+                '                            <use xlink:href="#iconPoints"></use>\n' +
+                '                        </svg>\n' +
+                '                    </a>\n' +
+                '                    <a href="https://ld246.com/activity/checkin" class="tooltipped tooltipped__n"\n' +
+                '                       aria-label="连续签到 28 天">\n' +
+                '                        <svg>\n' +
+                '                            <use xlink:href="#icon-check"></use>\n' +
+                '                        </svg>\n' +
+                '                    </a>\n' +
+                '                    <a href="https://ld246.com/city/上海" class="tooltipped tooltipped__n" rel="nofollow"\n' +
+                '                       aria-label="上海">\n' +
+                '                        <svg>\n' +
+                '                            <use xlink:href="#icon-local"></use>\n' +
+                '                        </svg>\n' +
+                '                    </a>\n' +
+                '                </div>\n' +
+                '                <div class="fn__shrink">\n' +
+                '                    <a class="green small btn" href="https://ld246.com/chats/fangly" rel="nofollow">\n' +
+                '                        聊天\n' +
+                '                    </a>\n' +
+                '                    <button class="follow small" id="userCardFollowUser" data-oid="1613811419517"\n' +
+                '                            data-type="follow">\n' +
+                '                        关注\n' +
+                '                    </button>\n' +
+                '                </div>\n' +
+                '            </div>\n' +
+                '        </div>\n' +
+                '    </div>\n' +
+                '</div>';
+            $("#userCard").html(html);
         }
 
         // 设置位置
@@ -778,7 +838,7 @@ ${HeaderBannerLabel}
                     $("#userCard").hide();
                 }
             }
-        }, 200);
+        }, 100);
     });
     $("#userCard").hover(function () {
         cardLock = true;
