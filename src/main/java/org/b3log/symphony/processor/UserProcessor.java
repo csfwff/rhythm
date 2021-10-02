@@ -214,6 +214,10 @@ public class UserProcessor {
         filteredUserProfile.put("followerCount", followerCnt);
         final long followingUserCnt = followQueryService.getFollowingCount(userId, Follow.FOLLOWING_TYPE_C_USER);
         filteredUserProfile.put("followingUserCount", followingUserCnt);
+        final String userRoleId = user.optString(User.USER_ROLE);
+        final JSONObject role = roleQueryService.getRole(userRoleId);
+        final String roleName = role.optString(Role.ROLE_NAME);
+        filteredUserProfile.put(User.USER_ROLE, roleName);
 
         context.renderJSON(StatusCodes.SUCC).renderJSON(filteredUserProfile);
     }
