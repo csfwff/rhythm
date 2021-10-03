@@ -503,9 +503,16 @@ public class DataModelService {
                         dataModel.put("hasSystemTitle", true);
                         dataModel.put("systemTitle", systemTitle);
                     }
+                    final String cardBg = settings.optString("cardBg");
+                    if (StringUtils.isBlank(cardBg)) {
+                        dataModel.put("cardBg", "");
+                    } else {
+                        dataModel.put("cardBg", cardBg);
+                    }
                 }
             } else {
                 dataModel.put("hasSystemTitle", false);
+                dataModel.put("cardBg", "");
             }
         } finally {
             Stopwatchs.end();

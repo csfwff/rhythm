@@ -66,4 +66,8 @@
         $("#userCardSettings").attr("bgUrl", imgUrl);
         Settings.update('system', '${csrfToken}');
     });
+
+    let currentCardBg = "${cardBg}";
+    $("#userCardSettings").val(currentCardBg);
+    $("#userCardSettings").attr("bgUrl", currentCardBg);
 </script>
