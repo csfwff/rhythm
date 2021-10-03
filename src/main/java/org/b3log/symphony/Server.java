@@ -23,24 +23,30 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.b3log.latke.Keys;
 import org.b3log.latke.Latkes;
 import org.b3log.latke.event.EventManager;
 import org.b3log.latke.http.BaseServer;
 import org.b3log.latke.ioc.BeanManager;
+import org.b3log.latke.model.User;
+import org.b3log.latke.repository.Query;
+import org.b3log.latke.repository.Transaction;
 import org.b3log.latke.util.Stopwatchs;
 import org.b3log.latke.util.Strings;
 import org.b3log.symphony.cache.DomainCache;
 import org.b3log.symphony.cache.TagCache;
 import org.b3log.symphony.event.*;
+import org.b3log.symphony.model.UserExt;
 import org.b3log.symphony.processor.Router;
 import org.b3log.symphony.processor.channel.UserChannel;
+import org.b3log.symphony.repository.UserRepository;
 import org.b3log.symphony.service.CronMgmtService;
 import org.b3log.symphony.service.InitMgmtService;
 import org.b3log.symphony.util.Markdowns;
 import org.b3log.symphony.util.Symphonys;
 import org.json.JSONObject;
 
-import java.io.*;
+import java.util.List;
 
 /**
  * Server.
@@ -224,6 +230,34 @@ public final class Server extends BaseServer {
             Symphonys.EXECUTOR_SERVICE.shutdown();
             Latkes.shutdown();
         }));
+
+        // 强制离线所有用户，防止在线 Flag 出现问题
+        LOGGER.log(Level.INFO, "Resetting users online status...");
+        final UserRepository userRepository = beanManager.getReference(UserRepository.class);
+        final Transaction transaction = userRepository.beginTransaction();
+        try {
+            final Query query = new Query();
+            List<JSONObject> userList = userRepository.getList(query);
+            for (JSONObject user : userList) {
+                String oId = user.optString(Keys.OBJECT_ID);
+                Boolean userOnlineFlag = user.optBoolean(UserExt.USER_ONLINE_FLAG);
+                if (userOnlineFlag) {
+                    user.put(UserExt.USER_ONLINE_FLAG, false);
+                    userRepository.update(oId, user);
+                    System.out.println("User [" + user.optString(User.USER_NAME) + "] is still online, changed to offline.");
+                }
+            }
+            transaction.commit();
+            System.out.println("Users online status has been reset successfully.");
+        } catch (Exception e) {
+            if (transaction.isActive()) {
+                transaction.rollback();
+            }
+
+            LOGGER.log(Level.ERROR, "Cannot offline all users forced", e);
+        }
+
+        LOGGER.log(Level.INFO, "Everything is ready, Thank you for using Rhythm!");
 
         final String unixDomainSocketPath = commandLine.getOptionValue("unix_domain_socket_path");
         if (StringUtils.isNotBlank(unixDomainSocketPath)) {
