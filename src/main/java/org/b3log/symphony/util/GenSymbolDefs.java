@@ -47,7 +47,7 @@ public class GenSymbolDefs {
             stringBuilder.append("</symbol>");
             stringBuilder.append("';");
 
-            System.out.println(stringBuilder + "\n");
+            System.out.println(stringBuilder.toString().replaceAll("\n", ""));
         }
     }
 }
