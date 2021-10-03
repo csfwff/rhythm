@@ -115,7 +115,7 @@ public final class Geos {
 
             return ret;
         } catch (final Exception e) {
-            LOGGER.log(Level.ERROR, "Can't get location from Baidu [ip=" + ip + "]", e);
+            LOGGER.log(Level.ERROR, "Can't get location from Baidu [ip=" + ip + "]");
 
             return null;
         } finally {
