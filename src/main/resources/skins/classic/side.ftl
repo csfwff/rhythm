@@ -54,7 +54,7 @@
         <#list sideBreezemoons as item>
             <li>
                 <a href="${servePath}/member/${item.breezemoonAuthorName}">
-                    <span class="avatar-small slogan tooltipped tooltipped-se" aria-label="${item.breezemoonAuthorName}"
+                    <span class="avatar-small slogan" aria-label="${item.breezemoonAuthorName}"
                           style="background-image: url(${item.breezemoonAuthorThumbnailURL48})"></span>
                 </a>
                 <a href="${servePath}/member/${item.breezemoonAuthorName}/breezemoons/${item.oId}"
@@ -80,7 +80,7 @@
             <#list sideHotArticles as hotArticle>
             <li<#if !hotArticle_has_next> class="last"</#if>>
                 <a rel="nofollow" href="${servePath}/member/${hotArticle.articleAuthorName}">
-                    <span class="avatar-small tooltipped tooltipped-se slogan" aria-label="${hotArticle.articleAuthorName}" style="background-image:url('${hotArticle.articleAuthorThumbnailURL20}')"></span>
+                    <span class="avatar-small slogan" aria-label="${hotArticle.articleAuthorName}" style="background-image:url('${hotArticle.articleAuthorThumbnailURL20}')"></span>
                   </a>
                 <a rel="nofollow" class="title" href="${servePath}${hotArticle.articlePermalink}">${hotArticle.articleTitleEmoj}</a>
             </li>
@@ -133,7 +133,7 @@
             <#list sideRandomArticles as randomArticle>
             <li<#if !randomArticle_has_next> class="last"</#if>>
                 <a rel="nofollow" href="${servePath}/member/${randomArticle.articleAuthorName}">
-                    <span aria-label="${randomArticle.articleAuthorName}" style="background-image:url('${randomArticle.articleAuthorThumbnailURL20}')" class="avatar-small tooltipped tooltipped-se slogan"></span>
+                    <span aria-label="${randomArticle.articleAuthorName}" style="background-image:url('${randomArticle.articleAuthorThumbnailURL20}')" class="avatar-small slogan"></span>
                 </a>
                 <a class="title" rel="nofollow" href="${servePath}${randomArticle.articlePermalink}">${randomArticle.articleTitleEmoj}</a>
             </li>
