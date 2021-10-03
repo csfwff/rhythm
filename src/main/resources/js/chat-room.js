@@ -196,6 +196,7 @@ var ChatRoom = {
             $('#chats>div.fn-none').removeClass("fn-none");
             ChatRoom.resetMoreBtnListen();
           }
+          Util.listenUserCard();
         } else {
           $("#more").removeAttr("onclick");
           $("#more").html("已经到底啦！");
@@ -252,7 +253,7 @@ var ChatRoom = {
     let newHTML = '' +
         '<div class="fn-none"><div id="chatroom' + oId + '" class="fn__flex chats__item' + meTag1 + '">\n' +
         '    <a href="/member/' + userName + '">\n' +
-        '        <div class="avatar tooltipped__user" aria-name="' + userName + '" style="background-image: url(\'' + userAvatarURL + '\');"></div>\n' +
+        '        <div class="avatar tooltipped__user" aria-label="' + userName + '" style="background-image: url(\'' + userAvatarURL + '\');"></div>\n' +
         '    </a>\n' +
         '    <div class="chats__content">\n' +
         '        <div class="chats__arrow"></div>\n' +

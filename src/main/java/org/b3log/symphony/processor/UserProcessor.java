@@ -187,6 +187,39 @@ public class UserProcessor {
         Dispatcher.get("/member/{userName}/points", userProcessor::showHomePoints, anonymousViewCheckMidware::handle, userCheckMidware::handle);
         Dispatcher.post("/users/names", userProcessor::listNames);
         Dispatcher.get("/users/emotions", userProcessor::getFrequentEmotions);
+        Dispatcher.get("/user/{userName}", userProcessor::getUserInfo, csrfMidware::check);
+    }
+
+    /**
+     * Get user info api.
+     *
+     * @param context
+     */
+    public void getUserInfo(final RequestContext context) {
+        final String userName = context.pathVar("userName");
+        final JSONObject user = userQueryService.getUserByName(userName);
+        final JSONObject filteredUserProfile = new JSONObject();
+        filteredUserProfile.put(User.USER_NAME, user.optString(User.USER_NAME));
+        filteredUserProfile.put(UserExt.USER_ONLINE_FLAG, user.optBoolean(UserExt.USER_ONLINE_FLAG));
+        filteredUserProfile.put(UserExt.ONLINE_MINUTE, user.optInt(UserExt.ONLINE_MINUTE));
+        filteredUserProfile.put(User.USER_URL, user.optString(User.USER_URL));
+        filteredUserProfile.put(UserExt.USER_NICKNAME, user.optString(UserExt.USER_NICKNAME));
+        filteredUserProfile.put(UserExt.USER_CITY, user.optString(UserExt.USER_CITY));
+        filteredUserProfile.put(UserExt.USER_AVATAR_URL, user.optString(UserExt.USER_AVATAR_URL));
+        filteredUserProfile.put(UserExt.USER_POINT, user.optInt(UserExt.USER_POINT));
+        filteredUserProfile.put(UserExt.USER_INTRO, user.optString(UserExt.USER_INTRO));
+        filteredUserProfile.put(Keys.OBJECT_ID, user.optString(Keys.OBJECT_ID));
+        final String userId = user.optString(Keys.OBJECT_ID);
+        final long followerCnt = followQueryService.getFollowerCount(userId, Follow.FOLLOWING_TYPE_C_USER);
+        filteredUserProfile.put("followerCount", followerCnt);
+        final long followingUserCnt = followQueryService.getFollowingCount(userId, Follow.FOLLOWING_TYPE_C_USER);
+        filteredUserProfile.put("followingUserCount", followingUserCnt);
+        final String userRoleId = user.optString(User.USER_ROLE);
+        final JSONObject role = roleQueryService.getRole(userRoleId);
+        final String roleName = role.optString(Role.ROLE_NAME);
+        filteredUserProfile.put(User.USER_ROLE, roleName);
+
+        context.renderJSON(StatusCodes.SUCC).renderJSON(filteredUserProfile);
     }
 
     /**

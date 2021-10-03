@@ -72,7 +72,7 @@
   line-height: 16px;
 }
 
-.tooltipped {
+/*.tooltipped {
   position: relative;
   cursor: pointer;
 }
@@ -112,6 +112,48 @@
   content: "";
   border: 5px solid transparent;
   opacity: 0
+}*/
+
+.tooltipped-new {
+  position: relative;
+  cursor: pointer;
+}
+
+.tooltipped-new::after {
+  position: absolute;
+  z-index: 1000000;
+  display: none;
+  padding: 5px 8px;
+  font-size: 11px;
+  font-weight: normal;
+  -webkit-font-smoothing: subpixel-antialiased;
+  color: #fff;
+  text-align: center;
+  text-decoration: none;
+  text-shadow: none;
+  text-transform: none;
+  letter-spacing: normal;
+  word-wrap: break-word;
+  white-space: pre;
+  pointer-events: none;
+  content: attr(aria-label);
+  background: rgba(0, 0, 0, 0.8);
+  border-radius: 3px;
+  line-height: 16px;
+  opacity: 0
+}
+
+.tooltipped-new::before {
+  position: absolute;
+  z-index: 1000001;
+  display: none;
+  width: 0;
+  height: 0;
+  color: rgba(0, 0, 0, 0.8);
+  pointer-events: none;
+  content: "";
+  border: 5px solid transparent;
+  opacity: 0
 }
 
 @-webkit-keyframes tooltip-appear {
@@ -141,7 +183,13 @@
 .tooltipped:active::before,
 .tooltipped:active::after,
 .tooltipped:focus::before,
-.tooltipped:focus::after {
+.tooltipped:focus::after,
+.tooltipped-new:hover::before,
+.tooltipped-new:hover::after,
+.tooltipped-new:active::before,
+.tooltipped-new:active::after,
+.tooltipped-new:focus::before,
+.tooltipped-new:focus::after {
   display: inline-block;
   text-decoration: none;
   -webkit-animation-name: tooltip-appear;

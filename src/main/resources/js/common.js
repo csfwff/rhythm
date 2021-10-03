@@ -1244,6 +1244,15 @@ var Util = {
    * @description 初识化前台页面
    */
   init: function (isLoggedIn) {
+    // 初始化用户卡片
+    $.ua.set(navigator.userAgent);
+    if ($.ua.device.type !== 'mobile') {
+      let cardHtml = '' +
+          '<div id="userCard" style="position: absolute; z-index: 130; right: auto; display: none;">' +
+          '</div>';
+      $("body").append(cardHtml);
+      Util.listenUserCard();
+    }
     //禁止 IE7 以下浏览器访问
     this._kill()
     // 导航
@@ -1306,6 +1315,126 @@ var Util = {
         $('.nav .form').hide()
       }
     })
+  },
+  /**
+   * @description 监听用户名片
+   */
+  listenUserCard: function () {
+    var cardLock = false;
+    $(".avatar, .avatar-small, .avatar-middle, .avatar-mid, .avatar-big").hover(function () {
+      // 加载用户信息
+      if ($(this).attr("aria-label") !== undefined) {
+        let username = $(this).attr("aria-label");
+        // 请求数据
+        let data;
+        $.ajax({
+          url: Label.servePath + "/user/" + username,
+          type: "GET",
+          cache: false,
+          async: false,
+          headers: {'csrfToken': Label.csrfToken},
+          success: function (result) {
+            data = result;
+          }
+        });
+        let followerCount = data.followerCount;
+        let followingUserCount = data.followingUserCount;
+        let oId = data.oId;
+        let onlineMinute = data.onlineMinute;
+        let userAvatarURL = data.userAvatarURL;
+        let userCity = data.userCity;
+        let userIntro = data.userIntro;
+        let userName = data.userName;
+        let userNickname = data.userNickname;
+        let userOnlineFlag = data.userOnlineFlag;
+        let userPoint = data.userPoint;
+        let userURL = data.userURL;
+        let userRole = data.userRole;
+        // 组合内容
+        let html = "" +
+            '<div class="user-card">\n' +
+            '    <div>\n' +
+            '        <a href="' + Label.servePath + '/member/' + userName + '">\n' +
+            '            <div class="avatar-mid-card" style="background-image: url(' + userAvatarURL + ');"></div>\n' +
+            '        </a>\n' +
+            '        <div class="user-card__meta">\n' +
+            '            <div class="fn__ellipsis">\n' +
+            '                <a class="user-card__name" href="' + Label.servePath + '/member/' + userName + '"><b>' + userNickname + '</b></a>\n' +
+            '                <a class="ft-gray ft-smaller" href="' + Label.servePath + '/member/' + userName + '"><b>' + userName + '</b></a>\n' +
+            '            </div>\n';
+        if (userIntro !== "") {
+          html += '' +
+              '            <div class="user-card__info vditor-reset">\n' +
+              '                ' + userIntro + '\n' +
+              '            </div>\n';
+        } else {
+          html += '<br>';
+        }
+        html += '            <div class="user-card__icons fn__flex">\n' +
+            '                <div class="fn__flex-1">\n' +
+            '                    <a href="https://pwl.icu/article/1630575841478" class="tooltipped__n tooltipped-new"\n' +
+            '                       aria-label="' + userRole + '">\n' +
+            '                        <svg>\n' +
+            '                            <use xlink:href="#iconUser"></use>\n' +
+            '                        </svg>\n' +
+            '                    </a>\n' +
+            '                    <a href="' + Label.servePath + '/member/' + userName + '/points" class="tooltipped-new tooltipped__n"\n' +
+            '                       aria-label="' + userPoint + ' 积分">\n' +
+            '                        <svg>\n' +
+            '                            <use xlink:href="#iconPoints"></use>\n' +
+            '                        </svg>\n' +
+            '                    </a>\n';
+        if (userCity !== "") {
+          html += '' +
+              '<a href="' + Label.servePath + '/city/' + userCity + '" class="tooltipped-new tooltipped__n" rel="nofollow"\n' +
+              '   aria-label="' + userCity + '">\n' +
+              '    <svg>\n' +
+              '        <use xlink:href="#icon-local"></use>\n' +
+              '    </svg>\n' +
+              '</a>\n';
+        }
+        html += '' +
+            '                </div>\n' +
+            '                <div class="fn__shrink">\n' +
+            '                    <a class="green small btn" href="' + Label.servePath + '/idle-talk?toUser=' + userName + '" rel="nofollow">\n' +
+            '                        聊天\n' +
+            '                    </a>\n' +
+            '                </div>\n' +
+            '            </div>\n' +
+            '        </div>\n' +
+            '    </div>\n' +
+            '</div>';
+        $("#userCard").html(html);
+
+        // 设置位置
+        let left = $(this).offset().left;
+        if (left + 350 > $(document.body).width()) {
+          left = left - 350;
+        }
+        $("#userCard").css("left", left);
+        let top = $(this).offset().top - 110;
+        if (top < 50) {
+          top = $(this).offset().top + 60;
+        }
+        $("#userCard").css("top", top + "px");
+        $("#userCard").show();
+      }
+    }, function (event) {
+      setTimeout(function () {
+        let el = $(event.toElement);
+        if ($(el).parents("#userCard").length === 0) {
+          if (!cardLock) {
+            $("#userCard").hide();
+          }
+        }
+      }, 50);
+    });
+    $("#userCard").hover(function () {
+      cardLock = true;
+    }, function () {
+      cardLock = false;
+      $("#userCard").hide();
+    });
   },
   /**
    * @description 用户状态 channel.

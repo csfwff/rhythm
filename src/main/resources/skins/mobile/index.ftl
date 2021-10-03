@@ -236,7 +236,7 @@ ${HeaderBannerLabel}
         if (!loading) {
             loading = true;
             rotate.submit();
-            $("#randomArticles").fadeOut(500);
+            $("#randomArticles").fadeOut(100);
             $.ajax({
                 url: "${servePath}/article/random/12",
                 method: "GET",

@@ -75,11 +75,11 @@ ${HeaderBannerLabel}
                     <#list recentArticles as article>
                         <li class="fn-flex">
                             <#if article.articleStick != 0>
-                                <span class="cb-stick tooltipped tooltipped-e" aria-label="管理置顶"><svg class="icon-pin"><use
+                                <span class="cb-stick" aria-label="管理置顶"><svg class="icon-pin"><use
                                                 xlink:href="#pin"></use></svg></span>
                             </#if>
                             <a rel="nofollow" href="${servePath}/member/${article.articleAuthorName}">
-                                    <span class="avatar-small tooltipped tooltipped-se slogan"
+                                    <span class="avatar-small slogan"
                                           aria-label="${article.articleAuthorName}"
                                           style="background-image:url('${article.articleAuthorThumbnailURL210}')"></span>
                             </a>
@@ -113,7 +113,7 @@ ${HeaderBannerLabel}
                         <#list indexRandomArticles as article>
                             <li class="fn-flex">
                                 <a rel="nofollow" href="${servePath}/member/${article.articleAuthorName}">
-                                    <span class="avatar-small tooltipped tooltipped-se slogan"
+                                    <span class="avatar-small slogan"
                                           aria-label="${article.articleAuthorName}"
                                           style="background-image:url('${article.articleAuthorThumbnailURL210}')"></span>
                                 </a>
@@ -136,8 +136,9 @@ ${HeaderBannerLabel}
             <div class="module-panel">
                 <div class="index-user">
                     <#list niceUsers as user>
-                        <a rel="nofollow" href="${servePath}/member/${user.userName}">
-                                    <span class="avatar-middle tooltipped tooltipped-se slogan"
+                        <a class="niceUsersElement fn-hidden" rel="nofollow"
+                           href="${servePath}/member/${user.userName}">
+                                    <span class="avatar-middle slogan"
                                           aria-label="${user.userName}"
                                           style="background-image:url('${user.userAvatarURL48}');height:30px;width:30px;margin: 0px 10px 10px 0px"></span>
                         </a>
@@ -155,7 +156,7 @@ ${HeaderBannerLabel}
                 <ul class="module-list">
                     <#list topCheckinUsers as user>
                         <#if user_index < 5>
-                            <li class="fn-flex rank">
+                            <li class="fn-flex rank topCheckInUsersElement fn-hidden">
                                 <#if user_index == 0 || user_index == 1 || user_index == 2>
                                 <span
                                         <#if user_index == 0>
@@ -165,19 +166,19 @@ ${HeaderBannerLabel}
                                         <#elseif user_index == 2>
                                             style="border-color: #d9822b transparent transparent #d9822b;"
                                         </#if>
-                                        class="cb-stick tooltipped tooltipped-e" aria-label="第${user_index + 1}名">
+                                        class="cb-stick" aria-label="第${user_index + 1}名">
                                     <span class="icon-pin-rank">${user_index + 1}</span>
                                     </#if>
                                 </span>
                                 <a rel="nofollow" href="${servePath}/member/${user.userName}">
-                                    <span class="avatar-small tooltipped tooltipped-se slogan"
+                                    <span class="avatar-small slogan"
                                           aria-label="${user.userName}"
                                           style="background-image:url('${user.userAvatarURL}')"></span>
                                 </a>
-                                <a rel="nofollow" class="title fn-flex-1 tooltipped tooltipped-w"
+                                <a rel="nofollow" class="title fn-flex-1"
                                    aria-label="${pointLabel} ${user.userPoint?c}"
                                    href="${servePath}/member/${user.userName}">${user.userName}</a>
-                                <a class="fn-right count ft-gray ft-smaller tooltipped tooltipped-w"
+                                <a class="fn-right count ft-gray ft-smaller"
                                    aria-label="${checkinStreakPart0Label}${user.userLongestCheckinStreak}${checkinStreakPart1Label}${user.userCurrentCheckinStreak}${checkinStreakPart2Label}"
                                    href="${servePath}/top/checkin">${user.userCurrentCheckinStreak}/<span
                                             class="ft-red">${user.userLongestCheckinStreak}</span></a>
@@ -197,7 +198,7 @@ ${HeaderBannerLabel}
                 <ul class="module-list">
                     <#list onlineTopUsers as user>
                         <#if user_index < 5>
-                            <li class="fn-flex rank">
+                            <li class="fn-flex rank topCheckInUsersElement fn-hidden">
                                 <#if user_index == 0 || user_index == 1 || user_index == 2>
                                 <span
                                         <#if user_index == 0>
@@ -207,19 +208,19 @@ ${HeaderBannerLabel}
                                         <#elseif user_index == 2>
                                             style="border-color: #d9822b transparent transparent #d9822b;"
                                         </#if>
-                                        class="cb-stick tooltipped tooltipped-e" aria-label="第${user_index + 1}名">
+                                        class="cb-stick" aria-label="第${user_index + 1}名">
                                     <span class="icon-pin-rank">${user_index + 1}</span>
                                     </#if>
                                 </span>
                                 <a rel="nofollow" href="${servePath}/member/${user.userName}">
-                                    <span class="avatar-small tooltipped tooltipped-se slogan"
+                                    <span class="avatar-small slogan"
                                           aria-label="${user.userName}"
                                           style="background-image:url('${user.userAvatarURL}')"></span>
                                 </a>
-                                <a rel="nofollow" class="title fn-flex-1 tooltipped tooltipped-w"
+                                <a rel="nofollow" class="title fn-flex-1"
                                    aria-label="${pointLabel} ${user.userPoint?c}"
                                    href="${servePath}/member/${user.userName}">${user.userName}</a>
-                                <a class="fn-right count ft-gray ft-smaller tooltipped tooltipped-w"
+                                <a class="fn-right count ft-gray ft-smaller"
                                    aria-label="在线时长共计 ${user.onlineMinute} 分钟"
                                    href="${servePath}/top/online">${user.onlineMinute} 分钟</a>
                             </li>
@@ -295,7 +296,8 @@ ${HeaderBannerLabel}
                                type="text"
                                class="comment__text breezemoon__input"
                                placeholder="简单聊聊 (高级功能请访问完整版聊天室哦)"/>
-                        <div id="chatUsernameSelectedPanel" class="completed-panel" style="height:170px;display:none;left:auto;top:auto;cursor:pointer;"></div>
+                        <div id="chatUsernameSelectedPanel" class="completed-panel"
+                             style="height:170px;display:none;left:auto;top:auto;cursor:pointer;"></div>
                         <span id="chatRoomPostBtn" class="btn breezemoon__btn" data-csrf="${csrfToken}"
                               onclick="sendChat()">Biu~</span>
                     </div>
@@ -304,9 +306,10 @@ ${HeaderBannerLabel}
                             <#if messages?size != 0>
                                 <#list messages as msg>
                                     <#if msg_index <= 9>
-                                        <li class="fn-flex" id="chatindex${msg.oId}" style='border-bottom: 1px solid #eee;'>
+                                        <li class="fn-flex" id="chatindex${msg.oId}"
+                                            style='border-bottom: 1px solid #eee;'>
                                             <a rel="nofollow" href="${servePath}/member/${msg.userName}">
-                                                <div class="avatar tooltipped tooltipped-n"
+                                                <div class="avatar"
                                                      aria-label="${msg.userName}"
                                                      style="background-image:url('${msg.userAvatarURL}')"></div>
                                             </a>
@@ -345,7 +348,16 @@ ${HeaderBannerLabel}
                                 <div class="tag-metro-item">
                                     <a class="preview" href="${servePath}/tag/${tag.tagURI}">
                                         <img src="${tag.tagIconPath}" alt="${tag.tagTitle}">
-                                        <b>${tag.tagTitle}</b>
+                                        <span style="white-space: nowrap;">
+                                        <#if tag.tagTitle?length gt 3>
+                                            <marquee width="100%" height="100%" scrollamount="1" scrolldelay="100"
+                                                     truespeed>
+                                                    ${tag.tagTitle}
+                                                </marquee>
+                                        <#else>
+                                            ${tag.tagTitle}
+                                        </#if>
+                                        </span>
                                     </a>
                                 </div>
                             </#if>
@@ -365,7 +377,7 @@ ${HeaderBannerLabel}
                             <#if article_index <= 8>
                                 <li class="fn-flex">
                                     <a rel="nofollow" href="${servePath}/member/${article.articleAuthorName}">
-                                    <span class="avatar-small tooltipped tooltipped-se slogan"
+                                    <span class="avatar-small slogan"
                                           aria-label="${article.articleAuthorName}"
                                           style="background-image:url('${article.articleAuthorThumbnailURL210}')"></span>
                                     </a>
@@ -407,7 +419,7 @@ ${HeaderBannerLabel}
                                 <#if item_index <= 13>
                                     <li>
                                         <a href="${servePath}/member/${item.breezemoonAuthorName}">
-                    <span class="avatar-small slogan tooltipped tooltipped-se" aria-label="${item.breezemoonAuthorName}"
+                    <span class="avatar-small slogan" aria-label="${item.breezemoonAuthorName}"
                           style="background-image: url(${item.breezemoonAuthorThumbnailURL48})"></span>
                                         </a>
                                         <a href="${servePath}/member/${item.breezemoonAuthorName}/breezemoons/${item.oId}"
@@ -426,6 +438,9 @@ ${HeaderBannerLabel}
     </div>
 </div>
 <#include "footer.ftl">
+<script>
+    Label.chatRoomPictureStatus = "<#if 0 == chatRoomPictureStatus> blur</#if>";
+</script>
 <script src="${staticServePath}/js/channel${miniPostfix}.js?${staticResourceVersion}"></script>
 <script type="text/javascript">
     // tag click
@@ -472,7 +487,6 @@ ${HeaderBannerLabel}
             }
         }
     });
-
 
 
     function fillUsername(username) {
@@ -652,11 +666,12 @@ ${HeaderBannerLabel}
 
     var loading = false;
     var rotate = new Rotate("randomArticlesRefreshSvg");
+
     function randomArticles() {
         if (!loading) {
             loading = true;
             rotate.submit();
-            $("#randomArticles").fadeOut(500);
+            $("#randomArticles").fadeOut(100);
             $.ajax({
                 url: "${servePath}/article/random/12",
                 method: "GET",
@@ -674,7 +689,7 @@ ${HeaderBannerLabel}
                         }
                         $("#randomArticles").append('<li class="fn-flex">' +
                             '<a rel="nofollow" href="${servePath}/member/' + article.articleAuthorName + '">' +
-                            '<span class="avatar-small tooltipped tooltipped-se slogan" aria-label="' + article.articleAuthorName + '" style="background-image:url(\'' + article.articleAuthorThumbnailURL210 + '\')"></span></a>' +
+                            '<span class="avatar-small slogan" aria-label="' + article.articleAuthorName + '" style="background-image:url(\'' + article.articleAuthorThumbnailURL210 + '\')"></span></a>' +
                             '<a rel="nofollow" class="title fn-ellipsis fn-flex-1" href="${servePath}' + article.articlePermalink + '">' + article.articleTitleEmoj + '</a>' +
                             '<a class="fn-right count ft-gray ft-smaller" href="${servePath}' + article.articlePermalink + '">' + viewCount + '</a>' +
                             '</li>');
@@ -717,6 +732,23 @@ ${HeaderBannerLabel}
             })
         }, 100)
     })
+</script>
+<script>
+    // 渐变输出
+    function elementFadeOut(element, speed) {
+        let fadePicList = $(element);
+        for (i = 0; i < fadePicList.length; i++) {
+            let element = $(fadePicList[i]);
+            setTimeout(function () {
+                element.css("display", "none");
+                element.removeClass("fn-hidden");
+                element.fadeIn(500);
+            }, speed * (i + 1));
+        }
+    }
+
+    elementFadeOut(".niceUsersElement", 20);
+    elementFadeOut(".topCheckInUsersElement", 90);
 </script>
 </body>
 </html>
