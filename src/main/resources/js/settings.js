@@ -505,8 +505,13 @@ var Settings = {
 
         break
       case 'system':
+        let cardBg = "";
+        if ($("#userCardSettings").attr("bgUrl") !== undefined) {
+          cardBg = $("#userCardSettings").attr("bgUrl");
+        }
         requestJSONObject = {
           systemTitle: $('#newSystemTitle').val(),
+          cardBg: cardBg,
         }
         break
       case 'deactivate':

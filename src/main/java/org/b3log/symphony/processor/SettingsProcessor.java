@@ -628,8 +628,10 @@ public class SettingsProcessor {
             requestJSONObject = new JSONObject();
         }
         String systemTitle = requestJSONObject.optString(SystemSettings.SYSTEM_TITLE);
+        String cardBg = requestJSONObject.optString("cardBg");
         final JSONObject settings = new JSONObject();
         settings.put(SystemSettings.SYSTEM_TITLE, systemTitle);
+        settings.put("cardBg", cardBg);
         try {
             settingsService.setSystemSettings(settings);
             context.renderJSON(StatusCodes.SUCC);

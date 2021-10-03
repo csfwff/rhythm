@@ -20,10 +20,10 @@
 -->
 <#include "macro-settings.ftl">
 <@home "system">
+    <div class="module-header">
+        <h2>自定义</h2>
+    </div>
     <div class="module">
-        <div class="module-header">
-            <h2>自定义网站标题</h2>
-        </div>
         <div class="module-panel form fn-clear">
             <label>当前社区标题</label>
             <input value="<#if hasSystemTitle>${systemTitle}<#else>${symphonyLabel}</#if>" type="text" readonly />
@@ -31,6 +31,22 @@
             <label>新的社区标题</label>
             <input id="newSystemTitle" type="text" value="<#if hasSystemTitle>${systemTitle}<#else>${symphonyLabel}</#if>"/><br/><br/>
 
+            <div id="systemTip" class="tip"></div><br/>
+            <button class="fn-right" onclick="Settings.update('system', '${csrfToken}')">${saveLabel}</button>
+        </div>
+    </div>
+
+    <div class="module">
+        <div class="module-header">
+            <h2>个人卡片背景</h2>
+        </div>
+        <div class="module-panel form fn-clear">
+            <div class="fn__clear">
+                <button class="red" id="homeProfileCardBgRmBtn">删除</button>
+                <label class="btn green label__upload">
+                    上传<input id="homeProfileCardBgFile" data-url="" type="file">
+                </label>
+            </div>
             <div id="systemTip" class="tip"></div><br/>
             <button class="fn-right" onclick="Settings.update('system', '${csrfToken}')">${saveLabel}</button>
         </div>
