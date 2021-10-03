@@ -619,20 +619,15 @@ public class SettingsProcessor {
     public void updateSystem(final RequestContext context) {
         context.renderJSON(StatusCodes.ERR);
         final Request request = context.getRequest();
-
-
         JSONObject requestJSONObject;
         try {
             requestJSONObject = context.requestJSON();
             request.setAttribute(Keys.REQUEST, requestJSONObject);
         } catch (final Exception e) {
             LOGGER.warn(e.getMessage());
-
             requestJSONObject = new JSONObject();
         }
-
         String systemTitle = requestJSONObject.optString(SystemSettings.SYSTEM_TITLE);
-
         final JSONObject settings = new JSONObject();
         settings.put(SystemSettings.SYSTEM_TITLE, systemTitle);
         try {
@@ -641,7 +636,6 @@ public class SettingsProcessor {
         } catch (Exception e) {
             context.renderMsg(e.getMessage());
         }
-
     }
 
     /**
