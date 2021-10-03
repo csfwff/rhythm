@@ -30,7 +30,7 @@
         <input value="<#if hasSystemTitle>${systemTitle}<#else>${symphonyLabel}</#if>" type="text" readonly />
 
         <label>新的社区标题</label>
-        <input id="newSystemTitle" type="text" /><br/><br/>
+        <input id="newSystemTitle" type="text" value="<#if hasSystemTitle>${systemTitle}<#else>${symphonyLabel}</#if>"/><br/><br/>
 
         <div id="systemTip" class="tip"></div><br/>
         <button class="fn-right" onclick="Settings.update('system', '${csrfToken}')">${saveLabel}</button>

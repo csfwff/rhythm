@@ -50,6 +50,10 @@
                 <use xlink:href="#local"></use>
             </svg> ${currentUser.userCity}</a>
         </#if>
+        <a href="${servePath}/top"<#if selected?? && 'top' == selected> class="current"</#if>>
+            <svg>
+                <use xlink:href="#rank"></use>
+            </svg> ${totalRankLabel}</a>
         <#if isLoggedIn>
         <a href="${servePath}/watch"<#if selected?? && 'watch' == selected> class="current"</#if>>
             <svg>
