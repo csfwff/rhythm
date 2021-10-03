@@ -349,7 +349,7 @@ ${HeaderBannerLabel}
                                     <a class="preview" href="${servePath}/tag/${tag.tagURI}">
                                         <img src="${tag.tagIconPath}" alt="${tag.tagTitle}">
                                         <span style="white-space: nowrap;">
-                                        <#if tag.tagTitle?length gt 3>
+                                        <#if tag.tagTitle?length gt 2>
                                             <marquee width="100%" height="100%" scrollamount="1" scrolldelay="100"
                                                      truespeed>
                                                     ${tag.tagTitle}
