@@ -32,8 +32,8 @@ import org.b3log.latke.util.Strings;
 import org.b3log.symphony.cache.DomainCache;
 import org.b3log.symphony.cache.TagCache;
 import org.b3log.symphony.event.*;
-import org.b3log.symphony.processor.ChatroomProcessor;
 import org.b3log.symphony.processor.Router;
+import org.b3log.symphony.processor.channel.UserChannel;
 import org.b3log.symphony.service.CronMgmtService;
 import org.b3log.symphony.service.InitMgmtService;
 import org.b3log.symphony.util.Markdowns;
@@ -216,6 +216,9 @@ public final class Server extends BaseServer {
 
         final Server server = new Server();
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+            // 用户层
+            UserChannel.settlement();
+            // 框架
             cronMgmtService.stop();
             server.shutdown();
             Symphonys.EXECUTOR_SERVICE.shutdown();

@@ -19,6 +19,9 @@
 package org.b3log.symphony.processor.channel;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.b3log.latke.Keys;
 import org.b3log.latke.http.Session;
 import org.b3log.latke.http.WebSocketChannel;
@@ -48,6 +51,11 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 @Singleton
 public class UserChannel implements WebSocketChannel {
+
+    /**
+     * Logger.
+     */
+    private static final Logger LOGGER = LogManager.getLogger(UserChannel.class);
 
     /**
      * User management service.
@@ -211,6 +219,25 @@ public class UserChannel implements WebSocketChannel {
             }
             userMgmtService.updateOnlineStatus(userId, ip, false, true);
             return;
+        }
+    }
+
+    /**
+     * 在服务器停止前，结算用户的在线时间
+     */
+    public static void settlement() {
+        LOGGER.log(Level.INFO, "Settlement user online time...");
+        for (String key : userOnline.keySet()) {
+            JSONObject onlineUser = userOnline.get(key);
+            long timeStamp = onlineUser.optLong("timeStamp");
+            int onlineMinute = onlineUser.optInt("onlineMinute");
+            long onlineTime = System.currentTimeMillis() - timeStamp;
+            int calcOnlineMinutes = (int) onlineTime / 1000 / 60;
+            onlineMinute = onlineMinute + calcOnlineMinutes;
+            System.out.println("UserId [" + key + "], Online time [" + onlineMinute + "]");
+            final BeanManager beanManager = BeanManager.getInstance();
+            final UserMgmtService userMgmtService = beanManager.getReference(UserMgmtService.class);
+            userMgmtService.setOnlineMinute(key, onlineMinute);
         }
     }
 }
