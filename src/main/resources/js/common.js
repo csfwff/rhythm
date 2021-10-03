@@ -1424,7 +1424,6 @@ var Util = {
             '</div>';
         $("#userCard").html(html);
         if (cardBg !== "") {
-          console.log(1);
           $("#userCardContent").addClass("user-card--bg");
           $("#userCardContent").css("background-image", "url(" + cardBg + ")");
           $("#userCardContent > div").attr("style", "background-image: linear-gradient(90deg, rgba(214, 227, 235, 0.36), rgba(255, 255, 255, 0.76), rgba(255, 255, 255, 0.76));");
