@@ -34,7 +34,7 @@
                     <div class="list">
                         <ul style="margin-left: 100px;">
                             <li class="fn__flex">
-                                <img class="avatar" src="${staticServePath}/images/link.png">
+                                <svg class="avatar"><use xlink:href="#linkIcon"></use></svg>
                                 <div class="fn-flex-1">
                                     <h2>
                                         <a class="title"
@@ -44,7 +44,7 @@
                                 </div>
                             </li>
                             <li class="fn__flex">
-                                <img class="avatar" src="${staticServePath}/images/money.png">
+                                <svg class="avatar"><use xlink:href="#balanceIcon"></use></svg>
                                 <div class="fn-flex-1">
                                     <h2>
                                         <a class="title"
@@ -54,7 +54,7 @@
                                 </div>
                             </li>
                             <li class="fn__flex">
-                                <img class="avatar" src="${staticServePath}/images/cart.png">
+                                <svg class="avatar"><use xlink:href="#consumptionIcon"></use></svg>
                                 <div class="fn-flex-1">
                                     <h2>
                                         <a class="title"
@@ -64,7 +64,7 @@
                                 </div>
                             </li>
                             <li class="fn__flex">
-                                <img class="avatar" src="${staticServePath}/images/checkin.png">
+                                <svg class="avatar"><use xlink:href="#checkinIcon"></use></svg>
                                 <div class="fn-flex-1">
                                     <h2>
                                         <a class="title"
@@ -74,7 +74,7 @@
                                 </div>
                             </li>
                             <li class="fn__flex">
-                                <img class="avatar" src="${staticServePath}/images/time.png">
+                                <svg class="avatar"><use xlink:href="#onlineIcon"></use></svg>
                                 <div class="fn-flex-1">
                                     <h2>
                                         <a class="title"
