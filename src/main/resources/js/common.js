@@ -1373,11 +1373,28 @@ var Util = {
         html += '            <div class="user-card__icons fn__flex">\n' +
             '                <div class="fn__flex-1">\n' +
             '                    <a href="https://pwl.icu/article/1630575841478" class="tooltipped__n tooltipped-new"\n' +
-            '                       aria-label="' + userRole + '">\n' +
-            '                        <svg>\n' +
-            '                            <use xlink:href="#iconUser"></use>\n' +
-            '                        </svg>\n' +
-            '                    </a>\n' +
+            '                       aria-label="用户分组：' + userRole + '">\n';
+        switch (userRole) {
+          case '管理员':
+            html += '<img style="height: 20px;margin: 0px;" src="https://pwl.stackoverflow.wiki/adminRole.png"/>';
+            break;
+          case 'OP':
+            html += '<img style="height: 20px;margin: 0px;" src="https://pwl.stackoverflow.wiki/opRole.png"/>';
+            break;
+          case '协警':
+            html += '<img style="height: 20px;margin: 0px;" src="https://pwl.stackoverflow.wiki/policeRole.png"/>';
+            break;
+          case '超级会员':
+            html += '<img style="height: 20px;margin: 0px;" src="https://pwl.stackoverflow.wiki/svipRole.png"/>';
+            break;
+          case '成员':
+            html += '<img style="height: 20px;margin: 0px;" src="https://pwl.stackoverflow.wiki/vipRole.png"/>';
+            break;
+          default:
+            html += '<img style="height: 20px;margin: 0px;" src="https://pwl.stackoverflow.wiki/newRole.png"/>';
+            break;
+        }
+        html += '                    </a>\n' +
             '                    <a href="' + Label.servePath + '/member/' + userName + '/points" class="tooltipped-new tooltipped__n"\n' +
             '                       aria-label="' + userPoint + ' 积分">\n' +
             '                        <svg>\n' +

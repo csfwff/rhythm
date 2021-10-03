@@ -65,7 +65,7 @@
                     <#else>
                     https://pwl.stackoverflow.wiki/newRole.png
                     </#if>
-                    ">
+                    "/>
                 </a>
             </div>
 
