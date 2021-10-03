@@ -1405,20 +1405,20 @@ var Util = {
             '    </div>\n' +
             '</div>';
         $("#userCard").html(html);
-      }
 
-      // 设置位置
-      let left = $(this).offset().left;
-      if (left + 350 > $(document.body).width()) {
-        left = left - 350;
+        // 设置位置
+        let left = $(this).offset().left;
+        if (left + 350 > $(document.body).width()) {
+          left = left - 350;
+        }
+        $("#userCard").css("left", left);
+        let top = $(this).offset().top - 110;
+        if (top < 50) {
+          top = $(this).offset().top + 60;
+        }
+        $("#userCard").css("top", top + "px");
+        $("#userCard").show();
       }
-      $("#userCard").css("left", left);
-      let top = $(this).offset().top - 110;
-      if (top < 50) {
-        top = $(this).offset().top + 60;
-      }
-      $("#userCard").css("top", top + "px");
-      $("#userCard").show();
     }, function (event) {
       setTimeout(function () {
         let el = $(event.toElement);
@@ -1427,7 +1427,7 @@ var Util = {
             $("#userCard").hide();
           }
         }
-      }, 100);
+      }, 50);
     });
     $("#userCard").hover(function () {
       cardLock = true;
