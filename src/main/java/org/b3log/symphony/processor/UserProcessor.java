@@ -165,6 +165,12 @@ public class UserProcessor {
     private BreezemoonQueryService breezemoonQueryService;
 
     /**
+     * System settings service.
+     */
+    @Inject
+    private SystemSettingsService systemSettingsService;
+
+    /**
      * Register request handlers.
      */
     public static void register() {
@@ -218,6 +224,20 @@ public class UserProcessor {
         final JSONObject role = roleQueryService.getRole(userRoleId);
         final String roleName = role.optString(Role.ROLE_NAME);
         filteredUserProfile.put(User.USER_ROLE, roleName);
+        // 获取用户个性化设定
+        final JSONObject systemSettings = systemSettingsService.getByUsrId(user.optString(Keys.OBJECT_ID));
+        if (Objects.isNull(systemSettings)) {
+            filteredUserProfile.put("cardBg", "");
+        } else {
+            final String settingsJson = systemSettings.optString(SystemSettings.SETTINGS);
+            final JSONObject settings = new JSONObject(settingsJson);
+            final String cardBg = settings.optString("cardBg");
+            if (StringUtils.isBlank(cardBg)) {
+                filteredUserProfile.put("cardBg", "");
+            } else {
+                filteredUserProfile.put("cardBg", cardBg);
+            }
+        }
 
         context.renderJSON(StatusCodes.SUCC).renderJSON(filteredUserProfile);
     }
