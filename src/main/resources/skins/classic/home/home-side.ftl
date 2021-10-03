@@ -24,12 +24,6 @@
         <div class="user-name">
             <div id="userNicknameDom"><b>${user.userNickname}</b></div>
             <div class="ft-gray">${user.userName}</div>
-            <div>
-                <span class="tooltipped tooltipped-n" aria-label="${roleLabel}">
-                    <#if user.roleName == '管理员' || user.roleName == 'OP' || user.roleName == '协警'><svg><use xlink:href="#perfect"></use></svg></#if>
-                    <span class="<#if user.roleName == '管理员'>color_admin<#elseif user.roleName == 'OP'>color_op<#elseif user.roleName == '协警'>color_police<#elseif user.roleName == '超级会员'>color_svip<#elseif user.roleName == '成员'>color_vip<#else>offline</#if>">${user.roleName}</span>
-                </span>
-            </div>
 
             <div>
                 <#if isLoggedIn && (currentUser.userName != user.userName)>
@@ -53,6 +47,26 @@
                 <span aria-label="${reportLabel}" class="tooltipped tooltipped-n"
                       onclick="$('#reportDialog').data('id', '${user.oId}').dialog('open')"
                 ><svg><use xlink:href="#icon-report"></use></svg></span>
+            </div>
+
+            <div>
+                <a href="https://pwl.icu/article/1630575841478" target="_blank">
+                    <img style="height: 26px;margin-top: 5px;" src="
+                    <#if user.roleName == '管理员'>
+                    https://pwl.stackoverflow.wiki/adminRole.png
+                    <#elseif user.roleName == 'OP'>
+                    https://pwl.stackoverflow.wiki/opRole.png
+                    <#elseif user.roleName == '协警'>
+                    https://pwl.stackoverflow.wiki/policeRole.png
+                    <#elseif user.roleName == '超级会员'>
+                    https://pwl.stackoverflow.wiki/svipRole.png
+                    <#elseif user.roleName == '成员'>
+                    https://pwl.stackoverflow.wiki/vipRole.png
+                    <#else>
+                    https://pwl.stackoverflow.wiki/newRole.png
+                    </#if>
+                    ">
+                </a>
             </div>
 
             <#if isLoggedIn && (currentUser.userName != user.userName)>
