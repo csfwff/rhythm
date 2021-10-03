@@ -1350,9 +1350,10 @@ var Util = {
         let userPoint = data.userPoint;
         let userURL = data.userURL;
         let userRole = data.userRole;
+        let cardBg = data.cardBg;
         // 组合内容
         let html = "" +
-            '<div class="user-card">\n' +
+            '<div class="user-card" id="userCardContent">\n' +
             '    <div>\n' +
             '        <a href="' + Label.servePath + '/member/' + userName + '">\n' +
             '            <div class="avatar-mid-card" style="background-image: url(' + userAvatarURL + ');"></div>\n' +
@@ -1422,6 +1423,15 @@ var Util = {
             '    </div>\n' +
             '</div>';
         $("#userCard").html(html);
+        if (cardBg !== "") {
+          console.log(1);
+          $("#userCardContent").addClass("user-card--bg");
+          $("#userCardContent").css("background-image", "url(" + cardBg + ")");
+          $("#userCardContent > div").attr("style", "background-image: linear-gradient(90deg, rgba(214, 227, 235, 0.36), rgba(255, 255, 255, 0.76), rgba(255, 255, 255, 0.76));");
+          $("#userCardContent > div > a > div").css("width", "120px");
+          $("#userCardContent > div > a > div").css("height", "120px");
+          $("#userCardContent > div > a > div").css("top", "80px");
+        }
 
         // 设置位置
         let left = $(this).offset().left;

@@ -96,7 +96,6 @@
         maxSize: '${imgMaxSize?c}'
     }, function (data) {
         let imgUrl = data.result.key;
-        console.log(imgUrl);
         $("#cardBgUploadButtons").css("margin-top", "270px");
         $("#userCardSettings").addClass("user-card--bg");
         $("#userCardSettings").css("background-image", "url(" + imgUrl + ")");

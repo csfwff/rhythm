@@ -31,24 +31,39 @@
             <label>新的社区标题</label>
             <input id="newSystemTitle" type="text" value="<#if hasSystemTitle>${systemTitle}<#else>${symphonyLabel}</#if>"/><br/><br/>
 
-            <div id="systemTip" class="tip"></div><br/>
             <button class="fn-right" onclick="Settings.update('system', '${csrfToken}')">${saveLabel}</button>
         </div>
     </div>
 
     <div class="module">
-        <div class="module-header">
+        <div class="module-header" style="margin-bottom: 15px;">
             <h2>个人卡片背景</h2>
         </div>
         <div class="module-panel form fn-clear">
-            <div class="fn__clear">
-                <button class="red" id="homeProfileCardBgRmBtn">删除</button>
-                <label class="btn green label__upload">
-                    上传<input id="homeProfileCardBgFile" data-url="" type="file">
-                </label>
+            <input id="userCardSettings" type="text" value="">
+            <div class="fn__clear" id="cardBgUploadButtons" style="margin-top: 15px;">
+                <form id="cardBgUpload" method="POST" enctype="multipart/form-data">
+                    <label class="btn green label__upload" style="height: 37px;margin: 0;">
+                        ${uploadLabel}<input type="file" name="file">
+                    </label>
+                </form>
             </div>
-            <div id="systemTip" class="tip"></div><br/>
-            <button class="fn-right" onclick="Settings.update('system', '${csrfToken}')">${saveLabel}</button>
+            <button class="fn-right" style="height: 37px;" onclick="$('#userCardSettings').attr('bgUrl', '');Settings.update('system', '${csrfToken}');">恢复默认</button>
         </div>
     </div>
+
+    <div id="systemTip" class="tip"></div><br/>
 </@home>
+<script src="${staticServePath}/js/lib/jquery/file-upload-9.10.1/jquery.fileupload.min.js"></script>
+<script>
+    Settings.initUploadAvatar({
+        id: 'cardBgUpload',
+        userId: '${currentUser.oId}',
+        maxSize: '${imgMaxSize?c}'
+    }, function (data) {
+        let imgUrl = data.result.key;
+        $("#userCardSettings").val(imgUrl);
+        $("#userCardSettings").attr("bgUrl", imgUrl);
+        Settings.update('system', '${csrfToken}');
+    });
+</script>
