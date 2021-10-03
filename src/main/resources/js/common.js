@@ -1397,7 +1397,7 @@ var Util = {
             '                </div>\n' +
             '                <div class="fn__shrink">\n' +
             '                    <a class="green small btn" href="' + Label.servePath + '/idle-talk?toUser=' + userName + '" rel="nofollow">\n' +
-            '                        聊天\n' +
+            '                        私信\n' +
             '                    </a>\n' +
             '                </div>\n' +
             '            </div>\n' +
