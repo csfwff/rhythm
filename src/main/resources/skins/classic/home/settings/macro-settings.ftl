@@ -40,6 +40,7 @@
                         <div class="module-panel fn-oh">
                             <nav class="home-menu">
                                 <a href="${servePath}/settings"<#if 'profile' == type> class="current"</#if>>${profilesLabel}</a>
+                                <a href="${servePath}/settings/system"<#if 'system' == type> class="current"</#if>>个性化</a>
                                 <a href="${servePath}/settings/avatar"<#if 'avatar' == type> class="current"</#if>>${avatarLabel}</a>
                                 <a href="${servePath}/settings/account"<#if 'account' == type> class="current"</#if>>${accountLabel}</a>
                                 <a href="${servePath}/settings/invite"<#if 'invite' == type> class="current"</#if>>
@@ -52,7 +53,6 @@
                                 <a href="${servePath}/settings/data"<#if 'data' == type> class="current"</#if>>${dataLabel}</a>
                                 <a href="${servePath}/settings/i18n"<#if 'i18n' == type> class="current"</#if>>${i18nLabel}</a>
                                 <a href="${servePath}/settings/help"<#if 'help' == type> class="current"</#if>>${helpLabel}</a>
-                                <a href="${servePath}/settings/system"<#if 'system' == type> class="current"</#if>>${systemLabel}</a>
                             </nav>
                         </div>
                     </div>

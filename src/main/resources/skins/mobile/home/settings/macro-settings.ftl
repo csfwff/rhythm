@@ -54,7 +54,7 @@
                     <#elseif type == "help">
                     ${helpLabel}
                     <#elseif type == "system">
-                    ${systemLabel}
+                    个性化
                     </#if>
 
                     <svg class="fn-right"><use xlink:href="#chevron-down"></use></svg>
@@ -62,6 +62,7 @@
                 <div class="fn-hr5"></div>
                 <ul class="tab fn-clear fn-none">
                     <li<#if 'profile' == type> class="fn-none"</#if>><a href="${servePath}/settings">${profilesLabel}</a></li>
+                    <li<#if 'system' == type> class="current"</#if>><a href="${servePath}/settings/system">个性化</a></li>
                     <li<#if 'avatar' == type> class="fn-none"</#if>><a href="${servePath}/settings/avatar">${avatarLabel}</a></li>
                     <li<#if 'account' == type> class="fn-none"</#if>><a href="${servePath}/settings/account">${accountLabel}</a></li>
                     <li<#if 'invite' == type> class="fn-none"</#if>><a href="${servePath}/settings/invite">${inviteLabel}</a></li>
@@ -72,7 +73,6 @@
                     <li<#if 'i18n' == type> class="fn-none"</#if>><a href="${servePath}/settings/i18n">${i18nLabel}</a></li>
                     <li<#if 'data' == type> class="fn-none"</#if>><a href="${servePath}/settings/data">${dataLabel}</a></li>
                     <li<#if 'help' == type> class="current"</#if>><a href="${servePath}/settings/help">${helpLabel}</a></li>
-                    <li<#if 'system' == type> class="current"</#if>><a href="${servePath}/settings/system">${systemLabel}</a></li>
                 </ul>
             </div>
             <div class="wrapper">
