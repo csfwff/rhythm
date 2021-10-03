@@ -60,7 +60,7 @@
                                         <a class="title"
                                            href="${servePath}/top/consumption">消费排行</a>
                                     </h2>
-                                    <div class="ft-fade ft-smaller">今晚消费陈公子买单</div>
+                                    <div class="ft-fade ft-smaller">今晚的消费，由陈公子买单</div>
                                 </div>
                             </li>
                             <li class="fn__flex">
@@ -70,7 +70,7 @@
                                         <a class="title"
                                            href="${servePath}/top/checkin">签到排行</a>
                                     </h2>
-                                    <div class="ft-fade ft-smaller">公司打卡是生存,摸鱼才是生活</div>
+                                    <div class="ft-fade ft-smaller">公司打卡是生存，摸鱼才是生活</div>
                                 </div>
                             </li>
                             <li class="fn__flex">
