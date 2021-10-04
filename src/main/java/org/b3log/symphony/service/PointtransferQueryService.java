@@ -537,6 +537,9 @@ public class PointtransferQueryService {
                         break;
                     case Pointtransfer.TRANSFER_TYPE_C_BLMZ:
                         break;
+                    case Pointtransfer.TRANSFER_TYPE_C_ACTIVITY_ADR:
+                        desTemplate = desTemplate.replace("{score}", dataId);
+                        break;
                     default:
                         LOGGER.warn("Invalid point type [" + type + "]");
                 }

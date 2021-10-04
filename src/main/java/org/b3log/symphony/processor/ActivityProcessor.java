@@ -33,6 +33,7 @@ import org.b3log.latke.ioc.Inject;
 import org.b3log.latke.ioc.Singleton;
 import org.b3log.latke.model.User;
 import org.b3log.latke.service.LangPropsService;
+import org.b3log.latke.service.ServiceException;
 import org.b3log.symphony.model.Common;
 import org.b3log.symphony.model.Pointtransfer;
 import org.b3log.symphony.model.UserExt;
@@ -119,6 +120,12 @@ public class ActivityProcessor {
     private LangPropsService langPropsService;
 
     /**
+     * Pointtransfer management service.
+     */
+    @Inject
+    private PointtransferMgmtService pointtransferMgmtService;
+
+    /**
      * Record if eating snake game is started.
      */
     final static HashMap<String, Long> EATING_SNAKE_STARTED = new HashMap<>();
@@ -167,7 +174,17 @@ public class ActivityProcessor {
             final int score = requestJSONObject.optInt("score");
             try {
                 JSONObject currentUser = Sessions.getUser();
-                System.out.println(currentUser.optString(User.USER_NAME) + " 通关ADR：" + score);
+                LOGGER.log(Level.INFO, currentUser.optString(User.USER_NAME) + " 通关ADR：" + score);
+                int amout = 10;
+                if (score > 1000) {
+                    amout = score / 1000;
+                }
+                final boolean succ = null != pointtransferMgmtService.transfer(Pointtransfer.ID_C_SYS, currentUser.optString(Keys.OBJECT_ID),
+                        Pointtransfer.TRANSFER_TYPE_C_ACTIVITY_ADR, amout,
+                        score + "", System.currentTimeMillis(), "");
+                if (!succ) {
+                    throw new ServiceException(langPropsService.get("transferFailLabel"));
+                }
                 context.renderJSON(StatusCodes.SUCC);
                 context.renderMsg("数据上传成功，恭喜你通关了！你可以在摸鱼派-总榜-ADarkRoom总分榜单中查看你的成绩！");
             } catch (NullPointerException e) {
@@ -176,7 +193,7 @@ public class ActivityProcessor {
             }
         } catch (Exception e) {
             context.renderJSON(StatusCodes.ERR);
-            context.renderMsg("存储数据失败！");
+            context.renderMsg("存储数据失败！请检查自己是否存在作弊行为！");
         }
     }
 
