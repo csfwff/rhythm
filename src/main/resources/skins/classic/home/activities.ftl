@@ -95,7 +95,7 @@
                                              aria-label="ADarkRoom" style="background-image:url('${staticServePath}/games/adarkroom/img/adr.png')"></div>
                                         <div class="fn-flex-1">
                                             <h2>
-                                                <a href="${servePath}/games/adarkroom/index.html?lang=zh_cn">《A Dark Room》</a>
+                                                <a href="${servePath}/games/adarkroom/?lang=zh_cn">《A Dark Room》</a>
                                             </h2>
                                             <span class="ft-fade vditor-reset">
                                                 极简主义的游戏杰作，有上世纪 ascii 游戏的遗风。<br>
