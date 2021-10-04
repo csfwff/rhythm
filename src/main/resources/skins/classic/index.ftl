@@ -264,7 +264,7 @@ ${HeaderBannerLabel}
                     </div>
                     <div class="metro-item">
                         <a class="preview" href="${servePath}/activities">
-                            <img src="https://pwl.stackoverflow.wiki/2021/09/围棋-9195fb7f.png" alt="五子棋">
+                            <img src="${staticServePath}/games/adarkroom/img/adr.png" alt="五子棋">
                             <b>好玩</b>
                         </a>
                     </div>
