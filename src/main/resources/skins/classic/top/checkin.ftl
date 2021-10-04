@@ -27,9 +27,8 @@
         <li>
             <div class="fn-flex">
                 <a rel="nofollow"
-                   class="tooltipped tooltipped-se"
-                   href="${servePath}/member/${user.userName}" 
-                   aria-label="${user.userName}"><div class="avatar" style="background-image:url('${user.userAvatarURL}')"></div></a>
+                   href="${servePath}/member/${user.userName}"
+                   ><div class="avatar" aria-label="${user.userName}" style="background-image:url('${user.userAvatarURL}')"></div></a>
                 <div class="has-view fn-flex-1">
                     <h2>
                         ${user_index + 1}.
