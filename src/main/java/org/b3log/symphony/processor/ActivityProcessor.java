@@ -153,6 +153,31 @@ public class ActivityProcessor {
         Dispatcher.post("/activity/eating-snake/collect", activityProcessor::collectEatingSnake, loginCheck::handle, csrfMidware::fill);
         Dispatcher.get("/activity/gobang", activityProcessor::showGobang, loginCheck::handle, csrfMidware::fill);
         Dispatcher.post("/activity/gobang/start", activityProcessor::startGobang, loginCheck::handle);
+        Dispatcher.post("/api/games/adarkroom/share", activityProcessor::shareADarkRoomScore, loginCheck::handle);
+    }
+
+    /**
+     * 上传 ADarkRoom 游戏成绩
+     *
+     * @param context
+     */
+    public void shareADarkRoomScore(final RequestContext context) {
+        try {
+            JSONObject requestJSONObject = context.requestJSON();
+            final int score = requestJSONObject.optInt("score");
+            try {
+                JSONObject currentUser = Sessions.getUser();
+                System.out.println(currentUser.optString(User.USER_NAME) + " 通关ADR：" + score);
+                context.renderJSON(StatusCodes.SUCC);
+                context.renderMsg("数据上传成功，恭喜你通关了！你可以在摸鱼派-总榜-ADarkRoom总分榜单中查看你的成绩！");
+            } catch (NullPointerException e) {
+                context.renderJSON(StatusCodes.ERR);
+                context.renderMsg("存储数据失败！原因：你还没有登录摸鱼派，请前往摸鱼派 https://pwl.icu 登录账号后重试。");
+            }
+        } catch (Exception e) {
+            context.renderJSON(StatusCodes.ERR);
+            context.renderMsg("存储数据失败！");
+        }
     }
 
     /**

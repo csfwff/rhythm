@@ -470,6 +470,16 @@ var Space = {
 								$('<br />')
 										.appendTo('.centerCont');
 								$('<span>')
+									.addClass('endGame endGameOption')
+									.text(_('上传你的最终成绩至摸鱼派社区'))
+									.click(Engine.uploadMarkToFishingPi)
+									.appendTo('.centerCont')
+									.animate({opacity:1},1500);
+								$('<br />')
+									.appendTo('.centerCont');
+								$('<br />')
+									.appendTo('.centerCont');
+								$('<span>')
 										.addClass('endGame')
 										.text(_('expanded story. alternate ending. behind the scenes commentary. get the app.'))
 										.appendTo('.centerCont')

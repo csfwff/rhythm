@@ -581,7 +581,7 @@
 								nextScene: 'end',
 								onChoose: function () {
 									$.ajax({
-										url: "https://pwl.icu/api/games/adarkroom/share",
+										url: "/api/games/adarkroom/share",
 										method: "POST",
 										data: JSON.stringify({
 											score: Prestige.get().score,
@@ -591,7 +591,7 @@
 													title: _('成绩上传'),
 													scenes: {
 														start: {
-															text: [_(result.data)],
+															text: [_(result.msg)],
 															buttons: {
 																'close': {
 																	text: _('close'),
@@ -610,7 +610,7 @@
 													title: _('成绩上传出错'),
 													scenes: {
 														start: {
-															text: [_(result.data)],
+															text: [_("请检查是否已经登录过摸鱼派，然后重试。")],
 															buttons: {
 																'close': {
 																	text: _('close'),
