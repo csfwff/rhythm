@@ -1369,7 +1369,8 @@ var Util = {
               '                ' + userIntro + '\n' +
               '            </div>\n';
         } else {
-          html += '<br>';
+          html += '<div class="user-card__info vditor-reset">' +
+              '</div>\n';
         }
         html += '            <div class="user-card__icons fn__flex">\n' +
             '                <div class="fn__flex-1">\n' +
@@ -1427,8 +1428,8 @@ var Util = {
           $("#userCardContent").addClass("user-card--bg");
           $("#userCardContent").css("background-image", "url(" + cardBg + ")");
           $("#userCardContent > div").attr("style", "background-image: linear-gradient(90deg, rgba(214, 227, 235, 0.36), rgba(255, 255, 255, 0.76), rgba(255, 255, 255, 0.76));");
-          $("#userCardContent > div > a > div").css("width", "120px");
-          $("#userCardContent > div > a > div").css("height", "120px");
+          $("#userCardContent > div > a > div").css("width", "105px");
+          $("#userCardContent > div > a > div").css("height", "105px");
           $("#userCardContent > div > a > div").css("top", "80px");
         }
 

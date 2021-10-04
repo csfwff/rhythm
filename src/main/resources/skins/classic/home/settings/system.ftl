@@ -100,8 +100,8 @@
         $("#userCardSettings").addClass("user-card--bg");
         $("#userCardSettings").css("background-image", "url(" + imgUrl + ")");
         $("#userCardSettings > div").attr("style", "background-image: linear-gradient(90deg, rgba(214, 227, 235, 0.36), rgba(255, 255, 255, 0.76), rgba(255, 255, 255, 0.76));");
-        $("#userCardSettings > div > a > div").css("width", "120px");
-        $("#userCardSettings > div > a > div").css("height", "120px");
+        $("#userCardSettings > div > a > div").css("width", "105px");
+        $("#userCardSettings > div > a > div").css("height", "105px");
         $("#userCardSettings > div > a > div").css("top", "80px");
         $("#userCardSettings").attr("bgUrl", imgUrl);
         Settings.update('system', '${csrfToken}');
@@ -113,8 +113,8 @@
         $("#userCardSettings").addClass("user-card--bg");
         $("#userCardSettings").css("background-image", "url(" + currentCardBg + ")");
         $("#userCardSettings > div").attr("style", "background-image: linear-gradient(90deg, rgba(214, 227, 235, 0.36), rgba(255, 255, 255, 0.76), rgba(255, 255, 255, 0.76));");
-        $("#userCardSettings > div > a > div").css("width", "120px");
-        $("#userCardSettings > div > a > div").css("height", "120px");
+        $("#userCardSettings > div > a > div").css("width", "105px");
+        $("#userCardSettings > div > a > div").css("height", "105px");
         $("#userCardSettings > div > a > div").css("top", "80px");
         $("#userCardSettings").attr("bgUrl", currentCardBg);
     }
