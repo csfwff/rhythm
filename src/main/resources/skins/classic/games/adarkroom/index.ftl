@@ -20,6 +20,9 @@
 	<meta itemprop="name" property="og:title" content="A Dark Room" />
 	<link rel="shortcut icon" href="${servePath}/games/adarkroom/favicon.ico" />
 	<link rel="image_src" href="${servePath}/games/adarkroom/img/adr.png" />
+	<script>
+		var servePath = "${servePath}";
+	</script>
 	<script src="${servePath}/games/adarkroom/lib/jquery.min.js"></script>
 	<script src="${servePath}/games/adarkroom/lib/jquery.color-2.1.2.min.js"></script>
 	<script src="${servePath}/games/adarkroom/lib/jquery.event.move.js"></script>
