@@ -21,7 +21,7 @@
 <div class="nav">
     <h1 aria-label="${symphonyLabel}" class="tooltipped tooltipped-s">
         <a href="${servePath}">
-            <svg><use xlink:href="#logo-white"></use></svg>
+            <svg class="swimming"><use xlink:href="#logo-white"></use></svg>
         </a>
     </h1>
     <div class="nav-tabs">
