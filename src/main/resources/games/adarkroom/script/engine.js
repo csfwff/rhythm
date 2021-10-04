@@ -587,23 +587,7 @@
 											score: Prestige.get().score,
 										}),
 										success: function (result) {
-											Events.startEvent({
-													title: _('成绩上传'),
-													scenes: {
-														start: {
-															text: [_(result.msg)],
-															buttons: {
-																'close': {
-																	text: _('close'),
-																	nextScene: 'end'
-																}
-															}
-														}
-													}
-												},
-												{
-													width: '400px'
-												});
+											alert(result.msg);
 										},
 										error: function (result) {
 											Events.startEvent({
