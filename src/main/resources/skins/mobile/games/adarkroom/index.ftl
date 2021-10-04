@@ -10,20 +10,24 @@
 		Inspired by Candy Box (http://candies.aniwey.net/)
 		Contribute on GitHub! (https://github.com/doublespeakgames/adarkroom/)
 	-->
-	<title>A Dark Room</title>
+	<#if hasSystemTitle>
+		<title>${systemTitle}</title>
+	<#else>
+		<title>A Dark Room</title>
+	</#if>
 	<meta itemprop="description" name="description" property="og:description" content="A minimalist text adventure">
 	<meta itemprop="image" property="og:image" content="img/adr.png" />
 	<meta itemprop="name" property="og:title" content="A Dark Room" />
-	<link rel="shortcut icon" href="favicon.ico" />
-	<link rel="image_src" href="img/adr.png" />
+	<link rel="shortcut icon" href="${servePath}/games/adarkroom/favicon.ico" />
+	<link rel="image_src" href="${servePath}/games/adarkroom/img/adr.png" />
 	<script src="${servePath}/games/adarkroom/lib/jquery.min.js"></script>
-	<script src="lib/jquery.color-2.1.2.min.js"></script>
-	<script src="lib/jquery.event.move.js"></script>
-	<script src="lib/jquery.event.swipe.js"></script>
-	<script src="lib/base64.js"></script>
-	<script src="lib/translate.js"></script>
+	<script src="${servePath}/games/adarkroom/lib/jquery.color-2.1.2.min.js"></script>
+	<script src="${servePath}/games/adarkroom/lib/jquery.event.move.js"></script>
+	<script src="${servePath}/games/adarkroom/lib/jquery.event.swipe.js"></script>
+	<script src="${servePath}/games/adarkroom/lib/base64.js"></script>
+	<script src="${servePath}/games/adarkroom/lib/translate.js"></script>
 	
-	<script src="lang/langs.js"></script>
+	<script src="${servePath}/games/adarkroom/lang/langs.js"></script>
 	
 	<script>
 		// try to read "lang" param's from url
@@ -41,29 +45,29 @@
 		}
 	</script>
 	
-	<script src="script/Button.js"></script>
-	<script src="script/audioLibrary.js"></script>
-	<script src="script/audio.js"></script>
-	<script src="script/engine.js"></script>
-	<script src="script/state_manager.js"></script>
-	<script src="script/header.js"></script>
-	<script src="script/notifications.js"></script>
-	<script src="script/events.js"></script>
-	<script src="script/room.js"></script>
-	<script src="script/outside.js"></script>
-	<script src="script/world.js"></script>
-	<script src="script/path.js"></script>
-	<script src="script/ship.js"></script>
-	<script src="script/space.js"></script>
-	<script src="script/prestige.js"></script>
-	<script src="script/scoring.js"></script>
+	<script src="${servePath}/games/adarkroom/script/Button.js"></script>
+	<script src="${servePath}/games/adarkroom/script/audioLibrary.js"></script>
+	<script src="${servePath}/games/adarkroom/script/audio.js"></script>
+	<script src="${servePath}/games/adarkroom/script/engine.js"></script>
+	<script src="${servePath}/games/adarkroom/script/state_manager.js"></script>
+	<script src="${servePath}/games/adarkroom/script/header.js"></script>
+	<script src="${servePath}/games/adarkroom/script/notifications.js"></script>
+	<script src="${servePath}/games/adarkroom/script/events.js"></script>
+	<script src="${servePath}/games/adarkroom/script/room.js"></script>
+	<script src="${servePath}/games/adarkroom/script/outside.js"></script>
+	<script src="${servePath}/games/adarkroom/script/world.js"></script>
+	<script src="${servePath}/games/adarkroom/script/path.js"></script>
+	<script src="${servePath}/games/adarkroom/script/ship.js"></script>
+	<script src="${servePath}/games/adarkroom/script/space.js"></script>
+	<script src="${servePath}/games/adarkroom/script/prestige.js"></script>
+	<script src="${servePath}/games/adarkroom/script/scoring.js"></script>
 	<!-- Event modules -->
-	<script src="script/events/global.js"></script>
-	<script src="script/events/room.js"></script>
-	<script src="script/events/outside.js"></script>
-	<script src="script/events/encounters.js"></script>
-  <script src="script/events/setpieces.js"></script>
-  <script src="script/events/marketing.js"></script>
+	<script src="${servePath}/games/adarkroom/script/events/global.js"></script>
+	<script src="${servePath}/games/adarkroom/script/events/room.js"></script>
+	<script src="${servePath}/games/adarkroom/script/events/outside.js"></script>
+	<script src="${servePath}/games/adarkroom/script/events/encounters.js"></script>
+  <script src="${servePath}/games/adarkroom/script/events/setpieces.js"></script>
+  <script src="${servePath}/games/adarkroom/script/events/marketing.js"></script>
 	
 	<script type='text/javascript'>
 		var oldIE = false;
@@ -72,15 +76,15 @@
 		<script type="text/javascript">oldIE = true;</script> 
 	<![endif]-->
 	
-	<link rel="stylesheet" type="text/css" href="css/main.css" />
-	<link rel="stylesheet" type="text/css" href="css/room.css" />
-	<link rel="stylesheet" type="text/css" href="css/outside.css" />
-	<link rel="stylesheet" type="text/css" href="css/path.css" />
-	<link rel="stylesheet" type="text/css" href="css/world.css" />
-	<link rel="stylesheet" type="text/css" href="css/ship.css" />
-	<link rel="stylesheet" type="text/css" href="css/space.css" />
+	<link rel="stylesheet" type="text/css" href="${servePath}/games/adarkroom/css/main.css" />
+	<link rel="stylesheet" type="text/css" href="${servePath}/games/adarkroom/css/room.css" />
+	<link rel="stylesheet" type="text/css" href="${servePath}/games/adarkroom/css/outside.css" />
+	<link rel="stylesheet" type="text/css" href="${servePath}/games/adarkroom/css/path.css" />
+	<link rel="stylesheet" type="text/css" href="${servePath}/games/adarkroom/css/world.css" />
+	<link rel="stylesheet" type="text/css" href="${servePath}/games/adarkroom/css/ship.css" />
+	<link rel="stylesheet" type="text/css" href="${servePath}/games/adarkroom/css/space.css" />
 	
-	<script src="script/localization.js"></script>
+	<script src="${servePath}/games/adarkroom/script/localization.js"></script>
 </head>
 <body>
 	<div id="wrapper">
