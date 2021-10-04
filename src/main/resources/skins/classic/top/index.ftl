@@ -30,9 +30,9 @@
         <div class="main">
             <div class="wrapper">
                 <div class="content activity">
-                    <h2 class="sub-head" style="margin-left: 90px;"><span>🏅</span> ${totalRankLabel}</h2>
+                    <h2 class="sub-head"><span>🏅</span> ${totalRankLabel}</h2>
                     <div class="list">
-                        <ul style="margin-left: 100px;">
+                        <ul>
                             <li class="fn__flex">
                                 <svg class="avatar"><use xlink:href="#linkIcon"></use></svg>
                                 <div class="fn-flex-1">
