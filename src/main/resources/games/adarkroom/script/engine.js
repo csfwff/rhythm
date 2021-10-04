@@ -588,6 +588,7 @@
 										}),
 										success: function (result) {
 											alert(result.msg);
+											Engine.confirmDelete();
 										},
 										error: function (result) {
 											Events.startEvent({
