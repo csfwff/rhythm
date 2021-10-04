@@ -136,6 +136,11 @@ public class ActivityProcessor {
     final static SimpleCurrentLimiter EATING_SNAKE_CURRENT_LIMITER = new SimpleCurrentLimiter(12 * 60 * 60, 5);
 
     /**
+     * Record ADR submit times 48hrs/req.
+     */
+    public static SimpleCurrentLimiter ADRLimiter = new SimpleCurrentLimiter((48 * 60 * 60), 1);
+
+    /**
      * Register request handlers.
      */
     public static void register() {
@@ -174,26 +179,34 @@ public class ActivityProcessor {
             final int score = requestJSONObject.optInt("score");
             try {
                 JSONObject currentUser = Sessions.getUser();
-                LOGGER.log(Level.INFO, currentUser.optString(User.USER_NAME) + " 通关ADR：" + score);
-                int amout = 10;
-                if (score > 1000) {
-                    amout = score / 1000;
+                if (ADRLimiter.access(currentUser.optString(User.USER_NAME))) {
+                    LOGGER.log(Level.INFO, currentUser.optString(User.USER_NAME) + " 通关ADR：" + score);
+                    int amout = 10;
+                    if (score > 1000) {
+                        amout = score / 1000;
+                    }
+                    if (amout > 200) {
+                        amout = 200;
+                    }
+                    final boolean succ = null != pointtransferMgmtService.transfer(Pointtransfer.ID_C_SYS, currentUser.optString(Keys.OBJECT_ID),
+                            Pointtransfer.TRANSFER_TYPE_C_ACTIVITY_ADR, amout,
+                            score + "", System.currentTimeMillis(), "");
+                    if (!succ) {
+                        throw new ServiceException(langPropsService.get("transferFailLabel"));
+                    }
+                    context.renderJSON(StatusCodes.SUCC);
+                    context.renderMsg("数据上传成功，恭喜你通关了！你获得了奖励 " + amout + " 积分！你可以在摸鱼派-总榜-ADarkRoom总分榜单中查看你的成绩！");
+                } else {
+                    context.renderJSON(StatusCodes.ERR);
+                    context.renderMsg("存储数据失败！原因：每 48 小时只允许提交一次成绩！");
                 }
-                final boolean succ = null != pointtransferMgmtService.transfer(Pointtransfer.ID_C_SYS, currentUser.optString(Keys.OBJECT_ID),
-                        Pointtransfer.TRANSFER_TYPE_C_ACTIVITY_ADR, amout,
-                        score + "", System.currentTimeMillis(), "");
-                if (!succ) {
-                    throw new ServiceException(langPropsService.get("transferFailLabel"));
-                }
-                context.renderJSON(StatusCodes.SUCC);
-                context.renderMsg("数据上传成功，恭喜你通关了！你可以在摸鱼派-总榜-ADarkRoom总分榜单中查看你的成绩！");
             } catch (NullPointerException e) {
                 context.renderJSON(StatusCodes.ERR);
                 context.renderMsg("存储数据失败！原因：你还没有登录摸鱼派，请前往摸鱼派 https://pwl.icu 登录账号后重试。");
             }
         } catch (Exception e) {
             context.renderJSON(StatusCodes.ERR);
-            context.renderMsg("存储数据失败！请检查自己是否存在作弊行为！");
+            context.renderMsg("存储数据失败！原因：请检查自己是否存在作弊行为！");
         }
     }
 
