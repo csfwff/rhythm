@@ -94,6 +94,7 @@ public class TopProcessor {
         Dispatcher.get("/top/consumption", topProcessor::showConsumption, anonymousViewCheckMidware::handle);
         Dispatcher.get("/top/checkin", topProcessor::showCheckin, anonymousViewCheckMidware::handle);
         Dispatcher.get("/top/online", topProcessor::showOnline, anonymousViewCheckMidware::handle);
+        Dispatcher.get("/top/adr", topProcessor::showADR, anonymousViewCheckMidware::handle);
     }
 
     /**
@@ -195,6 +196,24 @@ public class TopProcessor {
         final Map<String, Object> dataModel = renderer.getDataModel();
         final List<JSONObject> users = activityQueryService.getTopOnlineTimeUsers(Symphonys.TOP_CNT);
         dataModel.put("onlineTopUsers", users);
+
+        dataModelService.fillHeaderAndFooter(context, dataModel);
+        dataModelService.fillRandomArticles(dataModel);
+        dataModelService.fillSideHotArticles(dataModel);
+        dataModelService.fillSideTags(dataModel);
+        dataModelService.fillLatestCmts(dataModel);
+    }
+
+    /**
+     * Shows ADR score ranking list.
+     *
+     * @param context
+     */
+    public void showADR(final RequestContext context) {
+        final AbstractFreeMarkerRenderer renderer = new SkinRenderer(context, "top/adr.ftl");
+        final Map<String, Object> dataModel = renderer.getDataModel();
+        final List<JSONObject> users = activityQueryService.getTopADR(Symphonys.TOP_CNT);
+        dataModel.put("topUsers", users);
 
         dataModelService.fillHeaderAndFooter(context, dataModel);
         dataModelService.fillRandomArticles(dataModel);
