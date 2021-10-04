@@ -106,4 +106,8 @@
     <include path="/emoji/**/*.*" />
     <include path="/halt.html" />
     <include path="/opensearch.xml" />
+
+    <include path="/games/*.*" />
+    <include path="/games/**/*.*" />
+    <include path="/games/**/**/*.*" />
 </static-files>
