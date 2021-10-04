@@ -65,6 +65,21 @@
                             <li>
                                 <div class='fn-flex'>
                                     <div class="avatar tooltipped tooltipped-ne"
+                                         aria-label="ADarkRoom" style="background-image:url('${staticServePath}/games/adarkroom/img/adr.png')"></div>
+                                    <div class="fn-flex-1">
+                                        <h2 class="ft-13">
+                                            <a href="${servePath}/games/adarkroom/index.html?lang=zh_cn&ignorebrowser=true">ADarkRoom</a>
+                                        </h2>
+                                        <span class="ft-fade vditor-reset">
+                                                极简主义的游戏杰作，有上世纪ascii游戏的遗风。<br>
+                                                但与此同时，在其极简的界面下隐藏着巨大的信息量，从一个黑暗的屋子开始抽丝剥茧，每次剧情推进时的那一句话，简洁有力，像是出自海明威。
+                                            </span>
+                                    </div>
+                                </div>
+                            </li>
+                            <li>
+                                <div class='fn-flex'>
+                                    <div class="avatar tooltipped tooltipped-ne"
                                          aria-label="${chatRoomLabel}" style="background-image:url('${staticServePath}/images/activities/chat.png')"></div>
                                     <div class="fn-flex-1">
                                         <h2 class="ft-13">
