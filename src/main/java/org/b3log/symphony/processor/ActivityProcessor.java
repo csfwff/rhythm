@@ -165,7 +165,7 @@ public class ActivityProcessor {
         Dispatcher.post("/activity/eating-snake/collect", activityProcessor::collectEatingSnake, loginCheck::handle, csrfMidware::fill);
         Dispatcher.get("/activity/gobang", activityProcessor::showGobang, loginCheck::handle, csrfMidware::fill);
         Dispatcher.post("/activity/gobang/start", activityProcessor::startGobang, loginCheck::handle);
-        Dispatcher.post("/api/games/adarkroom/share", activityProcessor::shareADarkRoomScore, loginCheck::handle);
+        Dispatcher.post("/api/games/adarkroom/share", activityProcessor::shareADarkRoomScore, loginCheck::handle, csrfMidware::check);
     }
 
     /**

@@ -586,6 +586,7 @@
 										data: JSON.stringify({
 											score: Prestige.get().score,
 										}),
+										headers: {'csrfToken': Label.csrfToken},
 										success: function (result) {
 											alert(result.msg);
 											if (result.code === 0) {
