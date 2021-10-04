@@ -52,7 +52,8 @@
                         </div>
                     </div>
                     <div class="cmts tooltipped tooltipped-w" aria-label="总分 ${user.point}">
-                        总分 ${user.point}
+                        总分 ${user.point}<br>
+                        <span style="color: #888f91">${user.passTime?number_to_datetime}</span>
                     </div>
                 </div>
             </div>

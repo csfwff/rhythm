@@ -326,7 +326,7 @@ public class ActivityQueryService {
 
         try {
             final List<JSONObject> users = userRepository.select("SELECT\n"
-                    + "	u.*, MAX(dataId+0) AS point\n"
+                    + "	u.*, MAX(dataId+0) AS point, ANY_VALUE(p.time) as passTime\n"
                     + "FROM\n"
                     + "	" + pointtransferRepository.getName() + " AS p,\n"
                     + "	" + userRepository.getName() + " AS u\n"
