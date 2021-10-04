@@ -180,7 +180,6 @@ public class ActivityProcessor {
             try {
                 JSONObject currentUser = Sessions.getUser();
                 if (ADRLimiter.access(currentUser.optString(User.USER_NAME))) {
-                    LOGGER.log(Level.INFO, currentUser.optString(User.USER_NAME) + " 通关ADR：" + score);
                     int amout = 10;
                     if (score > 1000) {
                         amout = score / 1000;
