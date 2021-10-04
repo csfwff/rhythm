@@ -588,7 +588,9 @@
 										}),
 										success: function (result) {
 											alert(result.msg);
-											Engine.confirmDelete();
+											if (result.code === 0) {
+												Engine.confirmDelete();
+											}
 										},
 										error: function (result) {
 											Events.startEvent({
