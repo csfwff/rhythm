@@ -1351,6 +1351,9 @@ var Util = {
         let userURL = data.userURL;
         let userRole = data.userRole;
         let cardBg = data.cardBg;
+        let canFollow = data.canFollow;
+        let userNo = data.userNo;
+        let userAppRole = data.userAppRole;
         // 组合内容
         let html = "" +
             '<div class="user-card" id="userCardContent">\n' +
@@ -1369,8 +1372,15 @@ var Util = {
               '                ' + userIntro + '\n' +
               '            </div>\n';
         } else {
-          html += '<div class="user-card__info vditor-reset">' +
-              '</div>\n';
+          if (userAppRole === "0") {
+            html += '<div class="user-card__info vditor-reset">' +
+                '摸鱼派 ' + userNo + ' 号成员，<b>黑客</b>' +
+                '</div>\n';
+          } else if (userAppRole === "1") {
+            html += '<div class="user-card__info vditor-reset">' +
+                '摸鱼派 ' + userNo + ' 号成员，<b>画家</b>' +
+                '</div>\n';
+          }
         }
         html += '            <div class="user-card__icons fn__flex">\n' +
             '                <div class="fn__flex-1">\n' +
@@ -1417,7 +1427,19 @@ var Util = {
             '                <div class="fn__shrink">\n' +
             '                    <a class="green small btn" href="' + Label.servePath + '/idle-talk?toUser=' + userName + '" rel="nofollow">\n' +
             '                        私信\n' +
-            '                    </a>\n' +
+            '                    </a>\n';
+        if (canFollow === "yes") {
+          html += '' +
+              '<button class="follow small" onclick="Util.follow(this, \'' + oId + '\', \'user\')">\n' +
+              ' 关注\n' +
+              '</button>';
+        } else if (canFollow === "no") {
+          html += '' +
+              '<button class="follow small" onclick="Util.unfollow(this, \'' + oId + '\', \'user\')">\n' +
+              ' 取消关注\n' +
+              '</button>';
+        }
+        html += '' +
             '                </div>\n' +
             '            </div>\n' +
             '        </div>\n' +
