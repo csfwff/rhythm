@@ -98,10 +98,10 @@
 		</div>
   </div>
   <a class="logo" href="https://pwl.icu" alt="摸鱼派社区小游戏-作者DoubleSpeakGames.com" target="_blank" style="text-decoration: none; color: #3c4148;">
-	  <p>摸鱼派实时在线<br>用户名：${currentUser.userName}</p>
     <svg xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:cc="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:svg="http://www.w3.org/2000/svg" xmlns="http://www.w3.org/2000/svg" version="1.1" viewBox="0 0 32 32" class="logo-icon">
 		<image id="image0" width="32" height="32" x="0" y="0" href="https://pwl.stackoverflow.wiki/mplogo_128.png"/>
 	</svg>
+	  <p>反作弊已启动，将记录您的游戏时间<br>摸鱼派<span style="color: #3caf36; font-weight: bold;">实时在线</span>，用户名：${currentUser.userName}</p>
   </a>
 	<script src="${staticServePath}/js/lib/reconnecting-websocket.min.js?${staticResourceVersion}"></script>
 	<script src="${staticServePath}/js/symbol-defs${miniPostfix}.js?${staticResourceVersion}"></script>
