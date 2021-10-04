@@ -1629,11 +1629,23 @@ a[class*=" icon-"]:hover {
   10% {
     transform: translate(0,0) rotateY(0deg);
   }
+  27% {
+    transform: translate(100px,0) rotateY(0deg);
+  }
+  36% {
+    transform: translate(150px,5px) rotate(20deg);
+  }
+  42% {
+    transform: translate(175px,0) rotate(0deg);
+  }
   45% {
     transform: translate(200px,0) rotateY(0deg);
   }
+  47% {
+    transform: translate(200px,-5px) rotate(-20deg);
+  }
   50% {
-    transform: translate(200px,0) rotateY(180deg);
+    transform: translate(200px,-5px) rotate(0deg);
   }
   65% {
     transform: translate(200px,0) rotateY(180deg);
@@ -1641,7 +1653,7 @@ a[class*=" icon-"]:hover {
   85% {
     transform: translate(0,0) rotateY(180deg);
   }
-  90% {
+  88% {
     transform: translate(0,0) rotateY(0deg);
   }
   100% {
@@ -1650,5 +1662,5 @@ a[class*=" icon-"]:hover {
 }
 
 .swimming {
-  animation: swim 15s linear infinite;
+  animation: swim 15s linear;
 }
