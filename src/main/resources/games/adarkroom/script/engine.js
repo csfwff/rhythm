@@ -604,6 +604,25 @@
 												{
 													width: '400px'
 												});
+										},
+										error: function (result) {
+											Events.startEvent({
+													title: _('成绩上传出错'),
+													scenes: {
+														start: {
+															text: [_(result.data)],
+															buttons: {
+																'close': {
+																	text: _('close'),
+																	nextScene: 'end'
+																}
+															}
+														}
+													}
+												},
+												{
+													width: '400px'
+												});
 										}
 									});
 								}
