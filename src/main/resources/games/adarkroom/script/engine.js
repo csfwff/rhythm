@@ -589,7 +589,7 @@
 										success: function (result) {
 											alert(result.msg);
 											if (result.code === 0) {
-												Engine.confirmDelete();
+												Engine.deleteSave();
 											}
 										},
 										error: function (result) {
