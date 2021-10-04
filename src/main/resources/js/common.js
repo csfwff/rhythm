@@ -1435,13 +1435,14 @@ var Util = {
 
         // 设置位置
         let left = $(this).offset().left;
+        left = left + 30;
         if (left + 350 > $(document.body).width()) {
           left = left - 350;
         }
         $("#userCard").css("left", left);
         let top = $(this).offset().top - 110;
-        if (top < 50) {
-          top = $(this).offset().top + 60;
+        if (top < 45) {
+          top = $(this).offset().top + 45;
         }
         $("#userCard").css("top", top + "px");
         $("#userCard").show();
