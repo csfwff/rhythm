@@ -83,6 +83,16 @@
                                     <div class="ft-fade ft-smaller">摸鱼总统山</div>
                                 </div>
                             </li>
+                            <li class="fn__flex">
+                                <img class="avatar" src="${staticServePath}/games/adarkroom/img/adr.png" />
+                                <div class="fn-flex-1">
+                                    <h2>
+                                        <a class="title"
+                                           href="${servePath}/top/adr">A Dark Room 游戏总分排行</a>
+                                    </h2>
+                                    <div class="ft-fade ft-smaller">通过了 ADR 游戏的玩家总分排名</div>
+                                </div>
+                            </li>
                         </ul>
                         <br/>
                     </div>
