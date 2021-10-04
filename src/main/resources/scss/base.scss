@@ -1623,17 +1623,32 @@ a[class*=" icon-"]:hover {
 }
 
 @keyframes swim {
-  30% {
-    transform: translate(100px,0) rotate(0deg);
+  0% {
+    transform: translate(0,0) rotateY(0deg);
+  }
+  10% {
+    transform: translate(0,0) rotateY(0deg);
+  }
+  45% {
+    transform: translate(200px,0) rotateY(0deg);
   }
   50% {
-    transform: translate(100px,0) rotate(0deg);
+    transform: translate(200px,0) rotateY(180deg);
   }
-  80% {
-    transform: translate(0,0) rotate(0deg);
+  65% {
+    transform: translate(200px,0) rotateY(180deg);
+  }
+  85% {
+    transform: translate(0,0) rotateY(180deg);
+  }
+  90% {
+    transform: translate(0,0) rotateY(0deg);
+  }
+  100% {
+    transform: translate(0,0) rotateY(0deg);
   }
 }
 
 .swimming {
-  animation: swim 10s linear infinite;
+  animation: swim 15s linear infinite;
 }

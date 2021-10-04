@@ -525,7 +525,7 @@
     <h1 aria-label="${symphonyLabel}" class="tooltipped tooltipped-s">
         <a href="${servePath}">
             <svg>
-                <use xlink:href="#logo-white"></use>
+                <use xlink:href="#logo"></use>
             </svg>
         </a>
     </h1>
