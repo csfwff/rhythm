@@ -172,12 +172,6 @@
 				.click(Engine.share)
 				.appendTo(menu);
 
-			$('<span>')
-				.addClass('menuBtn')
-				.text(_('save.'))
-				.click(Engine.exportImport)
-				.appendTo(menu);
-
 			if(this.options.dropbox && Engine.Dropbox) {
 				this.dropbox = Engine.Dropbox.init();
 
@@ -286,80 +280,6 @@
 				$SM.set('version', Engine.VERSION);
 				Engine.event('progress', 'new game');
 			}
-		},
-
-		exportImport: function() {
-			Events.startEvent({
-				title: _('Export / Import'),
-				scenes: {
-					start: {
-						text: [
-							_('export or import save data, for backing up'),
-							_('or migrating computers')
-						],
-						buttons: {
-							'export': {
-								text: _('export'),
-								nextScene: {1: 'inputExport'}
-							},
-							'import': {
-								text: _('import'),
-								nextScene: {1: 'confirm'}
-							},
-							'cancel': {
-								text: _('cancel'),
-								nextScene: 'end'
-							}
-						}
-					},
-					'inputExport': {
-						text: [_('save this.')],
-						textarea: Engine.export64(),
-						onLoad: function() { Engine.event('progress', 'export'); },
-						readonly: true,
-						buttons: {
-							'done': {
-								text: _('got it'),
-								nextScene: 'end',
-								onChoose: Engine.disableSelection
-							}
-						}
-					},
-					'confirm': {
-						text: [
-							_('are you sure?'),
-							_('if the code is invalid, all data will be lost.'),
-							_('this is irreversible.')
-						],
-						buttons: {
-							'yes': {
-								text: _('yes'),
-								nextScene: {1: 'inputImport'},
-								onChoose: Engine.enableSelection
-							},
-							'no': {
-								text: _('no'),
-								nextScene: {1: 'start'}
-							}
-						}
-					},
-					'inputImport': {
-						text: [_('put the save code here.')],
-						textarea: '',
-						buttons: {
-							'okay': {
-								text: _('import'),
-								nextScene: 'end',
-								onChoose: Engine.import64
-							},
-							'cancel': {
-								text: _('cancel'),
-								nextScene: 'end'
-							}
-						}
-					}
-				}
-			});
 		},
 
 		generateExport64: function(){
