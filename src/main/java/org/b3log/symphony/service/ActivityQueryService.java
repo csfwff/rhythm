@@ -362,7 +362,7 @@ public class ActivityQueryService {
 
         try {
             final List<JSONObject> users = userRepository.select("SELECT\n"
-                    + "	u.*, MAX(dataId+0) AS point, ANY_VALUE(p.time) as passTime\n"
+                    + "	u.*, MAX(dataId+0) AS point, MAX(p.time) as passTime\n"
                     + "FROM\n"
                     + "	" + pointtransferRepository.getName() + " AS p,\n"
                     + "	" + userRepository.getName() + " AS u\n"
@@ -372,7 +372,7 @@ public class ActivityQueryService {
                     + "GROUP BY\n"
                     + "	toId\n"
                     + "ORDER BY\n"
-                    + "	point DESC\n"
+                    + "	point DESC, passTime ASC\n"
                     + "LIMIT ?", fetchSize);
 
             for (final JSONObject user : users) {
