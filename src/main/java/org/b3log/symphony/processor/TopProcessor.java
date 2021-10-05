@@ -95,6 +95,7 @@ public class TopProcessor {
         Dispatcher.get("/top/checkin", topProcessor::showCheckin, anonymousViewCheckMidware::handle);
         Dispatcher.get("/top/online", topProcessor::showOnline, anonymousViewCheckMidware::handle);
         Dispatcher.get("/top/adr", topProcessor::showADR, anonymousViewCheckMidware::handle);
+        Dispatcher.get("/top/mofish", topProcessor::showMofish, anonymousViewCheckMidware::handle);
     }
 
     /**
@@ -213,6 +214,24 @@ public class TopProcessor {
         final AbstractFreeMarkerRenderer renderer = new SkinRenderer(context, "top/adr.ftl");
         final Map<String, Object> dataModel = renderer.getDataModel();
         final List<JSONObject> users = activityQueryService.getTopADR(Symphonys.TOP_CNT);
+        dataModel.put("topUsers", users);
+
+        dataModelService.fillHeaderAndFooter(context, dataModel);
+        dataModelService.fillRandomArticles(dataModel);
+        dataModelService.fillSideHotArticles(dataModel);
+        dataModelService.fillSideTags(dataModel);
+        dataModelService.fillLatestCmts(dataModel);
+    }
+
+    /**
+     * Shows Mofish score ranking list.
+     *
+     * @param context
+     */
+    public void showMofish(final RequestContext context) {
+        final AbstractFreeMarkerRenderer renderer = new SkinRenderer(context, "top/mofish.ftl");
+        final Map<String, Object> dataModel = renderer.getDataModel();
+        final List<JSONObject> users = activityQueryService.getTopMofish(Symphonys.TOP_CNT);
         dataModel.put("topUsers", users);
 
         dataModelService.fillHeaderAndFooter(context, dataModel);
