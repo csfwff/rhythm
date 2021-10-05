@@ -143,6 +143,12 @@
 			}
 
 			$('<span>')
+				.addClass('menuBtn')
+				.text(_('github.'))
+				.click(function() { window.open('https://github.com/doublespeakgames/adarkroom'); })
+				.appendTo(menu);
+
+			$('<span>')
 				.addClass('volume menuBtn')
 				.text(_('sound on.'))
 				.click(() => Engine.toggleVolume())
@@ -184,8 +190,13 @@
 
 			$('<span>')
 				.addClass('menuBtn')
-				.text(_('github.'))
-				.click(function() { window.open('https://github.com/doublespeakgames/adarkroom'); })
+				.text(_('手动同步存档'))
+				.click(Engine.sync)
+				.appendTo(menu);
+
+			$('<span>')
+				.addClass('menuBtn')
+				.html(_('<span id="latestSyncTime"></span>'))
 				.appendTo(menu);
 
 			// Register keypress handlers
@@ -237,6 +248,8 @@
 
       setTimeout(notifyAboutSound, 3000);
 
+	  Engine.setSyncCron();
+
 		},
 		resumeAudioContext: function () {
 			AudioEngine.tryResumingAudioContext();
@@ -265,6 +278,16 @@
 				}
 				localStorage.gameState = JSON.stringify(State);
 			}
+		},
+
+		sync: function () {
+			$("#latestSyncTime").text("存档自动同步至摸鱼派云。最后同步时间：" + new Date().toLocaleString());
+		},
+
+		setSyncCron: function () {
+			setInterval(function () {
+				Engine.sync();
+			}, 10 * 1000);
 		},
 
 		loadGame: function() {
