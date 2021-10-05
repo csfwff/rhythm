@@ -34,6 +34,7 @@ public class CloudProcessor {
 
         final CloudProcessor cloudProcessor = beanManager.getReference(CloudProcessor.class);
         Dispatcher.post("/api/cloud/sync", cloudProcessor::sync, loginCheck::handle);
+        Dispatcher.post("/api/cloud/get", cloudProcessor::get, loginCheck::handle);
     }
 
     /**
@@ -55,5 +56,19 @@ public class CloudProcessor {
         } catch (Exception e) {
             context.renderJSON(StatusCodes.ERR).renderMsg("将游戏存档同步至摸鱼派失败");
         }
+    }
+
+    /**
+     * 获取存档
+     *
+     * @param context
+     */
+    public void get(final RequestContext context) {
+        JSONObject user = Sessions.getUser();
+        String userId = user.optString(Keys.OBJECT_ID);
+        JSONObject requestJSONObject = context.requestJSON();
+        String gameId = requestJSONObject.optString("gameId");
+        String data = cloudService.getFromCloud(userId, gameId);
+        context.renderJSON(StatusCodes.SUCC).renderJSON(new JSONObject().put("data", data));
     }
 }
