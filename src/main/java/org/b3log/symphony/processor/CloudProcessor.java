@@ -33,8 +33,8 @@ public class CloudProcessor {
         final CSRFMidware csrfMidware = beanManager.getReference(CSRFMidware.class);
 
         final CloudProcessor cloudProcessor = beanManager.getReference(CloudProcessor.class);
-        Dispatcher.post("/api/cloud/sync", cloudProcessor::sync, loginCheck::handle);
-        Dispatcher.post("/api/cloud/get", cloudProcessor::get, loginCheck::handle);
+        Dispatcher.post("/api/cloud/sync", cloudProcessor::sync, loginCheck::handle, csrfMidware::check);
+        Dispatcher.post("/api/cloud/get", cloudProcessor::get, loginCheck::handle, csrfMidware::check);
     }
 
     /**
