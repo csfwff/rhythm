@@ -93,6 +93,16 @@
                                     <div class="ft-fade ft-smaller">通过了 ADR 游戏的玩家总分排名</div>
                                 </div>
                             </li>
+                            <li class="fn__flex">
+                                <img class="avatar" src="${staticServePath}/images/mofish.png" />
+                                <div class="fn-flex-1">
+                                    <h2>
+                                        <a class="title"
+                                           href="${servePath}/top/mofish">摸鱼大闯关排行榜</a>
+                                    </h2>
+                                    <div class="ft-fade ft-smaller">摸鱼大闯关排行榜的玩家闯关数排名</div>
+                                </div>
+                            </li>
                         </ul>
                         <br/>
                     </div>
