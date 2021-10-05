@@ -69,6 +69,6 @@ public class CloudProcessor {
         JSONObject requestJSONObject = context.requestJSON();
         String gameId = requestJSONObject.optString("gameId");
         String data = cloudService.getFromCloud(userId, gameId);
-        context.renderJSON(StatusCodes.SUCC).renderJSON(new JSONObject().put("data", data));
+        context.renderJSON(StatusCodes.SUCC).renderData(data);
     }
 }

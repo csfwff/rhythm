@@ -281,7 +281,25 @@
 		},
 
 		sync: function () {
-			$("#latestSyncTime").text("存档自动同步至摸鱼派云。最后同步时间：" + new Date().toLocaleString());
+			$.ajax({
+				url: Label.servePath + "/api/cloud/sync",
+				method: "POST",
+				data: JSON.stringify({
+					gameId: "38",
+					data: Engine.export64()
+				}),
+				headers: {'csrfToken': Label.csrfToken},
+				success: function (result) {
+					if (result.code === 0) {
+						$("#latestSyncTime").text("存档自动同步至摸鱼派云。最后同步时间：" + new Date().toLocaleString());
+					} else {
+						$("#latestSyncTime").text(new Date().toLocaleString() + " 存档自动同步失败！原因：" + result.msg);
+					}
+				},
+				error: function () {
+					$("#latestSyncTime").text(new Date().toLocaleString() + " 存档自动同步失败！原因：无法连接到摸鱼派云");
+				}
+			});
 		},
 
 		setSyncCron: function () {
@@ -291,9 +309,29 @@
 		},
 
 		loadGame: function() {
+			var savedState = JSON.parse(localStorage.gameState);
 			try {
-				var savedState = JSON.parse(localStorage.gameState);
-				if(savedState) {
+				$.ajax({
+					url: Label.servePath + "/api/cloud/get",
+					method: "POST",
+					data: JSON.stringify({
+						gameId: "38",
+					}),
+					headers: {'csrfToken': Label.csrfToken},
+					success: function (result) {
+						if (result.code === 0) {
+							let string64 = result.data;
+							string64 = string64.replace(/\s/g, '');
+							string64 = string64.replace(/\./g, '');
+							string64 = string64.replace(/\n/g, '');
+							var decodedSave = Base64.decode(string64);
+							savedState = JSON.parse(decodedSave);
+							$("#latestSyncTime").text("云存档读取成功。");
+						}
+					},
+				});
+
+				if (savedState) {
 					State = savedState;
 					$SM.updateOldState();
 					Engine.log("loaded save!");
@@ -524,7 +562,7 @@
 								nextScene: 'end',
 								onChoose: function () {
 									$.ajax({
-										url: "/api/games/adarkroom/share",
+										url: Label.servePath + "/api/games/adarkroom/share",
 										method: "POST",
 										data: JSON.stringify({
 											score: Prestige.get().score,
