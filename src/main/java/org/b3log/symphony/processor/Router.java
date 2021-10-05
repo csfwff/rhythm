@@ -79,6 +79,8 @@ public final class Router {
         CaptchaProcessor.register();
         // 聊天室
         ChatroomProcessor.register();
+        // 云存储
+        CloudProcessor.register();
         // 回帖
         CommentProcessor.register();
         // 文件上传

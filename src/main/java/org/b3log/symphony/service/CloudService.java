@@ -5,6 +5,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.b3log.latke.ioc.Inject;
 import org.b3log.latke.repository.*;
+import org.b3log.latke.service.ServiceException;
 import org.b3log.latke.service.annotation.Service;
 import org.b3log.symphony.repository.CloudRepository;
 import org.json.JSONObject;
@@ -34,7 +35,7 @@ public class CloudService {
      * @param data
      * @return
      */
-    synchronized public String sync(final String userId, final String gameId, final String data) {
+    synchronized public void sync(final String userId, final String gameId, final String data) throws ServiceException {
         try {
             final Transaction transaction = cloudRepository.beginTransaction();
             // 删除旧存档
@@ -49,12 +50,12 @@ public class CloudService {
             cloudJSON.put("userId", userId)
                     .put("gameId", gameId)
                     .put("data", data);
-            String oId = cloudRepository.add(cloudJSON);
+            cloudRepository.add(cloudJSON);
             transaction.commit();
-            return oId;
         } catch (RepositoryException e) {
             LOGGER.log(Level.ERROR, "Cannot upload gaming save data to database.", e);
-            return "";
+
+            throw new ServiceException("Failed to upload game save");
         }
     }
 
