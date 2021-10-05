@@ -53,7 +53,7 @@ public class CloudService {
             transaction.commit();
             return oId;
         } catch (RepositoryException e) {
-            LOGGER.log(Level.ERROR, "Cannot upload gaming save data to the database.", e);
+            LOGGER.log(Level.ERROR, "Cannot upload gaming save data to database.", e);
             return "";
         }
     }
@@ -75,6 +75,7 @@ public class CloudService {
             JSONObject result = cloudRepository.getFirst(cloudQuery);
             return result.optString("data");
         } catch (RepositoryException e) {
+            LOGGER.log(Level.ERROR, "Cannot get gaming save data from database.", e);
             return "";
         }
     }
