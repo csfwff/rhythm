@@ -305,11 +305,10 @@
 		setSyncCron: function () {
 			setInterval(function () {
 				Engine.sync();
-			}, 10 * 1000);
+			}, 30 * 1000);
 		},
 
 		loadGame: function() {
-			var savedState = JSON.parse(localStorage.gameState);
 			try {
 				$.ajax({
 					url: Label.servePath + "/api/cloud/get",
@@ -332,6 +331,7 @@
 					},
 				});
 
+				var savedState = JSON.parse(localStorage.gameState);
 				if (savedState) {
 					State = savedState;
 					$SM.updateOldState();
