@@ -35,6 +35,7 @@ import org.b3log.symphony.util.Escapes;
 import org.b3log.symphony.util.Symphonys;
 import org.json.JSONObject;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -539,6 +540,10 @@ public class PointtransferQueryService {
                         break;
                     case Pointtransfer.TRANSFER_TYPE_C_ACTIVITY_ADR:
                         desTemplate = desTemplate.replace("{score}", dataId);
+                        break;
+                    case Pointtransfer.TRANSFER_TYPE_C_ACTIVITY_MOFISH:
+                        desTemplate = desTemplate.replace("{time}", new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date(Long.valueOf(dataId))));
+                        desTemplate = desTemplate.replace("{stage}", String.valueOf(record.optInt(Pointtransfer.SUM)));
                         break;
                     default:
                         LOGGER.warn("Invalid point type [" + type + "]");
