@@ -75,8 +75,8 @@ public class CloudService {
                     ));
             JSONObject result = cloudRepository.getFirst(cloudQuery);
             return result.optString("data");
-        } catch (RepositoryException e) {
-            LOGGER.log(Level.ERROR, "Cannot get gaming save data from database.", e);
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, "Cannot get gaming save data from database.");
             return "";
         }
     }

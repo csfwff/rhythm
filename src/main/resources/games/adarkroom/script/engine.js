@@ -291,7 +291,7 @@
 				headers: {'csrfToken': Label.csrfToken},
 				success: function (result) {
 					if (result.code === 0) {
-						$("#latestSyncTime").text("存档自动同步至摸鱼派云。最后同步时间：" + new Date().toLocaleString());
+						$("#latestSyncTime").text("存档自动同步至摸鱼派云。最后同步 " + new Date().toLocaleTimeString());
 					} else {
 						$("#latestSyncTime").text(new Date().toLocaleString() + " 存档自动同步失败！原因：" + result.msg);
 					}
@@ -319,12 +319,13 @@
 					}),
 					headers: {'csrfToken': Label.csrfToken},
 					success: function (result) {
-						if (result.code === 0) {
+						if (result.code === 0 && result.data !== "") {
 							let string64 = result.data;
 							string64 = string64.replace(/\s/g, '');
 							string64 = string64.replace(/\./g, '');
 							string64 = string64.replace(/\n/g, '');
 							var decodedSave = Base64.decode(string64);
+							localStorage.gameState = decodedSave;
 							savedState = JSON.parse(decodedSave);
 							$("#latestSyncTime").text("云存档读取成功。");
 						}
