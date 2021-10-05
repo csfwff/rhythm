@@ -403,6 +403,11 @@ public final class Pointtransfer {
     public static final int TRANSFER_TYPE_C_ACTIVITY_ADR = 38;
 
     /**
+     * Transfer type - Activity - Mofish.
+     */
+    public static final int TRANSFER_TYPE_C_ACTIVITY_MOFISH = 39;
+
+    /**
      * Transfer sum - 摆龙门阵.
      */
     public static final int TRANSFER_SUM_C_BLMZ = 5;

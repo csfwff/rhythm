@@ -126,6 +126,12 @@ public class ActivityProcessor {
     private PointtransferMgmtService pointtransferMgmtService;
 
     /**
+     * User query service.
+     */
+    @Inject
+    private UserQueryService userQueryService;
+
+    /**
      * Record if eating snake game is started.
      */
     final static HashMap<String, Long> EATING_SNAKE_STARTED = new HashMap<>();
@@ -166,6 +172,33 @@ public class ActivityProcessor {
         Dispatcher.get("/activity/gobang", activityProcessor::showGobang, loginCheck::handle, csrfMidware::fill);
         Dispatcher.post("/activity/gobang/start", activityProcessor::startGobang, loginCheck::handle);
         Dispatcher.post("/api/games/adarkroom/share", activityProcessor::shareADarkRoomScore, loginCheck::handle, csrfMidware::check);
+        Dispatcher.post("/api/games/mofish/score", activityProcessor::shareMofishScore);
+    }
+
+    /**
+     * 上传摸鱼大闯关游戏成绩
+     *
+     * @param context
+     */
+    public void shareMofishScore(final RequestContext context) {
+        try {
+            JSONObject requestJSONObject = context.requestJSON();
+            final String userName = requestJSONObject.optString("userName");
+            final int stage = requestJSONObject.optInt("stage");
+            final long time = requestJSONObject.optLong("time");
+            final JSONObject user = userQueryService.getUserByName(userName);
+            final boolean succ = null != pointtransferMgmtService.transfer(Pointtransfer.ID_C_SYS, user.optString(Keys.OBJECT_ID),
+                    Pointtransfer.TRANSFER_TYPE_C_ACTIVITY_MOFISH, stage,
+                    time + "", System.currentTimeMillis(), "");
+            if (!succ) {
+                throw new ServiceException(langPropsService.get("transferFailLabel"));
+            }
+            context.renderJSON(StatusCodes.SUCC);
+            context.renderMsg("数据上传成功！");
+        } catch (Exception e) {
+            context.renderJSON(StatusCodes.ERR);
+            context.renderMsg("存储数据失败！原因：未知原因");
+        }
     }
 
     /**
