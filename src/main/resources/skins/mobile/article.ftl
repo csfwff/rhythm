@@ -129,6 +129,12 @@
                         <a rel="author" href="${servePath}/member/${article.articleAuthorName}" class="ft-gray"
                            title="${article.articleAuthorName}"><strong>${article.articleAuthorName}</strong></a>
                         <span class="ft-gray">
+                        <#if article.articleCity != "">
+                        &nbsp;•&nbsp;
+                        <a href="${servePath}/city/${article.articleCity}" class="ft-gray">
+                                <span class="article__cnt">${article.articleCity}</span>
+                        </a>
+                        </#if>
                         &nbsp;•&nbsp;
                         <a rel="nofollow" class="ft-gray" href="#comments">
                             <b class="article-level<#if article.articleCommentCount lt 40>${(article.articleCommentCount/10)?int}<#else>4</#if>">${article.articleCommentCount}</b> ${cmtLabel}</a>
