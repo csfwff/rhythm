@@ -37,8 +37,8 @@
                             <ul>
                                 <li>
                                     <div class='fn-flex'>
-                                        <div class="avatar tooltipped tooltipped-ne"
-                                             aria-label="${activity1A0001Label}" style="background-image:url('${staticServePath}/images/activities/1A0001.png')"></div>
+                                        <div class="avatar"
+                                             style="background-image:url('${staticServePath}/images/activities/1A0001.png')"></div>
                                         <div class="fn-flex-1">
                                             <h2>
                                                 <a href="${servePath}/activity/1A0001">${activity1A0001Label}</a>
@@ -51,8 +51,8 @@
                                 </li>
                                 <li>
                                     <div class='fn-flex'>
-                                        <div class="avatar tooltipped tooltipped-ne"
-                                             aria-label="${characterLabel}" style="background-image:url('${staticServePath}/images/activities/char.png')"></div>
+                                        <div class="avatar"
+                                             style="background-image:url('${staticServePath}/images/activities/char.png')"></div>
                                         <div class="fn-flex-1">
                                             <h2>
                                                 <a href="${servePath}/activity/character">${characterLabel}</a>
@@ -63,8 +63,8 @@
                                 </li>
                                 <li>
                                     <div class='fn-flex'>
-                                        <div class="avatar tooltipped tooltipped-ne"
-                                             aria-label="${eatingSnakeLabel}" style="background-image:url('${staticServePath}/images/activities/snak.png')"></div>
+                                        <div class="avatar"
+                                             style="background-image:url('${staticServePath}/images/activities/snak.png')"></div>
                                         <div class="fn-flex-1">
                                             <h2>
                                                 <a href="${servePath}/activity/eating-snake">${eatingSnakeLabel}</a>
@@ -77,8 +77,8 @@
                                 </li>
                                 <li>
                                     <div class='fn-flex'>
-                                        <div class="avatar tooltipped tooltipped-ne"
-                                             aria-label="${gobangLabel}" style="background-image:url('${staticServePath}/images/activities/gobang.png')"></div>
+                                        <div class="avatar"
+                                             style="background-image:url('${staticServePath}/images/activities/gobang.png')"></div>
                                         <div class="fn-flex-1">
                                             <h2>
                                                 <a href="${servePath}/activity/gobang">${gobangLabel}</a>
@@ -91,8 +91,8 @@
                                 </li>
                                 <li>
                                     <div class='fn-flex'>
-                                        <div class="avatar tooltipped tooltipped-ne"
-                                             aria-label="ADarkRoom" style="background-image:url('${staticServePath}/games/adarkroom/img/adr.png')"></div>
+                                        <div class="avatar"
+                                             style="background-image:url('${staticServePath}/games/adarkroom/img/adr.png')"></div>
                                         <div class="fn-flex-1">
                                             <h2>
                                                 <a href="${servePath}/games/adarkroom/?lang=zh_cn">《A Dark Room》</a>
@@ -106,8 +106,8 @@
                                 </li>
                                 <li>
                                     <div class='fn-flex'>
-                                        <div class="avatar tooltipped tooltipped-ne"
-                                             aria-label="${chatRoomLabel}" style="background-image:url('${staticServePath}/images/activities/chat.png')"></div>
+                                        <div class="avatar"
+                                             style="background-image:url('${staticServePath}/images/activities/chat.png')"></div>
                                         <div class="fn-flex-1">
                                             <h2>
                                                 <a href="${servePath}/cr">${chatRoomLabel}</a>
