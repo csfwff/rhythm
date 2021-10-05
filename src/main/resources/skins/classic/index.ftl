@@ -244,28 +244,29 @@ ${HeaderBannerLabel}
                             <div style="font-size: 10px; color: rgba(161,163,163,0.91)" id="vLine3">我还在编......</div>
                         </div>
                     </div>
+                    <div class="metro-item">
+                        <a class="preview" href="${servePath}/activities">
+                            <img style="border-radius: 10px" src="${staticServePath}/games/adarkroom/img/adr.png" alt="五子棋">
+                            <b>摸鱼派在线游戏</b>
+                            <span style="font-size: 10px; color: #32b468">鱼油，A Dark Room上新，支持存档云同步、<br>社区排行榜，快来打游戏吧～</span>
+                        </a>
+                    </div>
                     <div class="metro-item" style="cursor: pointer">
                         <a class="preview" id="yesterday" onclick="yesterday()">
-                            <img id="yesterdayImg" src="https://pwl.stackoverflow.wiki/2021/09/红包-(1)-6e07f7a0.png"
+                            <img style="border-radius: 0" id="yesterdayImg" src="https://pwl.stackoverflow.wiki/2021/09/红包-(1)-6e07f7a0.png"
                                  alt="领取昨日活跃奖励"><b>领取昨日活跃奖励</b>
                         </a>
                     </div>
                     <div class="metro-item" style="cursor: pointer">
                         <a class="preview" id="checkIn" onclick="checkIn()">
-                            <img id="checkInImg" src="https://pwl.stackoverflow.wiki/2021/09/签到-(1)-fa104128.png"
+                            <img style="border-radius: 0" id="checkInImg" src="https://pwl.stackoverflow.wiki/2021/09/签到-(1)-fa104128.png"
                                  alt="每日签到"><b>每日签到</b>
                         </a>
                     </div>
                     <div class="metro-item">
                         <a class="preview" href="${servePath}/cr">
-                            <img src="https://pwl.stackoverflow.wiki/2021/09/多人在线聊天，聊天，群聊-2b7e898f.png" alt="聊天室">
+                            <img style="border-radius: 0" src="https://pwl.stackoverflow.wiki/2021/09/多人在线聊天，聊天，群聊-2b7e898f.png" alt="聊天室">
                             <b>聊天室</b>
-                        </a>
-                    </div>
-                    <div class="metro-item">
-                        <a class="preview" href="${servePath}/activities">
-                            <img src="${staticServePath}/games/adarkroom/img/adr.png" alt="五子棋">
-                            <b>好玩</b>
                         </a>
                     </div>
                 </div>
@@ -610,18 +611,18 @@ ${HeaderBannerLabel}
                 headers: {'csrfToken': '${csrfToken}'},
                 success: function (result) {
                     if (result.sum === -1) {
-                        $("#yesterday").html("<img src='https://pwl.stackoverflow.wiki/2021/09/embarrassed-4112bd37.png'><b>暂时没有昨日奖励可领取呦！明天再来试试吧</b>");
+                        $("#yesterday").html("<img style='border-radius: 0' src='https://pwl.stackoverflow.wiki/2021/09/embarrassed-4112bd37.png'><b>暂时没有昨日奖励可领取呦！明天再来试试吧</b>");
                         setTimeout(function () {
                             $("#yesterday").fadeOut(500, function () {
-                                $("#yesterday").html('<img src="https://pwl.stackoverflow.wiki/2021/09/红包-(1)-6e07f7a0.png" alt="领取昨日活跃奖励"><b>领取昨日活跃奖励</b>');
+                                $("#yesterday").html('<img style="border-radius: 0" src="https://pwl.stackoverflow.wiki/2021/09/红包-(1)-6e07f7a0.png" alt="领取昨日活跃奖励"><b>领取昨日活跃奖励</b>');
                                 $("#yesterday").fadeIn(500);
                             });
                         }, 2000);
                     } else {
-                        $("#yesterday").html("<img src='https://pwl.stackoverflow.wiki/2021/09/correct-1f5e3258.png'><b>昨日奖励已领取！积分 +" + result.sum + "</b>");
+                        $("#yesterday").html("<img style='border-radius: 0' src='https://pwl.stackoverflow.wiki/2021/09/correct-1f5e3258.png'><b>昨日奖励已领取！积分 +" + result.sum + "</b>");
                         setTimeout(function () {
                             $("#yesterday").fadeOut(500, function () {
-                                $("#yesterday").html('<img src="https://pwl.stackoverflow.wiki/2021/09/红包-(1)-6e07f7a0.png" alt="领取昨日活跃奖励"><b>领取昨日活跃奖励</b>');
+                                $("#yesterday").html('<img style="border-radius: 0" src="https://pwl.stackoverflow.wiki/2021/09/红包-(1)-6e07f7a0.png" alt="领取昨日活跃奖励"><b>领取昨日活跃奖励</b>');
                                 $("#yesterday").fadeIn(500);
                             });
                         }, 2000);
@@ -642,18 +643,18 @@ ${HeaderBannerLabel}
                 headers: {'csrfToken': '${csrfToken}'},
                 success: function (result) {
                     if (result.sum === -1) {
-                        $("#checkIn").html("<img src='https://pwl.stackoverflow.wiki/2021/09/embarrassed-4112bd37.png'><b>你已经签到过了哦！</b>");
+                        $("#checkIn").html("<img style='border-radius: 0' src='https://pwl.stackoverflow.wiki/2021/09/embarrassed-4112bd37.png'><b>你已经签到过了哦！</b>");
                         setTimeout(function () {
                             $("#checkIn").fadeOut(500, function () {
-                                $("#checkIn").html('<img id="checkInImg" src="https://pwl.stackoverflow.wiki/2021/09/签到-(1)-fa104128.png" alt="每日签到"><b>每日签到</b>');
+                                $("#checkIn").html('<img style="border-radius: 0" id="checkInImg" src="https://pwl.stackoverflow.wiki/2021/09/签到-(1)-fa104128.png" alt="每日签到"><b>每日签到</b>');
                                 $("#checkIn").fadeIn(500);
                             });
                         }, 2000);
                     } else {
-                        $("#checkIn").html("<img src='https://pwl.stackoverflow.wiki/2021/09/correct-1f5e3258.png'><b>签到成功～ 积分 +" + result.sum + "</b>");
+                        $("#checkIn").html("<img style='border-radius: 0' src='https://pwl.stackoverflow.wiki/2021/09/correct-1f5e3258.png'><b>签到成功～ 积分 +" + result.sum + "</b>");
                         setTimeout(function () {
                             $("#checkIn").fadeOut(500, function () {
-                                $("#checkIn").html('<img id="checkInImg" src="https://pwl.stackoverflow.wiki/2021/09/签到-(1)-fa104128.png" alt="每日签到"><b>每日签到</b>');
+                                $("#checkIn").html('<img style="border-radius: 0" id="checkInImg" src="https://pwl.stackoverflow.wiki/2021/09/签到-(1)-fa104128.png" alt="每日签到"><b>每日签到</b>');
                                 $("#checkIn").fadeIn(500);
                             });
                         }, 2000);

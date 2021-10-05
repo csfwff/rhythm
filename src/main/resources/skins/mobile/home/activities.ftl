@@ -72,8 +72,9 @@
                                         </h2>
                                         <span class="ft-fade vditor-reset">
                                                 极简主义的游戏杰作，有上世纪 ascii 游戏的遗风。<br>
-                                                但与此同时，在其极简的界面下隐藏着巨大的信息量，从一个黑暗的屋子开始抽丝剥茧，每次剧情推进时的那一句话，简洁有力，像是出自海明威。
-                                            </span>
+                                                支持存档云同步，参与 <a href="${servePath}/top/adr">${symphonyLabel} ADR 游戏总分排行榜</a><br>
+                                                <span style="color: #8b0000">注意：使用手机游玩 ADR 可能无法控制飞行器，需要插键盘或使用电脑进行通关</span>
+                                        </span>
                                     </div>
                                 </div>
                             </li>
