@@ -309,6 +309,7 @@
 		},
 
 		loadGame: function() {
+			let cloudSave = false;
 			try {
 				$.ajax({
 					url: Label.servePath + "/api/cloud/get",
@@ -316,6 +317,7 @@
 					data: JSON.stringify({
 						gameId: "38",
 					}),
+					async: false,
 					headers: {'csrfToken': Label.csrfToken},
 					success: function (result) {
 						if (result.code === 0 && result.data !== "") {
@@ -326,7 +328,7 @@
 							var decodedSave = Base64.decode(string64);
 							localStorage.gameState = decodedSave;
 							savedState = JSON.parse(decodedSave);
-							$("#latestSyncTime").text("云存档读取成功。");
+							cloudSave = true;
 						}
 					},
 				});
@@ -336,11 +338,23 @@
 					State = savedState;
 					$SM.updateOldState();
 					Engine.log("loaded save!");
+					if (cloudSave) {
+						setTimeout(function () {
+							$("#latestSyncTime").text("云存档读取成功。");
+						}, 2000);
+					} else {
+						setTimeout(function () {
+							$("#latestSyncTime").text("正在使用本地存档。");
+						}, 2000);
+					}
 				}
 			} catch(e) {
 				State = {};
 				$SM.set('version', Engine.VERSION);
 				Engine.event('progress', 'new game');
+				setTimeout(function () {
+					$("#latestSyncTime").text("存档新建成功。");
+				}, 2000);
 			}
 		},
 
