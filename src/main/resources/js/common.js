@@ -33,6 +33,32 @@ var Util = {
   bling: undefined,
   isBlinging: false,
 
+  fadeIn(element, callback) {
+    let opacity = 0;
+    for (let i = 0; i < 100; i++) {
+      setTimeout(function () {
+        opacity = +(opacity + 0.01).toFixed(2);
+        element.style.opacity = opacity;
+        if (i === 99) {
+          setTimeout(callback, 200);
+        }
+      }, i * 5);
+    }
+  },
+
+  fadeOut(element, callback) {
+    let opacity = 1;
+    for (let i = 0; i < 100; i++) {
+      setTimeout(function () {
+        opacity = +(opacity - 0.01).toFixed(2);
+        element.style.opacity = opacity;
+        if (i === 99) {
+          setTimeout(callback, 400);
+        }
+      }, i * 5);
+    }
+  },
+
   getAtUsers: function (key) {
     var atUsers = [];
     $.ajax({

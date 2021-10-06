@@ -634,34 +634,39 @@ ${HeaderBannerLabel}
     }
 
     function checkIn() {
-        $("#checkIn").fadeOut(500, function () {
-            $.ajax({
-                url: "${servePath}/activity/daily-checkin-api",
-                type: "GET",
-                cache: false,
-                async: false,
-                headers: {'csrfToken': '${csrfToken}'},
-                success: function (result) {
+        let checkInBtn = document.getElementById("checkIn");
+        Util.fadeOut(checkInBtn);
+        $.ajax({
+            url: "${servePath}/activity/daily-checkin-api",
+            type: "GET",
+            cache: false,
+            async: false,
+            headers: {'csrfToken': '${csrfToken}'},
+            success: function (result) {
+                setTimeout(function () {
                     if (result.sum === -1) {
                         $("#checkIn").html("<img style='border-radius: 0' src='https://pwl.stackoverflow.wiki/2021/09/embarrassed-4112bd37.png'><b>你已经签到过了哦！</b>");
-                        setTimeout(function () {
-                            $("#checkIn").fadeOut(500, function () {
-                                $("#checkIn").html('<img style="border-radius: 0" id="checkInImg" src="https://pwl.stackoverflow.wiki/2021/09/签到-(1)-fa104128.png" alt="每日签到"><b>每日签到</b>');
-                                $("#checkIn").fadeIn(500);
-                            });
-                        }, 2000);
+                        Util.fadeIn(checkInBtn, function () {
+                            setTimeout(function () {
+                                Util.fadeOut(checkInBtn, function () {
+                                    $("#checkIn").html('<img style="border-radius: 0" id="checkInImg" src="https://pwl.stackoverflow.wiki/2021/09/签到-(1)-fa104128.png" alt="每日签到"><b>每日签到</b>');
+                                    Util.fadeIn(checkInBtn);
+                                });
+                            }, 2000);
+                        });
                     } else {
                         $("#checkIn").html("<img style='border-radius: 0' src='https://pwl.stackoverflow.wiki/2021/09/correct-1f5e3258.png'><b>签到成功～ 积分 +" + result.sum + "</b>");
-                        setTimeout(function () {
-                            $("#checkIn").fadeOut(500, function () {
-                                $("#checkIn").html('<img style="border-radius: 0" id="checkInImg" src="https://pwl.stackoverflow.wiki/2021/09/签到-(1)-fa104128.png" alt="每日签到"><b>每日签到</b>');
-                                $("#checkIn").fadeIn(500);
-                            });
-                        }, 2000);
+                        Util.fadeIn(checkInBtn, function () {
+                            setTimeout(function () {
+                                Util.fadeOut(checkInBtn, function () {
+                                    $("#checkIn").html('<img style="border-radius: 0" id="checkInImg" src="https://pwl.stackoverflow.wiki/2021/09/签到-(1)-fa104128.png" alt="每日签到"><b>每日签到</b>');
+                                    Util.fadeIn(checkInBtn);
+                                });
+                            }, 2000);
+                        });
                     }
-                    $("#checkIn").fadeIn(500);
-                }
-            });
+                }, 500);
+            }
         });
     }
 
