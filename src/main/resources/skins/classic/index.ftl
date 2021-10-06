@@ -602,34 +602,42 @@ ${HeaderBannerLabel}
     });
 
     function yesterday() {
-        $("#yesterday").fadeOut(500, function () {
-            $.ajax({
-                url: "${servePath}/activity/yesterday-liveness-reward-api",
-                type: "GET",
-                cache: false,
-                async: false,
-                headers: {'csrfToken': '${csrfToken}'},
-                success: function (result) {
+        let yesterdayBtn = document.getElementById("yesterday");
+        Util.fadeOut(yesterdayBtn);
+        $.ajax({
+            url: "${servePath}/activity/yesterday-liveness-reward-api",
+            type: "GET",
+            cache: false,
+            async: false,
+            headers: {'csrfToken': '${csrfToken}'},
+            success: function (result) {
+                setTimeout(function () {
                     if (result.sum === -1) {
                         $("#yesterday").html("<img style='border-radius: 0' src='https://pwl.stackoverflow.wiki/2021/09/embarrassed-4112bd37.png'><b>暂时没有昨日奖励可领取呦！明天再来试试吧</b>");
-                        setTimeout(function () {
-                            $("#yesterday").fadeOut(500, function () {
-                                $("#yesterday").html('<img style="border-radius: 0" src="https://pwl.stackoverflow.wiki/2021/09/红包-(1)-6e07f7a0.png" alt="领取昨日活跃奖励"><b>领取昨日活跃奖励</b>');
-                                $("#yesterday").fadeIn(500);
-                            });
-                        }, 2000);
+                        Util.fadeIn(yesterdayBtn, function () {
+                            setTimeout(function () {
+                                Util.fadeOut(yesterdayBtn, function () {
+                                    $("#yesterday").html('<img style="border-radius: 0" src="https://pwl.stackoverflow.wiki/2021/09/红包-(1)-6e07f7a0.png" alt="领取昨日活跃奖励"><b>领取昨日活跃奖励</b>');
+                                    Util.fadeIn(yesterdayBtn);
+                                });
+                            }, 2000);
+                        });
                     } else {
                         $("#yesterday").html("<img style='border-radius: 0' src='https://pwl.stackoverflow.wiki/2021/09/correct-1f5e3258.png'><b>昨日奖励已领取！积分 +" + result.sum + "</b>");
-                        setTimeout(function () {
-                            $("#yesterday").fadeOut(500, function () {
-                                $("#yesterday").html('<img style="border-radius: 0" src="https://pwl.stackoverflow.wiki/2021/09/红包-(1)-6e07f7a0.png" alt="领取昨日活跃奖励"><b>领取昨日活跃奖励</b>');
-                                $("#yesterday").fadeIn(500);
-                            });
-                        }, 2000);
+                        Util.fadeIn(yesterdayBtn, function () {
+                            setTimeout(function () {
+                                Util.fadeOut(yesterdayBtn, function () {
+                                    $("#yesterday").html('<img style="border-radius: 0" src="https://pwl.stackoverflow.wiki/2021/09/红包-(1)-6e07f7a0.png" alt="领取昨日活跃奖励"><b>领取昨日活跃奖励</b>');
+                                    Util.fadeIn(yesterdayBtn);
+                                });
+                            }, 2000);
+                        });
                     }
-                    $("#yesterday").fadeIn(500);
-                }
-            });
+                }, 700);
+            },
+            error: function () {
+                Util.goLogin();
+            }
         });
     }
 
@@ -665,7 +673,10 @@ ${HeaderBannerLabel}
                             }, 2000);
                         });
                     }
-                }, 500);
+                }, 700);
+            },
+            error: function () {
+                Util.goLogin();
             }
         });
     }
