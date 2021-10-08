@@ -134,8 +134,14 @@ public class IndexProcessor {
         Dispatcher.get("/hot", indexProcessor::showHotArticles, anonymousViewCheckMidware::handle);
         Dispatcher.get("/perfect", indexProcessor::showPerfectArticles, anonymousViewCheckMidware::handle);
         Dispatcher.get("/charge/point", indexProcessor::showChargePoint, anonymousViewCheckMidware::handle);
+        Dispatcher.get("/games/adarkroom/", indexProcessor::showADarkRoom, loginCheck::handle);
     }
 
+    public void showADarkRoom(final RequestContext context) {
+        final AbstractFreeMarkerRenderer renderer = new SkinRenderer(context, "games/adarkroom/index.ftl");
+        final Map<String, Object> dataModel = renderer.getDataModel();
+        dataModelService.fillHeaderAndFooter(context, dataModel);
+    }
 
     /**
      * Show changelogs.

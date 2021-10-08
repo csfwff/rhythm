@@ -66,7 +66,7 @@
                                     </a>
                                 </div>
                                 <div class="fn__shrink">
-                                    <a class="green small btn" href="http://localhost:8080/idle-talk?toUser=adlered" rel="nofollow">
+                                    <a class="green small btn" href="${servePath}/idle-talk?toUser=${currentUser.userName}" rel="nofollow">
                                         私信
                                     </a>
                                 </div>

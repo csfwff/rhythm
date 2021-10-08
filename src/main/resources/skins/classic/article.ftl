@@ -193,6 +193,12 @@
                                 <span id="articltVia" class="via" data-ua="${article.articleUA}"></span>
                             </#if>
                         </a>
+                        <#if article.articleCity != "">
+                            <a href="${servePath}/city/${article.articleCity}" target="_blank" class="article__stats article__stats--a">
+                                <span class="article__cnt">${article.articleCity}</span>
+                                位置
+                            </a>
+                        </#if>
                         <div class="article__stats usersInteracts article__stats--a">
                             <span class="article__cnt">
                             ${article.articleCommentCount}
@@ -525,7 +531,7 @@
     <h1 aria-label="${symphonyLabel}" class="tooltipped tooltipped-s">
         <a href="${servePath}">
             <svg>
-                <use xlink:href="#logo-white"></use>
+                <use xlink:href="#logo"></use>
             </svg>
         </a>
     </h1>

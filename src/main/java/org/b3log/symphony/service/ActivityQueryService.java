@@ -314,4 +314,76 @@ public class ActivityQueryService {
 
         return DateUtils.isSameDay(now, new Date(time));
     }
+
+    /**
+     * Gets the top Mofish users (single game max) with the specified fetch size.
+     *
+     * @param fetchSize the specified fetch size
+     * @return users, returns an empty list if not found
+     */
+    public List<JSONObject> getTopMofish(final int fetchSize) {
+        final List<JSONObject> ret = new ArrayList<>();
+
+        try {
+            final List<JSONObject> users = userRepository.select("SELECT\n"
+                    + "	u.*, MAX(sum) AS point, MAX(p.dataId) AS passTime\n"
+                    + "FROM\n"
+                    + "	" + pointtransferRepository.getName() + " AS p,\n"
+                    + "	" + userRepository.getName() + " AS u\n"
+                    + "WHERE\n"
+                    + "	p.toId = u.oId\n"
+                    + "AND type = 39\n"
+                    + "GROUP BY\n"
+                    + "	toId\n"
+                    + "ORDER BY\n"
+                    + "	point DESC, passTime ASC\n"
+                    + "LIMIT ?", fetchSize);
+
+            for (final JSONObject user : users) {
+                avatarQueryService.fillUserAvatarURL(user);
+
+                ret.add(user);
+            }
+        } catch (final RepositoryException e) {
+            LOGGER.log(Level.ERROR, "Gets top Mofish users failed", e);
+        }
+
+        return ret;
+    }
+
+    /**
+     * Gets the top ADR users (single game max) with the specified fetch size.
+     *
+     * @param fetchSize the specified fetch size
+     * @return users, returns an empty list if not found
+     */
+    public List<JSONObject> getTopADR(final int fetchSize) {
+        final List<JSONObject> ret = new ArrayList<>();
+
+        try {
+            final List<JSONObject> users = userRepository.select("SELECT\n"
+                    + "	u.*, MAX(dataId+0) AS point, MAX(p.time) as passTime\n"
+                    + "FROM\n"
+                    + "	" + pointtransferRepository.getName() + " AS p,\n"
+                    + "	" + userRepository.getName() + " AS u\n"
+                    + "WHERE\n"
+                    + "	p.toId = u.oId\n"
+                    + "AND type = 38\n"
+                    + "GROUP BY\n"
+                    + "	toId\n"
+                    + "ORDER BY\n"
+                    + "	point DESC, passTime ASC\n"
+                    + "LIMIT ?", fetchSize);
+
+            for (final JSONObject user : users) {
+                avatarQueryService.fillUserAvatarURL(user);
+
+                ret.add(user);
+            }
+        } catch (final RepositoryException e) {
+            LOGGER.log(Level.ERROR, "Gets top ADR users failed", e);
+        }
+
+        return ret;
+    }
 }

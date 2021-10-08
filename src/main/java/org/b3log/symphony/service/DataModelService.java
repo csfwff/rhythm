@@ -488,10 +488,12 @@ public class DataModelService {
                 final JSONObject currentUser = Sessions.getUser();
                 if (Objects.isNull(currentUser)) {
                     dataModel.put("hasSystemTitle", false);
+                    dataModel.put("cardBg", "");
                 } else {
                     final JSONObject systemSettings = settingsService.getByUsrId(currentUser.optString(Keys.OBJECT_ID));
                     if (Objects.isNull(systemSettings)) {
                         dataModel.put("hasSystemTitle", false);
+                        dataModel.put("cardBg", "");
                         return;
                     }
                     final String settingsJson = systemSettings.optString(SystemSettings.SETTINGS);

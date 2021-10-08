@@ -1622,3 +1622,45 @@ a[class*=" icon-"]:hover {
   background-size: 100% 100%;
 }
 
+@keyframes swim {
+  0% {
+    transform: translate(0,0) rotateY(0deg);
+  }
+  10% {
+    transform: translate(0,0) rotateY(0deg);
+  }
+  27% {
+    transform: translate(100px,0) rotateY(0deg);
+  }
+  36% {
+    transform: translate(150px,5px) rotate(20deg);
+  }
+  42% {
+    transform: translate(175px,0) rotate(0deg);
+  }
+  45% {
+    transform: translate(200px,0) rotateY(0deg);
+  }
+  47% {
+    transform: translate(200px,-5px) rotate(-20deg);
+  }
+  50% {
+    transform: translate(200px,-5px) rotate(0deg);
+  }
+  65% {
+    transform: translate(200px,0) rotateY(180deg);
+  }
+  85% {
+    transform: translate(0,0) rotateY(180deg);
+  }
+  88% {
+    transform: translate(0,0) rotateY(0deg);
+  }
+  100% {
+    transform: translate(0,0) rotateY(0deg);
+  }
+}
+
+.swimming {
+  animation: swim 15s linear;
+}

@@ -215,6 +215,8 @@ public class UserProcessor {
         filteredUserProfile.put(UserExt.USER_POINT, user.optInt(UserExt.USER_POINT));
         filteredUserProfile.put(UserExt.USER_INTRO, user.optString(UserExt.USER_INTRO));
         filteredUserProfile.put(Keys.OBJECT_ID, user.optString(Keys.OBJECT_ID));
+        filteredUserProfile.put(UserExt.USER_NO, user.optString(UserExt.USER_NO));
+        filteredUserProfile.put(UserExt.USER_APP_ROLE, user.optString(UserExt.USER_APP_ROLE));
         final String userId = user.optString(Keys.OBJECT_ID);
         final long followerCnt = followQueryService.getFollowerCount(userId, Follow.FOLLOWING_TYPE_C_USER);
         filteredUserProfile.put("followerCount", followerCnt);
@@ -237,6 +239,29 @@ public class UserProcessor {
             } else {
                 filteredUserProfile.put("cardBg", cardBg);
             }
+        }
+        // 检查用户是否关注过这个用户
+        try {
+            final JSONObject currentUser = Sessions.getUser();
+            if (currentUser == null) {
+                // 用户未登录
+                filteredUserProfile.put("canFollow", "hide");
+            } else {
+                final String currentUserId = currentUser.optString(Keys.OBJECT_ID);
+                if (currentUserId.equals(userId)) {
+                    // 看的是自己
+                    filteredUserProfile.put("canFollow", "hide");
+                } else {
+                    final boolean isFollowing = followQueryService.isFollowing(currentUserId, userId, Follow.FOLLOWING_TYPE_C_USER);
+                    if (isFollowing) {
+                        filteredUserProfile.put("canFollow", "no");
+                    } else {
+                        filteredUserProfile.put("canFollow", "yes");
+                    }
+                }
+            }
+        } catch (Exception e) {
+            filteredUserProfile.put("canFollow", "hide");
         }
 
         context.renderJSON(StatusCodes.SUCC).renderJSON(filteredUserProfile);

@@ -45,7 +45,6 @@
                         </div>
                         <div id="yard">
                             <canvas id="snakeCanvas" height="600px" width="600px"></canvas>
-                            <#--<span id="tip" class="tip-succ" style="top: 307px;">${msg}</span>-->
                         </div>
                         <div class="fn-flex snak-rank">
                             <div class="module">
@@ -55,7 +54,7 @@
                                         <#list sumUsers as user>
                                         <li>
                                             <div class="avatar-small tooltipped tooltipped-ne slogan"
-                                                 aria-label="${activityDailyCheckinLabel}" style="background-image:url('${user.userAvatarURL48}')"></div>
+                                                 aria-label="${user.userName}" style="background-image:url('${user.userAvatarURL48}')"></div>
                                             <a class="title" href="${servePath}/member/${user.userName}">${user.userName}</a>
                                             <span class="fn-right count ft-gray ft-smaller">${user.point}</span>
                                         </li>
@@ -70,7 +69,7 @@
                                         <#list maxUsers as user>
                                         <li>
                                             <div class="avatar-small tooltipped tooltipped-ne slogan"
-                                                 aria-label="${activityDailyCheckinLabel}" style="background-image:url('${user.userAvatarURL48}')"></div>
+                                                 aria-label="${user.userName}" style="background-image:url('${user.userAvatarURL48}')"></div>
                                             <a class="title" href="${servePath}/member/${user.userName}">${user.userName}</a>
                                             <span class="fn-right count ft-gray ft-smaller">${user.point}</span>
                                         </li>

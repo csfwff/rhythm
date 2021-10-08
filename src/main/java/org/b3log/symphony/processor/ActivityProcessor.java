@@ -33,6 +33,7 @@ import org.b3log.latke.ioc.Inject;
 import org.b3log.latke.ioc.Singleton;
 import org.b3log.latke.model.User;
 import org.b3log.latke.service.LangPropsService;
+import org.b3log.latke.service.ServiceException;
 import org.b3log.symphony.model.Common;
 import org.b3log.symphony.model.Pointtransfer;
 import org.b3log.symphony.model.UserExt;
@@ -119,6 +120,18 @@ public class ActivityProcessor {
     private LangPropsService langPropsService;
 
     /**
+     * Pointtransfer management service.
+     */
+    @Inject
+    private PointtransferMgmtService pointtransferMgmtService;
+
+    /**
+     * User query service.
+     */
+    @Inject
+    private UserQueryService userQueryService;
+
+    /**
      * Record if eating snake game is started.
      */
     final static HashMap<String, Long> EATING_SNAKE_STARTED = new HashMap<>();
@@ -127,6 +140,11 @@ public class ActivityProcessor {
      * Record play times in eating snake game.
      */
     final static SimpleCurrentLimiter EATING_SNAKE_CURRENT_LIMITER = new SimpleCurrentLimiter(12 * 60 * 60, 5);
+
+    /**
+     * Record ADR submit times 48hrs/req.
+     */
+    public static SimpleCurrentLimiter ADRLimiter = new SimpleCurrentLimiter((48 * 60 * 60), 1);
 
     /**
      * Register request handlers.
@@ -153,6 +171,75 @@ public class ActivityProcessor {
         Dispatcher.post("/activity/eating-snake/collect", activityProcessor::collectEatingSnake, loginCheck::handle, csrfMidware::fill);
         Dispatcher.get("/activity/gobang", activityProcessor::showGobang, loginCheck::handle, csrfMidware::fill);
         Dispatcher.post("/activity/gobang/start", activityProcessor::startGobang, loginCheck::handle);
+        Dispatcher.post("/api/games/adarkroom/share", activityProcessor::shareADarkRoomScore, loginCheck::handle, csrfMidware::check);
+        Dispatcher.post("/api/games/mofish/score", activityProcessor::shareMofishScore);
+    }
+
+    /**
+     * 上传摸鱼大闯关游戏成绩
+     *
+     * @param context
+     */
+    public void shareMofishScore(final RequestContext context) {
+        try {
+            JSONObject requestJSONObject = context.requestJSON();
+            final String userName = requestJSONObject.optString("userName");
+            final int stage = requestJSONObject.optInt("stage");
+            final long time = requestJSONObject.optLong("time");
+            final JSONObject user = userQueryService.getUserByName(userName);
+            final boolean succ = null != pointtransferMgmtService.transfer(Pointtransfer.ID_C_SYS, user.optString(Keys.OBJECT_ID),
+                    Pointtransfer.TRANSFER_TYPE_C_ACTIVITY_MOFISH, stage,
+                    time + "", System.currentTimeMillis(), "");
+            if (!succ) {
+                throw new ServiceException(langPropsService.get("transferFailLabel"));
+            }
+            context.renderJSON(StatusCodes.SUCC);
+            context.renderMsg("数据上传成功！");
+        } catch (Exception e) {
+            context.renderJSON(StatusCodes.ERR);
+            context.renderMsg("存储数据失败！原因：未知原因");
+        }
+    }
+
+    /**
+     * 上传 ADarkRoom 游戏成绩
+     *
+     * @param context
+     */
+    public void shareADarkRoomScore(final RequestContext context) {
+        try {
+            JSONObject requestJSONObject = context.requestJSON();
+            final int score = requestJSONObject.optInt("score");
+            try {
+                JSONObject currentUser = Sessions.getUser();
+                if (ADRLimiter.access(currentUser.optString(User.USER_NAME))) {
+                    int amout = 10;
+                    if (score > 1000) {
+                        amout = score / 1000;
+                    }
+                    if (amout > 200) {
+                        amout = 200;
+                    }
+                    final boolean succ = null != pointtransferMgmtService.transfer(Pointtransfer.ID_C_SYS, currentUser.optString(Keys.OBJECT_ID),
+                            Pointtransfer.TRANSFER_TYPE_C_ACTIVITY_ADR, amout,
+                            score + "", System.currentTimeMillis(), "");
+                    if (!succ) {
+                        throw new ServiceException(langPropsService.get("transferFailLabel"));
+                    }
+                    context.renderJSON(StatusCodes.SUCC);
+                    context.renderMsg("数据上传成功，恭喜你通关了！你获得了奖励 " + amout + " 积分！你可以在摸鱼派-总榜-ADarkRoom总分榜单中查看你的成绩！");
+                } else {
+                    context.renderJSON(StatusCodes.ERR);
+                    context.renderMsg("存储数据失败！原因：每 48 小时只允许提交一次成绩！");
+                }
+            } catch (NullPointerException e) {
+                context.renderJSON(StatusCodes.ERR);
+                context.renderMsg("存储数据失败！原因：你还没有登录摸鱼派，请前往摸鱼派 https://pwl.icu 登录账号后重试。");
+            }
+        } catch (Exception e) {
+            context.renderJSON(StatusCodes.ERR);
+            context.renderMsg("存储数据失败！原因：请检查自己是否存在作弊行为！");
+        }
     }
 
     /**

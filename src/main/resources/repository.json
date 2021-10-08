@@ -1934,6 +1934,36 @@
           "description": "系统设置JSON"
         }
       ]
+    },
+    {
+      "name": "cloud",
+      "description": "游戏云存档存储库",
+      "keys": [
+        {
+          "name": "oId",
+          "type": "String",
+          "length": 19,
+          "description": "主键"
+        },
+        {
+          "name": "userId",
+          "type": "String",
+          "length": 19,
+          "description": "用户ID"
+        },
+        {
+          "name": "gameId",
+          "type": "String",
+          "length": 19,
+          "description": "游戏ID"
+        },
+        {
+          "name": "data",
+          "type": "String",
+          "length": 500000,
+          "description": "游戏存档"
+        }
+      ]
     }
   ]
 }
