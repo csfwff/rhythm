@@ -37,6 +37,11 @@ public class SystemSettings {
     public static final String SYSTEM_TITLE = "systemTitle";
 
     /**
+     * 在线时间渲染单位
+     */
+    public static final String ONLINE_TIME_UNIT = "onlineTimeUnit";
+
+    /**
      * 系统配置项
      */
     public static final String SETTINGS = "settings";
