@@ -36,6 +36,17 @@
     </div>
 
     <div class="module">
+        <div class="module-panel form fn-clear">
+            <label>在线时间显示单位</label>
+            <select id="onlineTimeUnit" onchange="Settings.update('system', '${csrfToken}')">
+                <option value="m" <#if 'm' == onlineTimeUnit>selected</#if>>分钟</option>
+                <option value="h" <#if 'h' == onlineTimeUnit>selected</#if>>小时</option>
+                <option value="d" <#if 'd' == onlineTimeUnit>selected</#if>>天</option>
+            </select>
+        </div>
+    </div>
+
+    <div class="module">
         <div class="module-header" style="margin-bottom: 15px;">
             <h2>个人卡片背景</h2>
         </div>

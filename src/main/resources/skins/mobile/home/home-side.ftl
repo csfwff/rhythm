@@ -155,7 +155,22 @@
         </ul>
         <ul class="status fn-flex" style="padding-top: 0">
             <li id="onlineMinute" style="cursor:pointer;">
-                <strong>${onlineMinute} 分钟</strong>
+                <strong>
+                    <#assign x=(user.onlineMinute?c)>
+                    <#if onlineTimeUnit??>
+                        <#if onlineTimeUnit == 'h'>
+                            <#assign t=(x?number/60)>
+                            ${t} 小时
+                        <#elseif onlineTimeUnit == 'd'>
+                            <#assign t=(x?number/60/24)>
+                            ${t} 天
+                        <#else>
+                            ${user.onlineMinute} 分钟
+                        </#if>
+                    <#else>
+                        ${user.onlineMinute} 分钟
+                    </#if>
+                </strong>
                 <span class="ft-gray">在线时间</span>
             </li>
         </ul>
