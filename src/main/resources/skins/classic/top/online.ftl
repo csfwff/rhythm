@@ -51,7 +51,20 @@
                         </div>
                     </div>
                     <div class="cmts tooltipped tooltipped-w" aria-label="在线时长共计 ${user.onlineMinute} 分钟">
-                        ${user.onlineMinute} 分钟
+                        <#assign x=(user.onlineMinute?c)>
+                        <#if onlineTimeUnit??>
+                            <#if onlineTimeUnit == 'h'>
+                                <#assign t=(x?number/60)>
+                                ${t} 小时
+                            <#elseif onlineTimeUnit == 'd'>
+                                <#assign t=(x?number/60/24)>
+                                ${t} 天
+                            <#else>
+                                ${user.onlineMinute} 分钟
+                            </#if>
+                        <#else>
+                            ${user.onlineMinute} 分钟
+                        </#if>
                     </div>
                 </div>
             </div>

@@ -489,11 +489,13 @@ public class DataModelService {
                 if (Objects.isNull(currentUser)) {
                     dataModel.put("hasSystemTitle", false);
                     dataModel.put("cardBg", "");
+                    dataModel.put(SystemSettings.ONLINE_TIME_UNIT, "m");
                 } else {
                     final JSONObject systemSettings = settingsService.getByUsrId(currentUser.optString(Keys.OBJECT_ID));
                     if (Objects.isNull(systemSettings)) {
                         dataModel.put("hasSystemTitle", false);
                         dataModel.put("cardBg", "");
+                        dataModel.put(SystemSettings.ONLINE_TIME_UNIT, "m");
                         return;
                     }
                     final String settingsJson = systemSettings.optString(SystemSettings.SETTINGS);
@@ -510,6 +512,12 @@ public class DataModelService {
                         dataModel.put("cardBg", "");
                     } else {
                         dataModel.put("cardBg", cardBg);
+                    }
+                    final String unit = settings.optString(SystemSettings.ONLINE_TIME_UNIT);
+                    if (StringUtils.isBlank(unit)) {
+                        dataModel.put(SystemSettings.ONLINE_TIME_UNIT, "m");
+                    } else {
+                        dataModel.put(SystemSettings.ONLINE_TIME_UNIT, unit);
                     }
                 }
             } else {

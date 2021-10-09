@@ -222,7 +222,22 @@ ${HeaderBannerLabel}
                                    href="${servePath}/member/${user.userName}">${user.userName}</a>
                                 <a class="fn-right count ft-gray ft-smaller"
                                    aria-label="在线时长共计 ${user.onlineMinute} 分钟"
-                                   href="${servePath}/top/online">${user.onlineMinute} 分钟</a>
+                                   href="${servePath}/top/online">
+                                    <#assign x=(user.onlineMinute?c)>
+                                    <#if onlineTimeUnit??>
+                                        <#if onlineTimeUnit == 'h'>
+                                            <#assign t=(x?number/60)>
+                                            ${t} 小时
+                                        <#elseif onlineTimeUnit == 'd'>
+                                            <#assign t=(x?number/60/24)>
+                                            ${t} 天
+                                        <#else>
+                                            ${user.onlineMinute} 分钟
+                                        </#if>
+                                    <#else>
+                                        ${user.onlineMinute} 分钟
+                                    </#if>
+                                </a>
                             </li>
                         </#if>
                     </#list>

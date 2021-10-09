@@ -512,6 +512,7 @@ var Settings = {
         requestJSONObject = {
           systemTitle: $('#newSystemTitle').val(),
           cardBg: cardBg,
+          onlineTimeUnit: $('#onlineTimeUnit').val()
         }
         break
       case 'deactivate':
