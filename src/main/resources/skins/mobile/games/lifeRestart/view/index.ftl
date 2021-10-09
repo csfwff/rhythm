@@ -117,9 +117,12 @@
             success: function (result) {
                 if (result.code === 0 && result.data !== "") {
                     Label.saveData = result.data;
-                    $("#load").click();
                 }
+                $("#load").click();
             },
+            error: function () {
+                $("#load").click();
+            }
         });
     }
 </script>
