@@ -56,9 +56,7 @@ class App{
         const indexPage = $(`
         <div id="main">
             <button id="achievement">成就</button>
-            <button id="themeToggleBtn">黑</button>
-            <button id="save">Save</button>
-            <button id="load">Load</button>
+            <button id="themeToggleBtn">黑色主题</button>
             <div id="title">
                 人生重开模拟器<br>
                 <div style="font-size:1.5rem; font-weight:normal;">这垃圾人生一秒也不想呆了</div>
@@ -103,17 +101,17 @@ class App{
                 this.switch('index');
                 this.setTheme(localStorage.getItem('theme'))
                 if(localStorage.getItem('theme') == 'light') {
-                    indexPage.find('#themeToggleBtn').text('黑')
+                    indexPage.find('#themeToggleBtn').text('黑色主题')
                 } else{
-                    indexPage.find('#themeToggleBtn').text('白')
+                    indexPage.find('#themeToggleBtn').text('白色主题')
                 }
                 this.hint('加载存档成功', 'success');
             });
 
         if(localStorage.getItem('theme') == 'light') {
-            indexPage.find('#themeToggleBtn').text('黑')
+            indexPage.find('#themeToggleBtn').text('黑色主题')
         } else{
-            indexPage.find('#themeToggleBtn').text('白')
+            indexPage.find('#themeToggleBtn').text('白色主题')
         }
 
         indexPage
@@ -121,10 +119,10 @@ class App{
             .click(() => {
                 if(localStorage.getItem('theme') == 'light') {
                     localStorage.setItem('theme', 'dark');
-                    indexPage.find('#themeToggleBtn').text('白')
+                    indexPage.find('#themeToggleBtn').text('白色主题')
                 } else {
                     localStorage.setItem('theme', 'light');
-                    indexPage.find('#themeToggleBtn').text('黑')
+                    indexPage.find('#themeToggleBtn').text('黑色主题')
                 }
 
                 this.setTheme(localStorage.getItem('theme'))
