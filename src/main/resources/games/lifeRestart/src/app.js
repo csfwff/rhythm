@@ -57,6 +57,8 @@ class App{
         <div id="main">
             <button id="achievement">成就</button>
             <button id="themeToggleBtn">黑色主题</button>
+            <button style="display: none" id="save">Save</button>
+            <button style="display: none" id="load">Load</button>
             <div id="title">
                 人生重开模拟器<br>
                 <div style="font-size:1.5rem; font-weight:normal;">这垃圾人生一秒也不想呆了</div>
