@@ -96,18 +96,22 @@ class App{
         indexPage
             .find('#load')
             .click(()=>{
-                const data = JSON.parse(saveData);
-                for(const key in data) {
-                    localStorage[key] = data[key];
+                if (Label.saveData !== '') {
+                    const data = JSON.parse(Label.saveData);
+                    for(const key in data) {
+                        localStorage[key] = data[key];
+                    }
+                    this.switch('index');
+                    this.setTheme(localStorage.getItem('theme'))
+                    if(localStorage.getItem('theme') == 'light') {
+                        indexPage.find('#themeToggleBtn').text('黑色主题')
+                    } else{
+                        indexPage.find('#themeToggleBtn').text('白色主题')
+                    }
+                    this.hint('云存档加载成功，欢迎回来！', 'success');
+                } else {
+                    this.hint('欢迎游玩人生重开模拟器！正在为你生成新的存档，并将自动同步到摸鱼派云～', 'success');
                 }
-                this.switch('index');
-                this.setTheme(localStorage.getItem('theme'))
-                if(localStorage.getItem('theme') == 'light') {
-                    indexPage.find('#themeToggleBtn').text('黑色主题')
-                } else{
-                    indexPage.find('#themeToggleBtn').text('白色主题')
-                }
-                this.hint('加载存档成功', 'success');
             });
 
         if(localStorage.getItem('theme') == 'light') {
@@ -751,6 +755,24 @@ class App{
             this.hint(`解锁成就【${name}】`, 'success');
         })
 
+        // 获取云存档
+        setTimeout(function () {
+            $.ajax({
+                url: Label.servePath + "/api/cloud/get",
+                method: "POST",
+                data: JSON.stringify({
+                    gameId: "39",
+                }),
+                async: true,
+                headers: {'csrfToken': Label.csrfToken},
+                success: function (result) {
+                    if (result.code === 0 && result.data !== "") {
+                        Label.saveData = result.data;
+                        $("#load").click()
+                    }
+                },
+            });
+        }, 1000);
 
         setInterval(function () {
 
