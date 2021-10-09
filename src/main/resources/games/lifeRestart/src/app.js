@@ -754,29 +754,6 @@ class App{
         $$on('achievement', ({name})=>{
             this.hint(`解锁成就【${name}】`, 'success');
         })
-
-        // 获取云存档
-        setTimeout(function () {
-            $.ajax({
-                url: Label.servePath + "/api/cloud/get",
-                method: "POST",
-                data: JSON.stringify({
-                    gameId: "39",
-                }),
-                async: true,
-                headers: {'csrfToken': Label.csrfToken},
-                success: function (result) {
-                    if (result.code === 0 && result.data !== "") {
-                        Label.saveData = result.data;
-                        $("#load").click()
-                    }
-                },
-            });
-        }, 1000);
-
-        setInterval(function () {
-
-        }, 5000);
     }
 
     switch(page) {
