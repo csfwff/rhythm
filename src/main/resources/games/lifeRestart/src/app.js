@@ -750,6 +750,11 @@ class App{
         $$on('achievement', ({name})=>{
             this.hint(`解锁成就【${name}】`, 'success');
         })
+
+
+        setInterval(function () {
+
+        }, 5000);
     }
 
     switch(page) {
