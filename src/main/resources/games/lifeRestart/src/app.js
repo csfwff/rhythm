@@ -553,9 +553,9 @@ class App{
                         return;
                     }
 
-                    achievement.hide();
-                    discord.hide();
-                    specialthanks.hide();
+                    // achievement.hide();
+                    // discord.hide();
+                    // specialthanks.hide();
                 },
             },
             specialthanks: {
