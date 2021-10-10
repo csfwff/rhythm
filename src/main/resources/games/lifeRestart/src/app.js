@@ -65,8 +65,8 @@ class App{
             <button id="restart" class="mainbtn"><span class="iconfont">&#xe6a7;</span>立即重开</button>
             <a id="discord" href="https://pwl.icu" target="_blank" style="z-index: 9999;"><button class="discord-btn" id="statusText">摸鱼派</button><style>.discord-btn {position: fixed;bottom: 0.5rem;left: 0.5rem;background-color: #5865F2;padding: 0.4rem;height: auto;color: white;text-align: right;vertical-align: middle;border: none;font-size: 0.7rem;border-radius: 4px;cursor: pointer}.discord-btn svg {height: 1.5rem;position: absolute;top: 50%;left: 0;transform: translateY(-50%);}.discord-btn:hover svg{animation:discord-wave 560ms ease-in-out;}@keyframes discord-wave{0%,100%{transform:translateY(-50%) rotate(0)}20%,60%{transform:translateY(-50%) rotate(-25deg)}40%,80%{transform:translateY(-50%) rotate(10deg)}}@media (max-width:500px){.discord-btn:hover svg{animation:none}.discord-btn svg{animation:discord-wave 560ms ease-in-out}}</style></a>
             <script>
-            window.onload = function() {
-                $.ajax({
+            setTimeout(function() {
+                 $.ajax({
                     url: Label.servePath + "/api/cloud/get",
                     method: "POST",
                     data: JSON.stringify({
@@ -84,7 +84,7 @@ class App{
                         $("#load").click();
                     }
                 });
-            };
+            }, 2000);
             </script>
         </div>
         `);
