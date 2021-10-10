@@ -24,13 +24,12 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.b3log.latke.Keys;
 import org.b3log.latke.ioc.Inject;
-import org.b3log.latke.repository.Query;
-import org.b3log.latke.repository.RepositoryException;
-import org.b3log.latke.repository.SortDirection;
+import org.b3log.latke.repository.*;
 import org.b3log.latke.service.annotation.Service;
 import org.b3log.latke.util.Stopwatchs;
 import org.b3log.symphony.model.Pointtransfer;
 import org.b3log.symphony.model.UserExt;
+import org.b3log.symphony.repository.CloudRepository;
 import org.b3log.symphony.repository.PointtransferRepository;
 import org.b3log.symphony.repository.UserRepository;
 import org.json.JSONObject;
@@ -77,6 +76,12 @@ public class ActivityQueryService {
      */
     @Inject
     private AvatarQueryService avatarQueryService;
+
+    /**
+     * Cloud repository.
+     */
+    @Inject
+    private CloudRepository cloudRepository;
 
     /**
      * Gets average point of activity eating snake of a user specified by the given user id.
@@ -313,6 +318,34 @@ public class ActivityQueryService {
         final long time = maybeToday.optLong(Pointtransfer.TIME);
 
         return DateUtils.isSameDay(now, new Date(time));
+    }
+
+    /**
+     * Gets the top Life Restart top of rank users with the specified fetch size.
+     *
+     * @param fetchSize the specified fetch size
+     * @return users, returns an empty list if not found
+     */
+    public List<JSONObject> getTopLifeRestart(final int fetchSize) {
+        final List<JSONObject> ret = new ArrayList<>();
+
+        try {
+            Query query = new Query()
+                    .setFilter(new PropertyFilter("gameId", FilterOperator.EQUAL, 39));
+            final List<JSONObject> users = cloudRepository.getList(query);
+
+
+
+            for (final JSONObject user : users) {
+                avatarQueryService.fillUserAvatarURL(user);
+
+                ret.add(user);
+            }
+        } catch (final RepositoryException e) {
+            LOGGER.log(Level.ERROR, "Gets top Mofish users failed", e);
+        }
+
+        return ret;
     }
 
     /**
