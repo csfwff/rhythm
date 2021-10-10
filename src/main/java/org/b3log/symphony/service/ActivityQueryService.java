@@ -351,6 +351,9 @@ public class ActivityQueryService {
                 int i2 = Integer.valueOf(new JSONObject(o2.optString("data")).optString("times"));
                 return i2 - i1;
             });
+            if (gameData.size() > fetchSize) {
+                gameData.subList(0, fetchSize);
+            }
 
             // 渲染用户信息
             for (final JSONObject data : gameData) {

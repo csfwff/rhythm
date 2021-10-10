@@ -761,34 +761,35 @@ class App{
                     }
                 });
             }, 1000);
-        }
-        setInterval(function () {
-            const data = {};
-            Object
-                .keys(localStorage)
-                .filter(v=>v.substr(0,4)!='goog')
-                .forEach(key=>data[key] = localStorage[key]);
-            let save = JSON.stringify(data);
-            $.ajax({
-                url: Label.servePath + "/api/cloud/sync",
-                method: "POST",
-                data: JSON.stringify({
-                    gameId: "39",
-                    data: save
-                }),
-                headers: {'csrfToken': Label.csrfToken},
-                success: function (result) {
-                    if (result.code === 0) {
-                        $("#statusText").html("存档自动同步至摸鱼派云。最后同步 " + new Date().toLocaleTimeString());
-                    } else {
-                        $("#statusText").html(new Date().toLocaleString() + " 存档自动同步失败！原因：" + result.msg);
+
+            setInterval(function () {
+                const data = {};
+                Object
+                    .keys(localStorage)
+                    .filter(v=>v.substr(0,4)!='goog')
+                    .forEach(key=>data[key] = localStorage[key]);
+                let save = JSON.stringify(data);
+                $.ajax({
+                    url: Label.servePath + "/api/cloud/sync",
+                    method: "POST",
+                    data: JSON.stringify({
+                        gameId: "39",
+                        data: save
+                    }),
+                    headers: {'csrfToken': Label.csrfToken},
+                    success: function (result) {
+                        if (result.code === 0) {
+                            $("#statusText").html("存档自动同步至摸鱼派云。最后同步 " + new Date().toLocaleTimeString());
+                        } else {
+                            $("#statusText").html(new Date().toLocaleString() + " 存档自动同步失败！原因：" + result.msg);
+                        }
+                    },
+                    error: function () {
+                        $("#statusText").html(new Date().toLocaleString() + " 存档自动同步失败！原因：无法连接到摸鱼派云");
                     }
-                },
-                error: function () {
-                    $("#statusText").html(new Date().toLocaleString() + " 存档自动同步失败！原因：无法连接到摸鱼派云");
-                }
-            });
-        }, 10000);
+                });
+            }, 10000);
+        }
     }
 
     switch(page) {
