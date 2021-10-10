@@ -96,6 +96,21 @@
                             <li>
                                 <div class='fn-flex'>
                                     <div class="avatar"
+                                         style="background-image:url('${staticServePath}/images/restart.png')"></div>
+                                    <div class="fn-flex-1">
+                                        <h2 class="ft-13">
+                                            <a href="${servePath}/games/lifeRestart/view/">人生重开模拟器</a>
+                                        </h2>
+                                        <span class="ft-fade vditor-reset">
+                                                如果你不满意现在的人生，那就来重开吧～<br>
+                                                支持存档云同步，参与 <a href="${servePath}/top/lifeRestart">人生重开模拟器成就排行榜</a>
+                                            </span>
+                                    </div>
+                                </div>
+                            </li>
+                            <li>
+                                <div class='fn-flex'>
+                                    <div class="avatar"
                                          style="background-image:url('${staticServePath}/images/activities/chat.png')"></div>
                                     <div class="fn-flex-1">
                                         <h2 class="ft-13">
