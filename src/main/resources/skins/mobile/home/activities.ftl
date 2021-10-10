@@ -108,18 +108,6 @@
                                     </div>
                                 </div>
                             </li>
-                            <li>
-                                <div class='fn-flex'>
-                                    <div class="avatar"
-                                         style="background-image:url('${staticServePath}/images/activities/chat.png')"></div>
-                                    <div class="fn-flex-1">
-                                        <h2 class="ft-13">
-                                            <a href="${servePath}/cr">${chatRoomLabel}</a>
-                                        </h2>
-                                        <span class="ft-fade vditor-reset">${activityChatTitleLabel}</span>
-                                    </div>
-                                </div>
-                            </li>
                         </ul>
                     </div>
                 </div>
