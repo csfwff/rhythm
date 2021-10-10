@@ -57,6 +57,7 @@ class App{
         <div id="main">
             <button id="achievement">成就</button>
             <button id="themeToggleBtn">黑色主题</button>
+            <button style="display: none" id="load">Load</button>
             <div id="title">
                 人生重开模拟器<br>
                 <div style="font-size:1.5rem; font-weight:normal;">这垃圾人生一秒也不想呆了</div>
@@ -76,6 +77,27 @@ class App{
         indexPage
             .find('#achievement')
             .click(()=>this.switch('achievement'));
+
+        indexPage
+            .find('#load')
+            .click(()=>{
+                if (Label.saveData !== '') {
+                    const data = JSON.parse(Label.saveData);
+                    for(const key in data) {
+                        localStorage[key] = data[key];
+                    }
+                    this.switch('index');
+                    this.setTheme(localStorage.getItem('theme'))
+                    if(localStorage.getItem('theme') == 'light') {
+                        indexPage.find('#themeToggleBtn').text('黑色主题')
+                    } else{
+                        indexPage.find('#themeToggleBtn').text('白色主题')
+                    }
+                    this.hint('欢迎回来！\n云存档加载成功', 'success');
+                } else {
+                    this.hint('欢迎游玩人生重开模拟器！\n正在为你生成新的存档，\n并将自动同步到摸鱼派云～', 'success');
+                }
+            });
 
         if(localStorage.getItem('theme') == 'light') {
             indexPage.find('#themeToggleBtn').text('黑色主题')
