@@ -27,32 +27,31 @@
         <li>
             <div class="fn-flex">
                 <a rel="nofollow"
-                   href="${servePath}/member/${user.userName}"
-                   ><div class="avatar" aria-label="${user.userName}" style="background-image:url('${user.userAvatarURL}')"></div></a>
+                   href="${servePath}/member/${user.profile.userName}"
+                   ><div class="avatar" aria-label="${user.profile.userName}" style="background-image:url('${user.profile.userAvatarURL}')"></div></a>
                 <div class="has-view fn-flex-1">
                     <h2>
                         ${user_index + 1}.
-                        <a rel="bookmark" href="${servePath}/member/${user.userName}">${user.userName}</a>
+                        <a rel="bookmark" href="${servePath}/member/${user.profile.userName}">${user.profile.userName}</a>
                     </h2>
                     <div class="ft-gray">
-                        <#if user.userIntro!="">
+                        <#if user.profile.userIntro!="">
                         <div>
-                            ${user.userIntro}
+                            ${user.profile.userIntro}
                         </div>
                         </#if>
-                        <#if user.userURL!="">
+                        <#if user.profile.userURL!="">
                         <div>
-                            <a target="_blank" rel="friend" href="${user.userURL?html}">${user.userURL?html}</a>
+                            <a target="_blank" rel="friend" href="${user.profile.userURL?html}">${user.profile.userURL?html}</a>
                         </div>
                         </#if>
                         <div>
-                            ${symphonyLabel} ${user.userNo?c} ${numMemberLabel},
-                            <#if 0 == user.userAppRole>${hackerLabel}<#else>${painterLabel}</#if>
+                            ${symphonyLabel} ${user.profile.userNo?c} ${numMemberLabel},
+                            <#if 0 == user.profile.userAppRole>${hackerLabel}<#else>${painterLabel}</#if>
                         </div>
                     </div>
-                    <div class="cmts tooltipped tooltipped-w" aria-label="总分 ${user.point}">
-                        总分 ${user.point}<br>
-                        <span style="color: #888f91">${user.passTime?number_to_datetime}</span>
+                    <div class="cmts tooltipped tooltipped-w">
+                        重开 ${user.data.times} 次，获得成就 ${user.achievement?c} 个<br>
                     </div>
                 </div>
             </div>

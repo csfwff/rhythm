@@ -32,11 +32,11 @@ import org.b3log.symphony.model.UserExt;
 import org.b3log.symphony.repository.CloudRepository;
 import org.b3log.symphony.repository.PointtransferRepository;
 import org.b3log.symphony.repository.UserRepository;
+import org.checkerframework.checker.units.qual.C;
+import org.json.JSONArray;
 import org.json.JSONObject;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 /**
  * Activity query service.
@@ -327,20 +327,44 @@ public class ActivityQueryService {
      * @return users, returns an empty list if not found
      */
     public List<JSONObject> getTopLifeRestart(final int fetchSize) {
-        final List<JSONObject> ret = new ArrayList<>();
+        List<JSONObject> ret = new ArrayList<>();
 
         try {
             Query query = new Query()
                     .setFilter(new PropertyFilter("gameId", FilterOperator.EQUAL, 39));
-            final List<JSONObject> users = cloudRepository.getList(query);
+            final List<JSONObject> gameDataFirst = cloudRepository.getList(query);
 
-
-
-            for (final JSONObject user : users) {
-                avatarQueryService.fillUserAvatarURL(user);
-
-                ret.add(user);
+            // 排序并剪切
+            final List<JSONObject> gameData = new ArrayList<>();
+            for (JSONObject data : gameDataFirst) {
+                try {
+                    JSONObject data2 = new JSONObject(data.optString("data"));
+                    String times = data2.optString("times");
+                    if (!times.isEmpty()) {
+                        gameData.add(data);
+                    }
+                } catch (Exception ignored) {
+                }
             }
+            Collections.sort(gameData, (o1, o2) -> {
+                int i1 = Integer.valueOf(new JSONObject(o1.optString("data")).optString("times"));
+                int i2 = Integer.valueOf(new JSONObject(o2.optString("data")).optString("times"));
+                return i2 - i1;
+            });
+
+            // 渲染用户信息
+            for (final JSONObject data : gameData) {
+                String userId = data.optString("userId");
+                data.put("profile", userRepository.get(userId));
+                data.put("data", new JSONObject(data.optString("data")));
+                try {
+                    data.put("achievement", new JSONArray(data.optJSONObject("data").optString("ACHV")).length());
+                } catch (Exception e) {
+                    data.put("achievement", 0);
+                }
+            }
+
+            ret = gameData;
         } catch (final RepositoryException e) {
             LOGGER.log(Level.ERROR, "Gets top Mofish users failed", e);
         }
