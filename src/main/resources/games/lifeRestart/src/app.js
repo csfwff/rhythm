@@ -57,14 +57,12 @@ class App{
         <div id="main">
             <button id="achievement">成就</button>
             <button id="themeToggleBtn">黑色主题</button>
-            <button style="display: none" id="save">Save</button>
-            <button style="display: none" id="load">Load</button>
             <div id="title">
                 人生重开模拟器<br>
                 <div style="font-size:1.5rem; font-weight:normal;">这垃圾人生一秒也不想呆了</div>
             </div>
             <button id="restart" class="mainbtn"><span class="iconfont">&#xe6a7;</span>立即重开</button>
-            <a id="discord" href="https://pwl.icu" target="_blank" style="z-index: 9999;"><button class="discord-btn"><svg width="50%" height="55" viewBox="0 0 71 55" fill="none" xmlns="http://www.w3.org/2000/svg"><image id="image0" width="55" height="55" x="0" y="0" href="https://pwl.stackoverflow.wiki/mplogo_white_128.png"/></svg>摸鱼派</button><style>.discord-btn {position: fixed;bottom: 0.5rem;left: 0.5rem;background-color: #5865F2;padding: 0.4rem;height: auto;color: white;text-align: right;vertical-align: middle;border: none;width: 5rem;font-size: 0.7rem;border-radius: 4px;cursor: pointer}.discord-btn svg {height: 1.5rem;position: absolute;top: 50%;left: 0;transform: translateY(-50%);}.discord-btn:hover svg{animation:discord-wave 560ms ease-in-out;}@keyframes discord-wave{0%,100%{transform:translateY(-50%) rotate(0)}20%,60%{transform:translateY(-50%) rotate(-25deg)}40%,80%{transform:translateY(-50%) rotate(10deg)}}@media (max-width:500px){.discord-btn:hover svg{animation:none}.discord-btn svg{animation:discord-wave 560ms ease-in-out}}</style></a>
+            <a id="discord" href="https://pwl.icu" target="_blank" style="z-index: 9999;"><button class="discord-btn" id="statusText">摸鱼派</button><style>.discord-btn {position: fixed;bottom: 0.5rem;left: 0.5rem;background-color: #5865F2;padding: 0.4rem;height: auto;color: white;text-align: right;vertical-align: middle;border: none;font-size: 0.7rem;border-radius: 4px;cursor: pointer}.discord-btn svg {height: 1.5rem;position: absolute;top: 50%;left: 0;transform: translateY(-50%);}.discord-btn:hover svg{animation:discord-wave 560ms ease-in-out;}@keyframes discord-wave{0%,100%{transform:translateY(-50%) rotate(0)}20%,60%{transform:translateY(-50%) rotate(-25deg)}40%,80%{transform:translateY(-50%) rotate(10deg)}}@media (max-width:500px){.discord-btn:hover svg{animation:none}.discord-btn svg{animation:discord-wave 560ms ease-in-out}}</style></a>
         </div>
         `);
 
@@ -78,41 +76,6 @@ class App{
         indexPage
             .find('#achievement')
             .click(()=>this.switch('achievement'));
-
-
-        indexPage
-            .find('#save')
-            .click(()=>{
-                const data = {};
-                Object
-                    .keys(localStorage)
-                    .filter(v=>v.substr(0,4)!='goog')
-                    .forEach(key=>data[key] = localStorage[key]);
-
-                let save = JSON.stringify(data);
-                console.log(save);
-            });
-
-        indexPage
-            .find('#load')
-            .click(()=>{
-                if (Label.saveData !== '') {
-                    const data = JSON.parse(Label.saveData);
-                    for(const key in data) {
-                        localStorage[key] = data[key];
-                    }
-                    this.switch('index');
-                    this.setTheme(localStorage.getItem('theme'))
-                    if(localStorage.getItem('theme') == 'light') {
-                        indexPage.find('#themeToggleBtn').text('黑色主题')
-                    } else{
-                        indexPage.find('#themeToggleBtn').text('白色主题')
-                    }
-                    this.hint('欢迎回来！\n云存档加载成功', 'success');
-                } else {
-                    this.hint('欢迎游玩人生重开模拟器！\n正在为你生成新的存档，\n并将自动同步到摸鱼派云～', 'success');
-                }
-            });
 
         if(localStorage.getItem('theme') == 'light') {
             indexPage.find('#themeToggleBtn').text('黑色主题')
@@ -775,6 +738,34 @@ class App{
                 }
             });
         }
+
+        setInterval(function () {
+            const data = {};
+            Object
+                .keys(localStorage)
+                .filter(v=>v.substr(0,4)!='goog')
+                .forEach(key=>data[key] = localStorage[key]);
+            let save = JSON.stringify(data);
+            $.ajax({
+                url: Label.servePath + "/api/cloud/sync",
+                method: "POST",
+                data: JSON.stringify({
+                    gameId: "39",
+                    data: save
+                }),
+                headers: {'csrfToken': Label.csrfToken},
+                success: function (result) {
+                    if (result.code === 0) {
+                        $("#statusText").html("存档自动同步至摸鱼派云。最后同步 " + new Date().toLocaleTimeString());
+                    } else {
+                        $("#statusText").html(new Date().toLocaleString() + " 存档自动同步失败！原因：" + result.msg);
+                    }
+                },
+                error: function () {
+                    $("#statusText").html(new Date().toLocaleString() + " 存档自动同步失败！原因：无法连接到摸鱼派云");
+                }
+            });
+        }, 10000);
     }
 
     switch(page) {
