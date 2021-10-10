@@ -108,9 +108,9 @@ class App{
                     } else{
                         indexPage.find('#themeToggleBtn').text('白色主题')
                     }
-                    this.hint('云存档加载成功，欢迎回来！', 'success');
+                    this.hint('欢迎回来！\n云存档加载成功', 'success');
                 } else {
-                    this.hint('欢迎游玩人生重开模拟器！正在为你生成新的存档，并将自动同步到摸鱼派云～', 'success');
+                    this.hint('欢迎游玩人生重开模拟器！\n正在为你生成新的存档，\n并将自动同步到摸鱼派云～', 'success');
                 }
             });
 
@@ -754,6 +754,27 @@ class App{
         $$on('achievement', ({name})=>{
             this.hint(`解锁成就【${name}】`, 'success');
         })
+
+        window.onload = function () {
+            $.ajax({
+                url: Label.servePath + "/api/cloud/get",
+                method: "POST",
+                data: JSON.stringify({
+                    gameId: "39",
+                }),
+                async: true,
+                headers: {'csrfToken': Label.csrfToken},
+                success: function (result) {
+                    if (result.code === 0 && result.data !== "") {
+                        Label.saveData = result.data;
+                    }
+                    $("#load").click();
+                },
+                error: function () {
+                    $("#load").click();
+                }
+            });
+        }
     }
 
     switch(page) {
