@@ -741,24 +741,26 @@ class App{
         })
 
         window.onload = function () {
-            $.ajax({
-                url: Label.servePath + "/api/cloud/get",
-                method: "POST",
-                data: JSON.stringify({
-                    gameId: "39",
-                }),
-                async: true,
-                headers: {'csrfToken': Label.csrfToken},
-                success: function (result) {
-                    if (result.code === 0 && result.data !== "") {
-                        Label.saveData = result.data;
+            setTimeout(function () {
+                $.ajax({
+                    url: Label.servePath + "/api/cloud/get",
+                    method: "POST",
+                    data: JSON.stringify({
+                        gameId: "39",
+                    }),
+                    async: true,
+                    headers: {'csrfToken': Label.csrfToken},
+                    success: function (result) {
+                        if (result.code === 0 && result.data !== "") {
+                            Label.saveData = result.data;
+                        }
+                        $("#load").click();
+                    },
+                    error: function () {
+                        $("#load").click();
                     }
-                    $("#load").click();
-                },
-                error: function () {
-                    $("#load").click();
-                }
-            });
+                });
+            }, 1000);
         }
         setInterval(function () {
             const data = {};
