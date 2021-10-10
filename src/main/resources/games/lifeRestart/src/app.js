@@ -133,7 +133,7 @@ class App{
 
         achievementPage
             .find('#rank')
-            .click(()=>this.hint('别卷了，没有排行榜'));
+            .click(()=>window.location.href = Label.servePath + "/top/lifeRestart");
         // Talent
         const talentPage = $(`
         <div id="main">
@@ -738,7 +738,6 @@ class App{
                 }
             });
         }
-
         setInterval(function () {
             const data = {};
             Object
