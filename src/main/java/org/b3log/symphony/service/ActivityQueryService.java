@@ -24,20 +24,19 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.b3log.latke.Keys;
 import org.b3log.latke.ioc.Inject;
-import org.b3log.latke.repository.Query;
-import org.b3log.latke.repository.RepositoryException;
-import org.b3log.latke.repository.SortDirection;
+import org.b3log.latke.repository.*;
 import org.b3log.latke.service.annotation.Service;
 import org.b3log.latke.util.Stopwatchs;
 import org.b3log.symphony.model.Pointtransfer;
 import org.b3log.symphony.model.UserExt;
+import org.b3log.symphony.repository.CloudRepository;
 import org.b3log.symphony.repository.PointtransferRepository;
 import org.b3log.symphony.repository.UserRepository;
+import org.checkerframework.checker.units.qual.C;
+import org.json.JSONArray;
 import org.json.JSONObject;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 /**
  * Activity query service.
@@ -77,6 +76,12 @@ public class ActivityQueryService {
      */
     @Inject
     private AvatarQueryService avatarQueryService;
+
+    /**
+     * Cloud repository.
+     */
+    @Inject
+    private CloudRepository cloudRepository;
 
     /**
      * Gets average point of activity eating snake of a user specified by the given user id.
@@ -313,6 +318,61 @@ public class ActivityQueryService {
         final long time = maybeToday.optLong(Pointtransfer.TIME);
 
         return DateUtils.isSameDay(now, new Date(time));
+    }
+
+    /**
+     * Gets the top Life Restart top of rank users with the specified fetch size.
+     *
+     * @param fetchSize the specified fetch size
+     * @return users, returns an empty list if not found
+     */
+    public List<JSONObject> getTopLifeRestart(final int fetchSize) {
+        List<JSONObject> ret = new ArrayList<>();
+
+        try {
+            Query query = new Query()
+                    .setFilter(new PropertyFilter("gameId", FilterOperator.EQUAL, 39));
+            final List<JSONObject> gameDataFirst = cloudRepository.getList(query);
+
+            // 排序并剪切
+            final List<JSONObject> gameData = new ArrayList<>();
+            for (JSONObject data : gameDataFirst) {
+                try {
+                    JSONObject data2 = new JSONObject(data.optString("data"));
+                    String times = data2.optString("times");
+                    if (!times.isEmpty()) {
+                        gameData.add(data);
+                    }
+                } catch (Exception ignored) {
+                }
+            }
+            Collections.sort(gameData, (o1, o2) -> {
+                int i1 = Integer.valueOf(new JSONObject(o1.optString("data")).optString("times"));
+                int i2 = Integer.valueOf(new JSONObject(o2.optString("data")).optString("times"));
+                return i2 - i1;
+            });
+            if (gameData.size() > fetchSize) {
+                gameData.subList(0, fetchSize);
+            }
+
+            // 渲染用户信息
+            for (final JSONObject data : gameData) {
+                String userId = data.optString("userId");
+                data.put("profile", userRepository.get(userId));
+                data.put("data", new JSONObject(data.optString("data")));
+                try {
+                    data.put("achievement", new JSONArray(data.optJSONObject("data").optString("ACHV")).length());
+                } catch (Exception e) {
+                    data.put("achievement", 0);
+                }
+            }
+
+            ret = gameData;
+        } catch (final RepositoryException e) {
+            LOGGER.log(Level.ERROR, "Gets top Mofish users failed", e);
+        }
+
+        return ret;
     }
 
     /**

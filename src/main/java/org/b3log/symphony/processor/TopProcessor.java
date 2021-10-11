@@ -96,6 +96,7 @@ public class TopProcessor {
         Dispatcher.get("/top/online", topProcessor::showOnline, anonymousViewCheckMidware::handle);
         Dispatcher.get("/top/adr", topProcessor::showADR, anonymousViewCheckMidware::handle);
         Dispatcher.get("/top/mofish", topProcessor::showMofish, anonymousViewCheckMidware::handle);
+        Dispatcher.get("/top/lifeRestart", topProcessor::showLifeRestart, anonymousViewCheckMidware::handle);
     }
 
     /**
@@ -232,6 +233,24 @@ public class TopProcessor {
         final AbstractFreeMarkerRenderer renderer = new SkinRenderer(context, "top/mofish.ftl");
         final Map<String, Object> dataModel = renderer.getDataModel();
         final List<JSONObject> users = activityQueryService.getTopMofish(Symphonys.TOP_CNT);
+        dataModel.put("topUsers", users);
+
+        dataModelService.fillHeaderAndFooter(context, dataModel);
+        dataModelService.fillRandomArticles(dataModel);
+        dataModelService.fillSideHotArticles(dataModel);
+        dataModelService.fillSideTags(dataModel);
+        dataModelService.fillLatestCmts(dataModel);
+    }
+
+    /**
+     * Shows Life Restart ranking list.
+     *
+     * @param context
+     */
+    public void showLifeRestart(final RequestContext context) {
+        final AbstractFreeMarkerRenderer renderer = new SkinRenderer(context, "top/lifeRestart.ftl");
+        final Map<String, Object> dataModel = renderer.getDataModel();
+        final List<JSONObject> users = activityQueryService.getTopLifeRestart(Symphonys.TOP_CNT);
         dataModel.put("topUsers", users);
 
         dataModelService.fillHeaderAndFooter(context, dataModel);

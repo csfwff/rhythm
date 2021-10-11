@@ -110,4 +110,12 @@
     <include path="/games/*.*" />
     <include path="/games/**/*.*" />
     <include path="/games/**/**/*.*" />
+    <include path="/games/**/**/**/*.*" />
+    <include path="/games/**/**/**/**/*.*" />
+    <include path="/games/**/**/**/**/**/*.*" />
+    <include path="/games/**/**/**/**/**/**/*.*" />
+    <include path="/games/**/**/**/**/**/**/**/*.*" />
+    <include path="/games/**/**/**/**/**/**/**/**/*.*" />
+    <include path="/games/**/**/**/**/**/**/**/**/**/*.*" />
+    <include path="/games/**/**/**/**/**/**/**/**/**/**/*.*" />
 </static-files>
