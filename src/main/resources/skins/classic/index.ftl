@@ -668,6 +668,7 @@ ${HeaderBannerLabel}
             '</div>' +
             '<br>' +
             '</div>');
+        $("#checkInCaptcha").focus();
         $("#checkInCaptcha").keypress(function (e) {
             if (e.which == 13) {
                 submitCheckIn();
@@ -697,6 +698,12 @@ ${HeaderBannerLabel}
                         '<br><br><br>' +
                         '<p style="color:red">验证码错误！请重试。</p>' +
                         '</div>');
+                    $("#checkInCaptcha").focus();
+                    $("#checkInCaptcha").keypress(function (e) {
+                        if (e.which == 13) {
+                            submitCheckIn();
+                        }
+                    });
                 } else {
                     if (result.sum === undefined) {
                         Util.goLogin();
