@@ -31,24 +31,30 @@ import org.b3log.latke.ioc.Singleton;
 import org.b3log.latke.util.Strings;
 import org.b3log.symphony.model.Common;
 import org.json.JSONObject;
+import org.patchca.background.BackgroundFactory;
+import org.patchca.color.ColorFactory;
 import org.patchca.color.GradientColorFactory;
 import org.patchca.color.RandomColorFactory;
+import org.patchca.filter.ConfigurableFilterFactory;
+import org.patchca.filter.library.AbstractImageOp;
+import org.patchca.filter.library.WobbleImageOp;
 import org.patchca.filter.predefined.CurvesRippleFilterFactory;
 import org.patchca.font.RandomFontFactory;
 import org.patchca.service.Captcha;
 import org.patchca.service.ConfigurableCaptchaService;
+import org.patchca.text.renderer.BestFitTextRenderer;
+import org.patchca.text.renderer.TextRenderer;
 import org.patchca.word.RandomWordFactory;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.image.BufferedImage;
+import java.awt.image.BufferedImageOp;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashSet;
+import java.util.*;
 import java.util.List;
-import java.util.Set;
 
 /**
  * Captcha processor.
@@ -78,12 +84,12 @@ public class CaptchaProcessor {
     /**
      * Captcha length.
      */
-    private static final int CAPTCHA_LENGTH = 4;
+    private static final int CAPTCHA_LENGTH = 1;
 
     /**
      * Captcha chars.
      */
-    private static final String CHARS = "acdefhijklmnprstuvwxy234578";
+    private static final String CHARS = "的是了我不人在他有这个上们来到时大地为子中你说生国年着就那和要她出也得里后自以会家可下而过天去能对小多然于心学么之都好看起发当没成只如事把还用第样道想作种开美总从无情己面最女但现前些所同日手又行意动方期它头经长儿回位分爱老因很给名法间斯知世什两次使身者被高已亲其进此话常与活正感";
 
     /**
      * Register request handlers.
@@ -126,18 +132,25 @@ public class CaptchaProcessor {
 
         try {
             final ConfigurableCaptchaService cs = new ConfigurableCaptchaService();
+            // 随机颜色
             if (0.5 < Math.random()) {
                 cs.setColorFactory(new GradientColorFactory());
             } else {
                 cs.setColorFactory(new RandomColorFactory());
             }
-            cs.setFilterFactory(new CurvesRippleFilterFactory(cs.getColorFactory()));
+            // 随机字符
             final RandomWordFactory randomWordFactory = new RandomWordFactory();
             randomWordFactory.setCharacters(CHARS);
             randomWordFactory.setMinLength(CAPTCHA_LENGTH);
             randomWordFactory.setMaxLength(CAPTCHA_LENGTH);
             cs.setWordFactory(randomWordFactory);
+            // 随机字体
             cs.setFontFactory(new RandomFontFactory(getAvaialbeFonts()));
+            // 自定义验证码图片背景
+            MyCustomBackgroundFactory backgroundFactory = new MyCustomBackgroundFactory();
+            cs.setBackgroundFactory(backgroundFactory);
+            // 彩条
+            cs.setFilterFactory(new CurvesRippleFilterFactory(cs.getColorFactory()));
 
             final Captcha captcha = cs.getCaptcha();
             final String challenge = captcha.getChallenge();
@@ -237,5 +250,55 @@ public class CaptchaProcessor {
         //ret.add(defaultFontName);
 
         return ret;
+    }
+
+    /**
+     * 自定义验证码图片背景,主要画一些噪点和干扰线
+     */
+    private class MyCustomBackgroundFactory implements BackgroundFactory {
+        private Random random = new Random();
+
+        public void fillBackground(BufferedImage image) {
+            Graphics graphics = image.getGraphics();
+
+            // 验证码图片的宽高
+            int imgWidth = image.getWidth();
+            int imgHeight = image.getHeight();
+
+            // 填充为灰色背景
+            graphics.setColor(Color.GRAY);
+            graphics.fillRect(0, 0, imgWidth, imgHeight);
+
+            // 画100个噪点(颜色及位置随机)
+            for(int i = 0; i < 100; i++) {
+                // 随机颜色
+                int rInt = random.nextInt(255);
+                int gInt = random.nextInt(255);
+                int bInt = random.nextInt(255);
+
+                graphics.setColor(new Color(rInt, gInt, bInt));
+
+                // 随机位置
+                int xInt = random.nextInt(imgWidth - 3);
+                int yInt = random.nextInt(imgHeight - 2);
+
+                // 随机旋转角度
+                int sAngleInt = random.nextInt(360);
+                int eAngleInt = random.nextInt(360);
+
+                // 随机大小
+                int wInt = random.nextInt(6);
+                int hInt = random.nextInt(6);
+
+                graphics.fillArc(xInt, yInt, wInt, hInt, sAngleInt, eAngleInt);
+
+                // 画5条干扰线
+                if (i % 20 == 0) {
+                    int xInt2 = random.nextInt(imgWidth);
+                    int yInt2 = random.nextInt(imgHeight);
+                    graphics.drawLine(xInt, yInt, xInt2, yInt2);
+                }
+            }
+        }
     }
 }
