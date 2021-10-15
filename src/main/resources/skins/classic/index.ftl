@@ -260,25 +260,25 @@ ${HeaderBannerLabel}
                         </div>
                     </div>
                     <div class="metro-item" style="cursor: pointer">
-                        <a class="preview" id="yesterday" onclick="yesterday()">
-                            <img style="border-radius: 0" id="yesterdayImg" src="https://pwl.stackoverflow.wiki/2021/10/coin-da297c7f.png"><b>领取昨日活跃奖励</b>
-                        </a>
-                    </div>
-                    <div class="metro-item" style="cursor: pointer">
                         <a class="preview" id="checkIn" onclick="checkIn()">
                             <img style="border-radius: 0" id="checkInImg" src="https://pwl.stackoverflow.wiki/2021/10/Fishing-a219e80c.png"><b>每日签到</b>
                         </a>
                     </div>
-                    <div class="metro-item">
-                        <a class="preview" href="${servePath}/cr">
-                            <img style="border-radius: 0" src="https://pwl.stackoverflow.wiki/2021/10/tips_wechat-cc864256.png">
-                            <b>聊天室</b>
+                    <div class="metro-item" style="cursor: pointer">
+                        <a class="preview" id="yesterday" onclick="yesterday()">
+                            <img style="border-radius: 0" id="yesterdayImg" src="https://pwl.stackoverflow.wiki/2021/10/coin-2-70217cc1.png"><b>领取昨日活跃奖励</b>
                         </a>
                     </div>
                     <div class="metro-item">
                         <a class="preview" href="${servePath}/activities">
                             <img style="border-radius: 10px" src="https://pwl.stackoverflow.wiki/2021/10/psp-game-1a94ae64.png">
                             <b>摸鱼派在线游戏</b>
+                        </a>
+                    </div>
+                    <div class="metro-item">
+                        <a class="preview" href="${servePath}/cr">
+                            <img style="border-radius: 0" src="https://pwl.stackoverflow.wiki/2021/10/tips_wechat-cc864256.png">
+                            <b>聊天室</b>
                         </a>
                     </div>
                 </div>
@@ -631,7 +631,7 @@ ${HeaderBannerLabel}
                         Util.fadeIn(yesterdayBtn, function () {
                             setTimeout(function () {
                                 Util.fadeOut(yesterdayBtn, function () {
-                                    $("#yesterday").html('<img style="border-radius: 0" src="https://pwl.stackoverflow.wiki/2021/10/coin-da297c7f.png" alt="领取昨日活跃奖励"><b>领取昨日活跃奖励</b>');
+                                    $("#yesterday").html('<img style="border-radius: 0" src="https://pwl.stackoverflow.wiki/2021/10/coin-2-70217cc1.png" alt="领取昨日活跃奖励"><b>领取昨日活跃奖励</b>');
                                     Util.fadeIn(yesterdayBtn);
                                 });
                             }, 2000);
@@ -641,7 +641,7 @@ ${HeaderBannerLabel}
                         Util.fadeIn(yesterdayBtn, function () {
                             setTimeout(function () {
                                 Util.fadeOut(yesterdayBtn, function () {
-                                    $("#yesterday").html('<img style="border-radius: 0" src="https://pwl.stackoverflow.wiki/2021/10/coin-da297c7f.png" alt="领取昨日活跃奖励"><b>领取昨日活跃奖励</b>');
+                                    $("#yesterday").html('<img style="border-radius: 0" src="https://pwl.stackoverflow.wiki/2021/10/coin-2-70217cc1.png" alt="领取昨日活跃奖励"><b>领取昨日活跃奖励</b>');
                                     Util.fadeIn(yesterdayBtn);
                                 });
                             }, 2000);
