@@ -293,6 +293,9 @@ ${HeaderBannerLabel}
                         }, 2000);
                     }
                     $("#yesterday").fadeIn(500);
+                },
+                error: function () {
+                    Util.goLogin();
                 }
             });
         });
@@ -371,6 +374,9 @@ ${HeaderBannerLabel}
                             }
                             $("#checkIn").fadeIn(500);
                         }
+                    },
+                    error: function () {
+                        Util.goLogin();
                     }
                 });
             });
