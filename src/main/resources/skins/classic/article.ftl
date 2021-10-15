@@ -222,6 +222,12 @@
                                 <span id="articleCollectCnt" class="article__cnt">${article.articleCollectCnt}</span>
                                 收藏
                             </div>
+                            <#if article.articleQnAOfferPoint?c != "0">
+                                <div class="article__stats usersInteracts article__stats--a">
+                                    <span id="articleQnAOfferCnt" class="article__cnt">${article.articleQnAOfferPoint?c}</span>
+                                    ${qnaOfferLabel}
+                                </div>
+                            </#if>
                         </div>
                         <br>
                         <br>
