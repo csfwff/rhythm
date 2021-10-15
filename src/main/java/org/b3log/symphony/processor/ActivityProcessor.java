@@ -160,9 +160,8 @@ public class ActivityProcessor {
         Dispatcher.get("/activity/character", activityProcessor::showCharacter, loginCheck::handle, csrfMidware::fill);
         Dispatcher.post("/activity/character/submit", activityProcessor::submitCharacter, loginCheck::handle);
         Dispatcher.get("/activities", activityProcessor::showActivities);
-        Dispatcher.get("/activity/checkin", activityProcessor::showDailyCheckin);
-        Dispatcher.get("/activity/daily-checkin-api", activityProcessor::dailyCheckinApi, loginCheck::handle, csrfMidware::check);
-        Dispatcher.get("/activity/yesterday-liveness-reward-api", activityProcessor::yesterdayLivenessRewardApi, loginCheck::handle, csrfMidware::check);
+        Dispatcher.get("/activity/daily-checkin-api/{captcha}", activityProcessor::dailyCheckinApi, loginCheck::handle);
+        Dispatcher.get("/activity/yesterday-liveness-reward-api", activityProcessor::yesterdayLivenessRewardApi, loginCheck::handle);
         Dispatcher.get("/activity/1A0001", activityProcessor::show1A0001, csrfMidware::fill);
         Dispatcher.post("/activity/1A0001/bet", activityProcessor::bet1A0001, loginCheck::handle, csrfMidware::check, activity1A0001ValidationMidware::handle);
         Dispatcher.post("/activity/1A0001/collect", activityProcessor::collect1A0001, loginCheck::handle, activity1A0001CollectValidationMidware::handle);
@@ -331,51 +330,19 @@ public class ActivityProcessor {
     }
 
     /**
-     * Shows daily checkin page.
-     *
-     * @param context the specified context
-     */
-    public void showDailyCheckin(final RequestContext context) {
-        final JSONObject user = Sessions.getUser();
-        final String userId = user.optString(Keys.OBJECT_ID);
-        if (activityQueryService.isCheckedinToday(userId)) {
-            context.sendRedirect(Latkes.getServePath() + "/member/" + user.optString(User.USER_NAME) + "/points");
-            return;
-        }
-
-        final AbstractFreeMarkerRenderer renderer = new SkinRenderer(context, "activity/checkin.ftl");
-        final Map<String, Object> dataModel = renderer.getDataModel();
-        dataModelService.fillHeaderAndFooter(context, dataModel);
-        dataModelService.fillRandomArticles(dataModel);
-        dataModelService.fillSideHotArticles(dataModel);
-        dataModelService.fillSideTags(dataModel);
-        dataModelService.fillLatestCmts(dataModel);
-    }
-
-    /**
-     * Daily checkin.
-     *
-     * @param context the specified context
-     */
-    @Deprecated
-    public void dailyCheckin(final RequestContext context) {
-        final JSONObject user = Sessions.getUser();
-        final String userId = user.optString(Keys.OBJECT_ID);
-        activityMgmtService.dailyCheckin(userId);
-
-        context.sendRedirect(Latkes.getServePath() + "/member/" + user.optString(User.USER_NAME) + "/points");
-    }
-
-    /**
      * Daily checkin.
      *
      * @param context the specified context
      */
     public void dailyCheckinApi(final RequestContext context) {
-        final JSONObject user = Sessions.getUser();
-        final String userId = user.optString(Keys.OBJECT_ID);
-
-        context.renderJSON(new JSONObject().put("sum", activityMgmtService.dailyCheckin(userId)));
+        final String captcha = context.pathVar("captcha");
+        if (CaptchaProcessor.invalidCaptcha(captcha)) {
+            context.renderJSON(new JSONObject().put("sum", -9999));
+        } else {
+            final JSONObject user = Sessions.getUser();
+            final String userId = user.optString(Keys.OBJECT_ID);
+            context.renderJSON(new JSONObject().put("sum", activityMgmtService.dailyCheckin(userId)));
+        }
     }
 
     /**

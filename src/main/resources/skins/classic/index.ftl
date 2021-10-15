@@ -655,42 +655,76 @@ ${HeaderBannerLabel}
         });
     }
 
+    Label.checkInCaptcha = "";
+
     function checkIn() {
+        Util.alert('请输入验证码以继续签到<br><br>' +
+            '<div class="input-wrap">' +
+            '<img id="registerCaptchaImg" style="width: 128px" src="${servePath}/captcha" onclick="this.src=\'${servePath}/captcha?\' + (new Date()).getTime()" />' +
+            '<br><br>' +
+            '<div>' +
+            '<input type="text" id="checkInCaptcha" placeholder="验证码" style="float:left;width:74%;border:1px solid rgba(0,0,0,0.38);background-color:#FAFAFA;border-radius:3px;box-shadow:0 1px 2px rgb(0 0 0 / 8%) inset;padding:7px 8px;line-height:17px;box-sizing:border-box;-moz-box-sizing:border-box;-webkit-box-sizing:border-box;" />' +
+            '<button onclick="submitCheckIn()" style="float:right;width:25%;cursor:pointer;color:rgba(0,0,0,0.87);border-radius:3px;padding:6px 12px;background-color:rgba(0,0,0,0.02);border:1px solid #D5D5D5;border-bottom-color:#E1E1E1;box-sizing:border-box;line-height:19px;white-space:nowrap;">签到</button>' +
+            '</div>' +
+            '<br>' +
+            '</div>');
+        $("#checkInCaptcha").keypress(function (e) {
+            if (e.which == 13) {
+                submitCheckIn();
+            }
+        });
+    }
+
+    function submitCheckIn() {
+        Label.checkInCaptcha = $("#checkInCaptcha").val();
+        Util.closeAlert();
         let checkInBtn = document.getElementById("checkIn");
         Util.fadeOut(checkInBtn);
         $.ajax({
-            url: "${servePath}/activity/daily-checkin-api",
+            url: "${servePath}/activity/daily-checkin-api/" + Label.checkInCaptcha,
             type: "GET",
-            cache: false,
             async: false,
-            headers: {'csrfToken': '${csrfToken}'},
             success: function (result) {
-                if (result.sum === undefined) {
-                    Util.goLogin();
-                }
-                setTimeout(function () {
-                    if (result.sum === -1) {
-                        $("#checkIn").html("<img style='border-radius: 0' src='https://pwl.stackoverflow.wiki/2021/09/embarrassed-4112bd37.png'><b>你已经签到过了哦！</b>");
-                        Util.fadeIn(checkInBtn, function () {
-                            setTimeout(function () {
-                                Util.fadeOut(checkInBtn, function () {
-                                    $("#checkIn").html('<img style="border-radius: 0" id="checkInImg" src="https://pwl.stackoverflow.wiki/2021/10/Fishing-a219e80c.png" alt="每日签到"><b>每日签到</b>');
-                                    Util.fadeIn(checkInBtn);
-                                });
-                            }, 2000);
-                        });
-                    } else {
-                        $("#checkIn").html("<img style='border-radius: 0' src='https://pwl.stackoverflow.wiki/2021/09/correct-1f5e3258.png'><b>签到成功～ 积分 +" + result.sum + "</b>");
-                        Util.fadeIn(checkInBtn, function () {
-                            setTimeout(function () {
-                                Util.fadeOut(checkInBtn, function () {
-                                    $("#checkIn").html('<img style="border-radius: 0" id="checkInImg" src="https://pwl.stackoverflow.wiki/2021/10/Fishing-a219e80c.png" alt="每日签到"><b>每日签到</b>');
-                                    Util.fadeIn(checkInBtn);
-                                });
-                            }, 2000);
-                        });
+                if (result.sum === -9999) {
+                    Util.alert('请输入验证码以继续签到<br><br>' +
+                        '<div class="input-wrap">' +
+                        '<img id="registerCaptchaImg" style="width: 128px" src="${servePath}/captcha" onclick="this.src=\'${servePath}/captcha?\' + (new Date()).getTime()" />' +
+                        '<br><br>' +
+                        '<div>' +
+                        '<input type="text" id="checkInCaptcha" placeholder="验证码" style="float:left;width:74%;border:1px solid rgba(0,0,0,0.38);background-color:#FAFAFA;border-radius:3px;box-shadow:0 1px 2px rgb(0 0 0 / 8%) inset;padding:7px 8px;line-height:17px;box-sizing:border-box;-moz-box-sizing:border-box;-webkit-box-sizing:border-box;" />' +
+                        '<button onclick="submitCheckIn()" style="float:right;width:25%;cursor:pointer;color:rgba(0,0,0,0.87);border-radius:3px;padding:6px 12px;background-color:rgba(0,0,0,0.02);border:1px solid #D5D5D5;border-bottom-color:#E1E1E1;box-sizing:border-box;line-height:19px;white-space:nowrap;">签到</button>' +
+                        '</div>' +
+                        '<br><br><br>' +
+                        '<p style="color:red">验证码错误！请重试。</p>' +
+                        '</div>');
+                } else {
+                    if (result.sum === undefined) {
+                        Util.goLogin();
                     }
-                }, 700);
+                    setTimeout(function () {
+                        if (result.sum === -1) {
+                            $("#checkIn").html("<img style='border-radius: 0' src='https://pwl.stackoverflow.wiki/2021/09/embarrassed-4112bd37.png'><b>你已经签到过了哦！</b>");
+                            Util.fadeIn(checkInBtn, function () {
+                                setTimeout(function () {
+                                    Util.fadeOut(checkInBtn, function () {
+                                        $("#checkIn").html('<img style="border-radius: 0" id="checkInImg" src="https://pwl.stackoverflow.wiki/2021/10/Fishing-a219e80c.png" alt="每日签到"><b>每日签到</b>');
+                                        Util.fadeIn(checkInBtn);
+                                    });
+                                }, 2000);
+                            });
+                        } else {
+                            $("#checkIn").html("<img style='border-radius: 0' src='https://pwl.stackoverflow.wiki/2021/09/correct-1f5e3258.png'><b>签到成功～ 积分 +" + result.sum + "</b>");
+                            Util.fadeIn(checkInBtn, function () {
+                                setTimeout(function () {
+                                    Util.fadeOut(checkInBtn, function () {
+                                        $("#checkIn").html('<img style="border-radius: 0" id="checkInImg" src="https://pwl.stackoverflow.wiki/2021/10/Fishing-a219e80c.png" alt="每日签到"><b>每日签到</b>');
+                                        Util.fadeIn(checkInBtn);
+                                    });
+                                }, 2000);
+                            });
+                        }
+                    }, 700);
+                }
             },
             error: function () {
                 Util.goLogin();
