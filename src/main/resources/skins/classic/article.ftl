@@ -224,14 +224,15 @@
                             <br><br><br>
                             <div id="articleThanksCnt" class="article__stats usersInteracts article__stats--a">
                                 <span class="article__cnt">${article.thankedCnt}</span>
-                                <span class="fn__flex-inline">感谢</span>
+                                <span class="fn__flex-inline">感谢&nbsp;<svg><use xlink:href="#iconHeart"></use></svg></span>
                             </div>
+                            <br>
                         </#if>
                         <#if article.articleCommentCount != 0>
                             <br><br><br>
                             <div class="article__stats usersInteracts article__stats--a">
                                 <span class="article__cnt">${article.articleCommentCount}</span>
-                                <span class="fn__flex-inline">${cmtLabel}</span>
+                                <span class="fn__flex-inline">${cmtLabel}&nbsp;<svg><use xlink:href="#replyIcon"></use></svg></span>
                             </div>
                             <#list article.commentors as user>
                                 <a target="_blank" href="${servePath}/member/${user.userName}">
