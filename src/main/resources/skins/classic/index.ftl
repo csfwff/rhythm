@@ -400,8 +400,7 @@ ${HeaderBannerLabel}
                                     <a rel="nofollow" class="title fn-ellipsis fn-flex-1"
                                        href="${servePath}${article.articlePermalink}">${article.articleTitleEmoj}</a>
                                     <a class="fn-right count ft-gray ft-smaller"
-                                       href="${servePath}${article.articlePermalink}"><#if article.articleViewCount < 1000>
-                                            ${article.articleViewCount}<#else>${article.articleViewCntDisplayFormat}</#if></a>
+                                       href="${servePath}${article.articlePermalink}">${article.articleQnAOfferPoint?c} ${qnaOfferLabel}</a>
                                 </li>
                             </#if>
                         </#list>
