@@ -136,6 +136,9 @@ public class CaptchaProcessor {
             randomWordFactory.setMinLength(CAPTCHA_LENGTH);
             randomWordFactory.setMaxLength(CAPTCHA_LENGTH);
             cs.setWordFactory(randomWordFactory);
+            // 随机字体
+            List<String> fonts = getAvaialbeFonts();
+            cs.setFontFactory(new RandomFontFactory(fonts));
             // 自定义验证码图片背景
             MyCustomBackgroundFactory backgroundFactory = new MyCustomBackgroundFactory();
             cs.setBackgroundFactory(backgroundFactory);
@@ -231,7 +234,7 @@ public class CaptchaProcessor {
         final GraphicsEnvironment e = GraphicsEnvironment.getLocalGraphicsEnvironment();
         final Font[] fonts = e.getAllFonts();
         for (final Font f : fonts) {
-            if (Strings.contains(f.getFontName(), new String[]{"Verdana", "DejaVu Sans Mono", "Tahoma"})) {
+            if (Strings.contains(f.getFontName(), new String[]{"文泉驿微米黑", "文泉驿等宽微米黑", "文泉驿正黑", "文泉驿等宽正黑", "文泉驿点阵正黑", "文鼎ＰＬ新宋", "AR PL UMing CN", "Arial-Black"})) {
                 ret.add(f.getFontName());
             }
         }
