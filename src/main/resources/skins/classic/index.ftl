@@ -708,6 +708,7 @@ ${HeaderBannerLabel}
                                 submitCheckIn();
                             }
                         });
+                        Util.fadeIn(checkInBtn);
                     } else {
                         if (result.sum === undefined) {
                             Util.goLogin();
