@@ -480,6 +480,9 @@ var Comment = {
         $('.editor-hide').click()
       },
     })
+
+    // 显示点赞和感谢数量
+
   },
   /**
    * @description 感谢评论.
