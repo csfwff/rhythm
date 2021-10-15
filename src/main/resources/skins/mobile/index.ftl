@@ -298,36 +298,83 @@ ${HeaderBannerLabel}
         });
     }
 
+    Label.checkInCaptcha = "";
+
     function checkIn() {
-        $("#checkIn").fadeOut(500, function () {
-            $.ajax({
-                url: "${servePath}/activity/daily-checkin-api",
-                type: "GET",
-                cache: false,
-                async: false,
-                headers: {'csrfToken': '${csrfToken}'},
-                success: function (result) {
-                    if (result.sum === -1) {
-                        $("#checkIn").html("你已经签到过了哦！");
-                        setTimeout(function () {
-                            $("#checkIn").fadeOut(500, function () {
-                                $("#checkIn").html('每日签到');
-                                $("#checkIn").fadeIn(500);
-                            });
-                        }, 2000);
-                    } else {
-                        $("#checkIn").html("签到成功～ 积分 +" + result.sum);
-                        setTimeout(function () {
-                            $("#checkIn").fadeOut(500, function () {
-                                $("#checkIn").html('每日签到');
-                                $("#checkIn").fadeIn(500);
-                            });
-                        }, 2000);
-                    }
-                    $("#checkIn").fadeIn(500);
-                }
-            });
+        Util.alert('请输入验证码以继续签到<br><br>' +
+            '<div class="input-wrap">' +
+            '<img id="registerCaptchaImg" style="width: 128px" src="" onclick="this.src=\'${servePath}/captcha?\' + (new Date()).getTime()" />' +
+            '<br><br>' +
+            '<div>' +
+            '<input type="text" id="checkInCaptcha" placeholder="验证码" style="float:left;width:74%;border:1px solid rgba(0,0,0,0.38);background-color:#FAFAFA;border-radius:3px;box-shadow:0 1px 2px rgb(0 0 0 / 8%) inset;padding:7px 8px;line-height:17px;box-sizing:border-box;-moz-box-sizing:border-box;-webkit-box-sizing:border-box;" />' +
+            '<button onclick="submitCheckIn()" style="float:right;width:25%;cursor:pointer;color:rgba(0,0,0,0.87);border-radius:3px;padding:6px 12px;background-color:rgba(0,0,0,0.02);border:1px solid #D5D5D5;border-bottom-color:#E1E1E1;box-sizing:border-box;line-height:19px;white-space:nowrap;">签到</button>' +
+            '</div>' +
+            '<br>' +
+            '</div>');
+        $("#registerCaptchaImg").attr("src", "${servePath}/captcha?" + (new Date()).getTime());
+        $("#checkInCaptcha").focus();
+        $("#checkInCaptcha").keypress(function (e) {
+            if (e.which == 13) {
+                submitCheckIn();
+            }
         });
+    }
+
+    function submitCheckIn() {
+        Label.checkInCaptcha = $("#checkInCaptcha").val();
+        if (Label.checkInCaptcha !== "") {
+            Util.closeAlert();
+            $("#checkIn").fadeOut(500, function () {
+                $.ajax({
+                    url: "${servePath}/activity/daily-checkin-api/" + Label.checkInCaptcha,
+                    type: "GET",
+                    async: false,
+                    headers: {'csrfToken': '${csrfToken}'},
+                    success: function (result) {
+                        if (result.sum === -9999) {
+                            Util.alert('请输入验证码以继续签到<br><br>' +
+                                '<div class="input-wrap">' +
+                                '<img id="registerCaptchaImg" style="width: 128px" src="" onclick="this.src=\'${servePath}/captcha?\' + (new Date()).getTime()" />' +
+                                '<br><br>' +
+                                '<div>' +
+                                '<input type="text" id="checkInCaptcha" placeholder="验证码" style="float:left;width:74%;border:1px solid rgba(0,0,0,0.38);background-color:#FAFAFA;border-radius:3px;box-shadow:0 1px 2px rgb(0 0 0 / 8%) inset;padding:7px 8px;line-height:17px;box-sizing:border-box;-moz-box-sizing:border-box;-webkit-box-sizing:border-box;" />' +
+                                '<button onclick="submitCheckIn()" style="float:right;width:25%;cursor:pointer;color:rgba(0,0,0,0.87);border-radius:3px;padding:6px 12px;background-color:rgba(0,0,0,0.02);border:1px solid #D5D5D5;border-bottom-color:#E1E1E1;box-sizing:border-box;line-height:19px;white-space:nowrap;">签到</button>' +
+                                '</div>' +
+                                '<br><br><br>' +
+                                '<p style="color:red">验证码错误！请重试。</p>' +
+                                '</div>');
+                            $("#registerCaptchaImg").attr("src", "${servePath}/captcha?" + (new Date()).getTime());
+                            $("#checkInCaptcha").focus();
+                            $("#checkInCaptcha").keypress(function (e) {
+                                if (e.which == 13) {
+                                    submitCheckIn();
+                                }
+                            });
+                            $("#checkIn").fadeIn(500);
+                        } else {
+                            if (result.sum === -1) {
+                                $("#checkIn").html("你已经签到过了哦！");
+                                setTimeout(function () {
+                                    $("#checkIn").fadeOut(500, function () {
+                                        $("#checkIn").html('每日签到');
+                                        $("#checkIn").fadeIn(500);
+                                    });
+                                }, 2000);
+                            } else {
+                                $("#checkIn").html("签到成功～ 积分 +" + result.sum);
+                                setTimeout(function () {
+                                    $("#checkIn").fadeOut(500, function () {
+                                        $("#checkIn").html('每日签到');
+                                        $("#checkIn").fadeIn(500);
+                                    });
+                                }, 2000);
+                            }
+                            $("#checkIn").fadeIn(500);
+                        }
+                    }
+                });
+            });
+        }
     }
 </script>
 </html>
