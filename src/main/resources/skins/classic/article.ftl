@@ -322,7 +322,7 @@
                             <li>
                                 <div class="fn-flex">
                                     <a rel="nofollow" href="${servePath}/member/${comment.commentAuthorName}">
-                                        <div class="avatar tooltipped tooltipped-se"
+                                        <div class="avatar"
                                              aria-label="${comment.commentAuthorName}"
                                              style="background-image:url('${comment.commentAuthorThumbnailURL}')"></div>
                                     </a>
