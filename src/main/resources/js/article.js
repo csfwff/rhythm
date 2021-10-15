@@ -480,9 +480,6 @@ var Comment = {
         $('.editor-hide').click()
       },
     })
-
-    // 显示点赞和感谢数量
-
   },
   /**
    * @description 感谢评论.
@@ -1137,6 +1134,30 @@ var Article = {
     if (searchQuery) {
       sessionStorage.setItem('r', searchQuery.split('&')[0])
     }
+
+    $(function () {
+      // 显示点赞和感谢数量
+      $.ajax({
+        url: Label.servePath + "/api/article/reward/senders/" + Label.articleOId,
+        method: "GET",
+        async: false,
+        headers: {'csrfToken': Label.csrfToken},
+        success: function (result) {
+          if (result.code === 0 && result.data !== "") {
+            let data = result.data;
+            for (let i = 0; i < data.length; i++) {
+              let innerData = data[i];
+              $("#articleThanksCnt").after("" +
+                  "<a target=\"_blank\" href=\"" + Label.servePath + "/member/" + innerData.userName + "\">\n" +
+                  "    <div class=\"article__participant\">\n" +
+                  "        <div class=\"avatar-small\" aria-label=\"" + innerData.userName + "\" style=\"background-image: url('" + innerData.userAvatarURL + "');\"></div>\n" +
+                  "    </div>\n" +
+                  "</a>")
+            };
+            Util.listenUserCard();
+          }},
+      });
+    });
   },
   /**
    * 历史版本对比
