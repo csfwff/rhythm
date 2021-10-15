@@ -136,8 +136,6 @@ public class CaptchaProcessor {
             randomWordFactory.setMinLength(CAPTCHA_LENGTH);
             randomWordFactory.setMaxLength(CAPTCHA_LENGTH);
             cs.setWordFactory(randomWordFactory);
-            // 随机字体
-            cs.setFontFactory(new RandomFontFactory(getAvaialbeFonts()));
             // 自定义验证码图片背景
             MyCustomBackgroundFactory backgroundFactory = new MyCustomBackgroundFactory();
             cs.setBackgroundFactory(backgroundFactory);
