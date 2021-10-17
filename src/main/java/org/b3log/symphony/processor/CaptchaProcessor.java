@@ -22,12 +22,14 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.b3log.latke.Latkes;
 import org.b3log.latke.http.Dispatcher;
 import org.b3log.latke.http.RequestContext;
 import org.b3log.latke.http.Response;
 import org.b3log.latke.http.renderer.PngRenderer;
 import org.b3log.latke.ioc.BeanManager;
 import org.b3log.latke.ioc.Singleton;
+import org.b3log.latke.util.Requests;
 import org.b3log.latke.util.Strings;
 import org.b3log.symphony.model.Common;
 import org.json.JSONObject;
@@ -39,12 +41,14 @@ import org.patchca.font.RandomFontFactory;
 import org.patchca.service.Captcha;
 import org.patchca.service.ConfigurableCaptchaService;
 import org.patchca.word.RandomWordFactory;
+import pers.adlered.simplecurrentlimiter.main.SimpleCurrentLimiter;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.net.URL;
 import java.util.*;
 import java.util.List;
 
@@ -118,51 +122,70 @@ public class CaptchaProcessor {
      *
      * @param context the specified context
      */
+    SimpleCurrentLimiter captchaCurrentLimiter = new SimpleCurrentLimiter(10, 2);
     public void get(final RequestContext context) {
-        final PngRenderer renderer = new PngRenderer();
-        context.setRenderer(renderer);
+        String address = Requests.getRemoteAddr(context.getRequest());
+        if (captchaCurrentLimiter.access(address)) {
+            final PngRenderer renderer = new PngRenderer();
+            context.setRenderer(renderer);
 
-        try {
-            final ConfigurableCaptchaService cs = new ConfigurableCaptchaService();
-            // 随机颜色
-            if (0.5 < Math.random()) {
-                cs.setColorFactory(new GradientColorFactory());
-            } else {
-                cs.setColorFactory(new RandomColorFactory());
+            try {
+                final ConfigurableCaptchaService cs = new ConfigurableCaptchaService();
+                // 随机颜色
+                if (0.5 < Math.random()) {
+                    cs.setColorFactory(new GradientColorFactory());
+                } else {
+                    cs.setColorFactory(new RandomColorFactory());
+                }
+                // 随机字符
+                final RandomWordFactory randomWordFactory = new RandomWordFactory();
+                randomWordFactory.setCharacters(CHARS);
+                randomWordFactory.setMinLength(CAPTCHA_LENGTH);
+                randomWordFactory.setMaxLength(CAPTCHA_LENGTH);
+                cs.setWordFactory(randomWordFactory);
+                // 随机字体
+                List<String> fonts = getAvaialbeFonts();
+                cs.setFontFactory(new RandomFontFactory(fonts));
+                // 自定义验证码图片背景
+                MyCustomBackgroundFactory backgroundFactory = new MyCustomBackgroundFactory();
+                cs.setBackgroundFactory(backgroundFactory);
+                // 彩条
+                cs.setFilterFactory(new CurvesRippleFilterFactory(cs.getColorFactory()));
+
+                final Captcha captcha = cs.getCaptcha();
+                final String challenge = captcha.getChallenge();
+                final BufferedImage bufferedImage = captcha.getImage();
+
+                if (CAPTCHAS.size() > 64) {
+                    CAPTCHAS.clear();
+                }
+
+                CAPTCHAS.add(challenge);
+
+                final Response response = context.getResponse();
+                response.setHeader("Pragma", "no-cache");
+                response.setHeader("Cache-Control", "no-cache");
+                response.setHeader("Expires", "0");
+
+                renderImg(renderer, bufferedImage);
+            } catch (final Exception e) {
+                LOGGER.log(Level.ERROR, e.getMessage(), e);
             }
-            // 随机字符
-            final RandomWordFactory randomWordFactory = new RandomWordFactory();
-            randomWordFactory.setCharacters(CHARS);
-            randomWordFactory.setMinLength(CAPTCHA_LENGTH);
-            randomWordFactory.setMaxLength(CAPTCHA_LENGTH);
-            cs.setWordFactory(randomWordFactory);
-            // 随机字体
-            List<String> fonts = getAvaialbeFonts();
-            cs.setFontFactory(new RandomFontFactory(fonts));
-            // 自定义验证码图片背景
-            MyCustomBackgroundFactory backgroundFactory = new MyCustomBackgroundFactory();
-            cs.setBackgroundFactory(backgroundFactory);
-            // 彩条
-            cs.setFilterFactory(new CurvesRippleFilterFactory(cs.getColorFactory()));
+        } else {
+            try {
+                final PngRenderer renderer = new PngRenderer();
+                context.setRenderer(renderer);
 
-            final Captcha captcha = cs.getCaptcha();
-            final String challenge = captcha.getChallenge();
-            final BufferedImage bufferedImage = captcha.getImage();
+                final Response response = context.getResponse();
+                response.setHeader("Pragma", "no-cache");
+                response.setHeader("Cache-Control", "no-cache");
+                response.setHeader("Expires", "0");
 
-            if (CAPTCHAS.size() > 64) {
-                CAPTCHAS.clear();
+                URL url = new URL(Latkes.getStaticServePath() + "/images/wait.png");
+                renderImg(renderer, ImageIO.read(url));
+            } catch (Exception e) {
+                e.printStackTrace();
             }
-
-            CAPTCHAS.add(challenge);
-
-            final Response response = context.getResponse();
-            response.setHeader("Pragma", "no-cache");
-            response.setHeader("Cache-Control", "no-cache");
-            response.setHeader("Expires", "0");
-
-            renderImg(renderer, bufferedImage);
-        } catch (final Exception e) {
-            LOGGER.log(Level.ERROR, e.getMessage(), e);
         }
     }
 
