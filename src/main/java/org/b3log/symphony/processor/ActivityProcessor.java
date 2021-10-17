@@ -334,14 +334,21 @@ public class ActivityProcessor {
      *
      * @param context the specified context
      */
+    SimpleCurrentLimiter dailyCheckLimiter = new SimpleCurrentLimiter(2, 1);
     public void dailyCheckinApi(final RequestContext context) {
+        final JSONObject user = Sessions.getUser();
+        String userName = user.optString(User.USER_NAME);
         final String captcha = context.pathVar("captcha");
-        if (CaptchaProcessor.invalidCaptcha(captcha)) {
-            context.renderJSON(new JSONObject().put("sum", -9999));
+        LOGGER.log(Level.INFO, "User " + userName + " has requested a captcha: " + captcha);
+        if (dailyCheckLimiter.access(userName)) {
+            if (CaptchaProcessor.invalidCaptcha(captcha)) {
+                context.renderJSON(new JSONObject().put("sum", -9999));
+            } else {
+                final String userId = user.optString(Keys.OBJECT_ID);
+                context.renderJSON(new JSONObject().put("sum", activityMgmtService.dailyCheckin(userId)));
+            }
         } else {
-            final JSONObject user = Sessions.getUser();
-            final String userId = user.optString(Keys.OBJECT_ID);
-            context.renderJSON(new JSONObject().put("sum", activityMgmtService.dailyCheckin(userId)));
+            context.renderJSON(new JSONObject().put("sum", -9998));
         }
     }
 

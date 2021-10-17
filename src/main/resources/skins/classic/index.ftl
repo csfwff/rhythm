@@ -709,6 +709,26 @@ ${HeaderBannerLabel}
                             }
                         });
                         Util.fadeIn(checkInBtn);
+                    } else if (result.sum === -9998) {
+                        Util.alert('请输入验证码以继续签到<br><br>' +
+                            '<div class="input-wrap">' +
+                            '<img id="registerCaptchaImg" style="width: 128px" src="" onclick="this.src=\'${servePath}/captcha?\' + (new Date()).getTime()" />' +
+                            '<br><br>' +
+                            '<div>' +
+                            '<input type="text" id="checkInCaptcha" placeholder="验证码" style="float:left;width:74%;border:1px solid rgba(0,0,0,0.38);background-color:#FAFAFA;border-radius:3px;box-shadow:0 1px 2px rgb(0 0 0 / 8%) inset;padding:7px 8px;line-height:17px;box-sizing:border-box;-moz-box-sizing:border-box;-webkit-box-sizing:border-box;" />' +
+                            '<button onclick="submitCheckIn()" style="float:right;width:25%;cursor:pointer;color:rgba(0,0,0,0.87);border-radius:3px;padding:6px 12px;background-color:rgba(0,0,0,0.02);border:1px solid #D5D5D5;border-bottom-color:#E1E1E1;box-sizing:border-box;line-height:19px;white-space:nowrap;">签到</button>' +
+                            '</div>' +
+                            '<br><br><br>' +
+                            '<p style="color:red">验证码输入过快！请稍候重试。</p>' +
+                            '</div>');
+                        $("#registerCaptchaImg").attr("src", "${servePath}/captcha?" + (new Date()).getTime());
+                        $("#checkInCaptcha").focus();
+                        $("#checkInCaptcha").keypress(function (e) {
+                            if (e.which == 13) {
+                                submitCheckIn();
+                            }
+                        });
+                        Util.fadeIn(checkInBtn);
                     } else {
                         if (result.sum === undefined) {
                             Util.goLogin();
