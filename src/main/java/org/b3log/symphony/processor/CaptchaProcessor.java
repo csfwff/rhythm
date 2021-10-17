@@ -29,9 +29,11 @@ import org.b3log.latke.http.Response;
 import org.b3log.latke.http.renderer.PngRenderer;
 import org.b3log.latke.ioc.BeanManager;
 import org.b3log.latke.ioc.Singleton;
+import org.b3log.latke.model.User;
 import org.b3log.latke.util.Requests;
 import org.b3log.latke.util.Strings;
 import org.b3log.symphony.model.Common;
+import org.b3log.symphony.util.Sessions;
 import org.json.JSONObject;
 import org.patchca.background.BackgroundFactory;
 import org.patchca.color.GradientColorFactory;
@@ -125,6 +127,15 @@ public class CaptchaProcessor {
     SimpleCurrentLimiter captchaCurrentLimiter = new SimpleCurrentLimiter(10, 2);
     public void get(final RequestContext context) {
         String address = Requests.getRemoteAddr(context.getRequest());
+        try {
+            JSONObject user = Sessions.getUser();
+            if (user == null) {
+                LOGGER.log(Level.INFO, "Host " + address + " requested to get a verify code.");
+            } else {
+                LOGGER.log(Level.INFO, "User " + user.optString(User.USER_NAME) + " requested to get a verify code.");
+            }
+        } catch (Exception ignored) {
+        }
         if (captchaCurrentLimiter.access(address)) {
             final PngRenderer renderer = new PngRenderer();
             context.setRenderer(renderer);
