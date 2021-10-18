@@ -354,10 +354,11 @@ var ChatRoomChannel = {
                         let userInfo = data.users[user];
                         $("#chatRoomOnlineCnt").append("<a target=\"_blank\" title=\"" + userInfo.userName + "\" data-name=\"" + userInfo.userName + "\"\n" +
                             "href=\"" + userInfo.homePage + "\">\n" +
-                            "<img class=\"avatar avatar-small tooltipped__user\" aria-name=\"" + userInfo.userName + "\"\n" +
+                            "<img class=\"avatar avatar-small\" aria-label=\"" + userInfo.userName + "\"\n" +
                             "src=\"" + userInfo.userAvatarURL + "\">\n" +
                             "</a>");
                     }
+                    Util.listenUserCard();
                     break;
                 case 'revoke':
                     $("#chatroom" + data.oId).remove();

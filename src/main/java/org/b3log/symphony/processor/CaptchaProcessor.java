@@ -22,15 +22,20 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.b3log.latke.Latkes;
 import org.b3log.latke.http.Dispatcher;
 import org.b3log.latke.http.RequestContext;
 import org.b3log.latke.http.Response;
 import org.b3log.latke.http.renderer.PngRenderer;
 import org.b3log.latke.ioc.BeanManager;
 import org.b3log.latke.ioc.Singleton;
+import org.b3log.latke.model.User;
+import org.b3log.latke.util.Requests;
 import org.b3log.latke.util.Strings;
 import org.b3log.symphony.model.Common;
+import org.b3log.symphony.util.Sessions;
 import org.json.JSONObject;
+import org.patchca.background.BackgroundFactory;
 import org.patchca.color.GradientColorFactory;
 import org.patchca.color.RandomColorFactory;
 import org.patchca.filter.predefined.CurvesRippleFilterFactory;
@@ -38,17 +43,16 @@ import org.patchca.font.RandomFontFactory;
 import org.patchca.service.Captcha;
 import org.patchca.service.ConfigurableCaptchaService;
 import org.patchca.word.RandomWordFactory;
+import pers.adlered.simplecurrentlimiter.main.SimpleCurrentLimiter;
 
 import javax.imageio.ImageIO;
-import javax.swing.*;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashSet;
+import java.net.URL;
+import java.util.*;
 import java.util.List;
-import java.util.Set;
 
 /**
  * Captcha processor.
@@ -78,12 +82,12 @@ public class CaptchaProcessor {
     /**
      * Captcha length.
      */
-    private static final int CAPTCHA_LENGTH = 4;
+    private static final int CAPTCHA_LENGTH = 1;
 
     /**
      * Captcha chars.
      */
-    private static final String CHARS = "acdefhijklmnprstuvwxy234578";
+    private static final String CHARS = "才寸下大丈与万上小口巾山千乞川亿个勺久凡及夕丸么广亡门义之尸弓己已子卫也女飞刃习叉马乡丰王井开夫天无元专云扎艺木五支厅不太犬区历尤友匹车巨牙屯比互切瓦止少日中冈贝内水见午牛手毛气升长仁什片仆化仇币仍仅斤爪反介父从今凶分乏公仓月氏勿欠风丹匀乌凤勾文六方火为斗忆订计户认心尺引丑巴孔队办以允予劝双书幻玉刊示末未击打巧正扑扒功扔去甘世古节本术可丙左厉右石布龙平灭轧东卡北占业旧帅归且旦目叶甲申叮电号田由史只央兄叼叫另叨叹四生失禾丘付仗代仙们仪白仔他斥瓜乎丛令用甩印乐句匆册犯外处冬鸟务包饥主市立闪兰半";
 
     /**
      * Register request handlers.
@@ -120,43 +124,79 @@ public class CaptchaProcessor {
      *
      * @param context the specified context
      */
+    SimpleCurrentLimiter captchaCurrentLimiter = new SimpleCurrentLimiter(10, 2);
     public void get(final RequestContext context) {
-        final PngRenderer renderer = new PngRenderer();
-        context.setRenderer(renderer);
-
+        String address = Requests.getRemoteAddr(context.getRequest());
         try {
-            final ConfigurableCaptchaService cs = new ConfigurableCaptchaService();
-            if (0.5 < Math.random()) {
-                cs.setColorFactory(new GradientColorFactory());
+            JSONObject user = Sessions.getUser();
+            if (user == null) {
+                LOGGER.log(Level.INFO, "Host " + address + " requested to get a verify code.");
             } else {
-                cs.setColorFactory(new RandomColorFactory());
+                LOGGER.log(Level.INFO, "User " + user.optString(User.USER_NAME) + " requested to get a verify code.");
             }
-            cs.setFilterFactory(new CurvesRippleFilterFactory(cs.getColorFactory()));
-            final RandomWordFactory randomWordFactory = new RandomWordFactory();
-            randomWordFactory.setCharacters(CHARS);
-            randomWordFactory.setMinLength(CAPTCHA_LENGTH);
-            randomWordFactory.setMaxLength(CAPTCHA_LENGTH);
-            cs.setWordFactory(randomWordFactory);
-            cs.setFontFactory(new RandomFontFactory(getAvaialbeFonts()));
+        } catch (Exception ignored) {
+        }
+        if (captchaCurrentLimiter.access(address)) {
+            final PngRenderer renderer = new PngRenderer();
+            context.setRenderer(renderer);
 
-            final Captcha captcha = cs.getCaptcha();
-            final String challenge = captcha.getChallenge();
-            final BufferedImage bufferedImage = captcha.getImage();
+            try {
+                final ConfigurableCaptchaService cs = new ConfigurableCaptchaService();
+                // 随机颜色
+                if (0.5 < Math.random()) {
+                    cs.setColorFactory(new GradientColorFactory());
+                } else {
+                    cs.setColorFactory(new RandomColorFactory());
+                }
+                // 随机字符
+                final RandomWordFactory randomWordFactory = new RandomWordFactory();
+                randomWordFactory.setCharacters(CHARS);
+                randomWordFactory.setMinLength(CAPTCHA_LENGTH);
+                randomWordFactory.setMaxLength(CAPTCHA_LENGTH);
+                cs.setWordFactory(randomWordFactory);
+                // 随机字体
+                List<String> fonts = getAvaialbeFonts();
+                cs.setFontFactory(new RandomFontFactory(fonts));
+                // 自定义验证码图片背景
+                MyCustomBackgroundFactory backgroundFactory = new MyCustomBackgroundFactory();
+                cs.setBackgroundFactory(backgroundFactory);
+                // 彩条
+                cs.setFilterFactory(new CurvesRippleFilterFactory(cs.getColorFactory()));
 
-            if (CAPTCHAS.size() > 64) {
-                CAPTCHAS.clear();
+                final Captcha captcha = cs.getCaptcha();
+                final String challenge = captcha.getChallenge();
+                final BufferedImage bufferedImage = captcha.getImage();
+
+                if (CAPTCHAS.size() > 64) {
+                    CAPTCHAS.clear();
+                }
+
+                CAPTCHAS.add(challenge);
+
+                final Response response = context.getResponse();
+                response.setHeader("Pragma", "no-cache");
+                response.setHeader("Cache-Control", "no-cache");
+                response.setHeader("Expires", "0");
+
+                renderImg(renderer, bufferedImage);
+            } catch (final Exception e) {
+                LOGGER.log(Level.ERROR, e.getMessage(), e);
             }
+        } else {
+            try {
+                final PngRenderer renderer = new PngRenderer();
+                context.setRenderer(renderer);
 
-            CAPTCHAS.add(challenge);
+                final Response response = context.getResponse();
+                response.setHeader("Pragma", "no-cache");
+                response.setHeader("Cache-Control", "no-cache");
+                response.setHeader("Expires", "0");
 
-            final Response response = context.getResponse();
-            response.setHeader("Pragma", "no-cache");
-            response.setHeader("Cache-Control", "no-cache");
-            response.setHeader("Expires", "0");
-
-            renderImg(renderer, bufferedImage);
-        } catch (final Exception e) {
-            LOGGER.log(Level.ERROR, e.getMessage(), e);
+                URL url = new URL(Latkes.getStaticServePath() + "/images/wait.png");
+                renderImg(renderer, ImageIO.read(url));
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
     }
 
@@ -228,7 +268,7 @@ public class CaptchaProcessor {
         final GraphicsEnvironment e = GraphicsEnvironment.getLocalGraphicsEnvironment();
         final Font[] fonts = e.getAllFonts();
         for (final Font f : fonts) {
-            if (Strings.contains(f.getFontName(), new String[]{"Verdana", "DejaVu Sans Mono", "Tahoma"})) {
+            if (Strings.contains(f.getFontName(), new String[]{"文泉驿微米黑", "文泉驿等宽微米黑", "文泉驿正黑", "文泉驿等宽正黑", "文泉驿点阵正黑", "文鼎ＰＬ新宋", "AR PL UMing CN", "Arial-Black"})) {
                 ret.add(f.getFontName());
             }
         }
@@ -237,5 +277,55 @@ public class CaptchaProcessor {
         //ret.add(defaultFontName);
 
         return ret;
+    }
+
+    /**
+     * 自定义验证码图片背景,主要画一些噪点和干扰线
+     */
+    private class MyCustomBackgroundFactory implements BackgroundFactory {
+        private Random random = new Random();
+
+        public void fillBackground(BufferedImage image) {
+            Graphics graphics = image.getGraphics();
+
+            // 验证码图片的宽高
+            int imgWidth = image.getWidth();
+            int imgHeight = image.getHeight();
+
+            // 填充为灰色背景
+            graphics.setColor(Color.GRAY);
+            graphics.fillRect(0, 0, imgWidth, imgHeight);
+
+            // 画100个噪点(颜色及位置随机)
+            for(int i = 0; i < 100; i++) {
+                // 随机颜色
+                int rInt = random.nextInt(255);
+                int gInt = random.nextInt(255);
+                int bInt = random.nextInt(255);
+
+                graphics.setColor(new Color(rInt, gInt, bInt));
+
+                // 随机位置
+                int xInt = random.nextInt(imgWidth - 3);
+                int yInt = random.nextInt(imgHeight - 2);
+
+                // 随机旋转角度
+                int sAngleInt = random.nextInt(360);
+                int eAngleInt = random.nextInt(360);
+
+                // 随机大小
+                int wInt = random.nextInt(6);
+                int hInt = random.nextInt(6);
+
+                graphics.fillArc(xInt, yInt, wInt, hInt, sAngleInt, eAngleInt);
+
+                // 画5条干扰线
+                if (i % 20 == 0) {
+                    int xInt2 = random.nextInt(imgWidth);
+                    int yInt2 = random.nextInt(imgHeight);
+                    graphics.drawLine(xInt, yInt, xInt2, yInt2);
+                }
+            }
+        }
     }
 }

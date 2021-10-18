@@ -29,6 +29,7 @@ import org.b3log.symphony.processor.middleware.CSRFMidware;
 import org.b3log.symphony.processor.middleware.LoginCheckMidware;
 import org.b3log.symphony.processor.middleware.validate.Activity1A0001CollectValidationMidware;
 import org.b3log.symphony.processor.middleware.validate.Activity1A0001ValidationMidware;
+import org.b3log.symphony.service.RewardQueryService;
 import org.b3log.symphony.service.UserQueryService;
 import org.b3log.symphony.util.StatusCodes;
 import org.json.JSONObject;
@@ -59,6 +60,9 @@ public class ApiProcessor {
 
         final ApiProcessor apiProcessor = beanManager.getReference(ApiProcessor.class);
         Dispatcher.get("/api/user/exists/{user}", apiProcessor::userExists);
+
+        final RewardQueryService rewardQueryService = beanManager.getReference(RewardQueryService.class);
+        Dispatcher.get("/api/article/reward/senders/{aId}", rewardQueryService::rewardedSenders);
     }
 
     public void userExists(final RequestContext context) {

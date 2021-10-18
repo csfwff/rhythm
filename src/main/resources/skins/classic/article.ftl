@@ -199,40 +199,49 @@
                                 位置
                             </a>
                         </#if>
-                        <div class="article__stats usersInteracts article__stats--a">
-                            <span class="article__cnt">
-                            ${article.articleCommentCount}
-                            </span>
-                            ${cmtLabel}
-                        </div>
                         <div id="articleStats">
-                            <div class="article__stats usersInteracts article__stats--a">
-                                <span class="article__cnt">${article.thankedCnt}</span>
-                                <span class="fn__flex-inline">感谢<svg><use xlink:href="#iconHeart"></use></svg></span>
-                            </div>
-                            <div class="article__stats usersInteracts article__stats--a">
-                                <span id="articleGoodCnt" class="article__cnt">${article.articleGoodCnt}</span>
+                            <div id="articleGoodCnt" class="article__stats usersInteracts article__stats--a">
+                                <span class="article__cnt">${article.articleGoodCnt}</span>
                                 点赞
                             </div>
-                            <div class="article__stats usersInteracts article__stats--a">
-                                <span id="articleFollowCnt" class="article__cnt">${article.articleWatchCnt}</span>
+                            <div id="articleFollowCnt" class="article__stats usersInteracts article__stats--a">
+                                <span class="article__cnt">${article.articleWatchCnt}</span>
                                 关注
                             </div>
-                            <div class="article__stats usersInteracts article__stats--a">
-                                <span id="articleCollectCnt" class="article__cnt">${article.articleCollectCnt}</span>
+                            <div id="articleCollectCnt" class="article__stats usersInteracts article__stats--a">
+                                <span class="article__cnt">${article.articleCollectCnt}</span>
                                 收藏
                             </div>
+                            <#if article.articleQnAOfferPoint?c != "0">
+                                <div id="articleQnAOfferCnt" class="article__stats usersInteracts article__stats--a">
+                                    <span class="article__cnt">${article.articleQnAOfferPoint?c}</span>
+                                    ${qnaOfferLabel}
+                                </div>
+                            </#if>
                         </div>
                         <br>
-                        <br>
-                        <br>
-                        <#list article.commentors as user>
-                            <a target="_blank" href="${servePath}/member/${user.userName}">
-                                <div class="article__participant">
-                                    <div class="avatar-small tooltipped-w tooltipped" aria-label="${user.userName}" style="background-image: url('${user.userAvatarURL}');"></div>
-                                </div>
-                            </a>
-                        </#list>
+                        <#if article.thankedCnt != 0>
+                            <br><br><br>
+                            <div id="articleThanksCnt" class="article__stats usersInteracts article__stats--a">
+                                <span class="article__cnt">${article.thankedCnt}</span>
+                                <span class="fn__flex-inline">感谢&nbsp;<svg><use xlink:href="#iconHeart"></use></svg></span>
+                            </div>
+                            <br>
+                        </#if>
+                        <#if article.articleCommentCount != 0>
+                            <br><br><br>
+                            <div class="article__stats usersInteracts article__stats--a">
+                                <span class="article__cnt">${article.articleCommentCount}</span>
+                                <span class="fn__flex-inline">${cmtLabel}&nbsp;<svg><use xlink:href="#replyIcon"></use></svg></span>
+                            </div>
+                            <#list article.commentors as user>
+                                <a target="_blank" href="${servePath}/member/${user.userName}">
+                                    <div class="article__participant">
+                                        <div class="avatar-small" aria-label="${user.userName}" style="background-image: url('${user.userAvatarURL}');"></div>
+                                    </div>
+                                </a>
+                            </#list>
+                        </#if>
                     </div>
                     <div class="fn__clear article__view">
                     <span class="fn__flex-inline tooltipped__n tooltipped-n tooltipped" aria-label="总访问计数">
@@ -322,7 +331,7 @@
                             <li>
                                 <div class="fn-flex">
                                     <a rel="nofollow" href="${servePath}/member/${comment.commentAuthorName}">
-                                        <div class="avatar tooltipped tooltipped-se"
+                                        <div class="avatar"
                                              aria-label="${comment.commentAuthorName}"
                                              style="background-image:url('${comment.commentAuthorThumbnailURL}')"></div>
                                     </a>
