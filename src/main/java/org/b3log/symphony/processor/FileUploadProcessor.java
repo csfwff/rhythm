@@ -155,7 +155,7 @@ public class FileUploadProcessor {
      *
      * @param context the specified context
      */
-    public void uploadFile(final RequestContext context) {
+    public synchronized void uploadFile(final RequestContext context) {
         final JSONObject result = Results.newFail();
         context.renderJSONPretty(result);
 
