@@ -1347,6 +1347,8 @@ var Util = {
    */
   listenUserCard: function () {
     var cardLock = false;
+    $(".avatar, .avatar-small, .avatar-middle, .avatar-mid, .avatar-big").unbind();
+
     $(".avatar, .avatar-small, .avatar-middle, .avatar-mid, .avatar-big").hover(function () {
       // 加载用户信息
       if ($(this).attr("aria-label") !== undefined) {
@@ -1505,6 +1507,7 @@ var Util = {
         }
       }, 50);
     });
+    $("#userCard").unbind();
     $("#userCard").hover(function () {
       cardLock = true;
     }, function () {
