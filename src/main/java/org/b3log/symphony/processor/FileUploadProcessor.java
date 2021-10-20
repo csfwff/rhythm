@@ -235,7 +235,8 @@ public class FileUploadProcessor {
                 fileName = genFilePath(fileName);
                 if (QN_ENABLED) {
                     bytes = fileBytes.get(i);
-                    com.qiniu.http.Response response = uploadManager.put(bytes, null, uploadToken);
+                    final String contentType = file.getContentType();
+                    com.qiniu.http.Response response = uploadManager.put(bytes, fileName, uploadToken, null, contentType, false);
                     //解析上传成功的结果
                     JSONObject putRet = new JSONObject(response.bodyString());
                     countDownLatch.countDown();
