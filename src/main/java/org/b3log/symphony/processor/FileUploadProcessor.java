@@ -19,7 +19,9 @@
 package org.b3log.symphony.processor;
 
 import com.qiniu.storage.Configuration;
+import com.qiniu.storage.Region;
 import com.qiniu.storage.UploadManager;
+import com.qiniu.storage.model.DefaultPutRet;
 import com.qiniu.util.Auth;
 import jodd.http.HttpRequest;
 import jodd.http.HttpResponse;
@@ -171,7 +173,8 @@ public class FileUploadProcessor {
         if (QN_ENABLED) {
             auth = Auth.create(Symphonys.UPLOAD_QINIU_AK, Symphonys.UPLOAD_QINIU_SK);
             uploadToken = auth.uploadToken(Symphonys.UPLOAD_QINIU_BUCKET);
-            uploadManager = new UploadManager(new Configuration());
+            Configuration cfg = new Configuration(Region.autoRegion());
+            uploadManager = new UploadManager(cfg);
         }
 
         final JSONObject data = new JSONObject();
@@ -232,12 +235,11 @@ public class FileUploadProcessor {
                 fileName = genFilePath(fileName);
                 if (QN_ENABLED) {
                     bytes = fileBytes.get(i);
-                    final String contentType = file.getContentType();
-                    uploadManager.asyncPut(bytes, fileName, uploadToken, null, contentType, false, (key, r) -> {
-                        LOGGER.log(Level.TRACE, "Uploaded [" + key + "], response [" + r.toString() + "]");
-                        countDownLatch.countDown();
-                    });
-                    url = Symphonys.UPLOAD_QINIU_DOMAIN + "/" + fileName;
+                    com.qiniu.http.Response response = uploadManager.put(bytes, null, uploadToken);
+                    //解析上传成功的结果
+                    JSONObject putRet = new JSONObject(response.bodyString());
+                    countDownLatch.countDown();
+                    url = Symphonys.UPLOAD_QINIU_DOMAIN + "/" + putRet.optString("key");
                     succMap.put(originalName, url);
                 } else {
                     final Path path = Paths.get(Symphonys.UPLOAD_LOCAL_DIR, fileName);
