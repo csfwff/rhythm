@@ -348,7 +348,8 @@ var ChatRoomChannel = {
 
             switch (data.type) {
                 case 'online':
-                    $('#onlineCnt').text(data.onlineChatCnt)
+                    $('#onlineCnt').text(data.onlineChatCnt);
+                    $('#indexOnlineChatCnt').text(data.onlineChatCnt);
                     $("#chatRoomOnlineCnt").html("");
                     for (var user in data.users) {
                         let userInfo = data.users[user];
