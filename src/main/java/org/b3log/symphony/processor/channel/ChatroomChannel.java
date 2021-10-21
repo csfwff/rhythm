@@ -70,6 +70,12 @@ public class ChatroomChannel implements WebSocketChannel {
             }
             final JSONObject user = new JSONObject(userStr);
             onlineUsers.put(session, user);
+        } else {
+            final String userStr = session.getHttpSession().getAttribute(User.USER);
+            if (null != userStr) {
+                final JSONObject user = new JSONObject(userStr);
+                onlineUsers.put(session, user);
+            }
         }
 
         SESSIONS.add(session);
