@@ -574,6 +574,12 @@ ${HeaderBannerLabel}
                     $("#vLine1").html("摸 🐟 加油！<br>距离" + vName + "还有");
                 }
                 $("#vDay").html(vRest);
+                if (vRest === 1) {
+                    $("#vLine1").html("今天提桶！明天跑路！<br>" + vName + "马上就要到了！！！");
+                    $("#vLine2").html("<span style='font-size:45px;color:#0cc958;'>🎉<br>明天<br>放假</span>");
+                    $("#vLine2").css("line-height", "30px");
+                    $("#vLine3").css("display", "none");
+                }
                 $.ajax({
                     url: "https://v1.hitokoto.cn/",
                     type: "GET",
