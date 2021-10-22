@@ -27,6 +27,13 @@
         <div id="fs">
             ${sloganLabel}
         </div>
+        <br>
+        <div>
+            友情链接
+        </div>
+        <div>
+            <a target="_blank" href="https://www.cxy521.com/">程序员导航</a>
+        </div>
         <div class="fn-hr5"></div>
         <div>
             <a href="https://github.com/csfwff/rhythm" target="_blank">Rhythm 社区</a>
