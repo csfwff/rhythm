@@ -730,7 +730,7 @@ var Settings = {
   initFunction: function () {
     $('#emojiGrid img').click(function () {
       var emoji = $(this).attr('alt')
-      if ($('#emotionList').val().indexOf(emoji) !== -1) {
+      if ($('#emotionList').val().split(',').indexOf(emoji) !== -1) {
         return
       }
       if ($('#emotionList').val() !== '') {
