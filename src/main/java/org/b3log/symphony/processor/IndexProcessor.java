@@ -135,6 +135,13 @@ public class IndexProcessor {
         Dispatcher.get("/charge/point", indexProcessor::showChargePoint, anonymousViewCheckMidware::handle);
         Dispatcher.get("/games/adarkroom/", indexProcessor::showADarkRoom, loginCheck::handle);
         Dispatcher.get("/games/lifeRestart/view/", indexProcessor::showLifeRestart, loginCheck::handle);
+        Dispatcher.get("/games/evolve/", indexProcessor::showEvolve, loginCheck::handle);
+    }
+
+    public void showEvolve(final RequestContext context) {
+        final AbstractFreeMarkerRenderer renderer = new SkinRenderer(context, "games/evolve/index.ftl");
+        final Map<String, Object> dataModel = renderer.getDataModel();
+        dataModelService.fillHeaderAndFooter(context, dataModel);
     }
 
     public void showLifeRestart(final RequestContext context) {
