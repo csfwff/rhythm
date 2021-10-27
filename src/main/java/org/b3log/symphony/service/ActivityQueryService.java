@@ -321,6 +321,50 @@ public class ActivityQueryService {
     }
 
     /**
+     * Gets the top Evolve top of rank users with the specified fetch size.
+     *
+     * @param fetchSize the specified fetch size
+     * @return users, returns an empty list if not found
+     */
+    public List<JSONObject> getEvolve(final int fetchSize) {
+        List<JSONObject> ret = new ArrayList<>();
+
+        try {
+            Query query = new Query()
+                    .setFilter(new PropertyFilter("gameId", FilterOperator.EQUAL, 40));
+            final List<JSONObject> gameData = cloudRepository.getList(query);
+
+            // 排序并剪切
+            Collections.sort(gameData, (o1, o2) -> {
+                int i1 = Integer.valueOf(new JSONObject(o1.optString("data")).optString("times"));
+                int i2 = Integer.valueOf(new JSONObject(o2.optString("data")).optString("times"));
+                return i2 - i1;
+            });
+            if (gameData.size() > fetchSize) {
+                gameData.subList(0, fetchSize);
+            }
+
+            // 渲染用户信息
+            for (final JSONObject data : gameData) {
+                String userId = data.optString("userId");
+                data.put("profile", userRepository.get(userId));
+                data.put("data", new JSONObject(data.optString("data")));
+                try {
+                    data.put("achievement", new JSONArray(data.optJSONObject("data").optString("ACHV")).length());
+                } catch (Exception e) {
+                    data.put("achievement", 0);
+                }
+            }
+
+            ret = gameData;
+        } catch (final RepositoryException e) {
+            LOGGER.log(Level.ERROR, "Gets top Mofish users failed", e);
+        }
+
+        return ret;
+    }
+
+    /**
      * Gets the top Life Restart top of rank users with the specified fetch size.
      *
      * @param fetchSize the specified fetch size
