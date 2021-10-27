@@ -1,6 +1,6 @@
 import {global, tmp_vars, save, message_logs, message_filters, webWorker, intervals} from './vars.js';
 import { loc, locales } from './locale.js';
-import { setupStats, alevel } from './achieve.js';
+import {setupStats, alevel, achievements} from './achieve.js';
 import { vBind, initMessageQueue, clearElement, flib, tagEvent, gameLoop, popover, powerGrid, easterEgg, trickOrTreat, drawIcon } from './functions.js';
 import { tradeRatio, atomic_mass, supplyValue, marketItem, containerItem, loadEjector, loadSupply, loadAlchemy, initResourceTabs, tradeSummery } from './resources.js';
 import { defineJobs, } from './jobs.js';
@@ -1371,8 +1371,8 @@ export function index(){
         <div class="promoBar">
             <span class="left">
                 <h1>
-                    <a href="https://pwl.icu" target="_blank" class="has-text-warning">摸鱼派社区</a>
-                    <a href="https://pwl.icu/activities" target="_blank"  class="has-text-success">鱼游</a>
+                    <a href="https://pwl.icu" target="_blank" class="has-text-warning">摸鱼派-鱼游</a>
+                    <span class="has-text-success">摸鱼派在线中，用户名：<span id="currentUserName"></span></span>
                 </h1>
             </span>
             <span class="right">
@@ -1390,18 +1390,26 @@ export function index(){
         </div>
     `);
 
+    $("#currentUserName").text(Label.currentUserName);
+
     intervals['upload_score'] = setInterval(function(){
-        let save = $(".year>.has-text-warning").text();
-        if (save !== '') {
-            $.ajax({
-                url: Label.servePath + "/api/cloud/sync",
-                method: "POST",
-                data: JSON.stringify({
-                    gameId: "40",
-                    data: save
-                }),
-                headers: {'csrfToken': Label.csrfToken}
-            });
-        }
+        var spent = {};
+        spent.know = global.stats.know;
+        let earned = 0;
+        Object.keys(achievements).forEach(function (achievement){
+            if (global.stats.achieve[achievement]) {
+                earned++;
+            }
+        });
+        spent.trick = earned;
+        $.ajax({
+            url: Label.servePath + "/api/cloud/sync",
+            method: "POST",
+            data: JSON.stringify({
+                gameId: "40",
+                data: spent
+            }),
+            headers: {'csrfToken': Label.csrfToken}
+        });
     }, 10000);
 }

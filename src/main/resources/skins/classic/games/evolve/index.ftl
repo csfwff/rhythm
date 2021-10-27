@@ -1,7 +1,11 @@
 <!DOCTYPE HTML>
 <html>
 <head>
-    <title>进化 - Evolve</title>
+    <#if hasSystemTitle>
+        <title>${systemTitle}</title>
+    <#else>
+        <title>进化 - Evolve</title>
+    </#if>
     <meta http-equiv="Content-type" content="text/html;charset=utf-8">
     <link rel="icon" href="../../../../games/evolve/evolved-light.ico" type="images/x-icon" media="(prefers-color-scheme:dark)">
     <link rel="icon" href="../../../../games/evolve/evolved.ico" type="images/x-icon" media="(prefers-color-scheme:light)">
@@ -65,3 +69,61 @@
     <div class="loading"><div class="lds-dual-ring"></div></div>
 </body>
 </html>
+<script src="${staticServePath}/js/lib/reconnecting-websocket.min.js?${staticResourceVersion}"></script>
+<script src="${staticServePath}/js/symbol-defs${miniPostfix}.js?${staticResourceVersion}"></script>
+<script src="${staticServePath}/js/common${miniPostfix}.js?${staticResourceVersion}"></script>
+<script>
+    var Label = {
+        saveData: '',
+        commentEditorPlaceholderLabel: '${commentEditorPlaceholderLabel}',
+        langLabel: '${langLabel}',
+        luteAvailable: ${luteAvailable?c},
+        reportSuccLabel: '${reportSuccLabel}',
+        breezemoonLabel: '${breezemoonLabel}',
+        confirmRemoveLabel: "${confirmRemoveLabel}",
+        reloginLabel: "${reloginLabel}",
+        invalidPasswordLabel: "${invalidPasswordLabel}",
+        loginNameErrorLabel: "${loginNameErrorLabel}",
+        followLabel: "${followLabel}",
+        unfollowLabel: "${unfollowLabel}",
+        symphonyLabel: "${symphonyLabel}",
+        visionLabel: "${visionLabel}",
+        cmtLabel: "${cmtLabel}",
+        collectLabel: "${collectLabel}",
+        uncollectLabel: "${uncollectLabel}",
+        desktopNotificationTemplateLabel: "${desktopNotificationTemplateLabel}",
+        servePath: "${servePath}",
+        staticServePath: "${staticServePath}",
+        isLoggedIn: ${isLoggedIn?c},
+        funNeedLoginLabel: '${funNeedLoginLabel}',
+        notificationCommentedLabel: '${notificationCommentedLabel}',
+        notificationReplyLabel: '${notificationReplyLabel}',
+        notificationAtLabel: '${notificationAtLabel}',
+        notificationFollowingLabel: '${notificationFollowingLabel}',
+        pointLabel: '${pointLabel}',
+        sameCityLabel: '${sameCityLabel}',
+        systemLabel: '${systemLabel}',
+        newFollowerLabel: '${newFollowerLabel}',
+        makeAsReadLabel: '${makeAsReadLabel}',
+        imgMaxSize: ${imgMaxSize?c},
+        fileMaxSize: ${fileMaxSize?c},
+        <#if isLoggedIn>
+        currentUserName: '${currentUser.userName}',
+        </#if>
+        <#if csrfToken??>
+        csrfToken: '${csrfToken}'
+        </#if>
+    }
+
+    <#if isLoggedIn>
+    Label.userKeyboardShortcutsStatus = '${currentUser.userKeyboardShortcutsStatus}'
+    </#if>
+
+    <#if isLoggedIn>
+    // Init [User] channel
+    Util.initUserChannel("${wsScheme}://${serverHost}:${serverPort}${contextPath}/user-channel")
+    </#if>
+</script>
+<script>
+    !function(p){"use strict";!function(t){var s=window,e=document,i=p,c="".concat("https:"===e.location.protocol?"https://":"http://","sdk.51.la/js-sdk-pro.min.js"),n=e.createElement("script"),r=e.getElementsByTagName("script")[0];n.type="text/javascript",n.setAttribute("charset","UTF-8"),n.async=!0,n.src=c,n.id="LA_COLLECT",i.d=n;var o=function(){s.LA.ids.push(i)};s.LA?s.LA.ids&&o():(s.LA=p,s.LA.ids=[],o()),r.parentNode.insertBefore(n,r)}()}({id:"JRkLwpTk0DlpkOHh",ck:"JRkLwpTk0DlpkOHh"});
+</script>
