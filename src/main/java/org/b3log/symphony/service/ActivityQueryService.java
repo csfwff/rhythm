@@ -336,8 +336,8 @@ public class ActivityQueryService {
 
             // 排序并剪切
             Collections.sort(gameData, (o1, o2) -> {
-                int i1 = Integer.valueOf(new JSONObject(o1.optString("data")).optString("times"));
-                int i2 = Integer.valueOf(new JSONObject(o2.optString("data")).optString("times"));
+                int i1 = Integer.valueOf(new JSONObject(o1.optString("data")).optString("know"));
+                int i2 = Integer.valueOf(new JSONObject(o2.optString("data")).optString("know"));
                 return i2 - i1;
             });
             if (gameData.size() > fetchSize) {
@@ -349,11 +349,6 @@ public class ActivityQueryService {
                 String userId = data.optString("userId");
                 data.put("profile", userRepository.get(userId));
                 data.put("data", new JSONObject(data.optString("data")));
-                try {
-                    data.put("achievement", new JSONArray(data.optJSONObject("data").optString("ACHV")).length());
-                } catch (Exception e) {
-                    data.put("achievement", 0);
-                }
             }
 
             ret = gameData;

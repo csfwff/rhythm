@@ -51,7 +51,7 @@
                         </div>
                     </div>
                     <div class="cmts tooltipped tooltipped-w">
-                        重开 ${user.data.times} 次，获得成就 ${user.achievement?c} 个<br>
+                        知识消耗 ${user.data.know}，获得成就 ${user.data.trick} 个<br>
                     </div>
                 </div>
             </div>
