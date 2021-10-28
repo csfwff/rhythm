@@ -18,7 +18,7 @@ globalThis.$$off = (tag, fn) => {
     if(listener) listener.delete(fn);
 }
 
-globalThis.json = async fileName => await (await fetch(`../data/${fileName}.json`)).json();
+globalThis.json = async fileName => await (await fetch(`https://pwl.stackoverflow.wiki/${fileName}.json`)).json();
 
 // Pssst, I've created a github package - https://github.com/brookesb91/dismissible
 globalThis.hideBanners = (e) => {
