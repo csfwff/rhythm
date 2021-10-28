@@ -37,7 +37,7 @@
                 <a href="${servePath}/statistic">${dataStatLabel}</a>
                 <a href="javascript:void(0);">API（开发中）</a>
                 <div class="fn-right">
-                ${visionLabel}
+                    <a href="https://icp.gov.moe/?keyword=20212123" target="_blank">${visionLabel}</a>
                 </div>
             </div>
             <div class="fn-clear ft-smaller">

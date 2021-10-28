@@ -21,7 +21,7 @@
 <div class="footer">
     <div class="wrapper ft-smaller">
         <div class="footer-nav">
-            ${visionLabel}
+            <a href="https://icp.gov.moe/?keyword=20212123" target="_blank">${visionLabel}</a>
         </div>
         <div class="fn-hr5"></div>
         <div id="fs">
