@@ -129,7 +129,7 @@ ${HeaderBannerLabel}
             </div>
         </div>
         <div class="index-recent fn-flex-1">
-            <div style="border-bottom: 1px solid #eee;margin:0px 10px ;">
+            <!--<div style="border-bottom: 1px solid #eee;margin:0px 10px ;">
                 <div style="float:left;font-size:13px;margin:5px 0 10px 0; font-weight:bold;">活跃成员</div>
                 <div style="clear:both;"></div>
             </div>
@@ -144,7 +144,7 @@ ${HeaderBannerLabel}
                         </a>
                     </#list>
                 </div>
-            </div>
+            </div>-->
 
             <div style="border-bottom: 1px solid #eee;margin:0px 10px ;">
                 <div style="float:left;font-size:13px;margin:5px 0 10px 0; font-weight:bold;">签到排行</div>
@@ -155,7 +155,7 @@ ${HeaderBannerLabel}
             <div class="module-panel">
                 <ul class="module-list">
                     <#list topCheckinUsers as user>
-                        <#if user_index < 5>
+                        <#if user_index < 8>
                             <li class="fn-flex rank topCheckInUsersElement fn-hidden">
                                 <#if user_index == 0 || user_index == 1 || user_index == 2>
                                 <span

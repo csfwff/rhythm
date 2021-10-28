@@ -341,10 +341,10 @@ public class IndexProcessor {
         dataModel.put(Common.FISHING_PI_VERSION, Server.FISHING_PI_VERSION);
 
         // 签到排行
-        final List<JSONObject> users = activityQueryService.getTopCheckinUsers(5);
+        final List<JSONObject> users = activityQueryService.getTopCheckinUsers(8);
         dataModel.put(Common.TOP_CHECKIN_USERS, users);
         // 在线时间排行
-        final List<JSONObject> onlineTopUsers = activityQueryService.getTopOnlineTimeUsers(3);
+        final List<JSONObject> onlineTopUsers = activityQueryService.getTopOnlineTimeUsers(5);
         dataModel.put("onlineTopUsers", onlineTopUsers);
         // 随机文章
         dataModel.put("indexRandomArticles", ArticleProcessor.getRandomArticles(12));
