@@ -37,7 +37,7 @@
                 <a href="${servePath}/statistic">${dataStatLabel}</a>
                 <a href="javascript:void(0);">API（开发中）</a>
                 <div class="fn-right">
-                    <a href="https://icp.gov.moe/?keyword=20212123" target="_blank">${visionLabel}</a>
+                    <a href="https://icp.gov.moe/?keyword=20212123" target="_blank">萌ICP备20212123号</a>
                 </div>
             </div>
             <div class="fn-clear ft-smaller">
