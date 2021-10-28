@@ -260,24 +260,28 @@ ${HeaderBannerLabel}
                         </div>
                     </div>
                     <div class="metro-item" style="cursor: pointer">
-                        <a class="preview" id="checkIn" onclick="checkIn()">
-                            <img style="border-radius: 0" id="checkInImg" src="https://pwl.stackoverflow.wiki/2021/10/Fishing-a219e80c.png"><b>每日签到</b>
+                        <a class="preview" id="checkIn" onclick="submitCheckIn()">
+                            <img style="border-radius: 0" id="checkInImg"
+                                 src="https://pwl.stackoverflow.wiki/2021/10/Fishing-a219e80c.png"><b>每日签到</b>
                         </a>
                     </div>
                     <div class="metro-item" style="cursor: pointer">
                         <a class="preview" id="yesterday" onclick="yesterday()">
-                            <img style="border-radius: 0" id="yesterdayImg" src="https://pwl.stackoverflow.wiki/2021/10/coin-2-70217cc1.png"><b>领取昨日活跃奖励</b>
+                            <img style="border-radius: 0" id="yesterdayImg"
+                                 src="https://pwl.stackoverflow.wiki/2021/10/coin-2-70217cc1.png"><b>领取昨日活跃奖励</b>
                         </a>
                     </div>
                     <div class="metro-item">
                         <a class="preview" href="${servePath}/activities">
-                            <img style="border-radius: 10px" src="https://pwl.stackoverflow.wiki/2021/10/psp-game-1a94ae64.png">
+                            <img style="border-radius: 10px"
+                                 src="https://pwl.stackoverflow.wiki/2021/10/psp-game-1a94ae64.png">
                             <b>摸鱼派在线游戏</b>
                         </a>
                     </div>
                     <div class="metro-item">
                         <a class="preview" href="${servePath}/cr">
-                            <img style="border-radius: 0" src="https://pwl.stackoverflow.wiki/2021/10/tips_wechat-cc864256.png">
+                            <img style="border-radius: 0"
+                                 src="https://pwl.stackoverflow.wiki/2021/10/tips_wechat-cc864256.png">
                             <b>聊天室</b>
                         </a>
                     </div>
@@ -298,7 +302,9 @@ ${HeaderBannerLabel}
         <div class="wrapper">
             <div class="index-recent fn-flex-1">
                 <div style="border-bottom: 1px solid #eee;margin:0px 10px ;">
-                    <div style="float:left;font-size:13px;margin:5px 0 10px 0; font-weight:bold;">聊天室（<span id="indexOnlineChatCnt"></span>人在线）</div>
+                    <div style="float:left;font-size:13px;margin:5px 0 10px 0; font-weight:bold;">聊天室（<span
+                                id="indexOnlineChatCnt"></span>人在线）
+                    </div>
                     <div style="float:right;font-size:13px;margin:5px 0 0 0;"><a href="${servePath}/cr">进入完整版聊天室</a>
                     </div>
                     <div style="clear:both;"></div>
@@ -397,7 +403,10 @@ ${HeaderBannerLabel}
                                     <a rel="nofollow" class="title fn-ellipsis fn-flex-1"
                                        href="${servePath}${article.articlePermalink}">${article.articleTitleEmoj}</a>
                                     <a class="fn-right count ft-gray ft-smaller"
-                                       href="${servePath}${article.articlePermalink}"><svg style="padding-top: 1px"><use xlink:href="#coin"></use></svg> ${article.articleQnAOfferPoint?c}</a>
+                                       href="${servePath}${article.articlePermalink}">
+                                        <svg style="padding-top: 1px">
+                                            <use xlink:href="#coin"></use>
+                                        </svg> ${article.articleQnAOfferPoint?c}</a>
                                 </li>
                             </#if>
                         </#list>
@@ -661,114 +670,46 @@ ${HeaderBannerLabel}
         });
     }
 
-    Label.checkInCaptcha = "";
-
-    function checkIn() {
-        Util.alert('请输入验证码以继续签到<br><br>' +
-            '<div class="input-wrap">' +
-            '<img id="registerCaptchaImg" style="width: 128px" src="" onclick="this.src=\'${servePath}/captcha?\' + (new Date()).getTime()" />' +
-            '<br><br>' +
-            '<div>' +
-            '<input type="text" id="checkInCaptcha" placeholder="验证码" style="float:left;width:74%;border:1px solid rgba(0,0,0,0.38);background-color:#FAFAFA;border-radius:3px;box-shadow:0 1px 2px rgb(0 0 0 / 8%) inset;padding:7px 8px;line-height:17px;box-sizing:border-box;-moz-box-sizing:border-box;-webkit-box-sizing:border-box;" />' +
-            '<button onclick="submitCheckIn()" style="float:right;width:25%;cursor:pointer;color:rgba(0,0,0,0.87);border-radius:3px;padding:6px 12px;background-color:rgba(0,0,0,0.02);border:1px solid #D5D5D5;border-bottom-color:#E1E1E1;box-sizing:border-box;line-height:19px;white-space:nowrap;">签到</button>' +
-            '</div>' +
-            '<br>' +
-            '</div>');
-        $("#registerCaptchaImg").attr("src", "${servePath}/captcha?" + (new Date()).getTime());
-        $("#checkInCaptcha").focus();
-        $("#checkInCaptcha").keypress(function (e) {
-            if (e.which == 13) {
-                submitCheckIn();
-            }
-        });
-    }
-
     function submitCheckIn() {
-        Label.checkInCaptcha = $("#checkInCaptcha").val();
-        if (Label.checkInCaptcha !== "") {
-            Util.closeAlert();
-            let checkInBtn = document.getElementById("checkIn");
-            Util.fadeOut(checkInBtn);
-            $.ajax({
-                url: "${servePath}/activity/daily-checkin-api/" + Label.checkInCaptcha,
-                type: "GET",
-                async: false,
-                cache: false,
-                success: function (result) {
-                    if (result.sum === -9999) {
-                        Util.alert('请输入验证码以继续签到<br><br>' +
-                            '<div class="input-wrap">' +
-                            '<img id="registerCaptchaImg" style="width: 128px" src="" onclick="this.src=\'${servePath}/captcha?\' + (new Date()).getTime()" />' +
-                            '<br><br>' +
-                            '<div>' +
-                            '<input type="text" id="checkInCaptcha" placeholder="验证码" style="float:left;width:74%;border:1px solid rgba(0,0,0,0.38);background-color:#FAFAFA;border-radius:3px;box-shadow:0 1px 2px rgb(0 0 0 / 8%) inset;padding:7px 8px;line-height:17px;box-sizing:border-box;-moz-box-sizing:border-box;-webkit-box-sizing:border-box;" />' +
-                            '<button onclick="submitCheckIn()" style="float:right;width:25%;cursor:pointer;color:rgba(0,0,0,0.87);border-radius:3px;padding:6px 12px;background-color:rgba(0,0,0,0.02);border:1px solid #D5D5D5;border-bottom-color:#E1E1E1;box-sizing:border-box;line-height:19px;white-space:nowrap;">签到</button>' +
-                            '</div>' +
-                            '<br><br><br>' +
-                            '<p style="color:red">验证码错误！请重试。</p>' +
-                            '</div>');
-                        $("#registerCaptchaImg").attr("src", "${servePath}/captcha?" + (new Date()).getTime());
-                        $("#checkInCaptcha").focus();
-                        $("#checkInCaptcha").keypress(function (e) {
-                            if (e.which == 13) {
-                                submitCheckIn();
-                            }
-                        });
-                        Util.fadeIn(checkInBtn);
-                    } else if (result.sum === -9998) {
-                        Util.alert('请输入验证码以继续签到<br><br>' +
-                            '<div class="input-wrap">' +
-                            '<img id="registerCaptchaImg" style="width: 128px" src="" onclick="this.src=\'${servePath}/captcha?\' + (new Date()).getTime()" />' +
-                            '<br><br>' +
-                            '<div>' +
-                            '<input type="text" id="checkInCaptcha" placeholder="验证码" style="float:left;width:74%;border:1px solid rgba(0,0,0,0.38);background-color:#FAFAFA;border-radius:3px;box-shadow:0 1px 2px rgb(0 0 0 / 8%) inset;padding:7px 8px;line-height:17px;box-sizing:border-box;-moz-box-sizing:border-box;-webkit-box-sizing:border-box;" />' +
-                            '<button onclick="submitCheckIn()" style="float:right;width:25%;cursor:pointer;color:rgba(0,0,0,0.87);border-radius:3px;padding:6px 12px;background-color:rgba(0,0,0,0.02);border:1px solid #D5D5D5;border-bottom-color:#E1E1E1;box-sizing:border-box;line-height:19px;white-space:nowrap;">签到</button>' +
-                            '</div>' +
-                            '<br><br><br>' +
-                            '<p style="color:red">验证码输入过快！请稍候重试。</p>' +
-                            '</div>');
-                        $("#registerCaptchaImg").attr("src", "${servePath}/captcha?" + (new Date()).getTime());
-                        $("#checkInCaptcha").focus();
-                        $("#checkInCaptcha").keypress(function (e) {
-                            if (e.which == 13) {
-                                submitCheckIn();
-                            }
-                        });
-                        Util.fadeIn(checkInBtn);
-                    } else {
-                        if (result.sum === undefined) {
-                            Util.goLogin();
-                        }
-                        setTimeout(function () {
-                            if (result.sum === -1) {
-                                $("#checkIn").html("<img style='border-radius: 0' src='https://pwl.stackoverflow.wiki/2021/09/embarrassed-4112bd37.png'><b>你已经签到过了哦！</b>");
-                                Util.fadeIn(checkInBtn, function () {
-                                    setTimeout(function () {
-                                        Util.fadeOut(checkInBtn, function () {
-                                            $("#checkIn").html('<img style="border-radius: 0" id="checkInImg" src="https://pwl.stackoverflow.wiki/2021/10/Fishing-a219e80c.png" alt="每日签到"><b>每日签到</b>');
-                                            Util.fadeIn(checkInBtn);
-                                        });
-                                    }, 2000);
-                                });
-                            } else {
-                                $("#checkIn").html("<img style='border-radius: 0' src='https://pwl.stackoverflow.wiki/2021/09/correct-1f5e3258.png'><b>签到成功～ 积分 +" + result.sum + "</b>");
-                                Util.fadeIn(checkInBtn, function () {
-                                    setTimeout(function () {
-                                        Util.fadeOut(checkInBtn, function () {
-                                            $("#checkIn").html('<img style="border-radius: 0" id="checkInImg" src="https://pwl.stackoverflow.wiki/2021/10/Fishing-a219e80c.png" alt="每日签到"><b>每日签到</b>');
-                                            Util.fadeIn(checkInBtn);
-                                        });
-                                    }, 2000);
-                                });
-                            }
-                        }, 700);
-                    }
-                },
-                error: function () {
+        let checkInBtn = document.getElementById("checkIn");
+        Util.fadeOut(checkInBtn);
+        $.ajax({
+            url: "${servePath}/activity/daily-checkin-api",
+            type: "GET",
+            async: false,
+            cache: false,
+            success: function (result) {
+                if (result.sum === undefined) {
                     Util.goLogin();
                 }
-            });
-        }
+                setTimeout(function () {
+                    if (result.sum === -1) {
+                        $("#checkIn").html("<img style='border-radius: 0' src='https://pwl.stackoverflow.wiki/2021/09/embarrassed-4112bd37.png'><b>你已经签到过了哦！</b>");
+                        Util.fadeIn(checkInBtn, function () {
+                            setTimeout(function () {
+                                Util.fadeOut(checkInBtn, function () {
+                                    $("#checkIn").html('<img style="border-radius: 0" id="checkInImg" src="https://pwl.stackoverflow.wiki/2021/10/Fishing-a219e80c.png" alt="每日签到"><b>每日签到</b>');
+                                    Util.fadeIn(checkInBtn);
+                                });
+                            }, 2000);
+                        });
+                    } else {
+                        $("#checkIn").html("<img style='border-radius: 0' src='https://pwl.stackoverflow.wiki/2021/09/correct-1f5e3258.png'><b>签到成功～ 积分 +" + result.sum + "</b>");
+                        Util.fadeIn(checkInBtn, function () {
+                            setTimeout(function () {
+                                Util.fadeOut(checkInBtn, function () {
+                                    $("#checkIn").html('<img style="border-radius: 0" id="checkInImg" src="https://pwl.stackoverflow.wiki/2021/10/Fishing-a219e80c.png" alt="每日签到"><b>每日签到</b>');
+                                    Util.fadeIn(checkInBtn);
+                                });
+                            }, 2000);
+                        });
+                    }
+                }, 700);
+            },
+            error: function () {
+                Util.goLogin();
+            }
+        });
     }
 
     var loading = false;
