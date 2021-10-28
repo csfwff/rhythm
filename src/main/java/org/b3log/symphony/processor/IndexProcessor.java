@@ -330,7 +330,7 @@ public class IndexProcessor {
         final List<JSONObject> perfectArticles = articleQueryService.getIndexPerfectArticles();
         dataModel.put(Common.PERFECT_ARTICLES, perfectArticles);
 
-        final List<JSONObject> niceUsers = userQueryService.getNiceUsers(30);
+        final List<JSONObject> niceUsers = userQueryService.getNiceUsers(10);
         dataModel.put(Common.NICE_USERS, niceUsers);
 
         final JSONObject result = articleQueryService.getQuestionArticles(0, 1, 10);
@@ -341,7 +341,7 @@ public class IndexProcessor {
         dataModel.put(Common.FISHING_PI_VERSION, Server.FISHING_PI_VERSION);
 
         // 签到排行
-        final List<JSONObject> users = activityQueryService.getTopCheckinUsers(8);
+        final List<JSONObject> users = activityQueryService.getTopCheckinUsers(6);
         dataModel.put(Common.TOP_CHECKIN_USERS, users);
         // 在线时间排行
         final List<JSONObject> onlineTopUsers = activityQueryService.getTopOnlineTimeUsers(5);

@@ -81,7 +81,7 @@ ${HeaderBannerLabel}
                             <a rel="nofollow" href="${servePath}/member/${article.articleAuthorName}">
                                     <span class="avatar-small slogan"
                                           aria-label="${article.articleAuthorName}"
-                                          style="background-image:url('${article.articleAuthorThumbnailURL210}')"></span>
+                                          style="background-image:url('${article.articleAuthorThumbnailURL48}')"></span>
                             </a>
                             <a rel="nofollow" class="title fn-ellipsis fn-flex-1"
                                href="${servePath}${article.articlePermalink}">${article.articleTitleEmoj}</a>
@@ -115,7 +115,7 @@ ${HeaderBannerLabel}
                                 <a rel="nofollow" href="${servePath}/member/${article.articleAuthorName}">
                                     <span class="avatar-small slogan"
                                           aria-label="${article.articleAuthorName}"
-                                          style="background-image:url('${article.articleAuthorThumbnailURL210}')"></span>
+                                          style="background-image:url('${article.articleAuthorThumbnailURL48}')"></span>
                                 </a>
                                 <a rel="nofollow" class="title fn-ellipsis fn-flex-1"
                                    href="${servePath}${article.articlePermalink}">${article.articleTitleEmoj}</a>
@@ -132,7 +132,7 @@ ${HeaderBannerLabel}
             <!--<div style="border-bottom: 1px solid #eee;margin:0px 10px ;">
                 <div style="float:left;font-size:13px;margin:5px 0 10px 0; font-weight:bold;">活跃成员</div>
                 <div style="clear:both;"></div>
-            </div>
+            </div>-->
             <div class="module-panel">
                 <div class="index-user">
                     <#list niceUsers as user>
@@ -144,7 +144,7 @@ ${HeaderBannerLabel}
                         </a>
                     </#list>
                 </div>
-            </div>-->
+            </div>
 
             <div style="border-bottom: 1px solid #eee;margin:0px 10px ;">
                 <div style="float:left;font-size:13px;margin:5px 0 10px 0; font-weight:bold;">签到排行</div>
@@ -155,7 +155,7 @@ ${HeaderBannerLabel}
             <div class="module-panel">
                 <ul class="module-list">
                     <#list topCheckinUsers as user>
-                        <#if user_index < 8>
+                        <#if user_index < 6>
                             <li class="fn-flex rank topCheckInUsersElement fn-hidden">
                                 <#if user_index == 0 || user_index == 1 || user_index == 2>
                                 <span
@@ -173,7 +173,7 @@ ${HeaderBannerLabel}
                                 <a rel="nofollow" href="${servePath}/member/${user.userName}">
                                     <span class="avatar-small slogan"
                                           aria-label="${user.userName}"
-                                          style="background-image:url('${user.userAvatarURL}')"></span>
+                                          style="background-image:url('${user.userAvatarURL48}')"></span>
                                 </a>
                                 <a rel="nofollow" class="title fn-flex-1"
                                    aria-label="${pointLabel} ${user.userPoint?c}"
@@ -215,7 +215,7 @@ ${HeaderBannerLabel}
                                 <a rel="nofollow" href="${servePath}/member/${user.userName}">
                                     <span class="avatar-small slogan"
                                           aria-label="${user.userName}"
-                                          style="background-image:url('${user.userAvatarURL}')"></span>
+                                          style="background-image:url('${user.userAvatarURL48}')"></span>
                                 </a>
                                 <a rel="nofollow" class="title fn-flex-1"
                                    aria-label="${pointLabel} ${user.userPoint?c}"
@@ -392,7 +392,7 @@ ${HeaderBannerLabel}
                                     <a rel="nofollow" href="${servePath}/member/${article.articleAuthorName}">
                                     <span class="avatar-small slogan"
                                           aria-label="${article.articleAuthorName}"
-                                          style="background-image:url('${article.articleAuthorThumbnailURL210}')"></span>
+                                          style="background-image:url('${article.articleAuthorThumbnailURL48}')"></span>
                                     </a>
                                     <a rel="nofollow" class="title fn-ellipsis fn-flex-1"
                                        href="${servePath}${article.articlePermalink}">${article.articleTitleEmoj}</a>
@@ -796,7 +796,7 @@ ${HeaderBannerLabel}
                         }
                         $("#randomArticles").append('<li class="fn-flex">' +
                             '<a rel="nofollow" href="${servePath}/member/' + article.articleAuthorName + '">' +
-                            '<span class="avatar-small slogan" aria-label="' + article.articleAuthorName + '" style="background-image:url(\'' + article.articleAuthorThumbnailURL210 + '\')"></span></a>' +
+                            '<span class="avatar-small slogan" aria-label="' + article.articleAuthorName + '" style="background-image:url(\'' + article.articleAuthorThumbnailURL48 + '\')"></span></a>' +
                             '<a rel="nofollow" class="title fn-ellipsis fn-flex-1" href="${servePath}' + article.articlePermalink + '">' + article.articleTitleEmoj + '</a>' +
                             '<a class="fn-right count ft-gray ft-smaller" href="${servePath}' + article.articlePermalink + '">' + viewCount + '</a>' +
                             '</li>');
