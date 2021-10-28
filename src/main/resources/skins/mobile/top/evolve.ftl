@@ -50,7 +50,7 @@
                                     <#if 0 == user.profile.userAppRole>${hackerLabel}<#else>${painterLabel}</#if>
                                 </div>
                             </div>
-                            <div class="cmts tooltipped tooltipped-w">
+                            <div class="cmts tooltipped tooltipped-w" aria-label="知识消耗 ${user.data.know}，获得成就 ${user.data.trick} 个">
                                 知识消耗 ${user.data.know}，获得成就 ${user.data.trick} 个<br>
                             </div>
                         </div>
