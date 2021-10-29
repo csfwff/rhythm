@@ -160,7 +160,7 @@ public class ActivityProcessor {
         Dispatcher.get("/activity/character", activityProcessor::showCharacter, loginCheck::handle, csrfMidware::fill);
         Dispatcher.post("/activity/character/submit", activityProcessor::submitCharacter, loginCheck::handle);
         Dispatcher.get("/activities", activityProcessor::showActivities);
-        Dispatcher.get("/activity/daily-checkin-api/{captcha}", activityProcessor::dailyCheckinApi, loginCheck::handle);
+        Dispatcher.get("/activity/daily-checkin-api", activityProcessor::dailyCheckinApi, loginCheck::handle);
         Dispatcher.get("/activity/yesterday-liveness-reward-api", activityProcessor::yesterdayLivenessRewardApi, loginCheck::handle);
         Dispatcher.get("/activity/1A0001", activityProcessor::show1A0001, csrfMidware::fill);
         Dispatcher.post("/activity/1A0001/bet", activityProcessor::bet1A0001, loginCheck::handle, csrfMidware::check, activity1A0001ValidationMidware::handle);
@@ -334,22 +334,10 @@ public class ActivityProcessor {
      *
      * @param context the specified context
      */
-    SimpleCurrentLimiter dailyCheckLimiter = new SimpleCurrentLimiter(2, 1);
     public void dailyCheckinApi(final RequestContext context) {
         final JSONObject user = Sessions.getUser();
-        String userName = user.optString(User.USER_NAME);
-        final String captcha = context.pathVar("captcha");
-        LOGGER.log(Level.INFO, "User " + userName + " has requested a captcha: " + captcha);
-        if (dailyCheckLimiter.access(userName)) {
-            if (CaptchaProcessor.invalidCaptcha(captcha)) {
-                context.renderJSON(new JSONObject().put("sum", -9999));
-            } else {
-                final String userId = user.optString(Keys.OBJECT_ID);
-                context.renderJSON(new JSONObject().put("sum", activityMgmtService.dailyCheckin(userId)));
-            }
-        } else {
-            context.renderJSON(new JSONObject().put("sum", -9998));
-        }
+        final String userId = user.optString(Keys.OBJECT_ID);
+        context.renderJSON(new JSONObject().put("sum", activityMgmtService.dailyCheckin(userId)));
     }
 
     /**

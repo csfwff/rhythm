@@ -65,6 +65,21 @@
                             <li>
                                 <div class='fn-flex'>
                                     <div class="avatar"
+                                         style="background-image:url('${staticServePath}/games/evolve/evolved.ico')"></div>
+                                    <div class="fn-flex-1">
+                                        <h2 class="ft-13">
+                                            <a href="${servePath}/games/evolve/">《进化-Evolve》</a>
+                                        </h2>
+                                        <span class="ft-fade vditor-reset">
+                                                在本游戏中，您首先由原生质选择进化为某种智慧生物，然后带领他们走向繁荣昌盛，最后迈向星空，征服宇宙。<br>
+                                                支持第三方存档云同步（需手动在游戏设定中开启），参与 <a href="${servePath}/top/evolve">进化排行榜</a>
+                                        </span>
+                                    </div>
+                                </div>
+                            </li>
+                            <li>
+                                <div class='fn-flex'>
+                                    <div class="avatar"
                                          style="background-image:url('${staticServePath}/games/adarkroom/img/adr.png')"></div>
                                     <div class="fn-flex-1">
                                         <h2 class="ft-13">

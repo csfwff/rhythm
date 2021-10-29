@@ -50,7 +50,7 @@
                             <#if 0 == user.profile.userAppRole>${hackerLabel}<#else>${painterLabel}</#if>
                         </div>
                     </div>
-                    <div class="cmts tooltipped tooltipped-w">
+                    <div class="cmts tooltipped tooltipped-w" aria-label="重开 ${user.data.times} 次，获得成就 ${user.achievement?c} 个">
                         重开 ${user.data.times} 次，获得成就 ${user.achievement?c} 个<br>
                     </div>
                 </div>

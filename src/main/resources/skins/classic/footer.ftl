@@ -25,13 +25,19 @@
         </div>
         <div class="fn-flex-1">
             <div class="footer-nav fn-clear">
+                友情链接&nbsp;
+                <a target="_blank" href="https://www.cxy521.com/">程序员导航</a>
+            </div>
+            <br>
+            <div class="footer-nav fn-clear">
                 <a rel="help" href="${servePath}/article/1630569106133">${aboutLabel}</a>
                 <a href="${servePath}/tag/announcement">${symAnnouncementLabel}</a>
                 <a href="${servePath}/domains">${domainLabel}</a>
                 <a href="${servePath}/tags">${tagLabel}</a>
                 <a href="${servePath}/statistic">${dataStatLabel}</a>
+                <a href="javascript:void(0);">API（开发中）</a>
                 <div class="fn-right">
-                ${visionLabel}
+                    <a href="https://icp.gov.moe/?keyword=20212123" target="_blank">萌ICP备20212123号</a>
                 </div>
             </div>
             <div class="fn-clear ft-smaller">

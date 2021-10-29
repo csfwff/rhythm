@@ -52,7 +52,7 @@
 </div>
 <script src="../../../../../games/lifeRestart/lib/jquery-3.6.0.min.js"></script>
 <script src="../../../../../games/lifeRestart/lib/dom-to-image.min.js"></script>
-<script src="../../../../../games/lifeRestart/public/bundle.js"></script>
+<script src="https://pwl.stackoverflow.wiki/bundle.js"></script>
 <script>
     if ('serviceWorker' in navigator) {
         window.addEventListener('load', function () {

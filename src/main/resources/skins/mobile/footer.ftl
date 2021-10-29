@@ -21,11 +21,18 @@
 <div class="footer">
     <div class="wrapper ft-smaller">
         <div class="footer-nav">
-            ${visionLabel}
+            <a href="https://icp.gov.moe/?keyword=20212123" target="_blank">萌ICP备20212123号</a>
         </div>
         <div class="fn-hr5"></div>
         <div id="fs">
             ${sloganLabel}
+        </div>
+        <br>
+        <div>
+            友情链接
+        </div>
+        <div>
+            <a target="_blank" href="https://www.cxy521.com/">程序员导航</a>
         </div>
         <div class="fn-hr5"></div>
         <div>

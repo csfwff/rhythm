@@ -135,6 +135,13 @@ public class IndexProcessor {
         Dispatcher.get("/charge/point", indexProcessor::showChargePoint, anonymousViewCheckMidware::handle);
         Dispatcher.get("/games/adarkroom/", indexProcessor::showADarkRoom, loginCheck::handle);
         Dispatcher.get("/games/lifeRestart/view/", indexProcessor::showLifeRestart, loginCheck::handle);
+        Dispatcher.get("/games/evolve/", indexProcessor::showEvolve, loginCheck::handle);
+    }
+
+    public void showEvolve(final RequestContext context) {
+        final AbstractFreeMarkerRenderer renderer = new SkinRenderer(context, "games/evolve/index.ftl");
+        final Map<String, Object> dataModel = renderer.getDataModel();
+        dataModelService.fillHeaderAndFooter(context, dataModel);
     }
 
     public void showLifeRestart(final RequestContext context) {
@@ -323,7 +330,7 @@ public class IndexProcessor {
         final List<JSONObject> perfectArticles = articleQueryService.getIndexPerfectArticles();
         dataModel.put(Common.PERFECT_ARTICLES, perfectArticles);
 
-        final List<JSONObject> niceUsers = userQueryService.getNiceUsers(30);
+        final List<JSONObject> niceUsers = userQueryService.getNiceUsers(10);
         dataModel.put(Common.NICE_USERS, niceUsers);
 
         final JSONObject result = articleQueryService.getQuestionArticles(0, 1, 10);
@@ -334,10 +341,10 @@ public class IndexProcessor {
         dataModel.put(Common.FISHING_PI_VERSION, Server.FISHING_PI_VERSION);
 
         // 签到排行
-        final List<JSONObject> users = activityQueryService.getTopCheckinUsers(5);
+        final List<JSONObject> users = activityQueryService.getTopCheckinUsers(6);
         dataModel.put(Common.TOP_CHECKIN_USERS, users);
         // 在线时间排行
-        final List<JSONObject> onlineTopUsers = activityQueryService.getTopOnlineTimeUsers(3);
+        final List<JSONObject> onlineTopUsers = activityQueryService.getTopOnlineTimeUsers(5);
         dataModel.put("onlineTopUsers", onlineTopUsers);
         // 随机文章
         dataModel.put("indexRandomArticles", ArticleProcessor.getRandomArticles(12));
@@ -512,7 +519,7 @@ public class IndexProcessor {
     public void showAbout(final RequestContext context) {
         // 关于页主要描述社区愿景、行为准则、内容协议等，并介绍社区的功能
         // 这些内容请搭建后自行编写发布，然后再修改这里进行重定向
-        context.sendRedirect(Latkes.getServePath() + "/member/admin");
+        context.sendRedirect(Latkes.getServePath() + "/article/1630569106133");
     }
 
     /**

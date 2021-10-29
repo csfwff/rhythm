@@ -1274,7 +1274,7 @@ var Util = {
     $.ua.set(navigator.userAgent);
     if ($.ua.device.type !== 'mobile') {
       let cardHtml = '' +
-          '<div id="userCard" style="position: absolute; z-index: 130; right: auto; display: none;">' +
+          '<div id="userCard" style="position: absolute; z-index: 130; right: auto; display: none; background: white;">' +
           '</div>';
       $("body").append(cardHtml);
       Util.listenUserCard();

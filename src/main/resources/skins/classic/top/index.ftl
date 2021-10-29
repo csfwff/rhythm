@@ -84,6 +84,16 @@
                                 </div>
                             </li>
                             <li class="fn__flex">
+                                <img class="avatar" src="${staticServePath}/games/evolve/evolved.ico" />
+                                <div class="fn-flex-1">
+                                    <h2>
+                                        <a class="title"
+                                           href="${servePath}/top/evolve"> 进化排行榜</a>
+                                    </h2>
+                                    <div class="ft-fade ft-smaller">进化-Evolve 游戏排名</div>
+                                </div>
+                            </li>
+                            <li class="fn__flex">
                                 <img class="avatar" src="${staticServePath}/games/adarkroom/img/adr.png" />
                                 <div class="fn-flex-1">
                                     <h2>

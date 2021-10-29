@@ -302,7 +302,7 @@ public class LoginProcessor {
     public void forgetPwd(final RequestContext context) {
         context.renderJSON(StatusCodes.ERR);
 
-        final JSONObject requestJSONObject = (JSONObject) context.attr(Keys.REQUEST);
+        final JSONObject requestJSONObject = context.requestJSON();
         final String email = requestJSONObject.optString(User.USER_EMAIL);
 
         try {

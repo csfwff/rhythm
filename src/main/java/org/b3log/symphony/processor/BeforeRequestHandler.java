@@ -64,11 +64,6 @@ public class BeforeRequestHandler implements Handler {
     public void handle(final RequestContext context) {
         Stopwatchs.start("Request initialized [" + context.requestURI() + "]");
 
-        String uri = context.requestURI();
-        String address = Requests.getRemoteAddr(context.getRequest());
-        String union = address + ":" + uri;
-        LOGGER.log(Level.INFO, union);
-
         Locales.setLocale(Latkes.getLocale());
 
         Sessions.setTemplateDir(Symphonys.SKIN_DIR_NAME);

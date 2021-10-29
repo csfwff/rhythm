@@ -33,6 +33,7 @@ import org.b3log.latke.ioc.Singleton;
 import org.b3log.latke.model.User;
 import org.b3log.latke.repository.*;
 import org.b3log.symphony.model.Common;
+import org.b3log.symphony.model.Liveness;
 import org.b3log.symphony.model.Notification;
 import org.b3log.symphony.model.UserExt;
 import org.b3log.symphony.processor.channel.ChatroomChannel;
@@ -156,6 +157,12 @@ public class ChatroomProcessor {
     private ChatRoomRepository chatRoomRepository;
 
     /**
+     * Liveness management service.
+     */
+    @Inject
+    private LivenessMgmtService livenessMgmtService;
+
+    /**
      * Register request handlers.
      */
     public static void register() {
@@ -185,6 +192,7 @@ public class ChatroomProcessor {
      *
      * @param context the specified context
      */
+    final private static SimpleCurrentLimiter chatRoomLivenessLimiter = new SimpleCurrentLimiter(30, 1);
     public synchronized void addChatRoomMsg(final RequestContext context) {
         final JSONObject requestJSONObject = (JSONObject) context.attr(Keys.REQUEST);
         String content = requestJSONObject.optString(Common.CONTENT);
@@ -197,6 +205,15 @@ public class ChatroomProcessor {
         msg.put(UserExt.USER_AVATAR_URL, currentUser.optString(UserExt.USER_AVATAR_URL));
         msg.put(Common.CONTENT, content);
         msg.put(Common.TIME, time);
+
+        // 加积分
+        try {
+            String userId = currentUser.optString(Keys.OBJECT_ID);
+            if (chatRoomLivenessLimiter.access(userId)) {
+                livenessMgmtService.incLiveness(userId, Liveness.LIVENESS_COMMENT);
+            }
+        } catch (Exception ignored) {
+        }
 
         // 聊天室内容保存到数据库
         final Transaction transaction = chatRoomRepository.beginTransaction();
