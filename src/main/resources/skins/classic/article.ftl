@@ -740,6 +740,10 @@
     <#if 3 == article.articleType>
     Article.playThought('${article.articleContent}');
     </#if>
+
+    setInterval(function () {
+        Util.listenUserCard();
+    }, 1000);
 </script>
 </body>
 </html>
