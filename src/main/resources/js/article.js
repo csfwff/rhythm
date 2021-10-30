@@ -470,7 +470,7 @@ var Comment = {
         position: 'top',
       },
       height: 200,
-      counter: 4096,
+      counter: 40960,
       placeholder: Label.commentEditorPlaceholderLabel,
       ctrlEnter: function () {
         Comment.add(Label.articleOId, Label.csrfToken,
@@ -752,8 +752,9 @@ var Comment = {
       },
       complete: function () {
         $(it).removeAttr('disabled').css('opacity', '1')
+        setTimeout(Util.listenUserCard, 1000);
       },
-    })
+    });
   },
   /**
    * @description 点击回复评论时，把当楼层的用户名带到评论框中

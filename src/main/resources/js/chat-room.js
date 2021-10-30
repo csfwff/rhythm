@@ -93,7 +93,7 @@ var ChatRoom = {
           ],
         }],
       height: 200,
-      counter: 4096,
+      counter: 40960,
       placeholder: '聊天室历史记录将永久保存，每天一次撤回机会；在发送消息前请三思而后行，友善是第一原则。',
       ctrlEnter: function () {
         ChatRoom.send()
