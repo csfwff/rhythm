@@ -1434,8 +1434,8 @@ var Util = {
             html += '<img style="height: 20px;margin: 0px;" src="https://pwl.stackoverflow.wiki/newRole.png"/>';
             break;
         }
-        html += '                    </a>\n' +
-            '                    <a href="' + Label.servePath + '/member/' + userName + '/points" class="tooltipped-new tooltipped__n"\n' +
+        html += '                    </a>\n';
+        html += '                    <a href="' + Label.servePath + '/member/' + userName + '/points" class="tooltipped-new tooltipped__n"\n' +
             '                       aria-label="' + userPoint + ' 积分">\n' +
             '                        <svg>\n' +
             '                            <use xlink:href="#iconPoints"></use>\n' +
@@ -1451,8 +1451,13 @@ var Util = {
               '</a>\n';
         }
         html += '' +
-            '                </div>\n' +
-            '                <div class="fn__shrink">\n' +
+            '                </div>\n';
+        if (userOnlineFlag === true) {
+          html += '<span style="background-color:#d23f31;color:#fff;font-size:12px;border-radius:3px;padding:0 5px;">在线</span>';
+        } else {
+          html += '<span style="background-color:rgba(0,0,0,0.54);color:#fff;font-size:12px;border-radius:3px;padding:0 5px;">离线</span>';
+        }
+        html += '                <div class="fn__shrink">\n' +
             '                    <a class="green small btn" href="' + Label.servePath + '/idle-talk?toUser=' + userName + '" rel="nofollow">\n' +
             '                        私信\n' +
             '                    </a>\n';
