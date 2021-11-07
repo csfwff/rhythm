@@ -38,46 +38,6 @@
                                 <li>
                                     <div class='fn-flex'>
                                         <div class="avatar"
-                                             style="background-image:url('${staticServePath}/images/activities/char.png')"></div>
-                                        <div class="fn-flex-1">
-                                            <h2>
-                                                <a href="${servePath}/activity/character">${characterLabel}</a>
-                                            </h2>
-                                            <span class="ft-fade vditor-reset">${activityCharacterTitleLabel}</span>
-                                        </div>
-                                    </div>
-                                </li>
-                                <li>
-                                    <div class='fn-flex'>
-                                        <div class="avatar"
-                                             style="background-image:url('${staticServePath}/images/activities/snak.png')"></div>
-                                        <div class="fn-flex-1">
-                                            <h2>
-                                                <a href="${servePath}/activity/eating-snake">${eatingSnakeLabel}</a>
-                                            </h2>
-                                            <span class="ft-fade vditor-reset">
-                                                ${activityEatingSnakeTitleLabel}
-                                            </span>
-                                        </div>
-                                    </div>
-                                </li>
-                                <li>
-                                    <div class='fn-flex'>
-                                        <div class="avatar"
-                                             style="background-image:url('${staticServePath}/images/activities/gobang.png')"></div>
-                                        <div class="fn-flex-1">
-                                            <h2>
-                                                <a href="${servePath}/activity/gobang">${gobangLabel}</a>
-                                            </h2>
-                                            <span class="ft-fade vditor-reset">
-                                            ${activityGobangTitleLabel}
-                                            </span>
-                                        </div>
-                                    </div>
-                                </li>
-                                <li>
-                                    <div class='fn-flex'>
-                                        <div class="avatar"
                                              style="background-image:url('${staticServePath}/games/evolve/evolved.ico')"></div>
                                         <div class="fn-flex-1">
                                             <h2>
@@ -131,6 +91,60 @@
                                             <span class="ft-fade vditor-reset">
                                                 如果你不满意现在的人生，那就来重开吧～<br>
                                                 支持存档云同步，参与 <a href="${servePath}/top/lifeRestart">人生重开模拟器成就排行榜</a>
+                                            </span>
+                                        </div>
+                                    </div>
+                                </li>
+                                <li>
+                                    <div class='fn-flex'>
+                                        <div class="avatar"
+                                             style="background-image:url('${staticServePath}/images/activities/cat.jpg')"></div>
+                                        <div class="fn-flex-1">
+                                            <h2>
+                                                <a href="${servePath}/activity/catch-the-cat">围住小猫</a>
+                                            </h2>
+                                            <span class="ft-fade vditor-reset">
+                                                你能围住这只调皮的小猫么？
+                                            </span>
+                                        </div>
+                                    </div>
+                                </li>
+                                <li>
+                                    <div class='fn-flex'>
+                                        <div class="avatar"
+                                             style="background-image:url('${staticServePath}/images/activities/char.png')"></div>
+                                        <div class="fn-flex-1">
+                                            <h2>
+                                                <a href="${servePath}/activity/character">${characterLabel}</a>
+                                            </h2>
+                                            <span class="ft-fade vditor-reset">${activityCharacterTitleLabel}</span>
+                                        </div>
+                                    </div>
+                                </li>
+                                <li>
+                                    <div class='fn-flex'>
+                                        <div class="avatar"
+                                             style="background-image:url('${staticServePath}/images/activities/snak.png')"></div>
+                                        <div class="fn-flex-1">
+                                            <h2>
+                                                <a href="${servePath}/activity/eating-snake">${eatingSnakeLabel}</a>
+                                            </h2>
+                                            <span class="ft-fade vditor-reset">
+                                                ${activityEatingSnakeTitleLabel}
+                                            </span>
+                                        </div>
+                                    </div>
+                                </li>
+                                <li>
+                                    <div class='fn-flex'>
+                                        <div class="avatar"
+                                             style="background-image:url('${staticServePath}/images/activities/gobang.png')"></div>
+                                        <div class="fn-flex-1">
+                                            <h2>
+                                                <a href="${servePath}/activity/gobang">${gobangLabel}</a>
+                                            </h2>
+                                            <span class="ft-fade vditor-reset">
+                                            ${activityGobangTitleLabel}
                                             </span>
                                         </div>
                                     </div>
