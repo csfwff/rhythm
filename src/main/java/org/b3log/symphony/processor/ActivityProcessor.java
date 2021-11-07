@@ -162,9 +162,9 @@ public class ActivityProcessor {
         Dispatcher.get("/activities", activityProcessor::showActivities);
         Dispatcher.get("/activity/daily-checkin-api", activityProcessor::dailyCheckinApi, loginCheck::handle);
         Dispatcher.get("/activity/yesterday-liveness-reward-api", activityProcessor::yesterdayLivenessRewardApi, loginCheck::handle);
-        Dispatcher.get("/activity/1A0001", activityProcessor::show1A0001, csrfMidware::fill);
-        Dispatcher.post("/activity/1A0001/bet", activityProcessor::bet1A0001, loginCheck::handle, csrfMidware::check, activity1A0001ValidationMidware::handle);
-        Dispatcher.post("/activity/1A0001/collect", activityProcessor::collect1A0001, loginCheck::handle, activity1A0001CollectValidationMidware::handle);
+        // Dispatcher.get("/activity/1A0001", activityProcessor::show1A0001, csrfMidware::fill);
+        // Dispatcher.post("/activity/1A0001/bet", activityProcessor::bet1A0001, loginCheck::handle, csrfMidware::check, activity1A0001ValidationMidware::handle);
+        // Dispatcher.post("/activity/1A0001/collect", activityProcessor::collect1A0001, loginCheck::handle, activity1A0001CollectValidationMidware::handle);
         Dispatcher.get("/activity/eating-snake", activityProcessor::showEatingSnake, loginCheck::handle, csrfMidware::fill);
         Dispatcher.post("/activity/eating-snake/start", activityProcessor::startEatingSnake, loginCheck::handle, csrfMidware::check);
         Dispatcher.post("/activity/eating-snake/collect", activityProcessor::collectEatingSnake, loginCheck::handle, csrfMidware::fill);

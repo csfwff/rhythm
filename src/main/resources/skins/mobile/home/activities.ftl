@@ -39,20 +39,6 @@
                             <li>
                                 <div class='fn-flex'>
                                     <div class="avatar"
-                                         style="background-image:url('${staticServePath}/images/activities/1A0001.png')"></div>
-                                    <div class="fn-flex-1">
-                                        <h2 class="ft-13">
-                                            <a href="${servePath}/activity/1A0001">${activity1A0001Label}</a>
-                                        </h2>
-                                        <span class="ft-fade vditor-reset">
-                                            下注后，请在当天 16-24 点在本页面进行兑奖，逾期作废！
-                                        </span>
-                                    </div>
-                                </div>
-                            </li>
-                            <li>
-                                <div class='fn-flex'>
-                                    <div class="avatar"
                                          style="background-image:url('${staticServePath}/images/activities/char.png')"></div>
                                     <div class="fn-flex-1">
                                         <h2 class="ft-13">
