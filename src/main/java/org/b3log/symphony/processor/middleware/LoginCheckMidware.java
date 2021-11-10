@@ -43,6 +43,12 @@ public class LoginCheckMidware {
             currentUser = user;
         } catch (NullPointerException ignored) {
         }
+        try {
+            final JSONObject requestJSONObject = context.requestJSON();
+            JSONObject user = ApiProcessor.getUserByKey(requestJSONObject.optString("apiKey"));
+            currentUser = user;
+        } catch (NullPointerException ignored) {
+        }
         if (null == currentUser) {
             context.sendError(401);
             context.abort();
