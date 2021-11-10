@@ -20,33 +20,29 @@
 -->
 <div class="footer">
     <div class="wrapper">
-        <div class="slogan" id="fs">
-        ${indexIntroLabel} &nbsp; &nbsp;
+        <div class="slogan">
+            摸鱼派 - 鱼油专属摸鱼社区<br>
         </div>
         <div class="fn-flex-1">
-            <div class="footer-nav fn-clear">
+            <div class="footer-nav fn-clear ft-smaller">
                 友情链接&nbsp;
                 <a target="_blank" href="https://www.cxy521.com/">程序员导航</a>
             </div>
-            <br>
-            <div class="footer-nav fn-clear">
+            <div class="fn-clear ft-smaller">
+                探索&nbsp;
+                <a href="https://github.com/csfwff/rhythm" target="_blank">Rhythm 社区引擎</a>
+                &nbsp;｜&nbsp;
+                <a href="https://github.com/imlinhanchao/pwl-chat/releases" target="_blank">摸鱼派聊天室客户端 (Win/Mac)</a>
+            </div>
+            <div class="footer-nav fn-clear" style="margin-top: 10px">
                 <a rel="help" href="${servePath}/article/1630569106133">${aboutLabel}</a>
                 <a href="${servePath}/tag/announcement">${symAnnouncementLabel}</a>
                 <a href="${servePath}/domains">${domainLabel}</a>
                 <a href="${servePath}/tags">${tagLabel}</a>
                 <a href="${servePath}/statistic">${dataStatLabel}</a>
-                <a href="${servePath}/article/1636516552191">API</a>
-                <div class="fn-right">
-                    <a href="https://icp.gov.moe/?keyword=20212123" target="_blank">萌ICP备20212123号</a>
-                </div>
+                <a href="${servePath}/article/1636516552191">开放 API</a>
             </div>
-            <div class="fn-clear ft-smaller">
-            ${sloganLabel}
-                <div class="fn-right">
-                    <a href="https://github.com/csfwff/rhythm" target="_blank">Rhythm 社区</a>
-                ${version}
-                </div>
-            </div>
+            <br>
         </div>
     </div>
 </div>
