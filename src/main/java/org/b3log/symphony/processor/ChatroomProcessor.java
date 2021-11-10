@@ -196,7 +196,12 @@ public class ChatroomProcessor {
     public synchronized void addChatRoomMsg(final RequestContext context) {
         final JSONObject requestJSONObject = (JSONObject) context.attr(Keys.REQUEST);
         String content = requestJSONObject.optString(Common.CONTENT);
-        final JSONObject currentUser = Sessions.getUser();
+        JSONObject currentUser = Sessions.getUser();
+        try {
+            JSONObject user = ApiProcessor.getUserByKey(context.param("apiKey"));
+            currentUser = user;
+        } catch (NullPointerException ignored) {
+        }
         final String userName = currentUser.optString(User.USER_NAME);
 
         final long time = System.currentTimeMillis();
