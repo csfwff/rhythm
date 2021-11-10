@@ -34,20 +34,19 @@ import org.b3log.latke.model.User;
 import org.b3log.latke.service.LangPropsService;
 import org.b3log.latke.service.ServiceException;
 import org.b3log.latke.util.Requests;
-import org.b3log.symphony.model.Common;
-import org.b3log.symphony.model.UserExt;
+import org.b3log.symphony.model.*;
 import org.b3log.symphony.processor.middleware.CSRFMidware;
 import org.b3log.symphony.processor.middleware.LoginCheckMidware;
 import org.b3log.symphony.processor.middleware.validate.Activity1A0001CollectValidationMidware;
 import org.b3log.symphony.processor.middleware.validate.Activity1A0001ValidationMidware;
-import org.b3log.symphony.service.RewardQueryService;
-import org.b3log.symphony.service.UserQueryService;
+import org.b3log.symphony.service.*;
 import org.b3log.symphony.util.Sessions;
 import org.b3log.symphony.util.StatusCodes;
 import org.json.JSONObject;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * 专业团队，专业的 API 接口
@@ -77,6 +76,24 @@ public class ApiProcessor {
     public static Map<String, JSONObject> keys = new HashMap<>();
 
     /**
+     * Follow query service.
+     */
+    @Inject
+    private FollowQueryService followQueryService;
+
+    /**
+     * Role query service.
+     */
+    @Inject
+    private RoleQueryService roleQueryService;
+
+    /**
+     * System settings service.
+     */
+    @Inject
+    private SystemSettingsService systemSettingsService;
+
+    /**
      * Register request handlers.
      */
     public static void register() {
@@ -87,6 +104,7 @@ public class ApiProcessor {
         final ApiProcessor apiProcessor = beanManager.getReference(ApiProcessor.class);
         Dispatcher.get("/api/user/exists/{user}", apiProcessor::userExists);
         Dispatcher.post("/api/getKey", apiProcessor::getKey);
+        Dispatcher.get("/api/user", apiProcessor::getUser);
 
         final RewardQueryService rewardQueryService = beanManager.getReference(RewardQueryService.class);
         Dispatcher.get("/api/article/reward/senders/{aId}", rewardQueryService::rewardedSenders);
@@ -140,6 +158,60 @@ public class ApiProcessor {
             context.renderMsg(langPropsService.get("wrongPwdLabel"));
         } catch (final ServiceException e) {
             context.renderMsg(langPropsService.get("loginFailLabel"));
+        }
+    }
+
+    /**
+     * 查询指定apiKey的用户信息
+     */
+    public void getUser(final RequestContext context) {
+        JSONObject ret = new JSONObject();
+        try {
+            JSONObject user = ApiProcessor.getUserByKey(context.param("apiKey"));
+            final JSONObject filteredUserProfile = new JSONObject();
+            filteredUserProfile.put(User.USER_NAME, user.optString(User.USER_NAME));
+            filteredUserProfile.put(UserExt.USER_ONLINE_FLAG, user.optBoolean(UserExt.USER_ONLINE_FLAG));
+            filteredUserProfile.put(UserExt.ONLINE_MINUTE, user.optInt(UserExt.ONLINE_MINUTE));
+            filteredUserProfile.put(User.USER_URL, user.optString(User.USER_URL));
+            filteredUserProfile.put(UserExt.USER_NICKNAME, user.optString(UserExt.USER_NICKNAME));
+            filteredUserProfile.put(UserExt.USER_CITY, user.optString(UserExt.USER_CITY));
+            filteredUserProfile.put(UserExt.USER_AVATAR_URL, user.optString(UserExt.USER_AVATAR_URL));
+            filteredUserProfile.put(UserExt.USER_POINT, user.optInt(UserExt.USER_POINT));
+            filteredUserProfile.put(UserExt.USER_INTRO, user.optString(UserExt.USER_INTRO));
+            filteredUserProfile.put(Keys.OBJECT_ID, user.optString(Keys.OBJECT_ID));
+            filteredUserProfile.put(UserExt.USER_NO, user.optString(UserExt.USER_NO));
+            filteredUserProfile.put(UserExt.USER_APP_ROLE, user.optString(UserExt.USER_APP_ROLE));
+            final String userId = user.optString(Keys.OBJECT_ID);
+            final long followerCnt = followQueryService.getFollowerCount(userId, Follow.FOLLOWING_TYPE_C_USER);
+            filteredUserProfile.put("followerCount", followerCnt);
+            final long followingUserCnt = followQueryService.getFollowingCount(userId, Follow.FOLLOWING_TYPE_C_USER);
+            filteredUserProfile.put("followingUserCount", followingUserCnt);
+            final String userRoleId = user.optString(User.USER_ROLE);
+            final JSONObject role = roleQueryService.getRole(userRoleId);
+            final String roleName = role.optString(Role.ROLE_NAME);
+            filteredUserProfile.put(User.USER_ROLE, roleName);
+            // 获取用户个性化设定
+            final JSONObject systemSettings = systemSettingsService.getByUsrId(user.optString(Keys.OBJECT_ID));
+            if (Objects.isNull(systemSettings)) {
+                filteredUserProfile.put("cardBg", "");
+            } else {
+                final String settingsJson = systemSettings.optString(SystemSettings.SETTINGS);
+                final JSONObject settings = new JSONObject(settingsJson);
+                final String cardBg = settings.optString("cardBg");
+                if (StringUtils.isBlank(cardBg)) {
+                    filteredUserProfile.put("cardBg", "");
+                } else {
+                    filteredUserProfile.put("cardBg", cardBg);
+                }
+            }
+            ret.put(Keys.CODE, StatusCodes.SUCC);
+            ret.put(Keys.MSG, "");
+            ret.put(Keys.DATA, filteredUserProfile);
+            context.renderJSON(ret);
+        } catch (Exception e) {
+            ret.put(Keys.CODE, StatusCodes.ERR);
+            ret.put(Keys.MSG, "Invalid Api Key.");
+            context.renderJSON(ret);
         }
     }
 
