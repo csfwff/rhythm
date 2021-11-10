@@ -59,11 +59,6 @@ public class ChatroomChannel implements WebSocketChannel {
      */
     @Override
     public void onConnect(final WebSocketSession session) {
-        String type = session.getParameter("type");
-        if (type == null) {
-            type = "";
-        }
-
         String apiKey = session.getParameter("apiKey");
         if (apiKey != null) {
             if (ApiProcessor.keys.containsKey(apiKey)) {
