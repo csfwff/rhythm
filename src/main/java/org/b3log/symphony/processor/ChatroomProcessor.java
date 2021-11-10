@@ -198,8 +198,7 @@ public class ChatroomProcessor {
         String content = requestJSONObject.optString(Common.CONTENT);
         JSONObject currentUser = Sessions.getUser();
         try {
-            JSONObject user = ApiProcessor.getUserByKey(requestJSONObject.optString("apiKey"));
-            currentUser = user;
+            currentUser = ApiProcessor.getUserByKey(requestJSONObject.optString("apiKey"));
         } catch (NullPointerException ignored) {
         }
         final String userName = currentUser.optString(User.USER_NAME);
@@ -361,8 +360,7 @@ public class ChatroomProcessor {
             int page = Integer.parseInt(context.param("page"));
             JSONObject currentUser = Sessions.getUser();
             try {
-                JSONObject user = ApiProcessor.getUserByKey(context.param("apiKey"));
-                currentUser = user;
+                currentUser = ApiProcessor.getUserByKey(context.param("apiKey"));
             } catch (NullPointerException ignored) {
             }
             if (null == currentUser) {
