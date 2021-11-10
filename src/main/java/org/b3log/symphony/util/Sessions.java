@@ -27,10 +27,7 @@ import org.b3log.latke.Keys;
 import org.b3log.latke.Latkes;
 import org.b3log.latke.cache.Cache;
 import org.b3log.latke.cache.CacheFactory;
-import org.b3log.latke.http.Cookie;
-import org.b3log.latke.http.Request;
-import org.b3log.latke.http.RequestContext;
-import org.b3log.latke.http.Response;
+import org.b3log.latke.http.*;
 import org.b3log.latke.ioc.BeanManager;
 import org.b3log.latke.model.User;
 import org.b3log.latke.util.Crypts;
@@ -353,7 +350,7 @@ public final class Sessions {
      * @param userId   the specified user id
      * @param response the specified response
      */
-    public static void logout(final String userId, final Response response) {
+    public static void logout(final String userId, final Request request, final Response response) {
         if (null != response) {
             final Cookie cookie = new Cookie(COOKIE_NAME, "");
             cookie.setMaxAge(0);
@@ -363,8 +360,12 @@ public final class Sessions {
 
         SESSION_CACHE.remove(userId);
 
-        final BeanManager beanManager = BeanManager.getInstance();
-        final UserMgmtService userMgmtService = beanManager.getReference(UserMgmtService.class);
+        final Session httpSession = request.getSession();
+        System.out.println(httpSession.getAttribute(User.USER));
+        httpSession.setAttribute(User.USER, null);
+
+        //final BeanManager beanManager = BeanManager.getInstance();
+        //final UserMgmtService userMgmtService = beanManager.getReference(UserMgmtService.class);
         //userMgmtService.updateOnlineStatus(userId, "", false, true);
     }
 

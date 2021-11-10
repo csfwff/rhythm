@@ -233,7 +233,7 @@ public class SettingsProcessor {
         final JSONObject currentUser = Sessions.getUser();
         try {
             userMgmtService.deactivateUser(currentUser.optString(Keys.OBJECT_ID));
-            Sessions.logout(currentUser.optString(Keys.OBJECT_ID), response);
+            Sessions.logout(currentUser.optString(Keys.OBJECT_ID), context.getRequest(), response);
 
             context.renderJSON(StatusCodes.SUCC);
         } catch (final Exception e) {

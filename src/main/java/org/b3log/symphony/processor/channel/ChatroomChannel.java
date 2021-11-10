@@ -25,6 +25,7 @@ import org.b3log.latke.ioc.Singleton;
 import org.b3log.latke.model.User;
 import org.b3log.symphony.model.Common;
 import org.b3log.symphony.model.UserExt;
+import org.b3log.symphony.processor.ApiProcessor;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -63,18 +64,26 @@ public class ChatroomChannel implements WebSocketChannel {
             type = "";
         }
 
-        if (!type.equals("index")) {
-            final String userStr = session.getHttpSession().getAttribute(User.USER);
-            if (null == userStr) {
-                return;
+        String apiKey = session.getParameter("apiKey");
+        if (apiKey != null) {
+            if (ApiProcessor.keys.containsKey(apiKey)) {
+                final JSONObject user = ApiProcessor.keys.get(apiKey);
+                onlineUsers.put(session, user);
             }
-            final JSONObject user = new JSONObject(userStr);
-            onlineUsers.put(session, user);
         } else {
-            final String userStr = session.getHttpSession().getAttribute(User.USER);
-            if (null != userStr) {
+            if (!type.equals("index")) {
+                final String userStr = session.getHttpSession().getAttribute(User.USER);
+                if (null == userStr) {
+                    return;
+                }
                 final JSONObject user = new JSONObject(userStr);
                 onlineUsers.put(session, user);
+            } else {
+                final String userStr = session.getHttpSession().getAttribute(User.USER);
+                if (null != userStr) {
+                    final JSONObject user = new JSONObject(userStr);
+                    onlineUsers.put(session, user);
+                }
             }
         }
 
