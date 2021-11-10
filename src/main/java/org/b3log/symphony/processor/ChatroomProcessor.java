@@ -174,7 +174,7 @@ public class ChatroomProcessor {
         final ChatroomProcessor chatroomProcessor = beanManager.getReference(ChatroomProcessor.class);
         Dispatcher.post("/chat-room/send", chatroomProcessor::addChatRoomMsg, loginCheck::handle, chatMsgAddValidationMidware::handle);
         Dispatcher.get("/cr", chatroomProcessor::showChatRoom, anonymousViewCheckMidware::handle);
-        Dispatcher.get("/chat-room/more", chatroomProcessor::getMore, loginCheck::handle);
+        Dispatcher.get("/chat-room/more", chatroomProcessor::getMore);
         Dispatcher.get("/cr/raw/{id}", chatroomProcessor::getChatRaw, anonymousViewCheckMidware::handle);
         Dispatcher.delete("/chat-room/revoke/{oId}", chatroomProcessor::revokeMessage, loginCheck::handle);
     }
@@ -354,6 +354,14 @@ public class ChatroomProcessor {
     public void getMore(final RequestContext context) {
         try {
             int page = Integer.parseInt(context.param("page"));
+            final JSONObject currentUser = Sessions.getUser();
+            if (null == currentUser) {
+                if (page >= 3) {
+                    context.sendError(401);
+                    context.abort();
+                    return;
+                }
+            }
             List<JSONObject> jsonObject = getMessages(page);
             JSONObject ret = new JSONObject();
             ret.put(Keys.CODE, StatusCodes.SUCC);
