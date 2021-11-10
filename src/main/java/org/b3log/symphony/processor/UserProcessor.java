@@ -242,7 +242,11 @@ public class UserProcessor {
         }
         // 检查用户是否关注过这个用户
         try {
-            final JSONObject currentUser = Sessions.getUser();
+            JSONObject currentUser = Sessions.getUser();
+            try {
+                currentUser = ApiProcessor.getUserByKey(context.param("apiKey"));
+            } catch (NullPointerException ignored) {
+            }
             if (currentUser == null) {
                 // 用户未登录
                 filteredUserProfile.put("canFollow", "hide");
