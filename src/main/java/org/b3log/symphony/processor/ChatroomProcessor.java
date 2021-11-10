@@ -391,6 +391,11 @@ public class ChatroomProcessor {
             String removeMessageId = context.pathVar("oId");
             JSONObject message = chatRoomRepository.get(removeMessageId);
             JSONObject currentUser = Sessions.getUser();
+            try {
+                final JSONObject requestJSONObject = context.requestJSON();
+                currentUser = ApiProcessor.getUserByKey(requestJSONObject.optString("apiKey"));
+            } catch (NullPointerException ignored) {
+            }
 
             String msgUser = new JSONObject(message.optString("content")).optString(User.USER_NAME);
             String curUser = currentUser.optString(User.USER_NAME);
