@@ -143,6 +143,15 @@ public class ApiProcessor {
         }
     }
 
+    public static JSONObject getUserByKey(String apiKey) throws NullPointerException {
+        if (apiKey != null) {
+            if (ApiProcessor.keys.containsKey(apiKey)) {
+                return ApiProcessor.keys.get(apiKey);
+            }
+        }
+        throw new NullPointerException();
+    }
+
     public void userExists(final RequestContext context) {
         String user = context.pathVar("user");
         JSONObject userJSON = userQueryService.getUserByName(user);

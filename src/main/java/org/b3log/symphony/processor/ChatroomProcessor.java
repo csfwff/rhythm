@@ -354,7 +354,12 @@ public class ChatroomProcessor {
     public void getMore(final RequestContext context) {
         try {
             int page = Integer.parseInt(context.param("page"));
-            final JSONObject currentUser = Sessions.getUser();
+            JSONObject currentUser = Sessions.getUser();
+            try {
+                JSONObject user = ApiProcessor.getUserByKey(context.param("apiKey"));
+                currentUser = user;
+            } catch (NullPointerException ignored) {
+            }
             if (null == currentUser) {
                 if (page >= 3) {
                     context.sendError(401);
