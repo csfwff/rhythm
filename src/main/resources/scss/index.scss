@@ -2056,12 +2056,22 @@ code .dec {
 }
 
 
+.old-almanac{
+
+    justify-content: center;
+    align-items: center;
+
 
     .date{
     	font-size:17pt;
     	font-weight: bold;
     	line-height: 30pt;
     	text-align: center;
+        vertical-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
     }
 
     .split, .clear {
@@ -2122,6 +2132,12 @@ code .dec {
     	font-size:15pt;
     }
 
+    .content-item{
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+    }
+
     .someday .good {
     	background: #dddddd;
     }
@@ -2137,3 +2153,66 @@ code .dec {
     .bad {
     	background: #ffddd3;
     }
+
+  .content{
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+
+  .content ul {
+    list-style: none;
+    margin:10px 0 0;
+    padding:0;
+  }
+
+  .content ul li {
+    line-height:150%;
+    font-size: 15pt;
+    font-weight: bold;
+    color: #444;
+  }
+
+  .content ul li div.description {
+    font-size: 11pt;
+    font-weight: normal;
+    color: #777;
+    line-height: 110%;
+    margin-bottom: 10px;
+    text-align: left;
+  }
+
+  .line-tip {
+    font-size: 11pt;
+    margin-top: 10px;
+    margin-left: 10px;
+  }
+
+  .direction_value {
+    color:#4a4;
+    font-weight: bold;
+    text-align: left;
+  }
+
+  .someday .direction_value {
+    color:#888;
+  }
+
+  .goddes_value {
+    color: #f87;
+  }
+
+  .someday .goddes_value {
+    color: #777;
+  }
+
+
+  .tip{
+    display: flex;
+    padding-left: 20px;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: center;
+  }
+}

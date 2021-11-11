@@ -63,7 +63,7 @@ function is_someday() {
 }
 
 function getTodayString() {
-	return "今天是" + today.getFullYear() + "年" + (today.getMonth() + 1) + "月" + today.getDate() + "日 星期" + weeks[today.getDay()];
+	return "今天是<br/>" + today.getFullYear() + "年" + (today.getMonth() + 1) + "月" + today.getDate() + "日<br/>星期" + weeks[today.getDay()];
 }
 
 function star(num) {
@@ -191,21 +191,21 @@ function parse(event) {
 
 // 添加到“宜”
 function addToGood(event) {
-	$('.good .content ul').append('<li><div class="name">' + event.name + '</div><div class="description">' + event.good + '</div></li>');
+	$('.good .content ul').append('<li class="content-item"><div class="name">' + event.name + '</div><div class="description">' + event.good + '</div></li>');
 }
 
 // 添加到“不宜”
 function addToBad(event) {
-	$('.bad .content ul').append('<li><div class="name">' + event.name + '</div><div class="description">' + event.bad + '</div></li>');
+	$('.bad .content ul').append('<li class="content-item"><div class="name">' + event.name + '</div><div class="description">' + event.bad + '</div></li>');
 }
 $(function(){
 	if (is_someday()) {
 	$('.old-almanac').addClass("someday")
 	//document.body.className = 'someday'
 	};
-	$('.date').html(getTodayString());
-	$('.direction_value').html(directions[random(iday, 2) % directions.length]);
-	$('.drink_value').html(pickRandom(drinks,2).join('，'));
-	$('.goddes_value').html(star(random(iday, 6) % 5 + 1));
+	$('.old-almanac .date').html(getTodayString());
+	$('.old-almanac .direction_value').html(directions[random(iday, 2) % directions.length]);
+	$('.old-almanac .drink_value').html(pickRandom(drinks,2).join('，'));
+	$('.old-almanac .goddes_value').html(star(random(iday, 6) % 5 + 1));
 	pickTodaysLuck();
 });

@@ -250,9 +250,9 @@ ${HeaderBannerLabel}
 <div>
     <div class="wrapper">
         <div class="metro-line fn-flex old-almanac" style="width:100%">
-            <div class="date">
+            <div class="date metro-item">
             </div>
-            <div class="good">
+            <div class="good metro-item">
                 <div class="title">
                     <table>
                         <tr><td>宜</td></tr>
@@ -264,7 +264,7 @@ ${HeaderBannerLabel}
                 <div class="clear"></div>
             </div>
             <div class="split"></div>
-            <div class="bad">
+            <div class="bad metro-item">
                 <div class="title">
                     <table>
                         <tr><td>不宜</td></tr>
@@ -276,15 +276,18 @@ ${HeaderBannerLabel}
                 <div class="clear"></div>
             </div>
             <div class="split"></div>
-            <div class="line-tip">
-                <strong>座位朝向：</strong>面向<span class="direction_value"></span>写程序，BUG 最少。
+            <div class="tip metro-item">
+                <div class="line-tip">
+                    <strong>座位朝向：</strong>面向<span class="direction_value"></span>写程序，BUG 最少。
+                </div>
+                <div class="line-tip">
+                    <strong>今日宜饮：</strong><span class="drink_value"></span>
+                </div>
+                <div class="line-tip">
+                    <strong>女神亲近指数：</strong><span class="goddes_value"></span>
+                </div>
             </div>
-            <div class="line-tip">
-                <strong>今日宜饮：</strong><span class="drink_value"></span>
-            </div>
-            <div class="line-tip">
-                <strong>女神亲近指数：</strong><span class="goddes_value"></span>
-            </div>
+
         </div>
     </div>
 </div>
