@@ -2054,3 +2054,86 @@ code .dec {
   background-color: hsla(0,0%,100%,.8);
   background-size: 100% 100%;
 }
+
+
+
+    .date{
+    	font-size:17pt;
+    	font-weight: bold;
+    	line-height: 30pt;
+    	text-align: center;
+    }
+
+    .split, .clear {
+    	clear: both;
+    	height: 1px;
+    	overflow-y: hidden;
+    }
+
+    .good, .bad {
+    	clear: both;
+    	position: relative;
+    }
+
+    .bad {
+    	/*top: -1px;*/
+    }
+
+    .good .title, .bad .title {
+    	float: left;
+    	width: 100px;
+    	font-weight: bold;
+    	text-align: center;
+    	font-size: 30pt;
+    	position:absolute;
+    	top:0;
+    	bottom:0;
+    }
+
+    .good .title>table, .bad .title>table {
+    	position:absolute;
+    	width:100%;
+    	height:100%;
+    	border:none;
+    }
+
+    .good .title {
+    	background: #ffee44;
+    }
+
+    .someday .good .title {
+    	background: #aaaaaa;
+    }
+
+    .bad .title {
+    	background: #ff4444;
+    	color: #fff;
+    }
+
+    .someday .bad .title {
+    	background: #666666;
+    	color: #fff;
+    }
+
+    .good .content, .bad .content {
+    	margin-left: 115px;
+    	padding-right: 10px;
+    	padding-top: 1px;
+    	font-size:15pt;
+    }
+
+    .someday .good {
+    	background: #dddddd;
+    }
+
+    .someday .bad {
+    	background: #aaaaaa;
+    }
+
+    .good {
+    	background: #ffffaa;
+    }
+
+    .bad {
+    	background: #ffddd3;
+    }
