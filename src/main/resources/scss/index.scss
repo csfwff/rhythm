@@ -2063,11 +2063,10 @@ code .dec {
 
 
     .date{
-    	font-size:17pt;
-    	font-weight: bold;
-    	line-height: 30pt;
-    	text-align: center;
-        vertical-align: center;
+      font-size:12pt;
+      line-height: 30pt;
+      vertical-align: center;
+      padding-left: 10px;
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -2094,7 +2093,7 @@ code .dec {
     	width: 100px;
     	font-weight: bold;
     	text-align: center;
-    	font-size: 30pt;
+    	font-size: 20pt;
     	position:absolute;
     	top:0;
     	bottom:0;
@@ -2169,7 +2168,7 @@ code .dec {
 
   .content ul li {
     line-height:150%;
-    font-size: 15pt;
+    font-size: 12pt;
     font-weight: bold;
     color: #444;
   }
@@ -2178,7 +2177,7 @@ code .dec {
     font-size: 11pt;
     font-weight: normal;
     color: #777;
-    line-height: 110%;
+    line-height: 105%;
     margin-bottom: 10px;
     text-align: left;
   }

@@ -63,7 +63,7 @@ function is_someday() {
 }
 
 function getTodayString() {
-	return "今天是<br/>" + today.getFullYear() + "年" + (today.getMonth() + 1) + "月" + today.getDate() + "日<br/>星期" + weeks[today.getDay()];
+	return "今天是 " + today.getFullYear() + "年" + (today.getMonth() + 1) + "月" + today.getDate() + "日 星期" + weeks[today.getDay()];
 }
 
 function star(num) {

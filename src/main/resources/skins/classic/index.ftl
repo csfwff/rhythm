@@ -247,53 +247,6 @@ ${HeaderBannerLabel}
         </div>
     </div>
 
-<div>
-    <div class="wrapper">
-        <div class="metro-line fn-flex old-almanac" style="width:100%">
-            <div class="date metro-item">
-            </div>
-            <div class="good metro-item">
-                <div class="title">
-                    <table>
-                        <tr><td>宜</td></tr>
-                    </table>
-                </div>
-                <div class="content">
-                    <ul></ul>
-                </div>
-                <div class="clear"></div>
-            </div>
-            <div class="split"></div>
-            <div class="bad metro-item">
-                <div class="title">
-                    <table>
-                        <tr><td>不宜</td></tr>
-                    </table>
-                </div>
-                <div class="content">
-                    <ul></ul>
-                </div>
-                <div class="clear"></div>
-            </div>
-            <div class="split"></div>
-            <div class="tip metro-item">
-                <div class="line-tip">
-                    <strong>座位朝向：</strong>面向<span class="direction_value"></span>写程序，BUG 最少。
-                </div>
-                <div class="line-tip">
-                    <strong>今日宜饮：</strong><span class="drink_value"></span>
-                </div>
-                <div class="line-tip">
-                    <strong>女神亲近指数：</strong><span class="goddes_value"></span>
-                </div>
-            </div>
-
-        </div>
-    </div>
-</div>
-
-
-
     <div style="background-color:#f6f8fa">
         <div class="wrapper">
             <div class="fn-flex-1">
@@ -346,8 +299,7 @@ ${HeaderBannerLabel}
     </div>
 
 
-
-    <div style="background-color:#f6f8fa;padding-top:40px;">
+    <div style="background-color:#f6f8fa;padding-top:40px;padding-bottom: 20px;">
         <div class="wrapper">
             <div class="index-recent fn-flex-1">
                 <div style="border-bottom: 1px solid #eee;margin:0px 10px ;">
@@ -506,12 +458,58 @@ ${HeaderBannerLabel}
             </div>
         </div>
     </div>
+
+    <div style="margin: 15px 0">
+        <div class="wrapper">
+            <div class="metro-line fn-flex old-almanac" style="width:100%">
+                <div class="tip metro-item">
+                    <span class="date"></span>
+                    <div class="line-tip">
+                        <strong>座位朝向：</strong>面向<span class="direction_value"></span>写程序，BUG 最少。
+                    </div>
+                    <div class="line-tip">
+                        <strong>今日宜饮：</strong><span class="drink_value"></span>
+                    </div>
+                    <div class="line-tip">
+                        <strong>女神亲近指数：</strong><span class="goddes_value"></span>
+                    </div>
+                </div>
+                <div class="good metro-item">
+                    <div class="title">
+                        <table>
+                            <tr>
+                                <td>宜</td>
+                            </tr>
+                        </table>
+                    </div>
+                    <div class="content">
+                        <ul></ul>
+                    </div>
+                    <div class="clear"></div>
+                </div>
+                <div class="bad metro-item">
+                    <div class="title">
+                        <table>
+                            <tr>
+                                <td>不宜</td>
+                            </tr>
+                        </table>
+                    </div>
+                    <div class="content">
+                        <ul></ul>
+                    </div>
+                    <div class="clear"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
 </div>
 <#include "footer.ftl">
 <script>
     Label.chatRoomPictureStatus = "<#if 0 == chatRoomPictureStatus> blur</#if>";
 </script>
-<script src="${staticServePath}/js/old-almanac.js?${staticResourceVersion}"></script>
+<script src="${staticServePath}/js/old-almanac${miniPostfix}.js?${staticResourceVersion}"></script>
 <script src="${staticServePath}/js/channel${miniPostfix}.js?${staticResourceVersion}"></script>
 <script type="text/javascript">
     // tag click
