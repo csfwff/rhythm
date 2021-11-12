@@ -511,7 +511,7 @@ ${HeaderBannerLabel}
 <script>
     Label.chatRoomPictureStatus = "<#if 0 == chatRoomPictureStatus> blur</#if>";
 </script>
-<script src="${staticServePath}/js/old-almanac.js?"></script>
+<script src="${staticServePath}/js/old-almanac.js?${staticResourceVersion}"></script>
 <script src="${staticServePath}/js/channel${miniPostfix}.js?${staticResourceVersion}"></script>
 <script type="text/javascript">
     // tag click
