@@ -246,7 +246,7 @@ var ChatRoom = {
     if (userNickname !== undefined && userNickname !== "") {
       userNickname = userNickname + " (" + userName + ")"
     } else {
-      userNickname = "";
+      userNickname = userName;
     }
     if (currentUser === userName) {
       meTag1 = " chats__item--me";
@@ -255,8 +255,13 @@ var ChatRoom = {
     if (isAdmin) {
       meTag2 = "<a onclick=\"ChatRoom.revoke(" + oId + ")\" class=\"item\">撤回 (使用管理员权限)</a>\n";
     }
-    let newHTML = '' +
-        '<div class="fn-none"><div id="chatroom' + oId + '" class="fn__flex chats__item' + meTag1 + '">\n' +
+    let newHTML = '<div class="fn-none">';
+    if (currentUser !== userName) {
+      newHTML += '<div class="ft-smaller ft__fade chats__item' + meTag1 + '" style="padding: 0 0 5px 0px">\n' +
+          '    <span class="ft-gray">' + userNickname + '</span>\n' +
+          '</div>';
+    }
+    newHTML += '<div id="chatroom' + oId + '" class="fn__flex chats__item' + meTag1 + '">\n' +
         '    <a href="/member/' + userName + '">\n' +
         '        <div class="avatar tooltipped__user" aria-label="' + userName + '" style="background-image: url(\'' + userAvatarURL + '\');"></div>\n' +
         '    </a>\n' +
