@@ -245,9 +245,9 @@ var ChatRoom = {
     });
     let value = ChatRoom.editor.getValue();
     if (value !== "\n") {
-      ChatRoom.editor.setValue("@" + userName + "  引用：\n" + "> " + md + "\n" + value);
+      ChatRoom.editor.setValue("@" + userName + "  引用：\n" + "> " + md + "\n" + value + "\n");
     } else {
-      ChatRoom.editor.setValue("@" + userName + "  引用：\n" + "> " + md);
+      ChatRoom.editor.setValue("@" + userName + "  引用：\n" + "> " + md + "\n");
     }
     ChatRoom.editor.focus();
   },
