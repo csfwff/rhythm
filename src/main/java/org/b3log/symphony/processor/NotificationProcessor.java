@@ -35,6 +35,7 @@ import org.b3log.symphony.service.DataModelService;
 import org.b3log.symphony.service.NotificationMgmtService;
 import org.b3log.symphony.service.NotificationQueryService;
 import org.b3log.symphony.service.UserQueryService;
+import org.b3log.symphony.util.Results;
 import org.b3log.symphony.util.Sessions;
 import org.b3log.symphony.util.StatusCodes;
 import org.b3log.symphony.util.Symphonys;
@@ -114,6 +115,7 @@ public class NotificationProcessor {
         Dispatcher.get("/notifications/following", notificationProcessor::showFollowingNotifications, loginCheck::handle);
         Dispatcher.get("/notifications/broadcast", notificationProcessor::showBroadcastNotifications, loginCheck::handle);
         Dispatcher.get("/notifications/unread/count", notificationProcessor::getUnreadNotificationCount, loginCheck::handle);
+        Dispatcher.get("/api/getNotifications", notificationProcessor::getNotificationsApi, loginCheck::handle);
     }
 
     /**
@@ -375,6 +377,43 @@ public class NotificationProcessor {
         }
 
         context.sendRedirect(Latkes.getServePath() + "/notifications/commented");
+    }
+
+    /**
+     * Get user's notifications by API.
+     *
+     * @param context the specified context
+     */
+    public void getNotificationsApi(final RequestContext context) {
+        final Request request = context.getRequest();
+
+        JSONObject currentUser = Sessions.getUser();
+        try {
+            currentUser = ApiProcessor.getUserByKey(context.param("apiKey"));
+        } catch (NullPointerException ignored) {
+        }
+        if (null == currentUser) {
+            context.sendError(403);
+            return;
+        }
+        final String userId = currentUser.optString(Keys.OBJECT_ID);
+        final int pageNum = Paginator.getPage(request);
+        final int pageSize = Symphonys.NOTIFICATION_LIST_CNT;
+        final String notificationType = context.param("type");
+
+        final JSONObject result = Results.newSucc();
+        context.renderJSON(result);
+        List<JSONObject> data = new ArrayList<>();
+
+        if (notificationType != null) {
+            switch (notificationType) {
+                case "point":
+                    data = (List<JSONObject>) notificationQueryService.getPointNotifications(userId, pageNum, pageSize).get(Keys.RESULTS);
+                    break;
+            }
+        }
+
+        result.put(Common.DATA, data);
     }
 
     /**
