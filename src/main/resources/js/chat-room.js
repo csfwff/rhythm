@@ -263,11 +263,11 @@ var ChatRoom = {
         '    <div class="chats__content">\n' +
         '        <div class="chats__arrow"></div>\n';
     if (currentUser !== userName) {
-      newHTML += '<div class="ft__fade ft__smaller" style="padding-bottom: 5px;">\n' +
+      newHTML += '<div class="ft__fade ft__smaller" style="padding-bottom: 3px;border-bottom: 1px solid #eee">\n' +
           '    <span class="ft-gray">' + userNickname + '</span>\n' +
           '</div>';
     }
-    newHTML += '        <div class="vditor-reset ft__smaller ' + Label.chatRoomPictureStatus + '">\n' +
+    newHTML += '        <div style="margin-top: 4px" class="vditor-reset ft__smaller ' + Label.chatRoomPictureStatus + '">\n' +
         '            ' + content + '\n' +
         '        </div>\n' +
         '        <div class="ft__smaller ft__fade">\n' +
