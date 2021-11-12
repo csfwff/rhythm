@@ -2680,7 +2680,7 @@ only screen and (device-width: 414px) and (device-height: 896px) and (-webkit-de
   flex-direction: row-reverse;
 }
 
-@keyframes swim {
+/*@keyframes swim {
   0% {
     transform: translate(0,0) rotateY(0deg);
   }
@@ -2721,4 +2721,4 @@ only screen and (device-width: 414px) and (device-height: 896px) and (-webkit-de
 
 .swimming {
   animation: swim 15s linear;
-}
+}*/

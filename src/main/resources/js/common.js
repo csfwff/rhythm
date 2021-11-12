@@ -1453,9 +1453,9 @@ var Util = {
         html += '' +
             '                </div>\n';
         if (userOnlineFlag === true) {
-          html += '<span style="background-color:#d23f31;color:#fff;font-size:12px;border-radius:3px;padding:0 5px;">在线</span>';
+          html += '<span style="background-color:#d23f31;color:#fff;font-size:12px;line-height:20px;border-radius:3px;height:20px;display:inline-block;padding:0 5px;vertical-align:middle;box-sizing:border-box;">在线</span>';
         } else {
-          html += '<span style="background-color:rgba(0,0,0,0.54);color:#fff;font-size:12px;border-radius:3px;padding:0 5px;">离线</span>';
+          html += '<span style="background-color:rgba(0,0,0,0.54);color:#fff;font-size:12px;line-height:20px;border-radius:3px;height:20px;display:inline-block;padding:0 5px;vertical-align:middle;box-sizing:border-box;">离线</span>';
         }
         html += '                <div class="fn__shrink">\n' +
             '                    <a class="green small btn" href="' + Label.servePath + '/idle-talk?toUser=' + userName + '" rel="nofollow">\n' +

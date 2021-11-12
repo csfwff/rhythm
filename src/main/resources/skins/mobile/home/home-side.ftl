@@ -184,6 +184,9 @@
     document.getElementById("userFollowing").addEventListener("click", function () {
         window.location.href = "${servePath}/member/${user.userName}/following/users";
     });
+    document.getElementById("onlineMinute").addEventListener("click", function () {
+        window.location.href = "${servePath}/top/online";
+    });
 </script>
 
 <div id="reportDialog">
