@@ -715,7 +715,6 @@ var Util = {
       upload: {
         max: Label.fileMaxSize,
         url: Label.servePath + '/upload',
-        linkToImgUrl: Label.servePath + '/fetch-upload',
         filename: function (name) {
           return name.replace(/\?|\\|\/|:|\||<|>|\*|\[|\]|\s+/g, '-')
         },

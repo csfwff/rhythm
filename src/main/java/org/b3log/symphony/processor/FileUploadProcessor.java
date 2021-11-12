@@ -93,7 +93,7 @@ public class FileUploadProcessor {
         final FileUploadProcessor fileUploadProcessor = beanManager.getReference(FileUploadProcessor.class);
         Dispatcher.get("/upload/{yyyy}/{MM}/{file}", fileUploadProcessor::getFile);
         Dispatcher.post("/upload", fileUploadProcessor::uploadFile);
-        Dispatcher.post("/fetch-upload", fileUploadProcessor::fetchUpload);
+        // Dispatcher.post("/fetch-upload", fileUploadProcessor::fetchUpload);
     }
 
     /**
