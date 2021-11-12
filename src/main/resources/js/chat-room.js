@@ -246,9 +246,9 @@ var ChatRoom = {
     });
     let value = ChatRoom.editor.getValue();
     if (value !== "\n") {
-      ChatRoom.editor.setValue("@" + userName + "  引用：\n" + md + "\n" + value + "\n并说：");
+      ChatRoom.editor.setValue("@" + userName + "  引用：\n> " + md + "\n并说：" + value);
     } else {
-      ChatRoom.editor.setValue("@" + userName + "  引用：\n" + "> " + md + "\n并说：");
+      ChatRoom.editor.setValue("@" + userName + "  引用：\n> " + md + "\n并说：");
     }
     ChatRoom.editor.focus();
   },
