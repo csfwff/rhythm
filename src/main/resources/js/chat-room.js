@@ -233,8 +233,22 @@ var ChatRoom = {
   /**
    * 艾特某个人
    */
-  at: function (userName) {
-    ChatRoom.editor.setValue("@" + userName + "  ");
+  at: function (userName, id) {
+    let md = '';
+    $.ajax({
+      url: Label.servePath + '/cr/raw/' + id,
+      method: 'get',
+      async: false,
+      success: function (result) {
+        md = result.replace(/(<!--).*/g, "");
+      }
+    });
+    let value = ChatRoom.editor.getValue();
+    if (value !== "\n") {
+      ChatRoom.editor.setValue("@" + userName + "  引用：\n" + "> " + md + "\n" + value);
+    } else {
+      ChatRoom.editor.setValue("@" + userName + "  引用：\n" + "> " + md);
+    }
     ChatRoom.editor.focus();
   },
   /**
@@ -278,8 +292,7 @@ var ChatRoom = {
         '                        ···\n' +
         '                    </summary>\n' +
         '                    <details-menu class="fn__layer">\n' +
-        '                        <a onclick=\"ChatRoom.at(\'' + userName + '\')\" class="item">@'+ userName + '</a>\n' +
-        '                        <a href="/cr/raw/' + oId + '" target="_blank" class="item">查看 Markdown</a>\n' +
+        '                        <a onclick=\"ChatRoom.at(\'' + userName + '\', \'' + oId + '\')\" class="item">引用</a>\n' +
         meTag2 +
         '                    </details-menu>\n' +
         '                </details>\n' +
