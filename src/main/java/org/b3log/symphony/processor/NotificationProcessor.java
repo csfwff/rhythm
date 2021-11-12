@@ -261,7 +261,11 @@ public class NotificationProcessor {
     public void makeNotificationReadByType(final RequestContext context) {
         final String type = context.pathVar("type"); // "commented"/"at"/"following"
 
-        final JSONObject currentUser = Sessions.getUser();
+        JSONObject currentUser = Sessions.getUser();
+        try {
+            currentUser = ApiProcessor.getUserByKey(context.param("apiKey"));
+        } catch (NullPointerException ignored) {
+        }
         final String userId = currentUser.optString(Keys.OBJECT_ID);
 
         switch (type) {
