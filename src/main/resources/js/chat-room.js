@@ -257,7 +257,7 @@ var ChatRoom = {
     }
     let newHTML = '<div class="fn-none">';
     if (currentUser !== userName) {
-      newHTML += '<div class="ft-smaller ft__fade chats__item' + meTag1 + '" style="padding: 0 0 5px 0px">\n' +
+      newHTML += '<div class="ft-smaller ft__fade chats__item' + meTag1 + '" style="padding: 0 0 5px 60px">\n' +
           '    <span class="ft-gray">' + userNickname + '</span>\n' +
           '</div>';
     }
