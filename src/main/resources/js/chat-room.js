@@ -244,7 +244,9 @@ var ChatRoom = {
     let meTag1 = "";
     let meTag2 = "";
     if (userNickname !== undefined && userNickname !== "") {
-      userName = userNickname + " (" + userName + ")"
+      userNickname = userNickname + " (" + userName + ")"
+    } else {
+      userNickname = "";
     }
     if (currentUser === userName) {
       meTag1 = " chats__item--me";

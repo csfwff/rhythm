@@ -379,6 +379,13 @@ var ChatRoomChannel = {
                     if ($("#chatRoomIndex").has("#emptyChatRoom").length !== 0) {
                         $("#emptyChatRoom").remove();
                     }
+                    let userNickname = data.userNickname;
+                    let userName = data.userName;
+                    if (userNickname !== undefined && userNickname !== "") {
+                        userNickname = userNickname + " ( " + userName + " )"
+                    } else {
+                        userNickname = userName;
+                    }
                     $("#chatRoomIndex").prepend("" +
                         "<li class=\"fn-flex\" id=\"chatindex" + data.oId + "\" style='display: none; border-bottom: 1px solid #eee;'>\n" +
                         "    <a rel=\"nofollow\" href=\"/member/" + data.userName + "\">\n" +
@@ -389,7 +396,7 @@ var ChatRoomChannel = {
                         "    <div class=\"fn-flex-1\">\n" +
                         "        <div class=\"ft-smaller\">\n" +
                         "            <a rel=\"nofollow\" href=\"/member/" + data.userName + "\">\n" +
-                        "                <span class=\"ft-gray\">" + data.userName + "</span>\n" +
+                        "                <span class=\"ft-gray\">" + userNickname + "</span>\n" +
                         "            </a>\n" +
                         "        </div>\n" +
                         "        <div class=\"vditor-reset comment " + Label.chatRoomPictureStatus + "\">\n" +
