@@ -1009,7 +1009,11 @@ public class UserProcessor {
         context.renderJSON(result);
 
         final List<JSONObject> data = new ArrayList<>();
-        final JSONObject currentUser = Sessions.getUser();
+        JSONObject currentUser = Sessions.getUser();
+        try {
+            currentUser = ApiProcessor.getUserByKey(context.param("apiKey"));
+        } catch (NullPointerException ignored) {
+        }
         if (null == currentUser) {
             result.put(Common.DATA, data);
             return;
