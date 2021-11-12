@@ -149,8 +149,11 @@ ${HeaderBannerLabel}
                                     <div class="fn-flex-1">
                                         <div class="ft-smaller">
                                             <a rel="nofollow" href="${servePath}/member/${msg.userName}">
-                                                <span class="ft-gray">${msg.userName}</span>
-                                            </a>
+                                                <#if msg.userNickname?? && msg.userNickname?length gt 1>
+                                                    <span class="ft-gray">${msg.userNickname} ( ${msg.userName} )</span>
+                                                <#else>
+                                                    <span class="ft-gray">${msg.userName}</span>
+                                                </#if>                                            </a>
                                         </div>
                                         <div class="vditor-reset comment<#if 0 == chatRoomPictureStatus> blur</#if>">
                                             ${msg.content}
