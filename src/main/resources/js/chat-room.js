@@ -233,22 +233,31 @@ var ChatRoom = {
   /**
    * 艾特某个人
    */
-  at: function (userName, id) {
-    let md = '';
-    $.ajax({
-      url: Label.servePath + '/cr/raw/' + id,
-      method: 'get',
-      async: false,
-      success: function (result) {
-        md = result.replace(/(<!--).*/g, "");
-        md = md.replace(/\n/g, "\n> ");
+  at: function (userName, id, justAt) {
+    if (justAt === true) {
+      let value = ChatRoom.editor.getValue();
+      if (value !== "\n") {
+        ChatRoom.editor.setValue("@" + userName + "  : " + value);
+      } else {
+        ChatRoom.editor.setValue("@" + userName + "  : ");
       }
-    });
-    let value = ChatRoom.editor.getValue();
-    if (value !== "\n") {
-      ChatRoom.editor.setValue("@" + userName + "  引用：\n> " + md + "\n并说：" + value);
     } else {
-      ChatRoom.editor.setValue("@" + userName + "  引用：\n> " + md + "\n并说：");
+      let md = '';
+      $.ajax({
+        url: Label.servePath + '/cr/raw/' + id,
+        method: 'get',
+        async: false,
+        success: function (result) {
+          md = result.replace(/(<!--).*/g, "");
+          md = md.replace(/\n/g, "\n> ");
+        }
+      });
+      let value = ChatRoom.editor.getValue();
+      if (value !== "\n") {
+        ChatRoom.editor.setValue("@" + userName + "  引用：\n> " + md + "\n并说：" + value);
+      } else {
+        ChatRoom.editor.setValue("@" + userName + "  引用：\n> " + md + "\n并说：");
+      }
     }
     ChatRoom.editor.focus();
   },
@@ -285,7 +294,7 @@ var ChatRoom = {
     newHTML += '        <div style="margin-top: 4px" class="vditor-reset ft__smaller ' + Label.chatRoomPictureStatus + '">\n' +
         '            ' + content + '\n' +
         '        </div>\n' +
-        '        <div class="ft__smaller ft__fade">\n' +
+        '        <div class="ft__smaller ft__fade fn__right">\n' +
         '            ' + time + '\n' +
         '                <span class="fn__space5"></span>\n' +
         '                <details class="details action__item fn__flex-center">\n' +
@@ -293,7 +302,8 @@ var ChatRoom = {
         '                        ···\n' +
         '                    </summary>\n' +
         '                    <details-menu class="fn__layer">\n' +
-        '                        <a onclick=\"ChatRoom.at(\'' + userName + '\', \'' + oId + '\')\" class="item">引用</a>\n' +
+        '                        <a onclick=\"ChatRoom.at(\'' + userName + '\', \'' + oId + '\', true)\" class="item">@' + userName + '</a>\n' +
+        '                        <a onclick=\"ChatRoom.at(\'' + userName + '\', \'' + oId + '\', false)\" class="item">引用</a>\n' +
         meTag2 +
         '                    </details-menu>\n' +
         '                </details>\n' +
