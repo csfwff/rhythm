@@ -241,13 +241,14 @@ var ChatRoom = {
       async: false,
       success: function (result) {
         md = result.replace(/(<!--).*/g, "");
+        md = md.replace(/\n/g, "\n> ");
       }
     });
     let value = ChatRoom.editor.getValue();
     if (value !== "\n") {
-      ChatRoom.editor.setValue("@" + userName + "  引用：\n" + "> " + md + "\n" + value + "\n");
+      ChatRoom.editor.setValue("@" + userName + "  引用：\n" + md + "\n" + value + "\n并说：");
     } else {
-      ChatRoom.editor.setValue("@" + userName + "  引用：\n" + "> " + md + "\n");
+      ChatRoom.editor.setValue("@" + userName + "  引用：\n" + "> " + md + "\n并说：");
     }
     ChatRoom.editor.focus();
   },
