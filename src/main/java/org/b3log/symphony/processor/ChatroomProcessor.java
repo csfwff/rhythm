@@ -209,8 +209,9 @@ public class ChatroomProcessor {
         msg.put(UserExt.USER_AVATAR_URL, currentUser.optString(UserExt.USER_AVATAR_URL));
         msg.put(Common.CONTENT, content);
         msg.put(Common.TIME, time);
+        msg.put(UserExt.USER_NICKNAME, currentUser.optString(UserExt.USER_NICKNAME));
 
-        // 加积分
+        // 加活跃
         try {
             String userId = currentUser.optString(Keys.OBJECT_ID);
             if (chatRoomLivenessLimiter.access(userId)) {

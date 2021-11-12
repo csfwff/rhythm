@@ -190,7 +190,7 @@ var ChatRoom = {
         if (result.data.length !== 0) {
           for (let i in result.data) {
             let data = result.data[i];
-            let liHtml = ChatRoom.renderMessage(data.userName, data.userAvatarURL, data.time, data.content, data.oId, Label.currentUser, Label.level3Permitted);
+            let liHtml = ChatRoom.renderMessage(data.userNickname, data.userName, data.userAvatarURL, data.time, data.content, data.oId, Label.currentUser, Label.level3Permitted);
             $('#chats').append(liHtml);
             $('#chats>div.fn-none').show(200);
             $('#chats>div.fn-none').removeClass("fn-none");
@@ -240,9 +240,12 @@ var ChatRoom = {
   /**
    * 渲染聊天室消息
    */
-  renderMessage: function (userName, userAvatarURL, time, content, oId, currentUser, isAdmin) {
+  renderMessage: function (userNickname, userName, userAvatarURL, time, content, oId, currentUser, isAdmin) {
     let meTag1 = "";
     let meTag2 = "";
+    if (userNickname !== undefined && userNickname !== "") {
+      userName = userNickname + " (" + userName + ")"
+    }
     if (currentUser === userName) {
       meTag1 = " chats__item--me";
       meTag2 = "<a onclick=\"ChatRoom.revoke(" + oId + ")\" class=\"item\">撤回</a>\n";

@@ -355,7 +355,7 @@ var ChatRoomChannel = {
                         let userInfo = data.users[user];
                         $("#chatRoomOnlineCnt").append("<a target=\"_blank\" title=\"" + userInfo.userName + "\" data-name=\"" + userInfo.userName + "\"\n" +
                             "href=\"" + userInfo.homePage + "\">\n" +
-                            "<img class=\"avatar avatar-small\" aria-label=\"" + userInfo.userName + "\"\n" +
+                            "<img style='margin-bottom: 10px' class=\"avatar avatar-small\" aria-label=\"" + userInfo.userName + "\"\n" +
                             "src=\"" + userInfo.userAvatarURL + "\">\n" +
                             "</a>");
                     }
@@ -368,7 +368,7 @@ var ChatRoomChannel = {
                 case 'msg':
                     // Chatroom
                     if ($("#chatRoomIndex").length === 0) {
-                        let liHTML = ChatRoom.renderMessage(data.userName, data.userAvatarURL, data.time, data.content, data.oId, Label.currentUser, Label.level3Permitted);
+                        let liHTML = ChatRoom.renderMessage(data.userNickname, data.userName, data.userAvatarURL, data.time, data.content, data.oId, Label.currentUser, Label.level3Permitted);
                         $('#chats').prepend(liHTML);
                         $('#chats>div.fn-none').show(200);
                         $('#chats>div.fn-none').removeClass("fn-none");
