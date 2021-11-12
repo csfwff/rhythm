@@ -199,10 +199,10 @@ function addToBad(event) {
 	$('.bad .content ul').append('<li class="content-item"><div class="name">' + event.name + '</div><div class="description">' + event.bad + '</div></li>');
 }
 $(function(){
-	if (is_someday()) {
-	$('.old-almanac').addClass("someday")
-	//document.body.className = 'someday'
-	};
+//	if (is_someday()) {
+//	$('.old-almanac').addClass("someday")
+//	//document.body.className = 'someday'
+//	};
 	$('.old-almanac .date').html(getTodayString());
 	$('.old-almanac .direction_value').html(directions[random(iday, 2) % directions.length]);
 	$('.old-almanac .drink_value').html(pickRandom(drinks,2).join('，'));
