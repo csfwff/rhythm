@@ -32,9 +32,9 @@
                 探索&nbsp;
                 <a href="https://github.com/csfwff/rhythm" target="_blank">Rhythm 社区引擎</a>
                 &nbsp;｜&nbsp;
-                <a href="https://github.com/imlinhanchao/pwl-chat/releases" target="_blank">摸鱼派聊天室客户端 (Win/Mac)</a>
+                <a href="https://github.com/imlinhanchao/pwl-chat/releases" target="_blank">摸鱼派聊天室客户端 (PC)</a>
             </div>
-            <div class="footer-nav fn-clear" style="margin-top: 10px">
+            <div class="footer-nav fn-clear" style="margin-top: 15px; margin-bottom: 15px">
                 <a rel="help" href="${servePath}/article/1630569106133">${aboutLabel}</a>
                 <a href="${servePath}/tag/announcement">${symAnnouncementLabel}</a>
                 <a href="${servePath}/domains">${domainLabel}</a>
@@ -42,7 +42,6 @@
                 <a href="${servePath}/statistic">${dataStatLabel}</a>
                 <a href="${servePath}/article/1636516552191">开放 API</a>
             </div>
-            <br>
         </div>
     </div>
 </div>
