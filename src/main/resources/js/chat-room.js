@@ -256,18 +256,18 @@ var ChatRoom = {
       meTag2 = "<a onclick=\"ChatRoom.revoke(" + oId + ")\" class=\"item\">撤回 (使用管理员权限)</a>\n";
     }
     let newHTML = '<div class="fn-none">';
-    if (currentUser !== userName) {
-      newHTML += '<div class="ft-smaller ft__fade chats__item' + meTag1 + '" style="padding: 0 0 5px 60px">\n' +
-          '    <span class="ft-gray">' + userNickname + '</span>\n' +
-          '</div>';
-    }
     newHTML += '<div id="chatroom' + oId + '" class="fn__flex chats__item' + meTag1 + '">\n' +
         '    <a href="/member/' + userName + '">\n' +
         '        <div class="avatar tooltipped__user" aria-label="' + userName + '" style="background-image: url(\'' + userAvatarURL + '\');"></div>\n' +
         '    </a>\n' +
         '    <div class="chats__content">\n' +
-        '        <div class="chats__arrow"></div>\n' +
-        '        <div class="vditor-reset ft__smaller ' + Label.chatRoomPictureStatus + '">\n' +
+        '        <div class="chats__arrow"></div>\n';
+    if (currentUser !== userName) {
+      newHTML += '<div class="ft__fade ft__smaller" style="padding-bottom: 2px;">\n' +
+          '    <span class="ft-gray">' + userNickname + '</span>\n' +
+          '</div>';
+    }
+    newHTML += '        <div class="vditor-reset ft__smaller ' + Label.chatRoomPictureStatus + '">\n' +
         '            ' + content + '\n' +
         '        </div>\n' +
         '        <div class="ft__smaller ft__fade fn__right">\n' +
