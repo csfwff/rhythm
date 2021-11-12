@@ -410,6 +410,24 @@ public class NotificationProcessor {
                 case "point":
                     data = (List<JSONObject>) notificationQueryService.getPointNotifications(userId, pageNum, pageSize).get(Keys.RESULTS);
                     break;
+                case "commented":
+                    data = (List<JSONObject>) notificationQueryService.getCommentedNotifications(userId, pageNum, pageSize).get(Keys.RESULTS);
+                    break;
+                case "reply":
+                    data = (List<JSONObject>) notificationQueryService.getReplyNotifications(userId, pageNum, pageSize).get(Keys.RESULTS);
+                    break;
+                case "at":
+                    data = (List<JSONObject>) notificationQueryService.getAtNotifications(userId, pageNum, pageSize).get(Keys.RESULTS);
+                    break;
+                case "following":
+                    data = (List<JSONObject>) notificationQueryService.getFollowingNotifications(userId, pageNum, pageSize).get(Keys.RESULTS);
+                    break;
+                case "broadcast":
+                    data = (List<JSONObject>) notificationQueryService.getBroadcastNotifications(userId, pageNum, pageSize).get(Keys.RESULTS);
+                    break;
+                case "sys-announce":
+                    data = (List<JSONObject>) notificationQueryService.getSysAnnounceNotifications(userId, pageNum, pageSize).get(Keys.RESULTS);
+                    break;
             }
         }
 
