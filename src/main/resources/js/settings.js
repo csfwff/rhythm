@@ -30,9 +30,18 @@
  * @static
  */
 var Settings = {
-  use2dayCheckinCard: function () {
+  use2dayCheckinCard: function (csrfToken) {
     if (confirm('两天免签卡同时只能拥有一个！\n使用两天免签卡后，明天和后天的签到将由系统自动帮你完成，不需要登录摸鱼派。确定使用吗？') === true) {
-
+      $.ajax({
+        url: Label.servePath + '/bag/2dayCheckin',
+        type: 'GET',
+        async: false,
+        headers: {'csrfToken': csrfToken},
+        success: function (result) {
+          alert(result.msg);
+          location.reload();
+        }
+      })
     }
   },
   /**

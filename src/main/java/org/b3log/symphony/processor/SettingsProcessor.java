@@ -225,6 +225,20 @@ public class SettingsProcessor {
         Dispatcher.post("/point/buy-invitecode", settingsProcessor::pointBuy, loginCheck::handle, csrfMidware::check);
         Dispatcher.post("/export/posts", settingsProcessor::exportPosts, loginCheck::handle);
         Dispatcher.post("/point/transfer", settingsProcessor::pointTransfer, loginCheck::handle, csrfMidware::check, pointTransferValidationMidware::handle);
+        Dispatcher.get("/bag/2dayCheckin", settingsProcessor::use2dayCheckinCard, loginCheck::handle, csrfMidware::check);
+    }
+
+    /**
+     * 使用两天免签卡
+     */
+    public void use2dayCheckinCard(final RequestContext context) {
+        final JSONObject user = Sessions.getUser();
+        final String userId = user.optString(Keys.OBJECT_ID);
+        if (cloudService.putBag(userId, "checkin2days", -1, 1) == 0) {
+            cloudService.putBag(userId, "sysCheckinRemain", 2, Integer.MAX_VALUE);
+            context.renderJSON(StatusCodes.SUCC);
+            context.renderMsg("两天免签卡使用成功！未来两天的签到将由系统自动进行～\n请注意：系统自动签到可能有小概率签到失败的问题，如果遇到请及时联系摸鱼派管理员。");
+        }
     }
 
     /**
