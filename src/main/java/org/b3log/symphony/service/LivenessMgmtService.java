@@ -162,7 +162,17 @@ public class LivenessMgmtService {
             final BeanManager beanManager = BeanManager.getInstance();
             final ActivityMgmtService activityMgmtService = beanManager.getReference(ActivityMgmtService.class);
             final CloudService cloudService = beanManager.getReference(CloudService.class);
-            cloudService.
+            List<JSONObject> bags = cloudService.getBags();
+            for (JSONObject i : bags) {
+                JSONObject bag = new JSONObject(i.optString("data"));
+                if (bag.has("sysCheckinRemain") && bag.optInt("sysCheckinRemain") > 0) {
+                    String userId = i.optString("userId");
+                    if (!activityQueryService.isCheckedinToday(userId)) {
+                        activityMgmtService.dailyCheckin(userId);
+                        cloudService.putBag(userId, "sysCheckinRemain", -1, Integer.MAX_VALUE);
+                    }
+                }
+            }
         }
     }
 }

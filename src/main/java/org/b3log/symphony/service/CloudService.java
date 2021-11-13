@@ -151,6 +151,23 @@ public class CloudService {
     }
 
     /**
+     * 获得所有人的背包
+     *
+     * @return
+     */
+    synchronized public List<JSONObject> getBags() {
+        try {
+            Query cloudQuery = new Query()
+                    .setFilter(
+                            new PropertyFilter("gameId", FilterOperator.EQUAL, CloudService.SYS_BAG)
+                    );
+            return cloudRepository.getList(cloudQuery);
+        } catch (Exception e) {
+            return new ArrayList<>();
+        }
+    }
+
+    /**
      * 向背包中取放东西
      *
      * @param userId
