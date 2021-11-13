@@ -272,9 +272,9 @@ ${HeaderBannerLabel}
                             </#if>
                             <div class="review" style="margin-bottom: 25px">
                                 <div class="progress">
-                                    <div class="progress-done" style="width:${liveness}%"></div>
+                                    <div class="progress-done" id="sp1"></div>
                                 </div>
-                                <span class="percent">${liveness}%</span>
+                                <span class="percent" id="sp2">0%</span>
                             </div>
                             <p style="user-select:none">
                             <#if liveness < 10 && checkedIn == 0>
@@ -829,6 +829,14 @@ ${HeaderBannerLabel}
 
     elementFadeOut(".niceUsersElement", 20);
     elementFadeOut(".topCheckInUsersElement", 90);
+</script>
+<script>
+    $("#sp1").css("width", "${liveness}%");
+    for (let i = 0; i <= ${liveness}; i++) {
+        setTimeout(function () {
+            $("#sp2").html(i + "%");
+        }, i * 10);
+    }
 </script>
 </body>
 </html>
