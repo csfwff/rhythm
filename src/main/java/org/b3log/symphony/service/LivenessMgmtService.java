@@ -141,7 +141,7 @@ public class LivenessMgmtService {
                     }
                 }
                 if (liveness == 100) {
-                    if (!gave2dayCards.get(userId).equals(date)) {
+                    if (gave2dayCards.get(userId) == null || !gave2dayCards.get(userId).equals(date)) {
                         if (cloudService.putBag(userId, "checkin2days", 1, 1) == 0) {
                             LOGGER.log(Level.INFO, "Checkin card 2 days for " + user.optString(User.USER_NAME));
                         }
