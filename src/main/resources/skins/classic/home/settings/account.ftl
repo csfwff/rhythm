@@ -30,7 +30,7 @@
         let html = '';
         let bag = ${sysBag};
         if (bag.checkin2days !== undefined) {
-            html += '<button>两天免签卡 x' + bag.checkin2days + '</button>';
+            html += '<button onclick="Settings.use2dayCheckinCard(\'${csrfToken}\')">两天免签卡 x' + bag.checkin2days + '</button>';
         }
         if (html === '') {
             html = '你的背包和钱包一样，是空的。';
