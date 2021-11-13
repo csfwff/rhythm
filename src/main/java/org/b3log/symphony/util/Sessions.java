@@ -361,7 +361,6 @@ public final class Sessions {
         SESSION_CACHE.remove(userId);
 
         final Session httpSession = request.getSession();
-        System.out.println(httpSession.getAttribute(User.USER));
         httpSession.setAttribute(User.USER, null);
 
         //final BeanManager beanManager = BeanManager.getInstance();
