@@ -121,31 +121,27 @@ public class LivenessMgmtService {
     public void checkLiveness() {
         final BeanManager beanManager = BeanManager.getInstance();
         final ActivityMgmtService activityMgmtService = beanManager.getReference(ActivityMgmtService.class);
-        LOGGER.log(Level.INFO, "Check liveness for users...");
         final String date = DateFormatUtils.format(System.currentTimeMillis(), "yyyyMMdd");
         try {
             List<JSONObject> userList = livenessRepository.getByDate(date);
             for (JSONObject i : userList) {
                 String userId = i.optString(Liveness.LIVENESS_USER_ID);
+                JSONObject user = userQueryService.getUser(userId);
+                final int livenessMax = Symphonys.ACTIVITY_YESTERDAY_REWARD_MAX;
+                final int currentLiveness = livenessQueryService.getCurrentLivenessPoint(userId);
+                float liveness = (float) (Math.round((float) currentLiveness / livenessMax * 100 * 100)) / 100;
                 if (!activityQueryService.isCheckedinToday(userId)) {
-                    JSONObject user = userQueryService.getUser(userId);
-                    final int livenessMax = Symphonys.ACTIVITY_YESTERDAY_REWARD_MAX;
-                    final int currentLiveness = livenessQueryService.getCurrentLivenessPoint(userId);
-                    float liveness = (float) (Math.round((float) currentLiveness / livenessMax * 100 * 100)) / 100;
-                    if (liveness == 100) {
-
-                    } else {
-                        if (liveness > 10) {
-                            activityMgmtService.dailyCheckin(userId);
-                            LOGGER.log(Level.INFO, "Checkin for " + user.optString(User.USER_NAME) + " liveness is " + liveness + "%");
-                        }
+                    if (liveness > 10) {
+                        activityMgmtService.dailyCheckin(userId);
+                        LOGGER.log(Level.INFO, "Checkin for " + user.optString(User.USER_NAME) + " liveness is " + liveness + "%");
                     }
+                }
+                if (liveness == 100) {
+                    LOGGER.log(Level.INFO, "Checkin card 2 days for " + user.optString(User.USER_NAME));
                 }
             }
         } catch (RepositoryException e) {
             LOGGER.log(Level.ERROR, "Check liveness [" + date + "] failed", e);
-        } finally {
-            LOGGER.log(Level.INFO, "Check liveness completed.");
         }
     }
 }

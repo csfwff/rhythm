@@ -54,6 +54,9 @@ public class CloudService {
      * @return
      */
     synchronized public void sync(final String userId, final String gameId, final String data) throws ServiceException {
+        if (gameId.startsWith("sys-")) {
+            return;
+        }
         try {
             final Transaction transaction = cloudRepository.beginTransaction();
             // 删除旧存档
