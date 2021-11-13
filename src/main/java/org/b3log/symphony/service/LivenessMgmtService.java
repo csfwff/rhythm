@@ -35,7 +35,9 @@ import org.b3log.symphony.repository.LivenessRepository;
 import org.b3log.symphony.util.Symphonys;
 import org.json.JSONObject;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Liveness management service.
@@ -118,6 +120,7 @@ public class LivenessMgmtService {
         }
     }
 
+    private static Map<String, String> gave2dayCards = new HashMap<>();
     public void checkLiveness() {
         final BeanManager beanManager = BeanManager.getInstance();
         final ActivityMgmtService activityMgmtService = beanManager.getReference(ActivityMgmtService.class);
@@ -138,8 +141,11 @@ public class LivenessMgmtService {
                     }
                 }
                 if (liveness == 100) {
-                    if (cloudService.putBag(userId, "checkin2days", 1, 1) == 0) {
-                        LOGGER.log(Level.INFO, "Checkin card 2 days for " + user.optString(User.USER_NAME));
+                    if (!gave2dayCards.get(userId).equals(date)) {
+                        if (cloudService.putBag(userId, "checkin2days", 1, 1) == 0) {
+                            LOGGER.log(Level.INFO, "Checkin card 2 days for " + user.optString(User.USER_NAME));
+                        }
+                        gave2dayCards.put(userId, date);
                     }
                 }
             }
