@@ -130,6 +130,17 @@ public class CronMgmtService {
 
         Symphonys.SCHEDULED_EXECUTOR_SERVICE.scheduleAtFixedRate(() -> {
             try {
+                livenessMgmtService.autoCheckin();
+            } catch (final Exception e) {
+                LOGGER.log(Level.ERROR, "Executes cron failed", e);
+            } finally {
+                Stopwatchs.release();
+            }
+        }, delay, 60 * 1000, TimeUnit.MILLISECONDS);
+        delay += 2000;
+
+        Symphonys.SCHEDULED_EXECUTOR_SERVICE.scheduleAtFixedRate(() -> {
+            try {
                 IdleTalkProcessor.cleanValidatedMessages();
             } catch (final Exception e) {
                 LOGGER.log(Level.ERROR, "Executes cron failed", e);

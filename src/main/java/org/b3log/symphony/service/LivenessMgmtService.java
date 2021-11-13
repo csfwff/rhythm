@@ -153,4 +153,16 @@ public class LivenessMgmtService {
             LOGGER.log(Level.ERROR, "Check liveness [" + date + "] failed", e);
         }
     }
+
+    public void autoCheckin() {
+        final String date = DateFormatUtils.format(System.currentTimeMillis(), "HHmm");
+        int numDate = Integer.parseInt(date);
+        if (numDate >= 0 && numDate <= 5) {
+            // 自动签到
+            final BeanManager beanManager = BeanManager.getInstance();
+            final ActivityMgmtService activityMgmtService = beanManager.getReference(ActivityMgmtService.class);
+            final CloudService cloudService = beanManager.getReference(CloudService.class);
+            cloudService.
+        }
+    }
 }
