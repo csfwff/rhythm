@@ -19,6 +19,7 @@
 package org.b3log.symphony.processor;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.time.DateFormatUtils;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -51,13 +52,7 @@ import org.jsoup.select.Elements;
 import pers.adlered.simplecurrentlimiter.main.SimpleCurrentLimiter;
 
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -90,11 +85,6 @@ public class ChatroomProcessor {
      * Chat messages.
      */
     public static LinkedList<JSONObject> messages = new LinkedList<>();
-
-    /**
-     * 24h / 1
-     */
-    final private static SimpleCurrentLimiter userRevokeLimiter = new SimpleCurrentLimiter((24 * 60 * 60), 1);
 
     /**
      * Data model service.
@@ -387,6 +377,7 @@ public class ChatroomProcessor {
      *
      * @param context
      */
+    private static Map<String, String> revoke = new HashMap<>();
     public void revokeMessage(final RequestContext context) {
         try {
             String removeMessageId = context.pathVar("oId");
@@ -413,7 +404,8 @@ public class ChatroomProcessor {
                 ChatroomChannel.notifyChat(jsonObject);
                 return;
             } else if (msgUser.equals(curUser)) {
-                if (userRevokeLimiter.access(curUser)) {
+                final String date = DateFormatUtils.format(System.currentTimeMillis(), "yyyyMMdd");
+                if (revoke.get(curUser) == null || !revoke.get(curUser).equals(date)) {
                     final Transaction transaction = chatRoomRepository.beginTransaction();
                     chatRoomRepository.remove(removeMessageId);
                     transaction.commit();
@@ -422,6 +414,7 @@ public class ChatroomProcessor {
                     jsonObject.put(Common.TYPE, "revoke");
                     jsonObject.put("oId", removeMessageId);
                     ChatroomChannel.notifyChat(jsonObject);
+                    revoke.put(curUser, date);
                     return;
                 } else {
                     context.renderJSON(StatusCodes.ERR).renderMsg("撤回失败，你每天只有一次撤回的机会！");
