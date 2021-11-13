@@ -835,7 +835,7 @@ ${HeaderBannerLabel}
     for (let i = 0; i <= ${liveness}; i++) {
         setTimeout(function () {
             $("#sp2").html(i + "%");
-        }, i * 10);
+        }, i * 15);
     }
 </script>
 </body>
