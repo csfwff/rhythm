@@ -22,6 +22,25 @@
 <@home "account">
 <div class="module">
     <div class="module-header">
+        <h2>你的背包</h2>
+    </div>
+    <div class="module-panel form fn-clear" id="bag">
+    </div>
+    <script>
+        let html = '';
+        let bag = ${sysBag};
+        if (bag.checkin2days !== undefined) {
+            html += '<button>两天免签卡 x' + bag.checkin2days + '</button>';
+        }
+        if (html === '') {
+            html = '你的背包和钱包一样，是空的。';
+        }
+        document.getElementById("bag").innerHTML = html;
+    </script>
+</div>
+
+<div class="module">
+    <div class="module-header">
         <h2>${userNameLabel} ${updateNameTipLabel}</h2>
     </div>
     <div class="module-panel form fn-clear">

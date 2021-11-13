@@ -190,6 +190,12 @@ public class SettingsProcessor {
     private SystemSettingsService settingsService;
 
     /**
+     * CLoud service.
+     */
+    @Inject
+    private CloudService cloudService;
+
+    /**
      * Register request handlers.
      */
     public static void register() {
@@ -508,6 +514,7 @@ public class SettingsProcessor {
         }
 
         dataModel.put(Common.TYPE, "settings");
+        dataModel.put("sysBag", cloudService.getBag(userId));
 
         // “感谢加入”系统通知已读置位 https://github.com/b3log/symphony/issues/907
         notificationMgmtService.makeRead(userId, Notification.DATA_TYPE_C_SYS_ANNOUNCE_NEW_USER);
