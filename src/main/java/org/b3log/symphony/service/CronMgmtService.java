@@ -170,7 +170,7 @@ public class CronMgmtService {
         Symphonys.SCHEDULED_EXECUTOR_SERVICE.scheduleAtFixedRate(() -> {
             try {
                 invitecodeMgmtService.expireInvitecodes();
-                mailMgmtService.sendWeeklyNewsletter();
+                // mailMgmtService.sendWeeklyNewsletter();
             } catch (final Exception e) {
                 LOGGER.log(Level.ERROR, "Executes cron failed", e);
             } finally {

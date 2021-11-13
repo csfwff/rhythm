@@ -24,7 +24,7 @@
     <div class="module-header">${functionTipLabel}</div>
     <div class="module-panel form fn-clear">
         <label>${userListPageSizeLabel}</label>
-        <input id="userListPageSize" type="number" value="${currentUser.userListPageSize}" /> 
+        <input id="userListPageSize" type="number" value="${currentUser.userListPageSize}" />
         <label>${cmtViewModeLabel}</label>
         <select id="userCommentViewMode" name="userCommentViewMode">
             <option value="0"<#if 0 == currentUser.userCommentViewMode> selected</#if>>${traditionLabel}</option>
@@ -43,19 +43,21 @@
         <label>${indexRedirectLabel}</label>
         <input id="userIndexRedirectURL" type="text" value="${currentUser.userIndexRedirectURL}"/>
         <div class="fn-clear">
-            <label>${useNotifyLabel} 
-                <input id="userNotifyStatus" <#if 0 == currentUser.userNotifyStatus> checked="checked"</#if> type="checkbox" /> 
-            </label> 
-        </div>
-        <div class="fn-clear">
-            <label>${subMailLabel} 
-                <input id="userSubMailStatus" <#if 0 == currentUser.userSubMailStatus> checked="checked"</#if> type="checkbox" />
+            <label>
+                <input id="userNotifyStatus" <#if 0 == currentUser.userNotifyStatus> checked="checked"</#if> type="checkbox" />
+                ${useNotifyLabel}
             </label>
         </div>
         <div class="fn-clear">
             <label>
-                ${enableKbdLabel}
+                <input id="userSubMailStatus" <#if 0 == currentUser.userSubMailStatus> checked="checked"</#if> type="checkbox" />
+                ${subMailLabel}
+            </label>
+        </div>
+        <div class="fn-clear">
+            <label>
                 <input id="enableKbdLabel" <#if 0 == currentUser.userKeyboardShortcutsStatus> checked="checked"</#if> type="checkbox" />
+                ${enableKbdLabel}
             </label>
         </div>
         <div class="fn-clear">
