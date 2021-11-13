@@ -207,7 +207,15 @@ ${HeaderBannerLabel}
             </div>
             <div class="module-panel">
                 <ul class="module-list">
-                    <li><a class="title" style="text-decoration: none" id="checkIn" onclick="submitCheckIn()">每日签到</a>
+                    <li><a class="title" style="text-decoration: none" id="checkIn">
+                            <#if liveness < 10>
+                                今日活跃度不足，到达 10% 后<br>系统将自动签到
+                            <#elseif liveness < 100>
+                                已签到，今日活跃度到达 100% 后<br>可获得一张免签卡 (2天)
+                            <#else>
+                                成功获取免签卡 (2天) 一张<br>可在设置-账户中使用
+                            </#if>
+                        </a>
                     </li>
                     <li><a class="title" style="text-decoration: none" id="yesterday" onclick="yesterday()">领取昨日活跃奖励</a>
                     </li>
@@ -300,40 +308,6 @@ ${HeaderBannerLabel}
                         }, 2000);
                     }
                     $("#yesterday").fadeIn(500);
-                },
-                error: function () {
-                    Util.goLogin();
-                }
-            });
-        });
-    }
-
-    function submitCheckIn() {
-        $("#checkIn").fadeOut(500, function () {
-            $.ajax({
-                url: "${servePath}/activity/daily-checkin-api",
-                type: "GET",
-                async: false,
-                headers: {'csrfToken': '${csrfToken}'},
-                success: function (result) {
-                    if (result.sum === -1) {
-                        $("#checkIn").html("你已经签到过了哦！");
-                        setTimeout(function () {
-                            $("#checkIn").fadeOut(500, function () {
-                                $("#checkIn").html('每日签到');
-                                $("#checkIn").fadeIn(500);
-                            });
-                        }, 2000);
-                    } else {
-                        $("#checkIn").html("签到成功～ 积分 +" + result.sum);
-                        setTimeout(function () {
-                            $("#checkIn").fadeOut(500, function () {
-                                $("#checkIn").html('每日签到');
-                                $("#checkIn").fadeIn(500);
-                            });
-                        }, 2000);
-                    }
-                    $("#checkIn").fadeIn(500);
                 },
                 error: function () {
                     Util.goLogin();
