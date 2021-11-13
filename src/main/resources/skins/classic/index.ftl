@@ -259,10 +259,32 @@ ${HeaderBannerLabel}
                             <div style="font-size: 10px; color: rgba(161,163,163,0.91)" id="vLine3">我还在编......</div>
                         </div>
                     </div>
-                    <div class="metro-item" style="cursor: pointer">
-                        <a class="preview" id="checkIn" onclick="submitCheckIn()">
-                            <img style="border-radius: 0" id="checkInImg"
-                                 src="https://pwl.stackoverflow.wiki/2021/10/Fishing-a219e80c.png"><b>每日签到</b>
+                    <div class="metro-item">
+                        <a class="preview" style="padding-top: 50px">
+                            <#if (liveness >= 10)>
+                                    <p style="user-select:none;color:#3caf36;font-weight:bold;font-size:13px">
+                                        今日签到已达标
+                                    </p>
+                                <#else>
+                                    <p style="user-select:none;color:#c46b25;font-weight:bold;font-size:13px">
+                                        今日签到未达标
+                                    </p>
+                            </#if>
+                            <div class="review" style="margin-bottom: 25px">
+                                <div class="progress">
+                                    <div class="progress-done" style="width:${liveness}%"></div>
+                                </div>
+                                <span class="percent">${liveness}%</span>
+                            </div>
+                            <p style="user-select:none">
+                            <#if liveness < 10>
+                                    今日活跃度到达 10% 后<br>系统将自动签到
+                                <#elseif liveness < 100>
+                                    今日活跃度到达 100% 后<br>可获得一张免签卡 (2天)
+                                <#else>
+                                    成功获取免签卡 (2天) 一张<br>可在设置-个性化中使用
+                            </#if>
+                            </p>
                         </a>
                     </div>
                     <div class="metro-item" style="cursor: pointer">
@@ -710,48 +732,6 @@ ${HeaderBannerLabel}
                                 Util.fadeOut(yesterdayBtn, function () {
                                     $("#yesterday").html('<img style="border-radius: 0" src="https://pwl.stackoverflow.wiki/2021/10/coin-2-70217cc1.png" alt="领取昨日活跃奖励"><b>领取昨日活跃奖励</b>');
                                     Util.fadeIn(yesterdayBtn);
-                                });
-                            }, 2000);
-                        });
-                    }
-                }, 700);
-            },
-            error: function () {
-                Util.goLogin();
-            }
-        });
-    }
-
-    function submitCheckIn() {
-        let checkInBtn = document.getElementById("checkIn");
-        Util.fadeOut(checkInBtn);
-        $.ajax({
-            url: "${servePath}/activity/daily-checkin-api",
-            type: "GET",
-            async: false,
-            cache: false,
-            success: function (result) {
-                if (result.sum === undefined) {
-                    Util.goLogin();
-                }
-                setTimeout(function () {
-                    if (result.sum === -1) {
-                        $("#checkIn").html("<img style='border-radius: 0' src='https://pwl.stackoverflow.wiki/2021/09/embarrassed-4112bd37.png'><b>你已经签到过了哦！</b>");
-                        Util.fadeIn(checkInBtn, function () {
-                            setTimeout(function () {
-                                Util.fadeOut(checkInBtn, function () {
-                                    $("#checkIn").html('<img style="border-radius: 0" id="checkInImg" src="https://pwl.stackoverflow.wiki/2021/10/Fishing-a219e80c.png" alt="每日签到"><b>每日签到</b>');
-                                    Util.fadeIn(checkInBtn);
-                                });
-                            }, 2000);
-                        });
-                    } else {
-                        $("#checkIn").html("<img style='border-radius: 0' src='https://pwl.stackoverflow.wiki/2021/09/correct-1f5e3258.png'><b>签到成功～ 积分 +" + result.sum + "</b>");
-                        Util.fadeIn(checkInBtn, function () {
-                            setTimeout(function () {
-                                Util.fadeOut(checkInBtn, function () {
-                                    $("#checkIn").html('<img style="border-radius: 0" id="checkInImg" src="https://pwl.stackoverflow.wiki/2021/10/Fishing-a219e80c.png" alt="每日签到"><b>每日签到</b>');
-                                    Util.fadeIn(checkInBtn);
                                 });
                             }, 2000);
                         });

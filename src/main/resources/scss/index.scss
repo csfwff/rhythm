@@ -2214,3 +2214,37 @@ code .dec {
     justify-content: center;
   }
 }
+
+.progress {
+  background-color: rgba(100, 100, 100, 0.2);
+  border-radius: 5px;
+  position: relative;
+  margin: 0 3px 0 10px;
+  height: 10px;
+  width: 100%;
+}
+
+.progress-done {
+  background: linear-gradient(to left, rgb(34, 199, 102), rgb(23, 154, 76));
+  box-shadow: 0 3px 3px -5px rgb(34, 199, 102), 0 2px 5px rgb(34, 199, 102);
+  border-radius: 5px;
+  height: 10px;
+  width: 0;
+  transition: width 1s ease 0.3s;
+}
+
+.percent {
+  color: #333;
+  user-select: none;
+}
+
+.review {
+  border: 1px solid transparent;
+  border-radius: 5px;
+  color: #777;
+  display: flex;
+  font-size: 12px;
+  align-items: center;
+  padding: 0 10px 10px 10px;
+  margin: 5px 0;
+}

@@ -160,7 +160,7 @@ public class ActivityProcessor {
         Dispatcher.get("/activity/character", activityProcessor::showCharacter, loginCheck::handle, csrfMidware::fill);
         Dispatcher.post("/activity/character/submit", activityProcessor::submitCharacter, loginCheck::handle);
         Dispatcher.get("/activities", activityProcessor::showActivities);
-        Dispatcher.get("/activity/daily-checkin-api", activityProcessor::dailyCheckinApi, loginCheck::handle);
+        // Dispatcher.get("/activity/daily-checkin-api", activityProcessor::dailyCheckinApi, loginCheck::handle);
         Dispatcher.get("/activity/yesterday-liveness-reward-api", activityProcessor::yesterdayLivenessRewardApi, loginCheck::handle);
         // Dispatcher.get("/activity/1A0001", activityProcessor::show1A0001, csrfMidware::fill);
         // Dispatcher.post("/activity/1A0001/bet", activityProcessor::bet1A0001, loginCheck::handle, csrfMidware::check, activity1A0001ValidationMidware::handle);
