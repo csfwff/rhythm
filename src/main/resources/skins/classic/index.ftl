@@ -260,7 +260,7 @@ ${HeaderBannerLabel}
                         </div>
                     </div>
                     <div class="metro-item">
-                        <a class="preview" style="padding-top: 50px">
+                        <a class="preview" style="padding-top: 60px">
                             <#if (liveness >= 10)>
                                     <p style="user-select:none;color:#3caf36;font-weight:bold;font-size:13px">
                                         今日签到已达标
