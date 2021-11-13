@@ -208,7 +208,7 @@ ${HeaderBannerLabel}
             <div class="module-panel">
                 <ul class="module-list">
                     <li><a class="title" style="text-decoration: none" id="checkIn">
-                            <#if liveness < 10>
+                            <#if liveness < 10 && checkedIn == 0>
                                 今日活跃度不足，到达 10% 后<br>系统将自动签到
                             <#elseif liveness < 100>
                                 已签到，今日活跃度到达 100% 后<br>可获得一张免签卡 (2天)

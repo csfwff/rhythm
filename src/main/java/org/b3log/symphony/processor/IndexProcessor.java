@@ -321,7 +321,7 @@ public class IndexProcessor {
             dataModel.put(UserExt.CHAT_ROOM_PICTURE_STATUS, UserExt.USER_XXX_STATUS_C_ENABLED);
             // 是否领取过昨日奖励
             dataModel.put("collectedYesterdayLivenessReward", 1);
-            dataModel.put("checkedIn", 1);
+            dataModel.put("checkedIn", 0);
         }
 
         final List<JSONObject> recentArticles = articleQueryService.getIndexRecentArticles();

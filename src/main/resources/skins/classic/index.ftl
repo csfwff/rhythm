@@ -261,9 +261,9 @@ ${HeaderBannerLabel}
                     </div>
                     <div class="metro-item">
                         <a class="preview" style="padding-top: 60px">
-                            <#if (liveness >= 10)>
+                            <#if checkedIn == 1>
                                     <p style="user-select:none;color:#3caf36;font-weight:bold;font-size:13px">
-                                        今日签到已达标
+                                        今日已签到
                                     </p>
                                 <#else>
                                     <p style="user-select:none;color:#c46b25;font-weight:bold;font-size:13px">
@@ -277,7 +277,7 @@ ${HeaderBannerLabel}
                                 <span class="percent">${liveness}%</span>
                             </div>
                             <p style="user-select:none">
-                            <#if liveness < 10>
+                            <#if liveness < 10 && checkedIn == 0>
                                     今日活跃度到达 10% 后<br>系统将自动签到
                                 <#elseif liveness < 100>
                                     今日活跃度到达 100% 后<br>可获得一张免签卡 (2天)
