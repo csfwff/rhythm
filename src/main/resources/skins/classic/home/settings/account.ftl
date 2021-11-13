@@ -30,10 +30,10 @@
         let html = '';
         let bag = ${sysBag};
         if (bag.checkin2days !== undefined && bag.checkin2days > 0) {
-            html += '<button onclick="Settings.use2dayCheckinCard(\'${csrfToken}\')">两天免签卡 x' + bag.checkin2days + '</button>';
+            html += '<button style="margin:0 5px 5px 0" onclick="Settings.use2dayCheckinCard(\'${csrfToken}\')">两天免签卡 x' + bag.checkin2days + '</button>';
         }
         if (bag.sysCheckinRemain !== undefined && bag.sysCheckinRemain > 0) {
-            html += '<button>免签卡生效中，剩余' + bag.sysCheckinRemain + '天</button>';
+            html += '<button style="margin:0 5px 5px 0">免签卡生效中，剩余' + bag.sysCheckinRemain + '天</button>';
         }
         if (html === '') {
             html = '你的背包和钱包一样，是空的。';

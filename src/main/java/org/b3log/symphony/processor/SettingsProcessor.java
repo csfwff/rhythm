@@ -234,8 +234,14 @@ public class SettingsProcessor {
     public void use2dayCheckinCard(final RequestContext context) {
         final JSONObject user = Sessions.getUser();
         final String userId = user.optString(Keys.OBJECT_ID);
+        JSONObject bag = new JSONObject(cloudService.getBag(userId));
+        if (bag.optInt("sysCheckinRemain") > 0) {
+            context.renderJSON(StatusCodes.ERR);
+            context.renderMsg("两天免签卡使用失败！你目前还有生效中的免签卡，省着点用吧～");
+            return;
+        }
         if (cloudService.putBag(userId, "checkin2days", -1, 1) == 0) {
-            cloudService.putBag(userId, "sysCheckinRemain", 2, Integer.MAX_VALUE);
+            cloudService.putBag(userId, "sysCheckinRemain", 2, 2);
             context.renderJSON(StatusCodes.SUCC);
             context.renderMsg("两天免签卡使用成功！未来两天的签到将由系统自动进行～\n请注意：系统自动签到可能有小概率签到失败的问题，如果遇到请及时联系摸鱼派管理员。");
         }
