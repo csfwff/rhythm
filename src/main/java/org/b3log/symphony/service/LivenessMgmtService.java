@@ -121,6 +121,7 @@ public class LivenessMgmtService {
     public void checkLiveness() {
         final BeanManager beanManager = BeanManager.getInstance();
         final ActivityMgmtService activityMgmtService = beanManager.getReference(ActivityMgmtService.class);
+        final CloudService cloudService = beanManager.getReference(CloudService.class);
         final String date = DateFormatUtils.format(System.currentTimeMillis(), "yyyyMMdd");
         try {
             List<JSONObject> userList = livenessRepository.getByDate(date);
@@ -137,7 +138,9 @@ public class LivenessMgmtService {
                     }
                 }
                 if (liveness == 100) {
-                    LOGGER.log(Level.INFO, "Checkin card 2 days for " + user.optString(User.USER_NAME));
+                    if (cloudService.putBag(userId, "checkin2days", 1, 1) == 0) {
+                        LOGGER.log(Level.INFO, "Checkin card 2 days for " + user.optString(User.USER_NAME));
+                    }
                 }
             }
         } catch (RepositoryException e) {
