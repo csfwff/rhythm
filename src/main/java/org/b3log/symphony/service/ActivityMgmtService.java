@@ -347,8 +347,6 @@ public class ActivityMgmtService {
                         Pointtransfer.TRANSFER_TYPE_C_ACTIVITY_CHECKIN_STREAK,
                         Pointtransfer.TRANSFER_SUM_C_ACTIVITY_CHECKINT_STREAK, userId, System.currentTimeMillis(), "");
             }
-
-            livenessMgmtService.incLiveness(userId, Liveness.LIVENESS_ACTIVITY);
             return sum;
         } catch (final Exception e) {
             LOGGER.log(Level.ERROR, "Checkin streak failed", e);

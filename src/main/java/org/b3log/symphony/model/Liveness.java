@@ -107,17 +107,20 @@ public final class Liveness {
         final float acceptAnswerPer = Symphonys.ACTIVITY_YESTERDAY_REWARD_ACCEPT_ANSWER_PER;
 
         final int activity = liveness.optInt(Liveness.LIVENESS_ACTIVITY);
-        final int article = liveness.optInt(Liveness.LIVENESS_ARTICLE);
+        int article = liveness.optInt(Liveness.LIVENESS_ARTICLE);
+        if (article > 1) {
+            article = 1;
+        }
         final int comment = liveness.optInt(Liveness.LIVENESS_COMMENT);
         int pv = liveness.optInt(Liveness.LIVENESS_PV);
-        if (pv > 50) {
-            pv = 50;
+        if (pv > 20) {
+            pv = 20;
         }
         final int reward = liveness.optInt(Liveness.LIVENESS_REWARD);
         final int thank = liveness.optInt(Liveness.LIVENESS_THANK);
         int vote = liveness.optInt(Liveness.LIVENESS_VOTE);
-        if (vote > 10) {
-            vote = 10;
+        if (vote > 2) {
+            vote = 2;
         }
         final int acceptAnswer = liveness.optInt(Liveness.LIVENESS_ACCEPT_ANSWER);
 
