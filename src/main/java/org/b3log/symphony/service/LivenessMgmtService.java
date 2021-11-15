@@ -135,7 +135,7 @@ public class LivenessMgmtService {
                 final int currentLiveness = livenessQueryService.getCurrentLivenessPoint(userId);
                 float liveness = (float) (Math.round((float) currentLiveness / livenessMax * 100 * 100)) / 100;
                 if (!activityQueryService.isCheckedinToday(userId)) {
-                    if (liveness > 10) {
+                    if (liveness >= 10) {
                         activityMgmtService.dailyCheckin(userId);
                         LOGGER.log(Level.INFO, "Checkin for " + user.optString(User.USER_NAME) + " liveness is " + liveness + "%");
                     }
