@@ -348,8 +348,7 @@ ${HeaderBannerLabel}
                             <#if messages?size != 0>
                                 <#list messages as msg>
                                     <#if msg_index <= 9>
-                                        <li class="fn-flex" id="chatindex${msg.oId}"
-                                            style='border-bottom: 1px solid #eee;'>
+                                        <li class="fn-flex index-chat" id="chatindex${msg.oId}">
                                             <a rel="nofollow" href="${servePath}/member/${msg.userName}">
                                                 <div class="avatar"
                                                      aria-label="${msg.userName}"
@@ -485,7 +484,7 @@ ${HeaderBannerLabel}
         </div>
     </div>
 
-    <div style="margin: 15px 0">
+    <div class="index-bottom" style="padding: 15px 0">
         <div class="wrapper">
             <div class="metro-line fn-flex old-almanac" style="width:100%">
                 <div class="tip metro-item">
