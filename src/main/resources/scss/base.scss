@@ -1622,6 +1622,16 @@ a[class*=" icon-"]:hover {
   background-size: 100% 100%;
 }
 
+.index-head-title{
+    border-bottom:
+    1px solid #eee;
+    margin:0px 10px ;
+}
+
+.index-bottom{
+background-color:#f6f8fa
+}
+
 /*@keyframes swim {
   0% {
     transform: translate(0,0) rotateY(0deg);
