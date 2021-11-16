@@ -41,9 +41,20 @@ function sassProcess () {
     pipe(gulp.dest('./src/main/resources/css'))
 }
 
+function themeSassProcess () {
+  return gulp.src('./src/main/resources/scss/theme/*.scss').
+    pipe(sass({outputStyle: 'compressed', includePaths: ['node_modules']}).
+      on('error', sass.logError)).
+    pipe(gulp.dest('./src/main/resources/css/theme'))
+}
+
+
 function sassProcessWatch () {
   gulp.watch('./src/main/resources/scss/*.scss', sassProcess)
+  gulp.watch('./src/main/resources/scss/theme/*.scss', themeSassProcess)
 }
+
+
 
 gulp.task('watch', gulp.series(sassProcessWatch))
 

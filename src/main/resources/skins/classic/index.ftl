@@ -35,7 +35,7 @@ ${HeaderBannerLabel}
 <div class="main">
     <div class="wrapper" style="padding-bottom: 20px">
         <div class="index-recent fn-flex-1">
-            <div style="border-bottom: 1px solid #eee;margin:0px 10px ;">
+            <div class="index-head-title" >
                 <div style="float:left;font-size:13px;margin:5px 0 10px 0; font-weight:bold;">最新</div>
                 <div style="float:right;font-size:13px;margin:5px 0 0 0;"><a href="${servePath}/recent">更多</a></div>
                 <div style="clear:both;"></div>
@@ -95,7 +95,7 @@ ${HeaderBannerLabel}
 
         </div>
         <div class="index-recent fn-flex-1">
-            <div style="border-bottom: 1px solid #eee;margin:0px 10px ;">
+            <div class="index-head-title">
                 <div style="float:left;font-size:13px;margin:5px 0 10px 0; font-weight:bold;">随便看看</div>
                 <div style="float:right;font-size:13px;margin:5px 0 0 0;">
                     <a onclick="randomArticles()" style="cursor: pointer; color: #c8383a; text-decoration: none;">
@@ -146,7 +146,7 @@ ${HeaderBannerLabel}
                 </div>
             </div>
 
-            <div style="border-bottom: 1px solid #eee;margin:0px 10px ;">
+            <div class="index-head-title">
                 <div style="float:left;font-size:13px;margin:5px 0 10px 0; font-weight:bold;">签到排行</div>
                 <div style="float:right;font-size:13px;margin:5px 0 0 0;"><a href="${servePath}/top/checkin">更多</a>
                 </div>
@@ -188,7 +188,7 @@ ${HeaderBannerLabel}
                 </ul>
             </div>
 
-            <div style="border-bottom: 1px solid #eee;margin:10px 10px 0 10px;">
+            <div class="index-head-title">
                 <div style="float:left;font-size:13px;margin:5px 0 10px 0; font-weight:bold;">在线时间排行</div>
                 <div style="float:right;font-size:13px;margin:5px 0 0 0;"><a href="${servePath}/top/online">更多</a>
                 </div>
@@ -247,7 +247,7 @@ ${HeaderBannerLabel}
         </div>
     </div>
 
-    <div style="background-color:#f6f8fa">
+    <div class="index-bottom">
         <div class="wrapper">
             <div class="fn-flex-1">
                 <div class="metro-line fn-flex">
@@ -321,10 +321,10 @@ ${HeaderBannerLabel}
     </div>
 
 
-    <div style="background-color:#f6f8fa;padding-top:40px;padding-bottom: 20px;">
+    <div class="index-bottom" style="padding-top:40px;padding-bottom: 20px;">
         <div class="wrapper">
             <div class="index-recent fn-flex-1">
-                <div style="border-bottom: 1px solid #eee;margin:0px 10px ;">
+                <div class="index-head-title">
                     <div style="float:left;font-size:13px;margin:5px 0 10px 0; font-weight:bold;">聊天室（<span
                                 id="indexOnlineChatCnt">?</span>人在线）
                     </div>
@@ -348,8 +348,7 @@ ${HeaderBannerLabel}
                             <#if messages?size != 0>
                                 <#list messages as msg>
                                     <#if msg_index <= 9>
-                                        <li class="fn-flex" id="chatindex${msg.oId}"
-                                            style='border-bottom: 1px solid #eee;'>
+                                        <li class="fn-flex index-chat" id="chatindex${msg.oId}">
                                             <a rel="nofollow" href="${servePath}/member/${msg.userName}">
                                                 <div class="avatar"
                                                      aria-label="${msg.userName}"
@@ -381,7 +380,7 @@ ${HeaderBannerLabel}
             </div>
 
             <div class="index-recent fn-flex-1">
-                <div style="border-bottom: 1px solid #eee;margin:0px 10px ;">
+                <div class="index-head-title">
                     <div style="float:left;font-size:13px;margin:5px 0 10px 0; font-weight:bold;">标签</div>
                     <div style="float:right;font-size:13px;margin:5px 0 0 0;"><a href="${servePath}/tags">更多</a>
                     </div>
@@ -411,7 +410,7 @@ ${HeaderBannerLabel}
                     </div>
                 </div>
 
-                <div style="border-bottom: 1px solid #eee;margin:0px 10px ;">
+                <div class="index-head-title">
                     <div style="float:left;font-size:13px;margin:5px 0 10px 0; font-weight:bold;">问答</div>
                     <div style="float:right;font-size:13px;margin:5px 0 0 0;"><a href="${servePath}/qna">更多</a>
                     </div>
@@ -442,7 +441,7 @@ ${HeaderBannerLabel}
             </div>
 
             <div class="index-recent fn-flex-1">
-                <div style="border-bottom: 1px solid #eee;margin:0px 10px ;">
+                <div class="index-head-title">
                     <div style="float:left;font-size:13px;margin:5px 0 10px 0; font-weight:bold;">清风明月</div>
                     <a href="${servePath}/article/1630938317106" title="清风明月是什么？"
                        style="float: right; margin: 5px 0 10px 0">
@@ -485,7 +484,7 @@ ${HeaderBannerLabel}
         </div>
     </div>
 
-    <div style="margin: 15px 0">
+    <div class="index-bottom" style="padding: 15px 0">
         <div class="wrapper">
             <div class="metro-line fn-flex old-almanac" style="width:100%">
                 <div class="tip metro-item">
