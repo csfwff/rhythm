@@ -5,6 +5,10 @@ body{
     color:#ccc;
 }
 
+input{
+color:white
+}
+
 .index-head-title{
     border-bottom:1px solid #000;
 }
@@ -36,6 +40,50 @@ background-color:#2F363D
     color:#ccc;
 }
 
-button .btn{
+button,.btn{
     border: 1px solid #333333;
+    color:#eee;
 }
+
+button:hover, .btn:hover{
+    background-color: #2F363D;
+}
+
+.vditor-reset {
+    color:#ccc;
+}
+
+.count{
+     background-color: #2F363D;
+}
+
+#userCard{
+background-color:#24292e;
+}
+
+#userCardContent{
+background-color:#24292e;
+}
+
+.user-card__name{
+color:#eee !important;
+}
+
+.user-card-bottom-bg{
+   background-color: rgba(36, 41, 46, 0.68) !important;
+}
+
+
+
+ .metro-item .preview:hover{
+//background-color: rgba(255,255,255,0.2) !important;
+color:#fff !important;
+}
+
+ .tag-metro-item .preview:hover{
+ color:#fff !important;
+ }
+
+.article-list ul>li{
+ background-color:#2f363d;
+ }
