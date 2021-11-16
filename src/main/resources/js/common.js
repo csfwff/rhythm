@@ -1538,8 +1538,13 @@ var Util = {
 
       switch (data.command) {
         case 'refreshNotification':
-          Util.setUnreadNotificationCount(true);
-          Util.notice("default", 3000, "你有一条新的通知！<a href='/notifications'>点击查看</a>");
+          if (window.location.pathname === '/' || window.location.pathname === '/cr') {
+            Util.makeNotificationRead('at');
+            Util.setUnreadNotificationCount(true);
+          } else {
+            Util.setUnreadNotificationCount(true);
+            Util.notice("default", 3000, "你有一条新的通知！<a href='/notifications'>点击查看</a>");
+          }
           break
         case 'newIdleChatMessage':
           if (window.location.pathname !== "/idle-talk") {
