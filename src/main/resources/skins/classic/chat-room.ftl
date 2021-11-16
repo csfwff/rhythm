@@ -47,7 +47,7 @@
                                     <button class="green" onclick="ChatRoom.send()">${postLabel}</button>
                                 </div>
                             </div>
-                            <div id="chatRoomOnlineCnt" class="chats__users">
+                            <div id="chatRoomOnlineCnt" class="chats__users" style="margin-top: 15px">
                             </div>
                         <#else>
                             <div class="comment-login">
