@@ -2721,3 +2721,28 @@ only screen and (device-width: 414px) and (device-height: 896px) and (-webkit-de
 .swimming {
   animation: swim 15s linear;
 }*/
+
+.hongbao__item {
+  background-color: var(--layer-background-color);
+  color: var(--layer-color);
+  cursor: pointer;
+  padding: 5px;
+  border-radius: 3px;
+  box-shadow: 0 1px 2px rgba(0,0,0,.2);
+  margin: 3px 5px 8px 3px
+}
+
+.hongbao__item:hover {
+  box-shadow: 0 0 3px rgba(0,0,0,.13),0 3px 6px rgba(0,0,0,.26)
+}
+
+.hongbao__icon {
+  height: 34px!important;
+  width: 34px!important;
+  margin-right: 5px
+}
+
+.hongbao__count {
+  font-size: 24px;
+  margin: 10px 0
+}
