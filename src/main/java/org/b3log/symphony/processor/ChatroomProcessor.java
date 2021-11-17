@@ -213,6 +213,7 @@ public class ChatroomProcessor {
                 if (message.length() > 20) {
                     message = message.substring(0, 20);
                 }
+
                 LOGGER.log(Level.INFO, message);
             } catch (Exception e) {
                 LOGGER.log(Level.INFO, "User " + userName + " failed to send a red packet.");
