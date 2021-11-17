@@ -563,7 +563,7 @@ public class ChatroomProcessor {
             }
             String content = message.optString("content");
             try {
-                JSONObject checkContent = new JSONObject(content);
+                JSONObject checkContent = new JSONObject(new JSONObject(content).optString("content"));
                 if (checkContent.optString("msgType").equals("redPacket")) {
                     context.renderJSON(StatusCodes.ERR).renderMsg("你想干嘛？");
                     return;
