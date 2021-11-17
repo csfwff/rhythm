@@ -351,9 +351,33 @@ var ChatRoom = {
     ChatRoom.editor.focus();
   },
   /**
+   * 拆开红包
+   */
+  unpackRedPacket: function (oId) {
+    console.log(oId);
+  },
+  /**
    * 渲染聊天室消息
    */
   renderMessage: function (userNickname, userName, userAvatarURL, time, content, oId, currentUser, isAdmin) {
+    let isRedPacket = false;
+    try {
+      let msgJSON = $.parseJSON(content.replace("<p>", "").replace("</p>", ""));
+      if (msgJSON.msgType === "redPacket") {
+        isRedPacket = true;
+        content = '' +
+            '<div class="hongbao__item fn__flex-inline" onclick="ChatRoom.unpackRedPacket(\'' + oId + '\')">\n' +
+            '    <svg class="ft__red hongbao__icon">\n' +
+            '        <use xlink:href="#redPacketIcon"></use>\n' +
+            '    </svg>\n' +
+            '    <div>\n' +
+            '        <div>大吉大利，今晚吃鱼！</div>\n' +
+            '        <div class="ft__smaller ft__fade">\n' +
+            '        </div>\n' +
+            '    </div>\n' +
+            '</div>';
+      }
+    } catch (err) {}
     let meTag1 = "";
     let meTag2 = "";
     if (userNickname !== undefined && userNickname !== "") {
@@ -385,18 +409,20 @@ var ChatRoom = {
         '        </div>\n' +
         '        <div class="ft__smaller ft__fade fn__right">\n' +
         '            ' + time + '\n' +
-        '                <span class="fn__space5"></span>\n' +
-        '                <details class="details action__item fn__flex-center">\n' +
-        '                    <summary>\n' +
-        '                        ···\n' +
-        '                    </summary>\n' +
-        '                    <details-menu class="fn__layer">\n' +
-        '                        <a onclick=\"ChatRoom.at(\'' + userName + '\', \'' + oId + '\', true)\" class="item">@' + userName + '</a>\n' +
-        '                        <a onclick=\"ChatRoom.at(\'' + userName + '\', \'' + oId + '\', false)\" class="item">引用</a>\n' +
-        meTag2 +
-        '                    </details-menu>\n' +
-        '                </details>\n' +
-        '        </div>\n' +
+        '                <span class="fn__space5"></span>\n';
+    if (!isRedPacket) {
+      newHTML += '                <details class="details action__item fn__flex-center">\n' +
+          '                    <summary>\n' +
+          '                        ···\n' +
+          '                    </summary>\n' +
+          '                    <details-menu class="fn__layer">\n' +
+          '                        <a onclick=\"ChatRoom.at(\'' + userName + '\', \'' + oId + '\', true)\" class="item">@' + userName + '</a>\n' +
+          '                        <a onclick=\"ChatRoom.at(\'' + userName + '\', \'' + oId + '\', false)\" class="item">引用</a>\n' +
+          meTag2 +
+          '                    </details-menu>\n' +
+          '                </details>\n';
+    }
+    newHTML += '        </div>\n' +
         '    </div>\n' +
         '</div></div>';
 
