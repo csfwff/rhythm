@@ -386,6 +386,10 @@ var ChatRoomChannel = {
                     } else {
                         userNickname = userName;
                     }
+                    let newContent = data.content;
+                    if (newContent.indexOf("\"msgType\":\"redPacket\"") !== -1) {
+                        newContent = "[收到红包，请在完整版聊天室查看]";
+                    }
                     $("#chatRoomIndex").prepend("" +
                         "<li class=\"fn-flex\" id=\"chatindex" + data.oId + "\" style='display: none; border-bottom: 1px solid #eee;'>\n" +
                         "    <a rel=\"nofollow\" href=\"/member/" + data.userName + "\">\n" +
@@ -400,7 +404,7 @@ var ChatRoomChannel = {
                         "            </a>\n" +
                         "        </div>\n" +
                         "        <div class=\"vditor-reset comment " + Label.chatRoomPictureStatus + "\">\n" +
-                        "            " + data.content + "\n" +
+                        "            " + newContent + "\n" +
                         "        </div>\n" +
                         "    </div>\n" +
                         "</li>");
