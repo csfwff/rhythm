@@ -49,6 +49,7 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import pers.adlered.simplecurrentlimiter.main.SimpleCurrentLimiter;
 
+import javax.xml.ws.Dispatch;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.regex.Matcher;
@@ -157,6 +158,12 @@ public class ChatroomProcessor {
     private PointtransferMgmtService pointtransferMgmtService;
 
     /**
+     * Chat Room Service.
+     */
+    @Inject
+    private ChatRoomService chatRoomService;
+
+    /**
      * Register request handlers.
      */
     public static void register() {
@@ -171,6 +178,80 @@ public class ChatroomProcessor {
         Dispatcher.get("/chat-room/more", chatroomProcessor::getMore);
         Dispatcher.get("/cr/raw/{id}", chatroomProcessor::getChatRaw, anonymousViewCheckMidware::handle);
         Dispatcher.delete("/chat-room/revoke/{oId}", chatroomProcessor::revokeMessage, loginCheck::handle);
+        Dispatcher.post("/chat-room/red-packet/open", chatroomProcessor::openRedPacket, loginCheck::handle);
+    }
+
+    /**
+     * 拆开红包
+     *
+     * @param context
+     */
+    public synchronized void openRedPacket(final RequestContext context) {
+        try {
+            JSONObject currentUser = Sessions.getUser();
+            try {
+                final JSONObject requestJSONObject = context.requestJSON();
+                currentUser = ApiProcessor.getUserByKey(requestJSONObject.optString("apiKey"));
+            } catch (NullPointerException ignored) {
+            }
+            String userId = currentUser.optString(Keys.OBJECT_ID);
+            final JSONObject requestJSONObject = context.requestJSON();
+            String oId = requestJSONObject.optString("oId");
+            JSONObject msg = chatRoomService.getChatMsg(oId);
+            JSONObject redPacket = new JSONObject(new JSONObject(msg.optString("content")).optString("content"));
+            String msgType = redPacket.optString("msgType");
+            if (msgType.equals("redPacket")) {
+                // 红包正常，可以抢了
+                int money = redPacket.optInt("money");
+                int count = redPacket.optInt("count");
+                int got = redPacket.optInt("got");
+                JSONArray who = redPacket.optJSONArray("who");
+                // 根据抢的人数判断是否已经抢光了
+                if (got >= count) {
+                    context.renderJSON(new JSONObject().put("who", who));
+                    return;
+                }
+                // 开始领取红包
+                // 先减掉已经领取的金额
+                for (Object o : who) {
+                    JSONObject currentWho = (JSONObject) o;
+                    String uId = currentWho.optString("userId");
+                    if (uId.equals(userId)) {
+                        context.renderJSON(new JSONObject().put("who", who));
+                        return;
+                    }
+                    int userMoney = currentWho.optInt("userMoney");
+                    money -= userMoney;
+                }
+                // 随机一个红包金额 1-N
+                Random random = new Random();
+                // 如果是最后一个红包了，给他一切
+                int meGot = 0;
+                if (count == got + 1) {
+                    meGot = money;
+                } else {
+                    meGot = random.nextInt(money + 1);
+                }
+                // 随机成功了
+                // 修改聊天室数据库
+                JSONObject source = new JSONObject(chatRoomService.getChatMsg(oId).optString("content"));
+                JSONObject source2 = new JSONObject(source.optString("content"));
+                source2.put("got", got + 1);
+                JSONArray source3 = source2.optJSONArray("who");
+                source3.put(new JSONObject().put("userMoney", meGot).put("userId", userId));
+                source2.put("who", source3);
+                source.put("content", source2);
+                final Transaction transaction = chatRoomRepository.beginTransaction();
+                chatRoomRepository.update(oId, new JSONObject().put("content", source.toString()));
+                transaction.commit();
+                // 把钱转给用户
+                System.out.println("1");
+            }
+        } catch (Exception e) {
+            context.renderJSON(StatusCodes.ERR).renderMsg("红包非法");
+            LOGGER.log(Level.ERROR, "Open Red Packet failed",e);
+        }
+        context.renderJSON(StatusCodes.ERR).renderMsg("红包非法");
     }
 
     /**
