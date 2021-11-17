@@ -33,10 +33,7 @@ import org.b3log.latke.ioc.Inject;
 import org.b3log.latke.ioc.Singleton;
 import org.b3log.latke.model.User;
 import org.b3log.latke.repository.*;
-import org.b3log.symphony.model.Common;
-import org.b3log.symphony.model.Liveness;
-import org.b3log.symphony.model.Notification;
-import org.b3log.symphony.model.UserExt;
+import org.b3log.symphony.model.*;
 import org.b3log.symphony.processor.channel.ChatroomChannel;
 import org.b3log.symphony.processor.middleware.AnonymousViewCheckMidware;
 import org.b3log.symphony.processor.middleware.LoginCheckMidware;
@@ -44,6 +41,7 @@ import org.b3log.symphony.processor.middleware.validate.ChatMsgAddValidationMidw
 import org.b3log.symphony.repository.ChatRoomRepository;
 import org.b3log.symphony.service.*;
 import org.b3log.symphony.util.*;
+import org.json.JSONArray;
 import org.json.JSONObject;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -153,6 +151,12 @@ public class ChatroomProcessor {
     private LivenessMgmtService livenessMgmtService;
 
     /**
+     * Pointtransfer management service.
+     */
+    @Inject
+    private PointtransferMgmtService pointtransferMgmtService;
+
+    /**
      * Register request handlers.
      */
     public static void register() {
@@ -201,6 +205,15 @@ public class ChatroomProcessor {
         msg.put(Common.TIME, time);
         msg.put(UserExt.USER_NICKNAME, currentUser.optString(UserExt.USER_NICKNAME));
 
+        // 加活跃
+        try {
+            String userId = currentUser.optString(Keys.OBJECT_ID);
+            if (chatRoomLivenessLimiter.access(userId)) {
+                livenessMgmtService.incLiveness(userId, Liveness.LIVENESS_COMMENT);
+            }
+        } catch (Exception ignored) {
+        }
+
         if (content.startsWith("[redpacket]") && content.endsWith("[/redpacket]")) {
             LOGGER.log(Level.INFO, "User " + userName + " has sent a red packet.");
             try {
@@ -213,21 +226,56 @@ public class ChatroomProcessor {
                 if (message.length() > 20) {
                     message = message.substring(0, 20);
                 }
+                String userId = currentUser.optString(Keys.OBJECT_ID);
+                // 扣积分
+                if (money > 20000) {
+                    context.renderJSON(StatusCodes.ERR).renderMsg("红包金额不得大于 20000 积分！");
+                    return;
+                }
+                try {
+                    final boolean succ = null != pointtransferMgmtService.transfer(userId, Pointtransfer.ID_C_SYS,
+                            Pointtransfer.TRANSFER_TYPE_C_ACTIVITY_SEND_RED_PACKET,
+                            money, "", System.currentTimeMillis(), "");
+                    if (!succ) {
+                        context.renderJSON(StatusCodes.ERR).renderMsg("少年，你的积分不足！");
+                        return;
+                    }
+                } catch (Exception e) {
+                    context.renderJSON(StatusCodes.ERR).renderMsg("少年，你的积分不足！");
+                    return;
+                }
+                // 组合新的 JSON
+                JSONObject redPacketJSON = new JSONObject();
+                redPacketJSON.put("senderId", userId);
+                redPacketJSON.put("money", money);
+                redPacketJSON.put("count", count);
+                redPacketJSON.put("msg", message);
+                // 已经抢了这个红包的人数
+                redPacketJSON.put("got", 0);
+                // 已经抢了这个红包的人以及抢到的金额
+                redPacketJSON.put("who", new JSONArray());
 
-                LOGGER.log(Level.INFO, message);
+                // 写入数据库
+                final Transaction transaction = chatRoomRepository.beginTransaction();
+                try {
+                    chatRoomRepository.add(new JSONObject().put("content", redPacketJSON));
+                } catch (RepositoryException e) {
+                    LOGGER.log(Level.ERROR, "Cannot save ChatRoom message to the database.", e);
+                }
+                transaction.commit();
+                context.renderJSON(StatusCodes.SUCC);
+
+                try {
+                    final JSONObject user = userQueryService.getUser(userId);
+                    user.put(UserExt.USER_LATEST_CMT_TIME, System.currentTimeMillis());
+                    userMgmtService.updateUser(userId, user);
+                } catch (final Exception e) {
+                    LOGGER.log(Level.ERROR, "Update user latest comment time failed", e);
+                }
             } catch (Exception e) {
                 LOGGER.log(Level.INFO, "User " + userName + " failed to send a red packet.");
             }
         } else {
-            // 加活跃
-            try {
-                String userId = currentUser.optString(Keys.OBJECT_ID);
-                if (chatRoomLivenessLimiter.access(userId)) {
-                    livenessMgmtService.incLiveness(userId, Liveness.LIVENESS_COMMENT);
-                }
-            } catch (Exception ignored) {
-            }
-
             // 聊天室内容保存到数据库
             final Transaction transaction = chatRoomRepository.beginTransaction();
             try {

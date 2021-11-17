@@ -545,6 +545,8 @@ public class PointtransferQueryService {
                         desTemplate = desTemplate.replace("{time}", new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date(Long.valueOf(dataId))));
                         desTemplate = desTemplate.replace("{stage}", String.valueOf(record.optInt(Pointtransfer.SUM)));
                         break;
+                    case Pointtransfer.TRANSFER_TYPE_C_ACTIVITY_SEND_RED_PACKET:
+                        break;
                     default:
                         LOGGER.warn("Invalid point type [" + type + "]");
                 }
