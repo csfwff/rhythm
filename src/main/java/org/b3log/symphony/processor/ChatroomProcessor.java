@@ -201,54 +201,58 @@ public class ChatroomProcessor {
         msg.put(Common.TIME, time);
         msg.put(UserExt.USER_NICKNAME, currentUser.optString(UserExt.USER_NICKNAME));
 
-        // 加活跃
-        try {
-            String userId = currentUser.optString(Keys.OBJECT_ID);
-            if (chatRoomLivenessLimiter.access(userId)) {
-                livenessMgmtService.incLiveness(userId, Liveness.LIVENESS_COMMENT);
-            }
-        } catch (Exception ignored) {
-        }
-
-        // 聊天室内容保存到数据库
-        final Transaction transaction = chatRoomRepository.beginTransaction();
-        try {
-            String oId = chatRoomRepository.add(new JSONObject().put("content", msg.toString()));
-            msg.put("oId", oId);
-        } catch (RepositoryException e) {
-            LOGGER.log(Level.ERROR, "Cannot save ChatRoom message to the database.", e);
-        }
-        transaction.commit();
-
-        msg = msg.put(Common.CONTENT, processMarkdown(msg.optString(Common.CONTENT)));
-        final JSONObject pushMsg = JSONs.clone(msg);
-        pushMsg.put(Common.TIME, new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(msg.optLong(Common.TIME)));
-        ChatroomChannel.notifyChat(pushMsg);
-
-        context.renderJSON(StatusCodes.SUCC);
-
-
-        try {
-            final List<JSONObject> atUsers = atUsers(msg.optString(Common.CONTENT), userName);
-            if (Objects.nonNull(atUsers) && !atUsers.isEmpty()) {
-                for (JSONObject user : atUsers) {
-                    final JSONObject notification = new JSONObject();
-                    notification.put(Notification.NOTIFICATION_USER_ID, user.optString("oId"));
-                    notification.put(Notification.NOTIFICATION_DATA_ID, msg.optString("oId"));
-                    notificationMgmtService.addChatRoomAtNotification(notification);
+        if (content.startsWith("[redpacket]") && content.endsWith("[/redpacket]")) {
+            LOGGER.log(Level.INFO, "User " + userName + " has sent a red packet.");
+        } else {
+            // 加活跃
+            try {
+                String userId = currentUser.optString(Keys.OBJECT_ID);
+                if (chatRoomLivenessLimiter.access(userId)) {
+                    livenessMgmtService.incLiveness(userId, Liveness.LIVENESS_COMMENT);
                 }
+            } catch (Exception ignored) {
             }
-        } catch (Exception e) {
-            LOGGER.log(Level.ERROR, "notify user failed", e);
-        }
 
-        try {
-            final String userId = currentUser.optString(Keys.OBJECT_ID);
-            final JSONObject user = userQueryService.getUser(userId);
-            user.put(UserExt.USER_LATEST_CMT_TIME, System.currentTimeMillis());
-            userMgmtService.updateUser(userId, user);
-        } catch (final Exception e) {
-            LOGGER.log(Level.ERROR, "Update user latest comment time failed", e);
+            // 聊天室内容保存到数据库
+            final Transaction transaction = chatRoomRepository.beginTransaction();
+            try {
+                String oId = chatRoomRepository.add(new JSONObject().put("content", msg.toString()));
+                msg.put("oId", oId);
+            } catch (RepositoryException e) {
+                LOGGER.log(Level.ERROR, "Cannot save ChatRoom message to the database.", e);
+            }
+            transaction.commit();
+
+            msg = msg.put(Common.CONTENT, processMarkdown(msg.optString(Common.CONTENT)));
+            final JSONObject pushMsg = JSONs.clone(msg);
+            pushMsg.put(Common.TIME, new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(msg.optLong(Common.TIME)));
+            ChatroomChannel.notifyChat(pushMsg);
+
+            context.renderJSON(StatusCodes.SUCC);
+
+
+            try {
+                final List<JSONObject> atUsers = atUsers(msg.optString(Common.CONTENT), userName);
+                if (Objects.nonNull(atUsers) && !atUsers.isEmpty()) {
+                    for (JSONObject user : atUsers) {
+                        final JSONObject notification = new JSONObject();
+                        notification.put(Notification.NOTIFICATION_USER_ID, user.optString("oId"));
+                        notification.put(Notification.NOTIFICATION_DATA_ID, msg.optString("oId"));
+                        notificationMgmtService.addChatRoomAtNotification(notification);
+                    }
+                }
+            } catch (Exception e) {
+                LOGGER.log(Level.ERROR, "notify user failed", e);
+            }
+
+            try {
+                final String userId = currentUser.optString(Keys.OBJECT_ID);
+                final JSONObject user = userQueryService.getUser(userId);
+                user.put(UserExt.USER_LATEST_CMT_TIME, System.currentTimeMillis());
+                userMgmtService.updateUser(userId, user);
+            } catch (final Exception e) {
+                LOGGER.log(Level.ERROR, "Update user latest comment time failed", e);
+            }
         }
     }
 
