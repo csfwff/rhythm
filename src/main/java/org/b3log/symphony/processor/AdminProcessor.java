@@ -1504,9 +1504,9 @@ public class AdminProcessor {
 
         final JSONObject currentUser = Sessions.getUser();
         // 仅允许管理员和OP修改用户所属分组
-        if (Role.ROLE_ID_C_ADMIN.equals(currentUser.optString(User.USER_ROLE))
-            ||
-            "1630552921050".equals(currentUser.optString(User.USER_ROLE))
+        if (!Role.ROLE_ID_C_ADMIN.equals(currentUser.optString(User.USER_ROLE))
+            &&
+            !"1630552921050".equals(currentUser.optString(User.USER_ROLE))
         ) {
             user.put(User.USER_ROLE, oldRole);
         }
