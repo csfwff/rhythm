@@ -24,7 +24,7 @@
         <@head title="榜单 - ${symphonyLabel}">
             <link rel="canonical" href="${servePath}/top/index">
         </@head>
-<#--        <link rel="stylesheet" href="${staticServePath}/css/theme/dark-index.css?${staticResourceVersion}" />-->
+        <link rel="stylesheet" href="${staticServePath}/css/theme/dark-index.css?${staticResourceVersion}" />
     </head>
     <body>
         <#include "../header.ftl">
