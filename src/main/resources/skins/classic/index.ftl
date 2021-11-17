@@ -365,7 +365,12 @@ ${HeaderBannerLabel}
                                                     </a>
                                                 </div>
                                                 <div class="vditor-reset comment<#if 0 == chatRoomPictureStatus> blur</#if>">
-                                                    ${msg.content}
+                                                    <#assign text=msg.content>
+                                                    <#if text?contains("\"msgType\":\"redPacket\"")>
+                                                        [收到红包，请在完整版聊天室查看]
+                                                    <#else>
+                                                        ${text}
+                                                    </#if>
                                                 </div>
                                             </div>
                                         </li>
