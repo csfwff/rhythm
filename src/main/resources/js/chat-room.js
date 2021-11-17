@@ -354,7 +354,85 @@ var ChatRoom = {
    * 拆开红包
    */
   unpackRedPacket: function (oId) {
-    console.log(oId);
+    $.ajax({
+      url: Label.servePath + "/chat-room/red-packet/open",
+      method: "POST",
+      data: JSON.stringify({
+        oId: oId
+      }),
+      success: function (result) {
+        let iGot = "没抢到，下次手速快一点哦";
+        let users = "";
+        let usersJSON = result.who;
+        for (let i = 0; i < usersJSON.length; i++) {
+          let current = usersJSON[i];
+          let currentUserMoney = current.userMoney;
+          let currentUserName = current.userName;
+          if (currentUserName === Label.currentUser) {
+            iGot = "抢到了 " + currentUserMoney + " 积分";
+          }
+          let currentUserTime = current.time;
+          let currentUser;
+          $.ajax({
+            url: Label.servePath + "/user/" + currentUserName,
+            type: "GET",
+            cache: false,
+            async: false,
+            headers: {'csrfToken': Label.csrfToken},
+            success: function (result) {
+              currentUser = result;
+            }
+          });
+          let currentUserAvatar = currentUser.userAvatarURL;
+          users += "" +
+          "            <li class=\"fn__flex menu__item\">\n" +
+          "                <img class=\"avatar avatar--mid\" style=\"margin-right: 10px; background-image: none; background-color: transparent;\" src=\"" + currentUserAvatar + "\">\n" +
+          "                <div class=\"fn__flex-1\" style=\"text-align: left !important;\">\n" +
+          "                    <h2 class=\"list__user\"><a href=\"" + Label.servePath + "/member/" + currentUserName +"\">" + currentUserName + "</a></h2>\n" +
+          "                    <span class=\"ft__fade ft__smaller\">" + currentUserTime + "</span>\n" +
+          "                </div>\n" +
+          "                <div class=\"fn__flex-center\">" + currentUserMoney + " 积分</div>\n" +
+          "            </li>\n";
+        }
+        Util.alert("" +
+            "<style>" +
+            ".dialog-header-bg {" +
+            "border-radius: 4px 4px 0px 0px; background-color: rgb(210, 63, 49); color: rgb(255, 255, 255);" +
+            "}" +
+            ".dialog-main {" +
+            "height: 456px;" +
+            "overflow: auto;" +
+            "}" +
+            "</style>" +
+            "<div class=\"fn-hr5\"></div>\n" +
+            "<div class=\"fn-hr5\"></div>\n" +
+            "<div class=\"fn-hr5\"></div>\n" +
+            "<div class=\"fn-hr5\"></div>\n" +
+            "<div class=\"ft__center\">\n" +
+            "    <div class=\"fn__flex-inline\">\n" +
+            "        <img class=\"avatar avatar--small\" src=\"" + result.info.userAvatarURL + "\" style=\"background-image: none; background-color: transparent; width: 20px; height: 20px; margin-right: 0px;\">\n" +
+            "        <div class=\"fn__space5\"></div>\n" +
+            "        <a href=\"" + Label.servePath + "/member/" + result.info.userName + "\">" + result.info.userName + "</a>'s 红包\n" +
+            "    </div>\n" +
+            "    <div class=\"fn-hr5\"></div>\n" +
+            "    <div class=\"ft__smaller ft__fade\">\n" +
+            result.info.msg + "\n" +
+            "    </div>\n" +
+            "    <div class=\"hongbao__count\">\n" +
+            iGot + "\n" +
+            "    </div>\n" +
+            "    <div class=\"ft__smaller ft__fade\">总计 " + result.info.got + "/" + result.info.count + "</div>\n" +
+            "</div>\n" +
+            "\n" +
+            "<div class=\"list\"><ul>\n" +
+            users +
+            "</ul></div>" +
+            "", "红包");
+      },
+      error: function (result) {
+        Util.alert(result.msg);
+      }
+    });
   },
   /**
    * 渲染聊天室消息
@@ -371,7 +449,7 @@ var ChatRoom = {
             '        <use xlink:href="#redPacketIcon"></use>\n' +
             '    </svg>\n' +
             '    <div>\n' +
-            '        <div>大吉大利，今晚吃鱼！</div>\n' +
+            '        <div>' + msgJSON.msg + '</div>\n' +
             '        <div class="ft__smaller ft__fade">\n' +
             '        </div>\n' +
             '    </div>\n' +
