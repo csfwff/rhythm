@@ -561,7 +561,15 @@ public class ChatroomProcessor {
                 currentUser = ApiProcessor.getUserByKey(requestJSONObject.optString("apiKey"));
             } catch (NullPointerException ignored) {
             }
-
+            String content = message.optString("content");
+            try {
+                JSONObject checkContent = new JSONObject(content);
+                if (checkContent.optString("msgType").equals("redPacket")) {
+                    context.renderJSON(StatusCodes.ERR).renderMsg("你想干嘛？");
+                    return;
+                }
+            } catch (Exception ignored) {
+            }
             String msgUser = new JSONObject(message.optString("content")).optString(User.USER_NAME);
             String curUser = currentUser.optString(User.USER_NAME);
             boolean isAdmin = DataModelService.hasPermission(currentUser.optString(User.USER_ROLE), 3);
