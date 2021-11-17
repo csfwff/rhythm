@@ -190,6 +190,16 @@ public class ChatroomProcessor {
     public synchronized void addChatRoomMsg(final RequestContext context) {
         final JSONObject requestJSONObject = (JSONObject) context.attr(Keys.REQUEST);
         String content = requestJSONObject.optString(Common.CONTENT);
+
+        try {
+            JSONObject checkContent = new JSONObject(content);
+            if (checkContent.optString("msgType").equals("redPacket")) {
+                context.renderJSON(StatusCodes.ERR).renderMsg("你想干嘛？");
+                return;
+            }
+        } catch (Exception ignored) {
+        }
+
         JSONObject currentUser = Sessions.getUser();
         try {
             currentUser = ApiProcessor.getUserByKey(requestJSONObject.optString("apiKey"));
@@ -254,16 +264,23 @@ public class ChatroomProcessor {
                 redPacketJSON.put("got", 0);
                 // 已经抢了这个红包的人以及抢到的金额
                 redPacketJSON.put("who", new JSONArray());
+                // 红包特殊标识，堵漏洞
+                redPacketJSON.put("msgType", "redPacket");
 
                 // 写入数据库
                 final Transaction transaction = chatRoomRepository.beginTransaction();
                 try {
-                    chatRoomRepository.add(new JSONObject().put("content", redPacketJSON));
+                    msg.put(Common.CONTENT, redPacketJSON.toString());
+                    String oId = chatRoomRepository.add(new JSONObject().put("content", msg.toString()));
+                    msg.put("oId", oId);
                 } catch (RepositoryException e) {
                     LOGGER.log(Level.ERROR, "Cannot save ChatRoom message to the database.", e);
                 }
                 transaction.commit();
-                context.renderJSON(StatusCodes.SUCC);
+
+                final JSONObject pushMsg = JSONs.clone(msg);
+                pushMsg.put(Common.TIME, new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(msg.optLong(Common.TIME)));
+                ChatroomChannel.notifyChat(pushMsg);
 
                 try {
                     final JSONObject user = userQueryService.getUser(userId);
@@ -272,6 +289,8 @@ public class ChatroomProcessor {
                 } catch (final Exception e) {
                     LOGGER.log(Level.ERROR, "Update user latest comment time failed", e);
                 }
+
+                context.renderJSON(StatusCodes.SUCC);
             } catch (Exception e) {
                 LOGGER.log(Level.INFO, "User " + userName + " failed to send a red packet.");
             }
