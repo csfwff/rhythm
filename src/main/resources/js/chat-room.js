@@ -132,6 +132,11 @@ var ChatRoom = {
         })
       }, 100)
     })
+
+    // 红包初始化
+    $("#redPacketBtn").on('click', function () {
+      alert("hello")
+    });
   },
   /**
    * 发送聊天内容

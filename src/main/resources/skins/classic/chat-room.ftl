@@ -39,15 +39,20 @@
                     <div class="reply">
                         <#if isLoggedIn>
                             <div id="chatContent"></div><br>
-                            <div class="fn-clear comment-submit">
-                                <div class="fn-left online-cnt">${onlineVisitorCountLabel} <span id="onlineCnt"></span>
-                                </div>
-                                <div class="tip fn-left" id="chatContentTip"></div>
+                            <div class="fn-clear" style="margin-bottom: 5px">
+                                <svg id="redPacketBtn" style="width: 30px; height: 30px; cursor:pointer;">
+                                    <use xlink:href="#redPacketIcon"></use>
+                                </svg>
                                 <div class="fn-right">
                                     <button class="green" onclick="ChatRoom.send()">${postLabel}</button>
                                 </div>
                             </div>
-                            <div id="chatRoomOnlineCnt" class="chats__users" style="margin-top: 15px">
+                            <div class="fn-clear comment-submit">
+                                <div class="fn-left online-cnt">${onlineVisitorCountLabel} <span id="onlineCnt"></span>
+                                </div>
+                                <div class="tip fn-left" id="chatContentTip"></div>
+                            </div>
+                            <div id="chatRoomOnlineCnt" class="chats__users">
                             </div>
                         <#else>
                             <div class="comment-login">

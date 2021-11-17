@@ -353,7 +353,7 @@ var ChatRoomChannel = {
                     $("#chatRoomOnlineCnt").html("");
                     for (var user in data.users) {
                         let userInfo = data.users[user];
-                        $("#chatRoomOnlineCnt").append("<a target=\"_blank\" title=\"" + userInfo.userName + "\" data-name=\"" + userInfo.userName + "\"\n" +
+                        $("#chatRoomOnlineCnt").append("<a target=\"_blank\" data-name=\"" + userInfo.userName + "\"\n" +
                             "href=\"" + userInfo.homePage + "\">\n" +
                             "<img style='margin-bottom: 10px' class=\"avatar avatar-small\" aria-label=\"" + userInfo.userName + "\"\n" +
                             "src=\"" + userInfo.userAvatarURL + "\">\n" +
