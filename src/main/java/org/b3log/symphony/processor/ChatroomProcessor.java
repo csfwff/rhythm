@@ -203,6 +203,20 @@ public class ChatroomProcessor {
 
         if (content.startsWith("[redpacket]") && content.endsWith("[/redpacket]")) {
             LOGGER.log(Level.INFO, "User " + userName + " has sent a red packet.");
+            try {
+                String redpacketString = content.replaceAll("^\\[redpacket\\]", "").replaceAll("\\[/redpacket\\]$", "");
+                JSONObject redpacket = new JSONObject(redpacketString);
+                int money = redpacket.optInt("money");
+                int count = redpacket.optInt("count");
+                String message = redpacket.optString("msg");
+                message = message.replaceAll("[^0-9a-zA-Z\\u4e00-\\u9fa5,，.。！!?？《》\\s]", "");
+                if (message.length() > 20) {
+                    message = message.substring(0, 20);
+                }
+                LOGGER.log(Level.INFO, message);
+            } catch (Exception e) {
+                LOGGER.log(Level.INFO, "User " + userName + " failed to send a red packet.");
+            }
         } else {
             // 加活跃
             try {
