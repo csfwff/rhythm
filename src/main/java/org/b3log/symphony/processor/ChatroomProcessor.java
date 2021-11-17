@@ -245,7 +245,13 @@ public class ChatroomProcessor {
                 chatRoomRepository.update(oId, new JSONObject().put("content", source.toString()));
                 transaction.commit();
                 // 把钱转给用户
-                System.out.println("1");
+                final boolean succ = null != pointtransferMgmtService.transfer(Pointtransfer.ID_C_SYS, userId,
+                        Pointtransfer.TRANSFER_TYPE_C_ACTIVITY_RECEIVE_RED_PACKET,
+                        meGot, "", System.currentTimeMillis(), "");
+                if (!succ) {
+                    context.renderJSON(StatusCodes.ERR).renderMsg("发送积分失败");
+                    return;
+                }
             }
         } catch (Exception e) {
             context.renderJSON(StatusCodes.ERR).renderMsg("红包非法");

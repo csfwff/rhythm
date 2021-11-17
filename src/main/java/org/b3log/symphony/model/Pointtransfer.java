@@ -413,6 +413,11 @@ public final class Pointtransfer {
     public static final int TRANSFER_TYPE_C_ACTIVITY_SEND_RED_PACKET = 40;
 
     /**
+     * Transfer type - Activity - ReceiveRedPacket.
+     */
+    public static final int TRANSFER_TYPE_C_ACTIVITY_RECEIVE_RED_PACKET = 41;
+
+    /**
      * Transfer sum - 摆龙门阵.
      */
     public static final int TRANSFER_SUM_C_BLMZ = 5;
