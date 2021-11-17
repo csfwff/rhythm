@@ -140,17 +140,17 @@ var ChatRoom = {
           "<label>\n" +
           "  <div class=\"ft__smaller ft__fade\" style=\"float: left\">积分</div>\n" +
           "  <div class=\"fn-hr5 fn__5\"></div>\n" +
-          "  <input type=\"number\" min=\"32\" max=\"1024\" required=\"\" value=\"32\" id=\"redPacketMoney\" onkeypress=\"return(/[\\d]/.test(String.fromCharCode(event.keyCode)))\">\n" +
+          "  <input type=\"number\" min=\"1\" max=\"20000\" required=\"\" value=\"32\" id=\"redPacketMoney\" onkeypress=\"return(/[\\d]/.test(String.fromCharCode(event.keyCode)))\">\n" +
           "</label>\n" +
           "<label>\n" +
           "  <div class=\"ft__smaller ft__fade\" style=\"float: left\">个数</div>\n" +
           "  <div class=\"fn-hr5 fn__5\"></div>\n" +
-          "  <input type=\"number\" min=\"2\" max=\"64\" required=\"\" value=\"2\" id=\"redPacketCount\" onkeypress=\"return(/[\\d]/.test(String.fromCharCode(event.keyCode)))\">\n" +
+          "  <input type=\"number\" min=\"1\" max=\"1000\" required=\"\" value=\"2\" id=\"redPacketCount\" onkeypress=\"return(/[\\d]/.test(String.fromCharCode(event.keyCode)))\">\n" +
           "</label>\n" +
           "<label>\n" +
           "  <div class=\"ft__smaller ft__fade\" style=\"float: left\">留言</div>\n" +
           "  <div class=\"fn-hr5 fn__5\"></div>\n" +
-          "  <input type=\"text\" id=\"redPacketMsg\" placeholder=\"摸鱼者，事竟成！\">\n" +
+          "  <input type=\"text\" id=\"redPacketMsg\" placeholder=\"摸鱼者，事竟成！\" maxlength=\"20\">\n" +
           "</label>\n" +
           "<div class=\"fn-hr5\"></div>\n" +
           "<div class=\"fn__flex\" style=\"margin-top: 15px\">\n" +
@@ -161,12 +161,28 @@ var ChatRoom = {
           "", "发红包");
 
       $("#redPacketMoney").unbind();
+      $("#redPacketCount").unbind();
 
       $("#redPacketMoney").on('change', function () {
         if ($("#redPacketMoney").val() === "") {
           $("#redPacketMoney").val("0");
         }
+        if ($("#redPacketMoney").val() > 20000) {
+          $("#redPacketMoney").val("20000");
+        }
+        if ($("#redPacketMoney").val() <= 0) {
+          $("#redPacketMoney").val("1");
+        }
         $("#redPacketAmount").text($("#redPacketMoney").val());
+      });
+
+      $("#redPacketCount").on('change', function () {
+        if ($("#redPacketCount").val() > 1000) {
+          $("#redPacketCount").val("1000");
+        }
+        if ($("#redPacketCount").val() <= 0) {
+          $("#redPacketCount").val("1");
+        }
       });
 
       $("#redPacketConfirm").on('click', function () {

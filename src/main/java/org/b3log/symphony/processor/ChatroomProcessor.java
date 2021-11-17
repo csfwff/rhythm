@@ -325,8 +325,8 @@ public class ChatroomProcessor {
                 }
                 String userId = currentUser.optString(Keys.OBJECT_ID);
                 // 扣积分
-                if (money > 20000) {
-                    context.renderJSON(StatusCodes.ERR).renderMsg("红包金额不得大于 20000 积分！");
+                if (money > 20000 || money <= 0 || count > 1000 || count <= 0) {
+                    context.renderJSON(StatusCodes.ERR).renderMsg("数据不合法！");
                     return;
                 }
                 try {
