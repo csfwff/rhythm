@@ -403,7 +403,7 @@ public class ChatroomProcessor {
             }
             transaction.commit();
 
-            msg = msg.put(Common.CONTENT, processMarkdown(msg.optString(Common.CONTENT)));
+            msg = msg.put("md", msg.optString(Common.CONTENT)).put(Common.CONTENT, processMarkdown(msg.optString(Common.CONTENT)));
             final JSONObject pushMsg = JSONs.clone(msg);
             pushMsg.put(Common.TIME, new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(msg.optLong(Common.TIME)));
             ChatroomChannel.notifyChat(pushMsg);

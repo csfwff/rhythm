@@ -370,7 +370,7 @@ var ChatRoomChannel = {
                     if ($("#chatRoomIndex").length === 0) {
                         let liHTML;
                         $("#plusOne").remove();
-                        if (data.content === Label.latestMessage) {
+                        if (data.md === Label.latestMessage) {
                             // +1 功能
                             liHTML = ChatRoom.renderMessage(data.userNickname, data.userName, data.userAvatarURL, data.time, data.content, data.oId, Label.currentUser, Label.level3Permitted, true);
                         } else {
@@ -380,7 +380,7 @@ var ChatRoomChannel = {
                         $('#chats>div.fn-none').show(200);
                         $('#chats>div.fn-none').removeClass("fn-none");
                         ChatRoom.resetMoreBtnListen();
-                        Label.latestMessage = data.content;
+                        Label.latestMessage = data.md;
                     }
 
                     // index
