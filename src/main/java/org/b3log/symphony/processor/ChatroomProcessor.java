@@ -238,7 +238,7 @@ public class ChatroomProcessor {
                 if (count == got + 1) {
                     meGot = money;
                 } else {
-                    meGot = random.nextInt(money + 1);
+                    meGot = random.nextInt((money / 2) + 1);
                 }
                 // 随机成功了
                 // 修改聊天室数据库
