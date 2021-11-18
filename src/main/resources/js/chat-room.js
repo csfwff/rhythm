@@ -361,7 +361,7 @@ var ChatRoom = {
         "  <input type=\"text\" id=\"fromURL\">\n" +
         "</label>\n" +
         "<div class=\"fn-hr5\"></div>\n" +
-        "<div class=\"fn__flex\" style=\"margin-top: 15px\">\n" +
+        "<div class=\"fn__flex\" style=\"margin-top: 15px; justify-content: flex-end;\">\n" +
         "  <button class=\"btn btn--confirm\" onclick='ChatRoom.addEmoji($(\"#fromURL\").val());Util.closeAlert();'>导入</button>\n" +
         "</div>\n" +
         "</div>" +
