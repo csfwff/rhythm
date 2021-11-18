@@ -139,6 +139,13 @@ var ChatRoom = {
         $("#emojiList").removeClass("showList");
       } else {
         $("#emojiList").addClass("showList");
+        setTimeout(function () {
+          $("body").unbind();
+          $("body").click(function() {
+            $("#emojiList").removeClass("showList");
+            $("body").unbind();
+          });
+        }, 100);
       }
     });
 
