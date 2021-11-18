@@ -133,6 +133,11 @@ var ChatRoom = {
       }, 100)
     })
 
+    // 表情包初始化
+    $("#emojiBtn").on('click', function () {
+      $("#emojiList").toggle();
+    });
+
     // 红包初始化
     $("#redPacketBtn").on('click', function () {
       Util.alert("" +
