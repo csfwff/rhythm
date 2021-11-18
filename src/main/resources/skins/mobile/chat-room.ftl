@@ -40,6 +40,9 @@
                                 <svg id="redPacketBtn" style="width: 30px; height: 30px; cursor:pointer;">
                                     <use xlink:href="#redPacketIcon"></use>
                                 </svg>
+                                <svg id="emojiBtn" style="width: 30px; height: 30px; cursor:pointer;">
+                                    <use xlink:href="#emojiIcon"></use>
+                                </svg>
                                 <div class="fn-right">
                                     <button class="green" onclick="ChatRoom.send()">${postLabel}</button>
                                 </div>
