@@ -43,6 +43,15 @@
                                 <svg id="emojiBtn" style="width: 30px; height: 30px; cursor:pointer;">
                                     <use xlink:href="#emojiIcon"></use>
                                 </svg>
+                                <div class="hide-list" id="emojiList">
+                                    <div class="hide-list-emojis" id="emojis" style="max-height: 200px">
+                                    </div>
+                                    <div class="hide-list-emojis__tail">
+                                        <span class="hide-list-emojis__tip"></span><span>
+                                            <a onclick="">上传表情包</a>
+                                        </span>
+                                    </div>
+                                </div>
                                 <div class="fn-right">
                                     <button class="green" onclick="ChatRoom.send()">${postLabel}</button>
                                 </div>

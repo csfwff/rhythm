@@ -135,7 +135,11 @@ var ChatRoom = {
 
     // 表情包初始化
     $("#emojiBtn").on('click', function () {
-      $("#emojiList").toggle();
+      if ($("#emojiList").hasClass("showList")) {
+        $("#emojiList").removeClass("showList");
+      } else {
+        $("#emojiList").addClass("showList");
+      }
     });
 
     // 红包初始化
@@ -309,7 +313,8 @@ var ChatRoom = {
    * 监听点击更多按钮关闭事件
    */
   resetMoreBtnListen: function () {
-    $("body").not("details-menu").click(function() {
+    $("body").unbind();
+    $("body").click(function() {
       $("details[open]").removeAttr("open");
     });
   },

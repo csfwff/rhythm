@@ -2746,3 +2746,113 @@ only screen and (device-width: 414px) and (device-height: 896px) and (-webkit-de
   font-size: 24px;
   margin: 10px 0
 }
+
+.hide-list {
+  --border-color: #d1d5da;
+  --second-color: rgba(88, 96, 105, 0.36);
+  --panel-background-color: #fff;
+  --panel-shadow: 0 1px 2px rgba(0, 0, 0, .2);
+  --toolbar-background-color: #f6f8fa;
+  --toolbar-icon-color: #586069;
+  --toolbar-icon-hover-color: #4285f4;
+  --toolbar-height: 35px;
+  --toolbar-divider-margin-top: 8px;
+  --textarea-background-color: #fafbfc;
+  --textarea-text-color: #24292e;
+  --resize-icon-color: var(--toolbar-icon-color);
+  --resize-background-color: var(--toolbar-background-color);
+  --resize-hover-icon-color: var(--panel-background-color);
+  --resize-hover-background-color: var(--toolbar-icon-hover-color);
+  --count-background-color: rgba(27, 31, 35, .05);
+  --heading-border-color: #eaecef;
+  --blockquote-color: #6a737d;
+  --ir-heading-color: #660e7a;
+  --ir-title-color: #808080;
+  --ir-bi-color: #0033b3;
+  --ir-link-color: #008000;
+  --ir-bracket-color: #0000ff;
+  --ir-paren-color: #008000;
+  background-color: var(--panel-background-color);
+  position: absolute;
+  box-shadow: var(--panel-shadow);
+  border-radius: 3px;
+  padding: 5px;
+  z-index: 3;
+  font-size: 14px;
+  display: none;
+  user-select: none;
+  max-width: 320px;
+  min-width: 80px;
+  animation-duration: .15s;
+  animation-name: scale-in;
+  animation-timing-function: cubic-bezier(0.2, 0, 0.13, 1.5);
+  color: var(--toolbar-icon-color);
+}
+
+.hide-list-emojis {
+  display: inline-block;
+  overflow: auto;
+}
+
+.hide-list-emojis button {
+  cursor: pointer;
+  border-radius: 3px;
+  float: left;
+  height: 72px;
+  width: 72px;
+  text-align: center;
+  line-height: 26px;
+  padding: 3px;
+  box-sizing: border-box;
+  font-size: 16px;
+  transition: all 0.15s ease-in-out;
+  border: 0;
+  margin: 0;
+  background-color: transparent;
+  overflow: hidden
+}
+
+.hide-list-emojis__tail {
+  margin-top: 5px;
+  font-size: 12px;
+  color: var(--toolbar-icon-color);
+  display: flex;
+}
+
+.hide-list-emojis__tail a {
+  text-decoration: none;
+  color: var(--toolbar-icon-color);
+}
+
+.hide-list-emojis__tail a:hover {
+  color: var(--toolbar-icon-hover-color);
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.hide-list-emojis__tip {
+  flex: 1;
+  min-width: 1px;
+  width: 200px;
+  margin-right: 10px;
+  color: var(--toolbar-icon-color);
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
+}
+
+.hide-list-emojis button:hover {
+  text-decoration: none;
+  border-color: rgba(0,0,0,0.38);
+  background-color: #eee
+}
+
+.hide-list-emojis button:active {
+  background-color: rgba(0,0,0,0.38);
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05) inset;
+}
+
+.showList {
+  display: block;
+}
+
