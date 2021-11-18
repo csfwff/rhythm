@@ -366,6 +366,7 @@ var ChatRoom = {
         "</div>\n" +
         "</div>" +
         "", "从URL导入表情包");
+    $("#fromURL").focus();
     $("#fromURL").unbind();
     $("#fromURL").bind('keypress',function(event){
       if (event.keyCode == "13") {
