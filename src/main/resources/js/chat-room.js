@@ -269,6 +269,9 @@ var ChatRoom = {
         if (result.code === 0) {
           Util.notice("success", 1500, "表情包删除成功。");
           ChatRoom.loadEmojis();
+          setTimeout(function () {
+            $("#emojiList").addClass("showList");
+          }, 50)
         } else {
           Util.notice("warning", 1500, "表情包删除失败：" + result.msg);
         }
@@ -395,14 +398,13 @@ var ChatRoom = {
         headers: {'csrfToken': Label.csrfToken},
         async: false,
         success: function (result) {
-          if (result.code === 0) {
-            Util.notice("success", 1500, "表情包上传成功。");
-          } else {
+          if (result.code !== 0) {
             Util.notice("warning", 1500, "表情包上传失败：" + result.msg);
           }
         }
       });
     }
+    Util.notice("success", 1500, "表情包上传成功。");
     $("details[open]").removeAttr("open");
     ChatRoom.loadEmojis();
   },
