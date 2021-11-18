@@ -133,6 +133,26 @@ var ChatRoom = {
       }, 100)
     })
 
+    // 表情包初始化
+    // 加载表情
+    ChatRoom.listenUploadEmojis();
+    ChatRoom.loadEmojis();
+    // 监听按钮
+    $("#emojiBtn").on('click', function () {
+      if ($("#emojiList").hasClass("showList")) {
+        $("#emojiList").removeClass("showList");
+      } else {
+        $("#emojiList").addClass("showList");
+        setTimeout(function () {
+          $("body").unbind();
+          $("body").click(function() {
+            $("#emojiList").removeClass("showList");
+            $("body").unbind();
+          });
+        }, 100);
+      }
+    });
+
     // 红包初始化
     $("#redPacketBtn").on('click', function () {
       Util.alert("" +
@@ -140,17 +160,17 @@ var ChatRoom = {
           "<label>\n" +
           "  <div class=\"ft__smaller ft__fade\" style=\"float: left\">积分</div>\n" +
           "  <div class=\"fn-hr5 fn__5\"></div>\n" +
-          "  <input type=\"number\" min=\"32\" max=\"1024\" required=\"\" value=\"32\" id=\"redPacketMoney\" onkeypress=\"return(/[\\d]/.test(String.fromCharCode(event.keyCode)))\">\n" +
+          "  <input type=\"number\" min=\"1\" max=\"20000\" required=\"\" value=\"32\" id=\"redPacketMoney\" onkeypress=\"return(/[\\d]/.test(String.fromCharCode(event.keyCode)))\">\n" +
           "</label>\n" +
           "<label>\n" +
           "  <div class=\"ft__smaller ft__fade\" style=\"float: left\">个数</div>\n" +
           "  <div class=\"fn-hr5 fn__5\"></div>\n" +
-          "  <input type=\"number\" min=\"2\" max=\"64\" required=\"\" value=\"2\" id=\"redPacketCount\" onkeypress=\"return(/[\\d]/.test(String.fromCharCode(event.keyCode)))\">\n" +
+          "  <input type=\"number\" min=\"1\" max=\"1000\" required=\"\" value=\"2\" id=\"redPacketCount\" onkeypress=\"return(/[\\d]/.test(String.fromCharCode(event.keyCode)))\">\n" +
           "</label>\n" +
           "<label>\n" +
           "  <div class=\"ft__smaller ft__fade\" style=\"float: left\">留言</div>\n" +
           "  <div class=\"fn-hr5 fn__5\"></div>\n" +
-          "  <input type=\"text\" id=\"redPacketMsg\" placeholder=\"摸鱼者，事竟成！\">\n" +
+          "  <input type=\"text\" id=\"redPacketMsg\" placeholder=\"摸鱼者，事竟成！\" maxlength=\"20\">\n" +
           "</label>\n" +
           "<div class=\"fn-hr5\"></div>\n" +
           "<div class=\"fn__flex\" style=\"margin-top: 15px\">\n" +
@@ -161,12 +181,35 @@ var ChatRoom = {
           "", "发红包");
 
       $("#redPacketMoney").unbind();
+      $("#redPacketCount").unbind();
 
       $("#redPacketMoney").on('change', function () {
         if ($("#redPacketMoney").val() === "") {
           $("#redPacketMoney").val("0");
         }
+        if ($("#redPacketMoney").val() > 20000) {
+          $("#redPacketMoney").val("20000");
+        }
+        if ($("#redPacketMoney").val() <= 0) {
+          $("#redPacketMoney").val("1");
+        }
         $("#redPacketAmount").text($("#redPacketMoney").val());
+      });
+
+      $("#redPacketCount").on('change', function () {
+        if (Number($("#redPacketCount").val()) > Number($("#redPacketMoney").val())) {
+          $("#redPacketCount").val($("#redPacketMoney").val());
+        } else {
+          console.log()
+          console.log($("#redPacketCount").val())
+          console.log($("#redPacketMoney").val())
+          if ($("#redPacketCount").val() > 1000) {
+            $("#redPacketCount").val("1000");
+          }
+          if ($("#redPacketCount").val() <= 0) {
+            $("#redPacketCount").val("1");
+          }
+        }
       });
 
       $("#redPacketConfirm").on('click', function () {
@@ -205,6 +248,188 @@ var ChatRoom = {
         Util.closeAlert();
       })
     });
+  },
+  delEmoji: function (url) {
+    let emojis = ChatRoom.getEmojis();
+    for (let i = 0; i < emojis.length; i++) {
+      if (emojis[i] === url) {
+        emojis.splice(i, 1);
+      }
+    }
+    $.ajax({
+      url: Label.servePath + "/api/cloud/sync",
+      method: "POST",
+      data: JSON.stringify({
+        gameId: "emojis",
+        data: emojis
+      }),
+      headers: {'csrfToken': Label.csrfToken},
+      async: false,
+      success: function (result) {
+        if (result.code === 0) {
+          Util.notice("success", 1500, "表情包删除成功。");
+          ChatRoom.loadEmojis();
+          setTimeout(function () {
+            $("#emojiBtn").click();
+          }, 50)
+        } else {
+          Util.notice("warning", 1500, "表情包删除失败：" + result.msg);
+        }
+      }
+    });
+  },
+  /**
+   * 加载表情
+   */
+  loadEmojis: function () {
+    $("#emojis").html("");
+    let emojis = ChatRoom.getEmojis();
+    for (let i = 0; i < emojis.length; i++) {
+      $("#emojis").append("" +
+          "<button>\n" +
+          "    <div class=\"divX\" onclick='ChatRoom.delEmoji(\"" + emojis[i] + "\")'>\n" +
+          "        <svg style=\"width: 15px; height: 15px;\"><use xlink:href=\"#delIcon\"></use></svg>\n" +
+          "    </div>" +
+          "    <img style='max-height: 50px' onclick=\"ChatRoom.editor.setValue(ChatRoom.editor.getValue() + '![图片表情](" + emojis[i] + ")')\" class=\"vditor-emojis__icon\" src=\"" + emojis[i] + "\">\n" +
+          "</button>");
+    }
+  },
+  /**
+   * 上传表情
+   */
+  listenUploadEmojis: function () {
+    $('#uploadEmoji').fileupload({
+      acceptFileTypes: /(\.|\/)(gif|jpe?g|png)$/i,
+      maxFileSize: 5242880,
+      multipart: true,
+      pasteZone: null,
+      dropZone: null,
+      url: Label.servePath + '/upload',
+      paramName: 'file[]',
+      add: function (e, data) {
+        ext = data.files[0].type.split('/')[1]
+
+        if (window.File && window.FileReader && window.FileList &&
+            window.Blob) {
+          var reader = new FileReader()
+          reader.readAsArrayBuffer(data.files[0])
+          reader.onload = function (evt) {
+            var fileBuf = new Uint8Array(evt.target.result.slice(0, 11))
+            var isImg = isImage(fileBuf)
+
+            if (!isImg) {
+              Util.alert('只允许上传图片!')
+
+              return
+            }
+
+            if (evt.target.result.byteLength > 1024 * 1024 * 5) {
+              Util.alert('图片过大 (最大限制 5M)')
+
+              return
+            }
+
+            data.submit()
+          }
+        } else {
+          data.submit()
+        }
+      },
+      formData: function (form) {
+        var data = form.serializeArray()
+        return data
+      },
+      submit: function (e, data) {
+      },
+      done: function (e, data) {
+        var result = {
+          result: {
+            key: data.result.data.succMap[Object.keys(data.result.data.succMap)[0]]
+          }
+        }
+        ChatRoom.addEmoji(result.result.key);
+      },
+      fail: function (e, data) {
+        Util.alert('Upload error: ' + data.errorThrown)
+      },
+    })
+  },
+  // 从URL导入表情包
+  fromURL: function () {
+    Util.alert("" +
+        "<div class=\"form fn__flex-column\">\n" +
+        "<label>\n" +
+        "  <div class=\"ft__smaller ft__fade\" style=\"float: left\">请输入图片的URL</div>\n" +
+        "  <div class=\"fn-hr5 fn__5\"></div>\n" +
+        "  <input type=\"text\" id=\"fromURL\">\n" +
+        "</label>\n" +
+        "<div class=\"fn-hr5\"></div>\n" +
+        "<div class=\"fn__flex\" style=\"margin-top: 15px; justify-content: flex-end;\">\n" +
+        "  <button class=\"btn btn--confirm\" onclick='ChatRoom.addEmoji($(\"#fromURL\").val());Util.closeAlert();'>导入</button>\n" +
+        "</div>\n" +
+        "</div>" +
+        "", "从URL导入表情包");
+    $("#fromURL").focus();
+    $("#fromURL").unbind();
+    $("#fromURL").bind('keypress',function(event){
+      if (event.keyCode == "13") {
+        ChatRoom.addEmoji($("#fromURL").val());
+        Util.closeAlert();
+      }
+    });
+  },
+  addEmoji: function () {
+    for (let i = 0; i < arguments.length; i++) {
+      let url = arguments[i];
+      let emojis = ChatRoom.getEmojis();
+      for (let i = 0; i < emojis.length; i++) {
+        if (emojis[i] === url) {
+          emojis.splice(i, 1);
+        }
+      }
+      emojis.push(url);
+      $.ajax({
+        url: Label.servePath + "/api/cloud/sync",
+        method: "POST",
+        data: JSON.stringify({
+          gameId: "emojis",
+          data: emojis
+        }),
+        headers: {'csrfToken': Label.csrfToken},
+        async: false,
+        success: function (result) {
+          if (result.code !== 0) {
+            Util.notice("warning", 1500, "表情包上传失败：" + result.msg);
+          }
+        }
+      });
+    }
+    Util.notice("success", 1500, "表情包上传成功。");
+    $("details[open]").removeAttr("open");
+    ChatRoom.loadEmojis();
+  },
+  /**
+   * 获取表情包
+   */
+  getEmojis: function () {
+    let ret;
+    $.ajax({
+      url: Label.servePath + "/api/cloud/get",
+      method: "POST",
+      data: JSON.stringify({
+        gameId: "emojis",
+      }),
+      headers: {'csrfToken': Label.csrfToken},
+      async: false,
+      success: function (result) {
+        if (result.code === 0 && result.data !== "") {
+          ret = Util.parseArray(result.data);
+        } else {
+          ret = [];
+        }
+      },
+    });
+    return ret;
   },
   /**
    * 发送聊天内容
@@ -281,7 +506,8 @@ var ChatRoom = {
    * 监听点击更多按钮关闭事件
    */
   resetMoreBtnListen: function () {
-    $("body").not("details-menu").click(function() {
+    $("body").unbind();
+    $("body").click(function() {
       $("details[open]").removeAttr("open");
     });
   },
@@ -335,9 +561,134 @@ var ChatRoom = {
     ChatRoom.editor.focus();
   },
   /**
+   * 渲染抢到红包的人的列表
+   *
+   * @param who
+   */
+  renderRedPacket: function (usersJSON) {
+    let hasGot = false;
+    for (let i = 0; i < usersJSON.length; i++) {
+      let current = usersJSON[i];
+      let currentUserMoney = current.userMoney;
+      let currentUserName = current.userName;
+      if (currentUserName === Label.currentUser) {
+        $("#redPacketIGot").text("抢到了 " + currentUserMoney + " 积分");
+        hasGot = true;
+      }
+      let currentUserTime = current.time;
+      let currentUser;
+      setTimeout(function () {
+        $.ajax({
+          url: Label.servePath + "/user/" + currentUserName,
+          type: "GET",
+          cache: false,
+          async: true,
+          headers: {'csrfToken': Label.csrfToken},
+          success: function (result) {
+            currentUser = result;
+            let currentUserAvatar = currentUser.userAvatarURL;
+            $("#redPacketList").append(
+                "            <li class=\"fn__flex menu__item\">\n" +
+                "                <img class=\"avatar avatar--mid\" style=\"margin-right: 10px; background-image: none; background-color: transparent;\" src=\"" + currentUserAvatar + "\">\n" +
+                "                <div class=\"fn__flex-1\" style=\"text-align: left !important;\">\n" +
+                "                    <h2 class=\"list__user\"><a href=\"" + Label.servePath + "/member/" + currentUserName +"\">" + currentUserName + "</a></h2>\n" +
+                "                    <span class=\"ft__fade ft__smaller\">" + currentUserTime + "</span>\n" +
+                "                </div>\n" +
+                "                <div class=\"fn__flex-center\">" + currentUserMoney + " 积分</div>\n" +
+                "            </li>\n");
+          }
+        });
+      }, 400 * i);
+    }
+    if (!hasGot) {
+      $("#redPacketIGot").text("你错过了这个红包");
+    }
+  },
+  /**
+   * 拆开红包
+   */
+  unpackRedPacket: function (oId) {
+    $.ajax({
+      url: Label.servePath + "/chat-room/red-packet/open",
+      method: "POST",
+      data: JSON.stringify({
+        oId: oId
+      }),
+      success: function (result) {
+        let iGot = "抢红包人数较多，加载中...";
+        Util.alert("" +
+            "<style>" +
+            ".dialog-header-bg {" +
+            "border-radius: 4px 4px 0px 0px; background-color: rgb(210, 63, 49); color: rgb(255, 255, 255);" +
+            "}" +
+            ".dialog-main {" +
+            "height: 456px;" +
+            "overflow: auto;" +
+            "}" +
+            "</style>" +
+            "<div class=\"fn-hr5\"></div>\n" +
+            "<div class=\"fn-hr5\"></div>\n" +
+            "<div class=\"fn-hr5\"></div>\n" +
+            "<div class=\"fn-hr5\"></div>\n" +
+            "<div class=\"ft__center\">\n" +
+            "    <div class=\"fn__flex-inline\">\n" +
+            "        <img class=\"avatar avatar--small\" src=\"" + result.info.userAvatarURL + "\" style=\"background-image: none; background-color: transparent; width: 20px; height: 20px; margin-right: 0px;\">\n" +
+            "        <div class=\"fn__space5\"></div>\n" +
+            "        <a href=\"" + Label.servePath + "/member/" + result.info.userName + "\">" + result.info.userName + "</a>'s 红包\n" +
+            "    </div>\n" +
+            "    <div class=\"fn-hr5\"></div>\n" +
+            "    <div class=\"ft__smaller ft__fade\">\n" +
+            result.info.msg + "\n" +
+            "    </div>\n" +
+            "    <div class=\"hongbao__count\" id='redPacketIGot'>\n" +
+            iGot +
+            "    </div>\n" +
+            "    <div class=\"ft__smaller ft__fade\">总计 " + result.info.got + "/" + result.info.count + "</div>\n" +
+            "</div>\n" +
+            "<div class=\"list\"><ul id=\"redPacketList\">\n" +
+            "</ul></div>" +
+            "", "红包");
+        ChatRoom.renderRedPacket(result.who);
+      },
+      error: function (result) {
+        Util.alert(result.msg);
+      }
+    });
+  },
+  /**
+   * 消息+1
+   */
+  plusOne: function () {
+    ChatRoom.editor.setValue(Label.latestMessage);
+    ChatRoom.send();
+  },
+  /**
    * 渲染聊天室消息
    */
-  renderMessage: function (userNickname, userName, userAvatarURL, time, content, oId, currentUser, isAdmin) {
+  renderMessage: function (userNickname, userName, userAvatarURL, time, content, oId, currentUser, isAdmin, addPlusOne) {
+    let isRedPacket = false;
+    try {
+      let msgJSON = $.parseJSON(content.replace("<p>", "").replace("</p>", ""));
+      if (msgJSON.msgType === "redPacket") {
+        isRedPacket = true;
+        content = '' +
+            '<div class="hongbao__item fn__flex-inline" onclick="ChatRoom.unpackRedPacket(\'' + oId + '\')">\n' +
+            '    <svg class="ft__red hongbao__icon">\n' +
+            '        <use xlink:href="#redPacketIcon"></use>\n' +
+            '    </svg>\n' +
+            '    <div>\n' +
+            '        <div>' + msgJSON.msg + '</div>\n' +
+            '        <div class="ft__smaller ft__fade">\n' +
+            '        </div>\n' +
+            '    </div>\n' +
+            '</div>';
+      }
+    } catch (err) {}
+    try {
+      if (addPlusOne === true) {
+        content += "<span id='plusOne' onclick='ChatRoom.plusOne()'><svg style='width: 20px; height: 20px; cursor: pointer;'><use xlink:href='#plusOneIcon'></use></svg></span>";
+      }
+    } catch (err) {}
     let meTag1 = "";
     let meTag2 = "";
     if (userNickname !== undefined && userNickname !== "") {
@@ -352,6 +703,28 @@ var ChatRoom = {
     if (isAdmin) {
       meTag2 = "<a onclick=\"ChatRoom.revoke(" + oId + ")\" class=\"item\">撤回 (使用管理员权限)</a>\n";
     }
+    try {
+      // 判断是否可以收藏为表情包
+      let emojiContent = content.replace("<p>", "").replace("</p>", "");
+      let emojiDom = Util.parseDom(emojiContent);
+      let canCollect = false;
+      let srcs = "";
+      let count = 0;
+      for (let i = 0; i < emojiDom.length; i++) {
+        let cur = emojiDom.item(i);
+        if (cur.src !== undefined) {
+          canCollect = true;
+          if (count !== 0) {
+            srcs += ",";
+          }
+          srcs += "\'" + cur.src + "\'";
+          count++;
+        }
+      }
+      if (canCollect) {
+        meTag2 += "<a onclick=\"ChatRoom.addEmoji(" + srcs + ")\" class=\"item\">一键收藏表情</a>";
+      }
+    } catch (err) {}
     let newHTML = '<div class="fn-none">';
     newHTML += '<div id="chatroom' + oId + '" class="fn__flex chats__item' + meTag1 + '">\n' +
         '    <a href="/member/' + userName + '">\n' +
@@ -369,18 +742,20 @@ var ChatRoom = {
         '        </div>\n' +
         '        <div class="ft__smaller ft__fade fn__right">\n' +
         '            ' + time + '\n' +
-        '                <span class="fn__space5"></span>\n' +
-        '                <details class="details action__item fn__flex-center">\n' +
-        '                    <summary>\n' +
-        '                        ···\n' +
-        '                    </summary>\n' +
-        '                    <details-menu class="fn__layer">\n' +
-        '                        <a onclick=\"ChatRoom.at(\'' + userName + '\', \'' + oId + '\', true)\" class="item">@' + userName + '</a>\n' +
-        '                        <a onclick=\"ChatRoom.at(\'' + userName + '\', \'' + oId + '\', false)\" class="item">引用</a>\n' +
-        meTag2 +
-        '                    </details-menu>\n' +
-        '                </details>\n' +
-        '        </div>\n' +
+        '                <span class="fn__space5"></span>\n';
+    if (!isRedPacket) {
+      newHTML += '                <details class="details action__item fn__flex-center">\n' +
+          '                    <summary>\n' +
+          '                        ···\n' +
+          '                    </summary>\n' +
+          '                    <details-menu class="fn__layer">\n' +
+          '                        <a onclick=\"ChatRoom.at(\'' + userName + '\', \'' + oId + '\', true)\" class="item">@' + userName + '</a>\n' +
+          '                        <a onclick=\"ChatRoom.at(\'' + userName + '\', \'' + oId + '\', false)\" class="item">引用</a>\n' +
+          meTag2 +
+          '                    </details-menu>\n' +
+          '                </details>\n';
+    }
+    newHTML += '        </div>\n' +
         '    </div>\n' +
         '</div></div>';
 

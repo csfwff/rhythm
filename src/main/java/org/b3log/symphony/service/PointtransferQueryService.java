@@ -547,6 +547,8 @@ public class PointtransferQueryService {
                         break;
                     case Pointtransfer.TRANSFER_TYPE_C_ACTIVITY_SEND_RED_PACKET:
                         break;
+                    case Pointtransfer.TRANSFER_TYPE_C_ACTIVITY_RECEIVE_RED_PACKET:
+                        break;
                     default:
                         LOGGER.warn("Invalid point type [" + type + "]");
                 }

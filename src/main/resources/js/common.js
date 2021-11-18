@@ -33,6 +33,24 @@ var Util = {
   bling: undefined,
   isBlinging: false,
 
+  parseDom(arg) {
+    var objE = document.createElement("div");
+    objE.innerHTML = arg;
+    return objE.childNodes;
+  },
+
+  parseArray(arrStr) {
+    var tempKey = 'arr23' + new Date().getTime();//arr231432350056527
+    var arrayJsonStr = '{"' + tempKey + '":' + arrStr + '}';
+    var arrayJson;
+    if (JSON && JSON.parse) {
+      arrayJson = JSON.parse(arrayJsonStr);
+    } else {
+      arrayJson = eval('(' + arrayJsonStr + ')');
+    }
+    return arrayJson[tempKey];
+  },
+
   fadeIn(element, callback) {
     let opacity = 0;
     for (let i = 0; i < 100; i++) {

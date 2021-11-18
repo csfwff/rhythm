@@ -36,14 +36,38 @@
                     <div class="reply">
                         <#if isLoggedIn>
                         <div id="chatContent"></div>
-                            <div class="fn-clear comment-submit">
-                                <div class="fn-left online-cnt">${onlineVisitorCountLabel} <span id="onlineCnt"></span></div>
-                                <div class="tip fn-left" id="chatContentTip"></div>
+                            <div class="fn-clear" style="margin-bottom: 5px; margin-top: 10px;">
+                                <svg id="redPacketBtn" style="width: 30px; height: 30px; cursor:pointer;">
+                                    <use xlink:href="#redPacketIcon"></use>
+                                </svg>
+                                <svg id="emojiBtn" style="width: 30px; height: 30px; cursor:pointer;">
+                                    <use xlink:href="#emojiIcon"></use>
+                                </svg>
+                                <div class="hide-list" id="emojiList">
+                                    <div class="hide-list-emojis" id="emojis" style="max-height: 200px">
+                                    </div>
+                                    <div class="hide-list-emojis__tail">
+                                        <span>
+                                        <a onclick="ChatRoom.fromURL()">从URL导入表情包</a>
+                                        </span>
+                                        <span class="hide-list-emojis__tip"></span>
+                                        <span>
+                                            <a onclick="$('#uploadEmoji input').click()">上传表情包</a>
+                                        </span>
+                                        <form style="display: none" id="uploadEmoji" method="POST" enctype="multipart/form-data">
+                                            <input type="file" name="file">
+                                        </form>
+                                    </div>
+                                </div>
                                 <div class="fn-right">
                                     <button class="green" onclick="ChatRoom.send()">${postLabel}</button>
                                 </div>
                             </div>
-                            <div id="chatRoomOnlineCnt" class="chats__users" style="margin-top: 15px">
+                            <div class="fn-clear comment-submit">
+                                <div class="fn-left online-cnt">${onlineVisitorCountLabel} <span id="onlineCnt"></span></div>
+                                <div class="tip fn-left" id="chatContentTip"></div>
+                            </div>
+                            <div id="chatRoomOnlineCnt" class="chats__users">
                             </div>
                         <#else>
                         <div class="comment-login">
@@ -67,6 +91,7 @@
         <script>
             Label.uploadLabel = "${uploadLabel}";
         </script>
+        <script src="${staticServePath}/js/lib/jquery/file-upload-9.10.1/jquery.fileupload.min.js"></script>
         <script src="${staticServePath}/js/channel${miniPostfix}.js?${staticResourceVersion}"></script>
         <script src="${staticServePath}/js/chat-room${miniPostfix}.js?${staticResourceVersion}"></script>
         <script>
@@ -86,6 +111,7 @@
             Label.currentUser = '<#if currentUser??>${currentUser.userName}</#if>';
             Label.level3Permitted = ${level3Permitted?string("true", "false")};
             Label.chatRoomPictureStatus = "<#if 0 == chatRoomPictureStatus> blur</#if>";
+            Label.latestMessage = "";
             ChatRoom.init();
             // Init [ChatRoom] channel
             ChatRoomChannel.init("${wsScheme}://${serverHost}:${serverPort}${contextPath}/chat-room-channel");

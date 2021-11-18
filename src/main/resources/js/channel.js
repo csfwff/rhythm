@@ -368,11 +368,21 @@ var ChatRoomChannel = {
                 case 'msg':
                     // Chatroom
                     if ($("#chatRoomIndex").length === 0) {
-                        let liHTML = ChatRoom.renderMessage(data.userNickname, data.userName, data.userAvatarURL, data.time, data.content, data.oId, Label.currentUser, Label.level3Permitted);
+                        let liHTML;
+                        $("#plusOne").remove();
+                        if (data.md === Label.latestMessage) {
+                            // +1 功能
+                            liHTML = ChatRoom.renderMessage(data.userNickname, data.userName, data.userAvatarURL, data.time, data.content, data.oId, Label.currentUser, Label.level3Permitted, true);
+                        } else {
+                            liHTML = ChatRoom.renderMessage(data.userNickname, data.userName, data.userAvatarURL, data.time, data.content, data.oId, Label.currentUser, Label.level3Permitted);
+                        }
                         $('#chats').prepend(liHTML);
                         $('#chats>div.fn-none').show(200);
                         $('#chats>div.fn-none').removeClass("fn-none");
                         ChatRoom.resetMoreBtnListen();
+                        if (data.md !== undefined) {
+                            Label.latestMessage = data.md;
+                        }
                     }
 
                     // index
@@ -385,6 +395,10 @@ var ChatRoomChannel = {
                         userNickname = userNickname + " ( " + userName + " )"
                     } else {
                         userNickname = userName;
+                    }
+                    let newContent = data.content;
+                    if (newContent.indexOf("\"msgType\":\"redPacket\"") !== -1) {
+                        newContent = "[收到红包，请在完整版聊天室查看]";
                     }
                     $("#chatRoomIndex").prepend("" +
                         "<li class=\"fn-flex\" id=\"chatindex" + data.oId + "\" style='display: none; border-bottom: 1px solid #eee;'>\n" +
@@ -400,7 +414,7 @@ var ChatRoomChannel = {
                         "            </a>\n" +
                         "        </div>\n" +
                         "        <div class=\"vditor-reset comment " + Label.chatRoomPictureStatus + "\">\n" +
-                        "            " + data.content + "\n" +
+                        "            " + newContent + "\n" +
                         "        </div>\n" +
                         "    </div>\n" +
                         "</li>");

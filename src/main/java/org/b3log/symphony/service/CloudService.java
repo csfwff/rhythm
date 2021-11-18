@@ -99,7 +99,6 @@ public class CloudService {
             JSONObject result = cloudRepository.getFirst(cloudQuery);
             return result.optString("data");
         } catch (Exception e) {
-            LOGGER.log(Level.ERROR, "Cannot get gaming save data from database.", e);
             return "";
         }
     }

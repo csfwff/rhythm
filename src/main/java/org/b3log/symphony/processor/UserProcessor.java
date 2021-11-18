@@ -35,6 +35,7 @@ import org.b3log.latke.util.Paginator;
 import org.b3log.symphony.model.*;
 import org.b3log.symphony.processor.middleware.AnonymousViewCheckMidware;
 import org.b3log.symphony.processor.middleware.CSRFMidware;
+import org.b3log.symphony.processor.middleware.LoginCheckMidware;
 import org.b3log.symphony.processor.middleware.UserCheckMidware;
 import org.b3log.symphony.service.*;
 import org.b3log.symphony.util.*;
@@ -171,6 +172,12 @@ public class UserProcessor {
     private SystemSettingsService systemSettingsService;
 
     /**
+     * Liveness query service.
+     */
+    @Inject
+    private LivenessQueryService livenessQueryService;
+
+    /**
      * Register request handlers.
      */
     public static void register() {
@@ -178,6 +185,7 @@ public class UserProcessor {
         final AnonymousViewCheckMidware anonymousViewCheckMidware = beanManager.getReference(AnonymousViewCheckMidware.class);
         final CSRFMidware csrfMidware = beanManager.getReference(CSRFMidware.class);
         final UserCheckMidware userCheckMidware = beanManager.getReference(UserCheckMidware.class);
+        final LoginCheckMidware loginCheck = beanManager.getReference(LoginCheckMidware.class);
 
         final UserProcessor userProcessor = beanManager.getReference(UserProcessor.class);
         Dispatcher.get("/member/{userName}", userProcessor::showHome, anonymousViewCheckMidware::handle, userCheckMidware::handle);
@@ -194,6 +202,25 @@ public class UserProcessor {
         Dispatcher.post("/users/names", userProcessor::listNames);
         Dispatcher.get("/users/emotions", userProcessor::getFrequentEmotions);
         Dispatcher.get("/user/{userName}", userProcessor::getUserInfo);
+        Dispatcher.get("/user/liveness", userProcessor::getLiveness, loginCheck::handle);
+    }
+
+    /**
+     * 获取用户活跃度
+     *
+     * @param context
+     */
+    public void getLiveness(final RequestContext context) {
+        JSONObject currentUser = Sessions.getUser();
+        try {
+            currentUser = ApiProcessor.getUserByKey(context.param("apiKey"));
+        } catch (NullPointerException ignored) {
+        }
+        String userId = currentUser.optString(Keys.OBJECT_ID);
+        final int livenessMax = Symphonys.ACTIVITY_YESTERDAY_REWARD_MAX;
+        final int currentLiveness = livenessQueryService.getCurrentLivenessPoint(userId);
+        float liveness = (float) (Math.round((float) currentLiveness / livenessMax * 100 * 100)) / 100;
+        context.renderJSON(StatusCodes.SUCC).renderJSON(new JSONObject().put("liveness", liveness));
     }
 
     /**
