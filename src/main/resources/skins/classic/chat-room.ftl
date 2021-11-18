@@ -48,34 +48,9 @@
                                 </svg>
                                 <div class="hide-list" id="emojiList">
                                     <div class="hide-list-emojis" id="emojis" style="max-height: 200px">
-                                        <button>
+                                        <button onclick="ChatRoom.editor.setValue(ChatRoom.editor.getValue() + '![图片表情](http://localhost:8080/emoji/graphics/trollface.png)')">
                                             <img class="vditor-emojis__icon" src="http://localhost:8080/emoji/graphics/trollface.png">
                                         </button>
-                                        <button>
-                                            <img class="vditor-emojis__icon" src="http://localhost:8080/emoji/graphics/trollface.png">
-                                        </button>
-                                        <button>
-                                            <img class="vditor-emojis__icon" src="http://localhost:8080/emoji/graphics/trollface.png">
-                                        </button>
-                                        <button>
-                                            <img class="vditor-emojis__icon" src="http://localhost:8080/emoji/graphics/trollface.png">
-                                        </button>
-                                        <button>
-                                            <img class="vditor-emojis__icon" src="http://localhost:8080/emoji/graphics/trollface.png">
-                                        </button>
-                                        <button>
-                                            <img class="vditor-emojis__icon" src="http://localhost:8080/emoji/graphics/trollface.png">
-                                        </button>
-                                        <button>
-                                            <img class="vditor-emojis__icon" src="http://localhost:8080/emoji/graphics/trollface.png">
-                                        </button>
-                                        <button>
-                                            <img class="vditor-emojis__icon" src="http://localhost:8080/emoji/graphics/trollface.png">
-                                        </button>
-                                        <button>
-                                            <img class="vditor-emojis__icon" src="http://localhost:8080/emoji/graphics/trollface.png">
-                                        </button>
-
                                     </div>
                                     <div class="hide-list-emojis__tail">
                                         <span class="hide-list-emojis__tip"></span><span>
