@@ -375,27 +375,36 @@ var ChatRoom = {
       }
     });
   },
-  addEmoji: function (url) {
-    let emojis = ChatRoom.getEmojis();
-    emojis.push(url);
-    $.ajax({
-      url: Label.servePath + "/api/cloud/sync",
-      method: "POST",
-      data: JSON.stringify({
-        gameId: "emojis",
-        data: emojis
-      }),
-      headers: {'csrfToken': Label.csrfToken},
-      async: true,
-      success: function (result) {
-        if (result.code === 0) {
-          Util.notice("success", 1500, "表情包上传成功。");
-          ChatRoom.loadEmojis();
-        } else {
-          Util.notice("warning", 1500, "表情包上传失败：" + result.msg);
+  addEmoji: function () {
+    for (let i = 0; i < arguments.length; i++) {
+      let url = arguments[i];
+      let emojis = ChatRoom.getEmojis();
+      for (let i = 0; i < emojis.length; i++) {
+        if (emojis[i] === url) {
+          emojis.splice(i, 1);
         }
       }
-    });
+      emojis.push(url);
+      $.ajax({
+        url: Label.servePath + "/api/cloud/sync",
+        method: "POST",
+        data: JSON.stringify({
+          gameId: "emojis",
+          data: emojis
+        }),
+        headers: {'csrfToken': Label.csrfToken},
+        async: false,
+        success: function (result) {
+          if (result.code === 0) {
+            Util.notice("success", 1500, "表情包上传成功。");
+          } else {
+            Util.notice("warning", 1500, "表情包上传失败：" + result.msg);
+          }
+        }
+      });
+    }
+    $("details[open]").removeAttr("open");
+    ChatRoom.loadEmojis();
   },
   /**
    * 获取表情包
@@ -696,9 +705,22 @@ var ChatRoom = {
       // 判断是否可以收藏为表情包
       let emojiContent = content.replace("<p>", "").replace("</p>", "");
       let emojiDom = Util.parseDom(emojiContent);
-      if (emojiDom.length === 1 && emojiDom.item(0).alt === "图片表情") {
-        let src = emojiDom.item(0).src;
-        meTag2 += "<a onclick=\"ChatRoom.addEmoji('" + src + "')\" class=\"item\">收藏表情</a>";
+      let canCollect = false;
+      let srcs = "";
+      let count = 0;
+      for (let i = 0; i < emojiDom.length; i++) {
+        let cur = emojiDom.item(i);
+        if (cur.src !== undefined) {
+          canCollect = true;
+          if (count !== 0) {
+            srcs += ",";
+          }
+          srcs += "\'" + cur.src + "\'";
+          count++;
+        }
+      }
+      if (canCollect) {
+        meTag2 += "<a onclick=\"ChatRoom.addEmoji(" + srcs + ")\" class=\"item\">一键收藏表情</a>";
       }
     } catch (err) {}
     let newHTML = '<div class="fn-none">';
