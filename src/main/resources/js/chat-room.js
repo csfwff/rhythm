@@ -136,6 +136,7 @@ var ChatRoom = {
     // 表情包初始化
     // 加载表情
     ChatRoom.listenUploadEmojis();
+    ChatRoom.loadEmojis();
     // 监听按钮
     $("#emojiBtn").on('click', function () {
       if ($("#emojiList").hasClass("showList")) {
@@ -248,6 +249,51 @@ var ChatRoom = {
       })
     });
   },
+  delEmoji: function (url) {
+    let emojis = ChatRoom.getEmojis();
+    for (let i = 0; i < emojis.length; i++) {
+      if (emojis[i] === url) {
+        emojis.splice(i, 1);
+      }
+    }
+    $.ajax({
+      url: Label.servePath + "/api/cloud/sync",
+      method: "POST",
+      data: JSON.stringify({
+        gameId: "emojis",
+        data: emojis
+      }),
+      headers: {'csrfToken': Label.csrfToken},
+      async: false,
+      success: function (result) {
+        if (result.code === 0) {
+          Util.notice("success", 1500, "表情包删除成功。");
+          ChatRoom.loadEmojis();
+        } else {
+          Util.notice("warning", 1500, "表情包删除失败：" + result.msg);
+        }
+      }
+    });
+  },
+  /**
+   * 加载表情
+   */
+  loadEmojis: function () {
+    $("#emojis").html("");
+    let emojis = ChatRoom.getEmojis();
+    for (let i = 0; i < emojis.length; i++) {
+      $("#emojis").append("" +
+          "<button>\n" +
+          "    <div class=\"divX\" onclick='ChatRoom.delEmoji(\"" + emojis[i] + "\")'>\n" +
+          "        <svg style=\"width: 15px; height: 15px;\"><use xlink:href=\"#delIcon\"></use></svg>\n" +
+          "    </div>" +
+          "    <img style='max-height: 50px' onclick=\"ChatRoom.editor.setValue(ChatRoom.editor.getValue() + '![图片表情](" + emojis[i] + ")')\" class=\"vditor-emojis__icon\" src=\"" + emojis[i] + "\">\n" +
+          "</button>");
+    }
+  },
+  /**
+   * 上传表情
+   */
   listenUploadEmojis: function () {
     $('#uploadEmoji').fileupload({
       acceptFileTypes: /(\.|\/)(gif|jpe?g|png)$/i,
@@ -298,17 +344,40 @@ var ChatRoom = {
             key: data.result.data.succMap[Object.keys(data.result.data.succMap)[0]]
           }
         }
-        console.log(result)
+        ChatRoom.addEmoji(result.result.key);
       },
       fail: function (e, data) {
         Util.alert('Upload error: ' + data.errorThrown)
       },
     })
   },
+  addEmoji: function (url) {
+    let emojis = ChatRoom.getEmojis();
+    emojis.push(url);
+    $.ajax({
+      url: Label.servePath + "/api/cloud/sync",
+      method: "POST",
+      data: JSON.stringify({
+        gameId: "emojis",
+        data: emojis
+      }),
+      headers: {'csrfToken': Label.csrfToken},
+      async: false,
+      success: function (result) {
+        if (result.code === 0) {
+          Util.notice("success", 1500, "表情包上传成功。");
+          ChatRoom.loadEmojis();
+        } else {
+          Util.notice("warning", 1500, "表情包上传失败：" + result.msg);
+        }
+      }
+    });
+  },
   /**
    * 获取表情包
    */
   getEmojis: function () {
+    let ret;
     $.ajax({
       url: Label.servePath + "/api/cloud/get",
       method: "POST",
@@ -316,14 +385,16 @@ var ChatRoom = {
         gameId: "emojis",
       }),
       headers: {'csrfToken': Label.csrfToken},
+      async: false,
       success: function (result) {
         if (result.code === 0 && result.data !== "") {
-          return result.data;
+          ret = Util.parseArray(result.data);
         } else {
-          return "";
+          ret = [];
         }
       },
     });
+    return ret;
   },
   /**
    * 发送聊天内容
