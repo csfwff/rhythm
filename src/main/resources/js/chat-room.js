@@ -351,6 +351,22 @@ var ChatRoom = {
       },
     })
   },
+  // 从URL导入表情包
+  fromURL: function () {
+    Util.alert("" +
+        "<div class=\"form fn__flex-column\">\n" +
+        "<label>\n" +
+        "  <div class=\"ft__smaller ft__fade\" style=\"float: left\">请输入图片的URL</div>\n" +
+        "  <div class=\"fn-hr5 fn__5\"></div>\n" +
+        "  <input type=\"text\" id=\"fromURL\">\n" +
+        "</label>\n" +
+        "<div class=\"fn-hr5\"></div>\n" +
+        "<div class=\"fn__flex\" style=\"margin-top: 15px\">\n" +
+        "  <button class=\"btn btn--confirm\" onclick='ChatRoom.addEmoji($(\"#fromURL\").val());Util.closeAlert();'>导入</button>\n" +
+        "</div>\n" +
+        "</div>" +
+        "", "从URL导入表情包");
+  },
   addEmoji: function (url) {
     let emojis = ChatRoom.getEmojis();
     emojis.push(url);

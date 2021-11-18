@@ -47,9 +47,16 @@
                                     <div class="hide-list-emojis" id="emojis" style="max-height: 200px">
                                     </div>
                                     <div class="hide-list-emojis__tail">
-                                        <span class="hide-list-emojis__tip"></span><span>
-                                            <a id="uploadEmoji">上传表情包</a>
+                                        <span>
+                                        <a onclick="ChatRoom.fromURL()">从URL导入表情包</a>
                                         </span>
+                                        <span class="hide-list-emojis__tip"></span>
+                                        <span>
+                                            <a onclick="$('#uploadEmoji input').click()">上传表情包</a>
+                                        </span>
+                                        <form style="display: none" id="uploadEmoji" method="POST" enctype="multipart/form-data">
+                                            <input type="file" name="file">
+                                        </form>
                                     </div>
                                 </div>
                                 <div class="fn-right">
