@@ -446,9 +446,16 @@ var ChatRoom = {
     });
   },
   /**
+   * 消息+1
+   */
+  plusOne: function () {
+    ChatRoom.editor.setValue(Label.latestMessage);
+    ChatRoom.send();
+  },
+  /**
    * 渲染聊天室消息
    */
-  renderMessage: function (userNickname, userName, userAvatarURL, time, content, oId, currentUser, isAdmin) {
+  renderMessage: function (userNickname, userName, userAvatarURL, time, content, oId, currentUser, isAdmin, addPlusOne) {
     let isRedPacket = false;
     try {
       let msgJSON = $.parseJSON(content.replace("<p>", "").replace("</p>", ""));
@@ -465,6 +472,11 @@ var ChatRoom = {
             '        </div>\n' +
             '    </div>\n' +
             '</div>';
+      }
+    } catch (err) {}
+    try {
+      if (addPlusOne === true) {
+        content += "<span id='plusOne' onclick='ChatRoom.plusOne()'><svg style='width: 20px; height: 20px;'><use xlink:href='#plusOneIcon'></use></svg></span>";
       }
     } catch (err) {}
     let meTag1 = "";
