@@ -386,7 +386,7 @@ var ChatRoom = {
         data: emojis
       }),
       headers: {'csrfToken': Label.csrfToken},
-      async: false,
+      async: true,
       success: function (result) {
         if (result.code === 0) {
           Util.notice("success", 1500, "表情包上传成功。");
@@ -692,6 +692,15 @@ var ChatRoom = {
     if (isAdmin) {
       meTag2 = "<a onclick=\"ChatRoom.revoke(" + oId + ")\" class=\"item\">撤回 (使用管理员权限)</a>\n";
     }
+    try {
+      // 判断是否可以收藏为表情包
+      let emojiContent = content.replace("<p>", "").replace("</p>", "");
+      let emojiDom = Util.parseDom(emojiContent);
+      if (emojiDom.length === 1 && emojiDom.item(0).alt === "图片表情") {
+        let src = emojiDom.item(0).src;
+        meTag2 += "<a onclick=\"ChatRoom.addEmoji('" + src + "')\" class=\"item\">收藏表情</a>";
+      }
+    } catch (err) {}
     let newHTML = '<div class="fn-none">';
     newHTML += '<div id="chatroom' + oId + '" class="fn__flex chats__item' + meTag1 + '">\n' +
         '    <a href="/member/' + userName + '">\n' +
