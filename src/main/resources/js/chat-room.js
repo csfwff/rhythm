@@ -366,6 +366,13 @@ var ChatRoom = {
         "</div>\n" +
         "</div>" +
         "", "从URL导入表情包");
+    $("#fromURL").unbind();
+    $("#fromURL").bind('keypress',function(event){
+      if (event.keyCode == "13") {
+        ChatRoom.addEmoji($("#fromURL").val());
+        Util.closeAlert();
+      }
+    });
   },
   addEmoji: function (url) {
     let emojis = ChatRoom.getEmojis();
