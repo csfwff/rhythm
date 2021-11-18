@@ -270,7 +270,7 @@ var ChatRoom = {
           Util.notice("success", 1500, "表情包删除成功。");
           ChatRoom.loadEmojis();
           setTimeout(function () {
-            $("#emojiList").addClass("showList");
+            $("#emojiBtn").click();
           }, 50)
         } else {
           Util.notice("warning", 1500, "表情包删除失败：" + result.msg);
