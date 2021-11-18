@@ -380,7 +380,9 @@ var ChatRoomChannel = {
                         $('#chats>div.fn-none').show(200);
                         $('#chats>div.fn-none').removeClass("fn-none");
                         ChatRoom.resetMoreBtnListen();
-                        Label.latestMessage = data.md;
+                        if (data.md !== undefined) {
+                            Label.latestMessage = data.md;
+                        }
                     }
 
                     // index
