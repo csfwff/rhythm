@@ -351,6 +351,43 @@ var ChatRoom = {
     ChatRoom.editor.focus();
   },
   /**
+   * 渲染抢到红包的人的列表
+   *
+   * @param who
+   */
+  renderRedPacket: function (usersJSON) {
+    for (let i = 0; i < usersJSON.length; i++) {
+      let current = usersJSON[i];
+      let currentUserMoney = current.userMoney;
+      let currentUserName = current.userName;
+      if (currentUserName === Label.currentUser) {
+        $("#redPacketIGot").text("抢到了 " + currentUserMoney + " 积分");
+      }
+      let currentUserTime = current.time;
+      let currentUser;
+      $.ajax({
+        url: Label.servePath + "/user/" + currentUserName,
+        type: "GET",
+        cache: false,
+        async: true,
+        headers: {'csrfToken': Label.csrfToken},
+        success: function (result) {
+          currentUser = result;
+          let currentUserAvatar = currentUser.userAvatarURL;
+          $("#redPacketList").append(
+              "            <li class=\"fn__flex menu__item\">\n" +
+              "                <img class=\"avatar avatar--mid\" style=\"margin-right: 10px; background-image: none; background-color: transparent;\" src=\"" + currentUserAvatar + "\">\n" +
+              "                <div class=\"fn__flex-1\" style=\"text-align: left !important;\">\n" +
+              "                    <h2 class=\"list__user\"><a href=\"" + Label.servePath + "/member/" + currentUserName +"\">" + currentUserName + "</a></h2>\n" +
+              "                    <span class=\"ft__fade ft__smaller\">" + currentUserTime + "</span>\n" +
+              "                </div>\n" +
+              "                <div class=\"fn__flex-center\">" + currentUserMoney + " 积分</div>\n" +
+              "            </li>\n");
+        }
+      });
+    }
+  },
+  /**
    * 拆开红包
    */
   unpackRedPacket: function (oId) {
@@ -361,39 +398,7 @@ var ChatRoom = {
         oId: oId
       }),
       success: function (result) {
-        let iGot = "没抢到，下次手速快一点哦";
-        let users = "";
-        let usersJSON = result.who;
-        for (let i = 0; i < usersJSON.length; i++) {
-          let current = usersJSON[i];
-          let currentUserMoney = current.userMoney;
-          let currentUserName = current.userName;
-          if (currentUserName === Label.currentUser) {
-            iGot = "抢到了 " + currentUserMoney + " 积分";
-          }
-          let currentUserTime = current.time;
-          let currentUser;
-          $.ajax({
-            url: Label.servePath + "/user/" + currentUserName,
-            type: "GET",
-            cache: false,
-            async: false,
-            headers: {'csrfToken': Label.csrfToken},
-            success: function (result) {
-              currentUser = result;
-            }
-          });
-          let currentUserAvatar = currentUser.userAvatarURL;
-          users += "" +
-          "            <li class=\"fn__flex menu__item\">\n" +
-          "                <img class=\"avatar avatar--mid\" style=\"margin-right: 10px; background-image: none; background-color: transparent;\" src=\"" + currentUserAvatar + "\">\n" +
-          "                <div class=\"fn__flex-1\" style=\"text-align: left !important;\">\n" +
-          "                    <h2 class=\"list__user\"><a href=\"" + Label.servePath + "/member/" + currentUserName +"\">" + currentUserName + "</a></h2>\n" +
-          "                    <span class=\"ft__fade ft__smaller\">" + currentUserTime + "</span>\n" +
-          "                </div>\n" +
-          "                <div class=\"fn__flex-center\">" + currentUserMoney + " 积分</div>\n" +
-          "            </li>\n";
-        }
+        let iGot = "抢红包人数较多，加载中...";
         Util.alert("" +
             "<style>" +
             ".dialog-header-bg {" +
@@ -418,16 +423,15 @@ var ChatRoom = {
             "    <div class=\"ft__smaller ft__fade\">\n" +
             result.info.msg + "\n" +
             "    </div>\n" +
-            "    <div class=\"hongbao__count\">\n" +
-            iGot + "\n" +
+            "    <div class=\"hongbao__count\" id='redPacketIGot'>\n" +
+            iGot +
             "    </div>\n" +
             "    <div class=\"ft__smaller ft__fade\">总计 " + result.info.got + "/" + result.info.count + "</div>\n" +
             "</div>\n" +
-            "\n" +
-            "<div class=\"list\"><ul>\n" +
-            users +
+            "<div class=\"list\"><ul id=\"redPacketList\">\n" +
             "</ul></div>" +
             "", "红包");
+        ChatRoom.renderRedPacket(result.who);
       },
       error: function (result) {
         Util.alert(result.msg);
