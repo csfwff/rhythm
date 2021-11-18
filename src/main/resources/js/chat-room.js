@@ -554,12 +554,14 @@ var ChatRoom = {
    * @param who
    */
   renderRedPacket: function (usersJSON) {
+    let hasGot = false;
     for (let i = 0; i < usersJSON.length; i++) {
       let current = usersJSON[i];
       let currentUserMoney = current.userMoney;
       let currentUserName = current.userName;
       if (currentUserName === Label.currentUser) {
         $("#redPacketIGot").text("抢到了 " + currentUserMoney + " 积分");
+        hasGot = true;
       }
       let currentUserTime = current.time;
       let currentUser;
@@ -583,6 +585,9 @@ var ChatRoom = {
               "            </li>\n");
         }
       });
+    }
+    if (!hasGot) {
+      $("#redPacketIGot").text("你错过了这个红包");
     }
   },
   /**
