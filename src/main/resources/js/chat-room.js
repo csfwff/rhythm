@@ -177,11 +177,18 @@ var ChatRoom = {
       });
 
       $("#redPacketCount").on('change', function () {
-        if ($("#redPacketCount").val() > 1000) {
-          $("#redPacketCount").val("1000");
-        }
-        if ($("#redPacketCount").val() <= 0) {
-          $("#redPacketCount").val("1");
+        if (Number($("#redPacketCount").val()) > Number($("#redPacketMoney").val())) {
+          $("#redPacketCount").val($("#redPacketMoney").val());
+        } else {
+          console.log()
+          console.log($("#redPacketCount").val())
+          console.log($("#redPacketMoney").val())
+          if ($("#redPacketCount").val() > 1000) {
+            $("#redPacketCount").val("1000");
+          }
+          if ($("#redPacketCount").val() <= 0) {
+            $("#redPacketCount").val("1");
+          }
         }
       });
 

@@ -336,7 +336,7 @@ public class ChatroomProcessor {
                 }
                 String userId = currentUser.optString(Keys.OBJECT_ID);
                 // 扣积分
-                if (money > 20000 || money <= 0 || count > 1000 || count <= 0) {
+                if (money > 20000 || money <= 0 || count > 1000 || count <= 0 || count > money) {
                     context.renderJSON(StatusCodes.ERR).renderMsg("数据不合法！");
                     return;
                 }
