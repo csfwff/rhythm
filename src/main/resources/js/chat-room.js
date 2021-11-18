@@ -134,6 +134,9 @@ var ChatRoom = {
     })
 
     // 表情包初始化
+    // 加载表情
+    ChatRoom.listenUploadEmojis();
+    // 监听按钮
     $("#emojiBtn").on('click', function () {
       if ($("#emojiList").hasClass("showList")) {
         $("#emojiList").removeClass("showList");
@@ -243,6 +246,83 @@ var ChatRoom = {
         })
         Util.closeAlert();
       })
+    });
+  },
+  listenUploadEmojis: function () {
+    $('#uploadEmoji').fileupload({
+      acceptFileTypes: /(\.|\/)(gif|jpe?g|png)$/i,
+      maxFileSize: 5242880,
+      multipart: true,
+      pasteZone: null,
+      dropZone: null,
+      url: Label.servePath + '/upload',
+      paramName: 'file[]',
+      add: function (e, data) {
+        ext = data.files[0].type.split('/')[1]
+
+        if (window.File && window.FileReader && window.FileList &&
+            window.Blob) {
+          var reader = new FileReader()
+          reader.readAsArrayBuffer(data.files[0])
+          reader.onload = function (evt) {
+            var fileBuf = new Uint8Array(evt.target.result.slice(0, 11))
+            var isImg = isImage(fileBuf)
+
+            if (!isImg) {
+              Util.alert('只允许上传图片!')
+
+              return
+            }
+
+            if (evt.target.result.byteLength > 1024 * 1024 * 5) {
+              Util.alert('图片过大 (最大限制 5M)')
+
+              return
+            }
+
+            data.submit()
+          }
+        } else {
+          data.submit()
+        }
+      },
+      formData: function (form) {
+        var data = form.serializeArray()
+        return data
+      },
+      submit: function (e, data) {
+      },
+      done: function (e, data) {
+        var result = {
+          result: {
+            key: data.result.data.succMap[Object.keys(data.result.data.succMap)[0]]
+          }
+        }
+        console.log(result)
+      },
+      fail: function (e, data) {
+        Util.alert('Upload error: ' + data.errorThrown)
+      },
+    })
+  },
+  /**
+   * 获取表情包
+   */
+  getEmojis: function () {
+    $.ajax({
+      url: Label.servePath + "/api/cloud/get",
+      method: "POST",
+      data: JSON.stringify({
+        gameId: "emojis",
+      }),
+      headers: {'csrfToken': Label.csrfToken},
+      success: function (result) {
+        if (result.code === 0 && result.data !== "") {
+          return result.data;
+        } else {
+          return "";
+        }
+      },
     });
   },
   /**

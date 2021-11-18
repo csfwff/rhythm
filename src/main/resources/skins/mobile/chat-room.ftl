@@ -48,7 +48,7 @@
                                     </div>
                                     <div class="hide-list-emojis__tail">
                                         <span class="hide-list-emojis__tip"></span><span>
-                                            <a onclick="">上传表情包</a>
+                                            <a id="uploadEmoji">上传表情包</a>
                                         </span>
                                     </div>
                                 </div>
@@ -84,6 +84,7 @@
         <script>
             Label.uploadLabel = "${uploadLabel}";
         </script>
+        <script src="${staticServePath}/js/lib/jquery/file-upload-9.10.1/jquery.fileupload.min.js"></script>
         <script src="${staticServePath}/js/channel${miniPostfix}.js?${staticResourceVersion}"></script>
         <script src="${staticServePath}/js/chat-room${miniPostfix}.js?${staticResourceVersion}"></script>
         <script>

@@ -54,8 +54,11 @@
                                     </div>
                                     <div class="hide-list-emojis__tail">
                                         <span class="hide-list-emojis__tip"></span><span>
-                                            <a onclick="">上传表情包</a>
+                                            <a onclick="$('#uploadEmoji input').click()">上传表情包</a>
                                         </span>
+                                        <form style="display: none" id="uploadEmoji" method="POST" enctype="multipart/form-data">
+                                            <input type="file" name="file">
+                                        </form>
                                     </div>
                                 </div>
                                 <div class="fn-right">
@@ -93,6 +96,7 @@
 <script>
     Label.uploadLabel = "${uploadLabel}";
 </script>
+<script src="${staticServePath}/js/lib/jquery/file-upload-9.10.1/jquery.fileupload.min.js"></script>
 <script src="${staticServePath}/js/channel${miniPostfix}.js?${staticResourceVersion}"></script>
 <script src="${staticServePath}/js/chat-room${miniPostfix}.js?${staticResourceVersion}"></script>
 <script>
