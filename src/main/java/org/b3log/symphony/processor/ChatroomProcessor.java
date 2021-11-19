@@ -221,6 +221,7 @@ public class ChatroomProcessor {
                 }
                 // 开始领取红包
                 // 先减掉已经领取的金额
+                boolean hasZero = false;
                 for (Object o : who) {
                     JSONObject currentWho = (JSONObject) o;
                     String uId = currentWho.optString("userId");
@@ -229,6 +230,9 @@ public class ChatroomProcessor {
                         return;
                     }
                     int userMoney = currentWho.optInt("userMoney");
+                    if (userMoney == 0) {
+                        hasZero = true;
+                    }
                     money -= userMoney;
                 }
                 // 随机一个红包金额 1-N
@@ -238,7 +242,11 @@ public class ChatroomProcessor {
                 if (count == got + 1) {
                     meGot = money;
                 } else {
-                    meGot = random.nextInt((money / 2) + 1);
+                    if (!hasZero) {
+                        meGot = random.nextInt((money / 2) + 1);
+                    } else {
+                        meGot = random.nextInt((money / 2) + 1) + 1;
+                    }
                 }
                 // 随机成功了
                 // 修改聊天室数据库
