@@ -145,9 +145,21 @@ var ChatRoom = {
         $("#emojiList").addClass("showList");
         setTimeout(function () {
           $("body").unbind();
+          $('body').click(function (event) {
+            if ($(event.target).closest('a').attr('id') !== 'aPersonListPanel' &&
+                $(event.target).closest('.module').attr('id') !== 'personListPanel') {
+              $('#personListPanel').hide()
+            }
+          })
           $("body").click(function() {
             $("#emojiList").removeClass("showList");
             $("body").unbind();
+            $('body').click(function (event) {
+              if ($(event.target).closest('a').attr('id') !== 'aPersonListPanel' &&
+                  $(event.target).closest('.module').attr('id') !== 'personListPanel') {
+                $('#personListPanel').hide()
+              }
+            })
           });
         }, 100);
       }
@@ -504,6 +516,12 @@ var ChatRoom = {
    */
   resetMoreBtnListen: function () {
     $("body").unbind();
+    $('body').click(function (event) {
+      if ($(event.target).closest('a').attr('id') !== 'aPersonListPanel' &&
+          $(event.target).closest('.module').attr('id') !== 'personListPanel') {
+        $('#personListPanel').hide()
+      }
+    })
     $("body").click(function() {
       $("details[open]").removeAttr("open");
     });
