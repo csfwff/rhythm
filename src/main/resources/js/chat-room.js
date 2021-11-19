@@ -576,29 +576,19 @@ var ChatRoom = {
         hasGot = true;
       }
       let currentUserTime = current.time;
-      let currentUser;
-      setTimeout(function () {
-        $.ajax({
-          url: Label.servePath + "/user/" + currentUserName,
-          type: "GET",
-          cache: false,
-          async: true,
-          headers: {'csrfToken': Label.csrfToken},
-          success: function (result) {
-            currentUser = result;
-            let currentUserAvatar = currentUser.userAvatarURL;
-            $("#redPacketList").append(
-                "            <li class=\"fn__flex menu__item\">\n" +
-                "                <img class=\"avatar avatar--mid\" style=\"margin-right: 10px; background-image: none; background-color: transparent;\" src=\"" + currentUserAvatar + "\">\n" +
-                "                <div class=\"fn__flex-1\" style=\"text-align: left !important;\">\n" +
-                "                    <h2 class=\"list__user\"><a href=\"" + Label.servePath + "/member/" + currentUserName +"\">" + currentUserName + "</a></h2>\n" +
-                "                    <span class=\"ft__fade ft__smaller\">" + currentUserTime + "</span>\n" +
-                "                </div>\n" +
-                "                <div class=\"fn__flex-center\">" + currentUserMoney + " 积分</div>\n" +
-                "            </li>\n");
-          }
-        });
-      }, 400 * i);
+      let currentUserAvatar = "";
+      if (current.avatar !== undefined) {
+        currentUserAvatar = "<img class=\"avatar avatar--mid\" style=\"margin-right: 10px; background-image: none; background-color: transparent;\" src=\"" + current.avatar + "\">\n";
+      }
+      $("#redPacketList").append(
+          "<li class=\"fn__flex menu__item\">\n" +
+          currentUserAvatar +
+          "    <div class=\"fn__flex-1\" style=\"text-align: left !important;\">\n" +
+          "        <h2 class=\"list__user\"><a href=\"" + Label.servePath + "/member/" + currentUserName +"\">" + currentUserName + "</a></h2>\n" +
+          "        <span class=\"ft__fade ft__smaller\">" + currentUserTime + "</span>\n" +
+          "    </div>\n" +
+          "    <div class=\"fn__flex-center\">" + currentUserMoney + " 积分</div>\n" +
+          "</li>\n");
     }
     if (!hasGot) {
       $("#redPacketIGot").text("你错过了这个红包");
