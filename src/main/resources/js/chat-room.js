@@ -668,7 +668,11 @@ var ChatRoom = {
             "<div class=\"list\"><ul id=\"redPacketList\">\n" +
             "</ul></div>" +
             "", "红包");
-        ChatRoom.renderRedPacket(result.who, result.info.count, result.info.got);
+        ChatRoom.renderRedPacket(result.who, result.info.count, result.info.got)
+        if (result.info.count === result.info.got) {
+          $("#chatroom" + oId).find(".hongbao__item").css("opacity", ".36");
+          $("#chatroom" + oId).find(".redPacketDesc").html("已经被抢光啦");
+        }
       },
       error: function (result) {
         Util.alert(result.msg);
@@ -699,7 +703,7 @@ var ChatRoom = {
               '    </svg>\n' +
               '    <div>\n' +
               '        <div>' + msgJSON.msg + '</div>\n' +
-              '        <div class="ft__smaller ft__fade">\n' +
+              '        <div class="ft__smaller ft__fade redPacketDesc">\n' +
               '           已经被抢光啦\n' +
               '        </div>\n' +
               '    </div>\n' +
@@ -712,7 +716,7 @@ var ChatRoom = {
               '    </svg>\n' +
               '    <div>\n' +
               '        <div>' + msgJSON.msg + '</div>\n' +
-              '        <div class="ft__smaller ft__fade">\n' +
+              '        <div class="ft__smaller ft__fade redPacketDesc">\n' +
               '        </div>\n' +
               '    </div>\n' +
               '</div>';
