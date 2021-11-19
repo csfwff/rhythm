@@ -562,8 +562,17 @@ var ChatRoom = {
    *
    * @param who
    */
-  renderRedPacket: function (usersJSON) {
+  renderRedPacket: function (usersJSON, count, got) {
     let hasGot = false;
+    let highest = -1;
+    if (count === got) {
+      for (let i = 0; i < usersJSON.length; i++) {
+        let current = usersJSON[i];
+        if (current.userMoney > highest) {
+          highest = current.userMoney;
+        }
+      }
+    }
     for (let i = 0; i < usersJSON.length; i++) {
       let current = usersJSON[i];
       let currentUserMoney = current.userMoney;
@@ -577,15 +586,21 @@ var ChatRoom = {
       if (current.avatar !== undefined) {
         currentUserAvatar = "<img class=\"avatar avatar--mid\" style=\"margin-right: 10px; background-image: none; background-color: transparent;\" src=\"" + current.avatar + "\">\n";
       }
-      $("#redPacketList").append(
-          "<li class=\"fn__flex menu__item\">\n" +
+      let html = "<li class=\"fn__flex menu__item\">\n" +
           currentUserAvatar +
           "    <div class=\"fn__flex-1\" style=\"text-align: left !important;\">\n" +
-          "        <h2 class=\"list__user\"><a href=\"" + Label.servePath + "/member/" + currentUserName +"\">" + currentUserName + "</a></h2>\n" +
-          "        <span class=\"ft__fade ft__smaller\">" + currentUserTime + "</span>\n" +
+          "        <h2 class=\"list__user\"><a href=\"" + Label.servePath + "/member/" + currentUserName +"\">" + currentUserName + "</a></h2>\n";
+      if (currentUserMoney === highest) {
+        highest = -1;
+        html += "<span class='green small btn'>来自老王的认可</span><br>\n";
+      } else if (currentUserMoney === 0) {
+        html += "<span class='red small btn'>0溢事件</span><br>\n";
+      }
+      html += "<span class=\"ft__fade ft__smaller\">" + currentUserTime + "</span>\n" +
           "    </div>\n" +
           "    <div class=\"fn__flex-center\">" + currentUserMoney + " 积分</div>\n" +
-          "</li>\n");
+          "</li>\n";
+      $("#redPacketList").append(html);
     }
     if (!hasGot) {
       $("#redPacketIGot").text("你错过了这个红包");
@@ -635,7 +650,7 @@ var ChatRoom = {
             "<div class=\"list\"><ul id=\"redPacketList\">\n" +
             "</ul></div>" +
             "", "红包");
-        ChatRoom.renderRedPacket(result.who);
+        ChatRoom.renderRedPacket(result.who, result.info.count, result.info.got);
       },
       error: function (result) {
         Util.alert(result.msg);
