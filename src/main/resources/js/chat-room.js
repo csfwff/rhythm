@@ -200,9 +200,6 @@ var ChatRoom = {
         if (Number($("#redPacketCount").val()) > Number($("#redPacketMoney").val())) {
           $("#redPacketCount").val($("#redPacketMoney").val());
         } else {
-          console.log()
-          console.log($("#redPacketCount").val())
-          console.log($("#redPacketMoney").val())
           if ($("#redPacketCount").val() > 1000) {
             $("#redPacketCount").val("1000");
           }
@@ -661,7 +658,6 @@ var ChatRoom = {
       let msgJSON = $.parseJSON(content.replace("<p>", "").replace("</p>", ""));
       if (msgJSON.msgType === "redPacket") {
         isRedPacket = true;
-        console.log(msgJSON);
         if (Number(msgJSON.count) === Number(msgJSON.got)) {
           content = '' +
               '<div style="opacity: .36;" class="hongbao__item fn__flex-inline" onclick="ChatRoom.unpackRedPacket(\'' + oId + '\')">\n' +
