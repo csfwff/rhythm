@@ -689,8 +689,6 @@ var ChatRoom = {
     let isRedPacket = false;
     try {
       let msgJSON = $.parseJSON(content.replace("<p>", "").replace("</p>", ""));
-      console.log(msgJSON)
-      console.log(msgJSON.msgType)
       if (msgJSON.msgType === "redPacket") {
         isRedPacket = true;
         if (Number(msgJSON.count) === Number(msgJSON.got)) {
