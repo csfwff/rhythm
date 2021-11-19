@@ -661,17 +661,33 @@ var ChatRoom = {
       let msgJSON = $.parseJSON(content.replace("<p>", "").replace("</p>", ""));
       if (msgJSON.msgType === "redPacket") {
         isRedPacket = true;
-        content = '' +
-            '<div class="hongbao__item fn__flex-inline" onclick="ChatRoom.unpackRedPacket(\'' + oId + '\')">\n' +
-            '    <svg class="ft__red hongbao__icon">\n' +
-            '        <use xlink:href="#redPacketIcon"></use>\n' +
-            '    </svg>\n' +
-            '    <div>\n' +
-            '        <div>' + msgJSON.msg + '</div>\n' +
-            '        <div class="ft__smaller ft__fade">\n' +
-            '        </div>\n' +
-            '    </div>\n' +
-            '</div>';
+        console.log(msgJSON);
+        if (Number(msgJSON.count) === Number(msgJSON.got)) {
+          content = '' +
+              '<div style="opacity: .36;" class="hongbao__item fn__flex-inline" onclick="ChatRoom.unpackRedPacket(\'' + oId + '\')">\n' +
+              '    <svg class="ft__red hongbao__icon">\n' +
+              '        <use xlink:href="#redPacketIcon"></use>\n' +
+              '    </svg>\n' +
+              '    <div>\n' +
+              '        <div>' + msgJSON.msg + '</div>\n' +
+              '        <div class="ft__smaller ft__fade">\n' +
+              '           已经被抢光啦\n' +
+              '        </div>\n' +
+              '    </div>\n' +
+              '</div>';
+        } else {
+          content = '' +
+              '<div class="hongbao__item fn__flex-inline" onclick="ChatRoom.unpackRedPacket(\'' + oId + '\')">\n' +
+              '    <svg class="ft__red hongbao__icon">\n' +
+              '        <use xlink:href="#redPacketIcon"></use>\n' +
+              '    </svg>\n' +
+              '    <div>\n' +
+              '        <div>' + msgJSON.msg + '</div>\n' +
+              '        <div class="ft__smaller ft__fade">\n' +
+              '        </div>\n' +
+              '    </div>\n' +
+              '</div>';
+        }
       }
     } catch (err) {}
     try {
