@@ -647,6 +647,14 @@ public class ChatroomProcessor {
     }
 
     private static String processMarkdown(String content) {
+        try {
+            JSONObject checkContent = new JSONObject(content);
+            if (checkContent.optString("msgType").equals("redPacket")) {
+                return content;
+            }
+        } catch (Exception ignored) {
+        }
+
         final BeanManager beanManager = BeanManager.getInstance();
         final ShortLinkQueryService shortLinkQueryService = beanManager.getReference(ShortLinkQueryService.class);
         content = shortLinkQueryService.linkArticle(content);
