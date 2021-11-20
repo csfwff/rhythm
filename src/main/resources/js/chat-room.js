@@ -766,7 +766,7 @@ var ChatRoom = {
     } catch (err) {}
     let newHTML = '<div class="fn-none">';
     newHTML += '<div id="chatroom' + oId + '" class="fn__flex chats__item' + meTag1 + '">\n' +
-        '    <a href="/member/' + userName + '">\n' +
+        '    <a href="/member/' + userName + '" style="height: 38px">\n' +
         '        <div class="avatar tooltipped__user" aria-label="' + userName + '" style="background-image: url(\'' + userAvatarURL + '\');"></div>\n' +
         '    </a>\n' +
         '    <div class="chats__content">\n' +
