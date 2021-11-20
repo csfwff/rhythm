@@ -270,6 +270,15 @@ public class ChatroomProcessor {
                 }
                 info.put("got", redPacket.optInt("got") + 1);
                 context.renderJSON(new JSONObject().put("who", source3).put("info", info));
+                // 广播红包情况
+                JSONObject redPacketStatus = new JSONObject();
+                redPacketStatus.put(Common.TYPE, "redPacketStatus");
+                redPacketStatus.put("whoGive", source.optString(User.USER_NAME));
+                redPacketStatus.put("whoGot", userName);
+                redPacketStatus.put("got", got + 1);
+                redPacketStatus.put("count", count);
+                redPacketStatus.put("oId", oId);
+                ChatroomChannel.notifyChat(redPacketStatus);
                 return;
             }
         } catch (Exception e) {
@@ -331,7 +340,6 @@ public class ChatroomProcessor {
         }
 
         if (content.startsWith("[redpacket]") && content.endsWith("[/redpacket]")) {
-            LOGGER.log(Level.INFO, "User " + userName + " has sent a red packet.");
             try {
                 String redpacketString = content.replaceAll("^\\[redpacket\\]", "").replaceAll("\\[/redpacket\\]$", "");
                 JSONObject redpacket = new JSONObject(redpacketString);

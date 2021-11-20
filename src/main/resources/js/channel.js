@@ -347,6 +347,23 @@ var ChatRoomChannel = {
             var data = JSON.parse(evt.data)
 
             switch (data.type) {
+                case 'redPacketStatus':
+                    let whoGive = data.whoGive;
+                    let whoGot = data.whoGot;
+                    let got = data.got;
+                    let count = data.count;
+                    let spell = whoGot + ' 抢到了 ' + whoGive + ' 的红包 (' + got + '/' + count + ')';
+                    // 红包抢光了，修改状态
+                    if (got === count) {
+                        $("#chatroom" + data.oId).find(".hongbao__item").css("opacity", ".36");
+                        $("#chatroom" + data.oId).find(".redPacketDesc").html("已经被抢光啦");
+                    }
+                    // 通知
+                    $('#chats').prepend("" +
+                        "<div style='color: rgb(50 50 50 / 74%);margin-bottom: 10px;text-align: center;'>" +
+                        "<svg><use xlink:href=\"#redPacketIcon\"></use></svg>&nbsp;" +
+                        spell +
+                        "</div>");
                 case 'online':
                     $('#onlineCnt').text(data.onlineChatCnt);
                     $('#indexOnlineChatCnt').text(data.onlineChatCnt);
