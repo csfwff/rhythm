@@ -352,7 +352,8 @@ var ChatRoomChannel = {
                     let whoGot = data.whoGot;
                     let got = data.got;
                     let count = data.count;
-                    let spell = '<a href="' + Label.servePath + '/member/' + whoGot + '" target="_blank">' + whoGot + '</a> 抢到了 <a href="' + Label.servePath + '/member/' + whoGive + '" target="_blank">' + whoGive + '</a> 的红包';
+                    let oId = data.oId;
+                    let spell = '<a href="' + Label.servePath + '/member/' + whoGot + '" target="_blank">' + whoGot + '</a> 抢到了 <a href="' + Label.servePath + '/member/' + whoGive + '" target="_blank">' + whoGive + '</a> 的 <a style="cursor: pointer" onclick="ChatRoom.unpackRedPacket(\'' + oId + '\')">红包</a>';
                     // 红包抢光了，修改状态
                     if (got === count) {
                         $("#chatroom" + data.oId).find(".hongbao__item").css("opacity", ".36");
