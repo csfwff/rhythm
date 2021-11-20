@@ -34,7 +34,12 @@
     <div class="wrapper">
         <div class="content chat-room">
             <div class="module">
-                <h2 class="sub-head">${chatRoomLabel}</h2>
+                <#if hasSystemTitle>
+                <h2>${systemTitle}</h2>
+                <#else>
+                <h2>${chatRoomLabel}</h2>
+                </#if>
+                <a style="line-height: 30px;text-decoration: none;color: #1296db;font-size: 12px;" href="https://gitee.com/imlinhanchao/pwl-chat/releases" target="_blank"><svg style="width: 12px; height: 12px;"><use xlink:href="#downloadIcon"></use></svg> 下载客户端</a>
                 <div class="fn-content">
                     <div class="reply">
                         <#if isLoggedIn>
