@@ -111,7 +111,7 @@
         <input value="${currentUser.userName}" type="text" readonly /><br/><br/>
 
         <div id="deactivateTip" class="tip"></div><br/>
-        <button class="fn-right ft-red" onclick="Settings.update('deactivate', '${csrfToken}')">${saveLabel}</button>
+        <button class="fn-right ft-red" onclick="Settings.requestDeactive('${csrfToken}')">${deactivateAccountLabel}</button>
     </div>
 </div>
 </@home>
