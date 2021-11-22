@@ -37,13 +37,13 @@ var Settings = {
     let html = '';
     let bag = sysBag;
     if (bag.checkin2days !== undefined && bag.checkin2days > 0) {
-      html += '<button style="margin:0 5px 5px 0" onclick="Settings.use2dayCheckinCard(\'${csrfToken}\')">两天免签卡 x' + bag.checkin2days + '</button>';
+      html += '<button style="margin:0 5px 5px 0" onclick="Settings.use2dayCheckinCard(\'' + Label.csrfToken + '\')">两天免签卡 x' + bag.checkin2days + '</button>';
     }
     if (bag.sysCheckinRemain !== undefined && bag.sysCheckinRemain > 0) {
       html += '<button style="margin:0 5px 5px 0">免签卡生效中，剩余' + bag.sysCheckinRemain + '天</button>';
     }
     if (bag.patchCheckinCard !== undefined && bag.patchCheckinCard > 0) {
-      html += '<button style="margin:0 5px 5px 0" onclick="Settings.usePatchCheckinCard(\'${csrfToken}\', ' + bag.patchStart + ')">补签卡 x' + bag.patchCheckinCard + '</button>';
+      html += '<button style="margin:0 5px 5px 0" onclick="Settings.usePatchCheckinCard(\'' + Label.csrfToken + '\', ' + bag.patchStart + ')">补签卡 x' + bag.patchCheckinCard + '</button>';
     }
     if (html === '') {
       html = '你的背包和钱包一样，是空的。';
@@ -57,6 +57,18 @@ var Settings = {
   usePatchCheckinCard: function (csrfToken, record) {
     if (record == undefined) {
       alert("您没有可以补签的记录！");
+      if (confirm('补签卡仅适用于断签一天的情况！\n在使用补签卡后，你的签到记录将提前至日期：' + record + '\n确定继续吗？') === true) {
+        $.ajax({
+          url: Label.servePath + '/bag/patchCheckin',
+          type: 'GET',
+          async: false,
+          headers: {'csrfToken': csrfToken},
+          success: function (result) {
+            alert(result.msg);
+            location.reload();
+          }
+        })
+      }
     } else {
       if (confirm('补签卡仅适用于断签一天的情况！\n在使用补签卡后，你的签到记录将提前至日期：' + record + '\n确定继续吗？') === true) {
         $.ajax({

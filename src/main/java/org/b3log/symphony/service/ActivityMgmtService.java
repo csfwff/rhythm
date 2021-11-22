@@ -383,18 +383,24 @@ public class ActivityMgmtService {
      */
     public synchronized int patchCheckin(final String userId) {
         try {
+            // 获取用户的补签后起始日期
+            int afterStart = Integer.valueOf(new JSONObject(cloudService.getBag(userId)).optString("patchStart"));
             if (cloudService.putBag(userId, "patchCheckinCard", -1, Integer.MAX_VALUE) != 0) {
                 // 没有补签卡，不予受理
                 return -1;
             }
 
-            // 获取用户的补签后起始日期
-            int afterStart = Integer.valueOf(new JSONObject(cloudService.getBag(userId)).optString("patchStart"));
-
+            final String datePattern = "yyyyMMdd";
             final JSONObject user = userQueryService.getUser(userId);
 
+            user.put(UserExt.USER_CURRENT_CHECKIN_STREAK_START, afterStart);
             int currentStreakStart = user.optInt(UserExt.USER_CURRENT_CHECKIN_STREAK_START);
             int currentStreakEnd = user.optInt(UserExt.USER_CURRENT_CHECKIN_STREAK_END);
+            final Date currentStreakStartDate = DateUtils.parseDate(String.valueOf(currentStreakStart), new String[]{datePattern});
+            final Date currentStreakEndDate = DateUtils.parseDate(String.valueOf(currentStreakEnd), new String[]{datePattern});
+            final int currentStreakDays = (int) ((currentStreakEndDate.getTime() - currentStreakStartDate.getTime()) / 86400000) + 1;
+            user.put(UserExt.USER_CURRENT_CHECKIN_STREAK, currentStreakDays);
+
             return 0;
 
         } catch (final Exception e) {
