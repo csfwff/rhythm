@@ -26,20 +26,6 @@
     </div>
     <div class="module-panel form fn-clear" id="bag">
     </div>
-    <script>
-        let html = '<br>';
-        let bag = ${sysBag};
-        if (bag.checkin2days !== undefined && bag.checkin2days > 0) {
-            html += '<button style="margin:0 5px 5px 0" onclick="Settings.use2dayCheckinCard(\'${csrfToken}\')">两天免签卡 x' + bag.checkin2days + '</button>';
-        }
-        if (bag.sysCheckinRemain !== undefined && bag.sysCheckinRemain > 0) {
-            html += '<button style="margin:0 5px 5px 0">免签卡生效中，剩余' + bag.sysCheckinRemain + '天</button>';
-        }
-        if (html === '<br>') {
-            html = '你的背包和钱包一样，是空的。';
-        }
-        document.getElementById("bag").innerHTML = html;
-    </script>
 </div>
 
 <div class="module">

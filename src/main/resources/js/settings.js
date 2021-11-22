@@ -30,6 +30,27 @@
  * @static
  */
 var Settings = {
+  /**
+   * 初始化背包
+   */
+  initBag: function (sysBag) {
+    let html = '';
+    let bag = sysBag;
+    if (bag.checkin2days !== undefined && bag.checkin2days > 0) {
+      html += '<button style="margin:0 5px 5px 0" onclick="Settings.use2dayCheckinCard(\'${csrfToken}\')">两天免签卡 x' + bag.checkin2days + '</button>';
+    }
+    if (bag.sysCheckinRemain !== undefined && bag.sysCheckinRemain > 0) {
+      html += '<button style="margin:0 5px 5px 0">免签卡生效中，剩余' + bag.sysCheckinRemain + '天</button>';
+    }
+    if (html === '') {
+      html = '你的背包和钱包一样，是空的。';
+    }
+    document.getElementById("bag").innerHTML = html;
+  },
+  /**
+   * 使用两天免签卡
+   * @param csrfToken
+   */
   use2dayCheckinCard: function (csrfToken) {
     if (confirm('使用两天免签卡后，明天和后天的签到将由系统自动帮你完成，不需要登录摸鱼派。确定使用吗？') === true) {
       $.ajax({
