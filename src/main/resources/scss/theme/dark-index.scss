@@ -24,8 +24,12 @@
   background-color: #2F363D;
 }
 
+#sp2{
+  color:#ccc;
+}
+
 #breezemoonInput{
-  background-color: #2F363D;
+  background-color: #2F363D !important;
 }
 
 .verify {
@@ -48,4 +52,17 @@ input{
 
 .pre-post-wrap{
 
+}
+
+.pagination a, .pagination span, .tabs-sub a{
+
+  color:#999999;
+}
+
+.article-list ul>li>h2>a:visited, .article-list .abstract:visited{
+  color:#aaa ;
+}
+
+.article-list .author{
+  color:#999;
 }

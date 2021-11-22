@@ -27,6 +27,7 @@
         <meta name="description" content="${symDescriptionLabel}"/>
     </@head>
     <link rel="stylesheet" href="${staticServePath}/css/index.css?${staticResourceVersion}"/>
+    <link rel="stylesheet" href="${staticServePath}/css/theme/dark-index.css?${staticResourceVersion}"/>
     <link rel="canonical" href="${servePath}">
 </head>
 <body class="index">
