@@ -127,6 +127,12 @@ public class ActivityMgmtService {
     private LivenessQueryService livenessQueryService;
 
     /**
+     * Cloud service.
+     */
+    @Inject
+    private CloudService cloudService;
+
+    /**
      * Starts eating snake.
      *
      * @param userId the specified user id
@@ -315,6 +321,22 @@ public class ActivityMgmtService {
             final Date nextDate = DateUtils.addDays(endDate, 1);
             if (!DateUtils.isSameDay(nextDate, today)) {
                 user.put(UserExt.USER_CURRENT_CHECKIN_STREAK_START, todayInt);
+                // 断签，处理
+                int end = Integer.valueOf(DateFormatUtils.format(endDate, datePattern));
+                int now = todayInt;
+                // 如果要补签，续签的UserEXT.USER_CURRENT_CHECKIN_STREAK_START要调整到哪天
+                int patchStart;
+                if (now - end == 1) {
+                    // 只断签了一天
+                    // 只要用一次补签卡就可以恢复之前的start时间
+                    patchStart = currentStreakStart;
+                } else {
+                    // 断签了两天及以上，补签了也只能回到前一天
+                    patchStart = todayInt - 1;
+                }
+                // 把补签信息写入到云存档
+                cloudService.removeBag(userId, "patchStart");
+                cloudService.putBag(userId, "patchStart", patchStart, Integer.MAX_VALUE);
             }
             user.put(UserExt.USER_CURRENT_CHECKIN_STREAK_END, todayInt);
 

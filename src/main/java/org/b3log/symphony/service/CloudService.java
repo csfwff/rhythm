@@ -167,6 +167,22 @@ public class CloudService {
     }
 
     /**
+     * 彻底删除背包中的某个物品
+     *
+     * @param userId
+     * @param item
+     * @return
+     */
+    synchronized public void removeBag(String userId, String item) {
+        JSONObject bagJSON = new JSONObject(getBag(userId));
+        if (!bagJSON.has(item)) {
+            return;
+        }
+        bagJSON.remove(item);
+        saveBag(userId, bagJSON.toString());
+    }
+
+    /**
      * 向背包中取放东西
      *
      * @param userId
