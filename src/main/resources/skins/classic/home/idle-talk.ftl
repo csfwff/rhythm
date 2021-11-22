@@ -31,7 +31,7 @@
 <div class="main">
     <div class="wrapper">
         <div class="content activity">
-            <div class="module">
+            <div class="module" style="margin-bottom: 20px">
                 <div style="background-color: #F7F7F7;padding: 25px;">
                     <h2><svg style="width: 20px; height: 20px;"><use xlink:href="#idleChat"></use></svg> 私信</h2>
                     <br>
