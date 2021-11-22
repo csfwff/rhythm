@@ -377,6 +377,32 @@ public class ActivityMgmtService {
     }
 
     /**
+     * 补签
+     *
+     * @param userId
+     */
+    public synchronized int patchCheckin(final String userId) {
+        try {
+            if (cloudService.putBag(userId, "patchCheckinCard", -1, Integer.MAX_VALUE) != 0) {
+                // 没有补签卡，不予受理
+                return -1;
+            }
+
+            // 获取用户的补签后起始日期
+            int afterStart = Integer.valueOf(new JSONObject(cloudService.getBag(userId)).optString("patchStart"));
+
+            final JSONObject user = userQueryService.getUser(userId);
+
+            int currentStreakStart = user.optInt(UserExt.USER_CURRENT_CHECKIN_STREAK_START);
+            int currentStreakEnd = user.optInt(UserExt.USER_CURRENT_CHECKIN_STREAK_END);
+            return 0;
+
+        } catch (final Exception e) {
+            return -1;
+        }
+    }
+
+    /**
      * Bets 1A0001.
      *
      * @param userId       the specified user id

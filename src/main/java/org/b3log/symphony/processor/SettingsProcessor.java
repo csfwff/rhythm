@@ -196,6 +196,12 @@ public class SettingsProcessor {
     private CloudService cloudService;
 
     /**
+     * Activity management service.
+     */
+    @Inject
+    private ActivityMgmtService activityMgmtService;
+
+    /**
      * Register request handlers.
      */
     public static void register() {
@@ -226,13 +232,30 @@ public class SettingsProcessor {
         Dispatcher.post("/export/posts", settingsProcessor::exportPosts, loginCheck::handle);
         Dispatcher.post("/point/transfer", settingsProcessor::pointTransfer, loginCheck::handle, csrfMidware::check, pointTransferValidationMidware::handle);
         Dispatcher.get("/bag/2dayCheckin", settingsProcessor::use2dayCheckinCard, loginCheck::handle, csrfMidware::check);
+        Dispatcher.get("/bag/patchCheckin", settingsProcessor::usePatchCheckinCard, loginCheck::handle, csrfMidware::check);
+
+    }
+
+    /**
+     * 使用补签卡
+     */
+    public void usePatchCheckinCard(final RequestContext context) {
+        JSONObject user = Sessions.getUser();
+        final String userId = user.optString(Keys.OBJECT_ID);
+        if (activityMgmtService.patchCheckin(userId) == 0) {
+            context.renderJSON(StatusCodes.SUCC);
+            context.renderMsg("补签卡使用成功！");
+        } else {
+            context.renderJSON(StatusCodes.ERR);
+            context.renderMsg("补签卡使用失败！可能没有需要补签的记录或背包中没有补签卡。");
+        }
     }
 
     /**
      * 使用两天免签卡
      */
     public void use2dayCheckinCard(final RequestContext context) {
-        final JSONObject user = Sessions.getUser();
+        JSONObject user = Sessions.getUser();
         final String userId = user.optString(Keys.OBJECT_ID);
         JSONObject bag = new JSONObject(cloudService.getBag(userId));
         if (bag.optInt("sysCheckinRemain") > 0) {
