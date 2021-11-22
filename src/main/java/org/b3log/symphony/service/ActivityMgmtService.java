@@ -385,6 +385,7 @@ public class ActivityMgmtService {
         try {
             // 获取用户的补签后起始日期
             int afterStart = Integer.valueOf(new JSONObject(cloudService.getBag(userId)).optString("patchStart"));
+            cloudService.removeBag(userId, "patchStart");
             if (cloudService.putBag(userId, "patchCheckinCard", -1, Integer.MAX_VALUE) != 0) {
                 // 没有补签卡，不予受理
                 return -1;
@@ -401,8 +402,20 @@ public class ActivityMgmtService {
             final int currentStreakDays = (int) ((currentStreakEndDate.getTime() - currentStreakStartDate.getTime()) / 86400000) + 1;
             user.put(UserExt.USER_CURRENT_CHECKIN_STREAK, currentStreakDays);
 
-            return 0;
+            final int longestStreakStart = user.optInt(UserExt.USER_LONGEST_CHECKIN_STREAK_START);
+            final int longestStreakEnd = user.optInt(UserExt.USER_LONGEST_CHECKIN_STREAK_END);
+            final Date longestStreakStartDate = DateUtils.parseDate(String.valueOf(longestStreakStart), new String[]{datePattern});
+            final Date longestStreakEndDate = DateUtils.parseDate(String.valueOf(longestStreakEnd), new String[]{datePattern});
+            final int longestStreakDays = (int) ((longestStreakEndDate.getTime() - longestStreakStartDate.getTime()) / 86400000) + 1;
+            user.put(UserExt.USER_LONGEST_CHECKIN_STREAK, longestStreakDays);
+            if (longestStreakDays < currentStreakDays) {
+                user.put(UserExt.USER_LONGEST_CHECKIN_STREAK_START, currentStreakStart);
+                user.put(UserExt.USER_LONGEST_CHECKIN_STREAK_END, currentStreakEnd);
+                user.put(UserExt.USER_LONGEST_CHECKIN_STREAK, currentStreakDays);
+            }
 
+            userMgmtService.updateUser(userId, user);
+            return 0;
         } catch (final Exception e) {
             return -1;
         }
