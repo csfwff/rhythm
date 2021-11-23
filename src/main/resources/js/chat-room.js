@@ -596,7 +596,13 @@ var ChatRoom = {
       let currentUserMoney = current.userMoney;
       let currentUserName = current.userName;
       if (currentUserName === Label.currentUser) {
-        $("#redPacketIGot").text("抢到了 " + currentUserMoney + " 积分");
+        if (currentUserMoney > 0) {
+          $("#redPacketIGot").text("抢到了 " + currentUserMoney + " 积分");
+        } else if (currentUserMoney == 0) {
+          $("#redPacketIGot").text("恭喜你，抢了个寂寞");
+        } else {
+          $("#redPacketIGot").text("什么运气，你竟然被反向抢红包了");
+        }
         hasGot = true;
       }
       let currentUserTime = current.time;

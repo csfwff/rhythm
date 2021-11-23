@@ -239,16 +239,15 @@ public class ChatroomProcessor {
                 Random random = new Random();
                 // 如果是最后一个红包了，给他一切
                 int meGot = 0;
-                if (count == got + 1) {
-                    if (money < -1) {
-                        money = -1;
-                    }
-                    meGot = money;
-                } else {
-                    if (!hasZero) {
-                        meGot = random.nextInt((money / 2) + 1);
+                if (money > 0) {
+                    if (count == got + 1) {
+                        meGot = money;
                     } else {
-                        meGot = random.nextInt((money / 2) + 1) + 1;
+                        if (!hasZero) {
+                            meGot = random.nextInt((money / 4) + 1);
+                        } else {
+                            meGot = random.nextInt((money / 4) + 1) + 1;
+                        }
                     }
                 }
                 // 随机成功了
