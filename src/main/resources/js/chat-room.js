@@ -294,7 +294,7 @@ var ChatRoom = {
                 html('<ul><li>' + result.statusText + '</li></ul>')
               }
             })
-          }, i * 200);
+          }, i * 500);
         }
       })
     });
