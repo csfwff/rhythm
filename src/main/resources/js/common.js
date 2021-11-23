@@ -272,9 +272,7 @@ var Util = {
    * @description 关闭 alert
    */
   closeAlert: function () {
-    var $alert = $('#alertDialogPanel')
-    $alert.prev().remove()
-    $alert.remove()
+    $("#alertDialogPanel,.dialog-background").remove()
   },
   /**
    * @description alert
