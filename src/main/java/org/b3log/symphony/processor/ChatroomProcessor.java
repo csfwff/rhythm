@@ -240,6 +240,9 @@ public class ChatroomProcessor {
                 // 如果是最后一个红包了，给他一切
                 int meGot = 0;
                 if (count == got + 1) {
+                    if (money < -1) {
+                        money = -1;
+                    }
                     meGot = money;
                 } else {
                     if (!hasZero) {
