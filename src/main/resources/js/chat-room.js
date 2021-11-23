@@ -613,6 +613,8 @@ var ChatRoom = {
         html += "<span class='green small btn'>来自老王的认可</span><br>\n";
       } else if (currentUserMoney === 0) {
         html += "<span class='red small btn'>0溢事件</span><br>\n";
+      } else if (currentUserMoney < 0) {
+        html += "<span class='yellow small btn'>抢红包有风险</span><br>\n";
       }
       html += "<span class=\"ft__fade ft__smaller\">" + currentUserTime + "</span>\n" +
           "    </div>\n" +
