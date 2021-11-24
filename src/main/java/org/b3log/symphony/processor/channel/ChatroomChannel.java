@@ -67,6 +67,7 @@ public class ChatroomChannel implements WebSocketChannel {
         if (null != userStr) {
             final JSONObject user = new JSONObject(userStr);
             onlineUsers.put(session, user);
+            System.out.println(user.optString(User.USER_NAME) + "|PUT|");
         }
 
         SESSIONS.add(session);
@@ -142,7 +143,9 @@ public class ChatroomChannel implements WebSocketChannel {
      */
     private void removeSession(final WebSocketSession session) {
         try {
+            System.out.println(onlineUsers.get(session).optString(User.USER_NAME) + "|DEL|");
             onlineUsers.remove(session);
+        } catch (NullPointerException ignored) {
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -164,32 +167,39 @@ public class ChatroomChannel implements WebSocketChannel {
      * @return
      */
     private JSONObject getOnline() {
-        // 使用 HashMap 去重
-        Map<String, JSONObject> filteredOnlineUsers = new HashMap<>();
-        for (JSONObject object : onlineUsers.values()) {
-            String name = object.optString(User.USER_NAME);
-            filteredOnlineUsers.put(name, object);
+        try {
+            // 使用 HashMap 去重
+            Map<String, JSONObject> filteredOnlineUsers = new HashMap<>();
+            for (JSONObject object : onlineUsers.values()) {
+                System.out.print(object.optString(User.USER_NAME) + "|GET|");
+                String name = object.optString(User.USER_NAME);
+                filteredOnlineUsers.put(name, object);
+            }
+            System.out.println();
+
+            JSONArray onlineArray = new JSONArray();
+            for (String user : filteredOnlineUsers.keySet()) {
+                JSONObject object = filteredOnlineUsers.get(user);
+
+                String avatar = object.optString(UserExt.USER_AVATAR_URL);
+                String homePage = Latkes.getStaticServePath() + "/member/" + user;
+
+                JSONObject generated = new JSONObject();
+                generated.put(User.USER_NAME, user);
+                generated.put(UserExt.USER_AVATAR_URL, avatar);
+                generated.put("homePage", homePage);
+                onlineArray.put(generated);
+            }
+
+            JSONObject result = new JSONObject();
+            result.put(Common.ONLINE_CHAT_CNT, filteredOnlineUsers.size());
+            result.put(Common.TYPE, "online");
+            result.put("users", onlineArray);
+
+            return result;
+        } catch (Exception e) {
+            e.printStackTrace();
         }
-
-        JSONArray onlineArray = new JSONArray();
-        for (String user : filteredOnlineUsers.keySet()) {
-            JSONObject object = filteredOnlineUsers.get(user);
-
-            String avatar = object.optString(UserExt.USER_AVATAR_URL);
-            String homePage = Latkes.getStaticServePath() + "/member/" + user;
-
-            JSONObject generated = new JSONObject();
-            generated.put(User.USER_NAME, user);
-            generated.put(UserExt.USER_AVATAR_URL, avatar);
-            generated.put("homePage", homePage);
-            onlineArray.put(generated);
-        }
-
-        JSONObject result = new JSONObject();
-        result.put(Common.ONLINE_CHAT_CNT, filteredOnlineUsers.size());
-        result.put(Common.TYPE, "online");
-        result.put("users", onlineArray);
-
-        return result;
+        return new JSONObject().put(Common.ONLINE_CHAT_CNT, 99999).put(Common.TYPE, "online").put("users", new JSONArray());
     }
 }
