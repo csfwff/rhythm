@@ -63,6 +63,11 @@ public class CloudProcessor {
     public void sync(final RequestContext context) {
         try {
             JSONObject user = Sessions.getUser();
+            try {
+                final JSONObject requestJSONObject = context.requestJSON();
+                user = ApiProcessor.getUserByKey(requestJSONObject.optString("apiKey"));
+            } catch (NullPointerException ignored) {
+            }
             String userName = user.optString(User.USER_NAME);
             String userId = user.optString(Keys.OBJECT_ID);
 
@@ -83,6 +88,11 @@ public class CloudProcessor {
      */
     public void get(final RequestContext context) {
         JSONObject user = Sessions.getUser();
+        try {
+            final JSONObject requestJSONObject = context.requestJSON();
+            user = ApiProcessor.getUserByKey(requestJSONObject.optString("apiKey"));
+        } catch (NullPointerException ignored) {
+        }
         String userId = user.optString(Keys.OBJECT_ID);
         JSONObject requestJSONObject = context.requestJSON();
         String gameId = requestJSONObject.optString("gameId");
