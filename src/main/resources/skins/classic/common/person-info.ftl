@@ -59,11 +59,30 @@
                     <#if 0 == currentUser.userAppRole>0x${currentUser.userPointHex}<#else><div class="painter-point" style="background-color: #${currentUser.userPointCC}"></div></#if></a>
             </div>
         </div>
-    </div> 
+    </div>
     <div class="top-left activity-board"></div>
     <div class="top-right activity-board"></div>
     <div class="right activity-board"></div>
     <div class="bottom activity-board"></div>
     <div class="left activity-board"></div>
+    <script>
+        function getActivityStatus() {
+            $.ajax({
+                url: Label.servePath + "/user/liveness",
+                method: "get",
+                cache: false,
+                async: false,
+                success: function (result) {
+                    let liveness = result.liveness;
+                    $('.person-info').data('percent', liveness);
+                    Util._initActivity();
+                    $('.person-info>.module-panel').attr('aria-label', '今日活跃 ' + liveness + '%');
+                }
+            });
+        }
+        setInterval(function () {
+            getActivityStatus();
+        }, 4000);
+    </script>
 </div>
 </#if>
