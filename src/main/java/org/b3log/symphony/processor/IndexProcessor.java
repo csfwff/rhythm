@@ -44,6 +44,7 @@ import org.b3log.symphony.processor.middleware.LoginCheckMidware;
 import org.b3log.symphony.service.*;
 import org.b3log.symphony.util.Markdowns;
 import org.b3log.symphony.util.Sessions;
+import org.b3log.symphony.util.StatusCodes;
 import org.b3log.symphony.util.Symphonys;
 import org.json.JSONObject;
 
@@ -136,6 +137,22 @@ public class IndexProcessor {
         Dispatcher.get("/games/adarkroom/", indexProcessor::showADarkRoom, loginCheck::handle);
         Dispatcher.get("/games/lifeRestart/view/", indexProcessor::showLifeRestart, loginCheck::handle);
         Dispatcher.get("/games/evolve/", indexProcessor::showEvolve, loginCheck::handle);
+        Dispatcher.get("/user/checkedIn", indexProcessor::isCheckedIn, loginCheck::handle);
+    }
+
+    /**
+     * 检测用户是否签到
+     *
+     * @param context
+     */
+    public void isCheckedIn(final RequestContext context) {
+        JSONObject currentUser = Sessions.getUser();
+        try {
+            currentUser = ApiProcessor.getUserByKey(context.param("apiKey"));
+        } catch (NullPointerException ignored) {
+        }
+        final String userId = currentUser.optString(Keys.OBJECT_ID);
+        context.renderJSON(StatusCodes.SUCC).renderJSON(new JSONObject().put("checkedIn", activityQueryService.isCheckedinToday(userId)));
     }
 
     public void showEvolve(final RequestContext context) {
