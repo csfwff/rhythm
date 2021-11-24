@@ -867,6 +867,9 @@ ${HeaderBannerLabel}
             formatedLiveness = i;
         }
         let nowLiveness = parseInt($("#sp2").text().replace("%", ""));
+        if (liveness == 0) {
+            nowLiveness = 0;
+        }
         if ($("#sp2").html() !== formatedLiveness + "%") {
             let j = 1;
             for (let i = nowLiveness; i <= liveness; i++) {
