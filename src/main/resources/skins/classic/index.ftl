@@ -189,7 +189,7 @@ ${HeaderBannerLabel}
             </div>
 
             <div class="index-head-title">
-                <div style="float:left;font-size:13px;margin:5px 0 10px 0; font-weight:bold;">在线时间排行</div>
+                <div style="float:left;font-size:13px;margin:15px 0 10px 0; font-weight:bold;">在线时间排行</div>
                 <div style="float:right;font-size:13px;margin:5px 0 0 0;"><a href="${servePath}/top/online">更多</a>
                 </div>
                 <div style="clear:both;"></div>
