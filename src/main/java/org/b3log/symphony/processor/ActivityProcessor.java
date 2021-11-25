@@ -381,8 +381,11 @@ public class ActivityProcessor {
      * @param context the specified context
      */
     public void yesterdayLivenessRewardApi(final RequestContext context) {
-        final Request request = context.getRequest();
-        final JSONObject user = Sessions.getUser();
+        JSONObject user = Sessions.getUser();
+        try {
+            user = ApiProcessor.getUserByKey(context.param("apiKey"));
+        } catch (NullPointerException ignored) {
+        }
         final String userId = user.optString(Keys.OBJECT_ID);
 
         int sum = activityMgmtService.yesterdayLivenessRewardApi(userId);
