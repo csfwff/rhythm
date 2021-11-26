@@ -137,8 +137,8 @@
             port = 1025;
         }
 
-        window.wsClient = new WsClient("ws://" + host + ":" + port + "/ratel");
-        window.imClient = new ImClient("ws://121.5.140.133:3444/im")
+        window.wsClient = new WsClient("wss://" + host + ":" + port + "/ratel");
+        window.imClient = new ImClient("wss://121.5.140.133:3444/im")
         window.imClient.Connect()
         window.wsClient.panel.help()
 
