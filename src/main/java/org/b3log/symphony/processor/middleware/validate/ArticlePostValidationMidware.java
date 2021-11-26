@@ -29,6 +29,7 @@ import org.b3log.latke.service.LangPropsService;
 import org.b3log.symphony.model.Article;
 import org.b3log.symphony.model.Role;
 import org.b3log.symphony.model.Tag;
+import org.b3log.symphony.processor.ApiProcessor;
 import org.b3log.symphony.service.OptionQueryService;
 import org.b3log.symphony.service.TagQueryService;
 import org.b3log.symphony.util.Emotions;
@@ -161,7 +162,15 @@ public class ArticlePostValidationMidware {
                     }
                 }
 
-                final JSONObject currentUser = Sessions.getUser();
+                JSONObject currentUser = Sessions.getUser();
+                try {
+                    currentUser = ApiProcessor.getUserByKey(context.param("apiKey"));
+                } catch (NullPointerException ignored) {
+                }
+                try {
+                    currentUser = ApiProcessor.getUserByKey(requestJSONObject.optString("apiKey"));
+                } catch (NullPointerException ignored) {
+                }
                 if (!Role.ROLE_ID_C_ADMIN.equals(currentUser.optString(User.USER_ROLE))
                         && ArrayUtils.contains(Symphonys.RESERVED_TAGS, tagTitle)) {
                     context.renderJSON(exception.put(Keys.MSG, langPropsService.get("articleTagReservedLabel") + " [" + tagTitle + "]"));

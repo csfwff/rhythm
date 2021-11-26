@@ -373,7 +373,7 @@ public class IndexProcessor {
         if (calendar.get(Calendar.DAY_OF_WEEK) == 6) {
             // 周五
             String date = DateFormatUtils.format(new Date(), "yyyyMMdd");
-            String articleTitle = "摸鱼日报 " + date;
+            String articleTitle = "摸鱼周报 " + date;
             JSONObject article = articleQueryService.getArticleByTitle(articleTitle);
             if (article == null) {
                 dataModel.put("TGIF", "0");

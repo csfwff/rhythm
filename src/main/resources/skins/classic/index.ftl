@@ -140,10 +140,10 @@ ${HeaderBannerLabel}
                                 <svg style="width: 30px; height: 30px;"><use xlink:href="#tadaIcon"></use></svg>
                             </div>
                             <div style="padding-left:40px">
-                                <b>每周五的摸鱼日报时间到了！</b>
+                                <b>每周五的摸鱼周报时间到了！</b>
                                 <br>
-                                <button class="green fn-right" style="margin-left: 5px" onclick="window.location.href=Label.servePath+'/post?type=0&tags=摸鱼日报&title=摸鱼日报 ${yyyyMMdd}'">我抢~</button>
-                                今天还没有人写摸鱼日报哦，抢在第一名写摸鱼日报，获得 <b style="color:orange">2000 积分</b> 奖励！
+                                <button class="green fn-right" style="margin-left: 5px" onclick="window.location.href=Label.servePath+'/post?type=0&tags=摸鱼周报&title=摸鱼周报 ${yyyyMMdd}'">我抢~</button>
+                                今天还没有人写摸鱼周报哦，抢在第一名写摸鱼周报，获得 <b style="color:orange">1000 积分</b> 奖励！
                             </div>
                         </div>
                         <#elseif TGIF == '-1'>
