@@ -67,7 +67,7 @@
         var input = document.querySelector("#input");
         input.addEventListener("keypress", selectServer, false);
         input.focus();
-        $("#input").val("2");
+        $("#input").val("1");
         let e = jQuery.Event("keypress");
         e.keyCode = 13;
         selectServer(e);
