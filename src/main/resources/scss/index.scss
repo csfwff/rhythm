@@ -1485,7 +1485,8 @@ code .dec {
 
 /* index chatroom */
 #chatRoomIndex li img {
-  max-height: 400px;
+  max-width:150px;
+  max-height:150px;
 }
 
 .comment__reply {
