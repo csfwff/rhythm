@@ -542,7 +542,7 @@ var ChatRoom = {
               let data = result.data[i];
               let liHtml = ChatRoom.renderMessage(data.userNickname, data.userName, data.userAvatarURL, data.time, data.content, data.oId, Label.currentUser, Label.level3Permitted);
               $('#chats').append(liHtml);
-              $('#chats>div.fn-none').slideDown(1000);
+              $('#chats>div.fn-none').show();
               $('#chats>div.fn-none').removeClass("fn-none");
               ChatRoom.resetMoreBtnListen();
             }
@@ -553,8 +553,8 @@ var ChatRoom = {
           }
         }
       });
+      NProgress.done();
     }, 0);
-    NProgress.done();
   },
   /**
    * 监听点击更多按钮关闭事件
