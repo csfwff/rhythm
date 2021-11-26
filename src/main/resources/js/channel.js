@@ -389,7 +389,7 @@ var ChatRoomChannel = {
                     break;
                 case 'msg':
                     // Chatroom
-                    if ($("#chatRoomIndex").length === 0) {
+                    if ($("#chatRoomIndex").length === 0 && $("#chatroom" + data.oId).length <= 0) {
                         let liHTML;
                         $("#plusOne").remove();
                         if (data.md === Label.latestMessage) {

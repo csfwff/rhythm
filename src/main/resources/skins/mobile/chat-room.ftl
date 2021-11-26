@@ -80,7 +80,7 @@
                     <div class="list" style="height: 100%">
                         <div id="chats">
                         </div>
-                        <div id="more" onclick="ChatRoom.more()" style="cursor: pointer; color: rgba(0,0,0,0.54);"><#if !isLoggedIn>登录后</#if>查看更多</div>
+                        <div id="more" onclick="ChatRoom.more();ChatRoom.more();" style="cursor: pointer; color: rgba(0,0,0,0.54);"><#if !isLoggedIn>登录后</#if>查看更多</div>
                     </div>
                 </div>
                 <div class="side">
