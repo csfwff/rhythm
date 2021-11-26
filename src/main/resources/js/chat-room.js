@@ -172,7 +172,7 @@ var ChatRoom = {
           "<label>\n" +
           "  <div class=\"ft__smaller ft__fade\" style=\"float: left\">积分</div>\n" +
           "  <div class=\"fn-hr5 fn__5\"></div>\n" +
-          "  <input type=\"number\" min=\"1\" max=\"20000\" required=\"\" value=\"32\" id=\"redPacketMoney\" onkeypress=\"return(/[\\d]/.test(String.fromCharCode(event.keyCode)))\">\n" +
+          "  <input type=\"number\" min=\"32\" max=\"20000\" required=\"\" value=\"32\" id=\"redPacketMoney\" onkeypress=\"return(/[\\d]/.test(String.fromCharCode(event.keyCode)))\">\n" +
           "</label>\n" +
           "<label>\n" +
           "  <div class=\"ft__smaller ft__fade\" style=\"float: left\">个数</div>\n" +
@@ -198,13 +198,13 @@ var ChatRoom = {
 
       $("#redPacketMoney").on('change', function () {
         if ($("#redPacketMoney").val() === "") {
-          $("#redPacketMoney").val("0");
+          $("#redPacketMoney").val("32");
         }
         if ($("#redPacketMoney").val() > 20000) {
           $("#redPacketMoney").val("20000");
         }
-        if ($("#redPacketMoney").val() <= 0) {
-          $("#redPacketMoney").val("1");
+        if ($("#redPacketMoney").val() < 32) {
+          $("#redPacketMoney").val("32");
         }
         $("#redPacketAmount").text($("#redPacketMoney").val());
       });
