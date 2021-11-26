@@ -1787,7 +1787,8 @@ code .dec {
   width:510px
 }
 .chats__content .vditor-reset img:not(.emoji) {
-  max-width:360px
+  max-width:150px;
+  max-height:300px;
 }
 .chats__arrow {
   position:relative
