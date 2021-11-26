@@ -99,7 +99,7 @@
         </div>
     </div>
 </div>
-<div id="goToTop" style="position:fixed;bottom:20px;right:10%;display:none;"><a href="#">返回顶部</a></div>
+<div id="goToTop" style="position:fixed;bottom:20px;right:10%;display:none;"><a href="#"><svg style="width:30px;height:30px;color:#626262;"><use xlink:href="#toTopIcon"></use></svg></a></div>
 <#include "footer.ftl">
 <script>
     Label.uploadLabel = "${uploadLabel}";
