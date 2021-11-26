@@ -343,4 +343,12 @@ ${HeaderBannerLabel}
         });
     }
 </script>
+<script>
+    $('#chatRoomIndex').on('click', '.vditor-reset img', function () {
+        if ($(this).hasClass('emoji')) {
+            return;
+        }
+        window.open($(this).attr('src'));
+    });
+</script>
 </html>
