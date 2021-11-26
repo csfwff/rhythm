@@ -35,7 +35,7 @@
                         <h2 class="sub-head">${activityLabel}</h2>
                         <div class="list">
                             <ul>
-                                <li>
+                                <!--<li>
                                     <div class='fn-flex'>
                                         <div class="avatar"
                                              style="background-image:url('${staticServePath}/games/ratel/favicons/icon.png')"></div>
@@ -49,7 +49,7 @@
                                             </span>
                                         </div>
                                     </div>
-                                </li>
+                                </li>-->
                                 <li>
                                     <div class='fn-flex'>
                                         <div class="avatar"
