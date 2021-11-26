@@ -577,7 +577,7 @@ ${HeaderBannerLabel}
         $("#chatUsernameSelectedPanel").html("");
 
         let value = $("#chatRoomInput").val()
-        let users;
+        let users = [];
         if (value == '@') {
             $("#chatUsernameSelectedPanel").show();
             users = Util.getAtUsers('');
