@@ -20,13 +20,6 @@
 -->
 <div class="footer">
     <div class="wrapper ft-smaller">
-        <div class="footer-nav">
-            <a href="https://icp.gov.moe/?keyword=20212123" target="_blank">萌ICP备20212123号</a>
-        </div>
-        <div class="fn-hr5"></div>
-        <div id="fs">
-            ${sloganLabel}
-        </div>
         <br>
         <div>
             友情链接
@@ -36,15 +29,9 @@
         </div>
         <div class="fn-hr5"></div>
         <div>
-            <a href="https://github.com/csfwff/rhythm" target="_blank">Rhythm 社区</a>
-            ${version}
+            <a href="https://github.com/csfwff/rhythm" target="_blank">Rhythm 社区引擎</a>
         </div>
-        <!--<#if footerBeiAnHao != ''>
-            <div class="fn-hr5"></div>
-            <div>
-                <a href="http://www.miitbeian.gov.cn/" target="_blank">${footerBeiAnHao}</a>
-            </div>
-        </#if>-->
+        <br>
     </div>
 </div>
 <script src="${staticServePath}/js/symbol-defs${miniPostfix}.js?${staticResourceVersion}"></script>

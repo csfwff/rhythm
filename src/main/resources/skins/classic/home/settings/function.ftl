@@ -24,7 +24,7 @@
     <div class="module-header">${functionTipLabel}</div>
     <div class="module-panel form fn-clear">
         <label>${userListPageSizeLabel}</label>
-        <input id="userListPageSize" type="number" value="${currentUser.userListPageSize}" /> 
+        <input id="userListPageSize" type="number" value="${currentUser.userListPageSize}" />
         <label>${cmtViewModeLabel}</label>
         <select id="userCommentViewMode" name="userCommentViewMode">
             <option value="0"<#if 0 == currentUser.userCommentViewMode> selected</#if>>${traditionLabel}</option>

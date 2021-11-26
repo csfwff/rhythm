@@ -99,6 +99,7 @@
                     Label.invalidUserNicknameLabel = "${invalidUserNicknameLabel}";
                     Label.previewLabel = "${previewLabel}";
                     Label.unPreviewLabel = "${unPreviewLabel}";
+                    <#if 'account' == type>Settings.initBag(${sysBag});</#if>
         </script>
     </body>
 </html>

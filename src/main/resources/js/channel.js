@@ -347,15 +347,37 @@ var ChatRoomChannel = {
             var data = JSON.parse(evt.data)
 
             switch (data.type) {
+                case 'redPacketStatus':
+                    let whoGive = data.whoGive;
+                    let whoGot = data.whoGot;
+                    let got = data.got;
+                    let count = data.count;
+                    let oId = data.oId;
+                    let spell = '<a href="' + Label.servePath + '/member/' + whoGot + '" target="_blank">' + whoGot + '</a> 抢到了 <a href="' + Label.servePath + '/member/' + whoGive + '" target="_blank">' + whoGive + '</a> 的 <a style="cursor: pointer" onclick="ChatRoom.unpackRedPacket(\'' + oId + '\')">红包</a>';
+                    // 红包抢光了，修改状态
+                    if (got === count) {
+                        $("#chatroom" + data.oId).find(".hongbao__item").css("opacity", ".36");
+                        $("#chatroom" + data.oId).find(".redPacketDesc").html("已经被抢光啦");
+                        spell += '，红包已被领完 (' + got + '/' + count + ')';
+                    } else {
+                        spell += ' (' + got + '/' + count + ')';
+                    }
+                    // 通知
+                    let html = "<div style='color: rgb(50 50 50);margin-bottom: 10px;text-align: center;'>" +
+                        "<svg><use xlink:href='#redPacketIcon'></use></svg>&nbsp;" +
+                        spell +
+                        "</div>";
+                    $('#chats').prepend(html);
+                    break;
                 case 'online':
                     $('#onlineCnt').text(data.onlineChatCnt);
                     $('#indexOnlineChatCnt').text(data.onlineChatCnt);
                     $("#chatRoomOnlineCnt").html("");
                     for (var user in data.users) {
                         let userInfo = data.users[user];
-                        $("#chatRoomOnlineCnt").append("<a target=\"_blank\" title=\"" + userInfo.userName + "\" data-name=\"" + userInfo.userName + "\"\n" +
+                        $("#chatRoomOnlineCnt").append("<a target=\"_blank\" data-name=\"" + userInfo.userName + "\"\n" +
                             "href=\"" + userInfo.homePage + "\">\n" +
-                            "<img class=\"avatar avatar-small\" aria-label=\"" + userInfo.userName + "\"\n" +
+                            "<img style='margin-bottom: 10px' class=\"avatar avatar-small\" aria-label=\"" + userInfo.userName + "\"\n" +
                             "src=\"" + userInfo.userAvatarURL + "\">\n" +
                             "</a>");
                     }
@@ -368,16 +390,37 @@ var ChatRoomChannel = {
                 case 'msg':
                     // Chatroom
                     if ($("#chatRoomIndex").length === 0) {
-                        let liHTML = ChatRoom.renderMessage(data.userName, data.userAvatarURL, data.time, data.content, data.oId, Label.currentUser, Label.level3Permitted);
+                        let liHTML;
+                        $("#plusOne").remove();
+                        if (data.md === Label.latestMessage) {
+                            // +1 功能
+                            liHTML = ChatRoom.renderMessage(data.userNickname, data.userName, data.userAvatarURL, data.time, data.content, data.oId, Label.currentUser, Label.level3Permitted, true);
+                        } else {
+                            liHTML = ChatRoom.renderMessage(data.userNickname, data.userName, data.userAvatarURL, data.time, data.content, data.oId, Label.currentUser, Label.level3Permitted);
+                        }
                         $('#chats').prepend(liHTML);
                         $('#chats>div.fn-none').show(200);
                         $('#chats>div.fn-none').removeClass("fn-none");
                         ChatRoom.resetMoreBtnListen();
+                        if (data.md !== undefined) {
+                            Label.latestMessage = data.md;
+                        }
                     }
 
                     // index
                     if ($("#chatRoomIndex").has("#emptyChatRoom").length !== 0) {
                         $("#emptyChatRoom").remove();
+                    }
+                    let userNickname = data.userNickname;
+                    let userName = data.userName;
+                    if (userNickname !== undefined && userNickname !== "") {
+                        userNickname = userNickname + " ( " + userName + " )"
+                    } else {
+                        userNickname = userName;
+                    }
+                    let newContent = data.content;
+                    if (newContent.indexOf("\"msgType\":\"redPacket\"") !== -1) {
+                        newContent = "[收到红包，请在完整版聊天室查看]";
                     }
                     $("#chatRoomIndex").prepend("" +
                         "<li class=\"fn-flex\" id=\"chatindex" + data.oId + "\" style='display: none; border-bottom: 1px solid #eee;'>\n" +
@@ -389,11 +432,11 @@ var ChatRoomChannel = {
                         "    <div class=\"fn-flex-1\">\n" +
                         "        <div class=\"ft-smaller\">\n" +
                         "            <a rel=\"nofollow\" href=\"/member/" + data.userName + "\">\n" +
-                        "                <span class=\"ft-gray\">" + data.userName + "</span>\n" +
+                        "                <span class=\"ft-gray\">" + userNickname + "</span>\n" +
                         "            </a>\n" +
                         "        </div>\n" +
                         "        <div class=\"vditor-reset comment " + Label.chatRoomPictureStatus + "\">\n" +
-                        "            " + data.content + "\n" +
+                        "            " + newContent + "\n" +
                         "        </div>\n" +
                         "    </div>\n" +
                         "</li>");

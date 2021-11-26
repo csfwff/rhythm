@@ -779,7 +779,7 @@ a[class*=" icon-"]:hover {
 }
 
 .dialog-main {
-  min-width: 300px;
+  min-width: 500px;
   padding: 10px;
   box-sizing: content-box;
 }
@@ -800,7 +800,7 @@ a[class*=" icon-"]:hover {
 }
 
 .main {
-  padding: 20px 0;
+  padding: 25px 0 0 0;
   background-attachment: fixed;
   min-height: 280px;
 }
@@ -1622,7 +1622,26 @@ a[class*=" icon-"]:hover {
   background-size: 100% 100%;
 }
 
-@keyframes swim {
+.index-head-title{
+    border-bottom:
+    1px solid #eee;
+    margin:0px 10px ;
+}
+
+.index-bottom{
+background-color:#f6f8fa
+}
+
+.index-chat{
+  border-bottom:1px solid #eee;
+}
+
+#userCard{
+background-color: white;
+}
+
+
+/*@keyframes swim {
   0% {
     transform: translate(0,0) rotateY(0deg);
   }
@@ -1663,4 +1682,4 @@ a[class*=" icon-"]:hover {
 
 .swimming {
   animation: swim 15s linear;
-}
+}*/

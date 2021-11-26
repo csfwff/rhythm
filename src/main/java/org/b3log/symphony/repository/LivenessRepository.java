@@ -23,6 +23,8 @@ import org.b3log.latke.repository.annotation.Repository;
 import org.b3log.symphony.model.Liveness;
 import org.json.JSONObject;
 
+import java.util.List;
+
 /**
  * Liveness repository.
  *
@@ -63,5 +65,12 @@ public class LivenessRepository extends AbstractRepository {
                 new PropertyFilter(Liveness.LIVENESS_USER_ID, FilterOperator.EQUAL, userId),
                 new PropertyFilter(Liveness.LIVENESS_DATE, FilterOperator.EQUAL, date))).setPageCount(1);
         return getFirst(query);
+    }
+
+    public List<JSONObject> getByDate(final String date) throws RepositoryException {
+        final Query query = new Query().setFilter(
+                new PropertyFilter(Liveness.LIVENESS_DATE, FilterOperator.EQUAL, date)
+        );
+        return getList(query);
     }
 }

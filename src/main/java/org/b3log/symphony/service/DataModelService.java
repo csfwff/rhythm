@@ -379,6 +379,7 @@ public class DataModelService {
 
 
             if (!isLoggedIn) {
+                dataModel.put(Liveness.LIVENESS, 0);
                 return;
             }
 
@@ -412,7 +413,7 @@ public class DataModelService {
             curUser.put(Role.ROLE_NAME, role.optString(Role.ROLE_NAME));
 
             // final int unreadNotificationCount = notificationQueryService.getUnreadNotificationCount(curUser.optString(Keys.OBJECT_ID));
-            dataModel.put(Notification.NOTIFICATION_T_UNREAD_COUNT, 0); // AJAX polling 
+            dataModel.put(Notification.NOTIFICATION_T_UNREAD_COUNT, 0); // AJAX polling
 
             dataModel.put(Common.IS_DAILY_CHECKIN, activityQueryService.isCheckedinToday(userId));
 

@@ -18,12 +18,4 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 -->
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Markdown Raw</title>
-</head>
-<body>
 ${raw}
-</body>
-</html>

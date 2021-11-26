@@ -35,7 +35,7 @@ ${HeaderBannerLabel}
 <div class="main">
     <div class="wrapper" style="padding-bottom: 20px">
         <div class="index-recent fn-flex-1">
-            <div style="border-bottom: 1px solid #eee;margin:0px 10px ;">
+            <div class="index-head-title">
                 <div style="float:left;font-size:13px;margin:5px 0 10px 0; font-weight:bold;">最新</div>
                 <div style="float:right;font-size:13px;margin:5px 0 0 0;"><a href="${servePath}/recent">更多</a></div>
                 <div style="clear:both;"></div>
@@ -95,7 +95,7 @@ ${HeaderBannerLabel}
 
         </div>
         <div class="index-recent fn-flex-1">
-            <div style="border-bottom: 1px solid #eee;margin:0px 10px ;">
+            <div class="index-head-title">
                 <div style="float:left;font-size:13px;margin:5px 0 10px 0; font-weight:bold;">随便看看</div>
                 <div style="float:right;font-size:13px;margin:5px 0 0 0;">
                     <a onclick="randomArticles()" style="cursor: pointer; color: #c8383a; text-decoration: none;">
@@ -134,19 +134,44 @@ ${HeaderBannerLabel}
                 <div style="clear:both;"></div>
             </div>-->
             <div class="module-panel">
-                <div class="index-user">
-                    <#list niceUsers as user>
-                        <a class="niceUsersElement fn-hidden" rel="nofollow"
-                           href="${servePath}/member/${user.userName}">
+                    <#if TGIF == '0'>
+                        <div class="TGIF__item">
+                            <div style="float: left">
+                                <svg style="width: 30px; height: 30px;"><use xlink:href="#tadaIcon"></use></svg>
+                            </div>
+                            <div style="padding-left:40px">
+                                <b>每周五的摸鱼周报时间到了！</b>
+                                <br>
+                                <button class="green fn-right" style="margin-left: 5px" onclick="window.location.href=Label.servePath+'/post?type=0&tags=摸鱼周报&title=摸鱼周报 ${yyyyMMdd}'">我抢~</button>
+                                今天还没有人写摸鱼周报哦，抢在第一名写摸鱼周报，获得 <b style="color:orange">1000 积分</b> 奖励！
+                            </div>
+                        </div>
+                        <#elseif TGIF == '-1'>
+                            <div class="index-user">
+                            <#list niceUsers as user>
+                                <a class="niceUsersElement fn-hidden" rel="nofollow"
+                                   href="${servePath}/member/${user.userName}">
                                     <span class="avatar-middle slogan"
                                           aria-label="${user.userName}"
                                           style="background-image:url('${user.userAvatarURL48}');height:30px;width:30px;margin: 0px 10px 10px 0px"></span>
-                        </a>
-                    </#list>
-                </div>
+                                </a>
+                            </#list>
+                            </div>
+                        <#else>
+                        <div class="TGIF__item">
+                            <div style="float: left">
+                                <svg style="width: 30px; height: 30px;"><use xlink:href="#tadaIcon"></use></svg>
+                            </div>
+                            <div style="padding-left:40px">
+                                <b>每周五的摸鱼周报时间到了！</b>
+                                <br>
+                                今天已经有人写了摸鱼周报哦，<a href="${TGIF}" style="text-decoration:none;font-weight:bold;color:green;">快来看看吧~</a>
+                            </div>
+                        </div>
+                    </#if>
             </div>
 
-            <div style="border-bottom: 1px solid #eee;margin:0px 10px ;">
+            <div class="index-head-title">
                 <div style="float:left;font-size:13px;margin:5px 0 10px 0; font-weight:bold;">签到排行</div>
                 <div style="float:right;font-size:13px;margin:5px 0 0 0;"><a href="${servePath}/top/checkin">更多</a>
                 </div>
@@ -188,9 +213,9 @@ ${HeaderBannerLabel}
                 </ul>
             </div>
 
-            <div style="border-bottom: 1px solid #eee;margin:10px 10px 0 10px;">
-                <div style="float:left;font-size:13px;margin:5px 0 10px 0; font-weight:bold;">在线时间排行</div>
-                <div style="float:right;font-size:13px;margin:5px 0 0 0;"><a href="${servePath}/top/online">更多</a>
+            <div class="index-head-title">
+                <div style="float:left;font-size:13px;margin:15px 0 10px 0; font-weight:bold;">在线时间排行</div>
+                <div style="float:right;font-size:13px;margin:15px 0 0 0;"><a href="${servePath}/top/online">更多</a>
                 </div>
                 <div style="clear:both;"></div>
             </div>
@@ -247,7 +272,7 @@ ${HeaderBannerLabel}
         </div>
     </div>
 
-    <div style="background-color:#f6f8fa">
+    <div class="index-bottom">
         <div class="wrapper">
             <div class="fn-flex-1">
                 <div class="metro-line fn-flex">
@@ -259,10 +284,18 @@ ${HeaderBannerLabel}
                             <div style="font-size: 10px; color: rgba(161,163,163,0.91)" id="vLine3">我还在编......</div>
                         </div>
                     </div>
-                    <div class="metro-item" style="cursor: pointer">
-                        <a class="preview" id="checkIn" onclick="submitCheckIn()">
-                            <img style="border-radius: 0" id="checkInImg"
-                                 src="https://pwl.stackoverflow.wiki/2021/10/Fishing-a219e80c.png"><b>每日签到</b>
+                    <div class="metro-item">
+                        <a class="preview" style="padding-top: 60px">
+                            <span id="checkedInStatus">
+                            </span>
+                            <div class="review" style="margin-bottom: 25px">
+                                <div class="progress">
+                                    <div class="progress-done" id="sp1"></div>
+                                </div>
+                                <span class="percent" id="sp2">0%</span>
+                            </div>
+                            <p id="activityDesc" style="user-select:none">
+                            </p>
                         </a>
                     </div>
                     <div class="metro-item" style="cursor: pointer">
@@ -298,12 +331,13 @@ ${HeaderBannerLabel}
         </div>
     </div>
 
-    <div style="background-color:#f6f8fa;padding-top:40px;">
+
+    <div class="index-bottom" style="padding-top:40px;padding-bottom: 20px;">
         <div class="wrapper">
             <div class="index-recent fn-flex-1">
-                <div style="border-bottom: 1px solid #eee;margin:0px 10px ;">
+                <div class="index-head-title">
                     <div style="float:left;font-size:13px;margin:5px 0 10px 0; font-weight:bold;">聊天室（<span
-                                id="indexOnlineChatCnt"></span>人在线）
+                                id="indexOnlineChatCnt">?</span>人在线）
                     </div>
                     <div style="float:right;font-size:13px;margin:5px 0 0 0;"><a href="${servePath}/cr">进入完整版聊天室</a>
                     </div>
@@ -325,8 +359,7 @@ ${HeaderBannerLabel}
                             <#if messages?size != 0>
                                 <#list messages as msg>
                                     <#if msg_index <= 9>
-                                        <li class="fn-flex" id="chatindex${msg.oId}"
-                                            style='border-bottom: 1px solid #eee;'>
+                                        <li class="fn-flex index-chat" id="chatindex${msg.oId}">
                                             <a rel="nofollow" href="${servePath}/member/${msg.userName}">
                                                 <div class="avatar"
                                                      aria-label="${msg.userName}"
@@ -335,11 +368,20 @@ ${HeaderBannerLabel}
                                             <div class="fn-flex-1">
                                                 <div class="ft-smaller">
                                                     <a rel="nofollow" href="${servePath}/member/${msg.userName}">
-                                                        <span class="ft-gray">${msg.userName}</span>
+                                                        <#if msg.userNickname?? && msg.userNickname?length gt 1>
+                                                            <span class="ft-gray">${msg.userNickname} ( ${msg.userName} )</span>
+                                                        <#else>
+                                                            <span class="ft-gray">${msg.userName}</span>
+                                                        </#if>
                                                     </a>
                                                 </div>
                                                 <div class="vditor-reset comment<#if 0 == chatRoomPictureStatus> blur</#if>">
-                                                    ${msg.content}
+                                                    <#assign text=msg.content>
+                                                    <#if text?contains("\"msgType\":\"redPacket\"")>
+                                                        [收到红包，请在完整版聊天室查看]
+                                                    <#else>
+                                                        ${text}
+                                                    </#if>
                                                 </div>
                                             </div>
                                         </li>
@@ -354,7 +396,7 @@ ${HeaderBannerLabel}
             </div>
 
             <div class="index-recent fn-flex-1">
-                <div style="border-bottom: 1px solid #eee;margin:0px 10px ;">
+                <div class="index-head-title">
                     <div style="float:left;font-size:13px;margin:5px 0 10px 0; font-weight:bold;">标签</div>
                     <div style="float:right;font-size:13px;margin:5px 0 0 0;"><a href="${servePath}/tags">更多</a>
                     </div>
@@ -384,7 +426,7 @@ ${HeaderBannerLabel}
                     </div>
                 </div>
 
-                <div style="border-bottom: 1px solid #eee;margin:0px 10px ;">
+                <div class="index-head-title">
                     <div style="float:left;font-size:13px;margin:5px 0 10px 0; font-weight:bold;">问答</div>
                     <div style="float:right;font-size:13px;margin:5px 0 0 0;"><a href="${servePath}/qna">更多</a>
                     </div>
@@ -415,7 +457,7 @@ ${HeaderBannerLabel}
             </div>
 
             <div class="index-recent fn-flex-1">
-                <div style="border-bottom: 1px solid #eee;margin:0px 10px ;">
+                <div class="index-head-title">
                     <div style="float:left;font-size:13px;margin:5px 0 10px 0; font-weight:bold;">清风明月</div>
                     <a href="${servePath}/article/1630938317106" title="清风明月是什么？"
                        style="float: right; margin: 5px 0 10px 0">
@@ -457,11 +499,58 @@ ${HeaderBannerLabel}
             </div>
         </div>
     </div>
+
+    <div class="index-bottom" style="padding: 15px 0">
+        <div class="wrapper">
+            <div class="metro-line fn-flex old-almanac" style="width:100%">
+                <div class="tip metro-item">
+                    <span class="date"></span>
+                    <div class="line-tip">
+                        <strong>座位朝向：</strong>面向<span class="direction_value"></span>写程序，BUG 最少。
+                    </div>
+                    <div class="line-tip">
+                        <strong>今日宜饮：</strong><span class="drink_value"></span>
+                    </div>
+                    <div class="line-tip">
+                        <strong>女神亲近指数：</strong><span class="goddes_value"></span>
+                    </div>
+                </div>
+                <div class="good metro-item">
+                    <div class="title">
+                        <table>
+                            <tr>
+                                <td>宜</td>
+                            </tr>
+                        </table>
+                    </div>
+                    <div class="content">
+                        <ul></ul>
+                    </div>
+                    <div class="clear"></div>
+                </div>
+                <div class="bad metro-item">
+                    <div class="title">
+                        <table>
+                            <tr>
+                                <td>不宜</td>
+                            </tr>
+                        </table>
+                    </div>
+                    <div class="content">
+                        <ul></ul>
+                    </div>
+                    <div class="clear"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
 </div>
 <#include "footer.ftl">
 <script>
     Label.chatRoomPictureStatus = "<#if 0 == chatRoomPictureStatus> blur</#if>";
 </script>
+<script src="${staticServePath}/js/old-almanac${miniPostfix}.js?${staticResourceVersion}"></script>
 <script src="${staticServePath}/js/channel${miniPostfix}.js?${staticResourceVersion}"></script>
 <script type="text/javascript">
     // tag click
@@ -670,48 +759,6 @@ ${HeaderBannerLabel}
         });
     }
 
-    function submitCheckIn() {
-        let checkInBtn = document.getElementById("checkIn");
-        Util.fadeOut(checkInBtn);
-        $.ajax({
-            url: "${servePath}/activity/daily-checkin-api",
-            type: "GET",
-            async: false,
-            cache: false,
-            success: function (result) {
-                if (result.sum === undefined) {
-                    Util.goLogin();
-                }
-                setTimeout(function () {
-                    if (result.sum === -1) {
-                        $("#checkIn").html("<img style='border-radius: 0' src='https://pwl.stackoverflow.wiki/2021/09/embarrassed-4112bd37.png'><b>你已经签到过了哦！</b>");
-                        Util.fadeIn(checkInBtn, function () {
-                            setTimeout(function () {
-                                Util.fadeOut(checkInBtn, function () {
-                                    $("#checkIn").html('<img style="border-radius: 0" id="checkInImg" src="https://pwl.stackoverflow.wiki/2021/10/Fishing-a219e80c.png" alt="每日签到"><b>每日签到</b>');
-                                    Util.fadeIn(checkInBtn);
-                                });
-                            }, 2000);
-                        });
-                    } else {
-                        $("#checkIn").html("<img style='border-radius: 0' src='https://pwl.stackoverflow.wiki/2021/09/correct-1f5e3258.png'><b>签到成功～ 积分 +" + result.sum + "</b>");
-                        Util.fadeIn(checkInBtn, function () {
-                            setTimeout(function () {
-                                Util.fadeOut(checkInBtn, function () {
-                                    $("#checkIn").html('<img style="border-radius: 0" id="checkInImg" src="https://pwl.stackoverflow.wiki/2021/10/Fishing-a219e80c.png" alt="每日签到"><b>每日签到</b>');
-                                    Util.fadeIn(checkInBtn);
-                                });
-                            }, 2000);
-                        });
-                    }
-                }, 700);
-            },
-            error: function () {
-                Util.goLogin();
-            }
-        });
-    }
-
     var loading = false;
     var rotate = new Rotate("randomArticlesRefreshSvg");
 
@@ -797,6 +844,82 @@ ${HeaderBannerLabel}
 
     elementFadeOut(".niceUsersElement", 20);
     elementFadeOut(".topCheckInUsersElement", 90);
+</script>
+<script>
+    var liveness = ${liveness};
+    var checkedIn = <#if checkedIn == 1>true<#else>false</#if>;
+    function getCheckedInStatus() {
+        $.ajax({
+            url: Label.servePath + "/user/checkedIn",
+            method: "get",
+            cache: false,
+            async: false,
+            success: function (result) {
+                checkedIn = result.checkedIn;
+            }
+        });
+    }
+    function getActivityStatus() {
+        $.ajax({
+            url: Label.servePath + "/user/liveness",
+            method: "get",
+            cache: false,
+            async: false,
+            success: function (result) {
+                liveness = result.liveness;
+            }
+        });
+    }
+    function refreshActivities() {
+        <#if isLoggedIn>
+        getCheckedInStatus();
+        getActivityStatus();
+        </#if>
+        if (checkedIn === true) {
+            $("#checkedInStatus").html('' +
+                '<p style="user-select:none;color:#3caf36;font-weight:bold;font-size:13px">' +
+                '今日已签到' +
+                '</p>');
+        } else if (checkedIn === false) {
+            $("#checkedInStatus").html('' +
+                '<p style="user-select:none;color:#c46b25;font-weight:bold;font-size:13px">' +
+                '今日未签到' +
+                '</p>');
+        }
+        $("#sp1").css("width", liveness + "%");
+        let formatedLiveness;
+        for (let i = 0; i <= liveness; i++) {
+            formatedLiveness = i;
+        }
+        let nowLiveness = parseInt($("#sp2").text().replace("%", ""));
+        if (liveness == 0) {
+            nowLiveness = 0;
+        }
+        if ($("#sp2").html() !== formatedLiveness + "%") {
+            let j = 1;
+            for (let i = nowLiveness; i <= liveness; i++) {
+                setTimeout(function () {
+                    $("#sp2").html(i + "%");
+                }, j * 40);
+                j++;
+            }
+        }
+        if (liveness < 10 && !checkedIn) {
+            $("#activityDesc").html("今日活跃度到达 10% 后<br>系统将自动签到");
+        } else if (liveness < 10 && checkedIn) {
+            $("#activityDesc").html("您的免签卡今日已生效");
+        } else if (liveness >= 10 && !checkedIn) {
+            $("#activityDesc").html("已提交自动签到至系统<br>请稍候查看签到状态");
+        } else if (liveness < 100) {
+            $("#activityDesc").html("今日活跃度到达 100% 后<br>可获得一张免签卡 (2天)");
+        } else {
+            $("#activityDesc").html("膜拜肝帝！活跃爆满！<br>免签卡已放入你的背包！");
+        }
+    }
+    refreshActivities();
+    <#if isLoggedIn>
+    setInterval(refreshActivities, 5000);
+    </#if>
 </script>
 </body>
 </html>

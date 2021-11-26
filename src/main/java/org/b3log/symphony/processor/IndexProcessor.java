@@ -20,6 +20,7 @@ package org.b3log.symphony.processor;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.time.DateFormatUtils;
 import org.b3log.latke.Keys;
 import org.b3log.latke.Latkes;
 import org.b3log.latke.http.Dispatcher;
@@ -44,6 +45,7 @@ import org.b3log.symphony.processor.middleware.LoginCheckMidware;
 import org.b3log.symphony.service.*;
 import org.b3log.symphony.util.Markdowns;
 import org.b3log.symphony.util.Sessions;
+import org.b3log.symphony.util.StatusCodes;
 import org.b3log.symphony.util.Symphonys;
 import org.json.JSONObject;
 
@@ -136,6 +138,22 @@ public class IndexProcessor {
         Dispatcher.get("/games/adarkroom/", indexProcessor::showADarkRoom, loginCheck::handle);
         Dispatcher.get("/games/lifeRestart/view/", indexProcessor::showLifeRestart, loginCheck::handle);
         Dispatcher.get("/games/evolve/", indexProcessor::showEvolve, loginCheck::handle);
+        Dispatcher.get("/user/checkedIn", indexProcessor::isCheckedIn, loginCheck::handle);
+    }
+
+    /**
+     * 检测用户是否签到
+     *
+     * @param context
+     */
+    public void isCheckedIn(final RequestContext context) {
+        JSONObject currentUser = Sessions.getUser();
+        try {
+            currentUser = ApiProcessor.getUserByKey(context.param("apiKey"));
+        } catch (NullPointerException ignored) {
+        }
+        final String userId = currentUser.optString(Keys.OBJECT_ID);
+        context.renderJSON(StatusCodes.SUCC).renderJSON(new JSONObject().put("checkedIn", activityQueryService.isCheckedinToday(userId)));
     }
 
     public void showEvolve(final RequestContext context) {
@@ -321,7 +339,7 @@ public class IndexProcessor {
             dataModel.put(UserExt.CHAT_ROOM_PICTURE_STATUS, UserExt.USER_XXX_STATUS_C_ENABLED);
             // 是否领取过昨日奖励
             dataModel.put("collectedYesterdayLivenessReward", 1);
-            dataModel.put("checkedIn", 1);
+            dataModel.put("checkedIn", 0);
         }
 
         final List<JSONObject> recentArticles = articleQueryService.getIndexRecentArticles();
@@ -348,6 +366,25 @@ public class IndexProcessor {
         dataModel.put("onlineTopUsers", onlineTopUsers);
         // 随机文章
         dataModel.put("indexRandomArticles", ArticleProcessor.getRandomArticles(12));
+
+        // TGIF
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(new Date());
+        if (calendar.get(Calendar.DAY_OF_WEEK) == 6) {
+            // 周五
+            String date = DateFormatUtils.format(new Date(), "yyyyMMdd");
+            String articleTitle = "摸鱼周报 " + date;
+            JSONObject article = articleQueryService.getArticleByTitle(articleTitle);
+            if (article == null) {
+                dataModel.put("TGIF", "0");
+                dataModel.put("yyyyMMdd", date);
+            } else {
+                dataModel.put("TGIF", Latkes.getServePath() + article.optString(Article.ARTICLE_PERMALINK));
+            }
+        } else {
+            // 不是周五
+            dataModel.put("TGIF", "-1");
+        }
 
         dataModelService.fillHeaderAndFooter(context, dataModel);
         dataModelService.fillIndexTags(dataModel);

@@ -34,18 +34,47 @@
     <div class="wrapper">
         <div class="content chat-room">
             <div class="module">
-                <h2 class="sub-head">${chatRoomLabel}</h2>
+                <#if hasSystemTitle>
+                <h2>${systemTitle}</h2>
+                <#else>
+                <h2>${chatRoomLabel}</h2>
+                </#if>
+                <a style="line-height: 30px;text-decoration: none;color: #1296db;font-size: 12px;" href="https://gitee.com/imlinhanchao/pwl-chat/releases" target="_blank"><svg style="width: 12px; height: 12px;"><use xlink:href="#downloadIcon"></use></svg> 下载客户端</a>
                 <div class="fn-content">
                     <div class="reply">
                         <#if isLoggedIn>
                             <div id="chatContent"></div><br>
+                            <div class="fn-clear" style="margin-bottom: 5px">
+                                <svg id="redPacketBtn" style="width: 30px; height: 30px; cursor:pointer;">
+                                    <use xlink:href="#redPacketIcon"></use>
+                                </svg>
+                                <svg id="emojiBtn" style="width: 30px; height: 30px; cursor:pointer;">
+                                    <use xlink:href="#emojiIcon"></use>
+                                </svg>
+                                <div class="hide-list" id="emojiList">
+                                    <div class="hide-list-emojis" id="emojis" style="max-height: 200px">
+                                    </div>
+                                    <div class="hide-list-emojis__tail">
+                                        <span>
+                                        <a onclick="ChatRoom.fromURL()">从URL导入表情包</a>
+                                        </span>
+                                        <span class="hide-list-emojis__tip"></span>
+                                        <span>
+                                            <a onclick="$('#uploadEmoji input').click()">上传表情包</a>
+                                        </span>
+                                        <form style="display: none" id="uploadEmoji" method="POST" enctype="multipart/form-data">
+                                            <input type="file" name="file">
+                                        </form>
+                                    </div>
+                                </div>
+                                <div class="fn-right">
+                                    <button class="green" onclick="ChatRoom.send()">${postLabel}</button>
+                                </div>
+                            </div>
                             <div class="fn-clear comment-submit">
                                 <div class="fn-left online-cnt">${onlineVisitorCountLabel} <span id="onlineCnt"></span>
                                 </div>
                                 <div class="tip fn-left" id="chatContentTip"></div>
-                                <div class="fn-right">
-                                    <button class="green" onclick="ChatRoom.send()">${postLabel}</button>
-                                </div>
                             </div>
                             <div id="chatRoomOnlineCnt" class="chats__users">
                             </div>
@@ -73,6 +102,7 @@
 <script>
     Label.uploadLabel = "${uploadLabel}";
 </script>
+<script src="${staticServePath}/js/lib/jquery/file-upload-9.10.1/jquery.fileupload.min.js"></script>
 <script src="${staticServePath}/js/channel${miniPostfix}.js?${staticResourceVersion}"></script>
 <script src="${staticServePath}/js/chat-room${miniPostfix}.js?${staticResourceVersion}"></script>
 <script>
@@ -92,6 +122,7 @@
     Label.currentUser = '<#if currentUser??>${currentUser.userName}</#if>';
     Label.level3Permitted = ${level3Permitted?string("true", "false")};
     Label.chatRoomPictureStatus = "<#if 0 == chatRoomPictureStatus> blur</#if>";
+    Label.latestMessage = "";
     ChatRoom.init();
     // Init [ChatRoom] channel
     ChatRoomChannel.init("${wsScheme}://${serverHost}:${serverPort}${contextPath}/chat-room-channel");

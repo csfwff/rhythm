@@ -35,6 +35,7 @@ import org.b3log.symphony.service.DataModelService;
 import org.b3log.symphony.service.NotificationMgmtService;
 import org.b3log.symphony.service.NotificationQueryService;
 import org.b3log.symphony.service.UserQueryService;
+import org.b3log.symphony.util.Results;
 import org.b3log.symphony.util.Sessions;
 import org.b3log.symphony.util.StatusCodes;
 import org.b3log.symphony.util.Symphonys;
@@ -114,6 +115,7 @@ public class NotificationProcessor {
         Dispatcher.get("/notifications/following", notificationProcessor::showFollowingNotifications, loginCheck::handle);
         Dispatcher.get("/notifications/broadcast", notificationProcessor::showBroadcastNotifications, loginCheck::handle);
         Dispatcher.get("/notifications/unread/count", notificationProcessor::getUnreadNotificationCount, loginCheck::handle);
+        Dispatcher.get("/api/getNotifications", notificationProcessor::getNotificationsApi, loginCheck::handle);
     }
 
     /**
@@ -243,7 +245,11 @@ public class NotificationProcessor {
      * @param context the specified context
      */
     public void makeAllNotificationsRead(final RequestContext context) {
-        final JSONObject currentUser = Sessions.getUser();
+        JSONObject currentUser = Sessions.getUser();
+        try {
+            currentUser = ApiProcessor.getUserByKey(context.param("apiKey"));
+        } catch (NullPointerException ignored) {
+        }
         final String userId = currentUser.optString(Keys.OBJECT_ID);
 
         notificationMgmtService.makeAllRead(userId);
@@ -259,7 +265,11 @@ public class NotificationProcessor {
     public void makeNotificationReadByType(final RequestContext context) {
         final String type = context.pathVar("type"); // "commented"/"at"/"following"
 
-        final JSONObject currentUser = Sessions.getUser();
+        JSONObject currentUser = Sessions.getUser();
+        try {
+            currentUser = ApiProcessor.getUserByKey(context.param("apiKey"));
+        } catch (NullPointerException ignored) {
+        }
         final String userId = currentUser.optString(Keys.OBJECT_ID);
 
         switch (type) {
@@ -375,6 +385,61 @@ public class NotificationProcessor {
         }
 
         context.sendRedirect(Latkes.getServePath() + "/notifications/commented");
+    }
+
+    /**
+     * Get user's notifications by API.
+     *
+     * @param context the specified context
+     */
+    public void getNotificationsApi(final RequestContext context) {
+        final Request request = context.getRequest();
+
+        JSONObject currentUser = Sessions.getUser();
+        try {
+            currentUser = ApiProcessor.getUserByKey(context.param("apiKey"));
+        } catch (NullPointerException ignored) {
+        }
+        if (null == currentUser) {
+            context.sendError(403);
+            return;
+        }
+        final String userId = currentUser.optString(Keys.OBJECT_ID);
+        final int pageNum = Paginator.getPage(request);
+        final int pageSize = Symphonys.NOTIFICATION_LIST_CNT;
+        final String notificationType = context.param("type");
+
+        final JSONObject result = Results.newSucc();
+        context.renderJSON(result);
+        List<JSONObject> data = new ArrayList<>();
+
+        if (notificationType != null) {
+            switch (notificationType) {
+                case "point":
+                    data = (List<JSONObject>) notificationQueryService.getPointNotifications(userId, pageNum, pageSize).get(Keys.RESULTS);
+                    break;
+                case "commented":
+                    data = (List<JSONObject>) notificationQueryService.getCommentedNotifications(userId, pageNum, pageSize).get(Keys.RESULTS);
+                    break;
+                case "reply":
+                    data = (List<JSONObject>) notificationQueryService.getReplyNotifications(userId, pageNum, pageSize).get(Keys.RESULTS);
+                    break;
+                case "at":
+                    data = (List<JSONObject>) notificationQueryService.getAtNotifications(userId, pageNum, pageSize).get(Keys.RESULTS);
+                    break;
+                case "following":
+                    data = (List<JSONObject>) notificationQueryService.getFollowingNotifications(userId, pageNum, pageSize).get(Keys.RESULTS);
+                    break;
+                case "broadcast":
+                    data = (List<JSONObject>) notificationQueryService.getBroadcastNotifications(userId, pageNum, pageSize).get(Keys.RESULTS);
+                    break;
+                case "sys-announce":
+                    data = (List<JSONObject>) notificationQueryService.getSysAnnounceNotifications(userId, pageNum, pageSize).get(Keys.RESULTS);
+                    break;
+            }
+        }
+
+        result.put(Common.DATA, data);
     }
 
     /**
@@ -703,7 +768,11 @@ public class NotificationProcessor {
      * @param context the specified context
      */
     public void getUnreadNotificationCount(final RequestContext context) {
-        final JSONObject currentUser = Sessions.getUser();
+        JSONObject currentUser = Sessions.getUser();
+        try {
+            currentUser = ApiProcessor.getUserByKey(context.param("apiKey"));
+        } catch (NullPointerException ignored) {
+        }
         final String userId = currentUser.optString(Keys.OBJECT_ID);
         final Map<String, Object> dataModel = new HashMap<>();
 

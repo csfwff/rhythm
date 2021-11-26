@@ -160,11 +160,11 @@ public class ActivityProcessor {
         Dispatcher.get("/activity/character", activityProcessor::showCharacter, loginCheck::handle, csrfMidware::fill);
         Dispatcher.post("/activity/character/submit", activityProcessor::submitCharacter, loginCheck::handle);
         Dispatcher.get("/activities", activityProcessor::showActivities);
-        Dispatcher.get("/activity/daily-checkin-api", activityProcessor::dailyCheckinApi, loginCheck::handle);
+        // Dispatcher.get("/activity/daily-checkin-api", activityProcessor::dailyCheckinApi, loginCheck::handle);
         Dispatcher.get("/activity/yesterday-liveness-reward-api", activityProcessor::yesterdayLivenessRewardApi, loginCheck::handle);
-        Dispatcher.get("/activity/1A0001", activityProcessor::show1A0001, csrfMidware::fill);
-        Dispatcher.post("/activity/1A0001/bet", activityProcessor::bet1A0001, loginCheck::handle, csrfMidware::check, activity1A0001ValidationMidware::handle);
-        Dispatcher.post("/activity/1A0001/collect", activityProcessor::collect1A0001, loginCheck::handle, activity1A0001CollectValidationMidware::handle);
+        // Dispatcher.get("/activity/1A0001", activityProcessor::show1A0001, csrfMidware::fill);
+        // Dispatcher.post("/activity/1A0001/bet", activityProcessor::bet1A0001, loginCheck::handle, csrfMidware::check, activity1A0001ValidationMidware::handle);
+        // Dispatcher.post("/activity/1A0001/collect", activityProcessor::collect1A0001, loginCheck::handle, activity1A0001CollectValidationMidware::handle);
         Dispatcher.get("/activity/eating-snake", activityProcessor::showEatingSnake, loginCheck::handle, csrfMidware::fill);
         Dispatcher.post("/activity/eating-snake/start", activityProcessor::startEatingSnake, loginCheck::handle, csrfMidware::check);
         Dispatcher.post("/activity/eating-snake/collect", activityProcessor::collectEatingSnake, loginCheck::handle, csrfMidware::fill);
@@ -172,6 +172,25 @@ public class ActivityProcessor {
         Dispatcher.post("/activity/gobang/start", activityProcessor::startGobang, loginCheck::handle);
         Dispatcher.post("/api/games/adarkroom/share", activityProcessor::shareADarkRoomScore, loginCheck::handle, csrfMidware::check);
         Dispatcher.post("/api/games/mofish/score", activityProcessor::shareMofishScore);
+        Dispatcher.get("/activity/catch-the-cat", activityProcessor::showCatchTheCat, csrfMidware::fill);
+    }
+
+    /**
+     * Catch the cat game.
+     *
+     * @param context
+     */
+    public void showCatchTheCat(final RequestContext context) {
+        final AbstractFreeMarkerRenderer renderer = new SkinRenderer(context, "activity/catch-the-cat.ftl");
+        final Map<String, Object> dataModel = renderer.getDataModel();
+        dataModelService.fillHeaderAndFooter(context, dataModel);
+        dataModelService.fillRandomArticles(dataModel);
+        dataModelService.fillSideHotArticles(dataModel);
+        dataModelService.fillSideTags(dataModel);
+        dataModelService.fillLatestCmts(dataModel);
+
+        final JSONObject user = Sessions.getUser();
+        final String userId = user.optString(Keys.OBJECT_ID);
     }
 
     /**
@@ -362,8 +381,11 @@ public class ActivityProcessor {
      * @param context the specified context
      */
     public void yesterdayLivenessRewardApi(final RequestContext context) {
-        final Request request = context.getRequest();
-        final JSONObject user = Sessions.getUser();
+        JSONObject user = Sessions.getUser();
+        try {
+            user = ApiProcessor.getUserByKey(context.param("apiKey"));
+        } catch (NullPointerException ignored) {
+        }
         final String userId = user.optString(Keys.OBJECT_ID);
 
         int sum = activityMgmtService.yesterdayLivenessRewardApi(userId);

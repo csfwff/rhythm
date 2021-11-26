@@ -54,24 +54,35 @@
             <span class="ft-red">♥</span> <a href="${servePath}/top/consumption">${consumptionRankLabel}</a>
 
             <div class="fn-right">
-                <#if !isDailyCheckin>
-                    <a class="ft-gray" href="${servePath}/activity/daily-checkin">${dailyCheckinLabel}</a>
-                <#else>
-                    <a class="tooltipped tooltipped-w ft-fade" aria-label="${checkinStreakLabel}/${checkinStreakPart0Label}" href="${servePath}/top/checkin">
-                    ${currentUser.userCurrentCheckinStreak}/<span class="ft-gray">${currentUser.userLongestCheckinStreak}</span>
-                    </a>
-                </#if>
-
                 <a href="${servePath}/member/${currentUser.userName}/points" class="tooltipped tooltipped-w ft-fade"
                    aria-label="${pointLabel} ${currentUser.userPoint?c}">
                     <#if 0 == currentUser.userAppRole>0x${currentUser.userPointHex}<#else><div class="painter-point" style="background-color: #${currentUser.userPointCC}"></div></#if></a>
             </div>
         </div>
-    </div> 
+    </div>
     <div class="top-left activity-board"></div>
     <div class="top-right activity-board"></div>
     <div class="right activity-board"></div>
     <div class="bottom activity-board"></div>
     <div class="left activity-board"></div>
+    <script>
+        function getActivityStatus() {
+            $.ajax({
+                url: Label.servePath + "/user/liveness",
+                method: "get",
+                cache: false,
+                async: false,
+                success: function (result) {
+                    let liveness = result.liveness;
+                    $('.person-info').data('percent', liveness);
+                    Util._initActivity();
+                    $('.person-info>.module-panel').attr('aria-label', '今日活跃 ' + liveness + '%');
+                }
+            });
+        }
+        setInterval(function () {
+            getActivityStatus();
+        }, 4000);
+    </script>
 </div>
 </#if>

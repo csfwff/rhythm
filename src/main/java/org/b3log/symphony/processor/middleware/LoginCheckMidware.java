@@ -22,6 +22,7 @@ import org.b3log.latke.http.RequestContext;
 import org.b3log.latke.ioc.Singleton;
 import org.b3log.latke.model.User;
 import org.b3log.symphony.model.UserExt;
+import org.b3log.symphony.processor.ApiProcessor;
 import org.b3log.symphony.util.Sessions;
 import org.json.JSONObject;
 
@@ -36,7 +37,16 @@ import org.json.JSONObject;
 public class LoginCheckMidware {
 
     public void handle(final RequestContext context) {
-        final JSONObject currentUser = Sessions.getUser();
+        JSONObject currentUser = Sessions.getUser();
+        try {
+            currentUser = ApiProcessor.getUserByKey(context.param("apiKey"));
+        } catch (NullPointerException ignored) {
+        }
+        try {
+            final JSONObject requestJSONObject = context.requestJSON();
+            currentUser = ApiProcessor.getUserByKey(requestJSONObject.optString("apiKey"));
+        } catch (NullPointerException ignored) {
+        }
         if (null == currentUser) {
             context.sendError(401);
             context.abort();

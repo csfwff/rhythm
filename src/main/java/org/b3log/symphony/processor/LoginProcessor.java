@@ -708,7 +708,7 @@ public class LoginProcessor {
     public void logout(final RequestContext context) {
         final JSONObject user = Sessions.getUser();
         if (null != user) {
-            Sessions.logout(user.optString(Keys.OBJECT_ID), context.getResponse());
+            Sessions.logout(user.optString(Keys.OBJECT_ID), context.getRequest(), context.getResponse());
         }
 
         String destinationURL = context.param(Common.GOTO);

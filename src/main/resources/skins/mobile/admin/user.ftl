@@ -352,5 +352,24 @@
             </form>
         </div>
     </div>
+
+    <div class="module">
+        <div class="module-header">
+            <h2>物品发放</h2>
+        </div>
+        <div class="module-panel form fn-clear">
+            <form action="${servePath}/admin/user/${user.oId}/adjust-bag" method="POST">
+                <label>${userNameLabel}</label>
+                <input type="text" name="userName" value="${user.userName}" readonly class="input--admin-readonly"/>
+                <label>物品名称</label>
+                <input type="text" name="item" value=""/>
+                <label>数量</label>
+                <input type="text" name="sum" value=""/>
+
+                <br/><br/>
+                <button type="submit" class="green fn-right">${submitLabel}</button>
+            </form>
+        </div>
+    </div>
 </div>
 </@admin>

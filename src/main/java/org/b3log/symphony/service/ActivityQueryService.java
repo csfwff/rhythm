@@ -336,8 +336,8 @@ public class ActivityQueryService {
 
             // 排序并剪切
             Collections.sort(gameData, (o1, o2) -> {
-                int i1 = Integer.valueOf(new JSONObject(o1.optString("data")).optString("know"));
-                int i2 = Integer.valueOf(new JSONObject(o2.optString("data")).optString("know"));
+                int i1 = Integer.valueOf(new JSONObject(o1.optString("data")).optString("trick"));
+                int i2 = Integer.valueOf(new JSONObject(o2.optString("data")).optString("trick"));
                 return i2 - i1;
             });
             if (gameData.size() > fetchSize) {

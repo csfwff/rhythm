@@ -249,6 +249,192 @@ var Comment = {
     })
   },
   /**
+   * 加载表情
+   */
+  loadEmojis: function () {
+    $("#emojis").html("");
+    let emojis = Comment.getEmojis();
+    for (let i = 0; i < emojis.length; i++) {
+      $("#emojis").append("" +
+          "<button>\n" +
+          "    <div class=\"divX\" onclick='Comment.delEmoji(\"" + emojis[i] + "\")'>\n" +
+          "        <svg style=\"width: 15px; height: 15px;\"><use xlink:href=\"#delIcon\"></use></svg>\n" +
+          "    </div>" +
+          "    <img style='max-height: 50px' onclick=\"Comment.editor.setValue(Comment.editor.getValue() + '![图片表情](" + emojis[i] + ")')\" class=\"vditor-emojis__icon\" src=\"" + emojis[i] + "\">\n" +
+          "</button>");
+    }
+  },
+  /**
+   * 删除表情包
+   * @param url
+   */
+  delEmoji: function (url) {
+    let emojis = Comment.getEmojis();
+    for (let i = 0; i < emojis.length; i++) {
+      if (emojis[i] === url) {
+        emojis.splice(i, 1);
+      }
+    }
+    $.ajax({
+      url: Label.servePath + "/api/cloud/sync",
+      method: "POST",
+      data: JSON.stringify({
+        gameId: "emojis",
+        data: emojis
+      }),
+      headers: {'csrfToken': Label.csrfToken},
+      async: false,
+      success: function (result) {
+        if (result.code === 0) {
+          Util.notice("success", 1500, "表情包删除成功。");
+          Comment.loadEmojis();
+          setTimeout(function () {
+            $("#emojiBtn").click();
+          }, 50)
+        } else {
+          Util.notice("warning", 1500, "表情包删除失败：" + result.msg);
+        }
+      }
+    });
+  },
+  /**
+   * 上传表情
+   */
+  listenUploadEmojis: function () {
+    $('#uploadEmoji').fileupload({
+      acceptFileTypes: /(\.|\/)(gif|jpe?g|png)$/i,
+      maxFileSize: 5242880,
+      multipart: true,
+      pasteZone: null,
+      dropZone: null,
+      url: Label.servePath + '/upload',
+      paramName: 'file[]',
+      add: function (e, data) {
+        ext = data.files[0].type.split('/')[1]
+
+        if (window.File && window.FileReader && window.FileList &&
+            window.Blob) {
+          var reader = new FileReader()
+          reader.readAsArrayBuffer(data.files[0])
+          reader.onload = function (evt) {
+            var fileBuf = new Uint8Array(evt.target.result.slice(0, 11))
+            var isImg = isImage(fileBuf)
+
+            if (!isImg) {
+              Util.alert('只允许上传图片!')
+
+              return
+            }
+
+            if (evt.target.result.byteLength > 1024 * 1024 * 5) {
+              Util.alert('图片过大 (最大限制 5M)')
+
+              return
+            }
+
+            data.submit()
+          }
+        } else {
+          data.submit()
+        }
+      },
+      formData: function (form) {
+        var data = form.serializeArray()
+        return data
+      },
+      submit: function (e, data) {
+      },
+      done: function (e, data) {
+        var result = {
+          result: {
+            key: data.result.data.succMap[Object.keys(data.result.data.succMap)[0]]
+          }
+        }
+        Comment.addEmoji(result.result.key);
+      },
+      fail: function (e, data) {
+        Util.alert('Upload error: ' + data.errorThrown)
+      },
+    })
+  },
+  // 从URL导入表情包
+  fromURL: function () {
+    Util.alert("" +
+        "<div class=\"form fn__flex-column\">\n" +
+        "<label>\n" +
+        "  <div class=\"ft__smaller ft__fade\" style=\"float: left\">请输入图片的URL</div>\n" +
+        "  <div class=\"fn-hr5 fn__5\"></div>\n" +
+        "  <input type=\"text\" id=\"fromURL\">\n" +
+        "</label>\n" +
+        "<div class=\"fn-hr5\"></div>\n" +
+        "<div class=\"fn__flex\" style=\"margin-top: 15px; justify-content: flex-end;\">\n" +
+        "  <button class=\"btn btn--confirm\" onclick='Comment.addEmoji($(\"#fromURL\").val());Util.closeAlert();'>导入</button>\n" +
+        "</div>\n" +
+        "</div>" +
+        "", "从URL导入表情包");
+    $("#fromURL").focus();
+    $("#fromURL").unbind();
+    $("#fromURL").bind('keypress',function(event){
+      if (event.keyCode == "13") {
+        Comment.addEmoji($("#fromURL").val());
+        Util.closeAlert();
+      }
+    });
+  },
+  addEmoji: function () {
+    for (let i = 0; i < arguments.length; i++) {
+      let url = arguments[i];
+      let emojis = Comment.getEmojis();
+      for (let i = 0; i < emojis.length; i++) {
+        if (emojis[i] === url) {
+          emojis.splice(i, 1);
+        }
+      }
+      emojis.push(url);
+      $.ajax({
+        url: Label.servePath + "/api/cloud/sync",
+        method: "POST",
+        data: JSON.stringify({
+          gameId: "emojis",
+          data: emojis
+        }),
+        headers: {'csrfToken': Label.csrfToken},
+        async: false,
+        success: function (result) {
+          if (result.code !== 0) {
+            Util.notice("warning", 1500, "表情包上传失败：" + result.msg);
+          }
+        }
+      });
+    }
+    Util.notice("success", 1500, "表情包上传成功。");
+    $("details[open]").removeAttr("open");
+    Comment.loadEmojis();
+  },
+  /**
+   * 获取表情包
+   */
+  getEmojis: function () {
+    let ret;
+    $.ajax({
+      url: Label.servePath + "/api/cloud/get",
+      method: "POST",
+      data: JSON.stringify({
+        gameId: "emojis",
+      }),
+      headers: {'csrfToken': Label.csrfToken},
+      async: false,
+      success: function (result) {
+        if (result.code === 0 && result.data !== "") {
+          ret = Util.parseArray(result.data);
+        } else {
+          ret = [];
+        }
+      },
+    });
+    return ret;
+  },
+  /**
    * 初始化帖子
    * @returns {undefined}
    */
@@ -470,7 +656,7 @@ var Comment = {
         position: 'top',
       },
       height: 200,
-      counter: 4096,
+      counter: 40960,
       placeholder: Label.commentEditorPlaceholderLabel,
       ctrlEnter: function () {
         Comment.add(Label.articleOId, Label.csrfToken,
@@ -752,8 +938,9 @@ var Comment = {
       },
       complete: function () {
         $(it).removeAttr('disabled').css('opacity', '1')
+        setTimeout(Util.listenUserCard, 1000);
       },
-    })
+    });
   },
   /**
    * @description 点击回复评论时，把当楼层的用户名带到评论框中
@@ -1785,6 +1972,38 @@ Article.init()
 
 $(document).ready(function () {
   Comment.init()
+
+  // 表情包初始化
+  // 加载表情
+  Comment.listenUploadEmojis();
+  Comment.loadEmojis();
+  // 监听表情包按钮
+  $("#emojiBtn").on('click', function () {
+    if ($("#emojiList").hasClass("showList")) {
+      $("#emojiList").removeClass("showList");
+    } else {
+      $("#emojiList").addClass("showList");
+      setTimeout(function () {
+        $("body").unbind();
+        $('body').click(function (event) {
+          if ($(event.target).closest('a').attr('id') !== 'aPersonListPanel' &&
+              $(event.target).closest('.module').attr('id') !== 'personListPanel') {
+            $('#personListPanel').hide()
+          }
+        })
+        $("body").click(function() {
+          $("#emojiList").removeClass("showList");
+          $("body").unbind();
+          $('body').click(function (event) {
+            if ($(event.target).closest('a').attr('id') !== 'aPersonListPanel' &&
+                $(event.target).closest('.module').attr('id') !== 'personListPanel') {
+              $('#personListPanel').hide()
+            }
+          })
+        });
+      }, 100);
+    }
+  });
 
   // Init [Article] channel
   ArticleChannel.init(Label.articleChannel)

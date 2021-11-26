@@ -190,6 +190,18 @@ public class SettingsProcessor {
     private SystemSettingsService settingsService;
 
     /**
+     * CLoud service.
+     */
+    @Inject
+    private CloudService cloudService;
+
+    /**
+     * Activity management service.
+     */
+    @Inject
+    private ActivityMgmtService activityMgmtService;
+
+    /**
      * Register request handlers.
      */
     public static void register() {
@@ -219,6 +231,43 @@ public class SettingsProcessor {
         Dispatcher.post("/point/buy-invitecode", settingsProcessor::pointBuy, loginCheck::handle, csrfMidware::check);
         Dispatcher.post("/export/posts", settingsProcessor::exportPosts, loginCheck::handle);
         Dispatcher.post("/point/transfer", settingsProcessor::pointTransfer, loginCheck::handle, csrfMidware::check, pointTransferValidationMidware::handle);
+        Dispatcher.get("/bag/2dayCheckin", settingsProcessor::use2dayCheckinCard, loginCheck::handle, csrfMidware::check);
+        Dispatcher.get("/bag/patchCheckin", settingsProcessor::usePatchCheckinCard, loginCheck::handle, csrfMidware::check);
+
+    }
+
+    /**
+     * 使用补签卡
+     */
+    public void usePatchCheckinCard(final RequestContext context) {
+        JSONObject user = Sessions.getUser();
+        final String userId = user.optString(Keys.OBJECT_ID);
+        if (activityMgmtService.patchCheckin(userId) == 0) {
+            context.renderJSON(StatusCodes.SUCC);
+            context.renderMsg("补签卡使用成功！");
+        } else {
+            context.renderJSON(StatusCodes.ERR);
+            context.renderMsg("补签卡使用失败！可能没有需要补签的记录或背包中没有补签卡。");
+        }
+    }
+
+    /**
+     * 使用两天免签卡
+     */
+    public void use2dayCheckinCard(final RequestContext context) {
+        JSONObject user = Sessions.getUser();
+        final String userId = user.optString(Keys.OBJECT_ID);
+        JSONObject bag = new JSONObject(cloudService.getBag(userId));
+        if (bag.optInt("sysCheckinRemain") > 0) {
+            context.renderJSON(StatusCodes.ERR);
+            context.renderMsg("两天免签卡使用失败！你目前还有生效中的免签卡，省着点用吧～");
+            return;
+        }
+        if (cloudService.putBag(userId, "checkin2days", -1, Integer.MAX_VALUE) == 0) {
+            cloudService.putBag(userId, "sysCheckinRemain", 2, 2);
+            context.renderJSON(StatusCodes.SUCC);
+            context.renderMsg("两天免签卡使用成功！未来两天的签到将由系统自动进行～");
+        }
     }
 
     /**
@@ -233,7 +282,7 @@ public class SettingsProcessor {
         final JSONObject currentUser = Sessions.getUser();
         try {
             userMgmtService.deactivateUser(currentUser.optString(Keys.OBJECT_ID));
-            Sessions.logout(currentUser.optString(Keys.OBJECT_ID), response);
+            Sessions.logout(currentUser.optString(Keys.OBJECT_ID), context.getRequest(), response);
 
             context.renderJSON(StatusCodes.SUCC);
         } catch (final Exception e) {
@@ -508,6 +557,7 @@ public class SettingsProcessor {
         }
 
         dataModel.put(Common.TYPE, "settings");
+        dataModel.put("sysBag", cloudService.getBag(userId));
 
         // “感谢加入”系统通知已读置位 https://github.com/b3log/symphony/issues/907
         notificationMgmtService.makeRead(userId, Notification.DATA_TYPE_C_SYS_ANNOUNCE_NEW_USER);

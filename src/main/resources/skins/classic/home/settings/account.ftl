@@ -22,6 +22,14 @@
 <@home "account">
 <div class="module">
     <div class="module-header">
+        <h2>你的背包</h2>
+    </div>
+    <div class="module-panel form fn-clear" id="bag">
+    </div>
+</div>
+
+<div class="module">
+    <div class="module-header">
         <h2>${userNameLabel} ${updateNameTipLabel}</h2>
     </div>
     <div class="module-panel form fn-clear">
@@ -89,7 +97,7 @@
         <input value="${currentUser.userName}" type="text" readonly /><br/><br/>
 
         <div id="deactivateTip" class="tip"></div><br/>
-        <button class="fn-right ft-red" onclick="Settings.update('deactivate', '${csrfToken}')">${saveLabel}</button>
+        <button class="fn-right ft-red" onclick="Settings.requestDeactive('${csrfToken}')">${deactivateAccountLabel}</button>
     </div>
 </div>
 </@home>

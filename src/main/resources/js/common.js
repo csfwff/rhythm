@@ -33,6 +33,24 @@ var Util = {
   bling: undefined,
   isBlinging: false,
 
+  parseDom(arg) {
+    var objE = document.createElement("div");
+    objE.innerHTML = arg;
+    return objE.childNodes;
+  },
+
+  parseArray(arrStr) {
+    var tempKey = 'arr23' + new Date().getTime();//arr231432350056527
+    var arrayJsonStr = '{"' + tempKey + '":' + arrStr + '}';
+    var arrayJson;
+    if (JSON && JSON.parse) {
+      arrayJson = JSON.parse(arrayJsonStr);
+    } else {
+      arrayJson = eval('(' + arrayJsonStr + ')');
+    }
+    return arrayJson[tempKey];
+  },
+
   fadeIn(element, callback) {
     let opacity = 0;
     for (let i = 0; i < 100; i++) {
@@ -254,22 +272,23 @@ var Util = {
    * @description 关闭 alert
    */
   closeAlert: function () {
-    var $alert = $('#alertDialogPanel')
-    $alert.prev().remove()
-    $alert.remove()
+    $("#alertDialogPanel,.dialog-background").remove()
   },
   /**
    * @description alert
    * @param {String} content alert 内容
    */
-  alert: function (content) {
+  alert: function (content, title) {
+    if (title === undefined) {
+      title = "";
+    }
     var alertHTML = '',
       alertBgHTML = '<div onclick="Util.closeAlert(this)" style="height: ' +
         document.documentElement.scrollHeight
         + 'px;display: block;" class="dialog-background"></div>',
       alertContentHTML = '<div class="dialog-panel" id="alertDialogPanel" tabindex="0">'
         +
-        '<div class="fn-clear dialog-header-bg"><a class="icon-close" href="javascript:void(0);" onclick="Util.closeAlert()"><svg><use xlink:href="#close"></use></svg></a></div>'
+        '<div class="fn-clear dialog-header-bg"><span style="font-size: 14px;">' + title + '</span><a class="icon-close" href="javascript:void(0);" onclick="Util.closeAlert()"><svg><use xlink:href="#close"></use></svg></a></div>'
         +
         '<div class="dialog-main" style="text-align:center;padding: 30px 10px 40px">' +
         content + '</div></div>'
@@ -715,7 +734,6 @@ var Util = {
       upload: {
         max: Label.fileMaxSize,
         url: Label.servePath + '/upload',
-        linkToImgUrl: Label.servePath + '/fetch-upload',
         filename: function (name) {
           return name.replace(/\?|\\|\/|:|\||<|>|\*|\[|\]|\s+/g, '-')
         },
@@ -1274,7 +1292,7 @@ var Util = {
     $.ua.set(navigator.userAgent);
     if ($.ua.device.type !== 'mobile') {
       let cardHtml = '' +
-          '<div id="userCard" style="position: absolute; z-index: 130; right: auto; display: none; background: white;">' +
+          '<div id="userCard" style="position: absolute; z-index: 130; right: auto; display: none; ">' +
           '</div>';
       $("body").append(cardHtml);
       Util.listenUserCard();
@@ -1434,8 +1452,8 @@ var Util = {
             html += '<img style="height: 20px;margin: 0px;" src="https://pwl.stackoverflow.wiki/newRole.png"/>';
             break;
         }
-        html += '                    </a>\n' +
-            '                    <a href="' + Label.servePath + '/member/' + userName + '/points" class="tooltipped-new tooltipped__n"\n' +
+        html += '                    </a>\n';
+        html += '                    <a href="' + Label.servePath + '/member/' + userName + '/points" class="tooltipped-new tooltipped__n"\n' +
             '                       aria-label="' + userPoint + ' 积分">\n' +
             '                        <svg>\n' +
             '                            <use xlink:href="#iconPoints"></use>\n' +
@@ -1451,8 +1469,13 @@ var Util = {
               '</a>\n';
         }
         html += '' +
-            '                </div>\n' +
-            '                <div class="fn__shrink">\n' +
+            '                </div>\n';
+        if (userOnlineFlag === true) {
+          html += '<span style="background-color:#d23f31;color:#fff;font-size:12px;line-height:20px;border-radius:3px;height:20px;display:inline-block;padding:0 5px;vertical-align:middle;box-sizing:border-box;">在线</span>';
+        } else {
+          html += '<span style="background-color:rgba(0,0,0,0.54);color:#fff;font-size:12px;line-height:20px;border-radius:3px;height:20px;display:inline-block;padding:0 5px;vertical-align:middle;box-sizing:border-box;">离线</span>';
+        }
+        html += '                <div class="fn__shrink">\n' +
             '                    <a class="green small btn" href="' + Label.servePath + '/idle-talk?toUser=' + userName + '" rel="nofollow">\n' +
             '                        私信\n' +
             '                    </a>\n';
@@ -1478,6 +1501,7 @@ var Util = {
           $("#userCardContent").addClass("user-card--bg");
           $("#userCardContent").css("background-image", "url(" + cardBg + ")");
           $("#userCardContent > div").attr("style", "background-image: linear-gradient(90deg, rgba(214, 227, 235, 0.36), rgba(255, 255, 255, 0.76), rgba(255, 255, 255, 0.76));");
+          //$("#userCardContent > div").addClass("user-card-bottom-bg);
           $("#userCardContent > div > a > div").css("width", "105px");
           $("#userCardContent > div > a > div").css("height", "105px");
           $("#userCardContent > div > a > div").css("top", "80px");
@@ -1534,8 +1558,13 @@ var Util = {
 
       switch (data.command) {
         case 'refreshNotification':
-          Util.setUnreadNotificationCount(true);
-          Util.notice("default", 3000, "你有一条新的通知！<a href='/notifications'>点击查看</a>");
+          if (window.location.pathname === '/' || window.location.pathname === '/cr') {
+            Util.makeNotificationRead('at');
+            Util.setUnreadNotificationCount(true);
+          } else {
+            Util.setUnreadNotificationCount(true);
+            Util.notice("default", 3000, "你有一条新的通知！<a href='/notifications'>点击查看</a>");
+          }
           break
         case 'newIdleChatMessage':
           if (window.location.pathname !== "/idle-talk") {

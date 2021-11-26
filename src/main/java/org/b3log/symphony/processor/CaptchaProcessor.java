@@ -124,7 +124,7 @@ public class CaptchaProcessor {
      *
      * @param context the specified context
      */
-    SimpleCurrentLimiter captchaCurrentLimiter = new SimpleCurrentLimiter(10, 2);
+    SimpleCurrentLimiter captchaCurrentLimiter = new SimpleCurrentLimiter(5, 3);
     public void get(final RequestContext context) {
         String address = Requests.getRemoteAddr(context.getRequest());
         try {
@@ -223,32 +223,70 @@ public class CaptchaProcessor {
                 return;
             }
 
-            final PngRenderer renderer = new PngRenderer();
-            context.setRenderer(renderer);
-
-            final ConfigurableCaptchaService cs = new ConfigurableCaptchaService();
-            if (0.5 < Math.random()) {
-                cs.setColorFactory(new GradientColorFactory());
-            } else {
-                cs.setColorFactory(new RandomColorFactory());
+            String address = Requests.getRemoteAddr(context.getRequest());
+            try {
+                JSONObject user = Sessions.getUser();
+                if (user == null) {
+                    LOGGER.log(Level.INFO, "Host " + address + " requested to get a verify code.");
+                } else {
+                    LOGGER.log(Level.INFO, "User " + user.optString(User.USER_NAME) + " requested to get a verify code.");
+                }
+            } catch (Exception ignored) {
             }
-            cs.setFilterFactory(new CurvesRippleFilterFactory(cs.getColorFactory()));
-            final RandomWordFactory randomWordFactory = new RandomWordFactory();
-            randomWordFactory.setCharacters(CHARS);
-            randomWordFactory.setMinLength(CAPTCHA_LENGTH);
-            randomWordFactory.setMaxLength(CAPTCHA_LENGTH);
-            cs.setWordFactory(randomWordFactory);
-            final Captcha captcha = cs.getCaptcha();
-            final String challenge = captcha.getChallenge();
-            final BufferedImage bufferedImage = captcha.getImage();
+            if (captchaCurrentLimiter.access(address)) {
 
-            wrong.put(CAPTCHA, challenge);
+                final PngRenderer renderer = new PngRenderer();
+                context.setRenderer(renderer);
 
-            response.setHeader("Pragma", "no-cache");
-            response.setHeader("Cache-Control", "no-cache");
-            response.setHeader("Expires", "0");
+                final ConfigurableCaptchaService cs = new ConfigurableCaptchaService();
 
-            renderImg(renderer, bufferedImage);
+                // 随机颜色
+                if (0.5 < Math.random()) {
+                    cs.setColorFactory(new GradientColorFactory());
+                } else {
+                    cs.setColorFactory(new RandomColorFactory());
+                }
+                // 随机字符
+                final RandomWordFactory randomWordFactory = new RandomWordFactory();
+                randomWordFactory.setCharacters(CHARS);
+                randomWordFactory.setMinLength(CAPTCHA_LENGTH);
+                randomWordFactory.setMaxLength(CAPTCHA_LENGTH);
+                cs.setWordFactory(randomWordFactory);
+                // 随机字体
+                List<String> fonts = getAvaialbeFonts();
+                cs.setFontFactory(new RandomFontFactory(fonts));
+                // 自定义验证码图片背景
+                MyCustomBackgroundFactory backgroundFactory = new MyCustomBackgroundFactory();
+                cs.setBackgroundFactory(backgroundFactory);
+                // 彩条
+                cs.setFilterFactory(new CurvesRippleFilterFactory(cs.getColorFactory()));
+
+                final Captcha captcha = cs.getCaptcha();
+                final String challenge = captcha.getChallenge();
+                final BufferedImage bufferedImage = captcha.getImage();
+
+                wrong.put(CAPTCHA, challenge);
+
+                response.setHeader("Pragma", "no-cache");
+                response.setHeader("Cache-Control", "no-cache");
+                response.setHeader("Expires", "0");
+
+                renderImg(renderer, bufferedImage);
+            } else {
+                try {
+                    final PngRenderer renderer = new PngRenderer();
+                    context.setRenderer(renderer);
+
+                    response.setHeader("Pragma", "no-cache");
+                    response.setHeader("Cache-Control", "no-cache");
+                    response.setHeader("Expires", "0");
+
+                    URL url = new URL(Latkes.getStaticServePath() + "/images/wait.png");
+                    renderImg(renderer, ImageIO.read(url));
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
         } catch (final Exception e) {
             LOGGER.log(Level.ERROR, e.getMessage(), e);
         }

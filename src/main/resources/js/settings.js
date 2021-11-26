@@ -31,6 +31,66 @@
  */
 var Settings = {
   /**
+   * 初始化背包
+   */
+  initBag: function (sysBag) {
+    let html = '';
+    let bag = sysBag;
+    if (bag.checkin2days !== undefined && bag.checkin2days > 0) {
+      html += '<button style="margin:0 5px 5px 0" onclick="Settings.use2dayCheckinCard(\'' + Label.csrfToken + '\')">两天免签卡 x' + bag.checkin2days + '</button>';
+    }
+    if (bag.sysCheckinRemain !== undefined && bag.sysCheckinRemain > 0) {
+      html += '<button style="margin:0 5px 5px 0">免签卡生效中，剩余' + bag.sysCheckinRemain + '天</button>';
+    }
+    if (bag.patchCheckinCard !== undefined && bag.patchCheckinCard > 0) {
+      html += '<button style="margin:0 5px 5px 0" onclick="Settings.usePatchCheckinCard(\'' + Label.csrfToken + '\', ' + bag.patchStart + ')">补签卡 x' + bag.patchCheckinCard + '</button>';
+    }
+    if (html === '') {
+      html = '你的背包和钱包一样，是空的。';
+    }
+    document.getElementById("bag").innerHTML = html;
+  },
+  /**
+   * 使用补签卡
+   * @param csrfToken
+   */
+  usePatchCheckinCard: function (csrfToken, record) {
+    if (record == undefined) {
+      alert("您没有可以补签的记录！");
+    } else {
+      if (confirm('补签卡仅适用于断签一天的情况！\n在使用补签卡后，你的签到记录将提前至日期：' + record + '\n确定继续吗？') === true) {
+        $.ajax({
+          url: Label.servePath + '/bag/patchCheckin',
+          type: 'GET',
+          async: false,
+          headers: {'csrfToken': csrfToken},
+          success: function (result) {
+            alert(result.msg);
+            location.reload();
+          }
+        })
+      }
+    }
+  },
+  /**
+   * 使用两天免签卡
+   * @param csrfToken
+   */
+  use2dayCheckinCard: function (csrfToken) {
+    if (confirm('使用两天免签卡后，明天和后天的签到将由系统自动帮你完成，不需要登录摸鱼派。确定使用吗？') === true) {
+      $.ajax({
+        url: Label.servePath + '/bag/2dayCheckin',
+        type: 'GET',
+        async: false,
+        headers: {'csrfToken': csrfToken},
+        success: function (result) {
+          alert(result.msg);
+          location.reload();
+        }
+      })
+    }
+  },
+  /**
    * 举报
    * @param it
    */
@@ -431,6 +491,16 @@ var Settings = {
         $('#invitecodeStateTip').show()
       },
     })
+  },
+  /**
+   * 向用户确认是否真的注销账号
+   */
+  requestDeactive: function (csrfToken) {
+    if (confirm("请注意！这不是保存按钮！！！\n点击确定后，您的摸鱼派账号将会被永久停用，无法登录，账户信息将被部分抹除，确定继续吗？")) {
+      if (confirm("亲爱的鱼油，再次向您确认！\n您的账号数据非常宝贵，如果对社区的发展有任何意见或建议，欢迎联系摸鱼派管理组。\n本次确认后，您的账户将被永久停用。")) {
+        Settings.update('deactivate', csrfToken);
+      }
+    }
   },
   /**
    * @description 更新 settings 页面数据.

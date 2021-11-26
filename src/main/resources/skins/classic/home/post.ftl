@@ -30,7 +30,7 @@
     </head>
     <body>
         <#include "../header.ftl">
-        <div class="main post">
+        <div class="main post" style="padding-bottom: 20px">
             <div class="fn-flex-1 fn-clear">
                 <input type="text" id="articleTitle" autocomplete="off" tabindex="1"<#if requisite> readonly disabled</#if>
                        value="<#if article??>${article.articleTitle}</#if>" placeholder="${titleLabel}" />

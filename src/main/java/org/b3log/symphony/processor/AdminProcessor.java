@@ -371,6 +371,7 @@ public class AdminProcessor {
         Dispatcher.post("/admin/user/{userId}/abuse-point", adminProcessor::abusePoint, middlewares);
         Dispatcher.post("/admin/user/{userId}/init-point", adminProcessor::initPoint, middlewares);
         Dispatcher.post("/admin/user/{userId}/exchange-point", adminProcessor::exchangePoint, middlewares);
+        Dispatcher.post("/admin/user/{userId}/adjust-bag", adminProcessor::adjustBag, middlewares);
         Dispatcher.get("/admin/articles", adminProcessor::showArticles, middlewares);
         Dispatcher.get("/admin/article/{articleId}", adminProcessor::showArticle, middlewares);
         Dispatcher.post("/admin/article/{articleId}", adminProcessor::updateArticle, middlewares);
@@ -392,6 +393,27 @@ public class AdminProcessor {
         Dispatcher.post("/admin/domain/{domainId}/remove-tag", adminProcessor::removeDomainTag, middlewares);
         Dispatcher.post("/admin/search/index", adminProcessor::rebuildArticleSearchIndex, middlewares);
         Dispatcher.post("/admin/search-index-article", adminProcessor::rebuildOneArticleSearchIndex, middlewares);
+    }
+
+    /**
+     * Adjust bag item.
+     *
+     * @param context
+     */
+    public void adjustBag(final RequestContext context) {
+        final JSONObject currentUser = Sessions.getUser();
+        final String userId = context.pathVar("userId");
+        final String item = context.param("item");
+        final int sum = Integer.parseInt(context.param("sum"));
+        if (Role.ROLE_ID_C_ADMIN.equals(currentUser.optString(User.USER_ROLE))
+            ||
+            "1630552921050".equals(currentUser.optString(User.USER_ROLE))
+        ) {
+            final BeanManager beanManager = BeanManager.getInstance();
+            final CloudService cloudService = beanManager.getReference(CloudService.class);
+            cloudService.putBag(userId, item, sum, Integer.MAX_VALUE);
+        }
+        context.sendRedirect(Latkes.getServePath() + "/admin/user/" + userId);
     }
 
     /**
@@ -1482,10 +1504,9 @@ public class AdminProcessor {
 
         final JSONObject currentUser = Sessions.getUser();
         // 仅允许管理员和OP修改用户所属分组
-        if (
-                ! Role.ROLE_ID_C_ADMIN.equals(currentUser.optString(User.USER_ROLE))
-                &&
-                ! "1630552921050".equals(currentUser.optString(User.USER_ROLE))
+        if (!Role.ROLE_ID_C_ADMIN.equals(currentUser.optString(User.USER_ROLE))
+            &&
+            !"1630552921050".equals(currentUser.optString(User.USER_ROLE))
         ) {
             user.put(User.USER_ROLE, oldRole);
         }
