@@ -2,7 +2,7 @@
     'use strict';
 
     var existingServerListApis = [
-        "serverlist.json",
+        "https://pwl.icu/games/ratel/serverlist.json",
     ];
     var existingServerList = [
         "121.5.140.133:1024:Nico[v1.3.0]"
