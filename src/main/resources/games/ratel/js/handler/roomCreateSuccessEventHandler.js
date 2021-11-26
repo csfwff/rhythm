@@ -9,8 +9,8 @@
 
     RoomCreateSuccessEventHandler.prototype.handle = function(client, panel, clientTransferData) {
         var roomId = JSON.parse(clientTransferData.data).id
-        panel.append("You have created a room with id " + roomId);
-        panel.append("Please wait for other players to join !");
+        panel.append("你创建了一个房间，ID为 " + roomId);
+        panel.append("请等待其他玩家加入！");
         window.imClient.createRoom(roomId + '')
         window.imClient.ratelRoomId = roomId + ''
     };

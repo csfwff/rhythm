@@ -7,13 +7,13 @@
 
     Utils.extend(ShowOptionsSettingEventHandler, Handler);
 
-    var tips = "Setting: \n" +
-            "1. Card with shape edges (Default)\n" +
-            "2. Card with rounded edges\n" +
-            "3. Text Only with types\n" +
-            "4. Text Only without types\n" +
-            "5. Unicode Cards\n" +
-            "Please select an option above (enter [BACK] to return to options list)";
+    var tips = "设置: \n" +
+            "1. 带形状边缘的卡片 (默认)\n" +
+            "2. 圆角卡片\n" +
+            "3. 仅带牌型的文本卡片\n" +
+            "4. 纯文本卡片\n" +
+            "5. Unicode 卡片\n" +
+            "请选择其中一个选项 (输入 back 返回列表)";
 
     ShowOptionsSettingEventHandler.prototype.handle = function(client, panel, clientTransferData) {
         panel.append(tips);
