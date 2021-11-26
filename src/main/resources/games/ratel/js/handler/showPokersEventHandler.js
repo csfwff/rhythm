@@ -14,7 +14,7 @@
         client.setLastSellClientType(obj.clientType);
         client.setLastSellClientNickname(obj.clientNickname);
 
-        panel.append(obj.clientNickname + "[" + obj.clientType + "] played:");
+        panel.append(obj.clientNickname + "[" + obj.clientType + "] 出牌了：");
         panel.append(Poker.toString(obj.pokers));
 
         if ("sellClinetNickname" in obj) {

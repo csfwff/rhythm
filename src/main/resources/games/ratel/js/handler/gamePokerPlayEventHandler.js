@@ -10,9 +10,9 @@
     GamePokerPlayEventHandler.prototype.handle = function(client, panel, clientTransferData) {
         var obj = JSON.parse(clientTransferData.data);
 
-        panel.append("It's your turn to play, your cards are as follows: ");
+        panel.append("轮到你出牌了，你的手牌有：");
         panel.append(Poker.toString(obj.pokers));
-        panel.append("Please enter the combination you came up with (enter [exit|e] to exit current room, enter [pass|p] to jump current round, enter [view|v] to show all valid combinations.)");
+        panel.append("请输入你想出的牌 (输入 exit 或 e 退出当前房间，输入 pass 或 p 跳过本轮出牌)");
 
         panel.waitInput()
             .then(s => inputResolve(client, panel, obj, s));
@@ -62,7 +62,7 @@
                     panel.append("Invalid enter");
 
                     if (client.getLastPokers() != null) {
-                        panel.append(client.getLastSellClientNickname() + "[" + client.getLastSellClientType() + "] played: ");
+                        panel.append(client.getLastSellClientNickname() + "[" + client.getLastSellClientType() + "] 出牌了： ");
                         panel.append(Poker.toString(client.getLastPokers()));
                     }
 

@@ -11,7 +11,7 @@
         panel.append("Your combination has lower rank than the previous. You cannot play this combination!");
 
         if (client.getLastPokers() != null) {
-            panel.append(Utils.format("{}[{}] played: ", client.getLastSellClientNickname(), client.getLastSellClientType()));
+            panel.append(Utils.format("{}[{}] 出牌了： ", client.getLastSellClientNickname(), client.getLastSellClientType()));
             panel.append(Poker.toString(client.getLastPokers()));
         }
 

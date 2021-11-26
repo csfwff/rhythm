@@ -13,7 +13,7 @@
         panel.append(Utils.format("Your combination is {} ({}), but the previous combination is {} ({}). Mismatch!", obj.playType, obj.playCount, obj.preType, obj.preCount));
 
         if (client.getLastPokers() != null) {
-            panel.append(Utils.format("{}[{}] played: ", client.getLastSellClientNickname(), client.getLastSellClientType()));
+            panel.append(Utils.format("{}[{}] 出牌了： ", client.getLastSellClientNickname(), client.getLastSellClientType()));
             panel.append(Poker.toString(client.getLastPokers()));
         }
 

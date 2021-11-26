@@ -61,12 +61,16 @@
     function showServerList() {
         var contentDiv = document.querySelector("#content");
         existingServerList.forEach((server, i) => {
-            contentDiv.innerHTML += (i + 1) + ". &nbsp;" + server + "</br>";
+            // contentDiv.innerHTML += (i + 1) + ". &nbsp;" + server + "</br>";
         });
 
         var input = document.querySelector("#input");
         input.addEventListener("keypress", selectServer, false);
         input.focus();
+        $("#input").val("2");
+        let e = jQuery.Event("keypress");
+        e.keyCode = 13;
+        selectServer(e);
     }
 
     function selectServer(e) {

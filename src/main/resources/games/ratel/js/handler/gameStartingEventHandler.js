@@ -8,9 +8,9 @@
     Utils.extend(GameStartingEventHandler, Handler);
 
     GameStartingEventHandler.prototype.handle = function(client, panel, clientTransferData) {
-        panel.append("Game starting!");
+        panel.append("游戏开始！");
         panel.append("");
-        panel.append("Your cards are");
+        panel.append("你的手牌：");
         var obj = JSON.parse(clientTransferData.data);
         panel.append(Poker.toString(obj.pokers));
 

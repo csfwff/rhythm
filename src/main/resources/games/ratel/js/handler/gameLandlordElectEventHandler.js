@@ -12,15 +12,15 @@
         var turnClientId = obj.nextClientId;
 
         if ("preClientNickname" in obj) {
-            panel.append(obj.preClientNickname + " don't rob the landlord!");
+            panel.append(obj.preClientNickname + "：不抢");
         }
 
         if (turnClientId == client.getClientId()) {
-            panel.append("It's your turn. Do you want to rob the landlord? [Y/N] (enter [exit|e] to exit current room)");
+            panel.append("到你了。你是否要抢地主？【输入 Y 抢地主，输入 N 不抢】 (输入 exit 或 e 离开当前房间)");
             panel.waitInput()
                 .then(s => landlordElectResolve(client, panel, s));
         } else {
-            panel.append("It's " + obj.nextClientNickname + "'s turn. Please wait patiently for his/her confirmation !");
+            panel.append("现在是 " + obj.nextClientNickname + " 出牌，请耐心等待！");
         }
     };
 

@@ -7,11 +7,10 @@
 
     Utils.extend(ShowOptionsPveEventHandler, Handler);
 
-    var tips = "PVE: \n" +
-            "1. Easy Mode \n" +
-            "2. Medium Mode\n" +
-            "3. Hard Mode\n" +
-            "Please select an option above (enter [back|b] to return to options list)";
+    var tips = "人机: \n" +
+            "1. 人工智障\n" +
+            "2. 人工智能\n" +
+            "请选择其中一个选项 (输入 back 或 b 返回列表)";
 
     ShowOptionsPveEventHandler.prototype.handle = function(client, panel, clientTransferData) {
         panel.append(tips);

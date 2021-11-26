@@ -10,7 +10,7 @@
     GameLandlordConfirmEventHandler.prototype.handle = function(client, panel, clientTransferData) {
         var obj = JSON.parse(clientTransferData.data);
 
-        panel.append(obj.landlordNickname + " has become the landlord and gotten three extra cards");
+        panel.append(obj.landlordNickname + " 抢到地主，并获得三张地主牌：");
         panel.append(Poker.toString(obj.additionalPokers));
 
         client.send(ServerEventCodes.CODE_GAME_POKER_PLAY_REDIRECT, null, null);

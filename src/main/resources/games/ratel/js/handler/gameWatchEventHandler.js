@@ -93,7 +93,7 @@
     function printPlayPokers(panel, rawData) {
         var obj = JSON.parse(rawData);
 
-        panel.append(Utils.format("Player [{}] played::", obj.clientNickname));
+        panel.append(Utils.format("Player [{}] 出牌了：:", obj.clientNickname));
         panel.append(Poker.toString(obj.pokers));
     }
 

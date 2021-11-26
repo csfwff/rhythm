@@ -8,7 +8,7 @@
     Utils.extend(ClientConnectEventHandler, Handler);
 
     ClientConnectEventHandler.prototype.handle = function(client, panel, clientTransferData) {
-        panel.append("成功连接到服务器，欢迎你，鱼油！");
+        panel.append("成功连接到服务器，欢迎你，" + Label.currentUserName + "！");
         client.setClientId(parseInt(clientTransferData.data));
     };
 

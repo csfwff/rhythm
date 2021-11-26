@@ -73,9 +73,9 @@
             </div>
         </div>
         <div id="terminal">
-            <div id="bar">鱼油斗地主</div>
+            <div id="bar"></div>
             <div id="content">
-                <span>摸鱼人，欢迎来到鱼油斗地主~ 感谢客户端作者 <a href="https://github.com/marmot-z/js-ratel-client" target="_blank">marmot-z</a>，QQ群: <a href="https://jq.qq.com/?_wv=1027&k=OhGYB1EC" target="_blank">948365095</a></span></br>
+                <span>鱼油，欢迎来到鱼油斗地主~ 感谢客户端作者 <a href="https://github.com/marmot-z/js-ratel-client" target="_blank">marmot-z</a>，QQ群: <a href="https://jq.qq.com/?_wv=1027&k=OhGYB1EC" target="_blank">948365095</a></span></br>
             </div>
             <div id="prefix"><i class="fa fa-angle-right" aria-hidden="true" style='color:#2877d2;font-weight:bold;font-size: 16px;'></i></div>
             <input id="input" type="text"/>
@@ -95,4 +95,63 @@
 <script type="text/javascript" src="../../../../games/ratel/js/imClient.js"></script>
 <script type="text/javascript" src="../../../../games/ratel/js/site.js"></script>
 <script type="text/javascript" src="../../../../games/ratel/js/init.js"></script>
+<script type="text/javascript" src="../../../../games/evolve/lib/jquery.min.js"></script>
+<script src="${staticServePath}/js/lib/reconnecting-websocket.min.js?${staticResourceVersion}"></script>
+<script src="${staticServePath}/js/symbol-defs${miniPostfix}.js?${staticResourceVersion}"></script>
+<script src="${staticServePath}/js/common${miniPostfix}.js?${staticResourceVersion}"></script>
+<script>
+    var Label = {
+        saveData: '',
+        commentEditorPlaceholderLabel: '${commentEditorPlaceholderLabel}',
+        langLabel: '${langLabel}',
+        luteAvailable: ${luteAvailable?c},
+        reportSuccLabel: '${reportSuccLabel}',
+        breezemoonLabel: '${breezemoonLabel}',
+        confirmRemoveLabel: "${confirmRemoveLabel}",
+        reloginLabel: "${reloginLabel}",
+        invalidPasswordLabel: "${invalidPasswordLabel}",
+        loginNameErrorLabel: "${loginNameErrorLabel}",
+        followLabel: "${followLabel}",
+        unfollowLabel: "${unfollowLabel}",
+        symphonyLabel: "${symphonyLabel}",
+        visionLabel: "${visionLabel}",
+        cmtLabel: "${cmtLabel}",
+        collectLabel: "${collectLabel}",
+        uncollectLabel: "${uncollectLabel}",
+        desktopNotificationTemplateLabel: "${desktopNotificationTemplateLabel}",
+        servePath: "${servePath}",
+        staticServePath: "${staticServePath}",
+        isLoggedIn: ${isLoggedIn?c},
+        funNeedLoginLabel: '${funNeedLoginLabel}',
+        notificationCommentedLabel: '${notificationCommentedLabel}',
+        notificationReplyLabel: '${notificationReplyLabel}',
+        notificationAtLabel: '${notificationAtLabel}',
+        notificationFollowingLabel: '${notificationFollowingLabel}',
+        pointLabel: '${pointLabel}',
+        sameCityLabel: '${sameCityLabel}',
+        systemLabel: '${systemLabel}',
+        newFollowerLabel: '${newFollowerLabel}',
+        makeAsReadLabel: '${makeAsReadLabel}',
+        imgMaxSize: ${imgMaxSize?c},
+        fileMaxSize: ${fileMaxSize?c},
+        <#if isLoggedIn>
+        currentUserName: '${currentUser.userName}',
+        </#if>
+        <#if csrfToken??>
+        csrfToken: '${csrfToken}'
+        </#if>
+    }
+
+    <#if isLoggedIn>
+    Label.userKeyboardShortcutsStatus = '${currentUser.userKeyboardShortcutsStatus}'
+    </#if>
+
+    <#if isLoggedIn>
+    // Init [User] channel
+    Util.initUserChannel("${wsScheme}://${serverHost}:${serverPort}${contextPath}/user-channel")
+    </#if>
+</script>
+<script>
+    !function(p){"use strict";!function(t){var s=window,e=document,i=p,c="".concat("https:"===e.location.protocol?"https://":"http://","sdk.51.la/js-sdk-pro.min.js"),n=e.createElement("script"),r=e.getElementsByTagName("script")[0];n.type="text/javascript",n.setAttribute("charset","UTF-8"),n.async=!0,n.src=c,n.id="LA_COLLECT",i.d=n;var o=function(){s.LA.ids.push(i)};s.LA?s.LA.ids&&o():(s.LA=p,s.LA.ids=[],o()),r.parentNode.insertBefore(n,r)}()}({id:"JRkLwpTk0DlpkOHh",ck:"JRkLwpTk0DlpkOHh"});
+</script>
 </html>

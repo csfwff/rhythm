@@ -16,7 +16,7 @@
             for (var clientInfo of clientInfos) {
                 var position = clientInfo.position.toUpperCase();
                 if (position == (i ? "DOWN" : "UP")) {
-                    panel.append(Utils.format("{} {}  surplus {} {}", clientInfo.position, clientInfo.clientNickname, clientInfo.surplus, clientInfo.type));
+                    panel.append(Utils.format("{} {} 剩余 {} {}", clientInfo.position, clientInfo.clientNickname, clientInfo.surplus, clientInfo.type));
                 }
             }
         }
@@ -25,7 +25,7 @@
         if (sellClientId == client.getClientId()) {
             client.dispatch({code: ClientEventCodes.CODE_GAME_POKER_PLAY, data: clientTransferData.data, info: null});
         } else {
-            panel.append("It is " + obj.sellClinetNickname + "'s turn. Please wait for him to play his cards.");
+            panel.append("轮到 " + obj.sellClientNickname + " 出牌...");
         }
     };
 
