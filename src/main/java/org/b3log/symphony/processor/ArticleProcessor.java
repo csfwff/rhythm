@@ -21,6 +21,7 @@ package org.b3log.symphony.processor;
 import jodd.util.Base64;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.time.DateFormatUtils;
 import org.apache.commons.lang.time.DateUtils;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
@@ -929,6 +930,21 @@ public class ArticleProcessor {
             }
 
             article.put(Article.ARTICLE_TAGS, articleTags);
+
+            // TGIF
+            Calendar calendar = Calendar.getInstance();
+            calendar.setTime(new Date());
+            if (calendar.get(Calendar.DAY_OF_WEEK) == 6) {
+                String date = DateFormatUtils.format(new Date(), "yyyyMMdd");
+                String articleTitleShouldBe = "摸鱼日报 " + date;
+                JSONObject checkArticle = articleQueryService.getArticleByTitle(articleTitleShouldBe);
+                if (checkArticle == null) {
+                    // 没有 TGIF
+                    if (articleTitle.equals(articleTitleShouldBe)) {
+                        // 发放奖励
+                    }
+                }
+            }
 
             final String articleId = articleMgmtService.addArticle(article);
 
