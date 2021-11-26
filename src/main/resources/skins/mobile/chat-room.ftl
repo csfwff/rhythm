@@ -60,7 +60,7 @@
                                     </div>
                                 </div>
                                 <div class="fn-right">
-                                    <button class="red" onclick="$('#chats').empty();page=0;ChatRoom.more();ChatRoom.more();">${cleanScreenLabel}</button>
+                                    <button class="red" onclick="$('#chats').empty();page=0;ChatRoom.more();">${cleanScreenLabel}</button>
                                     <button class="green" onclick="ChatRoom.send()">${postLabel}</button>
                                 </div>
                             </div>
@@ -80,7 +80,7 @@
                     <div class="list" style="height: 100%">
                         <div id="chats">
                         </div>
-                        <div id="more" onclick="ChatRoom.more();ChatRoom.more();" style="cursor: pointer; color: rgba(0,0,0,0.54);"><#if !isLoggedIn>登录后</#if>查看更多</div>
+                        <div id="more" onclick="ChatRoom.more();" style="cursor: pointer; color: rgba(0,0,0,0.54);"><#if !isLoggedIn>登录后</#if>查看更多</div>
                     </div>
                 </div>
             </div>
@@ -115,7 +115,6 @@
             ChatRoomChannel.init("${wsScheme}://${serverHost}:${serverPort}${contextPath}/chat-room-channel");
             var page = 0;
             ChatRoom.more();
-            ChatRoom.more();
         </script>
         <script>
             $(window).scroll(
@@ -124,7 +123,6 @@
                     var scrollHeight = $(document).height();
                     var windowHeight = $(this).height();
                     if (scrollTop + windowHeight == scrollHeight) {
-                        ChatRoom.more();
                         ChatRoom.more();
                     }
                 }
