@@ -83,9 +83,6 @@
                         <div id="more" onclick="ChatRoom.more();ChatRoom.more();" style="cursor: pointer; color: rgba(0,0,0,0.54);"><#if !isLoggedIn>登录后</#if>查看更多</div>
                     </div>
                 </div>
-                <div class="side">
-                    <#include "side.ftl">
-                </div>
             </div>
         </div>
         <#include "footer.ftl">
@@ -119,6 +116,19 @@
             var page = 0;
             ChatRoom.more();
             ChatRoom.more();
+        </script>
+        <script>
+            $(window).scroll(
+                function() {
+                    var scrollTop = $(this).scrollTop();
+                    var scrollHeight = $(document).height();
+                    var windowHeight = $(this).height();
+                    if (scrollTop + windowHeight == scrollHeight) {
+                        ChatRoom.more();
+                        ChatRoom.more();
+                    }
+                }
+            );
         </script>
     </body>
 </html>
