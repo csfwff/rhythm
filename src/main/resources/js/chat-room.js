@@ -548,8 +548,7 @@ var ChatRoom = {
             }
             Util.listenUserCard();
           } else {
-            $("#more").removeAttr("onclick");
-            $("#more").html("已经到底啦！");
+            alert("没有更多聊天消息了！");
           }
         }
       });

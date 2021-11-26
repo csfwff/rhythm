@@ -91,7 +91,7 @@
             <div class="list module pd__15" id="comments" style="height: 100%">
                 <div id="chats">
                 </div>
-                <div id="more" onclick="ChatRoom.more();" style="cursor: pointer; color: rgba(0,0,0,0.54);"><#if !isLoggedIn>登录后</#if>查看更多</div>
+                <#if !isLoggedIn><div style="color:rgba(0,0,0,0.54);">登录后查看更多</div></#if>
             </div>
         </div>
         <div class="side">
