@@ -61,6 +61,7 @@
                                 </div>
                                 <div class="fn-right">
                                     <button class="green" onclick="ChatRoom.send()">${postLabel}</button>
+                                    <button class="red" onclick="$('#chats').empty();page=0;ChatRoom.more();ChatRoom.more();">${cleanScreenLabel}</button>
                                 </div>
                             </div>
                             <div class="fn-clear comment-submit">
