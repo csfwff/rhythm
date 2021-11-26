@@ -212,6 +212,24 @@ ${HeaderBannerLabel}
             </div>
             <div class="module-panel">
                 <ul class="module-list">
+                    <#if TGIF == '0'>
+                        <li>
+                            <a class="title" onclick="window.location.href=Label.servePath+'/post?type=0&tags=摸鱼周报&title=摸鱼周报 ${yyyyMMdd}'">
+                                <b>每周五的摸鱼周报时间到了！</b>
+                                <br>
+                                今天还没有人写摸鱼周报哦，抢在第一名写摸鱼周报，获得 <b style="color:orange">1000 积分</b> 奖励！
+                            </a>
+                        </li>
+                    <#elseif TGIF == '-1'>
+                    <#else>
+                        <li>
+                            <a class="title" href="${TGIF}">
+                                <b>每周五的摸鱼周报时间到了！</b>
+                                <br>
+                                今天已经有人写了摸鱼周报哦，快来看看吧~
+                            </a>
+                        </li>
+                    </#if>
                     <li><a class="title" style="text-decoration: none">
                             今日活跃度：${liveness}%
                         </a>
