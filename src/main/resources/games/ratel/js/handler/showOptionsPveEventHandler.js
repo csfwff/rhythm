@@ -31,14 +31,14 @@
                 throw new Error(s + " is not a number.")
             }
         } catch (e) {
-            panel.append("Invalid option, please choose again：");
+            panel.append("输入错误，请重新输入：");
             panel.waitInput().then((s) => inputResolve(client, panel, s));
         }
 
         if (i < 4 && i > 0) {
             client.send(ServerEventCodes.CODE_ROOM_CREATE_PVE, s);
         } else {
-            panel.append("Invalid option, please choose again：");
+            panel.append("输入错误，请重新输入：");
             panel.waitInput().then((s) => inputResolve(client, panel, s));
         }
     }

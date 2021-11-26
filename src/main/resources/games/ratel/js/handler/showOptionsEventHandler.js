@@ -39,7 +39,7 @@
                 throw new Error(s + " is not a number.")
             }
         } catch (e) {
-            panel.append("Invalid option, please choose again：");
+            panel.append("输入错误，请重新输入：");
             panel.waitInput().then((s) => inputResolve(client, panel, s));
         }
 
@@ -54,7 +54,7 @@
                 client.dispatch({code: ClientEventCodes.CODE_SHOW_OPTIONS_SETTING, data: null, info: null});
                 break;
             default:
-                panel.append("Invalid option, please choose again：");
+                panel.append("输入错误，请重新输入：");
                 panel.waitInput().then((s) => inputResolve(client, panel, s));
         }
     }

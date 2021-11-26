@@ -9,10 +9,10 @@
 
     var tips = "                                                 \n" +
         "+------------------------------------------------\n" +
-        "|You are already watching the game.      \n"         +
-        "|Room owner: {}. Room current status: {}.\n"         +
+        "| 你已经进入观战模式。      \n"         +
+        "| 房主：{}. 当前房间状态：{}.\n"         +
         "+------------------------------------------------\n" +
-        "(Hint: enter [exit|e] to exit.)                  \n" +
+        "(输入 exit 或 e 退出观战模式)                  \n" +
         "                                                   ";
 
     GameWatchSuccessfulEventHandler.prototype.handle = function(client, panel, clientTransferData) {

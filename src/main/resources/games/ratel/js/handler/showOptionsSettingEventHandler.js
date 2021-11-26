@@ -35,7 +35,7 @@
                 throw new Error(s + " is not a number.")
             }
         } catch (e) {
-            panel.append("Invalid option, please choose again：");
+            panel.append("输入错误，请重新输入：");
             panel.waitInput().then((s) => inputResolve(client, panel, s));
         }
 

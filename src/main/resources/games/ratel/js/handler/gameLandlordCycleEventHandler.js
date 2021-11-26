@@ -8,7 +8,7 @@
     Utils.extend(GameLandlordCycleEventHandler, Handler);
 
     GameLandlordCycleEventHandler.prototype.handle = function(client, panel, clientTransferData) {
-        panel.append("No player takes the landlord, so redealing cards.");
+        panel.append("没人抢地主，重新发牌...");
     };
 
     if (!window._handlers_) {

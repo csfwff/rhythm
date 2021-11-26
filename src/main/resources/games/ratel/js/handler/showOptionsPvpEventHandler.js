@@ -34,7 +34,7 @@
                 throw new Error(s + " is not a number.")
             }
         } catch (e) {
-            panel.append("Invalid option, please choose again：");
+            panel.append("输入错误，请重新输入：");
             panel.waitInput().then((s) => optionChooseResolve(client, panel, s));
         }
 
@@ -60,12 +60,12 @@
                 throw new Error(s + " is not a number.")
             }
         } catch (ex) {
-            panel.append("Invalid option, please choose again：");
+            panel.append("输入错误，请重新输入：");
             panel.waitInput().then((s) => joinRoomResolve(client, panel, s));
         }
 
         if (j < 1) {
-            panel.append("Invalid option, please choose again：");
+            panel.append("输入错误，请重新输入：");
             panel.waitInput().then((s) => joinRoomResolve(client, panel, s));
         } else {
             client.send(ServerEventCodes.CODE_ROOM_JOIN, s);
@@ -79,12 +79,12 @@
                 throw new Error(s + " is not a number.")
             }
         } catch (e) {
-            panel.append("Invalid option, please choose again：");
+            panel.append("输入错误，请重新输入：");
             panel.waitInput().then((s) => watchResolve(client, panel, s));
         }
 
         if (i < 1) {
-            panel.append("Invalid option, please choose again：");
+            panel.append("输入错误，请重新输入：");
             panel.waitInput().then((s) => watchResolve(client, panel, s));
         } else {
             client.send(ServerEventCodes.CODE_GAME_WATCH, s);

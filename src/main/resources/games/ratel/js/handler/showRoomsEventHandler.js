@@ -13,12 +13,12 @@
         var rooms = JSON.parse(clientTransferData.data);
 
         if (Array.isArray(rooms) && rooms.length > 0) {
-            panel.append(Utils.format(format, "ID", "OWNER", "COUNT", "TYPE"));
+            panel.append(Utils.format(format, "房间号", "房主", "当前人数", "类型"));
             for (var i in rooms) {
                 panel.append(Utils.format(format, rooms[i].roomId, rooms[i].roomOwner, rooms[i].roomClientCount, rooms[i].roomType));
             }
         } else {
-            panel.append("No available room. Please create a room!");
+            panel.append("目前没有任何房间，创建一个吧！");
         }
         client.dispatch({code: ClientEventCodes.CODE_SHOW_OPTIONS_PVP, data: rooms, info: null});
     };

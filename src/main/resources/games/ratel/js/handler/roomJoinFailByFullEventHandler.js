@@ -9,7 +9,7 @@
 
     RoomJoinFailByFullEventHandler.prototype.handle = function(client, panel, clientTransferData) {
         var obj = JSON.parse(clientTransferData.data);
-        panel.append("Join room failed. Room " + obj.roomId + " is full!");
+        panel.append("加入房间失败，房间 " + obj.roomId + " 已满员！");
         client.dispatch({code: ClientEventCodes.CODE_SHOW_OPTIONS, info: null, data: null});
     };
 
