@@ -2,7 +2,7 @@
     'use strict';
 
     var existingServerListApis = [
-        "https://pwl.icu/games/ratel/serverlist.json",
+        "serverlist.json",
     ];
     var existingServerList = [
         "121.5.140.133:1024:Nico[v1.3.0]"
@@ -61,7 +61,7 @@
     function showServerList() {
         var contentDiv = document.querySelector("#content");
         existingServerList.forEach((server, i) => {
-            // contentDiv.innerHTML += (i + 1) + ". &nbsp;" + server + "</br>";
+            //contentDiv.innerHTML += (i + 1) + ". &nbsp;" + server + "</br>";
         });
 
         var input = document.querySelector("#input");
