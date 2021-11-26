@@ -99,6 +99,7 @@
         </div>
     </div>
 </div>
+<div id="goToTop" style="position:fixed;bottom:20px;right:10%;display:none;"><a href="#">返回顶部</a></div>
 <#include "footer.ftl">
 <script>
     Label.uploadLabel = "${uploadLabel}";
@@ -141,6 +142,23 @@
             }
         }
     );
+</script>
+<script type="text/javascript">
+    $(document).ready(function(){
+        $(function(){
+            $(window).scroll(function(){
+                if($(this).scrollTop()>1){
+                    $("#goToTop").fadeIn();
+                } else {
+                    $("#goToTop").fadeOut();
+                }
+            });
+        });
+        $("#goToTop a").click(function(){
+            $("html,body").animate({scrollTop:0},800);
+            return false;
+        });
+    });
 </script>
 </body>
 </html>
