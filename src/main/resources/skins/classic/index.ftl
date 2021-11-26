@@ -158,7 +158,16 @@ ${HeaderBannerLabel}
                             </#list>
                             </div>
                         <#else>
-
+                        <div class="TGIF__item">
+                            <div style="float: left">
+                                <svg style="width: 30px; height: 30px;"><use xlink:href="#tadaIcon"></use></svg>
+                            </div>
+                            <div style="padding-left:40px">
+                                <b>每周五的摸鱼周报时间到了！</b>
+                                <br>
+                                今天已经有人写了摸鱼周报哦，<a href="${TGIF}" style="text-decoration:none;font-weight:bold;color:green;">快来看看吧~</a>
+                            </div>
+                        </div>
                     </#if>
             </div>
 

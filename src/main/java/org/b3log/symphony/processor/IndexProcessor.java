@@ -379,7 +379,7 @@ public class IndexProcessor {
                 dataModel.put("TGIF", "0");
                 dataModel.put("yyyyMMdd", date);
             } else {
-                dataModel.put("TGIF", article.optString(Latkes.getServePath() + Article.ARTICLE_PERMALINK));
+                dataModel.put("TGIF", Latkes.getServePath() + article.optString(Article.ARTICLE_PERMALINK));
             }
         } else {
             // 不是周五
