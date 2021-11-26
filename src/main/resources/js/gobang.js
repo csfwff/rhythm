@@ -197,9 +197,10 @@ var GobangChannel = {
      */
     init: function (channelServer) {
         GobangChannel.ws = new ReconnectingWebSocket(channelServer);
-        GobangChannel.ws.reconnectInterval = 10000;
+        GobangChannel.ws.reconnectInterval = 1000;
 
         GobangChannel.ws.onopen = function () {
+            console.log("Connected to gobang channel websocket.")
             // GobangChannel.ws.send('zephyr test');
         };
 
@@ -256,7 +257,7 @@ var GobangChannel = {
         };
 
         GobangChannel.ws.onclose = function () {
-            GobangChannel.ws.close();
+            console.log("Disconnected to gobang channel websocket.")
         };
 
         GobangChannel.ws.onerror = function (err) {

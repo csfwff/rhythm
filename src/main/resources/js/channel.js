@@ -41,9 +41,10 @@ var ArticleChannel = {
      */
     init: function (channelServer) {
         ArticleChannel.ws = new ReconnectingWebSocket(channelServer)
-        ArticleChannel.ws.reconnectInterval = 10000
+        ArticleChannel.ws.reconnectInterval = 1000
 
         ArticleChannel.ws.onopen = function () {
+            console.log("Connected to article channel websocket.")
             setInterval(function () {
                 ArticleChannel.ws.send('-hb-')
             }, 1000 * 60 * 3)
@@ -137,6 +138,7 @@ var ArticleChannel = {
         }
 
         ArticleChannel.ws.onclose = function () {
+            console.log("Disconnected to article channel websocket.")
         }
 
         ArticleChannel.ws.onerror = function (err) {
@@ -161,9 +163,10 @@ var ArticleListChannel = {
      */
     init: function (channelServer) {
         ArticleListChannel.ws = new ReconnectingWebSocket(channelServer)
-        ArticleListChannel.ws.reconnectInterval = 10000
+        ArticleListChannel.ws.reconnectInterval = 1000
 
         ArticleListChannel.ws.onopen = function () {
+            console.log("Connected to article list channel websocket.")
             setInterval(function () {
                 ArticleListChannel.ws.send('-hb-')
             }, 1000 * 60 * 3)
@@ -196,7 +199,7 @@ var ArticleListChannel = {
         }
 
         ArticleListChannel.ws.onclose = function () {
-            ArticleListChannel.ws.close()
+            console.log("Disconnected to article list channel websocket.")
         }
 
         ArticleListChannel.ws.onerror = function (err) {
@@ -217,9 +220,10 @@ var IdleTalkChannel = {
      */
     init: function (channelServer) {
         IdleTalkChannel.ws = new ReconnectingWebSocket(channelServer)
-        IdleTalkChannel.ws.reconnectInterval = 10000
+        IdleTalkChannel.ws.reconnectInterval = 1000
 
         IdleTalkChannel.ws.onopen = function () {
+            console.log("Connected to idle talk channel websocket.")
             setInterval(function () {
                 IdleTalkChannel.ws.send('-hb-')
             }, 1000 * 60 * 3)
@@ -293,7 +297,7 @@ var IdleTalkChannel = {
         }
 
         IdleTalkChannel.ws.onclose = function () {
-            IdleTalkChannel.ws.close()
+            console.log("Disconnected to idle talk channel websocket.")
         }
 
         IdleTalkChannel.ws.onerror = function (err) {
@@ -335,9 +339,10 @@ var ChatRoomChannel = {
      */
     init: function (channelServer) {
         ChatRoomChannel.ws = new ReconnectingWebSocket(channelServer)
-        ChatRoomChannel.ws.reconnectInterval = 10000
+        ChatRoomChannel.ws.reconnectInterval = 1000
 
         ChatRoomChannel.ws.onopen = function () {
+            console.log("Connected to chat room channel websocket.")
             setInterval(function () {
                 ChatRoomChannel.ws.send('-hb-')
             }, 1000 * 60 * 3)
@@ -450,7 +455,7 @@ var ChatRoomChannel = {
         }
 
         ChatRoomChannel.ws.onclose = function () {
-            ChatRoomChannel.ws.close()
+            console.log("Disconnected to chat room channel websocket.")
         }
 
         ChatRoomChannel.ws.onerror = function (err) {
@@ -475,9 +480,10 @@ var GobangChannel = {
      */
     init: function (channelServer) {
         GobangChannel.ws = new ReconnectingWebSocket(channelServer)
-        GobangChannel.ws.reconnectInterval = 10000
+        GobangChannel.ws.reconnectInterval = 1000
 
         GobangChannel.ws.onopen = function () {
+            console.log("Connected to gobang channel websocket.")
             setInterval(function () {
                 GobangChannel.ws.send('zephyr test')
             }, 1000 * 60 * 3)
@@ -497,7 +503,7 @@ var GobangChannel = {
         }
 
         GobangChannel.ws.onclose = function () {
-            GobangChannel.ws.close()
+            console.log("Disconnected to gobang channel websocket.")
         }
 
         GobangChannel.ws.onerror = function (err) {
