@@ -399,7 +399,7 @@ var ChatRoomChannel = {
                             liHTML = ChatRoom.renderMessage(data.userNickname, data.userName, data.userAvatarURL, data.time, data.content, data.oId, Label.currentUser, Label.level3Permitted);
                         }
                         $('#chats').prepend(liHTML);
-                        $('#chats>div.fn-none').show(200);
+                        $('#chats>div.fn-none').slideDown(200);
                         $('#chats>div.fn-none').removeClass("fn-none");
                         ChatRoom.resetMoreBtnListen();
                         if (data.md !== undefined) {

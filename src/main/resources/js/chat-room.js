@@ -528,29 +528,33 @@ var ChatRoom = {
    * @returns {undefined}
    */
   more: function () {
-    page++;
-    $.ajax({
-      url: Label.servePath + '/chat-room/more?page=' + page,
-      type: 'GET',
-      cache: false,
-      async: false,
-      success: function(result) {
-        if (result.data.length !== 0) {
-          for (let i in result.data) {
-            let data = result.data[i];
-            let liHtml = ChatRoom.renderMessage(data.userNickname, data.userName, data.userAvatarURL, data.time, data.content, data.oId, Label.currentUser, Label.level3Permitted);
-            $('#chats').append(liHtml);
-            $('#chats>div.fn-none').show(200);
-            $('#chats>div.fn-none').removeClass("fn-none");
-            ChatRoom.resetMoreBtnListen();
+    NProgress.start();
+    setTimeout(function () {
+      page++;
+      $.ajax({
+        url: Label.servePath + '/chat-room/more?page=' + page,
+        type: 'GET',
+        cache: false,
+        async: false,
+        success: function(result) {
+          if (result.data.length !== 0) {
+            for (let i in result.data) {
+              let data = result.data[i];
+              let liHtml = ChatRoom.renderMessage(data.userNickname, data.userName, data.userAvatarURL, data.time, data.content, data.oId, Label.currentUser, Label.level3Permitted);
+              $('#chats').append(liHtml);
+              $('#chats>div.fn-none').slideDown(1000);
+              $('#chats>div.fn-none').removeClass("fn-none");
+              ChatRoom.resetMoreBtnListen();
+            }
+            Util.listenUserCard();
+          } else {
+            $("#more").removeAttr("onclick");
+            $("#more").html("已经到底啦！");
           }
-          Util.listenUserCard();
-        } else {
-          $("#more").removeAttr("onclick");
-          $("#more").html("已经到底啦！");
         }
-      }
-    });
+      });
+    }, 0);
+    NProgress.done();
   },
   /**
    * 监听点击更多按钮关闭事件
