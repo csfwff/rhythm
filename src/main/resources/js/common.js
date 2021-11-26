@@ -1545,9 +1545,10 @@ var Util = {
    */
   initUserChannel: function (channelServer) {
     var userChannel = new ReconnectingWebSocket(channelServer)
-    userChannel.reconnectInterval = 10000
+    userChannel.reconnectInterval = 1000
 
     userChannel.onopen = function () {
+      console.log("Connected to user channel websocket.")
       setInterval(function () {
         userChannel.send('-hb-')
       }, 1000 * 60 * 5)
@@ -1576,7 +1577,7 @@ var Util = {
     }
 
     userChannel.onclose = function () {
-      userChannel.close()
+      console.log("Disconnected to user channel websocket.")
     }
 
     userChannel.onerror = function (err) {
