@@ -134,16 +134,32 @@ ${HeaderBannerLabel}
                 <div style="clear:both;"></div>
             </div>-->
             <div class="module-panel">
-                <div class="index-user">
-                    <#list niceUsers as user>
-                        <a class="niceUsersElement fn-hidden" rel="nofollow"
-                           href="${servePath}/member/${user.userName}">
+                    <#if TGIF == '0'>
+                        <div class="TGIF__item">
+                            <div style="float: left">
+                                <svg style="width: 30px; height: 30px;"><use xlink:href="#tadaIcon"></use></svg>
+                            </div>
+                            <div style="padding-left:40px">
+                                <b>每周五的摸鱼日报时间到了！</b>
+                                <br>
+                                <button class="green fn-right" style="margin-left: 5px" onclick="window.location.href=Label.servePath+'/post?type=0&tags=摸鱼日报&title=摸鱼日报 ${yyyyMMdd}'">我抢~</button>
+                                今天还没有人写摸鱼日报哦，抢在第一名写摸鱼日报，获得 <b style="color:orange">2000 积分</b> 奖励！
+                            </div>
+                        </div>
+                        <#elseif TGIF == '-1'>
+                            <div class="index-user">
+                            <#list niceUsers as user>
+                                <a class="niceUsersElement fn-hidden" rel="nofollow"
+                                   href="${servePath}/member/${user.userName}">
                                     <span class="avatar-middle slogan"
                                           aria-label="${user.userName}"
                                           style="background-image:url('${user.userAvatarURL48}');height:30px;width:30px;margin: 0px 10px 10px 0px"></span>
-                        </a>
-                    </#list>
-                </div>
+                                </a>
+                            </#list>
+                            </div>
+                        <#else>
+
+                    </#if>
             </div>
 
             <div class="index-head-title">
@@ -190,7 +206,7 @@ ${HeaderBannerLabel}
 
             <div class="index-head-title">
                 <div style="float:left;font-size:13px;margin:15px 0 10px 0; font-weight:bold;">在线时间排行</div>
-                <div style="float:right;font-size:13px;margin:5px 0 0 0;"><a href="${servePath}/top/online">更多</a>
+                <div style="float:right;font-size:13px;margin:15px 0 0 0;"><a href="${servePath}/top/online">更多</a>
                 </div>
                 <div style="clear:both;"></div>
             </div>

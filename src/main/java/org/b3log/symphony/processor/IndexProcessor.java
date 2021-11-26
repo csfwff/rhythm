@@ -20,6 +20,7 @@ package org.b3log.symphony.processor;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.time.DateFormatUtils;
 import org.b3log.latke.Keys;
 import org.b3log.latke.Latkes;
 import org.b3log.latke.http.Dispatcher;
@@ -365,6 +366,25 @@ public class IndexProcessor {
         dataModel.put("onlineTopUsers", onlineTopUsers);
         // 随机文章
         dataModel.put("indexRandomArticles", ArticleProcessor.getRandomArticles(12));
+
+        // TGIF
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(new Date());
+        if (calendar.get(Calendar.DAY_OF_WEEK) == 6) {
+            // 周五
+            String date = DateFormatUtils.format(new Date(), "yyyyMMdd");
+            String articleTitle = "摸鱼日报 " + date;
+            JSONObject article = articleQueryService.getArticleByTitle(articleTitle);
+            if (article == null) {
+                dataModel.put("TGIF", "0");
+                dataModel.put("yyyyMMdd", date);
+            } else {
+                dataModel.put("TGIF", article.optString(Latkes.getServePath() + Article.ARTICLE_PERMALINK));
+            }
+        } else {
+            // 不是周五
+            dataModel.put("TGIF", "-1");
+        }
 
         dataModelService.fillHeaderAndFooter(context, dataModel);
         dataModelService.fillIndexTags(dataModel);
