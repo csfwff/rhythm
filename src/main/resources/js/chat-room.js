@@ -550,18 +550,20 @@ var ChatRoom = {
    * @param oId
    */
   revoke: function (oId) {
-    $.ajax({
-      url: Label.servePath + '/chat-room/revoke/' + oId,
-      type: 'DELETE',
-      cache: false,
-      success: function(result) {
-        if (0 === result.code) {
-          Util.alert(result.msg);
-        } else {
-          Util.alert(result.msg);
+    if (confirm("确定要撤回吗？")) {
+      $.ajax({
+        url: Label.servePath + '/chat-room/revoke/' + oId,
+        type: 'DELETE',
+        cache: false,
+        success: function(result) {
+          if (0 === result.code) {
+            Util.notice("success", 1500, result.msg);
+          } else {
+            Util.notice("danger", 1500, result.msg);
+          }
         }
-      }
-    });
+      });
+    }
   },
   /**
    * 艾特某个人
