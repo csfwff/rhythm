@@ -546,6 +546,58 @@ var ChatRoom = {
     });
   },
   /**
+   * 开始批量撤回聊天室消息
+   */
+  groupRevokeProcess: false,
+  startGroupRevoke: function () {
+    $("#groupRevoke").attr("onclick", "ChatRoom.stopGroupRevoke()");
+    $("#groupRevoke").html("<svg><use xlink:href=\"#userrole\"></use></svg>\n" +
+        "关闭批量撤回");
+    Util.notice("warning", 6000, "批量撤回已启动，已在消息中添加便捷撤回按钮。<br>使用完成后请记得关闭此功能。");
+    ChatRoom.groupRevokeProcess = true;
+    let groupRevokeInterval = setInterval(function () {
+      if (!ChatRoom.groupRevokeProcess) {
+        $('#chats').empty();
+        page = 0;
+        ChatRoom.more();
+        clearInterval(groupRevokeInterval);
+      }
+      $(".chats__item").each(function () {
+        if ($(this).find(".button").length === 0) {
+          $(this).find(".date-bar").css("float", "left");
+          $(this).find(".date-bar").html("<button class='button' onclick='ChatRoom.adminRevoke(\"" + $(this).attr("id").replace("chatroom", "") + "\")'>撤回</button>");
+        }
+      });
+    }, 500);
+  },
+  /**
+   * 停止批量撤回聊天室消息
+   */
+  stopGroupRevoke: function () {
+    $("#groupRevoke").attr("onclick", "ChatRoom.startGroupRevoke()");
+    $("#groupRevoke").html("<svg><use xlink:href=\"#userrole\"></use></svg>\n" +
+        "批量撤回");
+    Util.notice("success", 1500, "批量撤回已关闭。");
+    ChatRoom.groupRevokeProcess = false;
+  },
+  /**
+   * 管理员撤回聊天室消息，无提示
+   * @param oId
+   */
+  adminRevoke: function (oId) {
+    $.ajax({
+      url: Label.servePath + '/chat-room/revoke/' + oId,
+      type: 'DELETE',
+      cache: false,
+      success: function(result) {
+        if (0 === result.code) {
+        } else {
+          Util.notice("danger", 1500, result.msg);
+        }
+      }
+    });
+  },
+  /**
    * 撤回聊天室消息
    * @param oId
    */
@@ -769,7 +821,7 @@ var ChatRoom = {
       meTag2 = "<a onclick=\"ChatRoom.revoke(" + oId + ")\" class=\"item\">撤回</a>\n";
     }
     if (isAdmin) {
-      meTag2 = "<a onclick=\"ChatRoom.revoke(" + oId + ")\" class=\"item\">撤回 (使用管理员权限)</a>\n";
+      meTag2 = "<a onclick=\"ChatRoom.revoke(" + oId + ")\" class=\"item\"><svg><use xlink:href=\"#userrole\"></use></svg> 撤回</a>\n";
     }
     try {
       // 判断是否可以收藏为表情包
@@ -808,7 +860,7 @@ var ChatRoom = {
     newHTML += '        <div style="margin-top: 4px" class="vditor-reset ft__smaller ' + Label.chatRoomPictureStatus + '">\n' +
         '            ' + content + '\n' +
         '        </div>\n' +
-        '        <div class="ft__smaller ft__fade fn__right">\n' +
+        '        <div class="ft__smaller ft__fade fn__right date-bar">\n' +
         '            ' + time + '\n' +
         '                <span class="fn__space5"></span>\n';
     if (!isRedPacket) {

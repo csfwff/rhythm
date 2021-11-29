@@ -34,12 +34,16 @@
     <div class="wrapper">
         <div class="content chat-room">
             <div class="module">
+                <div style="margin-bottom: 15px;">
+                    <svg style="width: 12px; height: 12px;"><use xlink:href="#downloadIcon"></use></svg> 下载
+                    <a style="line-height: 30px;text-decoration: none;color: #1296db;" href="https://pwl.icu/article/1637143985245" target="_blank">PC客户端</a><span style="color: #577e8d">&nbsp;&nbsp;|&nbsp;</span>
+                    <a style="line-height: 30px;text-decoration: none;color: #1296db;" href="https://pwl.icu/article/1638189205758" target="_blank">IDEA插件端</a>
+                </div>
                 <#if hasSystemTitle>
                 <h2>${systemTitle}</h2>
                 <#else>
                 <h2>${chatRoomLabel}</h2>
                 </#if>
-                <a style="line-height: 30px;text-decoration: none;color: #1296db;font-size: 12px;" href="https://gitee.com/imlinhanchao/pwl-chat/releases" target="_blank"><svg style="width: 12px; height: 12px;"><use xlink:href="#downloadIcon"></use></svg> 下载客户端</a>
                 <div class="fn-content">
                     <div class="reply">
                         <#if isLoggedIn>
@@ -68,6 +72,12 @@
                                     </div>
                                 </div>
                                 <div class="fn-right">
+                                    <#if level3Permitted == true>
+                                        <button id="groupRevoke" onclick="ChatRoom.startGroupRevoke()" class="button">
+                                            <svg><use xlink:href="#userrole"></use></svg>
+                                            批量撤回
+                                        </button>
+                                    </#if>
                                     <button class="red" onclick="$('#chats').empty();page=0;ChatRoom.more();">${cleanScreenLabel}</button>
                                     <button class="green" onclick="ChatRoom.send()">${postLabel}</button>
                                 </div>

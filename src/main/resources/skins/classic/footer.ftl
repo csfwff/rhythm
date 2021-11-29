@@ -32,7 +32,7 @@
                 探索&nbsp;
                 <a href="https://github.com/csfwff/rhythm" target="_blank">Rhythm 社区引擎</a>
                 &nbsp;｜&nbsp;
-                <a href="https://gitee.com/imlinhanchao/pwl-chat/releases" target="_blank">摸鱼派聊天室客户端 (PC)</a>
+                <a href="https://pwl.icu/article/1637143985245" target="_blank">摸鱼派聊天室客户端 (PC)</a>
                 &nbsp;｜&nbsp;
                 <a href="https://pwl.icu/article/1638189205758" target="_blank">摸鱼派聊天室 IntelliJ IDEA 插件</a>
             </div>
