@@ -35,21 +35,6 @@
                         <h2 class="sub-head">${activityLabel}</h2>
                         <div class="list">
                             <ul>
-                                <!--<li>
-                                    <div class='fn-flex'>
-                                        <div class="avatar"
-                                             style="background-image:url('${staticServePath}/games/ratel/favicons/icon.png')"></div>
-                                        <div class="fn-flex-1">
-                                            <h2>
-                                                <a href="${servePath}/games/ratel/">鱼油斗地主（测试版）</a>
-                                            </h2>
-                                            <span class="ft-fade vditor-reset">
-                                                在控制台玩的斗地主，摸鱼技能 ++<br>
-                                                目前为测试版，暂未接入经济系统，欢迎试玩并提出建议</a>
-                                            </span>
-                                        </div>
-                                    </div>
-                                </li>-->
                                 <li>
                                     <div class='fn-flex'>
                                         <div class="avatar"

@@ -139,7 +139,6 @@ public class IndexProcessor {
         Dispatcher.get("/games/lifeRestart/view/", indexProcessor::showLifeRestart, loginCheck::handle);
         Dispatcher.get("/games/evolve/", indexProcessor::showEvolve, loginCheck::handle);
         Dispatcher.get("/user/checkedIn", indexProcessor::isCheckedIn, loginCheck::handle);
-        Dispatcher.get("/games/ratel/", indexProcessor::showRatel, loginCheck::handle);
     }
 
     /**
@@ -155,12 +154,6 @@ public class IndexProcessor {
         }
         final String userId = currentUser.optString(Keys.OBJECT_ID);
         context.renderJSON(StatusCodes.SUCC).renderJSON(new JSONObject().put("checkedIn", activityQueryService.isCheckedinToday(userId)));
-    }
-
-    public void showRatel(final RequestContext context) {
-        final AbstractFreeMarkerRenderer renderer = new SkinRenderer(context, "games/ratel/index.ftl");
-        final Map<String, Object> dataModel = renderer.getDataModel();
-        dataModelService.fillHeaderAndFooter(context, dataModel);
     }
 
     public void showEvolve(final RequestContext context) {
