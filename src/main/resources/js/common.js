@@ -301,7 +301,7 @@ var Util = {
       'top': ($(window).height() - $('#alertDialogPanel').height()) / 2 + 'px',
       'left': ($(window).width() - $('#alertDialogPanel').width()) / 2 + 'px',
       'outline': 'none',
-    }).show().focus()
+    }).fadeIn(200).focus()
   },
   /**
    * @description 标记指定类型的消息通知为已读状态.
