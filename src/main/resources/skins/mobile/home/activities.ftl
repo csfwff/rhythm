@@ -39,7 +39,7 @@
                             <li>
                                 <div class='fn-flex'>
                                     <div class="avatar"
-                                         style="background-image:url('${staticServePath}/games/evolve/evolved.ico')"></div>
+                                         style="background-image:url('https://pwl.stackoverflow.wiki/evolve/evolved.ico')"></div>
                                     <div class="fn-flex-1">
                                         <h2 class="ft-13">
                                             <a href="${servePath}/games/evolve/">《进化-Evolve》</a>
