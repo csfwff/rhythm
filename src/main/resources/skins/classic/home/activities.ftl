@@ -53,7 +53,7 @@
                                 <li>
                                     <div class='fn-flex'>
                                         <div class="avatar"
-                                             style="background-image:url('${staticServePath}/games/adarkroom/img/adr.png')"></div>
+                                             style="background-image:url('https://pwl.stackoverflow.wiki/adarkroom/img/adr.png')"></div>
                                         <div class="fn-flex-1">
                                             <h2>
                                                 <a href="${servePath}/games/adarkroom/?lang=zh_cn">《A Dark Room》</a>
