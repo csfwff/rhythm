@@ -668,9 +668,12 @@ public class ChatroomProcessor {
         final BeanManager beanManager = BeanManager.getInstance();
         final ShortLinkQueryService shortLinkQueryService = beanManager.getReference(ShortLinkQueryService.class);
         content = shortLinkQueryService.linkArticle(content);
+        content = Emotions.toAliases(content);
         content = Emotions.convert(content);
         content = Markdowns.toHTML(content);
         content = Markdowns.clean(content, "");
+        content = MediaPlayers.renderAudio(content);
+        content = MediaPlayers.renderVideo(content);
 
         return content;
     }
