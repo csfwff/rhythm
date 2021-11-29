@@ -137,7 +137,7 @@
             var scrollTop = $(this).scrollTop();
             var scrollHeight = $(document).height();
             var windowHeight = $(this).height();
-            if (scrollTop + windowHeight == scrollHeight) {
+            if (scrollTop + windowHeight + 500 >= scrollHeight) {
                 ChatRoom.more();
             }
         }
