@@ -710,6 +710,7 @@ var Util = {
     }
 
     var options = {
+      mode: 'wysiwyg',
       outline: data.outline || { enable: false },
       after: data.after || undefined,
       typewriterMode: data.typewriterMode || false,
