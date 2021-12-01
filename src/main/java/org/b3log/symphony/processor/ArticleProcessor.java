@@ -21,6 +21,7 @@ package org.b3log.symphony.processor;
 import jodd.util.Base64;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.time.DateFormatUtils;
 import org.apache.commons.lang.time.DateUtils;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
@@ -201,6 +202,12 @@ public class ArticleProcessor {
     private DataModelService dataModelService;
 
     /**
+     * Pointtransfer management service.
+     */
+    @Inject
+    private PointtransferMgmtService pointtransferMgmtService;
+
+    /**
      * Register request handlers.
      */
     public static void register() {
@@ -219,9 +226,9 @@ public class ArticleProcessor {
         Dispatcher.get("/pre-post", articleProcessor::showPreAddArticle, loginCheck::handle, csrfMidware::fill);
         Dispatcher.get("/post", articleProcessor::showAddArticle, loginCheck::handle, csrfMidware::fill);
         Dispatcher.group().middlewares(anonymousViewCheckMidware::handle, csrfMidware::fill).router().get().uris(new String[]{"/article/{articleId}", "/article/{articleId}/comment/{commentId}"}).handler(articleProcessor::showArticle);
-        Dispatcher.post("/article", articleProcessor::addArticle, loginCheck::handle, csrfMidware::check, permissionMidware::check, articlePostValidationMidware::handle);
+        Dispatcher.post("/article", articleProcessor::addArticle, loginCheck::handle, permissionMidware::check, articlePostValidationMidware::handle);
         Dispatcher.get("/update", articleProcessor::showUpdateArticle, loginCheck::handle, csrfMidware::fill);
-        Dispatcher.put("/article/{id}", articleProcessor::updateArticle, loginCheck::handle, csrfMidware::check, permissionMidware::check, articlePostValidationMidware::handle);
+        Dispatcher.put("/article/{id}", articleProcessor::updateArticle, loginCheck::handle, permissionMidware::check, articlePostValidationMidware::handle);
         Dispatcher.post("/markdown", articleProcessor::markdown2HTML);
         Dispatcher.get("/article/{articleId}/preview", articleProcessor::getArticlePreviewContent);
         Dispatcher.post("/article/reward", articleProcessor::rewardArticle, loginCheck::handle);
@@ -257,6 +264,12 @@ public class ArticleProcessor {
         }
 
         context.renderJSON(StatusCodes.ERR);
+
+        if (article.optString(Article.ARTICLE_TITLE).startsWith("摸鱼周报 ")) {
+            context.renderMsg("摸鱼周报不能被删除，请认真维护！");
+            return;
+        }
+
         try {
             articleMgmtService.removeArticle(id);
 
@@ -912,7 +925,11 @@ public class ArticleProcessor {
         article.put(Article.ARTICLE_T_NOTIFY_FOLLOWERS, articleNotifyFollowers);
         article.put(Article.ARTICLE_SHOW_IN_LIST, articleShowInList);
         try {
-            final JSONObject currentUser = Sessions.getUser();
+            JSONObject currentUser = Sessions.getUser();
+            try {
+                currentUser = ApiProcessor.getUserByKey(requestJSONObject.optString("apiKey"));
+            } catch (NullPointerException ignored) {
+            }
 
             article.put(Article.ARTICLE_AUTHOR_ID, currentUser.optString(Keys.OBJECT_ID));
 
@@ -929,6 +946,24 @@ public class ArticleProcessor {
             }
 
             article.put(Article.ARTICLE_TAGS, articleTags);
+
+            // TGIF
+            Calendar calendar = Calendar.getInstance();
+            calendar.setTime(new Date());
+            if (calendar.get(Calendar.DAY_OF_WEEK) == 6) {
+                String date = DateFormatUtils.format(new Date(), "yyyyMMdd");
+                String articleTitleShouldBe = "摸鱼周报 " + date;
+                JSONObject checkArticle = articleQueryService.getArticleByTitle(articleTitleShouldBe);
+                if (checkArticle == null) {
+                    // 没有 TGIF
+                    if (articleTitle.equals(articleTitleShouldBe)) {
+                        // 发放奖励
+                        pointtransferMgmtService.transfer(Pointtransfer.ID_C_SYS, currentUser.optString(Keys.OBJECT_ID),
+                                Pointtransfer.TRANSFER_TYPE_C_ACTIVITY_SEND_TGIF,
+                                1000, "", System.currentTimeMillis(), "");
+                    }
+                }
+            }
 
             final String articleId = articleMgmtService.addArticle(article);
 
@@ -1034,6 +1069,12 @@ public class ArticleProcessor {
 
         final JSONObject requestJSONObject = context.requestJSON();
         final String articleTitle = requestJSONObject.optString(Article.ARTICLE_TITLE);
+        if (oldArticle.optString(Article.ARTICLE_TITLE).startsWith("摸鱼周报 ")) {
+            if (!oldArticle.optString(Article.ARTICLE_TITLE).equals(articleTitle)) {
+                context.renderMsg("无法修改摸鱼周报的标题，请认真维护！");
+                return;
+            }
+        }
         String articleTags = requestJSONObject.optString(Article.ARTICLE_TAGS);
         final String articleContent = requestJSONObject.optString(Article.ARTICLE_CONTENT);
         final boolean articleCommentable = requestJSONObject.optBoolean(Article.ARTICLE_COMMENTABLE, true);
@@ -1062,7 +1103,11 @@ public class ArticleProcessor {
         article.put(Article.ARTICLE_UA, ua);
         article.put(Article.ARTICLE_T_NOTIFY_FOLLOWERS, articleNotifyFollowers);
         article.put(Article.ARTICLE_SHOW_IN_LIST, articleShowInList);
-        final JSONObject currentUser = Sessions.getUser();
+        JSONObject currentUser = Sessions.getUser();
+        try {
+            currentUser = ApiProcessor.getUserByKey(requestJSONObject.optString("apiKey"));
+        } catch (NullPointerException ignored) {
+        }
         if (null == currentUser
                 || !currentUser.optString(Keys.OBJECT_ID).equals(oldArticle.optString(Article.ARTICLE_AUTHOR_ID))) {
             context.sendError(403);

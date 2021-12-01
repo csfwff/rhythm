@@ -212,18 +212,28 @@ ${HeaderBannerLabel}
             </div>
             <div class="module-panel">
                 <ul class="module-list">
-                    <li><a class="title" style="text-decoration: none">
-                            今日活跃度：${liveness}%
+                    <#if TGIF == '0'>
+                        <li>
+                            <a class="title" onclick="window.location.href=Label.servePath+'/post?type=0&tags=摸鱼周报&title=摸鱼周报 ${yyyyMMdd}'">
+                                <b>每周五的摸鱼周报时间到了！</b>
+                                <br>
+                                今天还没有人写摸鱼周报哦，抢在第一名写摸鱼周报，获得 <b style="color:orange">1000 积分</b> 奖励！
+                            </a>
+                        </li>
+                    <#elseif TGIF == '-1'>
+                    <#else>
+                        <li>
+                            <a class="title" href="${TGIF}">
+                                <b>每周五的摸鱼周报时间到了！</b>
+                                <br>
+                                今天已经有人写了摸鱼周报哦，快来看看吧~
+                            </a>
+                        </li>
+                    </#if>
+                    <li><a class="title" style="text-decoration: none" id="livenessToday">
                         </a>
                     </li>
                     <li><a class="title" style="text-decoration: none" id="checkIn">
-                            <#if liveness < 10 && checkedIn == 0>
-                                今日活跃度到达 10% 后<br>系统将自动签到
-                            <#elseif liveness < 100>
-                                已签到，今日活跃度到达 100% 后<br>可获得一张免签卡 (2天)
-                            <#else>
-                                成功获取免签卡 (2天) 一张<br>可在设置-账户中使用
-                            </#if>
                         </a>
                     </li>
                     <li><a class="title" style="text-decoration: none" id="yesterday" onclick="yesterday()">领取昨日活跃奖励</a>
@@ -324,5 +334,61 @@ ${HeaderBannerLabel}
             });
         });
     }
+</script>
+<script>
+    $('#chatRoomIndex').on('click', '.vditor-reset img', function () {
+        if ($(this).hasClass('emoji')) {
+            return;
+        }
+        window.open($(this).attr('src'));
+    });
+</script>
+<script>
+    var liveness = ${liveness};
+    var checkedIn = <#if checkedIn == 1>true<#else>false</#if>;
+    function getCheckedInStatus() {
+        $.ajax({
+            url: Label.servePath + "/user/checkedIn",
+            method: "get",
+            cache: false,
+            async: false,
+            success: function (result) {
+                checkedIn = result.checkedIn;
+            }
+        });
+    }
+    function getActivityStatus() {
+        $.ajax({
+            url: Label.servePath + "/user/liveness",
+            method: "get",
+            cache: false,
+            async: false,
+            success: function (result) {
+                liveness = result.liveness;
+            }
+        });
+    }
+    function refreshActivities() {
+        <#if isLoggedIn>
+        getCheckedInStatus();
+        getActivityStatus();
+        </#if>
+        $("#livenessToday").html("今日活跃度：" + liveness + "%");
+        if (liveness < 10 && !checkedIn) {
+            $("#checkIn").html("今日活跃度到达 10% 后<br>系统将自动签到");
+        } else if (liveness < 10 && checkedIn) {
+            $("#checkIn").html("您的免签卡今日已生效");
+        } else if (liveness >= 10 && !checkedIn) {
+            $("#checkIn").html("已提交自动签到至系统<br>请稍候查看签到状态");
+        } else if (liveness < 100) {
+            $("#checkIn").html("今日活跃度到达 100% 后<br>可获得一张免签卡 (2天)");
+        } else {
+            $("#checkIn").html("膜拜肝帝！活跃爆满！<br>免签卡已放入你的背包！");
+        }
+    }
+    refreshActivities();
+    <#if isLoggedIn>
+    setInterval(refreshActivities, 5000);
+    </#if>
 </script>
 </html>

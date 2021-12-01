@@ -221,6 +221,7 @@ public class ChatroomProcessor {
                 }
                 // 开始领取红包
                 // 先减掉已经领取的金额
+                boolean hasZero = false;
                 for (Object o : who) {
                     JSONObject currentWho = (JSONObject) o;
                     String uId = currentWho.optString("userId");
@@ -229,16 +230,25 @@ public class ChatroomProcessor {
                         return;
                     }
                     int userMoney = currentWho.optInt("userMoney");
+                    if (userMoney == 0) {
+                        hasZero = true;
+                    }
                     money -= userMoney;
                 }
                 // 随机一个红包金额 1-N
                 Random random = new Random();
                 // 如果是最后一个红包了，给他一切
                 int meGot = 0;
-                if (count == got + 1) {
-                    meGot = money;
-                } else {
-                    meGot = random.nextInt((money / 2) + 1);
+                if (money > 0) {
+                    if (count == got + 1) {
+                        meGot = money;
+                    } else {
+                        if (!hasZero) {
+                            meGot = random.nextInt((money / 4) + 1);
+                        } else {
+                            meGot = random.nextInt((money / 4) + 1) + 1;
+                        }
+                    }
                 }
                 // 随机成功了
                 // 修改聊天室数据库
@@ -246,7 +256,7 @@ public class ChatroomProcessor {
                 JSONObject source2 = new JSONObject(source.optString("content"));
                 source2.put("got", got + 1);
                 JSONArray source3 = source2.optJSONArray("who");
-                source3.put(new JSONObject().put("userMoney", meGot).put("userId", userId).put("userName", userName).put("time", new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(System.currentTimeMillis())));
+                source3.put(new JSONObject().put("userMoney", meGot).put("userId", userId).put("userName", userName).put("time", new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(System.currentTimeMillis())).put("avatar", userQueryService.getUser(userId).optString(UserExt.USER_AVATAR_URL)));
                 source2.put("who", source3);
                 source.put("content", source2);
                 final Transaction transaction = chatRoomRepository.beginTransaction();
@@ -262,6 +272,15 @@ public class ChatroomProcessor {
                 }
                 info.put("got", redPacket.optInt("got") + 1);
                 context.renderJSON(new JSONObject().put("who", source3).put("info", info));
+                // 广播红包情况
+                JSONObject redPacketStatus = new JSONObject();
+                redPacketStatus.put(Common.TYPE, "redPacketStatus");
+                redPacketStatus.put("whoGive", source.optString(User.USER_NAME));
+                redPacketStatus.put("whoGot", userName);
+                redPacketStatus.put("got", got + 1);
+                redPacketStatus.put("count", count);
+                redPacketStatus.put("oId", oId);
+                ChatroomChannel.notifyChat(redPacketStatus);
                 return;
             }
         } catch (Exception e) {
@@ -323,7 +342,6 @@ public class ChatroomProcessor {
         }
 
         if (content.startsWith("[redpacket]") && content.endsWith("[/redpacket]")) {
-            LOGGER.log(Level.INFO, "User " + userName + " has sent a red packet.");
             try {
                 String redpacketString = content.replaceAll("^\\[redpacket\\]", "").replaceAll("\\[/redpacket\\]$", "");
                 JSONObject redpacket = new JSONObject(redpacketString);
@@ -336,7 +354,7 @@ public class ChatroomProcessor {
                 }
                 String userId = currentUser.optString(Keys.OBJECT_ID);
                 // 扣积分
-                if (money > 20000 || money <= 0 || count > 1000 || count <= 0 || count > money) {
+                if (money > 20000 || money < 32 || count > 1000 || count <= 0 || count > money) {
                     context.renderJSON(StatusCodes.ERR).renderMsg("数据不合法！");
                     return;
                 }
@@ -627,7 +645,7 @@ public class ChatroomProcessor {
             final BeanManager beanManager = BeanManager.getInstance();
             final ChatRoomRepository chatRoomRepository = beanManager.getReference(ChatRoomRepository.class);
             List<JSONObject> messageList = chatRoomRepository.getList(new Query()
-                    .setPage(page, 10)
+                    .setPage(page, 25)
                     .addSort(Keys.OBJECT_ID, SortDirection.DESCENDING));
             List<JSONObject> msgs = messageList.stream().map(msg -> new JSONObject(msg.optString("content")).put("oId", msg.optString(Keys.OBJECT_ID))).collect(Collectors.toList());
             msgs = msgs.stream().map(msg -> JSONs.clone(msg).put(Common.TIME, new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(msg.optLong(Common.TIME)))).collect(Collectors.toList());
@@ -639,12 +657,23 @@ public class ChatroomProcessor {
     }
 
     private static String processMarkdown(String content) {
+        try {
+            JSONObject checkContent = new JSONObject(content);
+            if (checkContent.optString("msgType").equals("redPacket")) {
+                return content;
+            }
+        } catch (Exception ignored) {
+        }
+
         final BeanManager beanManager = BeanManager.getInstance();
         final ShortLinkQueryService shortLinkQueryService = beanManager.getReference(ShortLinkQueryService.class);
         content = shortLinkQueryService.linkArticle(content);
+        content = Emotions.toAliases(content);
         content = Emotions.convert(content);
         content = Markdowns.toHTML(content);
         content = Markdowns.clean(content, "");
+        content = MediaPlayers.renderAudio(content);
+        content = MediaPlayers.renderVideo(content);
 
         return content;
     }

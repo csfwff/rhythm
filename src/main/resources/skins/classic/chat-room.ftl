@@ -34,7 +34,16 @@
     <div class="wrapper">
         <div class="content chat-room">
             <div class="module">
-                <h2 class="sub-head">${chatRoomLabel}</h2>
+                <div style="margin-bottom: 15px;">
+                    <svg style="width: 12px; height: 12px;"><use xlink:href="#downloadIcon"></use></svg> 下载
+                    <a style="line-height: 30px;text-decoration: none;color: #1296db;" href="https://pwl.icu/article/1637143985245" target="_blank">PC客户端</a><span style="color: #577e8d">&nbsp;&nbsp;|&nbsp;</span>
+                    <a style="line-height: 30px;text-decoration: none;color: #1296db;" href="https://pwl.icu/article/1638189205758" target="_blank">IDEA插件端</a>
+                </div>
+                <#if hasSystemTitle>
+                <h2>${systemTitle}</h2>
+                <#else>
+                <h2>${chatRoomLabel}</h2>
+                </#if>
                 <div class="fn-content">
                     <div class="reply">
                         <#if isLoggedIn>
@@ -63,6 +72,13 @@
                                     </div>
                                 </div>
                                 <div class="fn-right">
+                                    <#if level3Permitted == true>
+                                        <button id="groupRevoke" onclick="ChatRoom.startGroupRevoke()" class="button">
+                                            <svg><use xlink:href="#userrole"></use></svg>
+                                            批量撤回
+                                        </button>
+                                    </#if>
+                                    <button class="red" onclick="$('#chats').empty();page=0;ChatRoom.more();">${cleanScreenLabel}</button>
                                     <button class="green" onclick="ChatRoom.send()">${postLabel}</button>
                                 </div>
                             </div>
@@ -85,7 +101,7 @@
             <div class="list module pd__15" id="comments" style="height: 100%">
                 <div id="chats">
                 </div>
-                <div id="more" onclick="ChatRoom.more()" style="cursor: pointer; color: rgba(0,0,0,0.54);"><#if !isLoggedIn>登录后</#if>查看更多</div>
+                <#if !isLoggedIn><div style="color:rgba(0,0,0,0.54);">登录后查看更多</div></#if>
             </div>
         </div>
         <div class="side">
@@ -93,6 +109,7 @@
         </div>
     </div>
 </div>
+<div id="goToTop" style="position:fixed;bottom:20px;right:10%;display:none;"><a href="#"><svg style="width:30px;height:30px;color:#626262;"><use xlink:href="#toTopIcon"></use></svg></a></div>
 <#include "footer.ftl">
 <script>
     Label.uploadLabel = "${uploadLabel}";
@@ -123,10 +140,34 @@
     ChatRoomChannel.init("${wsScheme}://${serverHost}:${serverPort}${contextPath}/chat-room-channel");
     var page = 0;
     ChatRoom.more();
-    ChatRoom.more();
-
-    $("#more").hover(function () {
-        ChatRoom.more();
+</script>
+<script>
+    $(window).scroll(
+        function() {
+            var scrollTop = $(this).scrollTop();
+            var scrollHeight = $(document).height();
+            var windowHeight = $(this).height();
+            if (scrollTop + windowHeight + 500 >= scrollHeight) {
+                ChatRoom.more();
+            }
+        }
+    );
+</script>
+<script type="text/javascript">
+    $(document).ready(function(){
+        $(function(){
+            $(window).scroll(function(){
+                if($(this).scrollTop()>1){
+                    $("#goToTop").fadeIn();
+                } else {
+                    $("#goToTop").fadeOut();
+                }
+            });
+        });
+        $("#goToTop a").click(function(){
+            $("html,body").animate({scrollTop:0},800);
+            return false;
+        });
     });
 </script>
 </body>

@@ -41,12 +41,13 @@ var ArticleChannel = {
      */
     init: function (channelServer) {
         ArticleChannel.ws = new ReconnectingWebSocket(channelServer)
-        ArticleChannel.ws.reconnectInterval = 10000
+        ArticleChannel.ws.reconnectInterval = 1000
 
         ArticleChannel.ws.onopen = function () {
+            console.log("Connected to article channel websocket.")
             setInterval(function () {
                 ArticleChannel.ws.send('-hb-')
-            }, 1000 * 60 * 3)
+            }, 1000 * 30)
         }
 
         ArticleChannel.ws.onmessage = function (evt) {
@@ -137,6 +138,7 @@ var ArticleChannel = {
         }
 
         ArticleChannel.ws.onclose = function () {
+            console.log("Disconnected to article channel websocket.")
         }
 
         ArticleChannel.ws.onerror = function (err) {
@@ -161,12 +163,13 @@ var ArticleListChannel = {
      */
     init: function (channelServer) {
         ArticleListChannel.ws = new ReconnectingWebSocket(channelServer)
-        ArticleListChannel.ws.reconnectInterval = 10000
+        ArticleListChannel.ws.reconnectInterval = 1000
 
         ArticleListChannel.ws.onopen = function () {
+            console.log("Connected to article list channel websocket.")
             setInterval(function () {
                 ArticleListChannel.ws.send('-hb-')
-            }, 1000 * 60 * 3)
+            }, 1000 * 30)
         }
 
         ArticleListChannel.ws.onmessage = function (evt) {
@@ -196,7 +199,7 @@ var ArticleListChannel = {
         }
 
         ArticleListChannel.ws.onclose = function () {
-            ArticleListChannel.ws.close()
+            console.log("Disconnected to article list channel websocket.")
         }
 
         ArticleListChannel.ws.onerror = function (err) {
@@ -217,12 +220,13 @@ var IdleTalkChannel = {
      */
     init: function (channelServer) {
         IdleTalkChannel.ws = new ReconnectingWebSocket(channelServer)
-        IdleTalkChannel.ws.reconnectInterval = 10000
+        IdleTalkChannel.ws.reconnectInterval = 1000
 
         IdleTalkChannel.ws.onopen = function () {
+            console.log("Connected to idle talk channel websocket.")
             setInterval(function () {
                 IdleTalkChannel.ws.send('-hb-')
-            }, 1000 * 60 * 3)
+            }, 1000 * 30)
         }
 
         IdleTalkChannel.ws.onmessage = function (evt) {
@@ -293,7 +297,7 @@ var IdleTalkChannel = {
         }
 
         IdleTalkChannel.ws.onclose = function () {
-            IdleTalkChannel.ws.close()
+            console.log("Disconnected to idle talk channel websocket.")
         }
 
         IdleTalkChannel.ws.onerror = function (err) {
@@ -335,18 +339,41 @@ var ChatRoomChannel = {
      */
     init: function (channelServer) {
         ChatRoomChannel.ws = new ReconnectingWebSocket(channelServer)
-        ChatRoomChannel.ws.reconnectInterval = 10000
+        ChatRoomChannel.ws.reconnectInterval = 1000
 
         ChatRoomChannel.ws.onopen = function () {
+            console.log("Connected to chat room channel websocket.")
             setInterval(function () {
                 ChatRoomChannel.ws.send('-hb-')
-            }, 1000 * 60 * 3)
+            }, 1000 * 30)
         }
 
         ChatRoomChannel.ws.onmessage = function (evt) {
             var data = JSON.parse(evt.data)
 
             switch (data.type) {
+                case 'redPacketStatus':
+                    let whoGive = data.whoGive;
+                    let whoGot = data.whoGot;
+                    let got = data.got;
+                    let count = data.count;
+                    let oId = data.oId;
+                    let spell = '<a href="' + Label.servePath + '/member/' + whoGot + '" target="_blank">' + whoGot + '</a> 抢到了 <a href="' + Label.servePath + '/member/' + whoGive + '" target="_blank">' + whoGive + '</a> 的 <a style="cursor: pointer" onclick="ChatRoom.unpackRedPacket(\'' + oId + '\')">红包</a>';
+                    // 红包抢光了，修改状态
+                    if (got === count) {
+                        $("#chatroom" + data.oId).find(".hongbao__item").css("opacity", ".36");
+                        $("#chatroom" + data.oId).find(".redPacketDesc").html("已经被抢光啦");
+                        spell += '，红包已被领完 (' + got + '/' + count + ')';
+                    } else {
+                        spell += ' (' + got + '/' + count + ')';
+                    }
+                    // 通知
+                    let html = "<div style='color: rgb(50 50 50);margin-bottom: 10px;text-align: center;'>" +
+                        "<svg><use xlink:href='#redPacketIcon'></use></svg>&nbsp;" +
+                        spell +
+                        "</div>";
+                    $('#chats').prepend(html);
+                    break;
                 case 'online':
                     $('#onlineCnt').text(data.onlineChatCnt);
                     $('#indexOnlineChatCnt').text(data.onlineChatCnt);
@@ -367,7 +394,7 @@ var ChatRoomChannel = {
                     break;
                 case 'msg':
                     // Chatroom
-                    if ($("#chatRoomIndex").length === 0) {
+                    if ($("#chatRoomIndex").length === 0 && $("#chatroom" + data.oId).length <= 0) {
                         let liHTML;
                         $("#plusOne").remove();
                         if (data.md === Label.latestMessage) {
@@ -377,7 +404,7 @@ var ChatRoomChannel = {
                             liHTML = ChatRoom.renderMessage(data.userNickname, data.userName, data.userAvatarURL, data.time, data.content, data.oId, Label.currentUser, Label.level3Permitted);
                         }
                         $('#chats').prepend(liHTML);
-                        $('#chats>div.fn-none').show(200);
+                        $('#chats>div.fn-none').slideDown(200);
                         $('#chats>div.fn-none').removeClass("fn-none");
                         ChatRoom.resetMoreBtnListen();
                         if (data.md !== undefined) {
@@ -428,7 +455,7 @@ var ChatRoomChannel = {
         }
 
         ChatRoomChannel.ws.onclose = function () {
-            ChatRoomChannel.ws.close()
+            console.log("Disconnected to chat room channel websocket.")
         }
 
         ChatRoomChannel.ws.onerror = function (err) {
@@ -453,12 +480,13 @@ var GobangChannel = {
      */
     init: function (channelServer) {
         GobangChannel.ws = new ReconnectingWebSocket(channelServer)
-        GobangChannel.ws.reconnectInterval = 10000
+        GobangChannel.ws.reconnectInterval = 1000
 
         GobangChannel.ws.onopen = function () {
+            console.log("Connected to gobang channel websocket.")
             setInterval(function () {
                 GobangChannel.ws.send('zephyr test')
-            }, 1000 * 60 * 3)
+            }, 1000 * 30)
         }
 
         GobangChannel.ws.onmessage = function (evt) {
@@ -475,7 +503,7 @@ var GobangChannel = {
         }
 
         GobangChannel.ws.onclose = function () {
-            GobangChannel.ws.close()
+            console.log("Disconnected to gobang channel websocket.")
         }
 
         GobangChannel.ws.onerror = function (err) {

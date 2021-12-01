@@ -36,7 +36,7 @@ ${HeaderBannerLabel}
 <div class="main">
     <div class="wrapper" style="padding-bottom: 20px">
         <div class="index-recent fn-flex-1">
-            <div class="index-head-title" >
+            <div class="index-head-title">
                 <div style="float:left;font-size:13px;margin:5px 0 10px 0; font-weight:bold;">最新</div>
                 <div style="float:right;font-size:13px;margin:5px 0 0 0;"><a href="${servePath}/recent">更多</a></div>
                 <div style="clear:both;"></div>
@@ -135,16 +135,41 @@ ${HeaderBannerLabel}
                 <div style="clear:both;"></div>
             </div>-->
             <div class="module-panel">
-                <div class="index-user">
-                    <#list niceUsers as user>
-                        <a class="niceUsersElement fn-hidden" rel="nofollow"
-                           href="${servePath}/member/${user.userName}">
+                    <#if TGIF == '0'>
+                        <div class="TGIF__item">
+                            <div style="float: left">
+                                <svg style="width: 30px; height: 30px;"><use xlink:href="#tadaIcon"></use></svg>
+                            </div>
+                            <div style="padding-left:40px">
+                                <b>每周五的摸鱼周报时间到了！</b>
+                                <br>
+                                <button class="green fn-right" style="margin-left: 5px" onclick="window.location.href=Label.servePath+'/post?type=0&tags=摸鱼周报&title=摸鱼周报 ${yyyyMMdd}'">我抢~</button>
+                                今天还没有人写摸鱼周报哦，抢在第一名写摸鱼周报，获得 <b style="color:orange">1000 积分</b> 奖励！
+                            </div>
+                        </div>
+                        <#elseif TGIF == '-1'>
+                            <div class="index-user">
+                            <#list niceUsers as user>
+                                <a class="niceUsersElement fn-hidden" rel="nofollow"
+                                   href="${servePath}/member/${user.userName}">
                                     <span class="avatar-middle slogan"
                                           aria-label="${user.userName}"
                                           style="background-image:url('${user.userAvatarURL48}');height:30px;width:30px;margin: 0px 10px 10px 0px"></span>
-                        </a>
-                    </#list>
-                </div>
+                                </a>
+                            </#list>
+                            </div>
+                        <#else>
+                        <div class="TGIF__item">
+                            <div style="float: left">
+                                <svg style="width: 30px; height: 30px;"><use xlink:href="#tadaIcon"></use></svg>
+                            </div>
+                            <div style="padding-left:40px">
+                                <b>每周五的摸鱼周报时间到了！</b>
+                                <br>
+                                今天已经有人写了摸鱼周报哦，<a href="${TGIF}" style="text-decoration:none;font-weight:bold;color:green;">快来看看吧~</a>
+                            </div>
+                        </div>
+                    </#if>
             </div>
 
             <div class="index-head-title">
@@ -190,8 +215,8 @@ ${HeaderBannerLabel}
             </div>
 
             <div class="index-head-title">
-                <div style="float:left;font-size:13px;margin:5px 0 10px 0; font-weight:bold;">在线时间排行</div>
-                <div style="float:right;font-size:13px;margin:5px 0 0 0;"><a href="${servePath}/top/online">更多</a>
+                <div style="float:left;font-size:13px;margin:15px 0 10px 0; font-weight:bold;">在线时间排行</div>
+                <div style="float:right;font-size:13px;margin:15px 0 0 0;"><a href="${servePath}/top/online">更多</a>
                 </div>
                 <div style="clear:both;"></div>
             </div>
@@ -262,29 +287,15 @@ ${HeaderBannerLabel}
                     </div>
                     <div class="metro-item">
                         <a class="preview" style="padding-top: 60px">
-                            <#if checkedIn == 1>
-                                    <p style="user-select:none;color:#3caf36;font-weight:bold;font-size:13px">
-                                        今日已签到
-                                    </p>
-                                <#else>
-                                    <p style="user-select:none;color:#c46b25;font-weight:bold;font-size:13px">
-                                        今日签到未达标
-                                    </p>
-                            </#if>
+                            <span id="checkedInStatus">
+                            </span>
                             <div class="review" style="margin-bottom: 25px">
                                 <div class="progress">
                                     <div class="progress-done" id="sp1"></div>
                                 </div>
                                 <span class="percent" id="sp2">0%</span>
                             </div>
-                            <p style="user-select:none">
-                            <#if liveness < 10 && checkedIn == 0>
-                                    今日活跃度到达 10% 后<br>系统将自动签到
-                                <#elseif liveness < 100>
-                                    今日活跃度到达 100% 后<br>可获得一张免签卡 (2天)
-                                <#else>
-                                    成功获取免签卡 (2天) 一张<br>可在设置-账户中使用
-                            </#if>
+                            <p id="activityDesc" style="user-select:none">
                             </p>
                         </a>
                     </div>
@@ -567,7 +578,7 @@ ${HeaderBannerLabel}
         $("#chatUsernameSelectedPanel").html("");
 
         let value = $("#chatRoomInput").val()
-        let users;
+        let users = [];
         if (value == '@') {
             $("#chatUsernameSelectedPanel").show();
             users = Util.getAtUsers('');
@@ -786,39 +797,6 @@ ${HeaderBannerLabel}
     }
 </script>
 <script>
-    // img preview
-    var fixDblclick = null
-    $('#chatRoomIndex').on('dblclick', '.vditor-reset img', function () {
-        clearTimeout(fixDblclick)
-        if ($(this).hasClass('emoji')) {
-            return
-        }
-        window.open($(this).attr('src'))
-    }).on('click', '.vditor-reset img', function (event) {
-        clearTimeout(fixDblclick)
-        if ($(this).hasClass('emoji')) {
-            return
-        }
-        var $it = $(this),
-            it = this
-        fixDblclick = setTimeout(function () {
-            var top = it.offsetTop,
-                left = it.offsetLeft
-
-            $('body').append('<div class="img-preview" onclick="$(this).remove()"><img style="transform: translate3d(' +
-                Math.max(0, left) + 'px, ' +
-                Math.max(0, (top - $(window).scrollTop())) + 'px, 0)" src="' +
-                ($it.attr('src').split('?imageView2')[0]) +
-                '"></div>')
-
-            $('.img-preview').css({
-                'background-color': '#fff',
-                'position': 'fixed',
-            })
-        }, 100)
-    })
-</script>
-<script>
     // 渐变输出
     function elementFadeOut(element, speed) {
         let fadePicList = $(element);
@@ -836,12 +814,95 @@ ${HeaderBannerLabel}
     elementFadeOut(".topCheckInUsersElement", 90);
 </script>
 <script>
-    $("#sp1").css("width", "${liveness}%");
-    for (let i = 0; i <= ${liveness}; i++) {
-        setTimeout(function () {
-            $("#sp2").html(i + "%");
-        }, i * 15);
+    var liveness = ${liveness};
+    var checkedIn = <#if checkedIn == 1>true<#else>false</#if>;
+    function getCheckedInStatus() {
+        $.ajax({
+            url: Label.servePath + "/user/checkedIn",
+            method: "get",
+            cache: false,
+            async: false,
+            success: function (result) {
+                checkedIn = result.checkedIn;
+            }
+        });
     }
+    function getActivityStatus() {
+        $.ajax({
+            url: Label.servePath + "/user/liveness",
+            method: "get",
+            cache: false,
+            async: false,
+            success: function (result) {
+                liveness = result.liveness;
+            }
+        });
+    }
+    function refreshActivities() {
+        <#if isLoggedIn>
+        getCheckedInStatus();
+        getActivityStatus();
+        </#if>
+        if (checkedIn === true) {
+            $("#checkedInStatus").html('' +
+                '<p style="user-select:none;color:#3caf36;font-weight:bold;font-size:13px">' +
+                '今日已签到' +
+                '</p>');
+        } else if (checkedIn === false) {
+            $("#checkedInStatus").html('' +
+                '<p style="user-select:none;color:#c46b25;font-weight:bold;font-size:13px">' +
+                '今日未签到' +
+                '</p>');
+        }
+        $("#sp1").css("width", liveness + "%");
+        let formatedLiveness;
+        for (let i = 0; i <= liveness; i++) {
+            formatedLiveness = i;
+        }
+        let nowLiveness = parseInt($("#sp2").text().replace("%", ""));
+        if (liveness == 0) {
+            nowLiveness = 0;
+        }
+        if ($("#sp2").html() !== formatedLiveness + "%") {
+            let j = 1;
+            for (let i = nowLiveness; i <= liveness; i++) {
+                setTimeout(function () {
+                    $("#sp2").html(i + "%");
+                    if (i < 10) {
+                        $("#sp1").css("background", "linear-gradient(to left, #f11616, #d71212)").css("box-shadow", "0 3px 3px -5px #c72222, 0 2px 5px #c72222");
+                    } else if (i > 10 && i < 100) {
+                        $("#sp1").css("background", "linear-gradient(to left, #24b0b7, #1dacb3)").css("box-shadow", "0 3px 3px -5px #22bfc7, 0 2px 5px #22bfc7");
+                    } else if (i == 100) {
+                        $("#sp1").css("background", "linear-gradient(to left, #29d120, #3caf36)").css("box-shadow", "#3caf36 0px 3px 3px -5px, #3caf36 0px 2px 5px");
+                    }
+                }, j * 10);
+                j++;
+            }
+        }
+        if (liveness < 10 && !checkedIn) {
+            $("#activityDesc").html("今日活跃度到达 10% 后<br>系统将自动签到");
+        } else if (liveness < 10 && checkedIn) {
+            $("#activityDesc").html("您的免签卡今日已生效");
+        } else if (liveness >= 10 && !checkedIn) {
+            $("#activityDesc").html("已提交自动签到至系统<br>请稍候查看签到状态");
+        } else if (liveness < 100) {
+            $("#activityDesc").html("今日活跃度到达 100% 后<br>可获得一张免签卡 (2天)");
+        } else {
+            $("#activityDesc").html("膜拜肝帝！活跃爆满！<br>免签卡已放入你的背包！");
+        }
+    }
+    refreshActivities();
+    <#if isLoggedIn>
+    setInterval(refreshActivities, 5000);
+    </#if>
+</script>
+<script>
+    $('#chatRoomIndex').on('click', '.vditor-reset img', function () {
+        if ($(this).hasClass('emoji')) {
+            return;
+        }
+        window.open($(this).attr('src'));
+    });
 </script>
 </body>
 </html>

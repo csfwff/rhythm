@@ -22,10 +22,10 @@
 <html itemscope itemtype="https://schema.org/CreativeWork">
 <head>
 	<meta charset="UTF-8"/>
-	<!--  
+	<!--
 		A Dark Room (v1.4)
 		==================
-		
+
 		A minimalist text adventure by Michael Townsend and all his friends.
 		Inspired by Candy Box (http://candies.aniwey.net/)
 		Contribute on GitHub! (https://github.com/doublespeakgames/adarkroom/)
@@ -36,21 +36,21 @@
 		<title>A Dark Room</title>
 	</#if>
 	<meta itemprop="description" name="description" property="og:description" content="A minimalist text adventure">
-	<meta itemprop="image" property="og:image" content="img/adr.png" />
+	<meta itemprop="image" property="og:image" content="https://pwl.stackoverflow.wiki/adarkroom/img/adr.png" />
 	<meta itemprop="name" property="og:title" content="A Dark Room" />
-	<link rel="shortcut icon" href="${servePath}/games/adarkroom/favicon.ico" />
-	<link rel="image_src" href="${servePath}/games/adarkroom/img/adr.png" />
+	<link rel="shortcut icon" href="https://pwl.stackoverflow.wiki/adarkroom/favicon.ico" />
+	<link rel="image_src" href="https://pwl.stackoverflow.wiki/adarkroom/img/adr.png" />
 	<script>
 		var servePath = "${servePath}";
 	</script>
-	<script src="${servePath}/games/adarkroom/lib/jquery.min.js"></script>
-	<script src="${servePath}/games/adarkroom/lib/jquery.color-2.1.2.min.js"></script>
-	<script src="${servePath}/games/adarkroom/lib/jquery.event.move.js"></script>
-	<script src="${servePath}/games/adarkroom/lib/jquery.event.swipe.js"></script>
-	<script src="${servePath}/games/adarkroom/lib/base64.js"></script>
-	<script src="${servePath}/games/adarkroom/lib/translate.js"></script>
+	<script src="https://pwl.stackoverflow.wiki/adarkroom/lib/jquery.min.js"></script>
+	<script src="https://pwl.stackoverflow.wiki/adarkroom/lib/jquery.color-2.1.2.min.js"></script>
+	<script src="https://pwl.stackoverflow.wiki/adarkroom/lib/jquery.event.move.js"></script>
+	<script src="https://pwl.stackoverflow.wiki/adarkroom/lib/jquery.event.swipe.js"></script>
+	<script src="https://pwl.stackoverflow.wiki/adarkroom/lib/base64.js"></script>
+	<script src="https://pwl.stackoverflow.wiki/adarkroom/lib/translate.js"></script>
 
-	<script src="${servePath}/games/adarkroom/lang/langs.js"></script>
+	<script src="https://pwl.stackoverflow.wiki/adarkroom/lang/langs.js"></script>
 
 	<script>
 		// try to read "lang" param's from url
@@ -63,34 +63,34 @@
 		}
 		// if a language different than english requested, load all translations
 		if(lang && lang != 'en'){
-			document.write('<script src="lang/'+lang+'/strings.js"><\/script>');
-			document.write('<link rel="stylesheet" type="text/css" href="lang/'+lang+'/main.css" \/>');
+			document.write('<script src="https://pwl.stackoverflow.wiki/adarkroom/lang/'+lang+'/strings.js"><\/script>');
+			document.write('<link rel="stylesheet" type="text/css" href="https://pwl.stackoverflow.wiki/adarkroom/lang/'+lang+'/main.css" \/>');
 		}
 	</script>
 
-	<script src="${servePath}/games/adarkroom/script/Button.js"></script>
-	<script src="${servePath}/games/adarkroom/script/audioLibrary.js"></script>
-	<script src="${servePath}/games/adarkroom/script/audio.js"></script>
-	<script src="${servePath}/games/adarkroom/script/engine.js"></script>
-	<script src="${servePath}/games/adarkroom/script/state_manager.js"></script>
-	<script src="${servePath}/games/adarkroom/script/header.js"></script>
-	<script src="${servePath}/games/adarkroom/script/notifications.js"></script>
-	<script src="${servePath}/games/adarkroom/script/events.js"></script>
-	<script src="${servePath}/games/adarkroom/script/room.js"></script>
-	<script src="${servePath}/games/adarkroom/script/outside.js"></script>
-	<script src="${servePath}/games/adarkroom/script/world.js"></script>
-	<script src="${servePath}/games/adarkroom/script/path.js"></script>
-	<script src="${servePath}/games/adarkroom/script/ship.js"></script>
-	<script src="${servePath}/games/adarkroom/script/space.js"></script>
-	<script src="${servePath}/games/adarkroom/script/prestige.js"></script>
-	<script src="${servePath}/games/adarkroom/script/scoring.js"></script>
+	<script src="https://pwl.stackoverflow.wiki/adarkroom/script/Button.js"></script>
+	<script src="https://pwl.stackoverflow.wiki/adarkroom/script/audioLibrary.js"></script>
+	<script src="https://pwl.stackoverflow.wiki/adarkroom/script/audio.js"></script>
+	<script src="https://pwl.stackoverflow.wiki/adarkroom/script/engine.js"></script>
+	<script src="https://pwl.stackoverflow.wiki/adarkroom/script/state_manager.js"></script>
+	<script src="https://pwl.stackoverflow.wiki/adarkroom/script/header.js"></script>
+	<script src="https://pwl.stackoverflow.wiki/adarkroom/script/notifications.js"></script>
+	<script src="https://pwl.stackoverflow.wiki/adarkroom/script/events.js"></script>
+	<script src="https://pwl.stackoverflow.wiki/adarkroom/script/room.js"></script>
+	<script src="https://pwl.stackoverflow.wiki/adarkroom/script/outside.js"></script>
+	<script src="https://pwl.stackoverflow.wiki/adarkroom/script/world.js"></script>
+	<script src="https://pwl.stackoverflow.wiki/adarkroom/script/path.js"></script>
+	<script src="https://pwl.stackoverflow.wiki/adarkroom/script/ship.js"></script>
+	<script src="https://pwl.stackoverflow.wiki/adarkroom/script/space.js"></script>
+	<script src="https://pwl.stackoverflow.wiki/adarkroom/script/prestige.js"></script>
+	<script src="https://pwl.stackoverflow.wiki/adarkroom/script/scoring.js"></script>
 	<!-- Event modules -->
-	<script src="${servePath}/games/adarkroom/script/events/global.js"></script>
-	<script src="${servePath}/games/adarkroom/script/events/room.js"></script>
-	<script src="${servePath}/games/adarkroom/script/events/outside.js"></script>
-	<script src="${servePath}/games/adarkroom/script/events/encounters.js"></script>
-	<script src="${servePath}/games/adarkroom/script/events/setpieces.js"></script>
-	<script src="${servePath}/games/adarkroom/script/events/marketing.js"></script>
+	<script src="https://pwl.stackoverflow.wiki/adarkroom/script/events/global.js"></script>
+	<script src="https://pwl.stackoverflow.wiki/adarkroom/script/events/room.js"></script>
+	<script src="https://pwl.stackoverflow.wiki/adarkroom/script/events/outside.js"></script>
+	<script src="https://pwl.stackoverflow.wiki/adarkroom/script/events/encounters.js"></script>
+	<script src="https://pwl.stackoverflow.wiki/adarkroom/script/events/setpieces.js"></script>
+	<script src="https://pwl.stackoverflow.wiki/adarkroom/script/events/marketing.js"></script>
 
 	<script type='text/javascript'>
 		var oldIE = false;
@@ -99,15 +99,15 @@
 	<script type="text/javascript">oldIE = true;</script>
 	<![endif]-->
 
-	<link rel="stylesheet" type="text/css" href="${servePath}/games/adarkroom/css/main.css" />
-	<link rel="stylesheet" type="text/css" href="${servePath}/games/adarkroom/css/room.css" />
-	<link rel="stylesheet" type="text/css" href="${servePath}/games/adarkroom/css/outside.css" />
-	<link rel="stylesheet" type="text/css" href="${servePath}/games/adarkroom/css/path.css" />
-	<link rel="stylesheet" type="text/css" href="${servePath}/games/adarkroom/css/world.css" />
-	<link rel="stylesheet" type="text/css" href="${servePath}/games/adarkroom/css/ship.css" />
-	<link rel="stylesheet" type="text/css" href="${servePath}/games/adarkroom/css/space.css" />
+	<link rel="stylesheet" type="text/css" href="https://pwl.stackoverflow.wiki/adarkroom/css/main.css" />
+	<link rel="stylesheet" type="text/css" href="https://pwl.stackoverflow.wiki/adarkroom/css/room.css" />
+	<link rel="stylesheet" type="text/css" href="https://pwl.stackoverflow.wiki/adarkroom/css/outside.css" />
+	<link rel="stylesheet" type="text/css" href="https://pwl.stackoverflow.wiki/adarkroom/css/path.css" />
+	<link rel="stylesheet" type="text/css" href="https://pwl.stackoverflow.wiki/adarkroom/css/world.css" />
+	<link rel="stylesheet" type="text/css" href="https://pwl.stackoverflow.wiki/adarkroom/css/ship.css" />
+	<link rel="stylesheet" type="text/css" href="https://pwl.stackoverflow.wiki/adarkroom/css/space.css" />
 
-	<script src="${servePath}/games/adarkroom/script/localization.js"></script>
+	<script src="https://pwl.stackoverflow.wiki/adarkroom/script/localization.js"></script>
 </head>
 <body>
 <div id="wrapper">

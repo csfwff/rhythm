@@ -60,6 +60,13 @@
                                     </div>
                                 </div>
                                 <div class="fn-right">
+                                    <#if level3Permitted == true>
+                                        <button id="groupRevoke" onclick="ChatRoom.startGroupRevoke()" class="button">
+                                            <svg><use xlink:href="#userrole"></use></svg>
+                                            批量撤回
+                                        </button>
+                                    </#if>
+                                    <button class="red" onclick="$('#chats').empty();page=0;ChatRoom.more();">${cleanScreenLabel}</button>
                                     <button class="green" onclick="ChatRoom.send()">${postLabel}</button>
                                 </div>
                             </div>
@@ -79,14 +86,12 @@
                     <div class="list" style="height: 100%">
                         <div id="chats">
                         </div>
-                        <div id="more" onclick="ChatRoom.more()" style="cursor: pointer; color: rgba(0,0,0,0.54);"><#if !isLoggedIn>登录后</#if>查看更多</div>
+                        <#if !isLoggedIn><div style="color:rgba(0,0,0,0.54);">登录后查看更多</div></#if>
                     </div>
-                </div>
-                <div class="side">
-                    <#include "side.ftl">
                 </div>
             </div>
         </div>
+        <div id="goToTop" style="position:fixed;bottom:20px;right:10%;display:none;"><a href="#"><svg style="width:30px;height:30px;color:#626262;"><use xlink:href="#toTopIcon"></use></svg></a></div>
         <#include "footer.ftl">
         <script>
             Label.uploadLabel = "${uploadLabel}";
@@ -117,7 +122,35 @@
             ChatRoomChannel.init("${wsScheme}://${serverHost}:${serverPort}${contextPath}/chat-room-channel");
             var page = 0;
             ChatRoom.more();
-            ChatRoom.more();
+        </script>
+        <script>
+            $(window).scroll(
+                function() {
+                    var scrollTop = $(this).scrollTop();
+                    var scrollHeight = $(document).height();
+                    var windowHeight = $(this).height();
+                    if (scrollTop + windowHeight + 500 >= scrollHeight) {
+                        ChatRoom.more();
+                    }
+                }
+            );
+        </script>
+        <script type="text/javascript">
+            $(document).ready(function(){
+                $(function(){
+                    $(window).scroll(function(){
+                        if($(this).scrollTop()>1){
+                            $("#goToTop").fadeIn();
+                        } else {
+                            $("#goToTop").fadeOut();
+                        }
+                    });
+                });
+                $("#goToTop a").click(function(){
+                    $("html,body").animate({scrollTop:0},800);
+                    return false;
+                });
+            });
         </script>
     </body>
 </html>

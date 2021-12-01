@@ -59,6 +59,8 @@ import java.nio.file.Paths;
 import java.util.*;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import static org.b3log.symphony.util.Symphonys.QN_ENABLED;
 
@@ -229,8 +231,15 @@ public class FileUploadProcessor {
                 String url;
                 byte[] bytes;
                 suffix = Headers.getSuffix(file);
-                final String name = StringUtils.substringBeforeLast(fileName, ".");
+                String name = StringUtils.substringBeforeLast(fileName, ".");
                 final String uuid = StringUtils.substring(UUID.randomUUID().toString().replaceAll("-", ""), 0, 8);
+                String regex = "[a-zA-Z0-9\\u4e00-\\u9fa5]";
+                Matcher matcher = Pattern.compile(regex).matcher(name);
+                StringBuilder stringBuilder = new StringBuilder();
+                while (matcher.find()) {
+                    stringBuilder.append(matcher.group());
+                }
+                name = stringBuilder.toString();
                 fileName = name + '-' + uuid + "." + suffix;
                 fileName = genFilePath(fileName);
                 if (QN_ENABLED) {

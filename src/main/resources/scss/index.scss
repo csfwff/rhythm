@@ -1485,7 +1485,8 @@ code .dec {
 
 /* index chatroom */
 #chatRoomIndex li img {
-  max-height: 400px;
+  max-width:150px;
+  max-height:150px;
 }
 
 .comment__reply {
@@ -1787,7 +1788,8 @@ code .dec {
   width:510px
 }
 .chats__content .vditor-reset img:not(.emoji) {
-  max-width:360px
+  max-width:150px;
+  max-height:300px;
 }
 .chats__arrow {
   position:relative
@@ -2387,4 +2389,14 @@ code .dec {
   text-align: right;
   cursor: pointer;
   height: 15px;
+}
+
+.TGIF__item {
+  background-color: var(--layer-background-color);
+  color: var(--layer-color);
+  cursor: default;
+  padding: 10px;
+  border-radius: 3px;
+  box-shadow: 0 1px 2px rgba(0,0,0,.2);
+  margin: 0px 5px 10px 5px;
 }

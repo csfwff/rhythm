@@ -2476,7 +2476,8 @@ only screen and (device-width: 414px) and (device-height: 896px) and (-webkit-de
 
 /* index chatroom */
 #chatRoomIndex li img {
-  max-height: 400px;
+  max-width:150px;
+  max-height:150px;
 }
 
 .chat-room li img {
@@ -2517,7 +2518,8 @@ only screen and (device-width: 414px) and (device-height: 896px) and (-webkit-de
   width:510px
 }
 .chats__content .vditor-reset img:not(.emoji) {
-  max-width:360px
+  max-width:150px;
+  max-height:300px;
 }
 .chats__arrow {
   position:relative
