@@ -20,6 +20,7 @@
 -->
 <#macro top type>
 <#include "../macro-head.ftl">
+  <link rel="stylesheet" href="${staticServePath}/css/theme/dark-index.css?${staticResourceVersion}" />
 <!DOCTYPE html>
 <html>
     <head>

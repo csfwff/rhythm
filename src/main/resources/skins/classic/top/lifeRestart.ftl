@@ -19,6 +19,7 @@
 
 -->
 <#include "macro-top.ftl">
+  <link rel="stylesheet" href="${staticServePath}/css/theme/dark-index.css?${staticResourceVersion}" />
 <@top "online">
 <h2 class="sub-head">人生重开模拟器成就排行</h2>
 <div class="list">

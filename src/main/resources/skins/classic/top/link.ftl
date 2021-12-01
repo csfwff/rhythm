@@ -19,6 +19,7 @@
 
 -->
 <#include "macro-top.ftl">
+  <link rel="stylesheet" href="${staticServePath}/css/theme/dark-index.css?${staticResourceVersion}" />
 <@top "link">
 <h2 class="sub-head">
     <svg>

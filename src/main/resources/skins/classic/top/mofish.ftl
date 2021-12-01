@@ -19,6 +19,7 @@
 
 -->
 <#include "macro-top.ftl">
+  <link rel="stylesheet" href="${staticServePath}/css/theme/dark-index.css?${staticResourceVersion}" />
 <@top "online">
 <h2 class="sub-head">摸鱼大闯关游戏排行</h2>
 <div class="list">

@@ -19,6 +19,7 @@
 
 -->
 <#include "macro-top.ftl">
+  <link rel="stylesheet" href="${staticServePath}/css/theme/dark-index.css?${staticResourceVersion}" />
 <@top "checkin">
 <h2 class="sub-head"><span>♣</span> ${checkinTopLabel}</h2>
 <div class="list">
