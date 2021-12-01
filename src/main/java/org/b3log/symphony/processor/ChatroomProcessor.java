@@ -354,7 +354,7 @@ public class ChatroomProcessor {
                 }
                 String userId = currentUser.optString(Keys.OBJECT_ID);
                 // 扣积分
-                if (money > 20000 || money <= 0 || count > 1000 || count <= 0 || count > money) {
+                if (money > 20000 || money < 32 || count > 1000 || count <= 0 || count > money) {
                     context.renderJSON(StatusCodes.ERR).renderMsg("数据不合法！");
                     return;
                 }
@@ -645,7 +645,7 @@ public class ChatroomProcessor {
             final BeanManager beanManager = BeanManager.getInstance();
             final ChatRoomRepository chatRoomRepository = beanManager.getReference(ChatRoomRepository.class);
             List<JSONObject> messageList = chatRoomRepository.getList(new Query()
-                    .setPage(page, 10)
+                    .setPage(page, 25)
                     .addSort(Keys.OBJECT_ID, SortDirection.DESCENDING));
             List<JSONObject> msgs = messageList.stream().map(msg -> new JSONObject(msg.optString("content")).put("oId", msg.optString(Keys.OBJECT_ID))).collect(Collectors.toList());
             msgs = msgs.stream().map(msg -> JSONs.clone(msg).put(Common.TIME, new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(msg.optLong(Common.TIME)))).collect(Collectors.toList());
@@ -668,9 +668,12 @@ public class ChatroomProcessor {
         final BeanManager beanManager = BeanManager.getInstance();
         final ShortLinkQueryService shortLinkQueryService = beanManager.getReference(ShortLinkQueryService.class);
         content = shortLinkQueryService.linkArticle(content);
+        content = Emotions.toAliases(content);
         content = Emotions.convert(content);
         content = Markdowns.toHTML(content);
         content = Markdowns.clean(content, "");
+        content = MediaPlayers.renderAudio(content);
+        content = MediaPlayers.renderVideo(content);
 
         return content;
     }

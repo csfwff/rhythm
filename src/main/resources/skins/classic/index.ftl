@@ -577,7 +577,7 @@ ${HeaderBannerLabel}
         $("#chatUsernameSelectedPanel").html("");
 
         let value = $("#chatRoomInput").val()
-        let users;
+        let users = [];
         if (value == '@') {
             $("#chatUsernameSelectedPanel").show();
             users = Util.getAtUsers('');
@@ -796,39 +796,6 @@ ${HeaderBannerLabel}
     }
 </script>
 <script>
-    // img preview
-    var fixDblclick = null
-    $('#chatRoomIndex').on('dblclick', '.vditor-reset img', function () {
-        clearTimeout(fixDblclick)
-        if ($(this).hasClass('emoji')) {
-            return
-        }
-        window.open($(this).attr('src'))
-    }).on('click', '.vditor-reset img', function (event) {
-        clearTimeout(fixDblclick)
-        if ($(this).hasClass('emoji')) {
-            return
-        }
-        var $it = $(this),
-            it = this
-        fixDblclick = setTimeout(function () {
-            var top = it.offsetTop,
-                left = it.offsetLeft
-
-            $('body').append('<div class="img-preview" onclick="$(this).remove()"><img style="transform: translate3d(' +
-                Math.max(0, left) + 'px, ' +
-                Math.max(0, (top - $(window).scrollTop())) + 'px, 0)" src="' +
-                ($it.attr('src').split('?imageView2')[0]) +
-                '"></div>')
-
-            $('.img-preview').css({
-                'background-color': '#fff',
-                'position': 'fixed',
-            })
-        }, 100)
-    })
-</script>
-<script>
     // 渐变输出
     function elementFadeOut(element, speed) {
         let fadePicList = $(element);
@@ -900,7 +867,14 @@ ${HeaderBannerLabel}
             for (let i = nowLiveness; i <= liveness; i++) {
                 setTimeout(function () {
                     $("#sp2").html(i + "%");
-                }, j * 40);
+                    if (i < 10) {
+                        $("#sp1").css("background", "linear-gradient(to left, #f11616, #d71212)").css("box-shadow", "0 3px 3px -5px #c72222, 0 2px 5px #c72222");
+                    } else if (i > 10 && i < 100) {
+                        $("#sp1").css("background", "linear-gradient(to left, #24b0b7, #1dacb3)").css("box-shadow", "0 3px 3px -5px #22bfc7, 0 2px 5px #22bfc7");
+                    } else if (i == 100) {
+                        $("#sp1").css("background", "linear-gradient(to left, #29d120, #3caf36)").css("box-shadow", "#3caf36 0px 3px 3px -5px, #3caf36 0px 2px 5px");
+                    }
+                }, j * 10);
                 j++;
             }
         }
@@ -920,6 +894,14 @@ ${HeaderBannerLabel}
     <#if isLoggedIn>
     setInterval(refreshActivities, 5000);
     </#if>
+</script>
+<script>
+    $('#chatRoomIndex').on('click', '.vditor-reset img', function () {
+        if ($(this).hasClass('emoji')) {
+            return;
+        }
+        window.open($(this).attr('src'));
+    });
 </script>
 </body>
 </html>

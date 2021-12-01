@@ -58,30 +58,28 @@ var ChatRoom = {
         'headings',
         'bold',
         'italic',
+        '|',
         'link',
-        '|',
-        'list',
-        'ordered-list',
-        'check',
-        'outdent',
-        'indent',
-        '|',
-        'quote',
-        'code',
-        'insert-before',
-        'insert-after',
-        '|',
         'upload',
-        'table',
         '|',
         'undo',
         'redo',
         '|',
+        'edit-mode',
         {
           name: 'more',
           toolbar: [
+            'table',
+            'list',
+            'ordered-list',
+            'check',
+            'outdent',
+            'indent',
+            'quote',
+            'code',
+            'insert-before',
+            'insert-after',
             'fullscreen',
-            'edit-mode',
             'both',
             'preview',
             'outline',
@@ -92,46 +90,21 @@ var ChatRoom = {
             'help',
           ],
         }],
-      height: 200,
+      height: 170,
       counter: 40960,
-      placeholder: '聊天室历史记录将永久保存，每天一次撤回机会；在发送消息前请三思而后行，友善是第一原则。',
+      placeholder: '说点什么吧！每天一次撤回机会，三思而后行哦。',
       ctrlEnter: function () {
         ChatRoom.send()
       },
     })
 
     // img preview
-    var fixDblclick = null
-    $('.chat-room').on('dblclick', '.vditor-reset img', function () {
-      clearTimeout(fixDblclick)
+    $('.chat-room').on('click', '.vditor-reset img', function () {
       if ($(this).hasClass('emoji')) {
-        return
+        return;
       }
-      window.open($(this).attr('src'))
-    }).on('click', '.vditor-reset img', function (event) {
-      clearTimeout(fixDblclick)
-      if ($(this).hasClass('emoji')) {
-        return
-      }
-      var $it = $(this),
-          it = this
-      fixDblclick = setTimeout(function () {
-        var top = it.offsetTop,
-            left = it.offsetLeft
-
-        $('body').
-        append('<div class="img-preview" onclick="$(this).remove()"><img style="transform: translate3d(' +
-            Math.max(0, left) + 'px, ' +
-            Math.max(0, (top - $(window).scrollTop())) + 'px, 0)" src="' +
-            ($it.attr('src').split('?imageView2')[0]) +
-            '"></div>')
-
-        $('.img-preview').css({
-          'background-color': '#fff',
-          'position': 'fixed',
-        })
-      }, 100)
-    })
+      window.open($(this).attr('src'));
+    });
 
     // 表情包初始化
     // 加载表情
@@ -172,7 +145,7 @@ var ChatRoom = {
           "<label>\n" +
           "  <div class=\"ft__smaller ft__fade\" style=\"float: left\">积分</div>\n" +
           "  <div class=\"fn-hr5 fn__5\"></div>\n" +
-          "  <input type=\"number\" min=\"1\" max=\"20000\" required=\"\" value=\"32\" id=\"redPacketMoney\" onkeypress=\"return(/[\\d]/.test(String.fromCharCode(event.keyCode)))\">\n" +
+          "  <input type=\"number\" min=\"32\" max=\"20000\" required=\"\" value=\"32\" id=\"redPacketMoney\" onkeypress=\"return(/[\\d]/.test(String.fromCharCode(event.keyCode)))\">\n" +
           "</label>\n" +
           "<label>\n" +
           "  <div class=\"ft__smaller ft__fade\" style=\"float: left\">个数</div>\n" +
@@ -198,13 +171,13 @@ var ChatRoom = {
 
       $("#redPacketMoney").on('change', function () {
         if ($("#redPacketMoney").val() === "") {
-          $("#redPacketMoney").val("0");
+          $("#redPacketMoney").val("32");
         }
         if ($("#redPacketMoney").val() > 20000) {
           $("#redPacketMoney").val("20000");
         }
-        if ($("#redPacketMoney").val() <= 0) {
-          $("#redPacketMoney").val("1");
+        if ($("#redPacketMoney").val() < 32) {
+          $("#redPacketMoney").val("32");
         }
         $("#redPacketAmount").text($("#redPacketMoney").val());
       });
@@ -528,29 +501,32 @@ var ChatRoom = {
    * @returns {undefined}
    */
   more: function () {
-    page++;
-    $.ajax({
-      url: Label.servePath + '/chat-room/more?page=' + page,
-      type: 'GET',
-      cache: false,
-      async: false,
-      success: function(result) {
-        if (result.data.length !== 0) {
-          for (let i in result.data) {
-            let data = result.data[i];
-            let liHtml = ChatRoom.renderMessage(data.userNickname, data.userName, data.userAvatarURL, data.time, data.content, data.oId, Label.currentUser, Label.level3Permitted);
-            $('#chats').append(liHtml);
-            $('#chats>div.fn-none').show(200);
-            $('#chats>div.fn-none').removeClass("fn-none");
-            ChatRoom.resetMoreBtnListen();
+    NProgress.start();
+    setTimeout(function () {
+      page++;
+      $.ajax({
+        url: Label.servePath + '/chat-room/more?page=' + page,
+        type: 'GET',
+        cache: false,
+        async: false,
+        success: function(result) {
+          if (result.data.length !== 0) {
+            for (let i in result.data) {
+              let data = result.data[i];
+              let liHtml = ChatRoom.renderMessage(data.userNickname, data.userName, data.userAvatarURL, data.time, data.content, data.oId, Label.currentUser, Label.level3Permitted);
+              $('#chats').append(liHtml);
+              $('#chats>div.fn-none').show();
+              $('#chats>div.fn-none').removeClass("fn-none");
+              ChatRoom.resetMoreBtnListen();
+            }
+            Util.listenUserCard();
+          } else {
+            alert("没有更多聊天消息了！");
           }
-          Util.listenUserCard();
-        } else {
-          $("#more").removeAttr("onclick");
-          $("#more").html("已经到底啦！");
         }
-      }
-    });
+      });
+      NProgress.done();
+    }, 0);
   },
   /**
    * 监听点击更多按钮关闭事件
@@ -568,22 +544,76 @@ var ChatRoom = {
     });
   },
   /**
-   * 撤回聊天室消息
+   * 开始批量撤回聊天室消息
+   */
+  groupRevokeProcess: false,
+  startGroupRevoke: function () {
+    $("#groupRevoke").attr("onclick", "ChatRoom.stopGroupRevoke()");
+    $("#groupRevoke").html("<svg><use xlink:href=\"#userrole\"></use></svg>\n" +
+        "关闭批量撤回");
+    Util.notice("warning", 6000, "批量撤回已启动，已在消息中添加便捷撤回按钮。<br>使用完成后请记得关闭此功能。");
+    ChatRoom.groupRevokeProcess = true;
+    let groupRevokeInterval = setInterval(function () {
+      if (!ChatRoom.groupRevokeProcess) {
+        $('#chats').empty();
+        page = 0;
+        ChatRoom.more();
+        clearInterval(groupRevokeInterval);
+      }
+      $(".chats__item").each(function () {
+        if ($(this).find(".button").length === 0) {
+          $(this).find(".date-bar").css("float", "left");
+          $(this).find(".date-bar").html("<button class='button' onclick='ChatRoom.adminRevoke(\"" + $(this).attr("id").replace("chatroom", "") + "\")'>撤回</button>");
+        }
+      });
+    }, 500);
+  },
+  /**
+   * 停止批量撤回聊天室消息
+   */
+  stopGroupRevoke: function () {
+    $("#groupRevoke").attr("onclick", "ChatRoom.startGroupRevoke()");
+    $("#groupRevoke").html("<svg><use xlink:href=\"#userrole\"></use></svg>\n" +
+        "批量撤回");
+    Util.notice("success", 1500, "批量撤回已关闭。");
+    ChatRoom.groupRevokeProcess = false;
+  },
+  /**
+   * 管理员撤回聊天室消息，无提示
    * @param oId
    */
-  revoke: function (oId) {
+  adminRevoke: function (oId) {
     $.ajax({
       url: Label.servePath + '/chat-room/revoke/' + oId,
       type: 'DELETE',
       cache: false,
       success: function(result) {
         if (0 === result.code) {
-          Util.alert(result.msg);
         } else {
-          Util.alert(result.msg);
+          Util.notice("danger", 1500, result.msg);
         }
       }
     });
+  },
+  /**
+   * 撤回聊天室消息
+   * @param oId
+   */
+  revoke: function (oId) {
+    if (confirm("确定要撤回吗？")) {
+      $.ajax({
+        url: Label.servePath + '/chat-room/revoke/' + oId,
+        type: 'DELETE',
+        cache: false,
+        success: function(result) {
+          if (0 === result.code) {
+            Util.notice("success", 1500, result.msg);
+          } else {
+            Util.notice("danger", 1500, result.msg);
+          }
+        }
+      });
+    }
   },
   /**
    * 艾特某个人
@@ -789,7 +819,7 @@ var ChatRoom = {
       meTag2 = "<a onclick=\"ChatRoom.revoke(" + oId + ")\" class=\"item\">撤回</a>\n";
     }
     if (isAdmin) {
-      meTag2 = "<a onclick=\"ChatRoom.revoke(" + oId + ")\" class=\"item\">撤回 (使用管理员权限)</a>\n";
+      meTag2 = "<a onclick=\"ChatRoom.revoke(" + oId + ")\" class=\"item\"><svg><use xlink:href=\"#userrole\"></use></svg> 撤回</a>\n";
     }
     try {
       // 判断是否可以收藏为表情包
@@ -828,7 +858,7 @@ var ChatRoom = {
     newHTML += '        <div style="margin-top: 4px" class="vditor-reset ft__smaller ' + Label.chatRoomPictureStatus + '">\n' +
         '            ' + content + '\n' +
         '        </div>\n' +
-        '        <div class="ft__smaller ft__fade fn__right">\n' +
+        '        <div class="ft__smaller ft__fade fn__right date-bar">\n' +
         '            ' + time + '\n' +
         '                <span class="fn__space5"></span>\n';
     if (!isRedPacket) {

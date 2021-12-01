@@ -67,7 +67,6 @@ public class ChatroomChannel implements WebSocketChannel {
         if (null != userStr) {
             final JSONObject user = new JSONObject(userStr);
             onlineUsers.put(session, user);
-            System.out.println(user.optString(User.USER_NAME) + "|PUT|");
         }
 
         SESSIONS.add(session);
@@ -143,7 +142,6 @@ public class ChatroomChannel implements WebSocketChannel {
      */
     private void removeSession(final WebSocketSession session) {
         try {
-            System.out.println(onlineUsers.get(session).optString(User.USER_NAME) + "|DEL|");
             onlineUsers.remove(session);
         } catch (NullPointerException ignored) {
         } catch (Exception e) {
@@ -171,11 +169,9 @@ public class ChatroomChannel implements WebSocketChannel {
             // 使用 HashMap 去重
             Map<String, JSONObject> filteredOnlineUsers = new HashMap<>();
             for (JSONObject object : onlineUsers.values()) {
-                System.out.print(object.optString(User.USER_NAME) + "|GET|");
                 String name = object.optString(User.USER_NAME);
                 filteredOnlineUsers.put(name, object);
             }
-            System.out.println();
 
             JSONArray onlineArray = new JSONArray();
             for (String user : filteredOnlineUsers.keySet()) {
