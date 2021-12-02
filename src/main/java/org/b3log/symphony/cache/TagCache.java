@@ -53,7 +53,7 @@ public class TagCache {
     /**
      * Icon tags.
      */
-    private static final List<JSONObject> ICON_TAGS = new ArrayList<JSONObject>() {
+    private static final List<JSONObject> ICON_TAGS = Collections.synchronizedList(new ArrayList<JSONObject>() {
         @Override
         public synchronized boolean add(JSONObject o) {
             if (size() == 100) {
@@ -61,12 +61,12 @@ public class TagCache {
             }
             return super.add(o);
         }
-    };
+    });
 
     /**
      * New tags.
      */
-    private static final List<JSONObject> NEW_TAGS = new ArrayList<JSONObject>() {
+    private static final List<JSONObject> NEW_TAGS = Collections.synchronizedList(new ArrayList<JSONObject>() {
         @Override
         public synchronized boolean add(JSONObject o) {
             if (size() == 100) {
@@ -74,12 +74,12 @@ public class TagCache {
             }
             return super.add(o);
         }
-    };
+    });
 
     /**
      * All tags.
      */
-    private static final List<JSONObject> TAGS = new ArrayList<JSONObject>() {
+    private static final List<JSONObject> TAGS = Collections.synchronizedList(new ArrayList<JSONObject>() {
         @Override
         public synchronized boolean add(JSONObject o) {
             if (size() == 100) {
@@ -87,7 +87,7 @@ public class TagCache {
             }
             return super.add(o);
         }
-    };
+    });
 
     /**
      * &lt;title, URI&gt;
