@@ -53,27 +53,61 @@ public class TagCache {
     /**
      * Icon tags.
      */
-    private static final List<JSONObject> ICON_TAGS = new ArrayList<>();
+    private static final List<JSONObject> ICON_TAGS = new ArrayList<JSONObject>() {
+        @Override
+        public synchronized boolean add(JSONObject o) {
+            if (size() == 100) {
+                remove(0);
+            }
+            return super.add(o);
+        }
+    };
 
     /**
      * New tags.
      */
-    private static final List<JSONObject> NEW_TAGS = new ArrayList<>();
+    private static final List<JSONObject> NEW_TAGS = new ArrayList<JSONObject>() {
+        @Override
+        public synchronized boolean add(JSONObject o) {
+            if (size() == 100) {
+                remove(0);
+            }
+            return super.add(o);
+        }
+    };
 
     /**
      * All tags.
      */
-    private static final List<JSONObject> TAGS = new ArrayList<>();
+    private static final List<JSONObject> TAGS = new ArrayList<JSONObject>() {
+        @Override
+        public synchronized boolean add(JSONObject o) {
+            if (size() == 100) {
+                remove(0);
+            }
+            return super.add(o);
+        }
+    };
 
     /**
      * &lt;title, URI&gt;
      */
-    private static final Map<String, String> TITLE_URIS = new ConcurrentHashMap<>();
+    private static final Map<String, String> TITLE_URIS = Collections.synchronizedMap(new LinkedHashMap<String, String>() {
+        @Override
+        protected boolean removeEldestEntry(Map.Entry eldest) {
+            return size() > 100;
+        }
+    });
 
     /**
      * &lt;id, tag&gt;
      */
-    private static final Map<String, JSONObject> CACHE = new ConcurrentHashMap<>();
+    private static final Map<String, JSONObject> CACHE = Collections.synchronizedMap(new LinkedHashMap<String, JSONObject>() {
+        @Override
+        protected boolean removeEldestEntry(Map.Entry eldest) {
+            return size() > 100;
+        }
+    });
 
     /**
      * Gets a tag by the specified tag id.

@@ -25,6 +25,7 @@ import org.b3log.symphony.util.JSONs;
 import org.b3log.symphony.util.Sessions;
 import org.json.JSONObject;
 
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -43,22 +44,22 @@ public class UserCache {
     /**
      * Id, User.
      */
-    private static final Map<String, JSONObject> ID_CACHE = new LinkedHashMap<String, JSONObject>() {
+    private static final Map<String, JSONObject> ID_CACHE = Collections.synchronizedMap(new LinkedHashMap<String, JSONObject>() {
         @Override
         protected boolean removeEldestEntry(Map.Entry eldest) {
             return size() > 100;
         }
-    };
+    });
 
     /**
      * Name, User.
      */
-    private static final Map<String, JSONObject> NAME_CACHE = new LinkedHashMap<String, JSONObject>() {
+    private static final Map<String, JSONObject> NAME_CACHE = Collections.synchronizedMap(new LinkedHashMap<String, JSONObject>() {
         @Override
         protected boolean removeEldestEntry(Map.Entry eldest) {
             return size() > 100;
         }
-    };
+    });
 
     /**
      * Administrators cache.

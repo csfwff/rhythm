@@ -20,23 +20,36 @@ package org.b3log.symphony.util;
 
 import org.json.JSONObject;
 
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.Random;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.*;
 
 public class Tests {
     public static void main(String[] args) throws InterruptedException {
-        Map<String, JSONObject> MD_CACHE = new LinkedHashMap<String, JSONObject>() {
+        Map<String, JSONObject> MD_CACHE = Collections.synchronizedMap(new LinkedHashMap<String, JSONObject>() {
             @Override
             protected boolean removeEldestEntry(Map.Entry eldest) {
                 return size() > 5;
             }
-        };
+        });
         //MD_CACHE = new ConcurrentHashMap<>();
-        for (int i = 0; i < 4; i++) {
-            MD_CACHE.put(i + "", new JSONObject().put("hi", "hello"));
+        for (int i = 0; i < 10000; i++) {
+            int a = i;
+            new Thread(() -> {
+                try {
+                    Thread.sleep(new Random().nextInt(100) + 1);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                System.out.println("put " + a);
+                MD_CACHE.put(a + "", new JSONObject().put("hi", "hello"));
+            }).start();
         }
+        Thread.sleep(2000);
+        System.out.println(MD_CACHE.size());
+        for (Map.Entry<String, JSONObject> i : MD_CACHE.entrySet()) {
+            System.out.println(i.getKey() + " " + i.getValue());
+        }
+        Thread.sleep(2000);
+        MD_CACHE.put("new", new JSONObject().put("hi", "hello"));
         System.out.println(MD_CACHE.size());
         for (Map.Entry<String, JSONObject> i : MD_CACHE.entrySet()) {
             System.out.println(i.getKey() + " " + i.getValue());
