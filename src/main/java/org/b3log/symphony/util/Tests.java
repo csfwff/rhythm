@@ -18,17 +18,28 @@
  */
 package org.b3log.symphony.util;
 
+import org.json.JSONObject;
+
+import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.Random;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class Tests {
     public static void main(String[] args) throws InterruptedException {
-        while (true) {
-            int money = 64;
-            Random random = new Random();
-            int cal = (money / 2);
-            int meGot = random.nextInt(money / 2);
-            System.out.println(1 / 2);
-            Thread.sleep(50);
+        Map<String, JSONObject> MD_CACHE = new LinkedHashMap<String, JSONObject>() {
+            @Override
+            protected boolean removeEldestEntry(Map.Entry eldest) {
+                return size() > 5;
+            }
+        };
+        //MD_CACHE = new ConcurrentHashMap<>();
+        for (int i = 0; i < 4; i++) {
+            MD_CACHE.put(i + "", new JSONObject().put("hi", "hello"));
+        }
+        System.out.println(MD_CACHE.size());
+        for (Map.Entry<String, JSONObject> i : MD_CACHE.entrySet()) {
+            System.out.println(i.getKey() + " " + i.getValue());
         }
     }
 }

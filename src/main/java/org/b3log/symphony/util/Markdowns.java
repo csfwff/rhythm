@@ -80,7 +80,12 @@ public final class Markdowns {
     /**
      * Markdown cache.
      */
-    private static final Map<String, JSONObject> MD_CACHE = new ConcurrentHashMap<>();
+    private static final Map<String, JSONObject> MD_CACHE = new LinkedHashMap<String, JSONObject>() {
+        @Override
+        protected boolean removeEldestEntry(Map.Entry eldest) {
+            return size() > 100;
+        }
+    };
 
     /**
      * Lute engine serve path. https://github.com/88250/lute
