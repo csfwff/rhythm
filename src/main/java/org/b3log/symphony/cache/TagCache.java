@@ -55,7 +55,7 @@ public class TagCache {
      */
     private static final List<JSONObject> ICON_TAGS = Collections.synchronizedList(new ArrayList<JSONObject>() {
         @Override
-        public synchronized boolean add(JSONObject o) {
+        public boolean add(JSONObject o) {
             if (size() == 100) {
                 remove(0);
             }
@@ -68,7 +68,7 @@ public class TagCache {
      */
     private static final List<JSONObject> NEW_TAGS = Collections.synchronizedList(new ArrayList<JSONObject>() {
         @Override
-        public synchronized boolean add(JSONObject o) {
+        public boolean add(JSONObject o) {
             if (size() == 100) {
                 remove(0);
             }
@@ -81,7 +81,7 @@ public class TagCache {
      */
     private static final List<JSONObject> TAGS = Collections.synchronizedList(new ArrayList<JSONObject>() {
         @Override
-        public synchronized boolean add(JSONObject o) {
+        public boolean add(JSONObject o) {
             if (size() == 100) {
                 remove(0);
             }
