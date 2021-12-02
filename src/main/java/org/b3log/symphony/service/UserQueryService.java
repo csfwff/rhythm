@@ -64,7 +64,15 @@ public class UserQueryService {
     /**
      * All usernames.
      */
-    public static final List<JSONObject> USER_NAMES = Collections.synchronizedList(new ArrayList<>());
+    public static final List<JSONObject> USER_NAMES = Collections.synchronizedList(new ArrayList<JSONObject>() {
+        @Override
+        public synchronized boolean add(JSONObject o) {
+            if (size() == 100) {
+                remove(0);
+            }
+            return super.add(o);
+        }
+    });
 
     /**
      * User repository.
