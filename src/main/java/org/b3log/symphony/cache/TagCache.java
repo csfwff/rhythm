@@ -53,41 +53,17 @@ public class TagCache {
     /**
      * Icon tags.
      */
-    private static final List<JSONObject> ICON_TAGS = Collections.synchronizedList(new ArrayList<JSONObject>() {
-        @Override
-        public boolean add(JSONObject o) {
-            if (size() == 100) {
-                remove(0);
-            }
-            return super.add(o);
-        }
-    });
+    private static final List<JSONObject> ICON_TAGS = new ArrayList<>();
 
     /**
      * New tags.
      */
-    private static final List<JSONObject> NEW_TAGS = Collections.synchronizedList(new ArrayList<JSONObject>() {
-        @Override
-        public boolean add(JSONObject o) {
-            if (size() == 100) {
-                remove(0);
-            }
-            return super.add(o);
-        }
-    });
+    private static final List<JSONObject> NEW_TAGS = new ArrayList<>();
 
     /**
      * All tags.
      */
-    private static final List<JSONObject> TAGS = Collections.synchronizedList(new ArrayList<JSONObject>() {
-        @Override
-        public boolean add(JSONObject o) {
-            if (size() == 100) {
-                remove(0);
-            }
-            return super.add(o);
-        }
-    });
+    private static final List<JSONObject> TAGS = new ArrayList<>();
 
     /**
      * &lt;title, URI&gt;
