@@ -268,34 +268,38 @@ var Comment = {
    * 删除表情包
    * @param url
    */
+  confirmed: false,
   delEmoji: function (url) {
-    let emojis = Comment.getEmojis();
-    for (let i = 0; i < emojis.length; i++) {
-      if (emojis[i] === url) {
-        emojis.splice(i, 1);
-      }
-    }
-    $.ajax({
-      url: Label.servePath + "/api/cloud/sync",
-      method: "POST",
-      data: JSON.stringify({
-        gameId: "emojis",
-        data: emojis
-      }),
-      headers: {'csrfToken': Label.csrfToken},
-      async: false,
-      success: function (result) {
-        if (result.code === 0) {
-          Util.notice("success", 1500, "表情包删除成功。");
-          Comment.loadEmojis();
-          setTimeout(function () {
-            $("#emojiBtn").click();
-          }, 50)
-        } else {
-          Util.notice("warning", 1500, "表情包删除失败：" + result.msg);
+    if (Comment.confirmed === true || confirm("确定要删除该表情包吗？")) {
+      Comment.confirmed = true;
+      let emojis = Comment.getEmojis();
+      for (let i = 0; i < emojis.length; i++) {
+        if (emojis[i] === url) {
+          emojis.splice(i, 1);
         }
       }
-    });
+      $.ajax({
+        url: Label.servePath + "/api/cloud/sync",
+        method: "POST",
+        data: JSON.stringify({
+          gameId: "emojis",
+          data: emojis
+        }),
+        headers: {'csrfToken': Label.csrfToken},
+        async: false,
+        success: function (result) {
+          if (result.code === 0) {
+            Util.notice("success", 1500, "表情包删除成功。");
+            Comment.loadEmojis();
+            setTimeout(function () {
+              $("#emojiBtn").click();
+            }, 50)
+          } else {
+            Util.notice("warning", 1500, "表情包删除失败：" + result.msg);
+          }
+        }
+      });
+    }
   },
   /**
    * 上传表情
