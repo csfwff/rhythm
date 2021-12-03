@@ -57,22 +57,24 @@ var Settings = {
    */
   initMetal: function (metal) {
     let html = '';
-    for (let i = 0; i < metal.list.length; i++) {
-      let m = metal.list[i];
-      let btn = '';
-      if (m.enabled === true) {
-        btn = '<button class="btn red" onclick="Settings.toggleMetal(\'' + m.name + '\', false)">卸下</button>';
-      } else {
-        btn = '<button class="btn green" onclick="Settings.toggleMetal(\'' + m.name + '\', true)">佩戴</button>';
+    if (metal.list !== undefined) {
+      for (let i = 0; i < metal.list.length; i++) {
+        let m = metal.list[i];
+        let btn = '';
+        if (m.enabled === true) {
+          btn = '<button class="btn red" onclick="Settings.toggleMetal(\'' + m.name + '\', false)">卸下</button>';
+        } else {
+          btn = '<button class="btn green" onclick="Settings.toggleMetal(\'' + m.name + '\', true)">佩戴</button>';
+        }
+        html += '<div class="fn__flex" style="justify-content: space-between; margin-bottom: 10px">' +
+            '<div>' +
+            ' <label style="margin: 0 0 0 0">' +
+            '   <div><img src="' + Util.genMetal(m.name, m.attr) + '"/><br><span style="font-size: 5px">' + m.name + ' (' + m.description + ')</span></div>' +
+            ' </label>' +
+            ' </div>' +
+            ' <div>' + btn + "</div>" +
+            "</div>";
       }
-      html += '<div class="fn__flex" style="justify-content: space-between; margin-bottom: 10px">' +
-          '<div>' +
-          ' <label style="margin: 0 0 0 0">' +
-          '   <div><img src="' + Util.genMetal(m.name, m.attr) + '"/><br><span style="font-size: 5px">' + m.name + ' (' + m.description + ')</span></div>' +
-          ' </label>' +
-          ' </div>' +
-          ' <div>' + btn + "</div>" +
-          "</div>";
     }
     if (html === '') {
       html = '鱼战士，你还没有任何勋章！';

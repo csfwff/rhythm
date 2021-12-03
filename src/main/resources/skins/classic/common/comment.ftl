@@ -62,7 +62,7 @@
                     </span>
                     </#if>
                     <#list comment.sysMetal?eval as metal>
-                        <img title="${metal.name}" src="https://unv-shield.librian.net/api/unv_shield?scale=0.79&txt=${metal.name}&${metal.attr}"/>
+                        <img title="${metal.description}" src="https://unv-shield.librian.net/api/unv_shield?scale=0.79&txt=${metal.name}&${metal.attr}"/>
                     </#list>
                 </span>
             </div>
