@@ -632,9 +632,15 @@ public class CommentQueryService {
             try {
                 for (final JSONObject comment : ret) {
                     final String commentId = comment.optString(Keys.OBJECT_ID);
-
                     String commentAuthorId = comment.optString(Comment.COMMENT_AUTHOR_ID);
-                    comment.put("sysMetal", cloudService.getEnabledMetal(commentAuthorId));
+                    String metal = cloudService.getEnabledMetal(commentAuthorId);
+
+                    if (!metal.equals("{}")) {
+                        List<Object> list = new JSONObject(metal).optJSONArray("list").toList();
+                        comment.put("sysMetal", list);
+                    } else {
+                        comment.put("sysMetal", new ArrayList<>());
+                    }
 
                     // Fill revision count
                     comment.put(Comment.COMMENT_REVISION_COUNT, 0);
