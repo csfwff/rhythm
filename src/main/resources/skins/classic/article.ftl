@@ -218,6 +218,14 @@
                                     ${qnaOfferLabel}
                                 </div>
                             </#if>
+                            <div class="article__stats usersInteracts article__stats--a">
+                                <#if article.sysMetal != "[]">
+                                    <span class="article__cnt">作者勋章</span>
+                                    <#list article.sysMetal?eval as metal>
+                                        <img title="${metal.name}" src="https://unv-shield.librian.net/api/unv_shield?scale=0.79&txt=${metal.name}&${metal.attr}"/>
+                                    </#list>
+                                </#if>
+                            </div>
                         </div>
                         <br>
                         <#if article.thankedCnt != 0>
@@ -244,14 +252,14 @@
                         </#if>
                     </div>
                     <div class="fn__clear article__view">
-                    <span class="fn__flex-inline tooltipped__n tooltipped-n tooltipped" aria-label="总访问计数">
-                        <svg><use xlink:href="#iconTop"></use></svg>
-                        <#if article.articleViewCount < 1000>
-                            ${article.articleViewCount}
-                        <#else>
-                            ${article.articleViewCntDisplayFormat}
-                        </#if>
-                    </span>
+                        <span class="fn__flex-inline tooltipped__n tooltipped-n tooltipped" aria-label="总访问计数">
+                            <svg><use xlink:href="#iconTop"></use></svg>
+                            <#if article.articleViewCount < 1000>
+                                ${article.articleViewCount}
+                            <#else>
+                                ${article.articleViewCntDisplayFormat}
+                            </#if>
+                        </span>
                     </div>
                 </div>
             </div>

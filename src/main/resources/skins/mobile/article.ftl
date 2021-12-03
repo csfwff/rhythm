@@ -122,6 +122,13 @@
                         ${article.articleTitleEmoj}
                     </a>
                 </h1>
+                <div style="margin-bottom: 3px">
+                    <#if article.sysMetal != "[]">
+                        <#list article.sysMetal?eval as metal>
+                            <img title="${metal.name}" src="https://unv-shield.librian.net/api/unv_shield?scale=0.79&txt=${metal.name}&${metal.attr}"/>
+                        </#list>
+                    </#if>
+                </div>
                 <div class="article-info">
                     <a rel="author" href="${servePath}/member/${article.articleAuthorName}"
                        title="${article.articleAuthorName}"><div class="avatar" style="background-image:url('${article.articleAuthorThumbnailURL48}')"></div></a>
