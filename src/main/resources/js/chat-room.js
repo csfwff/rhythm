@@ -513,7 +513,7 @@ var ChatRoom = {
           if (result.data.length !== 0) {
             for (let i in result.data) {
               let data = result.data[i];
-              let liHtml = ChatRoom.renderMessage(data.userNickname, data.userName, data.userAvatarURL, data.time, data.content, data.oId, Label.currentUser, Label.level3Permitted);
+              let liHtml = ChatRoom.renderMessage(data.userNickname, data.userName, data.userAvatarURL, data.time, data.content, data.oId, Label.currentUser, Label.level3Permitted, false, data.sysMetal);
               $('#chats').append(liHtml);
               $('#chats>div.fn-none').show();
               $('#chats>div.fn-none').removeClass("fn-none");
@@ -768,7 +768,7 @@ var ChatRoom = {
   /**
    * 渲染聊天室消息
    */
-  renderMessage: function (userNickname, userName, userAvatarURL, time, content, oId, currentUser, isAdmin, addPlusOne) {
+  renderMessage: function (userNickname, userName, userAvatarURL, time, content, oId, currentUser, isAdmin, addPlusOne, sysMetal) {
     let isRedPacket = false;
     try {
       let msgJSON = $.parseJSON(content.replace("<p>", "").replace("</p>", ""));
@@ -852,8 +852,17 @@ var ChatRoom = {
         '        <div class="chats__arrow"></div>\n';
     if (currentUser !== userName) {
       newHTML += '<div class="ft__fade ft__smaller" style="padding-bottom: 3px;border-bottom: 1px solid #eee">\n' +
-          '    <span class="ft-gray">' + userNickname + '</span>\n' +
-          '</div>';
+          '    <span class="ft-gray">' + userNickname + '</span>\n';
+      if (sysMetal !== undefined && sysMetal !== "") {
+        let list = JSON.parse(sysMetal).list;
+        if (list !== undefined) {
+          for (let i = 0; i < list.length; i++) {
+            let m = list[i];
+            newHTML += "<img title='" + m.description + "' src='" + Util.genMetal(m.name, m.attr) + "'/>";
+          }
+        }
+      }
+      newHTML += '</div>';
     }
     newHTML += '        <div style="margin-top: 4px" class="vditor-reset ft__smaller ' + Label.chatRoomPictureStatus + '">\n' +
         '            ' + content + '\n' +
