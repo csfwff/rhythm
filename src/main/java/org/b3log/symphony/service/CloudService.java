@@ -251,6 +251,7 @@ public class CloudService {
                 .put("description", description)
                 .put("attr", attr)
                 .put("data", data)
+                .put("enabled", true)
         );
         metal.put("list", list);
     }

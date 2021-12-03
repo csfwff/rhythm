@@ -532,21 +532,21 @@
                 <div class="fn__flex">
                     <label class="mid">
                         <div>勋章名称</div>
-                        <input type="text" name="item" value=""/>
+                        <input type="text" name="name" value=""/>
                     </label>
                     <label>
                         <div>描述</div>
-                        <input type="text" name="sum" value=""/>
+                        <input type="text" name="description" value=""/>
                     </label>
                 </div>
                 <div class="fn__flex">
                     <label class="mid">
                         <div>属性</div>
-                        <input type="text" name="sum" value=""/>
+                        <input type="text" name="attr" value=""/>
                     </label>
                     <label>
                         <div>数据</div>
-                        <input type="text" name="sum" value=""/>
+                        <input type="text" name="data" value=""/>
                     </label>
                 </div>
                 <br/>
