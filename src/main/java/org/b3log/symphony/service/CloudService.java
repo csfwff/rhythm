@@ -282,4 +282,20 @@ public class CloudService {
         metal.put("list", list);
         saveMetal(userId, metal.toString());
     }
+
+    synchronized public void removeMetal(String userId, String name) {
+        JSONObject metal = new JSONObject(getMetal(userId));
+        if (!metal.has("list")) {
+            metal.put("list", new JSONArray());
+        }
+        JSONArray list = metal.optJSONArray("list");
+        for (int i = 0; i < list.length(); i++) {
+            JSONObject jsonObject = list.optJSONObject(i);
+            if (jsonObject.optString("name").equals(name)) {
+                list.remove(i);
+            }
+        }
+        metal.put("list", list);
+        saveMetal(userId, metal.toString());
+    }
 }

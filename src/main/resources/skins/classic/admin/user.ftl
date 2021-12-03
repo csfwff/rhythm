@@ -562,5 +562,27 @@
             </div>
         </div>
     </div>
+
+    <div class="module">
+        <div class="module-header">
+            <h2>勋章移除 (仅admin可用)</h2>
+        </div>
+        <div class="module-panel form fn-clear form--admin">
+            <form action="${servePath}/admin/user/${user.oId}/remove-metal" method="POST">
+                <div class="fn__flex">
+                    <label>
+                        <div>${userNameLabel}</div>
+                        <input type="text" name="userName" value="${user.userName}" readonly class="input--admin-readonly"/>
+                    </label>
+                    <label class="mid">
+                        <div>勋章名称</div>
+                        <input type="text" name="name" value=""/>
+                    </label>
+                </div>
+                <br/>
+                <button type="submit" class="green fn-right">${submitLabel}</button>
+            </form>
+        </div>
+    </div>
 </div>
 </@admin>
