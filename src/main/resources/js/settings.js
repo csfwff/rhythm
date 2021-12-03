@@ -54,7 +54,29 @@ var Settings = {
    * 初始化勋章
    */
   initMetal: function (metal) {
-
+    let html = '';
+    for (let i = 0; i < metal.list.length; i++) {
+      let m = metal.list[i];
+      console.log(m)
+      let btn = '';
+      if (m.enabled === true) {
+        btn = '<button class="btn red">卸下</button>';
+      } else {
+        btn = '<button class="btn green">佩戴</button>';
+      }
+      html += '<div class="fn__flex" style="justify-content: space-between">' +
+          '<div>' +
+          ' <label style="margin: 4px 0 20px 0">' +
+          '   <div>' + m.name + '</div>' +
+          ' </label>' +
+          ' </div>' +
+          ' <div>' + btn + "</div>" +
+          "</div>";
+    }
+    if (html === '') {
+      html = '鱼战士，你还没有任何勋章！';
+    }
+    document.getElementById("metal").innerHTML = html;
   },
   /**
    * 使用补签卡
