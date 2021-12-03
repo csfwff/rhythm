@@ -209,6 +209,15 @@ public class UserProcessor {
         Dispatcher.get("/users/emotions", userProcessor::getFrequentEmotions);
         Dispatcher.get("/user/{userName}", userProcessor::getUserInfo);
         Dispatcher.get("/user/liveness", userProcessor::getLiveness, loginCheck::handle);
+        Dispatcher.get("/user/{userName}/metal", userProcessor::getUserMetal, userCheckMidware::handle);
+    }
+
+    public void getUserMetal(final RequestContext context) {
+        final String userName = context.pathVar("userName");
+        final JSONObject user = userQueryService.getUserByName(userName);
+        String userId = user.optString(Keys.OBJECT_ID);
+        JSONObject metal = new JSONObject(cloudService.getMetal(userId));
+        context.renderJSON(StatusCodes.SUCC).renderData(metal);
     }
 
     /**
