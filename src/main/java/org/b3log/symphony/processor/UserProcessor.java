@@ -212,6 +212,11 @@ public class UserProcessor {
         Dispatcher.get("/user/{userName}/metal", userProcessor::getUserMetal, userCheckMidware::handle);
     }
 
+    /**
+     * 获取用户勋章
+     *
+     * @param context
+     */
     public void getUserMetal(final RequestContext context) {
         final String userName = context.pathVar("userName");
         final JSONObject user = userQueryService.getUserByName(userName);
