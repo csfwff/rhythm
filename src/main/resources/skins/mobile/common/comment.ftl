@@ -61,6 +61,9 @@
                         <div class="avatar-small" style="background-image:url('${comment.commentOriginalAuthorThumbnailURL}')"></div>
                     </span>
                     </#if>
+                    <#list comment.sysMetal?eval as metal>
+                        <img title="${metal.name}" src="https://unv-shield.librian.net/api/unv_shield?scale=0.79&txt=${metal.name}&${metal.attr}"/>
+                    </#list>
                 </span>
             </div>
             <div class="vditor-reset comment">
