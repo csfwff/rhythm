@@ -213,7 +213,7 @@ public class UserProcessor {
     }
 
     /**
-     * 获取用户勋章
+     * 获取用户已启用勋章
      *
      * @param context
      */
@@ -221,7 +221,7 @@ public class UserProcessor {
         final String userName = context.pathVar("userName");
         final JSONObject user = userQueryService.getUserByName(userName);
         String userId = user.optString(Keys.OBJECT_ID);
-        JSONObject metal = new JSONObject(cloudService.getMetal(userId));
+        JSONObject metal = new JSONObject(cloudService.getEnabledMetal(userId));
         context.renderJSON(StatusCodes.SUCC).renderData(metal);
     }
 

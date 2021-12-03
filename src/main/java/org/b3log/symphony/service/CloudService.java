@@ -260,6 +260,29 @@ public class CloudService {
         }
     }
 
+    synchronized public String getEnabledMetal(String userId) {
+        try {
+            Query cloudQuery = new Query()
+                    .setFilter(CompositeFilterOperator.and(
+                            new PropertyFilter("userId", FilterOperator.EQUAL, userId),
+                            new PropertyFilter("gameId", FilterOperator.EQUAL, CloudService.SYS_MEDAL)
+                    ));
+            JSONObject result = cloudRepository.getFirst(cloudQuery);
+            JSONObject object1 = new JSONObject(result.optString("data"));
+            JSONArray object2 = object1.optJSONArray("list");
+            for (int i = object2.length() - 1; i >= 0; i--) {
+                JSONObject object3 = object2.optJSONObject(i);
+                if (!object3.optBoolean("enabled")) {
+                    object2.remove(i);
+                }
+            }
+            object1.put("list", object2);
+            return object1.toString();
+        } catch (Exception e) {
+            return new JSONObject().toString();
+        }
+    }
+
     synchronized public void giveMetal(String userId, String name, String description, String attr, String data) {
         JSONObject metal = new JSONObject(getMetal(userId));
         if (!metal.has("list")) {

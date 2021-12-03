@@ -137,6 +137,19 @@
     Label.userName = '${user.userName}'
 
     Settings.initHome()
+
+    $.ajax({
+        url: Label.servePath + "/user/${user.userName}/metal",
+        async: true,
+        method: "get",
+        success: function (result) {
+            let list = result.data.list;
+            for (let i = 0; i < list.length; i++) {
+                let m = list[i];
+                $("#metal").append("<img title='" + m.description + "' src='" + Util.genMetal(m.name, m.attr) + "'/>");
+            }
+        }
+    });
 </script>
 </body>
 </html>

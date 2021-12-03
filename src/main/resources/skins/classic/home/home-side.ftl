@@ -69,6 +69,9 @@
                 </a>
             </div>
 
+            <div id="metal">
+            </div>
+
             <#if isLoggedIn && (currentUser.userName != user.userName)>
             <#if isFollowing>
             <button class="follow" onclick="Util.unfollow(this, '${followingId}', 'user')">
