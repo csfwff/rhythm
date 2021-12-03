@@ -33,6 +33,10 @@ import org.b3log.symphony.util.Sessions;
 import org.b3log.symphony.util.StatusCodes;
 import org.json.JSONObject;
 
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+
 @Singleton
 public class CloudProcessor {
 
@@ -97,6 +101,15 @@ public class CloudProcessor {
         JSONObject requestJSONObject = context.requestJSON();
         String gameId = requestJSONObject.optString("gameId");
         String data = cloudService.getFromCloud(userId, gameId);
+        if (gameId.equals("emojis")) {
+            try {
+                List<String> emojis = Arrays.asList(data.replaceAll("^\\[|]$", "").split(","));
+                Collections.reverse(emojis);
+                data = String.valueOf(emojis);
+            } catch (Exception ignored) {
+            }
+        }
+
         context.renderJSON(StatusCodes.SUCC).renderData(data);
     }
 }
