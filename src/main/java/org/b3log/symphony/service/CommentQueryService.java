@@ -109,6 +109,11 @@ public class CommentQueryService {
     @Inject
     private ShortLinkQueryService shortLinkQueryService;
 
+    /**
+     * Cloud service.
+     */
+    @Inject
+    private CloudService cloudService;
 
     /**
      * Gets the URL of a comment.
@@ -627,6 +632,9 @@ public class CommentQueryService {
             try {
                 for (final JSONObject comment : ret) {
                     final String commentId = comment.optString(Keys.OBJECT_ID);
+
+                    String commentAuthorId = comment.optString(Comment.COMMENT_AUTHOR_ID);
+                    comment.put("sysMetal", cloudService.getEnabledMetal(commentAuthorId));
 
                     // Fill revision count
                     comment.put(Comment.COMMENT_REVISION_COUNT, 0);
