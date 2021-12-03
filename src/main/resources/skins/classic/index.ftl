@@ -500,7 +500,7 @@ ${HeaderBannerLabel}
         </div>
     </div>
 
-    <div class="index-bottom" style="padding: 15px 0">
+    <!--<div class="index-bottom" style="padding: 15px 0">
         <div class="wrapper">
             <div class="metro-line fn-flex old-almanac" style="width:100%">
                 <div class="tip metro-item">
@@ -543,7 +543,7 @@ ${HeaderBannerLabel}
                 </div>
             </div>
         </div>
-    </div>
+    </div>-->
 
 </div>
 <#include "footer.ftl">
