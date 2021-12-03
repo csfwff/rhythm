@@ -26,6 +26,7 @@ import org.b3log.latke.repository.*;
 import org.b3log.latke.service.ServiceException;
 import org.b3log.latke.service.annotation.Service;
 import org.b3log.symphony.repository.CloudRepository;
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
@@ -46,6 +47,7 @@ public class CloudService {
     private CloudRepository cloudRepository;
 
     final public static String SYS_BAG = "sys-bag";
+    final public static String SYS_MEDAL = "sys-medal";
 
     /**
      * 上传存档
@@ -222,5 +224,34 @@ public class CloudService {
         }
 
         return -1;
+    }
+
+    synchronized public String getMetal(String userId) {
+        try {
+            Query cloudQuery = new Query()
+                    .setFilter(CompositeFilterOperator.and(
+                            new PropertyFilter("userId", FilterOperator.EQUAL, userId),
+                            new PropertyFilter("gameId", FilterOperator.EQUAL, CloudService.SYS_MEDAL)
+                    ));
+            JSONObject result = cloudRepository.getFirst(cloudQuery);
+            return result.optString("data");
+        } catch (Exception e) {
+            return new JSONObject().toString();
+        }
+    }
+
+    synchronized public void giveMetal(String userId, String name, String description, String attr, String data) {
+        JSONObject metal = new JSONObject(getMetal(userId));
+        if (!metal.has("list")) {
+            metal.put("list", new JSONArray());
+        }
+        JSONArray list = metal.optJSONArray("list");
+        list.put(new JSONObject()
+                .put("name", name)
+                .put("description", description)
+                .put("attr", attr)
+                .put("data", data)
+        );
+        metal.put("list", list);
     }
 }

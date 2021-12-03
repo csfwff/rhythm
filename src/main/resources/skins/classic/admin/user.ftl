@@ -485,7 +485,7 @@
 
     <div class="module">
         <div class="module-header">
-            <h2>物品发放</h2>
+            <h2>物品发放 (仅admin可用)</h2>
         </div>
         <div class="module-panel form fn-clear form--admin">
             <form action="${servePath}/admin/user/${user.oId}/adjust-bag" method="POST">
@@ -500,6 +500,52 @@
                     </label>
                     <label>
                         <div>数量</div>
+                        <input type="text" name="sum" value=""/>
+                    </label>
+                </div>
+                <br/>
+                <button type="submit" class="green fn-right">${submitLabel}</button>
+            </form>
+            <div style="float: left;font-size: 12px;color: rgba(0,0,0,0.38);">
+                当前用户背包数据：<br>
+                ${sysBag}<br>
+                可用物品名称：<br>
+                checkin2days (2日免签卡)<br>
+                patchCheckinCard (补签卡)<br>
+                数量为正数时，增加；数量为负数时，减少。
+            </div>
+        </div>
+    </div>
+
+    <div class="module">
+        <div class="module-header">
+            <h2>勋章发放 (仅admin可用)</h2>
+        </div>
+        <div class="module-panel form fn-clear form--admin">
+            <form action="${servePath}/admin/user/${user.oId}/give-metal" method="POST">
+                <div class="fn__flex">
+                    <label>
+                        <div>${userNameLabel}</div>
+                        <input type="text" name="userName" value="${user.userName}" readonly class="input--admin-readonly"/>
+                    </label>
+                </div>
+                <div class="fn__flex">
+                    <label class="mid">
+                        <div>勋章名称</div>
+                        <input type="text" name="item" value=""/>
+                    </label>
+                    <label>
+                        <div>描述</div>
+                        <input type="text" name="sum" value=""/>
+                    </label>
+                </div>
+                <div class="fn__flex">
+                    <label class="mid">
+                        <div>属性</div>
+                        <input type="text" name="sum" value=""/>
+                    </label>
+                    <label>
+                        <div>数据</div>
                         <input type="text" name="sum" value=""/>
                     </label>
                 </div>

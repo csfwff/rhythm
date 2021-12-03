@@ -316,6 +316,12 @@ public class AdminProcessor {
     private ReportRepository reportRepository;
 
     /**
+     * CLoud service.
+     */
+    @Inject
+    private CloudService cloudService;
+
+    /**
      * Register request handlers.
      */
     public static void register() {
@@ -372,6 +378,7 @@ public class AdminProcessor {
         Dispatcher.post("/admin/user/{userId}/init-point", adminProcessor::initPoint, middlewares);
         Dispatcher.post("/admin/user/{userId}/exchange-point", adminProcessor::exchangePoint, middlewares);
         Dispatcher.post("/admin/user/{userId}/adjust-bag", adminProcessor::adjustBag, middlewares);
+        Dispatcher.post("/admin/user/{userId}/give-metal", adminProcessor::giveMetal, middlewares);
         Dispatcher.get("/admin/articles", adminProcessor::showArticles, middlewares);
         Dispatcher.get("/admin/article/{articleId}", adminProcessor::showArticle, middlewares);
         Dispatcher.post("/admin/article/{articleId}", adminProcessor::updateArticle, middlewares);
@@ -405,13 +412,25 @@ public class AdminProcessor {
         final String userId = context.pathVar("userId");
         final String item = context.param("item");
         final int sum = Integer.parseInt(context.param("sum"));
-        if (Role.ROLE_ID_C_ADMIN.equals(currentUser.optString(User.USER_ROLE))
-            ||
-            "1630552921050".equals(currentUser.optString(User.USER_ROLE))
-        ) {
+        if (Role.ROLE_ID_C_ADMIN.equals(currentUser.optString(User.USER_ROLE))) {
             final BeanManager beanManager = BeanManager.getInstance();
             final CloudService cloudService = beanManager.getReference(CloudService.class);
             cloudService.putBag(userId, item, sum, Integer.MAX_VALUE);
+        }
+        context.sendRedirect(Latkes.getServePath() + "/admin/user/" + userId);
+    }
+
+    public void giveMetal(final RequestContext context) {
+        final JSONObject currentUser = Sessions.getUser();
+        final String userId = context.pathVar("userId");
+        final String name = context.param("name");
+        final String description = context.param("description");
+        final String attr = context.param("attr");
+        final String data = context.param("data");
+        if (Role.ROLE_ID_C_ADMIN.equals(currentUser.optString(User.USER_ROLE))) {
+            final BeanManager beanManager = BeanManager.getInstance();
+            final CloudService cloudService = beanManager.getReference(CloudService.class);
+            cloudService.giveMetal(userId, name, description, attr, data);
         }
         context.sendRedirect(Latkes.getServePath() + "/admin/user/" + userId);
     }
@@ -1361,6 +1380,8 @@ public class AdminProcessor {
         final JSONObject result = roleQueryService.getRoles(1, Integer.MAX_VALUE, 10);
         final List<JSONObject> roles = (List<JSONObject>) result.opt(Role.ROLES);
         dataModel.put(Role.ROLES, roles);
+
+        dataModel.put("sysBag", cloudService.getBag(userId));
 
         dataModelService.fillHeaderAndFooter(context, dataModel);
     }
