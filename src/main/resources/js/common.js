@@ -33,6 +33,15 @@ var Util = {
   bling: undefined,
   isBlinging: false,
 
+  genMetal(name, attr) {
+    if (attr !== undefined && attr !== '') {
+      attr = '&' + attr;
+    } else {
+      attr = '';
+    }
+    return 'https://unv-shield.librian.net/api/unv_shield?scale=0.79&txt=' + name + attr;
+  },
+
   parseDom(arg) {
     var objE = document.createElement("div");
     objE.innerHTML = arg;

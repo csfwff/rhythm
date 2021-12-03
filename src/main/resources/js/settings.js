@@ -59,7 +59,6 @@ var Settings = {
     let html = '';
     for (let i = 0; i < metal.list.length; i++) {
       let m = metal.list[i];
-      console.log(m)
       let btn = '';
       if (m.enabled === true) {
         btn = '<button class="btn red">卸下</button>';
@@ -69,7 +68,7 @@ var Settings = {
       html += '<div class="fn__flex" style="justify-content: space-between; margin-bottom: 10px">' +
           '<div>' +
           ' <label style="margin: 0 0 0 0">' +
-          '   <div>' + m.name + '</div>' +
+          '   <div><img src="' + Util.genMetal(m.name, m.attr) + '"/><br><span style="font-size: 5px">' + m.name + ' (' + m.description + ')</span></div>' +
           ' </label>' +
           ' </div>' +
           ' <div>' + btn + "</div>" +
