@@ -552,6 +552,14 @@
                 <br/>
                 <button type="submit" class="green fn-right">${submitLabel}</button>
             </form>
+            <div style="float: left;font-size: 12px;color: rgba(0,0,0,0.38);">
+                当前用户勋章数据：<br>
+                ${sysMetal}<br>
+                属性示例：<br>
+                url=[图标URL]&backcolor=0000ff&fontcolor=ffffff<br>
+                数据示例：<br>
+                暂时无需填写，留空即可
+            </div>
         </div>
     </div>
 </div>

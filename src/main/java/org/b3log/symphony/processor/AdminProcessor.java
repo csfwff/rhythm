@@ -1382,6 +1382,7 @@ public class AdminProcessor {
         dataModel.put(Role.ROLES, roles);
 
         dataModel.put("sysBag", cloudService.getBag(userId));
+        dataModel.put("sysMetal", cloudService.getMetal(userId));
 
         dataModelService.fillHeaderAndFooter(context, dataModel);
     }

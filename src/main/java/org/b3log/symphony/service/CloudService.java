@@ -226,6 +226,26 @@ public class CloudService {
         return -1;
     }
 
+    synchronized public void saveMetal(String userId, String data) {
+        try {
+            final Transaction transaction = cloudRepository.beginTransaction();
+            Query cloudDeleteQuery = new Query()
+                    .setFilter(CompositeFilterOperator.and(
+                            new PropertyFilter("userId", FilterOperator.EQUAL, userId),
+                            new PropertyFilter("gameId", FilterOperator.EQUAL, CloudService.SYS_MEDAL)
+                    ));
+            cloudRepository.remove(cloudDeleteQuery);
+            JSONObject cloudJSON = new JSONObject();
+            cloudJSON.put("userId", userId)
+                    .put("gameId", CloudService.SYS_MEDAL)
+                    .put("data", data);
+            cloudRepository.add(cloudJSON);
+            transaction.commit();
+        } catch (RepositoryException e) {
+            LOGGER.log(Level.ERROR, "Cannot save metal data to database.", e);
+        }
+    }
+
     synchronized public String getMetal(String userId) {
         try {
             Query cloudQuery = new Query()
@@ -246,6 +266,12 @@ public class CloudService {
             metal.put("list", new JSONArray());
         }
         JSONArray list = metal.optJSONArray("list");
+        for (int i = 0; i < list.length(); i++) {
+            JSONObject jsonObject = list.optJSONObject(i);
+            if (jsonObject.optString("name").equals(name)) {
+                return;
+            }
+        }
         list.put(new JSONObject()
                 .put("name", name)
                 .put("description", description)
@@ -254,5 +280,6 @@ public class CloudService {
                 .put("enabled", true)
         );
         metal.put("list", list);
+        saveMetal(userId, metal.toString());
     }
 }
