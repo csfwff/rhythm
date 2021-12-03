@@ -18,6 +18,7 @@
  */
 package org.b3log.symphony.processor;
 
+import com.sun.org.apache.xpath.internal.operations.Bool;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.math.RandomUtils;
@@ -380,6 +381,7 @@ public class AdminProcessor {
         Dispatcher.post("/admin/user/{userId}/adjust-bag", adminProcessor::adjustBag, middlewares);
         Dispatcher.post("/admin/user/{userId}/give-metal", adminProcessor::giveMetal, middlewares);
         Dispatcher.post("/admin/user/{userId}/remove-metal", adminProcessor::removeMetal, middlewares);
+        Dispatcher.post("/admin/user/{userId}/toggle-metal", adminProcessor::toggleMetal, middlewares);
         Dispatcher.get("/admin/articles", adminProcessor::showArticles, middlewares);
         Dispatcher.get("/admin/article/{articleId}", adminProcessor::showArticle, middlewares);
         Dispatcher.post("/admin/article/{articleId}", adminProcessor::updateArticle, middlewares);
@@ -446,6 +448,20 @@ public class AdminProcessor {
             cloudService.removeMetal(userId, name);
         }
         context.sendRedirect(Latkes.getServePath() + "/admin/user/" + userId);
+    }
+
+    public void toggleMetal(final RequestContext context) {
+        JSONObject currentUser = Sessions.getUser();
+        try {
+            currentUser = ApiProcessor.getUserByKey(context.param("apiKey"));
+        } catch (NullPointerException ignored) {
+        }
+        final String userId = currentUser.optString(Keys.OBJECT_ID);
+        final String name = context.param("name");
+        final boolean enabled = Boolean.parseBoolean(context.param("enabled"));
+        final BeanManager beanManager = BeanManager.getInstance();
+        final CloudService cloudService = beanManager.getReference(CloudService.class);
+        cloudService.toggleMetal(userId, name, enabled);
     }
 
     /**
