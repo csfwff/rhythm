@@ -51,6 +51,12 @@ var Settings = {
     document.getElementById("bag").innerHTML = html;
   },
   /**
+   * 初始化勋章
+   */
+  initMetal: function (metal) {
+
+  },
+  /**
    * 使用补签卡
    * @param csrfToken
    */
