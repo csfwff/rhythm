@@ -870,6 +870,16 @@ public class CommentQueryService {
             final String thumbnailURL = avatarQueryService.getAvatarURLByUser(author, "48");
             comment.put(Comment.COMMENT_T_AUTHOR_THUMBNAIL_URL, thumbnailURL);
 
+            final String authorId = comment.optString(Comment.COMMENT_AUTHOR_ID);
+            String metal = cloudService.getEnabledMetal(authorId);
+
+            if (!metal.equals("{}")) {
+                List<Object> list = new JSONObject(metal).optJSONArray("list").toList();
+                comment.put("sysMetal", list);
+            } else {
+                comment.put("sysMetal", new ArrayList<>());
+            }
+
             processCommentContent(comment);
         } finally {
             Stopwatchs.end();
