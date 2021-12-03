@@ -866,6 +866,21 @@ var Settings = {
       'hideFooter': true,
     })
 
+    $.ajax({
+      url: Label.servePath + "/user/" + Label.userName + "/metal",
+      async: true,
+      method: "get",
+      success: function (result) {
+        let list = result.data.list;
+        if (list !== undefined) {
+          for (let i = 0; i < list.length; i++) {
+            let m = list[i];
+            $("#metal").append("<img title='" + m.description + "' src='" + Util.genMetal(m.name, m.attr) + "'/>");
+          }
+        }
+      }
+    });
+
     if ($.ua.device.type !== 'mobile') {
       Settings.homeScroll()
     } else {
