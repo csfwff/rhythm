@@ -66,9 +66,9 @@ var Settings = {
       } else {
         btn = '<button class="btn green">佩戴</button>';
       }
-      html += '<div class="fn__flex" style="justify-content: space-between">' +
+      html += '<div class="fn__flex" style="justify-content: space-between; margin-bottom: 10px">' +
           '<div>' +
-          ' <label style="margin: 4px 0 20px 0">' +
+          ' <label style="margin: 0 0 0 0">' +
           '   <div>' + m.name + '</div>' +
           ' </label>' +
           ' </div>' +
