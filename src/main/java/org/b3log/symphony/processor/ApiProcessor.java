@@ -94,6 +94,12 @@ public class ApiProcessor {
     private SystemSettingsService systemSettingsService;
 
     /**
+     * Cloud service.
+     */
+    @Inject
+    private CloudService cloudService;
+
+    /**
      * Register request handlers.
      */
     public static void register() {
@@ -181,6 +187,7 @@ public class ApiProcessor {
             filteredUserProfile.put(Keys.OBJECT_ID, user.optString(Keys.OBJECT_ID));
             filteredUserProfile.put(UserExt.USER_NO, user.optString(UserExt.USER_NO));
             filteredUserProfile.put(UserExt.USER_APP_ROLE, user.optString(UserExt.USER_APP_ROLE));
+            filteredUserProfile.put("sysMetal", cloudService.getMetal(user.optString(Keys.OBJECT_ID)));
             final String userId = user.optString(Keys.OBJECT_ID);
             final long followerCnt = followQueryService.getFollowerCount(userId, Follow.FOLLOWING_TYPE_C_USER);
             filteredUserProfile.put("followerCount", followerCnt);
