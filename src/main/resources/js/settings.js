@@ -39,11 +39,13 @@ var Settings = {
     if (bag.checkin2days !== undefined && bag.checkin2days > 0) {
       html += '<button style="margin:0 5px 5px 0" onclick="Settings.use2dayCheckinCard(\'' + Label.csrfToken + '\')">两天免签卡 x' + bag.checkin2days + '</button>';
     }
-    if (bag.sysCheckinRemain !== undefined && bag.sysCheckinRemain > 0) {
-      html += '<button style="margin:0 5px 5px 0">免签卡生效中，剩余' + bag.sysCheckinRemain + '天</button>';
-    }
     if (bag.patchCheckinCard !== undefined && bag.patchCheckinCard > 0) {
       html += '<button style="margin:0 5px 5px 0" onclick="Settings.usePatchCheckinCard(\'' + Label.csrfToken + '\', ' + bag.patchStart + ')">补签卡 x' + bag.patchCheckinCard + '</button>';
+    }
+
+    // 下面内容不要变更顺序
+    if (bag.sysCheckinRemain !== undefined && bag.sysCheckinRemain > 0) {
+      html += '<br><div style="float: left;font-size: 12px;color: rgba(0,0,0,0.38);">免签卡生效中，剩余' + bag.sysCheckinRemain + '天</div>';
     }
     if (html === '') {
       html = '你的背包和钱包一样，是空的。';
