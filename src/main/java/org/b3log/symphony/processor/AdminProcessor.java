@@ -46,6 +46,7 @@ import org.b3log.latke.util.Paginator;
 import org.b3log.latke.util.Strings;
 import org.b3log.symphony.event.ArticleBaiduSender;
 import org.b3log.symphony.model.*;
+import org.b3log.symphony.processor.middleware.LoginCheckMidware;
 import org.b3log.symphony.processor.middleware.PermissionMidware;
 import org.b3log.symphony.processor.middleware.validate.UserRegister2ValidationMidware;
 import org.b3log.symphony.processor.middleware.validate.UserRegisterValidationMidware;
@@ -329,6 +330,7 @@ public class AdminProcessor {
         final BeanManager beanManager = BeanManager.getInstance();
         final AdminProcessor adminProcessor = beanManager.getReference(AdminProcessor.class);
         final PermissionMidware permissionMidware = beanManager.getReference(PermissionMidware.class);
+        final LoginCheckMidware loginCheck = beanManager.getReference(LoginCheckMidware.class);
         final Handler[] middlewares = new Handler[]{permissionMidware::check};
 
         Dispatcher.get("/admin/auditlog", adminProcessor::showAuditlog, middlewares);
@@ -381,7 +383,7 @@ public class AdminProcessor {
         Dispatcher.post("/admin/user/{userId}/adjust-bag", adminProcessor::adjustBag, middlewares);
         Dispatcher.post("/admin/user/{userId}/give-metal", adminProcessor::giveMetal, middlewares);
         Dispatcher.post("/admin/user/{userId}/remove-metal", adminProcessor::removeMetal, middlewares);
-        Dispatcher.post("/admin/user/{userId}/toggle-metal", adminProcessor::toggleMetal, middlewares);
+        Dispatcher.post("/admin/user/toggle-metal", adminProcessor::toggleMetal, loginCheck::handle);
         Dispatcher.get("/admin/articles", adminProcessor::showArticles, middlewares);
         Dispatcher.get("/admin/article/{articleId}", adminProcessor::showArticle, middlewares);
         Dispatcher.post("/admin/article/{articleId}", adminProcessor::updateArticle, middlewares);
@@ -462,6 +464,7 @@ public class AdminProcessor {
         final BeanManager beanManager = BeanManager.getInstance();
         final CloudService cloudService = beanManager.getReference(CloudService.class);
         cloudService.toggleMetal(userId, name, enabled);
+        context.renderJSON(StatusCodes.SUCC);
     }
 
     /**

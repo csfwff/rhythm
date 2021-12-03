@@ -61,9 +61,9 @@ var Settings = {
       let m = metal.list[i];
       let btn = '';
       if (m.enabled === true) {
-        btn = '<button class="btn red">卸下</button>';
+        btn = '<button class="btn red" onclick="Settings.toggleMetal(\'' + m.name + '\', false)">卸下</button>';
       } else {
-        btn = '<button class="btn green">佩戴</button>';
+        btn = '<button class="btn green" onclick="Settings.toggleMetal(\'' + m.name + '\', true)">佩戴</button>';
       }
       html += '<div class="fn__flex" style="justify-content: space-between; margin-bottom: 10px">' +
           '<div>' +
@@ -78,6 +78,17 @@ var Settings = {
       html = '鱼战士，你还没有任何勋章！';
     }
     document.getElementById("metal").innerHTML = html;
+  },
+  toggleMetal: function (name, enabled) {
+    $.ajax({
+      url: Label.servePath + "/admin/user/toggle-metal",
+      method: "post",
+      data: "name=" + name + "&enabled=" + enabled,
+      async: false,
+      success: function () {
+        location.reload();
+      }
+    });
   },
   /**
    * 使用补签卡
