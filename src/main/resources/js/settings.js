@@ -39,16 +39,58 @@ var Settings = {
     if (bag.checkin2days !== undefined && bag.checkin2days > 0) {
       html += '<button style="margin:0 5px 5px 0" onclick="Settings.use2dayCheckinCard(\'' + Label.csrfToken + '\')">两天免签卡 x' + bag.checkin2days + '</button>';
     }
-    if (bag.sysCheckinRemain !== undefined && bag.sysCheckinRemain > 0) {
-      html += '<button style="margin:0 5px 5px 0">免签卡生效中，剩余' + bag.sysCheckinRemain + '天</button>';
-    }
     if (bag.patchCheckinCard !== undefined && bag.patchCheckinCard > 0) {
       html += '<button style="margin:0 5px 5px 0" onclick="Settings.usePatchCheckinCard(\'' + Label.csrfToken + '\', ' + bag.patchStart + ')">补签卡 x' + bag.patchCheckinCard + '</button>';
+    }
+
+    // 下面内容不要变更顺序
+    if (bag.sysCheckinRemain !== undefined && bag.sysCheckinRemain > 0) {
+      html += '<br><div style="float: left;font-size: 12px;color: rgba(0,0,0,0.38);">免签卡生效中，剩余' + bag.sysCheckinRemain + '天</div>';
     }
     if (html === '') {
       html = '你的背包和钱包一样，是空的。';
     }
     document.getElementById("bag").innerHTML = html;
+  },
+  /**
+   * 初始化勋章
+   */
+  initMetal: function (metal) {
+    let html = '';
+    if (metal.list !== undefined) {
+      for (let i = 0; i < metal.list.length; i++) {
+        let m = metal.list[i];
+        let btn = '';
+        if (m.enabled === true) {
+          btn = '<button class="btn red" onclick="Settings.toggleMetal(\'' + m.name + '\', false)">卸下</button>';
+        } else {
+          btn = '<button class="btn green" onclick="Settings.toggleMetal(\'' + m.name + '\', true)">佩戴</button>';
+        }
+        html += '<div class="fn__flex" style="justify-content: space-between; margin-bottom: 10px">' +
+            '<div>' +
+            ' <label style="margin: 0 0 0 0">' +
+            '   <div><img src="' + Util.genMetal(m.name, m.attr) + '"/><br><span style="font-size: 5px">' + m.name + ' (' + m.description + ')</span></div>' +
+            ' </label>' +
+            ' </div>' +
+            ' <div>' + btn + "</div>" +
+            "</div>";
+      }
+    }
+    if (html === '') {
+      html = '鱼战士，你还没有任何勋章！';
+    }
+    document.getElementById("metal").innerHTML = html;
+  },
+  toggleMetal: function (name, enabled) {
+    $.ajax({
+      url: Label.servePath + "/admin/user/toggle-metal",
+      method: "post",
+      data: "name=" + name + "&enabled=" + enabled,
+      async: false,
+      success: function () {
+        location.reload();
+      }
+    });
   },
   /**
    * 使用补签卡
@@ -825,6 +867,21 @@ var Settings = {
       'modal': true,
       'hideFooter': true,
     })
+
+    $.ajax({
+      url: Label.servePath + "/user/" + Label.userName + "/metal",
+      async: true,
+      method: "get",
+      success: function (result) {
+        let list = result.data.list;
+        if (list !== undefined) {
+          for (let i = 0; i < list.length; i++) {
+            let m = list[i];
+            $("#metal").append("<img title='" + m.description + "' src='" + Util.genMetal(m.name, m.attr) + "'/>");
+          }
+        }
+      }
+    });
 
     if ($.ua.device.type !== 'mobile') {
       Settings.homeScroll()

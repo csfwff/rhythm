@@ -18,6 +18,7 @@
  */
 package org.b3log.symphony.processor;
 
+import com.sun.org.apache.xpath.internal.operations.Bool;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.math.RandomUtils;
@@ -45,6 +46,7 @@ import org.b3log.latke.util.Paginator;
 import org.b3log.latke.util.Strings;
 import org.b3log.symphony.event.ArticleBaiduSender;
 import org.b3log.symphony.model.*;
+import org.b3log.symphony.processor.middleware.LoginCheckMidware;
 import org.b3log.symphony.processor.middleware.PermissionMidware;
 import org.b3log.symphony.processor.middleware.validate.UserRegister2ValidationMidware;
 import org.b3log.symphony.processor.middleware.validate.UserRegisterValidationMidware;
@@ -316,12 +318,19 @@ public class AdminProcessor {
     private ReportRepository reportRepository;
 
     /**
+     * CLoud service.
+     */
+    @Inject
+    private CloudService cloudService;
+
+    /**
      * Register request handlers.
      */
     public static void register() {
         final BeanManager beanManager = BeanManager.getInstance();
         final AdminProcessor adminProcessor = beanManager.getReference(AdminProcessor.class);
         final PermissionMidware permissionMidware = beanManager.getReference(PermissionMidware.class);
+        final LoginCheckMidware loginCheck = beanManager.getReference(LoginCheckMidware.class);
         final Handler[] middlewares = new Handler[]{permissionMidware::check};
 
         Dispatcher.get("/admin/auditlog", adminProcessor::showAuditlog, middlewares);
@@ -372,6 +381,9 @@ public class AdminProcessor {
         Dispatcher.post("/admin/user/{userId}/init-point", adminProcessor::initPoint, middlewares);
         Dispatcher.post("/admin/user/{userId}/exchange-point", adminProcessor::exchangePoint, middlewares);
         Dispatcher.post("/admin/user/{userId}/adjust-bag", adminProcessor::adjustBag, middlewares);
+        Dispatcher.post("/admin/user/{userId}/give-metal", adminProcessor::giveMetal, middlewares);
+        Dispatcher.post("/admin/user/{userId}/remove-metal", adminProcessor::removeMetal, middlewares);
+        Dispatcher.post("/admin/user/toggle-metal", adminProcessor::toggleMetal, loginCheck::handle);
         Dispatcher.get("/admin/articles", adminProcessor::showArticles, middlewares);
         Dispatcher.get("/admin/article/{articleId}", adminProcessor::showArticle, middlewares);
         Dispatcher.post("/admin/article/{articleId}", adminProcessor::updateArticle, middlewares);
@@ -405,15 +417,54 @@ public class AdminProcessor {
         final String userId = context.pathVar("userId");
         final String item = context.param("item");
         final int sum = Integer.parseInt(context.param("sum"));
-        if (Role.ROLE_ID_C_ADMIN.equals(currentUser.optString(User.USER_ROLE))
-            ||
-            "1630552921050".equals(currentUser.optString(User.USER_ROLE))
-        ) {
+        if (Role.ROLE_ID_C_ADMIN.equals(currentUser.optString(User.USER_ROLE))) {
             final BeanManager beanManager = BeanManager.getInstance();
             final CloudService cloudService = beanManager.getReference(CloudService.class);
             cloudService.putBag(userId, item, sum, Integer.MAX_VALUE);
         }
         context.sendRedirect(Latkes.getServePath() + "/admin/user/" + userId);
+    }
+
+    public void giveMetal(final RequestContext context) {
+        final JSONObject currentUser = Sessions.getUser();
+        final String userId = context.pathVar("userId");
+        final String name = context.param("name");
+        final String description = context.param("description");
+        final String attr = context.param("attr");
+        final String data = context.param("data");
+        if (Role.ROLE_ID_C_ADMIN.equals(currentUser.optString(User.USER_ROLE))) {
+            final BeanManager beanManager = BeanManager.getInstance();
+            final CloudService cloudService = beanManager.getReference(CloudService.class);
+            cloudService.giveMetal(userId, name, description, attr, data);
+        }
+        context.sendRedirect(Latkes.getServePath() + "/admin/user/" + userId);
+    }
+
+    public void removeMetal(final RequestContext context) {
+        final JSONObject currentUser = Sessions.getUser();
+        final String userId = context.pathVar("userId");
+        final String name = context.param("name");
+        if (Role.ROLE_ID_C_ADMIN.equals(currentUser.optString(User.USER_ROLE))) {
+            final BeanManager beanManager = BeanManager.getInstance();
+            final CloudService cloudService = beanManager.getReference(CloudService.class);
+            cloudService.removeMetal(userId, name);
+        }
+        context.sendRedirect(Latkes.getServePath() + "/admin/user/" + userId);
+    }
+
+    public void toggleMetal(final RequestContext context) {
+        JSONObject currentUser = Sessions.getUser();
+        try {
+            currentUser = ApiProcessor.getUserByKey(context.param("apiKey"));
+        } catch (NullPointerException ignored) {
+        }
+        final String userId = currentUser.optString(Keys.OBJECT_ID);
+        final String name = context.param("name");
+        final boolean enabled = Boolean.parseBoolean(context.param("enabled"));
+        final BeanManager beanManager = BeanManager.getInstance();
+        final CloudService cloudService = beanManager.getReference(CloudService.class);
+        cloudService.toggleMetal(userId, name, enabled);
+        context.renderJSON(StatusCodes.SUCC);
     }
 
     /**
@@ -1361,6 +1412,9 @@ public class AdminProcessor {
         final JSONObject result = roleQueryService.getRoles(1, Integer.MAX_VALUE, 10);
         final List<JSONObject> roles = (List<JSONObject>) result.opt(Role.ROLES);
         dataModel.put(Role.ROLES, roles);
+
+        dataModel.put("sysBag", cloudService.getBag(userId));
+        dataModel.put("sysMetal", cloudService.getMetal(userId));
 
         dataModelService.fillHeaderAndFooter(context, dataModel);
     }

@@ -164,6 +164,12 @@ public class ChatroomProcessor {
     private ChatRoomService chatRoomService;
 
     /**
+     * Cloud service.
+     */
+    @Inject
+    private CloudService cloudService;
+
+    /**
      * Register request handlers.
      */
     public static void register() {
@@ -331,6 +337,7 @@ public class ChatroomProcessor {
         msg.put(Common.CONTENT, content);
         msg.put(Common.TIME, time);
         msg.put(UserExt.USER_NICKNAME, currentUser.optString(UserExt.USER_NICKNAME));
+        msg.put("sysMetal", cloudService.getEnabledMetal(currentUser.optString(Keys.OBJECT_ID)));
 
         // 加活跃
         try {

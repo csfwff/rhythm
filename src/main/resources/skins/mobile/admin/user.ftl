@@ -371,5 +371,73 @@
             </form>
         </div>
     </div>
+
+    <div class="module">
+        <div class="module-header">
+            <h2>勋章发放 (仅admin可用)</h2>
+        </div>
+        <div class="module-panel form fn-clear form--admin">
+            <form action="${servePath}/admin/user/${user.oId}/give-metal" method="POST">
+                <div class="fn__flex">
+                    <label>
+                        <div>${userNameLabel}</div>
+                        <input type="text" name="userName" value="${user.userName}" readonly class="input--admin-readonly"/>
+                    </label>
+                </div>
+                <div class="fn__flex">
+                    <label class="mid">
+                        <div>勋章名称</div>
+                        <input type="text" name="name" value=""/>
+                    </label>
+                    <label>
+                        <div>描述</div>
+                        <input type="text" name="description" value=""/>
+                    </label>
+                </div>
+                <div class="fn__flex">
+                    <label class="mid">
+                        <div>属性</div>
+                        <input type="text" name="attr" value=""/>
+                    </label>
+                    <label>
+                        <div>数据</div>
+                        <input type="text" name="data" value=""/>
+                    </label>
+                </div>
+                <br/>
+                <button type="submit" class="green fn-right">${submitLabel}</button>
+            </form>
+            <div style="float: left;font-size: 12px;color: rgba(0,0,0,0.38);">
+                当前用户勋章数据：<br>
+                ${sysMetal}<br>
+                属性示例：<br>
+                url=[图标URL]&backcolor=0000ff&fontcolor=ffffff<br>
+                数据示例：<br>
+                暂时无需填写，留空即可
+            </div>
+        </div>
+    </div>
+
+    <div class="module">
+        <div class="module-header">
+            <h2>勋章移除 (仅admin可用)</h2>
+        </div>
+        <div class="module-panel form fn-clear form--admin">
+            <form action="${servePath}/admin/user/${user.oId}/remove-metal" method="POST">
+                <div class="fn__flex">
+                    <label>
+                        <div>${userNameLabel}</div>
+                        <input type="text" name="userName" value="${user.userName}" readonly class="input--admin-readonly"/>
+                    </label>
+                    <label class="mid">
+                        <div>勋章名称</div>
+                        <input type="text" name="name" value=""/>
+                    </label>
+                </div>
+                <br/>
+                <button type="submit" class="green fn-right">${submitLabel}</button>
+            </form>
+        </div>
+    </div>
 </div>
 </@admin>

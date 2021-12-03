@@ -33,6 +33,15 @@ var Util = {
   bling: undefined,
   isBlinging: false,
 
+  genMetal(name, attr) {
+    if (attr !== undefined && attr !== '') {
+      attr = '&' + attr;
+    } else {
+      attr = '';
+    }
+    return 'https://unv-shield.librian.net/api/unv_shield?scale=0.79&txt=' + name + attr;
+  },
+
   parseDom(arg) {
     var objE = document.createElement("div");
     objE.innerHTML = arg;
@@ -1400,6 +1409,7 @@ var Util = {
         let canFollow = data.canFollow;
         let userNo = data.userNo;
         let userAppRole = data.userAppRole;
+        let sysMetal = JSON.parse(data.sysMetal);
         // 组合内容
         let html = "" +
             '<div class="user-card" id="userCardContent">\n' +
@@ -1410,8 +1420,15 @@ var Util = {
             '        <div class="user-card__meta">\n' +
             '            <div class="fn__ellipsis">\n' +
             '                <a class="user-card__name" href="' + Label.servePath + '/member/' + userName + '"><b>' + userNickname + '</b></a>\n' +
-            '                <a class="ft-gray ft-smaller" href="' + Label.servePath + '/member/' + userName + '"><b>' + userName + '</b></a>\n' +
-            '            </div>\n';
+            '                <a class="ft-gray ft-smaller" href="' + Label.servePath + '/member/' + userName + '"><b>' + userName + '</b></a>\n';
+        let list = sysMetal.list;
+        if (list !== undefined) {
+          for (let i = 0; i < list.length; i++) {
+            let m = list[i];
+            html += "<img title='" + m.description + "' src='" + Util.genMetal(m.name, m.attr) + "'/>";
+          }
+        }
+        html += '            </div>\n';
         if (userIntro !== "") {
           html += '' +
               '            <div class="user-card__info vditor-reset">\n' +

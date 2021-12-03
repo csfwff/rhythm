@@ -26,6 +26,7 @@ import org.b3log.latke.repository.*;
 import org.b3log.latke.service.ServiceException;
 import org.b3log.latke.service.annotation.Service;
 import org.b3log.symphony.repository.CloudRepository;
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
@@ -46,6 +47,7 @@ public class CloudService {
     private CloudRepository cloudRepository;
 
     final public static String SYS_BAG = "sys-bag";
+    final public static String SYS_MEDAL = "sys-medal";
 
     /**
      * 上传存档
@@ -222,5 +224,119 @@ public class CloudService {
         }
 
         return -1;
+    }
+
+    synchronized public void saveMetal(String userId, String data) {
+        try {
+            final Transaction transaction = cloudRepository.beginTransaction();
+            Query cloudDeleteQuery = new Query()
+                    .setFilter(CompositeFilterOperator.and(
+                            new PropertyFilter("userId", FilterOperator.EQUAL, userId),
+                            new PropertyFilter("gameId", FilterOperator.EQUAL, CloudService.SYS_MEDAL)
+                    ));
+            cloudRepository.remove(cloudDeleteQuery);
+            JSONObject cloudJSON = new JSONObject();
+            cloudJSON.put("userId", userId)
+                    .put("gameId", CloudService.SYS_MEDAL)
+                    .put("data", data);
+            cloudRepository.add(cloudJSON);
+            transaction.commit();
+        } catch (RepositoryException e) {
+            LOGGER.log(Level.ERROR, "Cannot save metal data to database.", e);
+        }
+    }
+
+    synchronized public String getMetal(String userId) {
+        try {
+            Query cloudQuery = new Query()
+                    .setFilter(CompositeFilterOperator.and(
+                            new PropertyFilter("userId", FilterOperator.EQUAL, userId),
+                            new PropertyFilter("gameId", FilterOperator.EQUAL, CloudService.SYS_MEDAL)
+                    ));
+            JSONObject result = cloudRepository.getFirst(cloudQuery);
+            return result.optString("data");
+        } catch (Exception e) {
+            return new JSONObject().toString();
+        }
+    }
+
+    synchronized public String getEnabledMetal(String userId) {
+        try {
+            Query cloudQuery = new Query()
+                    .setFilter(CompositeFilterOperator.and(
+                            new PropertyFilter("userId", FilterOperator.EQUAL, userId),
+                            new PropertyFilter("gameId", FilterOperator.EQUAL, CloudService.SYS_MEDAL)
+                    ));
+            JSONObject result = cloudRepository.getFirst(cloudQuery);
+            JSONObject object1 = new JSONObject(result.optString("data"));
+            JSONArray object2 = object1.optJSONArray("list");
+            for (int i = object2.length() - 1; i >= 0; i--) {
+                JSONObject object3 = object2.optJSONObject(i);
+                if (!object3.optBoolean("enabled")) {
+                    object2.remove(i);
+                }
+            }
+            object1.put("list", object2);
+            return object1.toString();
+        } catch (Exception e) {
+            return new JSONObject().toString();
+        }
+    }
+
+    synchronized public void giveMetal(String userId, String name, String description, String attr, String data) {
+        JSONObject metal = new JSONObject(getMetal(userId));
+        if (!metal.has("list")) {
+            metal.put("list", new JSONArray());
+        }
+        JSONArray list = metal.optJSONArray("list");
+        for (int i = 0; i < list.length(); i++) {
+            JSONObject jsonObject = list.optJSONObject(i);
+            if (jsonObject.optString("name").equals(name)) {
+                return;
+            }
+        }
+        list.put(new JSONObject()
+                .put("name", name)
+                .put("description", description)
+                .put("attr", attr)
+                .put("data", data)
+                .put("enabled", true)
+        );
+        metal.put("list", list);
+        saveMetal(userId, metal.toString());
+    }
+
+    synchronized public void removeMetal(String userId, String name) {
+        JSONObject metal = new JSONObject(getMetal(userId));
+        if (!metal.has("list")) {
+            metal.put("list", new JSONArray());
+        }
+        JSONArray list = metal.optJSONArray("list");
+        for (int i = 0; i < list.length(); i++) {
+            JSONObject jsonObject = list.optJSONObject(i);
+            if (jsonObject.optString("name").equals(name)) {
+                list.remove(i);
+            }
+        }
+        metal.put("list", list);
+        saveMetal(userId, metal.toString());
+    }
+
+    synchronized public void toggleMetal(String userId, String name, boolean enabled) {
+        JSONObject metal = new JSONObject(getMetal(userId));
+        if (!metal.has("list")) {
+            metal.put("list", new JSONArray());
+        }
+        JSONArray list = metal.optJSONArray("list");
+        for (int i = 0; i < list.length(); i++) {
+            JSONObject jsonObject = list.optJSONObject(i);
+            if (jsonObject.optString("name").equals(name)) {
+                list.remove(i);
+                jsonObject.put("enabled", enabled);
+                list.put(jsonObject);
+            }
+        }
+        metal.put("list", list);
+        saveMetal(userId, metal.toString());
     }
 }

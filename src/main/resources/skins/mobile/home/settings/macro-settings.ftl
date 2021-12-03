@@ -100,6 +100,7 @@
                     Label.previewLabel = "${previewLabel}";
                     Label.unPreviewLabel = "${unPreviewLabel}";
                     <#if 'account' == type>Settings.initBag(${sysBag});</#if>
+                    <#if 'account' == type>Settings.initMetal(${sysMetal});</#if>
         </script>
     </body>
 </html>

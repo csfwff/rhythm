@@ -30,6 +30,14 @@
 
 <div class="module">
     <div class="module-header">
+        <h2>你的勋章</h2>
+    </div>
+    <div class="module-panel form fn-clear" id="metal">
+    </div>
+</div>
+
+<div class="module">
+    <div class="module-header">
         <h2>${userNameLabel} ${updateNameTipLabel}</h2>
     </div>
     <div class="module-panel form fn-clear">

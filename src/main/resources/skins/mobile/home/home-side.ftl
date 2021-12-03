@@ -25,6 +25,9 @@
             <div id="userNicknameDom"><b>${user.userNickname}</b></div>
             <div class="ft-gray">${user.userName}</div>
 
+            <div id="metal">
+            </div>
+
             <div>
                 <#if isLoggedIn && (currentUser.userName != user.userName)>
                     <button class="green small" onclick="window.location.href = '${servePath}/idle-talk?toUser=${user.userName}'">

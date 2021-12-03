@@ -21,10 +21,18 @@
 <#include "macro-settings.ftl">
 <@home "account">
 <div class="module">
-    <div class="module-header">
+    <div class="module-header" style="margin-bottom: 10px">
         <h2>你的背包</h2>
     </div>
     <div class="module-panel form fn-clear" id="bag">
+    </div>
+</div>
+
+<div class="module">
+    <div class="module-header" style="margin-bottom: 10px">
+        <h2>你的勋章</h2>
+    </div>
+    <div class="module-panel form fn-clear" id="metal">
     </div>
 </div>
 

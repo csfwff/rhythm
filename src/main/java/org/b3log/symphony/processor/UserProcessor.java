@@ -178,6 +178,12 @@ public class UserProcessor {
     private LivenessQueryService livenessQueryService;
 
     /**
+     * Cloud service.
+     */
+    @Inject
+    private CloudService cloudService;
+
+    /**
      * Register request handlers.
      */
     public static void register() {
@@ -203,6 +209,20 @@ public class UserProcessor {
         Dispatcher.get("/users/emotions", userProcessor::getFrequentEmotions);
         Dispatcher.get("/user/{userName}", userProcessor::getUserInfo);
         Dispatcher.get("/user/liveness", userProcessor::getLiveness, loginCheck::handle);
+        Dispatcher.get("/user/{userName}/metal", userProcessor::getUserMetal, userCheckMidware::handle);
+    }
+
+    /**
+     * 获取用户已启用勋章
+     *
+     * @param context
+     */
+    public void getUserMetal(final RequestContext context) {
+        final String userName = context.pathVar("userName");
+        final JSONObject user = userQueryService.getUserByName(userName);
+        String userId = user.optString(Keys.OBJECT_ID);
+        JSONObject metal = new JSONObject(cloudService.getEnabledMetal(userId));
+        context.renderJSON(StatusCodes.SUCC).renderData(metal);
     }
 
     /**
@@ -244,6 +264,7 @@ public class UserProcessor {
         filteredUserProfile.put(Keys.OBJECT_ID, user.optString(Keys.OBJECT_ID));
         filteredUserProfile.put(UserExt.USER_NO, user.optString(UserExt.USER_NO));
         filteredUserProfile.put(UserExt.USER_APP_ROLE, user.optString(UserExt.USER_APP_ROLE));
+        filteredUserProfile.put("sysMetal", cloudService.getEnabledMetal(user.optString(Keys.OBJECT_ID)));
         final String userId = user.optString(Keys.OBJECT_ID);
         final long followerCnt = followQueryService.getFollowerCount(userId, Follow.FOLLOWING_TYPE_C_USER);
         filteredUserProfile.put("followerCount", followerCnt);

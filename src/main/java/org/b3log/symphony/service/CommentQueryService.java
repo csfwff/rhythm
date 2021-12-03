@@ -109,6 +109,11 @@ public class CommentQueryService {
     @Inject
     private ShortLinkQueryService shortLinkQueryService;
 
+    /**
+     * Cloud service.
+     */
+    @Inject
+    private CloudService cloudService;
 
     /**
      * Gets the URL of a comment.
@@ -627,6 +632,15 @@ public class CommentQueryService {
             try {
                 for (final JSONObject comment : ret) {
                     final String commentId = comment.optString(Keys.OBJECT_ID);
+                    String commentAuthorId = comment.optString(Comment.COMMENT_AUTHOR_ID);
+                    String metal = cloudService.getEnabledMetal(commentAuthorId);
+
+                    if (!metal.equals("{}")) {
+                        List<Object> list = new JSONObject(metal).optJSONArray("list").toList();
+                        comment.put("sysMetal", list);
+                    } else {
+                        comment.put("sysMetal", new ArrayList<>());
+                    }
 
                     // Fill revision count
                     comment.put(Comment.COMMENT_REVISION_COUNT, 0);
@@ -855,6 +869,16 @@ public class CommentQueryService {
             comment.put(Comment.COMMENT_T_AUTHOR_URL, author.optString(User.USER_URL));
             final String thumbnailURL = avatarQueryService.getAvatarURLByUser(author, "48");
             comment.put(Comment.COMMENT_T_AUTHOR_THUMBNAIL_URL, thumbnailURL);
+
+            final String authorId = comment.optString(Comment.COMMENT_AUTHOR_ID);
+            String metal = cloudService.getEnabledMetal(authorId);
+
+            if (!metal.equals("{}")) {
+                List<Object> list = new JSONObject(metal).optJSONArray("list").toList();
+                comment.put("sysMetal", list);
+            } else {
+                comment.put("sysMetal", new ArrayList<>());
+            }
 
             processCommentContent(comment);
         } finally {
