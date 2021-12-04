@@ -199,7 +199,7 @@ ${HeaderBannerLabel}
         <#if ADLabel != ''>
             <div class="module">
                 <div class="module-header" style="background-color: #7ea5c8">
-                    <a href="${servePath}/about">${sponsorLabel}</a>
+                    ${sponsorLabel}
                 </div>
                 <div class="ad module-panel fn-clear">
                     ${ADLabel}
