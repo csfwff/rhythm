@@ -30,7 +30,9 @@
     <link rel="canonical" href="${servePath}">
 </head>
 <body class="index">
-${HeaderBannerLabel}
+<#if showTopAd>
+    ${HeaderBannerLabel}
+</#if>
 <#include "header.ftl">
 <div class="main">
     <div class="wrapper" style="padding-bottom: 20px">

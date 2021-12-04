@@ -28,7 +28,9 @@
     </@head>
 </head>
 <body class="index">
-${HeaderBannerLabel}
+<#if showTopAd>
+    ${HeaderBannerLabel}
+</#if>
 <#include "header.ftl">
 <@subNav '' ''/>
 <div class="main">
