@@ -22,7 +22,7 @@
 <@home "system">
     <div id="systemTip" class="tip"></div><br/>
     <div class="module-header">
-        <h2>自定义</h2>
+        自定义
     </div>
     <div class="module">
         <div class="module-panel form fn-clear">
@@ -57,13 +57,13 @@
             <div class="fn-clear settings-secret">
                 <div>
                     <label>
-                        <input id="showSideAd" type="checkbox">
+                        <input id="showSideAd" type="checkbox" <#if showSideAd>checked="checked"</#if>>
                         显示侧栏广告 (融入感强，默认开启)
                     </label>
                 </div>
                 <div>
                     <label>
-                        <input id="showTopAd" type="checkbox">
+                        <input id="showTopAd" type="checkbox" <#if showTopAd>checked="checked"</#if>>
                         显示顶栏广告 (较突兀，默认关闭)
                     </label>
                 </div>
@@ -74,7 +74,7 @@
 
     <div class="module">
         <div class="module-header" style="margin-bottom: 15px;">
-            <h2>个人卡片背景</h2>
+            个人卡片背景
         </div>
         <div class="module-panel form fn-clear">
             <input id="userCardSettings" type="text" value="">

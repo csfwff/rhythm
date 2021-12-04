@@ -491,17 +491,32 @@ public class DataModelService {
                     dataModel.put("hasSystemTitle", false);
                     dataModel.put("cardBg", "");
                     dataModel.put(SystemSettings.ONLINE_TIME_UNIT, "m");
+                    dataModel.put("showSideAd", true);
+                    dataModel.put("showTopAd", true);
                 } else {
                     final JSONObject systemSettings = settingsService.getByUsrId(currentUser.optString(Keys.OBJECT_ID));
                     if (Objects.isNull(systemSettings)) {
                         dataModel.put("hasSystemTitle", false);
                         dataModel.put("cardBg", "");
                         dataModel.put(SystemSettings.ONLINE_TIME_UNIT, "m");
+                        dataModel.put("showSideAd", true);
+                        dataModel.put("showTopAd", true);
                         return;
                     }
                     final String settingsJson = systemSettings.optString(SystemSettings.SETTINGS);
                     final JSONObject settings = new JSONObject(settingsJson);
                     final String systemTitle = settings.optString(SystemSettings.SYSTEM_TITLE);
+                    boolean showSideAd;
+                    try {
+                        showSideAd = settings.getBoolean("showSideAd");
+                    } catch (Exception e) {
+                        showSideAd = true;
+                    }
+                    final boolean showTopAd = settings.optBoolean("showTopAd");
+
+                    dataModel.put("showSideAd", showSideAd);
+                    dataModel.put("showTopAd", showTopAd);
+
                     if (StringUtils.isBlank(systemTitle)) {
                         dataModel.put("hasSystemTitle", false);
                     } else {
@@ -524,6 +539,8 @@ public class DataModelService {
             } else {
                 dataModel.put("hasSystemTitle", false);
                 dataModel.put("cardBg", "");
+                dataModel.put("showSideAd", true);
+                dataModel.put("showTopAd", true);
             }
         } finally {
             Stopwatchs.end();
