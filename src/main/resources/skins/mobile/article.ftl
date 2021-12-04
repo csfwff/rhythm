@@ -399,6 +399,7 @@
                 </#if>
             </div>
             <div class="side wrapper">
+                <#if showSideAd>
                 <#if ADLabel!="">
                 <div class="module">
                     <div class="module-header">
@@ -411,6 +412,7 @@
                         ${ADLabel}
                     </div>
                 </div>
+                </#if>
                 </#if>
                 <#if sideRelevantArticles?size != 0>
                 <div class="module">

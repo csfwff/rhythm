@@ -61,6 +61,7 @@
                     </div>
                 </div>
                 <div class="side">
+                    <#if showSideAd>
                     <#if ADLabel!="">
                     <div class="module">
                         <div class="module-header">

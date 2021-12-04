@@ -198,6 +198,7 @@
 <div class="fn-hr10"></div>
 <div class="main">
     <div class="wrapper">
+        <#if showSideAd>
         <#if ADLabel != ''>
             <div class="module">
                 <div class="module-header" style="background-color: #7ea5c8">
@@ -207,6 +208,7 @@
                     ${ADLabel}
                 </div>
             </div>
+        </#if>
         </#if>
         <div class="module">
             <div class="module-header" style="background-color: #9cd462">

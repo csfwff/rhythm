@@ -57,6 +57,7 @@
                         Tags: <b>${tagCnt}</b>
                     </div>
                     <#include "common/person-info.ftl">
+                    <#if showSideAd>
                     <#if ADLabel!="">
                     <div class="module">
                         <div class="module-header">
@@ -69,6 +70,7 @@
                             ${ADLabel}
                         </div>
                     </div>
+                    </#if>
                     </#if>
                 </div>
             </div>

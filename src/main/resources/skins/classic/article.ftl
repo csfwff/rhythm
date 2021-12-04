@@ -483,6 +483,7 @@
         </div>
     </#if>
 
+    <#if showSideAd>
     <#if ADLabel!="">
         <div class="module">
             <div class="module-header">
@@ -495,6 +496,7 @@
                 ${ADLabel}
             </div>
         </div>
+    </#if>
     </#if>
 </div>
 

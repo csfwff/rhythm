@@ -27,6 +27,7 @@
     </div>
 </#if>
 
+<#if showSideAd>
 <#if ADLabel!="" && ((tag?? && tag.tagShowSideAd == 0) || !tag??)>
 <div class="module">
     <div class="module-header">
@@ -39,6 +40,7 @@
         ${ADLabel}
     </div>
 </div>
+</#if>
 </#if>
 
 <div class="module">
