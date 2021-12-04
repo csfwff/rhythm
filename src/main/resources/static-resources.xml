@@ -26,11 +26,11 @@
     Author: Liyuan Li
 -->
 <static-files>
-    
+
     <include path="/favicon.ico" />
     <include path="/favicon.png" />
     <include path="/robots.txt" />
-        
+
     <include path="/js/**.js" />
     <include path="/js/**/*.js" />
     <include path="/js/**.css" />
@@ -51,7 +51,7 @@
     <include path="/js/**/*.svg" />
     <include path="/js/**/*.ttf" />
     <include path="/js/**/*.woff" />
-        
+
     <include path="/skins/**.css" />
     <include path="/skins/**/*.css" />
     <include path="/skins/**.js" />
@@ -68,16 +68,16 @@
     <include path="/skins/**/*.svg" />
     <include path="/skins/**/*.ttf" />
     <include path="/skins/**/*.woff" />
-        
+
     <include path="/css/**.css" />
     <include path="/css/**/*.css" />
-        
+
     <include path="/css/fonts/*.eot" />
     <include path="/css/fonts/*.svg" />
     <include path="/css/*.svg" />
     <include path="/css/fonts/*.ttf" />
     <include path="/css/fonts/*.woff" />
-        
+
     <include path="/images/**.png" />
     <include path="/images/**/*.png" />
     <include path="/images/**.jpg" />
@@ -85,7 +85,7 @@
     <include path="/images/**.gif" />
     <include path="/images/**/*.gif" />
     <include path="/images/**/*.svg" />
-        
+
     <include path="/plugins/**.css" />
     <include path="/plugins/**/*.css" />
     <include path="/plugins/**.js" />
@@ -118,4 +118,6 @@
     <include path="/games/**/**/**/**/**/**/**/**/*.*" />
     <include path="/games/**/**/**/**/**/**/**/**/**/*.*" />
     <include path="/games/**/**/**/**/**/**/**/**/**/**/*.*" />
+
+    <include path="/ads.txt" />
 </static-files>
