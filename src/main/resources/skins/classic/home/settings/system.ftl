@@ -20,6 +20,7 @@
 -->
 <#include "macro-settings.ftl">
 <@home "system">
+    <div id="systemTip" class="tip"></div>
     <div class="module-header">
         <h2>自定义</h2>
     </div>
@@ -43,6 +44,31 @@
                 <option value="h" <#if 'h' == onlineTimeUnit>selected</#if>>小时</option>
                 <option value="d" <#if 'd' == onlineTimeUnit>selected</#if>>天</option>
             </select>
+        </div>
+    </div>
+
+    <div class="module">
+        <div class="module-header">社区广告</div>
+        <div class="module-panel form fn-clear">
+            <label>
+                摸鱼派社区❤️用爱发电；如果你喜欢这里的氛围，可以通过开启社区广告来支持我们。<br>
+                广告收入将全部用于社区项目维护支出。
+            </label>
+            <div class="fn-clear settings-secret">
+                <div>
+                    <label>
+                        <input id="showSideAd" type="checkbox">
+                        显示侧栏广告 (融入感强，默认开启)
+                    </label>
+                </div>
+                <div>
+                    <label>
+                        <input id="showTopAd" type="checkbox">
+                        显示顶栏广告 (较突兀，默认关闭)
+                    </label>
+                </div>
+            </div>
+            <button class="fn-right" onclick="Settings.update('system', '${csrfToken}')">${saveLabel}</button>
         </div>
     </div>
 
@@ -96,8 +122,6 @@
             <button class="fn-right" style="height: 37px;" onclick="$('#userCardSettings').attr('bgUrl', '');Settings.update('system', '${csrfToken}');location.reload();">恢复默认</button>
         </div>
     </div>
-
-    <div id="systemTip" class="tip"></div><br/>
 </@home>
 <script src="${staticServePath}/js/lib/jquery/file-upload-9.10.1/jquery.fileupload.min.js"></script>
 <script>

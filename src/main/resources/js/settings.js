@@ -624,7 +624,9 @@ var Settings = {
         requestJSONObject = {
           systemTitle: $('#newSystemTitle').val(),
           cardBg: cardBg,
-          onlineTimeUnit: $('#onlineTimeUnit').val()
+          onlineTimeUnit: $('#onlineTimeUnit').val(),
+          showSideAd: $("#showSideAd").prop("checked"),
+          showTopAd: $("#showTopAd").prop("checked"),
         }
         break
       case 'deactivate':
