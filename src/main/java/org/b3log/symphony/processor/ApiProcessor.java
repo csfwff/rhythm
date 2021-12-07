@@ -44,9 +44,7 @@ import org.b3log.symphony.util.Sessions;
 import org.b3log.symphony.util.StatusCodes;
 import org.json.JSONObject;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 
 /**
  * 专业团队，专业的 API 接口
@@ -73,7 +71,12 @@ public class ApiProcessor {
     /**
      * 存储用户的Key
      */
-    public static Map<String, JSONObject> keys = new HashMap<>();
+    public static Map<String, JSONObject> keys = Collections.synchronizedMap(new LinkedHashMap<String, JSONObject>() {
+        @Override
+        protected boolean removeEldestEntry(Map.Entry eldest) {
+            return size() > 100;
+        }
+    });
 
     /**
      * Follow query service.
