@@ -1421,13 +1421,6 @@ var Util = {
             '            <div class="fn__ellipsis">\n' +
             '                <a class="user-card__name" href="' + Label.servePath + '/member/' + userName + '"><b>' + userNickname + '</b></a>\n' +
             '                <a class="ft-gray ft-smaller" href="' + Label.servePath + '/member/' + userName + '"><b>' + userName + '</b></a>\n';
-        let list = sysMetal.list;
-        if (list !== undefined) {
-          for (let i = 0; i < list.length; i++) {
-            let m = list[i];
-            html += "<img title='" + m.description + "' src='" + Util.genMetal(m.name, m.attr) + "'/>";
-          }
-        }
         html += '            </div>\n';
         if (userIntro !== "") {
           html += '' +
@@ -1444,6 +1437,15 @@ var Util = {
                 '摸鱼派 ' + userNo + ' 号成员，<b>画家</b>' +
                 '</div>\n';
           }
+        }
+        let list = sysMetal.list;
+        if (list !== undefined) {
+          html += '<div class="user-card__info vditor-reset">';
+          for (let i = 0; i < list.length; i++) {
+            let m = list[i];
+            html += "<img title='" + m.description + "' src='" + Util.genMetal(m.name, m.attr) + "'/>";
+          }
+          html += '</div>';
         }
         html += '            <div class="user-card__icons fn__flex">\n' +
             '                <div class="fn__flex-1">\n' +
