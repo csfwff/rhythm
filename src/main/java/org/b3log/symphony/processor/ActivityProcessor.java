@@ -173,6 +173,7 @@ public class ActivityProcessor {
         Dispatcher.post("/api/games/adarkroom/share", activityProcessor::shareADarkRoomScore, loginCheck::handle, csrfMidware::check);
         Dispatcher.post("/api/games/mofish/score", activityProcessor::shareMofishScore);
         Dispatcher.get("/activity/catch-the-cat", activityProcessor::showCatchTheCat, loginCheck::handle, csrfMidware::fill);
+        Dispatcher.get("/activity/2048", activityProcessor::show2048, loginCheck::handle, csrfMidware::fill);
     }
 
     /**
@@ -192,6 +193,27 @@ public class ActivityProcessor {
         final JSONObject user = Sessions.getUser();
         final String userId = user.optString(Keys.OBJECT_ID);
     }
+
+
+    /**
+     * 2048 game.
+     *
+     * @param context
+     */
+    public void show2048(final RequestContext context) {
+        final AbstractFreeMarkerRenderer renderer = new SkinRenderer(context, "activity/2048.ftl");
+        final Map<String, Object> dataModel = renderer.getDataModel();
+        dataModelService.fillHeaderAndFooter(context, dataModel);
+        dataModelService.fillRandomArticles(dataModel);
+        dataModelService.fillSideHotArticles(dataModel);
+        dataModelService.fillSideTags(dataModel);
+        dataModelService.fillLatestCmts(dataModel);
+
+        final JSONObject user = Sessions.getUser();
+        final String userId = user.optString(Keys.OBJECT_ID);
+    }
+
+
 
     /**
      * 上传摸鱼大闯关游戏成绩
