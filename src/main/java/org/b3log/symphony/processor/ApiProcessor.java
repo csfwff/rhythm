@@ -244,4 +244,14 @@ public class ApiProcessor {
         context.renderJSON(StatusCodes.SUCC);
     }
 
+    public static void removeKeyByUsername(String userName) {
+        for (Map.Entry<String, JSONObject> jsonObject : keys.entrySet()) {
+            String currentUserName = jsonObject.getValue().optString(User.USER_NAME);
+            if (userName.equals(currentUserName)) {
+                keys.remove(jsonObject.getKey());
+                System.out.println(userName);
+            }
+        }
+    }
+
 }

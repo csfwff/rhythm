@@ -317,6 +317,9 @@ public class SettingsProcessor {
                     Pointtransfer.TRANSFER_TYPE_C_CHANGE_USERNAME, Pointtransfer.TRANSFER_SUM_C_CHANGE_USERNAME,
                     oldName + "-" + newName, System.currentTimeMillis(), "");
 
+            // 将该用户 API 无效化
+            ApiProcessor.removeKeyByUsername(oldName);
+
             context.renderJSON(StatusCodes.SUCC);
         } catch (final ServiceException e) {
             context.renderMsg(e.getMessage());
