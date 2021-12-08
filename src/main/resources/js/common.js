@@ -1374,9 +1374,9 @@ var Util = {
    */
   listenUserCard: function () {
     var cardLock = false;
-    $(".avatar, .avatar-small, .avatar-middle, .avatar-mid, .avatar-big").unbind();
+    $(".avatar, .avatar-small, .avatar-middle, .avatar-mid, .avatar-big, .nameAt").unbind();
 
-    $(".avatar, .avatar-small, .avatar-middle, .avatar-mid, .avatar-big").hover(function () {
+    $(".avatar, .avatar-small, .avatar-middle, .avatar-mid, .avatar-big, .nameAt").hover(function () {
       // 加载用户信息
       if ($(this).attr("aria-label") !== undefined) {
         let username = $(this).attr("aria-label");
@@ -1520,7 +1520,6 @@ var Util = {
           $("#userCardContent").addClass("user-card--bg");
           $("#userCardContent").css("background-image", "url(" + cardBg + ")");
           $("#userCardContent > div").attr("style", "background-image: linear-gradient(90deg, rgba(214, 227, 235, 0.36), rgba(255, 255, 255, 0.76), rgba(255, 255, 255, 0.76));");
-          //$("#userCardContent > div").addClass("user-card-bottom-bg);
           $("#userCardContent > div > a > div").css("width", "105px");
           $("#userCardContent > div > a > div").css("height", "105px");
           $("#userCardContent > div > a > div").css("top", "80px");
