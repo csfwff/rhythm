@@ -18,7 +18,6 @@
  */
 package org.b3log.symphony.processor;
 
-import com.sun.org.apache.xpath.internal.operations.Bool;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.math.RandomUtils;

@@ -54,11 +54,9 @@ import org.b3log.symphony.processor.middleware.validate.UserRegisterValidationMi
 import org.b3log.symphony.repository.ArticleRepository;
 import org.b3log.symphony.service.*;
 import org.b3log.symphony.util.*;
-import org.json.JSONArray;
 import org.json.JSONObject;
 
 import javax.imageio.ImageIO;
-import javax.xml.ws.Dispatch;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;

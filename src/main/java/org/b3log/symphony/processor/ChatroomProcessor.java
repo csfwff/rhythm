@@ -49,7 +49,6 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import pers.adlered.simplecurrentlimiter.main.SimpleCurrentLimiter;
 
-import javax.xml.ws.Dispatch;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.regex.Matcher;
