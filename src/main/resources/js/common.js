@@ -1374,9 +1374,9 @@ var Util = {
    */
   listenUserCard: function () {
     var cardLock = false;
-    $(".avatar, .avatar-small, .avatar-middle, .avatar-mid, .avatar-big, .nameAt").unbind();
+    $(".avatar, .avatar-small, .avatar-middle, .avatar-mid, .avatar-big, .name-at").unbind();
 
-    $(".avatar, .avatar-small, .avatar-middle, .avatar-mid, .avatar-big, .nameAt").hover(function () {
+    $(".avatar, .avatar-small, .avatar-middle, .avatar-mid, .avatar-big, .name-at").hover(function () {
       // 加载用户信息
       if ($(this).attr("aria-label") !== undefined) {
         let username = $(this).attr("aria-label");
