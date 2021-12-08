@@ -78,6 +78,9 @@
 </head>
 <body class="fn__flex-column">
         <#include "../header.ftl">
+        <style>
+        </style>
+        <div class="bg">
 <div class="main fn__flex-1">
     <div class="wrapper">
         <div class="content" id="home-pjax-container">
@@ -115,6 +118,7 @@
         </div>
     </div>
 </div>
+        </div>
         <#include "../footer.ftl">
 <script src="${staticServePath}/js/settings${miniPostfix}.js?${staticResourceVersion}"></script>
 <script src="${staticServePath}/js/breezemoon${miniPostfix}.js?${staticResourceVersion}"></script>

@@ -1107,5 +1107,21 @@ public class UserProcessor {
         final JSONObject role = roleQueryService.getRole(roleId);
         user.put(Role.ROLE_NAME, role.optString(Role.ROLE_NAME));
         user.put(UserExt.USER_T_CREATE_TIME, new Date(user.optLong(Keys.OBJECT_ID)));
+
+        // 获取用户个性化设定
+        final SystemSettingsService systemSettingsService = beanManager.getReference(SystemSettingsService.class);
+        final JSONObject systemSettings = systemSettingsService.getByUsrId(user.optString(Keys.OBJECT_ID));
+        if (Objects.isNull(systemSettings)) {
+            user.put("cardBg", "");
+        } else {
+            final String settingsJson = systemSettings.optString(SystemSettings.SETTINGS);
+            final JSONObject settings = new JSONObject(settingsJson);
+            final String cardBg = settings.optString("cardBg");
+            if (StringUtils.isBlank(cardBg)) {
+                user.put("cardBg", "");
+            } else {
+                user.put("cardBg", cardBg);
+            }
+        }
     }
 }
