@@ -1439,7 +1439,7 @@ var Util = {
           }
         }
         let list = sysMetal.list;
-        if (list !== undefined) {
+        if (list !== undefined && list.length !== 0) {
           html += '<div class="user-card__info vditor-reset">';
           for (let i = 0; i < list.length; i++) {
             let m = list[i];
