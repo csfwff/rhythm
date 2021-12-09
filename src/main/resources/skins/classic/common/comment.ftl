@@ -32,6 +32,9 @@
             <div class="fn-clear comment-info">
                 <span class="fn-left ft-smaller">
                     <a rel="nofollow" href="${servePath}/member/${comment.commentAuthorName}" class="ft-gray"><span class="ft-gray">${comment.commentAuthorName}</span></a>
+                    <#list comment.sysMetal?eval as metal>
+                        <img title="${metal.description}" src="https://unv-shield.librian.net/api/unv_shield?scale=0.79&txt=${metal.name}&${metal.attr}"/>
+                    </#list>
                     <span class="ft-fade">• ${comment.timeAgo}</span>
                     <#if 0 == comment.commenter.userUAStatus><span class="cmt-via ft-fade hover-show fn-hidden" data-ua="${comment.commentUA}"></span></#if>
                 </span>
@@ -61,9 +64,7 @@
                         <div class="avatar-small" style="background-image:url('${comment.commentOriginalAuthorThumbnailURL}')"></div>
                     </span>
                     </#if>
-                    <#list comment.sysMetal?eval as metal>
-                        <img title="${metal.description}" src="https://unv-shield.librian.net/api/unv_shield?scale=0.79&txt=${metal.name}&${metal.attr}"/>
-                    </#list>
+
                 </span>
             </div>
             <div class="vditor-reset comment">
