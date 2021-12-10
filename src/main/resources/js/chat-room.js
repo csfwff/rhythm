@@ -627,13 +627,9 @@ var ChatRoom = {
    * 艾特某个人
    */
   at: function (userName, id, justAt) {
+    ChatRoom.editor.focus();
     if (justAt === true) {
-      let value = ChatRoom.editor.getValue();
-      if (value !== "\n") {
-        ChatRoom.editor.setValue("@" + userName + "  : " + value);
-      } else {
-        ChatRoom.editor.setValue("@" + userName + "  : ");
-      }
+      ChatRoom.editor.insertValue("@" + userName + "  \n", !1);
     } else {
       let md = '';
       $.ajax({
@@ -645,14 +641,9 @@ var ChatRoom = {
           md = md.replace(/\n/g, "\n> ");
         }
       });
-      let value = ChatRoom.editor.getValue();
-      if (value !== "\n") {
-        ChatRoom.editor.setValue("@" + userName + "  引用：\n> " + md + "\n并说：" + value);
-      } else {
-        ChatRoom.editor.setValue("@" + userName + "  引用：\n> " + md + "\n并说：");
-      }
+      ChatRoom.editor.insertValue("\n##### 引用 @" + userName + "  \n> " + md + "\n", !1);
     }
-    ChatRoom.editor.focus();
+    $(window).scrollTop(0);
   },
   /**
    * 渲染抢到红包的人的列表
