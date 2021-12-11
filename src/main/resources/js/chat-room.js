@@ -38,7 +38,7 @@ var ChatRoom = {
       $('.list').height($(window).height() - 173)
     } */
 
-    // 没用登录就不需要编辑器初始化了
+    // 没有登录就不需要编辑器初始化了
     if ($('#chatContent').length === 0) {
       return false
     }
@@ -99,12 +99,12 @@ var ChatRoom = {
     })
 
     // img preview
-    $('.chat-room').on('click', '.vditor-reset img', function () {
-      if ($(this).hasClass('emoji')) {
-        return;
-      }
-      window.open($(this).attr('src'));
-    });
+    // $('.chat-room').on('click', '.vditor-reset img', function () {
+    //   if ($(this).hasClass('emoji')) {
+    //     return;
+    //   }
+    //   window.open($(this).attr('src'));
+    // });
 
     // 表情包初始化
     // 加载表情
@@ -886,6 +886,18 @@ var ChatRoom = {
         '</div></div>';
 
     return newHTML;
+  },
+  /**
+   * 全屏看图插件渲染
+   */
+  imgViewer:null,
+  imageViewer(){
+    this.imgViewer&&this.imgViewer.destroy();
+    this.imgViewer = new Viewer(document.querySelector('#chats'), {
+      inline: false,
+      className:"PWLimgViwer",
+      filter:(img)=>!img.parentElement.classList.contains("ft__smaller")&&!img.classList.contains("emoji")
+    });
   }
 }
 
