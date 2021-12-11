@@ -896,7 +896,12 @@ var ChatRoom = {
     this.imgViewer = new Viewer(document.querySelector('#chats'), {
       inline: false,
       className:"PWLimgViwer",
-      filter:(img)=>!img.parentElement.classList.contains("ft__smaller")&&!img.classList.contains("emoji")
+      filter:(img)=>!img.parentElement.classList.contains("ft__smaller")&&!img.classList.contains("emoji"),
+      title() {
+        let ele = this.images[$(".PWLimgViwer .viewer-active").attr("data-index")];
+        while (ele = ele.parentElement, !ele.querySelector(".avatar"));
+        return "From @" + ele.querySelector(".avatar").getAttribute("aria-label")
+      }
     });
   }
 }
