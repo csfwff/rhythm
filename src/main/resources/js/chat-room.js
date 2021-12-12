@@ -271,6 +271,7 @@ var ChatRoom = {
         }
       })
     });
+
   },
   /**
    * 删除表情包
@@ -528,6 +529,7 @@ var ChatRoom = {
               ChatRoom.resetMoreBtnListen();
             }
             Util.listenUserCard();
+            ChatRoom.imageViewer()
           } else {
             alert("没有更多聊天消息了！");
           }

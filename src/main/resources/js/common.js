@@ -1556,7 +1556,6 @@ var Util = {
       cardLock = false;
       $("#userCard").hide();
     });
-    ChatRoom.imageViewer()
   },
   /**
    * @description 用户状态 channel.
