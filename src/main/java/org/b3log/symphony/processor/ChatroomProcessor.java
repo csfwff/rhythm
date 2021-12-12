@@ -226,37 +226,43 @@ public class ChatroomProcessor {
                     return;
                 }
                 // 开始领取红包
-                // 先减掉已经领取的金额
-                boolean hasZero = false;
-                for (Object o : who) {
-                    JSONObject currentWho = (JSONObject) o;
-                    String uId = currentWho.optString("userId");
-                    if (uId.equals(userId)) {
-                        context.renderJSON(new JSONObject().put("who", who).put("info", info));
-                        return;
-                    }
-                    int userMoney = currentWho.optInt("userMoney");
-                    if (userMoney == 0) {
-                        hasZero = true;
-                    }
-                    money -= userMoney;
-                }
-                // 随机一个红包金额 1-N
-                Random random = new Random();
-                // 如果是最后一个红包了，给他一切
                 int meGot = 0;
-                int coefficient = 2;
-                if ((countMoney / 2) <= money) {
-                    coefficient = 1;
-                }
-                if (money > 0) {
-                    if (count == got + 1) {
-                        meGot = money;
-                    } else {
-                        if (!hasZero) {
-                            meGot = random.nextInt((money / coefficient) + 1);
+                if (redPacket.has("type") && "average".equals(redPacket.getString("type"))) {
+                    // 普通红包逻辑
+                    meGot = money;
+                } else {
+                    // 先减掉已经领取的金额
+                    boolean hasZero = false;
+                    for (Object o : who) {
+                        JSONObject currentWho = (JSONObject) o;
+                        String uId = currentWho.optString("userId");
+                        if (uId.equals(userId)) {
+                            context.renderJSON(new JSONObject().put("who", who).put("info", info));
+                            return;
+                        }
+                        int userMoney = currentWho.optInt("userMoney");
+                        if (userMoney == 0) {
+                            hasZero = true;
+                        }
+                        money -= userMoney;
+                    }
+                    // 随机一个红包金额 1-N
+                    Random random = new Random();
+                    // 如果是最后一个红包了，给他一切
+
+                    int coefficient = 2;
+                    if ((countMoney / 2) <= money) {
+                        coefficient = 1;
+                    }
+                    if (money > 0) {
+                        if (count == got + 1) {
+                            meGot = money;
                         } else {
-                            meGot = random.nextInt((money / coefficient) + 1) + 1;
+                            if (!hasZero) {
+                                meGot = random.nextInt((money / coefficient) + 1);
+                            } else {
+                                meGot = random.nextInt((money / coefficient) + 1) + 1;
+                            }
                         }
                     }
                 }
@@ -295,9 +301,13 @@ public class ChatroomProcessor {
             }
         } catch (Exception e) {
             context.renderJSON(StatusCodes.ERR).renderMsg("红包非法");
-            LOGGER.log(Level.ERROR, "Open Red Packet failed",e);
+            LOGGER.log(Level.ERROR, "Open Red Packet failed", e);
         }
         context.renderJSON(StatusCodes.ERR).renderMsg("红包非法");
+    }
+
+    private void openAverageRedPacket() {
+
     }
 
     /**
@@ -314,6 +324,7 @@ public class ChatroomProcessor {
      * @param context the specified context
      */
     final private static SimpleCurrentLimiter chatRoomLivenessLimiter = new SimpleCurrentLimiter(30, 1);
+
     public synchronized void addChatRoomMsg(final RequestContext context) {
         final JSONObject requestJSONObject = (JSONObject) context.attr(Keys.REQUEST);
         String content = requestJSONObject.optString(Common.CONTENT);
@@ -356,6 +367,10 @@ public class ChatroomProcessor {
             try {
                 String redpacketString = content.replaceAll("^\\[redpacket\\]", "").replaceAll("\\[/redpacket\\]$", "");
                 JSONObject redpacket = new JSONObject(redpacketString);
+                String type = redpacket.optString("type");
+                if (StringUtils.isBlank(type)) {
+                    type = "random";
+                }
                 int money = redpacket.optInt("money");
                 int count = redpacket.optInt("count");
                 String message = redpacket.optString("msg");
@@ -370,9 +385,20 @@ public class ChatroomProcessor {
                     return;
                 }
                 try {
-                    final boolean succ = null != pointtransferMgmtService.transfer(userId, Pointtransfer.ID_C_SYS,
-                            Pointtransfer.TRANSFER_TYPE_C_ACTIVITY_SEND_RED_PACKET,
-                            money, "", System.currentTimeMillis(), "");
+                    boolean succ;
+                    switch (type) {
+                        case "average":
+                            succ = null != pointtransferMgmtService.transfer(userId, Pointtransfer.ID_C_SYS,
+                                    Pointtransfer.TRANSFER_TYPE_C_ACTIVITY_SEND_RED_PACKET,
+                                    money * count, "", System.currentTimeMillis(), "");
+                            break;
+                        case "random":
+                        default:
+                            succ = null != pointtransferMgmtService.transfer(userId, Pointtransfer.ID_C_SYS,
+                                    Pointtransfer.TRANSFER_TYPE_C_ACTIVITY_SEND_RED_PACKET,
+                                    money, "", System.currentTimeMillis(), "");
+                    }
+
                     if (!succ) {
                         context.renderJSON(StatusCodes.ERR).renderMsg("少年，你的积分不足！");
                         return;
@@ -384,6 +410,7 @@ public class ChatroomProcessor {
                 // 组合新的 JSON
                 JSONObject redPacketJSON = new JSONObject();
                 redPacketJSON.put("senderId", userId);
+                redPacketJSON.put("type", type);
                 redPacketJSON.put("money", money);
                 redPacketJSON.put("count", count);
                 redPacketJSON.put("msg", message);
@@ -591,6 +618,7 @@ public class ChatroomProcessor {
      * @param context
      */
     private static Map<String, String> revoke = new HashMap<>();
+
     public void revokeMessage(final RequestContext context) {
         try {
             String removeMessageId = context.pathVar("oId");

@@ -143,6 +143,14 @@ var ChatRoom = {
       Util.alert("" +
           "<div class=\"form fn__flex-column\">\n" +
           "<label>\n" +
+          "  <div class=\"ft__smaller ft__fade\" style=\"float: left\">红包类型</div>\n" +
+          "  <div class=\"fn-hr5 fn__5\"></div>\n" +
+          "  <select id=\"redPacketType\">\n" +
+          "  <option value=\"random\" selected>拼手气红包</option>" +
+          "  <option value=\"average\">普通红包</option>" +
+          "  </select>\n" +
+          "</label>\n" +
+          "<label>\n" +
           "  <div class=\"ft__smaller ft__fade\" style=\"float: left\">积分</div>\n" +
           "  <div class=\"fn-hr5 fn__5\"></div>\n" +
           "  <input type=\"number\" min=\"32\" max=\"20000\" required=\"\" value=\"32\" id=\"redPacketMoney\" onkeypress=\"return(/[\\d]/.test(String.fromCharCode(event.keyCode)))\">\n" +
@@ -196,13 +204,18 @@ var ChatRoom = {
       });
 
       $("#redPacketConfirm").on('click', function () {
+        let type = $("#redPacketType").val();
         let money = $("#redPacketMoney").val();
         let count = $("#redPacketCount").val();
         let msg = $("#redPacketMsg").val();
+        if (type === '' || type === null || type === undefined) {
+          type = "random";
+        }
         if (msg === '') {
           msg = '摸鱼者，事竟成！';
         }
         let content = {
+          type:  type,
           money: money,
           count: count,
           msg: msg
@@ -232,13 +245,18 @@ var ChatRoom = {
       })
 
       $("#xRedPacketConfirm").on('click', function () {
+        let type = $("#redPacketType").val();
         let money = $("#redPacketMoney").val();
         let count = $("#redPacketCount").val();
         let msg = $("#redPacketMsg").val();
+        if (type === '' || type === null || type === undefined) {
+          type = "random";
+        }
         if (msg === '') {
           msg = '摸鱼者，事竟成！';
         }
         let content = {
+          type:  type,
           money: money,
           count: count,
           msg: msg
