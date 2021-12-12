@@ -216,6 +216,7 @@ public class ChatroomProcessor {
             if (msgType.equals("redPacket")) {
                 // 红包正常，可以抢了
                 int money = redPacket.optInt("money");
+                int countMoney = money;
                 int count = redPacket.optInt("count");
                 int got = redPacket.optInt("got");
                 JSONArray who = redPacket.optJSONArray("who");
@@ -244,14 +245,18 @@ public class ChatroomProcessor {
                 Random random = new Random();
                 // 如果是最后一个红包了，给他一切
                 int meGot = 0;
+                int coefficient = 2;
+                if ((countMoney / 2) <= money) {
+                    coefficient = 1;
+                }
                 if (money > 0) {
                     if (count == got + 1) {
                         meGot = money;
                     } else {
                         if (!hasZero) {
-                            meGot = random.nextInt((money / 4) + 1);
+                            meGot = random.nextInt((money / coefficient) + 1);
                         } else {
-                            meGot = random.nextInt((money / 4) + 1) + 1;
+                            meGot = random.nextInt((money / coefficient) + 1) + 1;
                         }
                     }
                 }
