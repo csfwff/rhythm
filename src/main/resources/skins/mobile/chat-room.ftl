@@ -26,6 +26,7 @@
         <@head title="${chatRoomLabel} - ${symphonyLabel}">
         <meta name="description" content="${chatRoomLabel}"/>
         </@head>
+        <link rel="stylesheet" href="${staticServePath}/css/viewer.min.css"/>
     </head>
     <body>
         <#include "header.ftl">
@@ -99,6 +100,7 @@
         <script src="${staticServePath}/js/lib/jquery/file-upload-9.10.1/jquery.fileupload.min.js"></script>
         <script src="${staticServePath}/js/channel${miniPostfix}.js?${staticResourceVersion}"></script>
         <script src="${staticServePath}/js/chat-room${miniPostfix}.js?${staticResourceVersion}"></script>
+        <script src="${staticServePath}/js/lib/viewer.min.js"></script>
         <script>
             Label.addBoldLabel = '${addBoldLabel}';
             Label.addItalicLabel = '${addItalicLabel}';
