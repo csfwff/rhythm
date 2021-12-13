@@ -148,7 +148,18 @@ var ChatRoom = {
           "  <select id=\"redPacketType\">\n" +
           "  <option value=\"random\" selected>拼手气红包</option>" +
           "  <option value=\"average\">普通红包</option>" +
+          "  <option value=\"specify\">专属红包</option>" +
           "  </select>\n" +
+          "</label>\n" +
+          "<label id = \"who\" style=\"display:none;\">\n" +
+          "  <div class=\"ft__smaller ft__fade\" style=\"float: left\">发给谁</div>\n" +
+          "  <div class=\"fn-hr5 fn__5\"></div>\n" +
+          "  <div id=\"recivers\" class=\"chats__users\">\n" +
+          "                            </div> \n" +
+          "  <select id=\"userOption\" multiple=\"multiple\" style='height: 150px; left: 50px'>\n" +
+          "  </select>\n" +
+          "  <div id=\"chatUsernameSelectedPanel\" class=\"completed-panel\"\n" +
+          "                             style=\"height:170px;display:none;left:auto;top:auto;cursor:pointer;\"></div> \n" +
           "</label>\n" +
           "<label>\n" +
           "  <div class=\"ft__smaller ft__fade\" style=\"float: left\">积分</div>\n" +
@@ -174,6 +185,58 @@ var ChatRoom = {
           "</div>" +
           "", "发红包");
 
+      $("#userOption").on('change', function () {
+        var users = $("#userOption").val()
+        var userInfos = []
+        for (index in users) {
+          userInfos.push(onelineUsers.get(users[index]))
+        }
+        $("#recivers").html("");
+        $("#redPacketCount").val(userInfos.length);
+        for (var userInfo in userInfos) {
+          $("#recivers").append("<a target=\"_blank\" data-name=\"" + userInfos[userInfo].userName + "\"\n" +
+              "href=\"" + userInfos[userInfo].homePage + "\">\n" +
+              "<img style='margin-bottom: 10px' class=\"avatar avatar-small\" aria-label=\"" + userInfos[userInfo].userName + "\"\n" +
+              "src=\"" + userInfos[userInfo].userAvatarURL + "\">\n" +
+              "</a>");
+        }
+      });
+
+      var onelineUsers = new Map();
+
+      $("#redPacketType").on('change',function () {
+         let type = $("#redPacketType").val();
+        if (type === 'specify') {
+          $('#who').removeAttr("style");
+          $("#redPacketCount").val("1");
+          $('#redPacketCount').attr("readOnly","true");
+          $.ajax({
+            url: Label.servePath + '/chat-room/online-users',
+            type: 'GET',
+            cache: false,
+            success: function (result) {
+              console.log(result)
+              if (0 == result.code) {
+                $("#userOption").html("");
+                for (var userIndex in result.data.users) {
+                  var user = result.data.users[userIndex]
+                  onelineUsers.set(user.userName,user)
+                  $("#userOption").append("<option value=\""+user.userName+"\">"+user.userName+"</option>\n");
+                }
+              } else {
+                console.log("获取聊天室在线成员信息失败")
+              }
+            },
+            error: function (result) {
+              console.log("获取聊天室在线成员信息失败")
+            }
+          })
+        } else {
+          $('#who').css('display','none')
+          $('#redPacketCount').removeAttr("readOnly");
+        }
+      });
+
       $("#redPacketMoney").unbind();
       $("#redPacketCount").unbind();
 
@@ -197,6 +260,9 @@ var ChatRoom = {
           $("#redPacketMsg").val("平分红包，人人有份！");
         } else if (type === 'random') {
           $("#redPacketAmount").text($("#redPacketMoney").val());
+        } else if (type === 'specify') {
+          $("#redPacketAmount").text($("#redPacketMoney").val() * $("#redPacketCount").val());
+          $("#redPacketMsg").val("这是属于你的！");
         }
       });
 
@@ -207,6 +273,10 @@ var ChatRoom = {
           $("#redPacketMsg").val("平分红包，人人有份！");
         } else if (type === 'random') {
           $("#redPacketAmount").text($("#redPacketMoney").val());
+          $("#redPacketMsg").val("摸鱼者，事竟成！");
+        } else if (type === 'specify') {
+          $("#redPacketAmount").text($("#redPacketMoney").val() * $("#redPacketCount").val());
+          $("#redPacketMsg").val("这是属于你的！");
         }
       });
 
@@ -228,8 +298,17 @@ var ChatRoom = {
         let money = $("#redPacketMoney").val();
         let count = $("#redPacketCount").val();
         let msg = $("#redPacketMsg").val();
+        let recivers = $("#userOption").val();
         if (type === '' || type === null || type === undefined) {
           type = "random";
+        }
+        if (recivers === undefined) {
+          recivers = []
+        }
+        if(recivers.length == 0 && type === 'specify') {
+          $('#chatContentTip').
+          addClass('error').
+          html('<ul><li>请选择红包发送对象</li></ul>')
         }
         if (msg === '') {
           msg = '摸鱼者，事竟成！';
@@ -238,7 +317,8 @@ var ChatRoom = {
           type:  type,
           money: money,
           count: count,
-          msg: msg
+          msg: msg,
+          recivers:recivers
         }
         let requestJSONObject = {
           content: "[redpacket]" + JSON.stringify(content) + "[/redpacket]",
@@ -269,8 +349,17 @@ var ChatRoom = {
         let money = $("#redPacketMoney").val();
         let count = $("#redPacketCount").val();
         let msg = $("#redPacketMsg").val();
+        let recivers = $("#userOption").val();
         if (type === '' || type === null || type === undefined) {
           type = "random";
+        }
+        if (recivers === undefined) {
+          recivers = []
+        }
+        if(recivers.length == 0 && type === 'specify') {
+          $('#chatContentTip').
+          addClass('error').
+          html('<ul><li>请选择红包发送对象</li></ul>')
         }
         if (msg === '') {
           msg = '摸鱼者，事竟成！';
@@ -279,7 +368,8 @@ var ChatRoom = {
           type:  type,
           money: money,
           count: count,
-          msg: msg
+          msg: msg,
+          recivers:recivers
         }
         let requestJSONObject = {
           content: "[redpacket]" + JSON.stringify(content) + "[/redpacket]",
@@ -690,7 +780,7 @@ var ChatRoom = {
    *
    * @param who
    */
-  renderRedPacket: function (usersJSON, count, got) {
+  renderRedPacket: function (usersJSON, count, got, recivers) {
     let hasGot = false;
     let highest = -1;
     if (count === got) {
@@ -741,6 +831,16 @@ var ChatRoom = {
     if (!hasGot) {
       $("#redPacketIGot").text("你错过了这个红包");
     }
+
+    console.log(recivers)
+    if (recivers.length > 0) {
+      index = recivers.indexOf(Label.currentUser);
+      console.log(index)
+      if (index === -1) {
+        $("#msg").text("这个红包属于 " + recivers)
+        $("#redPacketIGot").text("这个红包不属于你");
+      }
+    }
   },
   /**
    * 拆开红包
@@ -775,7 +875,7 @@ var ChatRoom = {
             "        <a href=\"" + Label.servePath + "/member/" + result.info.userName + "\">" + result.info.userName + "</a>'s 红包\n" +
             "    </div>\n" +
             "    <div class=\"fn-hr5\"></div>\n" +
-            "    <div class=\"ft__smaller ft__fade\">\n" +
+            "    <div id = \"msg\" class=\"ft__smaller ft__fade\">\n" +
             result.info.msg + "\n" +
             "    </div>\n" +
             "    <div class=\"hongbao__count\" id='redPacketIGot'>\n" +
@@ -786,7 +886,7 @@ var ChatRoom = {
             "<div class=\"list\"><ul id=\"redPacketList\">\n" +
             "</ul></div>" +
             "", "红包");
-        ChatRoom.renderRedPacket(result.who, result.info.count, result.info.got)
+        ChatRoom.renderRedPacket(result.who, result.info.count, result.info.got, result.recivers)
         if (result.info.count === result.info.got) {
           $("#chatroom" + oId).find(".hongbao__item").css("opacity", ".36");
           $("#chatroom" + oId).find(".redPacketDesc").html("已经被抢光啦");
