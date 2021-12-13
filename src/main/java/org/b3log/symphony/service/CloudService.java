@@ -57,7 +57,7 @@ public class CloudService {
      * @param data
      * @return
      */
-    synchronized public void sync(final String userId, final String gameId, final String data) throws ServiceException {
+    synchronized public void sync(final String userId, final String gameId, final JSONObject data) throws ServiceException {
         if (gameId.startsWith("sys-")) {
             return;
         }
@@ -70,11 +70,21 @@ public class CloudService {
                             new PropertyFilter("gameId", FilterOperator.EQUAL, gameId)
                     ));
             cloudRepository.remove(cloudDeleteQuery);
+            JSONObject stats = data.optJSONObject("stats");
+            if (stats == null) {
+                return;
+            }
+            JSONObject top = new JSONObject();
+            top.put("achievement", stats.optJSONObject("achieve").toMap().size());
+            top.put("know", stats.optLong("know") + stats.optLong("tknow"));
+            top.put("days", stats.optLong("days") + stats.optLong("tdays"));
+            top.put("reset", stats.optLong("reset") + stats.optLong("reset"));
+            data.put("top", top);
             // 上传新存档
             JSONObject cloudJSON = new JSONObject();
             cloudJSON.put("userId", userId)
                     .put("gameId", gameId)
-                    .put("data", data);
+                    .put("data", data.toString());
             cloudRepository.add(cloudJSON);
             transaction.commit();
         } catch (RepositoryException e) {
