@@ -2182,7 +2182,7 @@ function Rotate(id) {
 $(function(){
   let today = new Date();
   if(today.getMonth() == 11 && today.getDate() == 13){
-      $('body').css("filter","grayscale(100%)")
-      $('body').css("-webkit-filter","grayscale(100%)")
+      $('html').css("filter","grayscale(100%)")
+      $('html').css("-webkit-filter","grayscale(100%)")
   }
 });
