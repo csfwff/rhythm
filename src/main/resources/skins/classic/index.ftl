@@ -904,6 +904,13 @@
         }
         window.open($(this).attr('src'));
     });
+    $(function(){
+        let today = new Date();
+        if(today.getMonth() == 11 && today.getDate() == 13){
+        $('html').css("filter","grayscale(100%)")
+         $('html').css("-webkit-filter","grayscale(100%)")
+     }
+    });
 </script>
 </body>
 </html>
