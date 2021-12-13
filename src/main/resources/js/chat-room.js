@@ -890,21 +890,51 @@ var ChatRoom = {
     return newHTML;
   },
   /**
-   * 全屏看图插件渲染
+   * 看图插件dom
    */
   imgViewer:null,
-  imageViewer(){
-    this.imgViewer&&this.imgViewer.destroy();
-    this.imgViewer = new Viewer(document.querySelector('#chats'), {
-      inline: false,
-      className:"PWLimgViwer",
-      filter:(img)=>!img.parentElement.classList.contains("ft__smaller")&&!img.classList.contains("emoji"),
-      title() {
-        let ele = this.images[$(".PWLimgViwer .viewer-active").attr("data-index")];
-        while (ele = ele.parentElement, !ele.querySelector(".avatar"));
-        return "From @" + ele.querySelector(".avatar").getAttribute("aria-label")
-      }
+  /**
+   * 看图插件等待更新状态
+   */
+  imgWaitting = false,
+  /**
+   * 全屏看图插件渲染
+   */
+  imageViewer = function() {
+    // console.log("新消息")
+    //没有新图片就不重载
+    if ($("div.vditor-reset.ft__smaller img:not(.ft__smaller,.emoji)").length === this.imgViewer.length)
+        return
+    // console.log("包含图片")
+    this.imgViewer = this.imgViewer || new Viewer(document.querySelector('#chats'),{
+        inline: false,
+        className: "PWLimgViwer",
+        filter: (img)=>!img.parentElement.classList.contains("ft__smaller") && !img.classList.contains("emoji"),
+        title() {
+            let ele = this.images[$(".PWLimgViwer .viewer-active").attr("data-index")];
+            while (ele = ele.parentElement,
+            !ele.querySelector(".avatar"));
+            return "From @" + ele.querySelector(".avatar").getAttribute("aria-label")
+        }
     });
-  }
+    const delayshow = function() {
+        setTimeout(()=>{
+            if (!ChatRoom.imgViewer.isShown) {
+                ChatRoom.imgWaitting = false;
+                // console.log("重载")
+                ChatRoom.imgViewer.update()
+            } else {
+                // console.log("等待")
+                delayshow()
+            }
+        }
+        , 1000)
+        return true
+    }
+    // console.log("前", this.imgWaitting)
+    this.imgWaitting = this.imgWaitting || delayshow()
+    // console.log("后", this.imgWaitting)
+}
+
 }
 
