@@ -229,6 +229,14 @@ public class ChatroomProcessor {
                 int meGot = 0;
                 if (redPacket.has("type") && "average".equals(redPacket.getString("type"))) {
                     // 普通红包逻辑
+                    for (Object o : who) {
+                        JSONObject currentWho = (JSONObject) o;
+                        String uId = currentWho.optString("userId");
+                        if (uId.equals(userId)) {
+                            context.renderJSON(new JSONObject().put("who", who).put("info", info));
+                            return;
+                        }
+                    }
                     meGot = money;
                 } else {
                     // 先减掉已经领取的金额

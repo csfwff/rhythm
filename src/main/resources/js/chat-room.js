@@ -190,6 +190,26 @@ var ChatRoom = {
         $("#redPacketAmount").text($("#redPacketMoney").val());
       });
 
+      $('#redPacketMoney,#redPacketCount').bind('input propertychange', function() {
+        let type = $("#redPacketType").val();
+        if (type === 'average') {
+          $("#redPacketAmount").text($("#redPacketMoney").val() * $("#redPacketCount").val());
+          $("#redPacketMsg").val("平分红包，人人有份！");
+        } else if (type === 'random') {
+          $("#redPacketAmount").text($("#redPacketMoney").val());
+        }
+      });
+
+      $("#redPacketType").on('change', function () {
+        let type = $("#redPacketType").val();
+        if (type === 'average') {
+          $("#redPacketAmount").text($("#redPacketMoney").val() * $("#redPacketCount").val());
+          $("#redPacketMsg").val("平分红包，人人有份！");
+        } else if (type === 'random') {
+          $("#redPacketAmount").text($("#redPacketMoney").val());
+        }
+      });
+
       $("#redPacketCount").on('change', function () {
         if (Number($("#redPacketCount").val()) > Number($("#redPacketMoney").val())) {
           $("#redPacketCount").val($("#redPacketMoney").val());
