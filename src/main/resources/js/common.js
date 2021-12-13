@@ -2177,3 +2177,12 @@ function Rotate(id) {
     return (d >= 0 && this.lastIndexOf(endStr) === d);
   }
 }
+
+
+$(function(){
+  let today = new Date();
+  if(today.getMonth() == 11 && today.getDate() == 13){
+      $('body').css("filter","grayscale(100%)")
+      $('body').css("-webkit-filter","grayscale(100%)")
+  }
+});
