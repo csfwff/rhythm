@@ -910,18 +910,18 @@ var ChatRoom = {
   /**
    * 看图插件dom
    */
-  imgViewer:null,
+  imgViewer: null,
   /**
    * 看图插件等待更新状态
    */
-  imgWaitting = false,
+  imgWaitting: false,
   /**
    * 全屏看图插件渲染
    */
-  imageViewer = function() {
+  imageViewer: function() {
     // console.log("新消息")
     //没有新图片就不重载
-    if ($("div.vditor-reset.ft__smaller img:not(.ft__smaller,.emoji)").length === this.imgViewer.length)
+    if (this.imgViewer && $("div.vditor-reset.ft__smaller img:not(.ft__smaller,.emoji)").length === this.imgViewer.length)
         return
     // console.log("包含图片")
     this.imgViewer = this.imgViewer || new Viewer(document.querySelector('#chats'),{

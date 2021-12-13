@@ -50,7 +50,7 @@ public class ChatroomChannel implements WebSocketChannel {
     /**
      * Online user information storage.
      */
-    public static final Map<WebSocketSession, JSONObject> onlineUsers = new HashMap<>();
+    public static final Map<WebSocketSession, JSONObject> onlineUsers = Collections.synchronizedMap(new HashMap<>());
 
     /**
      * Called when the socket connection with the browser is established.
