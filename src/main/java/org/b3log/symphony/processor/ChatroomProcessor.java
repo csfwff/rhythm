@@ -51,6 +51,7 @@ import pers.adlered.simplecurrentlimiter.main.SimpleCurrentLimiter;
 
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -288,8 +289,6 @@ public class ChatroomProcessor {
                     }
                     meGot = money;
                 } else {
-                    // 先减掉已经领取的金额
-                    boolean hasZero = false;
                     for (Object o : who) {
                         JSONObject currentWho = (JSONObject) o;
                         String uId = currentWho.optString("userId");
@@ -297,31 +296,8 @@ public class ChatroomProcessor {
                             context.renderJSON(new JSONObject().put("who", who).put("info", info));
                             return;
                         }
-                        int userMoney = currentWho.optInt("userMoney");
-                        if (userMoney == 0) {
-                            hasZero = true;
-                        }
-                        money -= userMoney;
                     }
-                    // 随机一个红包金额 1-N
-                    Random random = new Random();
-                    // 如果是最后一个红包了，给他一切
-
-                    int coefficient = 2;
-                    if ((countMoney / 2) <= money) {
-                        coefficient = 1;
-                    }
-                    if (money > 0) {
-                        if (count == got + 1) {
-                            meGot = money;
-                        } else {
-                            if (!hasZero) {
-                                meGot = random.nextInt((money / coefficient) + 1);
-                            } else {
-                                meGot = random.nextInt((money / coefficient) + 1) + 1;
-                            }
-                        }
-                    }
+                    meGot = RED_PACKET_BUCKET.get(oId).packs.poll();
                 }
                 // 随机成功了
                 // 修改聊天室数据库
@@ -353,6 +329,11 @@ public class ChatroomProcessor {
                 redPacketStatus.put("got", got + 1);
                 redPacketStatus.put("count", count);
                 redPacketStatus.put("oId", oId);
+
+                if ("random".equals(redPacket.getString("type")) && redPacketStatus.optInt("got") == redPacketStatus.optInt("count")) {
+                    RED_PACKET_BUCKET.remove(oId);
+                }
+
                 ChatroomChannel.notifyChat(redPacketStatus);
                 return;
             }
@@ -363,9 +344,6 @@ public class ChatroomProcessor {
         context.renderJSON(StatusCodes.ERR).renderMsg("红包非法");
     }
 
-    private void openAverageRedPacket() {
-
-    }
 
     /**
      * Adds a chat message.
@@ -503,7 +481,7 @@ public class ChatroomProcessor {
                     LOGGER.log(Level.ERROR, "Cannot save ChatRoom message to the database.", e);
                 }
                 transaction.commit();
-
+                RED_PACKET_BUCKET.put(msg.optString("oId"), allocateRedPacket(msg.optString("oId"), userId, money, count, 2));
                 final JSONObject pushMsg = JSONs.clone(msg);
                 pushMsg.put(Common.TIME, new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(msg.optLong(Common.TIME)));
                 ChatroomChannel.notifyChat(pushMsg);
@@ -530,7 +508,6 @@ public class ChatroomProcessor {
                 LOGGER.log(Level.ERROR, "Cannot save ChatRoom message to the database.", e);
             }
             transaction.commit();
-
             msg = msg.put("md", msg.optString(Common.CONTENT)).put(Common.CONTENT, processMarkdown(msg.optString(Common.CONTENT)));
             final JSONObject pushMsg = JSONs.clone(msg);
             pushMsg.put(Common.TIME, new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(msg.optLong(Common.TIME)));
@@ -788,4 +765,125 @@ public class ChatroomProcessor {
 
         return content;
     }
+
+    /**
+     * @param id        红包ID
+     * @param sendId    发送者ID
+     * @param money     总金额
+     * @param count     红包的个数
+     * @param zeroCount 允许出现0的次数
+     * @return
+     */
+    private static RedPacket allocateRedPacket(String id, String sendId, int money, int count, int zeroCount) {
+        if (zeroCount >= count) {
+            zeroCount = 0;
+        }
+        int realZeroCount = 0;
+        RedPacket redPacket = new RedPacket.Builder()
+                .id(id)
+                .sendId(sendId)
+                .money(money)
+                .time(System.currentTimeMillis())
+                .count(count)
+                .packs(new LinkedList<>())
+                .build();
+        if (count == 1) {
+            redPacket.packs.push(money);
+            return redPacket;
+        }
+        final ThreadLocalRandom random = ThreadLocalRandom.current();
+        int remain = money;
+        for (int i = 0; i < count; i++) {
+            if (remain == 0) {
+                redPacket.packs.push(remain);
+            } else {
+                if (redPacket.packs.size() == count - 1) {
+                    redPacket.packs.push(remain);
+                    break;
+                }
+                int min = 0;
+                int max = (remain / (count * 2)) + 1;
+                int get = random.nextInt(min, max);
+                if (get == 0) {
+                    if (zeroCount > 0 && zeroCount > realZeroCount) {
+                        //还有0的名额
+                        realZeroCount++;
+                    } else {
+                        get = 1;
+                    }
+                }
+                redPacket.packs.push(get);
+                remain -= get;
+            }
+        }
+        Collections.shuffle(redPacket.packs);
+        return redPacket;
+    }
+
+    public static class RedPacket {
+        public String id;
+        public String sendId;
+        public long time;
+        public LinkedList<Integer> packs;
+        public int count;
+        public int money;
+
+        private RedPacket(Builder builder) {
+            id = builder.id;
+            sendId = builder.sendId;
+            time = builder.time;
+            packs = builder.packs;
+            count = builder.count;
+            money = builder.money;
+        }
+
+
+        public static final class Builder {
+            private String id;
+            private String sendId;
+            private long time;
+            private LinkedList<Integer> packs;
+            private int count;
+            private int money;
+
+            public Builder() {
+            }
+
+            public Builder id(String val) {
+                id = val;
+                return this;
+            }
+
+            public Builder sendId(String val) {
+                sendId = val;
+                return this;
+            }
+
+            public Builder time(long val) {
+                time = val;
+                return this;
+            }
+
+            public Builder packs(LinkedList<Integer> val) {
+                packs = val;
+                return this;
+            }
+
+            public Builder count(int val) {
+                count = val;
+                return this;
+            }
+
+            public Builder money(int val) {
+                money = val;
+                return this;
+            }
+
+            public RedPacket build() {
+                return new RedPacket(this);
+            }
+        }
+    }
+
+    public static final Map<String, RedPacket> RED_PACKET_BUCKET = new HashMap<>(32);
 }
