@@ -289,6 +289,7 @@ public class ChatroomProcessor {
                     }
                     meGot = money;
                 } else {
+                    boolean hasZero = false;
                     for (Object o : who) {
                         JSONObject currentWho = (JSONObject) o;
                         String uId = currentWho.optString("userId");
@@ -296,8 +297,35 @@ public class ChatroomProcessor {
                             context.renderJSON(new JSONObject().put("who", who).put("info", info));
                             return;
                         }
+                        int userMoney = currentWho.optInt("userMoney");
+                        if (userMoney == 0) {
+                            hasZero = true;
+                        }
+                        money -= userMoney;
                     }
-                    meGot = RED_PACKET_BUCKET.get(oId).packs.poll();
+                    if (RED_PACKET_BUCKET.isEmpty() || !RED_PACKET_BUCKET.containsKey(oId)) {
+                        //服务器重启或者宕机导致的红包缓存失效，走原来的逻辑
+                        // 随机一个红包金额 1-N
+                        Random random = new Random();
+                        // 如果是最后一个红包了，给他一切
+                        int coefficient = 2;
+                        if ((countMoney / 2) <= money) {
+                            coefficient = 1;
+                        }
+                        if (money > 0) {
+                            if (count == got + 1) {
+                                meGot = money;
+                            } else {
+                                if (!hasZero) {
+                                    meGot = random.nextInt((money / coefficient) + 1);
+                                } else {
+                                    meGot = random.nextInt((money / coefficient) + 1) + 1;
+                                }
+                            }
+                        }
+                    } else {
+                        meGot = RED_PACKET_BUCKET.get(oId).packs.poll();
+                    }
                 }
                 // 随机成功了
                 // 修改聊天室数据库

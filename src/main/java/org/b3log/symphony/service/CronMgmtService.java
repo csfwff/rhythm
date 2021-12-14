@@ -24,13 +24,10 @@ import org.apache.logging.log4j.Logger;
 import org.b3log.latke.ioc.Inject;
 import org.b3log.latke.service.annotation.Service;
 import org.b3log.latke.util.Stopwatchs;
-import org.b3log.symphony.processor.ChatroomProcessor;
 import org.b3log.symphony.processor.IdleTalkProcessor;
 import org.b3log.symphony.util.Symphonys;
 import org.b3log.symphony.util.Vocation;
 
-import java.util.Iterator;
-import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -114,37 +111,11 @@ public class CronMgmtService {
     @Inject
     private LivenessMgmtService livenessMgmtService;
 
-    private static final long ONE_DAY = 24 * 3600 * 1000;
-
 
     /**
      * Start all cron tasks.
      */
     public void start() {
-
-        Symphonys.SCHEDULED_EXECUTOR_SERVICE.scheduleAtFixedRate(() -> {
-            try {
-                final long now = System.currentTimeMillis();
-                Iterator<Map.Entry<String, ChatroomProcessor.RedPacket>> iterator = ChatroomProcessor.RED_PACKET_BUCKET.entrySet().iterator();
-                while (iterator.hasNext()) {
-                    Map.Entry<String, ChatroomProcessor.RedPacket> next = iterator.next();
-                    ChatroomProcessor.RedPacket packet = next.getValue();
-                    long gap = now - packet.time;
-                    if (gap > ONE_DAY) {
-                        //将积分返还
-                        System.out.println("模拟积分返还");
-                        iterator.remove();
-                    }
-                }
-
-            } catch (final Exception e) {
-                LOGGER.log(Level.ERROR, "Executes cron failed", e);
-            } finally {
-                Stopwatchs.release();
-            }
-        }, 1000, 2000, TimeUnit.MILLISECONDS);
-
-
         long delay = 10000;
 
         Symphonys.SCHEDULED_EXECUTOR_SERVICE.scheduleAtFixedRate(() -> {
