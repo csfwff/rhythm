@@ -2058,9 +2058,10 @@ code .dec {
 
 
 .old-almanac{
-
+    width: 320px;
     justify-content: center;
     align-items: center;
+    flex-direction: column;
 
 
     .date{
