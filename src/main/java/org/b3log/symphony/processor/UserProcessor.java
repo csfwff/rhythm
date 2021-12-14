@@ -242,8 +242,12 @@ public class UserProcessor {
         userId = context.param("userId");
         if (StringUtils.isEmpty(userId)) {
             userId = currentUser.optString(Keys.OBJECT_ID);
+        } else {
+            if (Objects.isNull(userQueryService.getUser(userId))) {
+                context.renderJSON(StatusCodes.SUCC).renderJSON(new JSONObject().put("liveness", -1));
+                return;
+            }
         }
-
         final int livenessMax = Symphonys.ACTIVITY_YESTERDAY_REWARD_MAX;
         final int currentLiveness = livenessQueryService.getCurrentLivenessPoint(userId);
         float liveness = (float) (Math.round((float) currentLiveness / livenessMax * 100 * 100)) / 100;
