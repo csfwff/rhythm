@@ -168,6 +168,9 @@ public class ChatroomProcessor {
     @Inject
     private CloudService cloudService;
 
+    @Inject
+    private ChatroomChannel chatroomChannel;
+
     /**
      * Register request handlers.
      */
@@ -181,9 +184,25 @@ public class ChatroomProcessor {
         Dispatcher.post("/chat-room/send", chatroomProcessor::addChatRoomMsg, loginCheck::handle, chatMsgAddValidationMidware::handle);
         Dispatcher.get("/cr", chatroomProcessor::showChatRoom, anonymousViewCheckMidware::handle);
         Dispatcher.get("/chat-room/more", chatroomProcessor::getMore);
+        Dispatcher.get("/chat-room/online-users", chatroomProcessor::getChatRoomUsers);
         Dispatcher.get("/cr/raw/{id}", chatroomProcessor::getChatRaw, anonymousViewCheckMidware::handle);
         Dispatcher.delete("/chat-room/revoke/{oId}", chatroomProcessor::revokeMessage, loginCheck::handle);
         Dispatcher.post("/chat-room/red-packet/open", chatroomProcessor::openRedPacket, loginCheck::handle);
+    }
+
+
+    /**
+     * 获取聊天室在线人数
+     *
+     * @param context
+     */
+    public void getChatRoomUsers(final RequestContext context) {
+        final JSONObject online = chatroomChannel.getOnline();
+        JSONObject ret = new JSONObject();
+        ret.put(Keys.CODE, StatusCodes.SUCC);
+        ret.put(Keys.MSG, "");
+        ret.put(Keys.DATA, online);
+        context.renderJSON(ret);
     }
 
     /**
@@ -212,6 +231,13 @@ public class ChatroomProcessor {
             info.put("count", redPacket.optInt("count"));
             info.put("got", redPacket.optInt("got"));
             info.put("msg", redPacket.optString("msg"));
+            JSONArray recivers;
+            if (!redPacket.has("recivers") || StringUtils.isBlank(redPacket.optString("recivers"))) {
+                recivers = new JSONArray();
+            } else {
+                recivers = new JSONArray(redPacket.optString("recivers"));
+            }
+
             String msgType = redPacket.optString("msgType");
             if (msgType.equals("redPacket")) {
                 // 红包正常，可以抢了
@@ -222,7 +248,7 @@ public class ChatroomProcessor {
                 JSONArray who = redPacket.optJSONArray("who");
                 // 根据抢的人数判断是否已经抢光了
                 if (got >= count) {
-                    context.renderJSON(new JSONObject().put("who", who).put("info", info));
+                    context.renderJSON(new JSONObject().put("who", who).put("info", info).put("recivers", recivers));
                     return;
                 }
                 // 开始领取红包
@@ -234,6 +260,29 @@ public class ChatroomProcessor {
                         String uId = currentWho.optString("userId");
                         if (uId.equals(userId)) {
                             context.renderJSON(new JSONObject().put("who", who).put("info", info));
+                            return;
+                        }
+                    }
+                    meGot = money;
+                } else if (redPacket.has("type") && "specify".equals(redPacket.getString("type"))) {
+                    //专属红包逻辑
+                    final boolean isReciver = recivers.toList().stream().anyMatch(x -> {
+                        final String reciver = (String) x;
+                        if (reciver.equals(userName)) {
+                            return true;
+                        } else {
+                            return false;
+                        }
+                    });
+                    if (!isReciver) {
+                        context.renderJSON(new JSONObject().put("who", who).put("info", info).put("recivers", recivers));
+                        return;
+                    }
+                    for (Object o : who) {
+                        JSONObject currentWho = (JSONObject) o;
+                        String uId = currentWho.optString("userId");
+                        if (uId.equals(userId)) {
+                            context.renderJSON(new JSONObject().put("who", who).put("info", info).put("recivers", recivers));
                             return;
                         }
                     }
@@ -295,7 +344,7 @@ public class ChatroomProcessor {
                     return;
                 }
                 info.put("got", redPacket.optInt("got") + 1);
-                context.renderJSON(new JSONObject().put("who", source3).put("info", info));
+                context.renderJSON(new JSONObject().put("who", source3).put("info", info).put("recivers", recivers));
                 // 广播红包情况
                 JSONObject redPacketStatus = new JSONObject();
                 redPacketStatus.put(Common.TYPE, "redPacketStatus");
@@ -381,6 +430,7 @@ public class ChatroomProcessor {
                 }
                 int money = redpacket.optInt("money");
                 int count = redpacket.optInt("count");
+                String recivers = redpacket.optString("recivers");
                 String message = redpacket.optString("msg");
                 message = message.replaceAll("[^0-9a-zA-Z\\u4e00-\\u9fa5,，.。！!?？《》\\s]", "");
                 if (message.length() > 20) {
@@ -393,20 +443,33 @@ public class ChatroomProcessor {
                     return;
                 }
                 try {
-                    boolean succ;
+                    int toatlMoney = 0;
                     switch (type) {
                         case "average":
-                            succ = null != pointtransferMgmtService.transfer(userId, Pointtransfer.ID_C_SYS,
-                                    Pointtransfer.TRANSFER_TYPE_C_ACTIVITY_SEND_RED_PACKET,
-                                    money * count, "", System.currentTimeMillis(), "");
+                            toatlMoney = money * count;
+                            break;
+                        case "specify":
+                            if (StringUtils.isNotBlank(recivers)) {
+                                final JSONArray reciverArray = new JSONArray(recivers);
+                                final int length = reciverArray.length();
+                                if (length > 0) {
+                                    toatlMoney = money * length;
+                                } else {
+                                    context.renderJSON(StatusCodes.ERR).renderMsg("专属红包需要指定用户！");
+                                    return;
+                                }
+                            } else {
+                                context.renderJSON(StatusCodes.ERR).renderMsg("专属红包需要指定用户！");
+                                return;
+                            }
                             break;
                         case "random":
                         default:
-                            succ = null != pointtransferMgmtService.transfer(userId, Pointtransfer.ID_C_SYS,
-                                    Pointtransfer.TRANSFER_TYPE_C_ACTIVITY_SEND_RED_PACKET,
-                                    money, "", System.currentTimeMillis(), "");
+                            toatlMoney = money;
                     }
-
+                    final boolean succ = null != pointtransferMgmtService.transfer(userId, Pointtransfer.ID_C_SYS,
+                            Pointtransfer.TRANSFER_TYPE_C_ACTIVITY_SEND_RED_PACKET,
+                            toatlMoney, "", System.currentTimeMillis(), "");
                     if (!succ) {
                         context.renderJSON(StatusCodes.ERR).renderMsg("少年，你的积分不足！");
                         return;
@@ -422,6 +485,7 @@ public class ChatroomProcessor {
                 redPacketJSON.put("money", money);
                 redPacketJSON.put("count", count);
                 redPacketJSON.put("msg", message);
+                redPacketJSON.put("recivers", recivers);
                 // 已经抢了这个红包的人数
                 redPacketJSON.put("got", 0);
                 // 已经抢了这个红包的人以及抢到的金额
