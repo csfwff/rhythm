@@ -77,7 +77,7 @@ public class CloudProcessor {
 
             JSONObject requestJSONObject = context.requestJSON();
             String gameId = requestJSONObject.optString("gameId");
-            String data = requestJSONObject.optString("data");
+            JSONObject data = requestJSONObject.optJSONObject("data");
             cloudService.sync(userId, gameId, data);
             context.renderJSON(StatusCodes.SUCC).renderMsg("摸鱼派账号 " + userName + " - 游戏存档已同步至摸鱼派云服务");
         } catch (Exception e) {
