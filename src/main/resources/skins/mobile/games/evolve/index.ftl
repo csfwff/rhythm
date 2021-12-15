@@ -52,7 +52,7 @@
     -->
     <link rel="stylesheet" type="text/css" href="https://pwl.stackoverflow.wiki/evolve/evolve/evolve.css?r=20210605">
     <script src="https://pwl.stackoverflow.wiki/evolve/lib/lz-string.min.js"></script>
-    <script src="https://pwl.stackoverflow.wiki/main.js?r=20210605" type="module"></script>
+    <script src="https://pwl.stackoverflow.wiki/main.js" type="module"></script>
 </head>
 <body>
 <!--          <script src="zh/core.js"></script> -->
