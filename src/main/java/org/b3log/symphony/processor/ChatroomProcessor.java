@@ -821,11 +821,12 @@ public class ChatroomProcessor {
         }
         final ThreadLocalRandom random = ThreadLocalRandom.current();
         int remain = money;
-        for (int i = 0; i < count; i++) {
+        int cnt = count;
+        for (int i = 0; i < cnt; i++) {
             if (remain == 0) {
                 redPacket.packs.push(remain);
             } else {
-                if (redPacket.packs.size() == count - 1) {
+                if (count == 1) {
                     redPacket.packs.push(remain);
                     break;
                 }
@@ -841,6 +842,7 @@ public class ChatroomProcessor {
                     }
                 }
                 redPacket.packs.push(get);
+                count--;
                 remain -= get;
             }
         }
