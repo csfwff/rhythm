@@ -174,6 +174,22 @@ public class ActivityProcessor {
         Dispatcher.post("/api/games/mofish/score", activityProcessor::shareMofishScore);
         Dispatcher.get("/activity/catch-the-cat", activityProcessor::showCatchTheCat, loginCheck::handle, csrfMidware::fill);
         Dispatcher.get("/activity/2048", activityProcessor::show2048, loginCheck::handle, csrfMidware::fill);
+        Dispatcher.get("/api/activity/is-collected-liveness", activityProcessor::isCollectedYesterdayLivenessRewardApi, loginCheck::handle);
+    }
+
+    /**
+     * 查询用户是否已经领取昨日奖励
+     * @param context
+     */
+    public void isCollectedYesterdayLivenessRewardApi(final RequestContext context) {
+        JSONObject currentUser = Sessions.getUser();
+        try {
+            currentUser = ApiProcessor.getUserByKey(context.param("apiKey"));
+        } catch (NullPointerException ignored) {
+        }
+        final String userId = currentUser.optString(Keys.OBJECT_ID);
+        boolean result = activityQueryService.isCollectedYesterdayLivenessReward(userId);
+        context.renderJSON(StatusCodes.SUCC).renderJSON(new JSONObject().put("isCollectedYesterdayLivenessReward", result));
     }
 
     /**
