@@ -35,6 +35,8 @@
                 <a href="https://pwl.icu/article/1637143985245" target="_blank">摸鱼派聊天室客户端 (PC)</a>
                 &nbsp;｜&nbsp;
                 <a href="https://pwl.icu/article/1638189205758" target="_blank">摸鱼派聊天室 IntelliJ IDEA 插件</a>
+                &nbsp;｜&nbsp;
+                <a href="https://zhuanlan.zhihu.com/p/445372463" target="_blank">摸鱼派聊天室 VSCode 插件</a>
             </div>
             <div class="footer-nav fn-clear" style="margin-top: 15px; margin-bottom: 15px">
                 <a rel="help" href="${servePath}/article/1630569106133">${aboutLabel}</a>
