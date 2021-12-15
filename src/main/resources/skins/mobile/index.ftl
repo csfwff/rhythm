@@ -399,7 +399,7 @@
     }
     refreshActivities();
     <#if isLoggedIn>
-    setInterval(refreshActivities, 5000);
+    setInterval(refreshActivities, 30000);
     </#if>
 </script>
 </html>
