@@ -830,7 +830,7 @@ public class ChatroomProcessor {
                     break;
                 }
                 int min = 0;
-                int max = (remain / (count * 2)) + 1;
+                int max = (remain / count) + 1;
                 int get = random.nextInt(min, max);
                 if (get == 0) {
                     if (zeroCount > 0 && zeroCount > realZeroCount) {
