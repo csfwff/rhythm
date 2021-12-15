@@ -19,6 +19,7 @@
 package org.b3log.symphony.processor;
 
 import org.b3log.latke.http.Dispatcher;
+import org.b3log.latke.http.Request;
 import org.b3log.latke.http.RequestContext;
 import org.b3log.latke.http.renderer.AbstractFreeMarkerRenderer;
 import org.b3log.latke.ioc.BeanManager;
@@ -268,9 +269,13 @@ public class TopProcessor {
      */
     public void showEvolve(final RequestContext context) {
         final AbstractFreeMarkerRenderer renderer = new SkinRenderer(context, "top/evolve.ftl");
+        final Request request = context.getRequest();
+        final String type = request.getParameter("type") != null ?
+                request.getParameter("type") : "achievement";
         final Map<String, Object> dataModel = renderer.getDataModel();
-        final List<JSONObject> users = activityQueryService.getEvolve(Symphonys.TOP_CNT);
+        final List<JSONObject> users = activityQueryService.getEvolve(type, Symphonys.TOP_CNT);
         dataModel.put("topUsers", users);
+        dataModel.put("type", type);
 
         dataModelService.fillHeaderAndFooter(context, dataModel);
         dataModelService.fillRandomArticles(dataModel);
