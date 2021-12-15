@@ -139,6 +139,7 @@ public class IndexProcessor {
         Dispatcher.get("/games/lifeRestart/view/", indexProcessor::showLifeRestart, loginCheck::handle);
         Dispatcher.get("/games/evolve/", indexProcessor::showEvolve, loginCheck::handle);
         Dispatcher.get("/user/checkedIn", indexProcessor::isCheckedIn, loginCheck::handle);
+        Dispatcher.get("/oldAlmanac", indexProcessor::showOldAlmanac, anonymousViewCheckMidware::handle);
     }
 
     /**
@@ -547,6 +548,25 @@ public class IndexProcessor {
         dataModelService.fillSideTags(dataModel);
         dataModelService.fillLatestCmts(dataModel);
     }
+
+
+    /**
+     * Shows old almanac.
+     *
+     * @param context the specified context
+     */
+    public void showOldAlmanac(final RequestContext context) {
+        //老黄历
+        final AbstractFreeMarkerRenderer renderer = new SkinRenderer(context, "/old-almanac.ftl");
+        final Map<String, Object> dataModel = renderer.getDataModel();
+        dataModelService.fillHeaderAndFooter(context, dataModel);
+        dataModelService.fillRandomArticles(dataModel);
+        dataModelService.fillSideHotArticles(dataModel);
+        dataModelService.fillSideTags(dataModel);
+        dataModelService.fillLatestCmts(dataModel);
+    }
+
+
 
     /**
      * Shows about.

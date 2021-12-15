@@ -184,6 +184,16 @@ public class UserProcessor {
     private CloudService cloudService;
 
     /**
+     * Cache for liveness.
+     */
+    public static final Map<String, Float> livenessCache = Collections.synchronizedMap(new LinkedHashMap<String, Float>() {
+        @Override
+        protected boolean removeEldestEntry(Map.Entry eldest) {
+            return size() > 1000;
+        }
+    });
+
+    /**
      * Register request handlers.
      */
     public static void register() {
@@ -236,22 +246,17 @@ public class UserProcessor {
             currentUser = ApiProcessor.getUserByKey(context.param("apiKey"));
         } catch (NullPointerException ignored) {
         }
-
-        String userId;
-
-        userId = context.param("userId");
-        if (StringUtils.isEmpty(userId)) {
-            userId = currentUser.optString(Keys.OBJECT_ID);
+        String userId = currentUser.optString(Keys.OBJECT_ID);
+        if (livenessCache.containsKey(userId)) {
+            float liveness = livenessCache.get(userId);
+            context.renderJSON(StatusCodes.SUCC).renderJSON(new JSONObject().put("liveness", liveness));
         } else {
-            if (Objects.isNull(userQueryService.getUser(userId))) {
-                context.renderJSON(StatusCodes.SUCC).renderJSON(new JSONObject().put("liveness", -1));
-                return;
-            }
+            final int livenessMax = Symphonys.ACTIVITY_YESTERDAY_REWARD_MAX;
+            final int currentLiveness = livenessQueryService.getCurrentLivenessPoint(userId);
+            float liveness = (float) (Math.round((float) currentLiveness / livenessMax * 100 * 100)) / 100;
+            livenessCache.put(userId, liveness);
+            context.renderJSON(StatusCodes.SUCC).renderJSON(new JSONObject().put("liveness", liveness));
         }
-        final int livenessMax = Symphonys.ACTIVITY_YESTERDAY_REWARD_MAX;
-        final int currentLiveness = livenessQueryService.getCurrentLivenessPoint(userId);
-        float liveness = (float) (Math.round((float) currentLiveness / livenessMax * 100 * 100)) / 100;
-        context.renderJSON(StatusCodes.SUCC).renderJSON(new JSONObject().put("liveness", liveness));
     }
 
     /**

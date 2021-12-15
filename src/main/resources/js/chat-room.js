@@ -262,7 +262,7 @@ var ChatRoom = {
           $("#redPacketAmount").text($("#redPacketMoney").val());
         } else if (type === 'specify') {
           $("#redPacketAmount").text($("#redPacketMoney").val() * $("#redPacketCount").val());
-          $("#redPacketMsg").val("这是属于你的！");
+          $("#redPacketMsg").val("专属红包");
         }
       });
 
@@ -276,7 +276,7 @@ var ChatRoom = {
           $("#redPacketMsg").val("摸鱼者，事竟成！");
         } else if (type === 'specify') {
           $("#redPacketAmount").text($("#redPacketMoney").val() * $("#redPacketCount").val());
-          $("#redPacketMsg").val("这是属于你的！");
+          $("#redPacketMsg").val("专属红包");
         }
       });
 
