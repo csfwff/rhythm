@@ -95,6 +95,41 @@ public class CloudService {
     }
 
     /**
+     * 上传存档
+     *
+     * @param userId
+     * @param gameId
+     * @param data
+     * @return
+     */
+    synchronized public void sync(final String userId, final String gameId, final String data) throws ServiceException {
+        if (gameId.startsWith("sys-")) {
+            return;
+        }
+        try {
+            final Transaction transaction = cloudRepository.beginTransaction();
+            // 删除旧存档
+            Query cloudDeleteQuery = new Query()
+                    .setFilter(CompositeFilterOperator.and(
+                            new PropertyFilter("userId", FilterOperator.EQUAL, userId),
+                            new PropertyFilter("gameId", FilterOperator.EQUAL, gameId)
+                    ));
+            cloudRepository.remove(cloudDeleteQuery);
+            // 上传新存档
+            JSONObject cloudJSON = new JSONObject();
+            cloudJSON.put("userId", userId)
+                    .put("gameId", gameId)
+                    .put("data", data);
+            cloudRepository.add(cloudJSON);
+            transaction.commit();
+        } catch (RepositoryException e) {
+            LOGGER.log(Level.ERROR, "Cannot upload gaming save data to database.", e);
+
+            throw new ServiceException("Failed to upload game save");
+        }
+    }
+
+    /**
      * 获取存档
      *
      * @param userId

@@ -77,8 +77,13 @@ public class CloudProcessor {
 
             JSONObject requestJSONObject = context.requestJSON();
             String gameId = requestJSONObject.optString("gameId");
-            JSONObject data = requestJSONObject.optJSONObject("data");
-            cloudService.sync(userId, gameId, data);
+            if (gameId.equals("40")) {
+                JSONObject data = requestJSONObject.optJSONObject("data");
+                cloudService.sync(userId, gameId, data);
+            } else {
+                String data = requestJSONObject.optString("data");
+                cloudService.sync(userId, gameId, data);
+            }
             context.renderJSON(StatusCodes.SUCC).renderMsg("摸鱼派账号 " + userName + " - 游戏存档已同步至摸鱼派云服务");
         } catch (Exception e) {
             context.renderJSON(StatusCodes.ERR).renderMsg("将游戏存档同步至摸鱼派失败");
