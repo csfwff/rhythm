@@ -1068,7 +1068,7 @@ var ChatRoom = {
       $fn.css('left', Label.plusN * 9 + 'px');
       $fn.css('top', Label.plusN * 27 + 'px');
       $fn.css('position', 'absolute');
-      $fn.find('.chats__content').css('background-color', 'rgb(240 245 254)');
+      $fn.find('.chats__content').css('background-color', Label.plusN % 2 === 0 ? 'rgb(240 245 254)' : 'rgb(245 245 245)');
       $fn.removeClass("fn-none");
     } else {
       $('#plusOne').remove();
