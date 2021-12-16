@@ -395,21 +395,8 @@ var ChatRoomChannel = {
                 case 'msg':
                     // Chatroom
                     if ($("#chatRoomIndex").length === 0 && $("#chatroom" + data.oId).length <= 0) {
-                        let liHTML;
-                        $("#plusOne").remove();
-                        if (data.md === Label.latestMessage) {
-                            // +1 功能
-                            liHTML = ChatRoom.renderMessage(data.userNickname, data.userName, data.userAvatarURL, data.time, data.content, data.oId, Label.currentUser, Label.level3Permitted, true, data.sysMetal);
-                        } else {
-                            liHTML = ChatRoom.renderMessage(data.userNickname, data.userName, data.userAvatarURL, data.time, data.content, data.oId, Label.currentUser, Label.level3Permitted, false, data.sysMetal);
-                        }
-                        $('#chats').prepend(liHTML);
-                        $('#chats>div.fn-none').slideDown(200);
-                        $('#chats>div.fn-none').removeClass("fn-none");
+                        ChatRoom.renderMsg(data);
                         ChatRoom.resetMoreBtnListen();
-                        if (data.md !== undefined) {
-                            Label.latestMessage = data.md;
-                        }
                     }
 
                     // index
