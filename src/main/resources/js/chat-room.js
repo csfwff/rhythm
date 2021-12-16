@@ -754,6 +754,23 @@ var ChatRoom = {
     }
   },
   /**
+   * 复读机
+   */
+  repeat: function (id) {
+    let md = '';
+    $.ajax({
+      url: Label.servePath + '/cr/raw/' + id,
+      method: 'get',
+      async: false,
+      success: function (result) {
+        md = result.replace(/(<!--).*/g, "");
+      }
+    });
+    ChatRoom.editor.setValue(md);
+    ChatRoom.send();
+    $(window).scrollTop(0);
+  },
+  /**
    * 艾特某个人
    */
   at: function (userName, id, justAt) {
@@ -1017,6 +1034,7 @@ var ChatRoom = {
           '                    <details-menu class="fn__layer">\n' +
           '                        <a onclick=\"ChatRoom.at(\'' + userName + '\', \'' + oId + '\', true)\" class="item">@' + userName + '</a>\n' +
           '                        <a onclick=\"ChatRoom.at(\'' + userName + '\', \'' + oId + '\', false)\" class="item">引用</a>\n' +
+          '                        <a onclick=\"ChatRoom.repeat(\'' + oId + '\')\" class="item">复读机</a>\n' +
           meTag2 +
           '                    </details-menu>\n' +
           '                </details>\n';
