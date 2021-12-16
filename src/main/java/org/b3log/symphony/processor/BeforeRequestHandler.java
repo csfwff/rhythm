@@ -64,6 +64,13 @@ public class BeforeRequestHandler implements Handler {
     public void handle(final RequestContext context) {
         Stopwatchs.start("Request initialized [" + context.requestURI() + "]");
 
+        if (context.header(Common.USER_AGENT) == null) {
+            LOGGER.log(Level.WARN, "Refused a null UA client [remoteAddr="
+                    + Requests.getRemoteAddr(context.getRequest()) + ", URI=" + context.requestURI() + "]");
+            context.sendStatus(500);
+            return;
+        }
+
         Locales.setLocale(Latkes.getLocale());
 
         Sessions.setTemplateDir(Symphonys.SKIN_DIR_NAME);
