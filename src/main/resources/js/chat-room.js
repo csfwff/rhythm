@@ -960,7 +960,7 @@ var ChatRoom = {
     } catch (err) {}
     try {
       if (addPlusOne === true) {
-        content += "<span id='plusOne' onclick='ChatRoom.plusOne()'><svg style='width: 20px; height: 20px; cursor: pointer;'><use xlink:href='#plusOneIcon'></use></svg></span>";
+        content += "<span id='plusOne' onclick='ChatRoom.plusOne()'><svg style='width: 30px; height: 20px; cursor: pointer;'><use xlink:href='#plusOneIcon'></use></svg></span>";
       }
     } catch (err) {}
     let meTag1 = "";
