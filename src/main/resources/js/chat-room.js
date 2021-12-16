@@ -149,6 +149,7 @@ var ChatRoom = {
           "  <option value=\"random\" selected>拼手气红包</option>" +
           "  <option value=\"average\">普通红包</option>" +
           "  <option value=\"specify\">专属红包</option>" +
+          "  <option value=\"heartbeat\">心跳红包</option>" +
           "  </select>\n" +
           "</label>\n" +
           "<label id = \"who\" style=\"display:none;\">\n" +
@@ -277,6 +278,9 @@ var ChatRoom = {
         } else if (type === 'specify') {
           $("#redPacketAmount").text($("#redPacketMoney").val() * $("#redPacketCount").val());
           $("#redPacketMsg").val("专属红包");
+        } else if (type === 'heartbeat') {
+          $("#redPacketAmount").text($("#redPacketMoney").val());
+          $("#redPacketMsg").val("玩的就是心跳！");
         }
       });
 
