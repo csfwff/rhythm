@@ -65,8 +65,7 @@ public class BeforeRequestHandler implements Handler {
         Stopwatchs.start("Request initialized [" + context.requestURI() + "]");
 
         if (context.header(Common.USER_AGENT) == null) {
-            LOGGER.log(Level.WARN, "Refused a null UA client [remoteAddr="
-                    + Requests.getRemoteAddr(context.getRequest()) + ", URI=" + context.requestURI() + "]");
+            System.out.println("Refused a null UA client " + Requests.getRemoteAddr(context.getRequest()) + ", " + context.requestURI());
             context.sendStatus(500);
             return;
         }
