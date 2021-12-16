@@ -74,7 +74,7 @@ public class ApiProcessor {
     public static Map<String, JSONObject> keys = Collections.synchronizedMap(new LinkedHashMap<String, JSONObject>() {
         @Override
         protected boolean removeEldestEntry(Map.Entry eldest) {
-            return size() > 100;
+            return size() > 1000;
         }
     });
 
