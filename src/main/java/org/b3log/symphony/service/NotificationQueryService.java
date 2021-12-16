@@ -811,6 +811,7 @@ public class NotificationQueryService {
         final List<Filter> subFilters = new ArrayList<>();
         subFilters.add(new PropertyFilter(Notification.NOTIFICATION_DATA_TYPE, FilterOperator.EQUAL, Notification.DATA_TYPE_C_AT));
         subFilters.add(new PropertyFilter(Notification.NOTIFICATION_DATA_TYPE, FilterOperator.EQUAL, Notification.DATA_TYPE_C_CHAT_ROOM_AT));
+        subFilters.add(new PropertyFilter(Notification.NOTIFICATION_DATA_TYPE, FilterOperator.EQUAL, Notification.DATA_TYPE_C_RED_PACKET));
         subFilters.add(new PropertyFilter(Notification.NOTIFICATION_DATA_TYPE, FilterOperator.EQUAL, Notification.DATA_TYPE_C_ARTICLE_NEW_FOLLOWER));
         subFilters.add(new PropertyFilter(Notification.NOTIFICATION_DATA_TYPE, FilterOperator.EQUAL, Notification.DATA_TYPE_C_ARTICLE_NEW_WATCHER));
         subFilters.add(new PropertyFilter(Notification.NOTIFICATION_DATA_TYPE, FilterOperator.EQUAL, Notification.DATA_TYPE_C_COMMENT_VOTE_UP));
@@ -839,6 +840,16 @@ public class NotificationQueryService {
                 atNotification.put(Common.CREATE_TIME, new Date(notification.optLong(Keys.OBJECT_ID)));
 
                 switch (dataType) {
+                    case Notification.DATA_TYPE_C_RED_PACKET:
+                        final JSONObject redPacket = chatRoomService.getChatMsg(dataId);
+                        final JSONObject content = new JSONObject(redPacket.optString(Common.CONTENT));
+                        final JSONObject redPacketContent = new JSONObject(content.optString(Common.CONTENT));
+                        atNotification.put(Common.CONTENT, redPacketContent.optString("msg"));
+                        atNotification.put(UserExt.USER_AVATAR_URL, content.optString(UserExt.USER_AVATAR_URL));
+                        atNotification.put(Common.CREATE_TIME, new Date(content.optLong((Common.TIME))));
+                        atNotification.put(User.USER_NAME, content.optString(User.USER_NAME));
+                        rslts.add(atNotification);
+                        break;
                     case Notification.DATA_TYPE_C_CHAT_ROOM_AT:
                         final JSONObject chatMsg = chatRoomService.getChatMsg(dataId);
                         if (Objects.isNull(chatMsg)) {

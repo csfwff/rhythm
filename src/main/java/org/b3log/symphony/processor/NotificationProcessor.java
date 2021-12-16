@@ -282,6 +282,7 @@ public class NotificationProcessor {
             case "at":
                 notificationMgmtService.makeRead(userId, Notification.DATA_TYPE_C_AT);
                 notificationMgmtService.makeRead(userId, Notification.DATA_TYPE_C_CHAT_ROOM_AT);
+                notificationMgmtService.makeRead(userId, Notification.DATA_TYPE_C_RED_PACKET);
                 notificationMgmtService.makeRead(userId, Notification.DATA_TYPE_C_ARTICLE_NEW_FOLLOWER);
                 notificationMgmtService.makeRead(userId, Notification.DATA_TYPE_C_ARTICLE_NEW_WATCHER);
                 notificationMgmtService.makeRead(userId, Notification.DATA_TYPE_C_COMMENT_VOTE_UP);
@@ -504,6 +505,7 @@ public class NotificationProcessor {
         final int unreadAtNotificationCnt
                 = notificationQueryService.getUnreadNotificationCountByType(userId, Notification.DATA_TYPE_C_AT)
                 + notificationQueryService.getUnreadNotificationCountByType(userId, Notification.DATA_TYPE_C_CHAT_ROOM_AT)
+                + notificationQueryService.getUnreadNotificationCountByType(userId, Notification.DATA_TYPE_C_RED_PACKET)
                 + notificationQueryService.getUnreadNotificationCountByType(userId, Notification.DATA_TYPE_C_ARTICLE_NEW_FOLLOWER)
                 + notificationQueryService.getUnreadNotificationCountByType(userId, Notification.DATA_TYPE_C_ARTICLE_NEW_WATCHER)
                 + notificationQueryService.getUnreadNotificationCountByType(userId, Notification.DATA_TYPE_C_COMMENT_VOTE_UP)
@@ -648,7 +650,7 @@ public class NotificationProcessor {
 
         final List<JSONObject> articleFollowAndWatchNotifications = new ArrayList<>();
         for (final JSONObject notification : atNotifications) {
-            if (Notification.DATA_TYPE_C_AT != notification.optInt(Notification.NOTIFICATION_DATA_TYPE) && Notification.DATA_TYPE_C_CHAT_ROOM_AT != notification.optInt(Notification.NOTIFICATION_DATA_TYPE)) {
+            if (Notification.DATA_TYPE_C_AT != notification.optInt(Notification.NOTIFICATION_DATA_TYPE) && Notification.DATA_TYPE_C_CHAT_ROOM_AT != notification.optInt(Notification.NOTIFICATION_DATA_TYPE) && Notification.DATA_TYPE_C_RED_PACKET != notification.optInt(Notification.NOTIFICATION_DATA_TYPE)) {
                 articleFollowAndWatchNotifications.add(notification);
             }
         }

@@ -360,6 +360,9 @@ public class ChatroomProcessor {
 
                 if ("random".equals(redPacket.getString("type")) && redPacketStatus.optInt("got") == redPacketStatus.optInt("count")) {
                     RED_PACKET_BUCKET.remove(oId);
+                } else if ("specify".equals(redPacket.getString("type"))) {
+                    // 通知标为已读
+                    notificationMgmtService.makeRead(currentUser.optString(Keys.OBJECT_ID), Notification.DATA_TYPE_C_RED_PACKET);
                 }
 
                 ChatroomChannel.notifyChat(redPacketStatus);
@@ -509,7 +512,29 @@ public class ChatroomProcessor {
                     LOGGER.log(Level.ERROR, "Cannot save ChatRoom message to the database.", e);
                 }
                 transaction.commit();
-                RED_PACKET_BUCKET.put(msg.optString("oId"), allocateRedPacket(msg.optString("oId"), userId, money, count, 2));
+                switch (type) {
+                    case "random":
+                        //预分配红包
+                        RED_PACKET_BUCKET.put(msg.optString("oId"), allocateRedPacket(msg.optString("oId"), userId, money, count, 2));
+                        break;
+                    case "specify":
+                        //发通知
+                        final JSONArray jsonArray = new JSONArray(recivers);
+                        for (Object o : jsonArray) {
+                            final String reciver = (String) o;
+                            final JSONObject user = userQueryService.getUserByName(reciver);
+                            if (Objects.isNull(user) || user.optString("oId").equals(currentUser.optString("oId"))) {
+                                continue;
+                            }
+                            final JSONObject notification = new JSONObject();
+                            notification.put(Notification.NOTIFICATION_USER_ID, user.optString("oId"));
+                            notification.put(Notification.NOTIFICATION_DATA_ID, msg.optString("oId"));
+                            notificationMgmtService.addRedPacketNotification(notification);
+                        }
+                        break;
+                    default:
+                        //ignore
+                }
                 final JSONObject pushMsg = JSONs.clone(msg);
                 pushMsg.put(Common.TIME, new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(msg.optLong(Common.TIME)));
                 ChatroomChannel.notifyChat(pushMsg);
