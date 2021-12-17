@@ -261,9 +261,13 @@ var ChatRoom = {
           $("#redPacketMsg").val("平分红包，人人有份！");
         } else if (type === 'random') {
           $("#redPacketAmount").text($("#redPacketMoney").val());
+          $("#redPacketMsg").val("摸鱼者，事竟成！");
         } else if (type === 'specify') {
           $("#redPacketAmount").text($("#redPacketMoney").val() * $("#redPacketCount").val());
-          $("#redPacketMsg").val("专属红包");
+          $("#redPacketMsg").val("试试看，这是给你的红包吗？");
+        } else if (type === 'heartbeat') {
+          $("#redPacketAmount").text($("#redPacketMoney").val());
+          $("#redPacketMsg").val("玩的就是心跳！");
         }
       });
 
@@ -277,7 +281,7 @@ var ChatRoom = {
           $("#redPacketMsg").val("摸鱼者，事竟成！");
         } else if (type === 'specify') {
           $("#redPacketAmount").text($("#redPacketMoney").val() * $("#redPacketCount").val());
-          $("#redPacketMsg").val("专属红包");
+          $("#redPacketMsg").val("试试看，这是给你的红包吗？");
         } else if (type === 'heartbeat') {
           $("#redPacketAmount").text($("#redPacketMoney").val());
           $("#redPacketMsg").val("玩的就是心跳！");
@@ -935,6 +939,21 @@ var ChatRoom = {
       let msgJSON = $.parseJSON(data.content.replace("<p>", "").replace("</p>", ""));
       if (msgJSON.msgType === "redPacket") {
         isRedPacket = true;
+        let type = "未知类型红包";
+        switch (msgJSON.type) {
+          case "random":
+            type = "拼手气红包";
+            break;
+          case "average":
+            type = "普通红包";
+            break;
+          case "specify":
+            type = "专属红包";
+            break;
+          case "heartbeat":
+            type = "心跳红包 (慎抢)";
+            break;
+        }
         if (Number(msgJSON.count) === Number(msgJSON.got)) {
           data.content = '' +
               '<div style="opacity: .36;" class="hongbao__item fn__flex-inline" onclick="ChatRoom.unpackRedPacket(\'' + data.oId + '\')">\n' +
@@ -942,7 +961,7 @@ var ChatRoom = {
               '        <use xlink:href="#redPacketIcon"></use>\n' +
               '    </svg>\n' +
               '    <div>\n' +
-              '        <div>' + msgJSON.msg + '</div>\n' +
+              '        <div>' + msgJSON.msg + '<br><b>' + type + '</b></div>\n' +
               '        <div class="ft__smaller ft__fade redPacketDesc">\n' +
               '           已经被抢光啦\n' +
               '        </div>\n' +
@@ -955,7 +974,7 @@ var ChatRoom = {
               '        <use xlink:href="#redPacketIcon"></use>\n' +
               '    </svg>\n' +
               '    <div>\n' +
-              '        <div>' + msgJSON.msg + '</div>\n' +
+              '        <div>' + msgJSON.msg + '<br><b>' + type + '</b></div>\n' +
               '        <div class="ft__smaller ft__fade redPacketDesc">\n' +
               '        </div>\n' +
               '    </div>\n' +
