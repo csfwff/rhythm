@@ -368,11 +368,12 @@ var ChatRoomChannel = {
                         spell += ' (' + got + '/' + count + ')';
                     }
                     // 通知
-                    let html = "<div style='color: rgb(50 50 50);margin-bottom: 10px;text-align: center;'>" +
+                    let html = "<div class='redPacketNotice' style='color: rgb(50 50 50);margin-bottom: 8px;text-align: center;display: none;'>" +
                         "<svg><use xlink:href='#redPacketIcon'></use></svg>&nbsp;" +
                         spell +
                         "</div>";
                     $('#chats').prepend(html);
+                    $(".redPacketNotice").slideDown(500);
                     break;
                 case 'online':
                     $('#onlineCnt').text(data.onlineChatCnt);
