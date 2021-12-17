@@ -1063,7 +1063,6 @@ var ChatRoom = {
     newHTML += '        </div>\n' +
         '    </div>\n' +
         '</div></div>';
-
     if (more) {
       $('#chats').append(newHTML);
       let $fn = $('#chats>div.fn-none');
@@ -1073,26 +1072,33 @@ var ChatRoom = {
     // 堆叠复读机消息
     else if (isPlusOne) {
       if (++Label.plusN === 1) {
-        let stackedHtml = "<div id='stacked' class='fn__flex' style='position:relative;'>" +
+        let stackedHtml = "<div id='stacked' class='fn__flex' style='position:relative;display:none;'>" +
             "<span id='plusOne' onclick='ChatRoom.plusOne()' style='display:block;margin-left: 20px'><svg style='width: 30px; height: 20px; cursor: pointer;'><use xlink:href='#plusOneIcon'></use></svg></span>" +
             "</div>"
         $('#chats').prepend(stackedHtml);
         let latest = $('#chats>div.latest');
-        $('#stacked').prepend(latest)
+        $('#stacked').prepend(latest);
         latest.find('#userName').show();
         latest.removeClass('latest');
       }
       let $stacked = $('#stacked');
-      $stacked.append(newHTML);
-      $stacked.height($stacked.height() + 27 + 'px')
+      if (Label.plusN !== 1) {
+        $stacked.fadeOut(100);
+      }
+      setTimeout(function () {
+        $stacked.append(newHTML);
+        $stacked.height($stacked.height() + 27 + 'px')
 
-      let $fn = $('#stacked>div.fn-none');
-      $fn.show();
-      $fn.css('left', Label.plusN * 9 + 'px');
-      $fn.css('top', Label.plusN * 27 + 'px');
-      $fn.css('position', 'absolute');
-      $fn.find('.chats__content').css('background-color', Label.plusN % 2 === 0 ? 'rgb(240 245 254)' : 'rgb(245 245 245)');
-      $fn.removeClass("fn-none");
+        let $fn = $('#stacked>div.fn-none');
+        $fn.show();
+        $fn.css('left', Label.plusN * 9 + 'px');
+        $fn.css('top', Label.plusN * 27 + 'px');
+        $fn.css('position', 'absolute');
+        $fn.find('.chats__content').css('background-color', Label.plusN % 2 === 0 ? 'rgb(240 245 254)' : 'rgb(245 245 245)');
+        $fn.removeClass("fn-none");
+
+        $stacked.fadeIn(500);
+      }, 100);
     } else {
       $('#plusOne').remove();
       if (data.md) {
