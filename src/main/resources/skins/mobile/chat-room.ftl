@@ -119,6 +119,8 @@
             Label.level3Permitted = ${level3Permitted?string("true", "false")};
             Label.chatRoomPictureStatus = "<#if 0 == chatRoomPictureStatus> blur</#if>";
             Label.latestMessage = "";
+            Label.plusN = 0;
+            Label.hasMore = true;
             ChatRoom.init();
             // Init [ChatRoom] channel
             ChatRoomChannel.init("${wsScheme}://${serverHost}:${serverPort}${contextPath}/chat-room-channel");

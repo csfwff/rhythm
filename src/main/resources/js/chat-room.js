@@ -645,28 +645,28 @@ var ChatRoom = {
     NProgress.start();
     setTimeout(function () {
       page++;
-      $.ajax({
-        url: Label.servePath + '/chat-room/more?page=' + page,
-        type: 'GET',
-        cache: false,
-        async: false,
-        success: function(result) {
-          if (result.data.length !== 0) {
-            for (let i in result.data) {
-              let data = result.data[i];
-              let liHtml = ChatRoom.renderMessage(data.userNickname, data.userName, data.userAvatarURL, data.time, data.content, data.oId, Label.currentUser, Label.level3Permitted, false, data.sysMetal);
-              $('#chats').append(liHtml);
-              $('#chats>div.fn-none').show();
-              $('#chats>div.fn-none').removeClass("fn-none");
-              ChatRoom.resetMoreBtnListen();
+      if (Label.hasMore) {
+        $.ajax({
+          url: Label.servePath + '/chat-room/more?page=' + page,
+          type: 'GET',
+          cache: false,
+          async: false,
+          success: function (result) {
+            if (result.data.length !== 0) {
+              for (let i in result.data) {
+                let data = result.data[i];
+                ChatRoom.renderMsg(data, 'more');
+                ChatRoom.resetMoreBtnListen();
+              }
+              Util.listenUserCard();
+              ChatRoom.imageViewer()
+            } else {
+              alert("没有更多聊天消息了！");
+              Label.hasMore = false;
             }
-            Util.listenUserCard();
-            ChatRoom.imageViewer()
-          } else {
-            alert("没有更多聊天消息了！");
           }
-        }
-      });
+        });
+      }
       NProgress.done();
     }, 0);
   },
@@ -928,15 +928,16 @@ var ChatRoom = {
   /**
    * 渲染聊天室消息
    */
-  renderMessage: function (userNickname, userName, userAvatarURL, time, content, oId, currentUser, isAdmin, addPlusOne, sysMetal) {
+  renderMsg: function (data, more) {
     let isRedPacket = false;
+    let isPlusOne = Label.latestMessage === data.md;
     try {
-      let msgJSON = $.parseJSON(content.replace("<p>", "").replace("</p>", ""));
+      let msgJSON = $.parseJSON(data.content.replace("<p>", "").replace("</p>", ""));
       if (msgJSON.msgType === "redPacket") {
         isRedPacket = true;
         if (Number(msgJSON.count) === Number(msgJSON.got)) {
-          content = '' +
-              '<div style="opacity: .36;" class="hongbao__item fn__flex-inline" onclick="ChatRoom.unpackRedPacket(\'' + oId + '\')">\n' +
+          data.content = '' +
+              '<div style="opacity: .36;" class="hongbao__item fn__flex-inline" onclick="ChatRoom.unpackRedPacket(\'' + data.oId + '\')">\n' +
               '    <svg class="ft__red hongbao__icon">\n' +
               '        <use xlink:href="#redPacketIcon"></use>\n' +
               '    </svg>\n' +
@@ -948,8 +949,8 @@ var ChatRoom = {
               '    </div>\n' +
               '</div>';
         } else {
-          content = '' +
-              '<div class="hongbao__item fn__flex-inline" onclick="ChatRoom.unpackRedPacket(\'' + oId + '\')">\n' +
+          data.content = '' +
+              '<div class="hongbao__item fn__flex-inline" onclick="ChatRoom.unpackRedPacket(\'' + data.oId + '\')">\n' +
               '    <svg class="ft__red hongbao__icon">\n' +
               '        <use xlink:href="#redPacketIcon"></use>\n' +
               '    </svg>\n' +
@@ -962,28 +963,24 @@ var ChatRoom = {
         }
       }
     } catch (err) {}
-    try {
-      if (addPlusOne === true) {
-        content += "<span id='plusOne' onclick='ChatRoom.plusOne()'><svg style='width: 30px; height: 20px; cursor: pointer;'><use xlink:href='#plusOneIcon'></use></svg></span>";
-      }
-    } catch (err) {}
     let meTag1 = "";
     let meTag2 = "";
-    if (userNickname !== undefined && userNickname !== "") {
-      userNickname = userNickname + " (" + userName + ")"
+    if (data.userNickname !== undefined && data.userNickname !== "") {
+      data.userNickname = data.userNickname + " (" + data.userName + ")"
     } else {
-      userNickname = userName;
+      data.userNickname = data.userName;
     }
-    if (currentUser === userName) {
+    if (Label.currentUser === data.userName) {
       meTag1 = " chats__item--me";
-      meTag2 = "<a onclick=\"ChatRoom.revoke(" + oId + ")\" class=\"item\">撤回</a>\n";
+      meTag2 = "<a onclick=\"ChatRoom.revoke(" + data.oId + ")\" class=\"item\">撤回</a>\n";
     }
-    if (isAdmin) {
-      meTag2 = "<a onclick=\"ChatRoom.revoke(" + oId + ")\" class=\"item\"><svg><use xlink:href=\"#userrole\"></use></svg> 撤回</a>\n";
+    // isAdmin
+    if (Label.level3Permitted) {
+      meTag2 = "<a onclick=\"ChatRoom.revoke(" + data.oId + ")\" class=\"item\"><svg><use xlink:href=\"#userrole\"></use></svg> 撤回</a>\n";
     }
     try {
       // 判断是否可以收藏为表情包
-      let emojiContent = content.replace("<p>", "").replace("</p>", "");
+      let emojiContent = data.content.replace("<p>", "").replace("</p>", "");
       let emojiDom = Util.parseDom(emojiContent);
       let canCollect = false;
       let srcs = "";
@@ -1004,31 +1001,32 @@ var ChatRoom = {
       }
     } catch (err) {}
     let newHTML = '<div class="fn-none">';
-    newHTML += '<div id="chatroom' + oId + '" class="fn__flex chats__item' + meTag1 + '">\n' +
-        '    <a href="/member/' + userName + '" style="height: 38px">\n' +
-        '        <div class="avatar tooltipped__user" aria-label="' + userName + '" style="background-image: url(\'' + userAvatarURL + '\');"></div>\n' +
+    newHTML += '<div id="chatroom' + data.oId + '" class="fn__flex chats__item' + meTag1 + '">\n' +
+        '    <a href="/member/' + data.userName + '" style="height: 38px">\n' +
+        '        <div class="avatar tooltipped__user" aria-label="' + data.userName + '" style="background-image: url(\'' + data.userAvatarURL + '\');"></div>\n' +
         '    </a>\n' +
         '    <div class="chats__content">\n' +
         '        <div class="chats__arrow"></div>\n';
-    if (currentUser !== userName) {
-      newHTML += '<div class="ft__fade ft__smaller" style="padding-bottom: 3px;border-bottom: 1px solid #eee">\n' +
-          '    <span class="ft-gray">' + userNickname + '</span>\n';
-      if (sysMetal !== undefined && sysMetal !== "") {
-        let list = JSON.parse(sysMetal).list;
-        if (list !== undefined) {
-          for (let i = 0; i < list.length; i++) {
-            let m = list[i];
-            newHTML += "<img title='" + m.description + "' src='" + Util.genMetal(m.name, m.attr) + "'/>";
-          }
+
+    let display = Label.currentUser === data.userName && !isPlusOne ? 'display: none;' : ''
+    newHTML += '<div id="userName" class="ft__fade ft__smaller" style="' + display + 'padding-bottom: 3px;border-bottom: 1px solid #eee">\n' +
+        '    <span class="ft-gray">' + data.userNickname + '</span>\n';
+    if (data.sysMetal !== undefined && data.sysMetal !== "") {
+      let list = JSON.parse(data.sysMetal).list;
+      if (list !== undefined) {
+        for (let i = 0; i < list.length; i++) {
+          let m = list[i];
+          newHTML += "<img title='" + m.description + "' src='" + Util.genMetal(m.name, m.attr) + "'/>";
         }
       }
-      newHTML += '</div>';
     }
+    newHTML += '</div>';
+
     newHTML += '        <div style="margin-top: 4px" class="vditor-reset ft__smaller ' + Label.chatRoomPictureStatus + '">\n' +
-        '            ' + content + '\n' +
+        '            ' + data.content + '\n' +
         '        </div>\n' +
         '        <div class="ft__smaller ft__fade fn__right date-bar">\n' +
-        '            ' + time + '\n' +
+        '            ' + data.time + '\n' +
         '                <span class="fn__space5"></span>\n';
     if (!isRedPacket) {
       newHTML += '                <details class="details action__item fn__flex-center">\n' +
@@ -1036,9 +1034,9 @@ var ChatRoom = {
           '                        ···\n' +
           '                    </summary>\n' +
           '                    <details-menu class="fn__layer">\n' +
-          '                        <a onclick=\"ChatRoom.at(\'' + userName + '\', \'' + oId + '\', true)\" class="item">@' + userName + '</a>\n' +
-          '                        <a onclick=\"ChatRoom.at(\'' + userName + '\', \'' + oId + '\', false)\" class="item">引用</a>\n' +
-          '                        <a onclick=\"ChatRoom.repeat(\'' + oId + '\')\" class="item">复读机</a>\n' +
+          '                        <a onclick=\"ChatRoom.at(\'' + data.userName + '\', \'' + data.oId + '\', true)\" class="item">@' + data.userName + '</a>\n' +
+          '                        <a onclick=\"ChatRoom.at(\'' + data.userName + '\', \'' + data.oId + '\', false)\" class="item">引用</a>\n' +
+          '                        <a onclick=\"ChatRoom.repeat(\'' + data.oId + '\')\" class="item">复读机</a>\n' +
           meTag2 +
           '                    </details-menu>\n' +
           '                </details>\n';
@@ -1047,7 +1045,49 @@ var ChatRoom = {
         '    </div>\n' +
         '</div></div>';
 
-    return newHTML;
+    if (more) {
+      $('#chats').append(newHTML);
+      let $fn = $('#chats>div.fn-none');
+      $fn.show();
+      $fn.removeClass("fn-none");
+    }
+    // 堆叠复读机消息
+    else if (isPlusOne) {
+      if (++Label.plusN === 1) {
+        let stackedHtml = "<div id='stacked' class='fn__flex' style='position:relative;'>" +
+            "<span id='plusOne' onclick='ChatRoom.plusOne()' style='display:block;margin-left: 20px'><svg style='width: 30px; height: 20px; cursor: pointer;'><use xlink:href='#plusOneIcon'></use></svg></span>" +
+            "</div>"
+        $('#chats').prepend(stackedHtml);
+        let latest = $('#chats>div.latest');
+        $('#stacked').prepend(latest)
+        latest.find('#userName').show();
+        latest.removeClass('latest');
+      }
+      let $stacked = $('#stacked');
+      $stacked.append(newHTML);
+      $stacked.height($stacked.height() + 27 + 'px')
+
+      let $fn = $('#stacked>div.fn-none');
+      $fn.show();
+      $fn.css('left', Label.plusN * 9 + 'px');
+      $fn.css('top', Label.plusN * 27 + 'px');
+      $fn.css('position', 'absolute');
+      $fn.find('.chats__content').css('background-color', Label.plusN % 2 === 0 ? 'rgb(240 245 254)' : 'rgb(245 245 245)');
+      $fn.removeClass("fn-none");
+    } else {
+      $('#plusOne').remove();
+      if (data.md) {
+        Label.latestMessage = data.md;
+        Label.plusN = 0;
+      }
+      let $chats = $('#chats');
+      $chats.find('.latest').removeClass('latest');
+      $chats.prepend(newHTML);
+      let $fn = $('#chats>div.fn-none');
+      $fn.slideDown(200);
+      $fn.addClass("latest");
+      $fn.removeClass("fn-none");
+    }
   },
   /**
    * 看图插件dom
@@ -1094,7 +1134,7 @@ var ChatRoom = {
     // console.log("前", this.imgWaitting)
     this.imgWaitting = this.imgWaitting || delayshow()
     // console.log("后", this.imgWaitting)
-}
+ }
 
 }
 
