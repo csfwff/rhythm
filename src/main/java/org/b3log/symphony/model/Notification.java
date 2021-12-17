@@ -218,6 +218,11 @@ public final class Notification {
      */
     public static final int DATA_TYPE_C_CHAT_ROOM_AT = 38;
 
+    /**
+     * Data type - 专属红包提醒
+     */
+    public static final int DATA_TYPE_C_RED_PACKET = 39;
+
     //// Transient ////
     /**
      * Key of unread notification count.

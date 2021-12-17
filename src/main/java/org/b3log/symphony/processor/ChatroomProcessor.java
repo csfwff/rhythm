@@ -288,7 +288,7 @@ public class ChatroomProcessor {
                         }
                     }
                     meGot = money;
-                } else {
+                } else if (redPacket.has("type") && "random".equals(redPacket.getString("type"))) {
                     boolean hasZero = false;
                     for (Object o : who) {
                         JSONObject currentWho = (JSONObject) o;
@@ -326,6 +326,20 @@ public class ChatroomProcessor {
                     } else {
                         meGot = RED_PACKET_BUCKET.get(oId).packs.poll();
                     }
+                } else {
+                    for (Object o : who) {
+                        JSONObject currentWho = (JSONObject) o;
+                        String uId = currentWho.optString("userId");
+                        if (uId.equals(userId)) {
+                            context.renderJSON(new JSONObject().put("who", who).put("info", info));
+                            return;
+                        }
+                    }
+                    if (!RED_PACKET_BUCKET.containsKey(oId)) {
+                        context.renderJSON(StatusCodes.ERR).renderMsg("红包失效");
+                        return;
+                    }
+                    meGot = RED_PACKET_BUCKET.get(oId).packs.poll();
                 }
                 // 随机成功了
                 // 修改聊天室数据库
@@ -359,6 +373,11 @@ public class ChatroomProcessor {
                 redPacketStatus.put("oId", oId);
 
                 if ("random".equals(redPacket.getString("type")) && redPacketStatus.optInt("got") == redPacketStatus.optInt("count")) {
+                    RED_PACKET_BUCKET.remove(oId);
+                } else if ("specify".equals(redPacket.getString("type"))) {
+                    // 通知标为已读
+                    notificationMgmtService.makeRead(currentUser.optString(Keys.OBJECT_ID), Notification.DATA_TYPE_C_RED_PACKET);
+                } else if ("random".equals(redPacket.getString("type")) && redPacketStatus.optInt("got") == redPacketStatus.optInt("count")) {
                     RED_PACKET_BUCKET.remove(oId);
                 }
 
@@ -470,6 +489,7 @@ public class ChatroomProcessor {
                             }
                             break;
                         case "random":
+                        case "heartbeat":
                         default:
                             toatlMoney = money;
                     }
@@ -509,7 +529,33 @@ public class ChatroomProcessor {
                     LOGGER.log(Level.ERROR, "Cannot save ChatRoom message to the database.", e);
                 }
                 transaction.commit();
-                RED_PACKET_BUCKET.put(msg.optString("oId"), allocateRedPacket(msg.optString("oId"), userId, money, count, 2));
+                switch (type) {
+                    case "heartbeat":
+                        //预分配红包
+                        RED_PACKET_BUCKET.put(msg.optString("oId"), allocateHeartbeatRedPacket(msg.optString("oId"), userId, money, count, 3));
+                        break;
+                    case "random":
+                        //预分配红包
+                        RED_PACKET_BUCKET.put(msg.optString("oId"), allocateRedPacket(msg.optString("oId"), userId, money, count, 2));
+                        break;
+                    case "specify":
+                        //发通知
+                        final JSONArray jsonArray = new JSONArray(recivers);
+                        for (Object o : jsonArray) {
+                            final String reciver = (String) o;
+                            final JSONObject user = userQueryService.getUserByName(reciver);
+                            if (Objects.isNull(user) || user.optString("oId").equals(currentUser.optString("oId"))) {
+                                continue;
+                            }
+                            final JSONObject notification = new JSONObject();
+                            notification.put(Notification.NOTIFICATION_USER_ID, user.optString("oId"));
+                            notification.put(Notification.NOTIFICATION_DATA_ID, msg.optString("oId"));
+                            notificationMgmtService.addRedPacketNotification(notification);
+                        }
+                        break;
+                    default:
+                        //ignore
+                }
                 final JSONObject pushMsg = JSONs.clone(msg);
                 pushMsg.put(Common.TIME, new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(msg.optLong(Common.TIME)));
                 ChatroomChannel.notifyChat(pushMsg);
@@ -792,6 +838,56 @@ public class ChatroomProcessor {
         content = MediaPlayers.renderVideo(content);
 
         return content;
+    }
+
+    private static RedPacket allocateHeartbeatRedPacket(String id, String sendId, int money, int count, int zeroCount) {
+        if (zeroCount >= count) {
+            zeroCount = 1;
+        }
+        int extraMoney = (money / count) + 10;
+        int realZeroCount = 0;
+        RedPacket redPacket = new RedPacket.Builder()
+                .id(id)
+                .sendId(sendId)
+                .money(money)
+                .time(System.currentTimeMillis())
+                .count(count)
+                .packs(new LinkedList<>())
+                .build();
+        if (count == 1) {
+            redPacket.packs.push(money);
+            return redPacket;
+        }
+        redPacket.packs.push(money + extraMoney);
+        final ThreadLocalRandom random = ThreadLocalRandom.current();
+        int remain = extraMoney;
+        int cnt = --count;
+        for (int i = 0; i < cnt; i++) {
+            if (remain == 0) {
+                redPacket.packs.push(-remain);
+            } else {
+                if (count == 1) {
+                    redPacket.packs.push(-remain);
+                    break;
+                }
+                int min = 0;
+                int max = (remain / count) + 1;
+                int get = random.nextInt(min, max);
+                if (get == 0) {
+                    if (zeroCount > 0 && zeroCount > realZeroCount) {
+                        //还有0的名额
+                        realZeroCount++;
+                    } else {
+                        get = 1;
+                    }
+                }
+                redPacket.packs.push(get == 0 ? 0 : -get);
+                count--;
+                remain -= get;
+            }
+        }
+        Collections.shuffle(redPacket.packs);
+        return redPacket;
     }
 
     /**
