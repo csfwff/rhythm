@@ -40,6 +40,7 @@ import org.b3log.symphony.processor.middleware.UserCheckMidware;
 import org.b3log.symphony.service.*;
 import org.b3log.symphony.util.*;
 import org.json.JSONObject;
+import pers.adlered.simplecurrentlimiter.main.SimpleCurrentLimiter;
 
 import java.util.*;
 
@@ -240,7 +241,14 @@ public class UserProcessor {
      *
      * @param context
      */
+    SimpleCurrentLimiter livenessApiQueryCurrentLimiter = new SimpleCurrentLimiter(29, 1);
     public void getLiveness(final RequestContext context) {
+        if (context.param("apiKey") != null) {
+            if (!livenessApiQueryCurrentLimiter.access(context.param("apiKey"))) {
+                context.sendStatus(500);
+                return;
+            }
+        }
         JSONObject currentUser = Sessions.getUser();
         try {
             currentUser = ApiProcessor.getUserByKey(context.param("apiKey"));
