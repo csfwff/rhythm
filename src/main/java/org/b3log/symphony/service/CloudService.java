@@ -78,7 +78,7 @@ public class CloudService {
             top.put("achievement", stats.optJSONObject("achieve").toMap().size());
             top.put("know", stats.optLong("know") + stats.optLong("tknow"));
             top.put("days", stats.optLong("days") + stats.optLong("tdays"));
-            top.put("reset", stats.optLong("reset") + stats.optLong("reset"));
+            top.put("reset", stats.optLong("reset"));
             data.put("top", top);
             // 上传新存档
             JSONObject cloudJSON = new JSONObject();
