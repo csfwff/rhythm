@@ -33,6 +33,7 @@ import org.b3log.symphony.cache.DomainCache;
 import org.b3log.symphony.cache.TagCache;
 import org.b3log.symphony.model.Common;
 import org.b3log.symphony.processor.StatisticProcessor;
+import org.b3log.symphony.processor.UserProcessor;
 import org.b3log.symphony.processor.channel.ArticleChannel;
 import org.b3log.symphony.processor.channel.ArticleListChannel;
 import org.b3log.symphony.processor.channel.ChatroomChannel;
@@ -113,6 +114,7 @@ public class CacheMgmtService {
             final StatisticProcessor statisticProcessor = BeanManager.getInstance().getReference(StatisticProcessor.class);
             statisticProcessor.loadStatData();
             userQueryService.loadUserNames();
+            UserProcessor.livenessCache.clear();
             statusReport();
             LOGGER.info("Refreshed cache");
         } finally {
