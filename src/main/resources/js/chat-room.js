@@ -1071,7 +1071,8 @@ var ChatRoom = {
     }
     // 堆叠复读机消息
     else if (isPlusOne) {
-      if (++Label.plusN === 1) {
+      let plusN = ++Label.plusN;
+      if (plusN === 1) {
         let stackedHtml = "<div id='stacked' class='fn__flex' style='position:relative;display:none;'>" +
             "<span id='plusOne' onclick='ChatRoom.plusOne()' style='display:block;margin-left: 20px'><svg style='width: 30px; height: 20px; cursor: pointer;'><use xlink:href='#plusOneIcon'></use></svg></span>" +
             "</div>"
@@ -1082,7 +1083,7 @@ var ChatRoom = {
         latest.removeClass('latest');
       }
       let $stacked = $('#stacked');
-      if (Label.plusN !== 1) {
+      if (plusN !== 1) {
         $stacked.fadeOut(100);
       }
       setTimeout(function () {
@@ -1091,10 +1092,10 @@ var ChatRoom = {
 
         let $fn = $('#stacked>div.fn-none');
         $fn.show();
-        $fn.css('left', Label.plusN * 9 + 'px');
-        $fn.css('top', Label.plusN * 27 + 'px');
+        $fn.css('left', plusN * 9 + 'px');
+        $fn.css('top', plusN * 27 + 'px');
         $fn.css('position', 'absolute');
-        $fn.find('.chats__content').css('background-color', Label.plusN % 2 === 0 ? 'rgb(240 245 254)' : 'rgb(245 245 245)');
+        $fn.find('.chats__content').css('background-color', plusN % 2 === 0 ? 'rgb(240 245 254)' : 'rgb(245 245 245)');
         $fn.removeClass("fn-none");
 
         $stacked.fadeIn(200);
