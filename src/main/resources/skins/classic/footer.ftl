@@ -29,14 +29,19 @@
                 <a target="_blank" href="https://www.cxy521.com/">程序员导航</a>
             </div>
             <div class="fn-clear ft-smaller">
-                探索&nbsp;
-                <a href="https://github.com/csfwff/rhythm" target="_blank">Rhythm 社区引擎</a>
-                &nbsp;｜&nbsp;
-                <a href="https://pwl.icu/article/1637143985245" target="_blank">摸鱼派聊天室客户端 (PC)</a>
-                &nbsp;｜&nbsp;
-                <a href="https://pwl.icu/article/1638189205758" target="_blank">摸鱼派聊天室 IntelliJ IDEA 插件</a>
-                &nbsp;｜&nbsp;
-                <a href="https://zhuanlan.zhihu.com/p/445372463" target="_blank">摸鱼派聊天室 VSCode 插件</a>
+                <div style="margin-top: 5px">探索</div>
+                <div>
+                    <a href="https://github.com/csfwff/rhythm" target="_blank">Rhythm 社区引擎</a>
+                    &nbsp;｜&nbsp;
+                    <a href="https://pwl.icu/article/1637143985245" target="_blank">摸鱼派聊天室客户端 (PC)</a>
+                    &nbsp;｜&nbsp;
+                    <a href="https://pwl.icu/article/1638189205758" target="_blank">摸鱼派聊天室 IntelliJ IDEA 插件</a>
+                </div>
+                <div>
+                    <a href="https://zhuanlan.zhihu.com/p/445372463" target="_blank">摸鱼派聊天室 VSCode 插件</a>
+                    &nbsp;｜&nbsp;
+                    <a href="https://pwl.icu/article/1639648815789" target="_blank">摸鱼派聊天室 Chrome 插件</a>
+                </div>
             </div>
             <div class="footer-nav fn-clear" style="margin-top: 15px; margin-bottom: 15px">
                 <a rel="help" href="${servePath}/article/1630569106133">${aboutLabel}</a>

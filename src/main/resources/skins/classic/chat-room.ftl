@@ -39,7 +39,8 @@
                     <svg style="width: 12px; height: 12px;"><use xlink:href="#downloadIcon"></use></svg> 下载
                     <a style="line-height: 30px;text-decoration: none;color: #1296db;" href="https://pwl.icu/article/1637143985245" target="_blank">PC客户端</a><span style="color: #577e8d">&nbsp;&nbsp;|&nbsp;</span>
                     <a style="line-height: 30px;text-decoration: none;color: #1296db;" href="https://pwl.icu/article/1638189205758" target="_blank">IDEA插件</a><span style="color: #577e8d">&nbsp;&nbsp;|&nbsp;</span>
-                    <a style="line-height: 30px;text-decoration: none;color: #1296db;" href="https://zhuanlan.zhihu.com/p/445372463" target="_blank">VSCode插件</a>
+                    <a style="line-height: 30px;text-decoration: none;color: #1296db;" href="https://zhuanlan.zhihu.com/p/445372463" target="_blank">VSCode插件</a><span style="color: #577e8d">&nbsp;&nbsp;|&nbsp;</span>
+                    <a style="line-height: 30px;text-decoration: none;color: #1296db;" href="https://pwl.icu/article/1639648815789" target="_blank">Chrome插件</a>
                 </div>
                 <#if hasSystemTitle>
                 <h2>${systemTitle}</h2>
