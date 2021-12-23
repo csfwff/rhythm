@@ -477,6 +477,10 @@ public class ChatroomProcessor {
                             if (StringUtils.isNotBlank(recivers)) {
                                 final JSONArray reciverArray = new JSONArray(recivers);
                                 final int length = reciverArray.length();
+                                if (length == 1 && userName.equals(reciverArray.optString(0))) {
+                                    context.renderJSON(StatusCodes.ERR).renderMsg("不允许自己给自己单独发专属红包! ");
+                                    return;
+                                }
                                 if (length > 0) {
                                     toatlMoney = money * length;
                                 } else {
