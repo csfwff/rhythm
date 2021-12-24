@@ -1199,13 +1199,11 @@ var ChatRoom = {
    }
    //  中秋头像挂件
    if(new Date(MidAutumnFestivalDateList[year][0]) <= new Date(formatDate) && new Date(MidAutumnFestivalDateList[year][1]) >= new Date(formatDate)){
-     console.log('Christmas')
      chatRoom.classList.add('MidAutumnFestival')
      return;
    }
   //  春节头像挂件
    if(new Date(SpringFestivalDateList[year][0]) <= new Date(formatDate) && new Date(SpringFestivalDateList[year][1]) >= new Date(formatDate)){
-     console.log('Christmas')
      chatRoom.classList.add('SpringFestival')
      return;
    }
