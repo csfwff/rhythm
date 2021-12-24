@@ -1805,8 +1805,46 @@ code .dec {
   border-right:5px solid var(--background-secondary-color)
 }
 .chats__item .avatar {
+  position: relative;
   margin-right:0;
 }
+
+.chats__item .avatar::after{
+  content: "";
+  position: absolute;
+  width: 38px;
+  height: 38px;
+}
+
+.Christmas .avatar::after{
+  right: -18px;
+  top: -12px;
+  transform: rotate(15deg);
+  background: url("../images/festival/Christmas.png") no-repeat center center;
+  background-size: cover;
+}
+
+.NationalDay .avatar::after{
+  right: 0;
+  top: 0;
+  background: url("../images/festival/NationalDay.png") no-repeat center center;
+  background-size: cover;
+}
+
+.MidAutumnFestival .avatar::after{
+  right: 0;
+  top: 0;
+  background: url("../images/festival/MidAutumnFestival.png") no-repeat center center;
+  background-size: cover;
+}
+
+.SpringFestival .avatar::after{
+  right: 0;
+  top: 0;
+  background: url("../images/festival/SpringFestival.png") no-repeat center center;
+  background-size: cover;
+}
+
 .chats__item--me {
   flex-direction:row-reverse
 }
@@ -2055,7 +2093,41 @@ code .dec {
   background-color: hsla(0,0%,100%,.8);
   background-size: 100% 100%;
 }
+.user-card .avatar-mid-card::after{
+  content: "";
+  position: absolute;
+  width: 77px;
+  height: 77px;
+}
 
+.Christmas .avatar-mid-card::after{
+  right: -18px;
+  top: -12px;
+  transform: rotate(15deg);
+  background: url("../images/festival/Christmas.png") no-repeat center center;
+  background-size: cover;
+}
+
+.NationalDay .avatar-mid-card::after{
+  right: 0;
+  top: 0;
+  background: url("../images/festival/NationalDay.png") no-repeat center center;
+  background-size: cover;
+}
+
+.MidAutumnFestival .avatar-mid-card::after{
+  right: 0;
+  top: 0;
+  background: url("../images/festival/MidAutumnFestival.png") no-repeat center center;
+  background-size: cover;
+}
+
+.SpringFestival .avatar-mid-card::after{
+  right: 0;
+  top: 0;
+  background: url("../images/festival/SpringFestival.png") no-repeat center center;
+  background-size: cover;
+}
 
 .old-almanac{
     width: 320px;
