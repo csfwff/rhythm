@@ -408,6 +408,8 @@ var ChatRoom = {
       })
     });
 
+  //  加载挂件
+    ChatRoom.loadAvatarPendant();
   },
   /**
    * 删除表情包
@@ -1160,7 +1162,51 @@ var ChatRoom = {
     // console.log("前", this.imgWaitting)
     this.imgWaitting = this.imgWaitting || delayshow()
     // console.log("后", this.imgWaitting)
- }
+ },
 
+ /**
+  * 按时间加载头像挂件
+  * */
+ loadAvatarPendant: function(){
+   let year = new Date().getFullYear();
+   let month = new Date().getMonth() + 1;
+   let day = new Date().getDay();
+   let formatDate = `${year}-${month}-${day}`;
+   let SpringFestivalDateList = {
+     2022:["2022-01-31","2022-02-06"],
+     2023:["2023-01-21","2023-01-07"],
+     2024:["2024-02-09","2024-02-15"],
+     2025:["2025-01-28","2025-02-03"],
+     2026:["2026-02-16","2026-01-22"],
+   }
+   let MidAutumnFestivalDateList = {
+     2022:["2022-09-10","2022-09-12"],
+     2023:["2023-09-29","2023-10-01"],
+     2024:["2024-09-17","2024-09-19"],
+     2025:["2025-10-06","2025-10-09"],
+     2026:["2026-09-25","2026-09-27"],
+   }
+  //  国庆头像挂件
+   let chatRoom = document.querySelector('body')
+   if(month === 10 && day <= 7){
+     chatRoom.classList.add('NationalDay')
+     return;
+   }
+   //  圣诞节头像挂件
+   if((month === 12 && day >= 24) || (month === 12 && day <= 25)){
+     chatRoom.classList.add('Christmas')
+     return;
+   }
+   //  中秋头像挂件
+   if(new Date(MidAutumnFestivalDateList[year][0]) <= new Date(formatDate) && new Date(MidAutumnFestivalDateList[year][1]) >= new Date(formatDate)){
+     chatRoom.classList.add('MidAutumnFestival')
+     return;
+   }
+  //  春节头像挂件
+   if(new Date(SpringFestivalDateList[year][0]) <= new Date(formatDate) && new Date(SpringFestivalDateList[year][1]) >= new Date(formatDate)){
+     chatRoom.classList.add('SpringFestival')
+     return;
+   }
+ }
 }
 
