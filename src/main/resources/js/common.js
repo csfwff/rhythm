@@ -1458,7 +1458,7 @@ var Util = {
           case 'OP':
             html += '<img style="height: 20px;margin: 0px;" src="https://pwl.stackoverflow.wiki/opRole.png"/>';
             break;
-          case '协警':
+          case '纪律委员':
             html += '<img style="height: 20px;margin: 0px;" src="https://pwl.stackoverflow.wiki/policeRole.png"/>';
             break;
           case '超级会员':

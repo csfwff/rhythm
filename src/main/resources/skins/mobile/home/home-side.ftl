@@ -59,7 +59,7 @@
                     https://pwl.stackoverflow.wiki/adminRole.png
                     <#elseif user.roleName == 'OP'>
                     https://pwl.stackoverflow.wiki/opRole.png
-                    <#elseif user.roleName == '协警'>
+                    <#elseif user.roleName == '纪律委员'>
                     https://pwl.stackoverflow.wiki/policeRole.png
                     <#elseif user.roleName == '超级会员'>
                     https://pwl.stackoverflow.wiki/svipRole.png
