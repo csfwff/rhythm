@@ -605,12 +605,16 @@ var ChatRoom = {
    * 发送聊天内容
    * @returns {undefined}
    */
+  isSend:false,
   send: function () {
+    if(ChatRoom.isSend){
+      return;
+    }
+    ChatRoom.isSend = true;
     var content = ChatRoom.editor.getValue()
     var requestJSONObject = {
       content: content,
     }
-
     $.ajax({
       url: Label.servePath + '/chat-room/send',
       type: 'POST',
@@ -639,6 +643,7 @@ var ChatRoom = {
           html('<ul><li>' + result.statusText + '</li></ul>')
       },
       complete: function (jqXHR, textStatus) {
+        ChatRoom.isSend = false;
         $('.form button.red').removeAttr('disabled').css('opacity', '1')
       },
     })
@@ -1170,9 +1175,10 @@ var ChatRoom = {
  loadAvatarPendant: function(){
    let year = new Date().getFullYear();
    let month = new Date().getMonth() + 1;
-   let day = new Date().getDay();
+   let day = new Date().getDate();
    let formatDate = `${year}-${month}-${day}`;
    let SpringFestivalDateList = {
+     2021:["2021-02-11","2021-02-17"],
      2022:["2022-01-31","2022-02-06"],
      2023:["2023-01-21","2023-01-07"],
      2024:["2024-02-09","2024-02-15"],
@@ -1180,6 +1186,7 @@ var ChatRoom = {
      2026:["2026-02-16","2026-01-22"],
    }
    let MidAutumnFestivalDateList = {
+     2021:["2021-09-19","2021-09-21"],
      2022:["2022-09-10","2022-09-12"],
      2023:["2023-09-29","2023-10-01"],
      2024:["2024-09-17","2024-09-19"],
@@ -1193,7 +1200,7 @@ var ChatRoom = {
      return;
    }
    //  圣诞节头像挂件
-   if((month === 12 && day >= 24) || (month === 12 && day <= 25)){
+   if((month === 12 && day >= 24) && (month === 12 && day <= 25)){
      chatRoom.classList.add('Christmas')
      return;
    }
