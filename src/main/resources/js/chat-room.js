@@ -605,12 +605,16 @@ var ChatRoom = {
    * 发送聊天内容
    * @returns {undefined}
    */
+  isSend:false,
   send: function () {
+    if(ChatRoom.isSend){
+      return;
+    }
+    ChatRoom.isSend = true;
     var content = ChatRoom.editor.getValue()
     var requestJSONObject = {
       content: content,
     }
-
     $.ajax({
       url: Label.servePath + '/chat-room/send',
       type: 'POST',
@@ -639,6 +643,7 @@ var ChatRoom = {
           html('<ul><li>' + result.statusText + '</li></ul>')
       },
       complete: function (jqXHR, textStatus) {
+        ChatRoom.isSend = false;
         $('.form button.red').removeAttr('disabled').css('opacity', '1')
       },
     })
