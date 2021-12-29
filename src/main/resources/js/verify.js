@@ -95,8 +95,13 @@ var Verify = {
                 captcha: $("#registerCaptcha").val()
             };
 
+            let args = "";
+            if (Util.getParameterByName("r") !== '') {
+                args = "?r=" + Util.getParameterByName("r");
+            }
+
             $.ajax({
-                url: Label.servePath + "/register",
+                url: Label.servePath + "/register" + args,
                 type: "POST",
                 cache: false,
                 data: JSON.stringify(requestJSONObject),
