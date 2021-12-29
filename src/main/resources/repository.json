@@ -1311,6 +1311,12 @@
           "description": "用户邮箱"
         },
         {
+          "name": "userPhone",
+          "type": "String",
+          "length": 255,
+          "description": "用户手机号"
+        },
+        {
           "name": "userName",
           "type": "String",
           "length": 64,
