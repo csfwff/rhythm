@@ -1860,6 +1860,12 @@ var Validate = {
           isValidate = false
         }
         break
+      case 'phone' :
+        if (!/^[1][3,4,5,7,8,9][0-9]{9}$/.test(
+          data.target.val())) {
+          isValidate = false
+        }
+        break
       default:
         if (val.length <= data.max && val.length >= (data.min ? data.min : 0)) {
           isValidate = true

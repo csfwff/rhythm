@@ -28,7 +28,7 @@
  * @description Verify
  * @static
  */
-var Verify = {  
+var Verify = {
     /**
      * @description 登录
      */
@@ -84,13 +84,13 @@ var Verify = {
                     "type": 'string',
                     'max': 20
                 }, {
-                    "target": $("#registerUserEmail"),
-                    "msg": Label.invalidEmailLabel,
-                    "type": "email"
+                    "target": $("#registerUserPhone"),
+                    "msg": "手机号码不合法",
+                    "type": "phone"
                 }]})) {
             var requestJSONObject = {
                 userName: $("#registerUserName").val().replace(/(^\s*)|(\s*$)/g, ""),
-                userEmail: $("#registerUserEmail").val().replace(/(^\s*)|(\s*$)/g, ""),
+                userPhone: $("#registerUserPhone").val().replace(/(^\s*)|(\s*$)/g, ""),
                 invitecode: $("#registerInviteCode").val().replace(/(^\s*)|(\s*$)/g, ""),
                 captcha: $("#registerCaptcha").val(),
                 referral: sessionStorage.r || ''
