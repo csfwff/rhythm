@@ -505,6 +505,7 @@ public class LoginProcessor {
             verifycode.put(Verifycode.TYPE, Verifycode.TYPE_C_PHONE);
             verifycode.put(Verifycode.USER_ID, newUserId);
             verifycodeMgmtService.addVerifycode(verifycode);
+            LOGGER.log(Level.INFO, "Generated a verify code [userName={}, phone={}, code={}]", name, userPhone, code);
 
             final String allowRegister = optionQueryService.getAllowRegister();
             if ("2".equals(allowRegister) && StringUtils.isNotBlank(invitecode)) {
