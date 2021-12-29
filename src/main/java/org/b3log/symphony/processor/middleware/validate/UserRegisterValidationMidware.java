@@ -241,7 +241,7 @@ public class UserRegisterValidationMidware {
         }
 
         if (!isMobileNO(phone)) {
-            context.renderJSON(new JSONObject().put(Keys.MSG, langPropsService.get("registerFailLabel") + " - " + langPropsService.get("invalidEmailLabel")));
+            context.renderJSON(new JSONObject().put(Keys.MSG, langPropsService.get("registerFailLabel") + " - " + "手机号不合法"));
             context.abort();
             return;
         }

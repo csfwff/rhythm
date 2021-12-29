@@ -355,7 +355,7 @@ public class UserMgmtService {
         final Transaction transaction = userRepository.beginTransaction();
 
         try {
-            final String userEmail = requestJSONObject.optString(User.USER_EMAIL).trim().toLowerCase();
+            final String userPhone = requestJSONObject.optString("userPhone");
             final String userName = requestJSONObject.optString(User.USER_NAME);
             JSONObject user = userRepository.getByName(userName);
             if (null != user && (UserExt.USER_STATUS_C_VALID == user.optInt(UserExt.USER_STATUS)
@@ -372,7 +372,7 @@ public class UserMgmtService {
             boolean toUpdate = false;
             String ret = null;
             String avatarURL = null;
-            user = userRepository.getByEmail(userEmail);
+            user = userRepository.getByPhone(userPhone);
             int userNo = 0;
             if (null != user) {
                 if (UserExt.USER_STATUS_C_VALID == user.optInt(UserExt.USER_STATUS)
@@ -382,7 +382,7 @@ public class UserMgmtService {
                         transaction.rollback();
                     }
 
-                    throw new ServiceException(langPropsService.get("duplicatedEmailLabel"));
+                    throw new ServiceException("该手机号已注册");
                 }
 
                 toUpdate = true;
@@ -393,7 +393,8 @@ public class UserMgmtService {
 
             user = new JSONObject();
             user.put(User.USER_NAME, userName);
-            user.put(User.USER_EMAIL, userEmail);
+            user.put("userPhone", userPhone);
+            user.put(User.USER_EMAIL, "");
             user.put(UserExt.USER_APP_ROLE, requestJSONObject.optInt(UserExt.USER_APP_ROLE));
             user.put(User.USER_PASSWORD, requestJSONObject.optString(User.USER_PASSWORD));
             user.put(User.USER_ROLE, requestJSONObject.optString(User.USER_ROLE, Role.ROLE_ID_C_DEFAULT));

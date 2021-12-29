@@ -41,7 +41,7 @@
                             <input id="registerUserName" type="text" placeholder="${userNamePlaceholderLabel}" autocomplete="off" autofocus="autofocus" />
                         </div>
                         <div class="input-wrap">
-                            <svg><use xlink:href="#email"></use></svg>
+                            <svg><use xlink:href="#phone"></use></svg>
                             <input id="registerUserPhone" type="text" placeholder="手机号码" autocomplete="off" />
                         </div>
 
