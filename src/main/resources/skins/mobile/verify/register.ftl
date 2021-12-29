@@ -58,7 +58,6 @@
                         </div>
 
                         <div id="registerTip" class="tip"></div>
-                        <input id="referral" type="hidden" value="${referral}">
                         <button class="green" id="registerBtn" onclick="Verify.register()">发送验证码</button>
                         <button id="gotoLoginBtn" onclick="Util.goLogin()">${loginLabel}</button>
                     </div>
@@ -71,9 +70,6 @@
         <#include "../footer.ftl">
         <script src="${staticServePath}/js/verify${miniPostfix}.js?${staticResourceVersion}"></script>
         <script>
-            if ('${referral}' !== '') {
-                sessionStorage.setItem('r', '${referral}');
-            }
             Verify.init();
             Label.invalidUserNameLabel = "${invalidUserNameLabel}";
             Label.invalidEmailLabel = "${invalidEmailLabel}";

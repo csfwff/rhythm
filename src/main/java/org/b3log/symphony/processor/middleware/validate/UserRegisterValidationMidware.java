@@ -162,7 +162,10 @@ public class UserRegisterValidationMidware {
 
     public void handle(final RequestContext context) {
         final JSONObject requestJSONObject = context.requestJSON();
-        final String referral = requestJSONObject.optString(Common.REFERRAL);
+        String referral = context.param("r");
+        if (referral == null) {
+            referral = "";
+        }
 
         // check if admin allow to register
         final JSONObject option = optionQueryService.getOption(Option.ID_C_MISC_ALLOW_REGISTER);

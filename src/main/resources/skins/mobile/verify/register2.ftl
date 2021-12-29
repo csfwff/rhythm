@@ -58,7 +58,6 @@
                         </div>
                         <div id="registerTip2" class="tip"></div>
                         <button class="green" onclick="Verify.register2()">${registerLabel}</button>
-                        <input id="referral2" type="hidden" value="${referral}">
                         <input id="userId2" type="hidden" value="${user.oId}">
 
                     </div>

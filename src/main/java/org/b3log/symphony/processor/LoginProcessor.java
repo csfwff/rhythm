@@ -414,7 +414,6 @@ public class LoginProcessor {
 
         final AbstractFreeMarkerRenderer renderer = new SkinRenderer(context, null);
         final Map<String, Object> dataModel = renderer.getDataModel();
-        dataModel.put(Common.REFERRAL, "");
 
         boolean useInvitationLink = false;
 
@@ -422,8 +421,6 @@ public class LoginProcessor {
         if (!UserRegisterValidationMidware.invalidUserName(referral)) {
             final JSONObject referralUser = userQueryService.getUserByName(referral);
             if (null != referralUser) {
-                dataModel.put(Common.REFERRAL, referral);
-
                 final Map<String, JSONObject> permissions =
                         roleQueryService.getUserPermissionsGrantMap(referralUser.optString(Keys.OBJECT_ID));
                 final JSONObject useILPermission =
@@ -451,11 +448,6 @@ public class LoginProcessor {
                         || UserExt.NULL_USER_NAME.equals(user.optString(User.USER_NAME))) {
                     dataModel.put(Keys.MSG, langPropsService.get("userExistLabel"));
                     renderer.setTemplateName("error/custom.ftl");
-                } else {
-                    referral = StringUtils.substringAfter(code, "r=");
-                    if (StringUtils.isNotBlank(referral)) {
-                        dataModel.put(Common.REFERRAL, referral);
-                    }
                 }
             }
         }
@@ -480,7 +472,6 @@ public class LoginProcessor {
         final String name = requestJSONObject.optString(User.USER_NAME);
         final String userPhone = requestJSONObject.optString("userPhone");
         final String invitecode = requestJSONObject.optString(Invitecode.INVITECODE);
-        final String referral = requestJSONObject.optString(Common.REFERRAL);
 
         final JSONObject user = new JSONObject();
         user.put(User.USER_NAME, name);
@@ -495,9 +486,6 @@ public class LoginProcessor {
             final JSONObject verifycode = new JSONObject();
             verifycode.put(Verifycode.BIZ_TYPE, Verifycode.BIZ_TYPE_C_REGISTER);
             String code = RandomStringUtils.randomNumeric(6);
-            if (StringUtils.isNotBlank(referral)) {
-                code += "r=" + referral;
-            }
             verifycode.put(Verifycode.CODE, code);
             verifycode.put(Verifycode.EXPIRED, DateUtils.addDays(new Date(), 1).getTime());
             verifycode.put(Verifycode.RECEIVER, userPhone);
@@ -539,7 +527,10 @@ public class LoginProcessor {
 
         final String password = requestJSONObject.optString(User.USER_PASSWORD); // Hashed
         final int appRole = requestJSONObject.optInt(UserExt.USER_APP_ROLE);
-        final String referral = requestJSONObject.optString(Common.REFERRAL);
+        String referral = context.param("r");
+        if (referral == null) {
+            referral = "";
+        }
         final String userId = requestJSONObject.optString(UserExt.USER_T_ID);
 
         String name = null;

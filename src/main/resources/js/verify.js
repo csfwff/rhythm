@@ -92,8 +92,7 @@ var Verify = {
                 userName: $("#registerUserName").val().replace(/(^\s*)|(\s*$)/g, ""),
                 userPhone: $("#registerUserPhone").val().replace(/(^\s*)|(\s*$)/g, ""),
                 invitecode: $("#registerInviteCode").val().replace(/(^\s*)|(\s*$)/g, ""),
-                captcha: $("#registerCaptcha").val(),
-                referral: sessionStorage.r || ''
+                captcha: $("#registerCaptcha").val()
             };
 
             $.ajax({
@@ -111,7 +110,11 @@ var Verify = {
                             '    <input id="registerVerifyCode" type="text" placeholder="短信验证码" autocomplete="off" />\n' +
                             '</div>');
                         $("#registerBtn").text('验证');
-                        $("#registerBtn").attr('onclick', 'location.href = Label.servePath + "/register?code=" + $("#registerVerifyCode").val()');
+                        if (Util.getParameterByName("r") !== '') {
+                            $("#registerBtn").attr('onclick', 'location.href = Label.servePath + "/register?r=" + Util.getParameterByName("r") + "&code=" + $("#registerVerifyCode").val()');
+                        } else {
+                            $("#registerBtn").attr('onclick', 'location.href = Label.servePath + "/register?code=" + $("#registerVerifyCode").val()');
+                        }
                     } else {
                         $("#registerTip").addClass('error').removeClass('succ').html('<ul><li>' + result.msg + '</li></ul>');
                         $("#registerCaptchaImg").attr("src", Label.servePath + "/captcha?code=" + Math.random());
@@ -144,8 +147,13 @@ var Verify = {
                 userId: $("#userId2").val()
             };
 
+            let args = "";
+            if (Util.getParameterByName("r") !== '') {
+                args = "?r=" + Util.getParameterByName("r");
+            }
+
             $.ajax({
-                url: Label.servePath + "/register2",
+                url: Label.servePath + "/register2" + args,
                 type: "POST",
                 cache: false,
                 data: JSON.stringify(requestJSONObject),
