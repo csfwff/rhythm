@@ -39,8 +39,8 @@
                             <input type="text" id="registerUserName2" value="${user.userName}" readonly="readonly" placeholder="${userNameLabel}" autocomplete="off" />
                         </div>
                         <div class="input-wrap">
-                            <svg><use xlink:href="#email"></use></svg>
-                            <input type="text" id="registerUserEmail2" value="${user.userEmail}" readonly="readonly" placeholder="${emailLabel}" autocomplete="off" />
+                            <svg><use xlink:href="#phone"></use></svg>
+                            <input type="text" id="registerUserPhone2" value="${user.userPhone}" readonly="readonly" placeholder="${emailLabel}" autocomplete="off" />
                         </div>
                         <div class="input-wrap">
                             <svg><use xlink:href="#locked"></use></svg>
