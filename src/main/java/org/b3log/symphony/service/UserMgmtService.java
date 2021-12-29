@@ -699,6 +699,36 @@ public class UserMgmtService {
     }
 
     /**
+     * Updates the specified user's phone by the given user id.
+     *
+     * @param userId the given user id
+     * @param user   the specified user, contains the new phone
+     * @throws ServiceException service exception
+     */
+    public void updateUserPhone(final String userId, final JSONObject user) throws ServiceException {
+        final String newPhone = user.optString("userPhone");
+
+        final Transaction transaction = userRepository.beginTransaction();
+
+        try {
+            if (null != userRepository.getByPhone(newPhone)) {
+                throw new ServiceException("手机号重复 [" + newPhone + "]");
+            }
+
+            userRepository.update(userId, user, "userPhone");
+
+            transaction.commit();
+        } catch (final RepositoryException e) {
+            if (transaction.isActive()) {
+                transaction.rollback();
+            }
+
+            LOGGER.log(Level.ERROR, "Updates phone of the user[id=" + userId + "] failed", e);
+            throw new ServiceException(e);
+        }
+    }
+
+    /**
      * Updates the specified user's email by the given user id.
      *
      * @param userId the given user id

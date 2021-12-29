@@ -373,6 +373,7 @@ public class AdminProcessor {
         Dispatcher.get("/admin/add-user", adminProcessor::showAddUser, middlewares);
         Dispatcher.post("/admin/add-user", adminProcessor::addUser, middlewares);
         Dispatcher.post("/admin/user/{userId}", adminProcessor::updateUser, middlewares);
+        Dispatcher.post("/admin/user/{userId}/phone", adminProcessor::updateUserPhone, middlewares);
         Dispatcher.post("/admin/user/{userId}/email", adminProcessor::updateUserEmail, middlewares);
         Dispatcher.post("/admin/user/{userId}/username", adminProcessor::updateUserName, middlewares);
         Dispatcher.post("/admin/user/{userId}/charge-point", adminProcessor::chargePoint, middlewares);
@@ -1576,6 +1577,41 @@ public class AdminProcessor {
         dataModel.put("sysMetal", cloudService.getMetal(userId));
 
         dataModelService.fillHeaderAndFooter(context, dataModel);
+    }
+
+    /**
+     * Updates a user's phone.
+     *
+     * @param context the specified context
+     */
+    public void updateUserPhone(final RequestContext context) {
+        final String userId = context.pathVar("userId");
+        final Request request = context.getRequest();
+
+        final JSONObject user = userQueryService.getUser(userId);
+        final String oldPhone = user.optString("userPhone");
+        final String newPhone = context.param("userPhone");
+
+        if (oldPhone.equals(newPhone)) {
+            context.sendRedirect(Latkes.getServePath() + "/admin/user/" + userId);
+            return;
+        }
+
+        user.put("userPhone", newPhone);
+
+        try {
+            userMgmtService.updateUserPhone(userId, user);
+            operationMgmtService.addOperation(Operation.newOperation(request, Operation.OPERATION_CODE_C_UPDATE_USER_EMAIL, userId));
+        } catch (final ServiceException e) {
+            final AbstractFreeMarkerRenderer renderer = new SkinRenderer(context, "admin/error.ftl");
+            final Map<String, Object> dataModel = renderer.getDataModel();
+
+            dataModel.put(Keys.MSG, e.getMessage());
+            dataModelService.fillHeaderAndFooter(context, dataModel);
+            return;
+        }
+
+        context.sendRedirect(Latkes.getServePath() + "/admin/user/" + userId);
     }
 
     /**
