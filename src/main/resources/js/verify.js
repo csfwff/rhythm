@@ -104,7 +104,9 @@ var Verify = {
                 success: function (result, textStatus) {
                     if (0 === result.code) {
                         $("#registerTip").addClass('succ').removeClass('error').html('<ul><li>' + result.msg + '</li></ul>');
-                        $("#registerBtn").attr('disabled', 'disabled');
+                        $("#regForm, #gotoLoginBtn").hide();
+                        $("#registerBtn").text('验证');
+                        $("#registerBtn").attr('onclick', 'alert()');
                     } else {
                         $("#registerTip").addClass('error').removeClass('succ').html('<ul><li>' + result.msg + '</li></ul>');
                         $("#registerCaptchaImg").attr("src", Label.servePath + "/captcha?code=" + Math.random());
