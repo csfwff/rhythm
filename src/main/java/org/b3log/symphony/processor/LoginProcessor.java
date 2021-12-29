@@ -562,7 +562,7 @@ public class LoginProcessor {
 
             Sessions.login(response, userId, false);
 
-            final String ip = Requests.getRemoteAddr(request);
+            //final String ip = Requests.getRemoteAddr(request);
             //userMgmtService.updateOnlineStatus(user.optString(Keys.OBJECT_ID), ip, true, true);
 
             if (StringUtils.isNotBlank(referral) && !UserRegisterValidationMidware.invalidUserName(referral)) {
