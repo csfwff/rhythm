@@ -361,6 +361,16 @@
             <h2>${advancedUpdateLabel}</h2>
         </div>
         <div class="module-panel form fn-clear form--admin">
+            <form class="fn__flex" action="${servePath}/admin/user/${user.oId}/phone" method="POST">
+                <label>
+                    <div>手机号码</div>
+                    <input type="text" id="userPhone" name="userPhone" value="${user.userPhone}"/>
+                </label>
+                <div>
+                    &nbsp; &nbsp;
+                    <button type="submit" class="green fn-right btn--admin">${submitLabel}</button>
+                </div>
+            </form>
             <form class="fn__flex" action="${servePath}/admin/user/${user.oId}/email" method="POST">
                 <label>
                     <div>${userEmailLabel}</div>
