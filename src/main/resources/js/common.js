@@ -1861,7 +1861,7 @@ var Validate = {
         }
         break
       case 'phone' :
-        if (!/^[1][3,4,5,7,8,9][0-9]{9}$/.test(
+        if (!/^[1][0-9]{10}$/.test(
           data.target.val())) {
           isValidate = false
         }

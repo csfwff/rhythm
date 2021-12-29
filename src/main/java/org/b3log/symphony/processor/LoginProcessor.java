@@ -494,7 +494,7 @@ public class LoginProcessor {
 
             final JSONObject verifycode = new JSONObject();
             verifycode.put(Verifycode.BIZ_TYPE, Verifycode.BIZ_TYPE_C_REGISTER);
-            String code = RandomStringUtils.randomAlphanumeric(6);
+            String code = RandomStringUtils.randomNumeric(6);
             if (StringUtils.isNotBlank(referral)) {
                 code += "r=" + referral;
             }

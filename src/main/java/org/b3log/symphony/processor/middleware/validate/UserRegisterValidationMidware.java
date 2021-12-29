@@ -225,7 +225,7 @@ public class UserRegisterValidationMidware {
         }
 
         final String name = requestJSONObject.optString(User.USER_NAME);
-        final String email = requestJSONObject.optString(User.USER_EMAIL);
+        final String phone = requestJSONObject.optString("userPhone");
         final int appRole = requestJSONObject.optInt(UserExt.USER_APP_ROLE);
 
         if (UserExt.isReservedUserName(name)) {
@@ -240,14 +240,8 @@ public class UserRegisterValidationMidware {
             return;
         }
 
-        if (!Strings.isEmail(email)) {
+        if (!isMobileNO(phone)) {
             context.renderJSON(new JSONObject().put(Keys.MSG, langPropsService.get("registerFailLabel") + " - " + langPropsService.get("invalidEmailLabel")));
-            context.abort();
-            return;
-        }
-
-        if (!UserExt.isValidMailDomain(email)) {
-            context.renderJSON(new JSONObject().put(Keys.MSG, langPropsService.get("registerFailLabel") + " - " + langPropsService.get("invalidEmail1Label")));
             context.abort();
             return;
         }
@@ -259,5 +253,14 @@ public class UserRegisterValidationMidware {
         }
 
         context.handle();
+    }
+
+    public static boolean isMobileNO(String mobiles) {
+        String telRegex = "[1]\\d{10}";
+        if (mobiles.isEmpty()) {
+            return false;
+        } else {
+            return mobiles.matches(telRegex);
+        }
     }
 }
