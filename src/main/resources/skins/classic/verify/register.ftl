@@ -58,7 +58,7 @@
 
                         <div id="registerTip" class="tip"></div>
                         <input id="referral" type="hidden" value="${referral}">
-                        <button class="green" id="registerBtn" onclick="Verify.register()">${registerLabel}</button>
+                        <button class="green" id="registerBtn" onclick="Verify.register()">发送验证码</button>
                         <button onclick="Util.goLogin()">${loginLabel}</button>
                     </div>
                 </div>
