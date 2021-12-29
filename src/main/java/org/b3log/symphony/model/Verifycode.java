@@ -78,6 +78,11 @@ public final class Verifycode {
      */
     public static final int TYPE_C_EMAIL = 0;
 
+    /**
+     * Type - Phone.
+     */
+    public static final int TYPE_C_PHONE = 1;
+
     // Business type constants
     /**
      * Business type - Register.

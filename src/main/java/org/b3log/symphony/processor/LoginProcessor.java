@@ -478,13 +478,13 @@ public class LoginProcessor {
         context.renderJSON(StatusCodes.ERR);
         final JSONObject requestJSONObject = context.getRequest().getJSON();
         final String name = requestJSONObject.optString(User.USER_NAME);
-        final String email = requestJSONObject.optString(User.USER_EMAIL);
+        final String userPhone = requestJSONObject.optString("userPhone");
         final String invitecode = requestJSONObject.optString(Invitecode.INVITECODE);
         final String referral = requestJSONObject.optString(Common.REFERRAL);
 
         final JSONObject user = new JSONObject();
         user.put(User.USER_NAME, name);
-        user.put(User.USER_EMAIL, email);
+        user.put("userPhone", userPhone);
         user.put(User.USER_PASSWORD, "");
         final Locale locale = Locales.getLocale();
         user.put(UserExt.USER_LANGUAGE, locale.getLanguage() + "_" + locale.getCountry());
@@ -500,9 +500,9 @@ public class LoginProcessor {
             }
             verifycode.put(Verifycode.CODE, code);
             verifycode.put(Verifycode.EXPIRED, DateUtils.addDays(new Date(), 1).getTime());
-            verifycode.put(Verifycode.RECEIVER, email);
+            verifycode.put(Verifycode.RECEIVER, userPhone);
             verifycode.put(Verifycode.STATUS, Verifycode.STATUS_C_UNSENT);
-            verifycode.put(Verifycode.TYPE, Verifycode.TYPE_C_EMAIL);
+            verifycode.put(Verifycode.TYPE, Verifycode.TYPE_C_PHONE);
             verifycode.put(Verifycode.USER_ID, newUserId);
             verifycodeMgmtService.addVerifycode(verifycode);
 
@@ -519,7 +519,7 @@ public class LoginProcessor {
             context.renderJSON(StatusCodes.SUCC).renderMsg(langPropsService.get("verifycodeSentLabel"));
         } catch (final ServiceException e) {
             final String msg = langPropsService.get("registerFailLabel") + " - " + e.getMessage();
-            LOGGER.log(Level.ERROR, msg + "[name={}, email={}]", name, email);
+            LOGGER.log(Level.ERROR, msg + "[name={}, phone={}]", name, userPhone);
             context.renderMsg(msg);
         }
     }
