@@ -252,6 +252,15 @@
             <h2>${advancedUpdateLabel}</h2>
         </div>
         <div class="module-panel form fn-clear">
+            <form action="${servePath}/admin/user/${user.oId}/phone" method="POST">
+                <label for="userPhone">手机号码</label>
+                <input type="text" id="userPhone" name="userPhone" value="${user.userPhone}"/>
+
+                <br/><br/>
+                <button type="submit" class="green fn-right">${submitLabel}</button>
+            </form>
+            <br/>
+
             <form action="${servePath}/admin/user/${user.oId}/email" method="POST">
                 <label for="userEmail">${userEmailLabel}</label>
                 <input type="text" id="userEmail" name="userEmail" value="${user.userEmail}" />
