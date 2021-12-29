@@ -96,8 +96,6 @@ var Verify = {
                 referral: sessionStorage.r || ''
             };
 
-            $("#registerBtn").attr('disabled', 'disabled');
-
             $.ajax({
                 url: Label.servePath + "/register",
                 type: "POST",
@@ -111,7 +109,6 @@ var Verify = {
                         $("#registerTip").addClass('error').removeClass('succ').html('<ul><li>' + result.msg + '</li></ul>');
                         $("#registerCaptchaImg").attr("src", Label.servePath + "/captcha?code=" + Math.random());
                         $("#registerCaptcha").val("");
-                        $("#registerBtn").removeAttr('disabled');
                     }
                 }
             });
