@@ -127,15 +127,6 @@ public class CaptchaProcessor {
     SimpleCurrentLimiter captchaCurrentLimiter = new SimpleCurrentLimiter(5, 3);
     public void get(final RequestContext context) {
         String address = Requests.getRemoteAddr(context.getRequest());
-        try {
-            JSONObject user = Sessions.getUser();
-            if (user == null) {
-                LOGGER.log(Level.INFO, "Host " + address + " requested to get a verify code.");
-            } else {
-                LOGGER.log(Level.INFO, "User " + user.optString(User.USER_NAME) + " requested to get a verify code.");
-            }
-        } catch (Exception ignored) {
-        }
         if (captchaCurrentLimiter.access(address)) {
             final PngRenderer renderer = new PngRenderer();
             context.setRenderer(renderer);
@@ -224,15 +215,6 @@ public class CaptchaProcessor {
             }
 
             String address = Requests.getRemoteAddr(context.getRequest());
-            try {
-                JSONObject user = Sessions.getUser();
-                if (user == null) {
-                    LOGGER.log(Level.INFO, "Host " + address + " requested to get a verify code.");
-                } else {
-                    LOGGER.log(Level.INFO, "User " + user.optString(User.USER_NAME) + " requested to get a verify code.");
-                }
-            } catch (Exception ignored) {
-            }
             if (captchaCurrentLimiter.access(address)) {
 
                 final PngRenderer renderer = new PngRenderer();
