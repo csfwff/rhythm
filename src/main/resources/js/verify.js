@@ -111,7 +111,7 @@ var Verify = {
                             '    <input id="registerVerifyCode" type="text" placeholder="短信验证码" autocomplete="off" />\n' +
                             '</div>');
                         $("#registerBtn").text('验证');
-                        $("#registerBtn").attr('onclick', 'alert()');
+                        $("#registerBtn").attr('onclick', 'location.href = Label.servePath + "/register?code=" + $("#registerVerifyCode").val()');
                     } else {
                         $("#registerTip").addClass('error').removeClass('succ').html('<ul><li>' + result.msg + '</li></ul>');
                         $("#registerCaptchaImg").attr("src", Label.servePath + "/captcha?code=" + Math.random());
