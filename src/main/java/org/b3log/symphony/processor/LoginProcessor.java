@@ -542,7 +542,7 @@ public class LoginProcessor {
         final String userId = requestJSONObject.optString(UserExt.USER_T_ID);
 
         String name = null;
-        String email = null;
+        String phone = null;
         try {
             final JSONObject user = userQueryService.getUser(userId);
             if (null == user) {
@@ -551,7 +551,7 @@ public class LoginProcessor {
             }
 
             name = user.optString(User.USER_NAME);
-            email = user.optString(User.USER_EMAIL);
+            phone = user.optString("userPhone");
 
             user.put(UserExt.USER_APP_ROLE, appRole);
             user.put(User.USER_PASSWORD, password);
@@ -607,10 +607,10 @@ public class LoginProcessor {
 
             context.renderJSON(StatusCodes.SUCC);
 
-            LOGGER.log(Level.INFO, "Registered a user [name={}, email={}]", name, email);
+            LOGGER.log(Level.INFO, "Registered a user [name={}, phone={}]", name, phone);
         } catch (final ServiceException e) {
             final String msg = langPropsService.get("registerFailLabel") + " - " + e.getMessage();
-            LOGGER.log(Level.ERROR, msg + " [name={}, email={}]", name, email);
+            LOGGER.log(Level.ERROR, msg + " [name={}, phone={}]", name, phone);
             context.renderMsg(msg);
         }
     }
