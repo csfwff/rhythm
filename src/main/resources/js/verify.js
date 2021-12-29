@@ -105,6 +105,11 @@ var Verify = {
                     if (0 === result.code) {
                         $("#registerTip").addClass('succ').removeClass('error').html('<ul><li>' + result.msg + '</li></ul>');
                         $("#regForm, #gotoLoginBtn").hide();
+                        $("#registerTip").before('' +
+                            '<div class="input-wrap">\n' +
+                            '    <svg><use xlink:href="#email"></use></svg>\n' +
+                            '    <input id="registerVerifyCode" type="text" placeholder="短信验证码" autocomplete="off" />\n' +
+                            '</div>');
                         $("#registerBtn").text('验证');
                         $("#registerBtn").attr('onclick', 'alert()');
                     } else {
