@@ -501,15 +501,15 @@ public class UserMgmtService {
                         byte[] avatarData;
 
                         final String hash = DigestUtils.md5Hex(ret);
-                        avatarData = Gravatars.getRandomAvatarData(hash); // https://github.com/b3log/symphony/issues/569
-                        if (null == avatarData) {
+                        /*avatarData = Gravatars.getRandomAvatarData(hash); // https://github.com/b3log/symphony/issues/569
+                        if (null == avatarData) {*/
                             final BufferedImage img = avatarQueryService.createAvatar(hash, 512);
                             final ByteArrayOutputStream baos = new ByteArrayOutputStream();
                             ImageIO.write(img, "jpg", baos);
                             baos.flush();
                             avatarData = baos.toByteArray();
                             baos.close();
-                        }
+                        /*}*/
 
                         if (Symphonys.QN_ENABLED) {
                             final Auth auth = Auth.create(Symphonys.UPLOAD_QINIU_AK, Symphonys.UPLOAD_QINIU_SK);
