@@ -72,6 +72,15 @@
 
 <div class="module">
     <div class="module-header">
+        <h2>绑定手机</h2>
+    </div>
+    <div class="module-panel form fn-clear">
+        <label>手机号</label>
+        <input id="phoneInput" disabled="disabled" type="text" value="${currentUser.userPhone}" />
+        <br><br>
+        <a class="ft-gray" href="${servePath}">修改绑定手机号</a>
+    </div>
+    <div class="module-header">
         <h2>${emailLabel}</h2>
     </div>
     <div class="module-panel form fn-clear">
