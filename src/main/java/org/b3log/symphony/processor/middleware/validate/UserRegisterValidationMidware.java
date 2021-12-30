@@ -181,7 +181,6 @@ public class UserRegisterValidationMidware {
             try {
                 final JSONObject referralUser = userQueryService.getUserByName(referral);
                 if (null != referralUser) {
-
                     final Map<String, JSONObject> permissions =
                             roleQueryService.getUserPermissionsGrantMap(referralUser.optString(Keys.OBJECT_ID));
                     final JSONObject useILPermission =
