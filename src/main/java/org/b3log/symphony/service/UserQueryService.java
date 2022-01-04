@@ -428,6 +428,22 @@ public class UserQueryService {
     }
 
     /**
+     * Gets a user by the specified phone.
+     *
+     * @param phone the specified phone
+     * @return user, returns {@code null} if not found
+     * @throws ServiceException service exception
+     */
+    public JSONObject getUserByPhone(final String phone) throws ServiceException {
+        try {
+            return userRepository.getByPhone(phone);
+        } catch (final RepositoryException e) {
+            LOGGER.log(Level.ERROR, "Gets user by phone[" + phone + "] failed", e);
+            throw new ServiceException(e);
+        }
+    }
+
+    /**
      * Gets user names from the specified text.
      * <p>
      * A user name is between &#64; and a punctuation, a blank or a line break (\n). For example, the specified text is
