@@ -55,7 +55,7 @@
     </#if>
 <div class="module">
     <div class="module-header">
-        <h2>${queryInvitecodeStateLabel}</h2> 
+        <h2>${queryInvitecodeStateLabel}</h2>
     </div>
     <div class="module-panel form fn-clear">
         <input id="invitecode" type="text" placeholder="${inputInvitecodeLabel}"/><br/><br/>
