@@ -22,6 +22,10 @@
     <div class="wrapper ft-smaller">
         <br>
         <div>
+            <a href="https://beian.miit.gov.cn/" target="_blank">京ICP备2022000226号-1</a>
+        </div>
+        <br>
+        <div>
             友情链接
         </div>
         <div>
