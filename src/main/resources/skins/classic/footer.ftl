@@ -50,6 +50,9 @@
                 <a href="${servePath}/tags">${tagLabel}</a>
                 <a href="${servePath}/statistic">${dataStatLabel}</a>
                 <a href="${servePath}/article/1636516552191">开放 API</a>
+                <div class="ft-smaller fn-right">
+                    <a href="https://beian.miit.gov.cn/" target="_blank">京ICP备2022000226号-1</a>
+                </div>
             </div>
         </div>
     </div>
