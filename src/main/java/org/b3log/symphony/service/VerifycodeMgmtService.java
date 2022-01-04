@@ -212,6 +212,7 @@ public class VerifycodeMgmtService {
         } catch (TencentCloudSDKException e) {
             LOGGER.log(Level.ERROR, "Unable send SMS [phoneNumber={}, templateParam={}]", phoneNumber, templateParam);
         }
-        System.out.println(SendSmsResponse.toJsonString(res));
+        assert res != null;
+        LOGGER.log(Level.INFO, SendSmsResponse.toJsonString(res));
     }
 }
