@@ -193,11 +193,11 @@ public class VerifycodeMgmtService {
         }
     }
 
-    public void sendVerifyCodeSMS(String phone, String code) {
-        sendMsg(new String[]{phone}, new String[]{code});
+    public boolean sendVerifyCodeSMS(String phone, String code) {
+        return sendMsg(new String[]{phone}, new String[]{code});
     }
 
-    public void sendMsg(String[] phoneNumber, String[] templateParam) {
+    public boolean sendMsg(String[] phoneNumber, String[] templateParam) {
         Credential cred = new Credential(Symphonys.TEN_SMS_SECRET_ID, Symphonys.TEN_SMS_SECRET_KEY);
         SmsClient client = new SmsClient(cred, Symphonys.TEN_SMS_DIYU);
         SendSmsRequest req = new SendSmsRequest();
@@ -211,8 +211,10 @@ public class VerifycodeMgmtService {
             res = client.SendSms(req);
         } catch (TencentCloudSDKException e) {
             LOGGER.log(Level.ERROR, "Unable send SMS [phoneNumber={}, templateParam={}]", phoneNumber, templateParam);
+            return false;
         }
         assert res != null;
         LOGGER.log(Level.INFO, SendSmsResponse.toJsonString(res));
+        return true;
     }
 }

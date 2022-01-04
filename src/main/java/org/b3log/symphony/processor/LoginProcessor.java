@@ -474,52 +474,60 @@ public class LoginProcessor {
      *
      * @param context the specified context
      */
+    public static SimpleCurrentLimiter verifySMSCodeLimiterOfIP = new SimpleCurrentLimiter(60, 1);
+    public static SimpleCurrentLimiter verifySMSCodeLimiterOfName = new SimpleCurrentLimiter(60, 1);
+    public static SimpleCurrentLimiter verifySMSCodeLimiterOfPhone = new SimpleCurrentLimiter(60, 1);
     public void register(final RequestContext context) {
         context.renderJSON(StatusCodes.ERR);
+        final String ip = Requests.getRemoteAddr(context.getRequest());
         final JSONObject requestJSONObject = context.getRequest().getJSON();
         final String name = requestJSONObject.optString(User.USER_NAME);
         final String userPhone = requestJSONObject.optString("userPhone");
-        final String invitecode = requestJSONObject.optString(Invitecode.INVITECODE);
+        if (verifySMSCodeLimiterOfIP.access(ip) && verifySMSCodeLimiterOfName.access(name) && verifySMSCodeLimiterOfPhone.access(userPhone)) {
+            final String invitecode = requestJSONObject.optString(Invitecode.INVITECODE);
 
-        final JSONObject user = new JSONObject();
-        user.put(User.USER_NAME, name);
-        user.put("userPhone", userPhone);
-        user.put(User.USER_PASSWORD, "");
-        final Locale locale = Locales.getLocale();
-        user.put(UserExt.USER_LANGUAGE, locale.getLanguage() + "_" + locale.getCountry());
+            final JSONObject user = new JSONObject();
+            user.put(User.USER_NAME, name);
+            user.put("userPhone", userPhone);
+            user.put(User.USER_PASSWORD, "");
+            final Locale locale = Locales.getLocale();
+            user.put(UserExt.USER_LANGUAGE, locale.getLanguage() + "_" + locale.getCountry());
 
-        try {
-            final String newUserId = userMgmtService.addUser(user);
+            try {
+                final String newUserId = userMgmtService.addUser(user);
 
-            final JSONObject verifycode = new JSONObject();
-            verifycode.put(Verifycode.BIZ_TYPE, Verifycode.BIZ_TYPE_C_REGISTER);
-            String code = RandomStringUtils.randomNumeric(6);
-            verifycode.put(Verifycode.CODE, code);
-            verifycode.put(Verifycode.EXPIRED, DateUtils.addDays(new Date(), 1).getTime());
-            verifycode.put(Verifycode.RECEIVER, userPhone);
-            verifycode.put(Verifycode.STATUS, Verifycode.STATUS_C_UNSENT);
-            verifycode.put(Verifycode.TYPE, Verifycode.TYPE_C_PHONE);
-            verifycode.put(Verifycode.USER_ID, newUserId);
-            verifycodeMgmtService.addVerifycode(verifycode);
-            LOGGER.log(Level.INFO, "Generated a verify code [userName={}, phone={}, code={}]", name, userPhone, code);
+                final JSONObject verifycode = new JSONObject();
+                verifycode.put(Verifycode.BIZ_TYPE, Verifycode.BIZ_TYPE_C_REGISTER);
+                String code = RandomStringUtils.randomNumeric(6);
+                verifycode.put(Verifycode.CODE, code);
+                verifycode.put(Verifycode.EXPIRED, DateUtils.addDays(new Date(), 1).getTime());
+                verifycode.put(Verifycode.RECEIVER, userPhone);
+                verifycode.put(Verifycode.STATUS, Verifycode.STATUS_C_UNSENT);
+                verifycode.put(Verifycode.TYPE, Verifycode.TYPE_C_PHONE);
+                verifycode.put(Verifycode.USER_ID, newUserId);
+                verifycodeMgmtService.addVerifycode(verifycode);
+                LOGGER.log(Level.INFO, "Generated a verify code [userName={}, phone={}, code={}]", name, userPhone, code);
 
-            verifycodeMgmtService.sendVerifyCodeSMS(userPhone, code);
+                verifycodeMgmtService.sendVerifyCodeSMS(userPhone, code);
 
-            final String allowRegister = optionQueryService.getAllowRegister();
-            if ("2".equals(allowRegister) && StringUtils.isNotBlank(invitecode)) {
-                final JSONObject ic = invitecodeQueryService.getInvitecode(invitecode);
-                ic.put(Invitecode.USER_ID, newUserId);
-                ic.put(Invitecode.USE_TIME, System.currentTimeMillis());
-                final String icId = ic.optString(Keys.OBJECT_ID);
+                final String allowRegister = optionQueryService.getAllowRegister();
+                if ("2".equals(allowRegister) && StringUtils.isNotBlank(invitecode)) {
+                    final JSONObject ic = invitecodeQueryService.getInvitecode(invitecode);
+                    ic.put(Invitecode.USER_ID, newUserId);
+                    ic.put(Invitecode.USE_TIME, System.currentTimeMillis());
+                    final String icId = ic.optString(Keys.OBJECT_ID);
 
-                invitecodeMgmtService.updateInvitecode(icId, ic);
+                    invitecodeMgmtService.updateInvitecode(icId, ic);
+                }
+
+                context.renderJSON(StatusCodes.SUCC).renderMsg(langPropsService.get("verifycodeSentLabel"));
+            } catch (final ServiceException e) {
+                final String msg = langPropsService.get("registerFailLabel") + " - " + e.getMessage();
+                LOGGER.log(Level.ERROR, msg + "[name={}, phone={}]", name, userPhone);
+                context.renderMsg(msg);
             }
-
-            context.renderJSON(StatusCodes.SUCC).renderMsg(langPropsService.get("verifycodeSentLabel"));
-        } catch (final ServiceException e) {
-            final String msg = langPropsService.get("registerFailLabel") + " - " + e.getMessage();
-            LOGGER.log(Level.ERROR, msg + "[name={}, phone={}]", name, userPhone);
-            context.renderMsg(msg);
+        } else {
+            context.renderMsg("验证码发送频率，请稍候重试");
         }
     }
 
@@ -621,7 +629,7 @@ public class LoginProcessor {
             final JSONObject requestJSONObject = context.getRequest().getJSON();
             final String userId = requestJSONObject.optString(UserExt.USER_T_ID);
             final String password = requestJSONObject.optString(User.USER_PASSWORD); // Hashed
-            LOGGER.log(Level.INFO, "Detected a user registration attack [ip={}, userId={}, password={}]", ip, userId, password);
+            LOGGER.log(Level.WARN, "Detected a user registration attack [ip={}, userId={}, password={}]", ip, userId, password);
             context.renderMsg("频率过快，请稍候重试");
         }
     }
