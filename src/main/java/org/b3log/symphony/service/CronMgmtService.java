@@ -155,7 +155,7 @@ public class CronMgmtService {
             try {
                 Vocation.refresh();
             } catch (final Exception e) {
-                LOGGER.log(Level.ERROR, "Executes cron failed", e);
+                LOGGER.log(Level.ERROR, "Get vocation data failed");
             } finally {
                 Stopwatchs.release();
             }
