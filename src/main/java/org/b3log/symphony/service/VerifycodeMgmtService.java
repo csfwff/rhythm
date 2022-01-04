@@ -186,4 +186,8 @@ public class VerifycodeMgmtService {
             LOGGER.log(Level.ERROR, "Sends verifycode failed", e);
         }
     }
+
+    public void sendMsg(String[] phoneNumber) {
+
+    }
 }
