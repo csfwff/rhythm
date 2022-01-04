@@ -484,6 +484,12 @@ public class LoginProcessor {
         final String name = requestJSONObject.optString(User.USER_NAME);
         final String userPhone = requestJSONObject.optString("userPhone");
         if (verifySMSCodeLimiterOfIP.access(ip) && verifySMSCodeLimiterOfName.access(name) && verifySMSCodeLimiterOfPhone.access(userPhone)) {
+            final String code = RandomStringUtils.randomNumeric(6);
+            if (!verifycodeMgmtService.sendVerifyCodeSMS(userPhone, code)) {
+                context.renderMsg("验证码发送失败，请稍候重试");
+                return;
+            }
+
             final String invitecode = requestJSONObject.optString(Invitecode.INVITECODE);
 
             final JSONObject user = new JSONObject();
@@ -498,7 +504,6 @@ public class LoginProcessor {
 
                 final JSONObject verifycode = new JSONObject();
                 verifycode.put(Verifycode.BIZ_TYPE, Verifycode.BIZ_TYPE_C_REGISTER);
-                String code = RandomStringUtils.randomNumeric(6);
                 verifycode.put(Verifycode.CODE, code);
                 verifycode.put(Verifycode.EXPIRED, DateUtils.addDays(new Date(), 1).getTime());
                 verifycode.put(Verifycode.RECEIVER, userPhone);
@@ -507,8 +512,6 @@ public class LoginProcessor {
                 verifycode.put(Verifycode.USER_ID, newUserId);
                 verifycodeMgmtService.addVerifycode(verifycode);
                 LOGGER.log(Level.INFO, "Generated a verify code [userName={}, phone={}, code={}]", name, userPhone, code);
-
-                verifycodeMgmtService.sendVerifyCodeSMS(userPhone, code);
 
                 final String allowRegister = optionQueryService.getAllowRegister();
                 if ("2".equals(allowRegister) && StringUtils.isNotBlank(invitecode)) {
