@@ -30,6 +30,16 @@
                 <button class="btn" id="shareClipboard">${copyLabel}</button>
             </div>
         </div>
+        <#else>
+            <div class="module">
+                <div class="module-header">
+                    <h2>${inviteTipLabel}</h2>
+                </div>
+                <div class="module-panel form">
+                    <input readonly="readonly" type="text" value="${serverScheme}://${serverHost}${contextPath}/register?r=${currentUser.userName}" onclick="this.select()"/>
+                    <button class="btn" id="shareClipboard">${copyLabel}</button>
+                </div>
+            </div>
     </#if>
 <#if "2" == allowRegister>
     <#if permissions["commonExchangeIC"].permissionGrant>
