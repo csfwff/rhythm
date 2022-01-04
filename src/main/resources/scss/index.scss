@@ -1785,7 +1785,8 @@ code .dec {
   display:none
 }
 .chats__content .language-echarts,.chats__content .language-mermaid,.chats__content .language-mindmap,.chats__content iframe {
-  width:510px
+  max-width:510px;
+  border: none !important;
 }
 .chats__content .vditor-reset img:not(.emoji) {
   max-width:150px;

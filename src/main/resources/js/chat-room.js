@@ -846,7 +846,7 @@ var ChatRoom = {
           currentUserAvatar +
           "    <div class=\"fn__flex-1\" style=\"text-align: left !important;\">\n" +
           "        <h2 class=\"list__user\"><a href=\"" + Label.servePath + "/member/" + currentUserName +"\">" + currentUserName + "</a></h2>\n";
-      if (currentUserMoney === highest) {
+      if (currentUserMoney > 0 && currentUserMoney === highest) {
         highest = -1;
         html += "<span class='green small btn'>来自老王的认可</span><br>\n";
       } else if (currentUserMoney === 0) {
