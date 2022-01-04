@@ -503,6 +503,8 @@ public class LoginProcessor {
             verifycodeMgmtService.addVerifycode(verifycode);
             LOGGER.log(Level.INFO, "Generated a verify code [userName={}, phone={}, code={}]", name, userPhone, code);
 
+            verifycodeMgmtService.sendVerifyCodeSMS(userPhone, code);
+
             final String allowRegister = optionQueryService.getAllowRegister();
             if ("2".equals(allowRegister) && StringUtils.isNotBlank(invitecode)) {
                 final JSONObject ic = invitecodeQueryService.getInvitecode(invitecode);

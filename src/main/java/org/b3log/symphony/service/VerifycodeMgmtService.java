@@ -193,6 +193,10 @@ public class VerifycodeMgmtService {
         }
     }
 
+    public void sendVerifyCodeSMS(String phone, String code) {
+        sendMsg(new String[]{phone}, new String[]{code});
+    }
+
     public void sendMsg(String[] phoneNumber, String[] templateParam) {
         Credential cred = new Credential(Symphonys.TEN_SMS_SECRET_ID, Symphonys.TEN_SMS_SECRET_KEY);
         SmsClient client = new SmsClient(cred, Symphonys.TEN_SMS_DIYU);
