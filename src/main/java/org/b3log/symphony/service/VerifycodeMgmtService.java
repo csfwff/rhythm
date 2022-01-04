@@ -18,6 +18,11 @@
  */
 package org.b3log.symphony.service;
 
+import com.tencentcloudapi.common.Credential;
+import com.tencentcloudapi.common.exception.TencentCloudSDKException;
+import com.tencentcloudapi.sms.v20210111.SmsClient;
+import com.tencentcloudapi.sms.v20210111.models.SendSmsRequest;
+import com.tencentcloudapi.sms.v20210111.models.SendSmsResponse;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -35,6 +40,7 @@ import org.b3log.symphony.model.Verifycode;
 import org.b3log.symphony.repository.UserRepository;
 import org.b3log.symphony.repository.VerifycodeRepository;
 import org.b3log.symphony.util.Mails;
+import org.b3log.symphony.util.Symphonys;
 import org.json.JSONObject;
 
 import java.util.*;
@@ -187,7 +193,21 @@ public class VerifycodeMgmtService {
         }
     }
 
-    public void sendMsg(String[] phoneNumber) {
-
+    public void sendMsg(String[] phoneNumber, String[] templateParam) {
+        Credential cred = new Credential(Symphonys.TEN_SMS_SECRET_ID, Symphonys.TEN_SMS_SECRET_KEY);
+        SmsClient client = new SmsClient(cred, Symphonys.TEN_SMS_DIYU);
+        SendSmsRequest req = new SendSmsRequest();
+        req.setSmsSdkAppId(Symphonys.TEN_SMS_SDK_APPID);
+        req.setSignName(Symphonys.TEN_SMS_SIGN_NAME);
+        req.setTemplateId(Symphonys.TEN_SMS_TEMPLATE_ID);
+        req.setPhoneNumberSet(phoneNumber);
+        req.setTemplateParamSet(templateParam);
+        SendSmsResponse res = null;
+        try {
+            res = client.SendSms(req);
+        } catch (TencentCloudSDKException e) {
+            LOGGER.log(Level.ERROR, "Unable send SMS [phoneNumber={}, templateParam={}]", phoneNumber, templateParam);
+        }
+        System.out.println(SendSmsResponse.toJsonString(res));
     }
 }
