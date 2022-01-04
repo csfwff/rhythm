@@ -474,9 +474,9 @@ public class LoginProcessor {
      *
      * @param context the specified context
      */
-    public static SimpleCurrentLimiter verifySMSCodeLimiterOfIP = new SimpleCurrentLimiter(60, 1);
-    public static SimpleCurrentLimiter verifySMSCodeLimiterOfName = new SimpleCurrentLimiter(60, 1);
-    public static SimpleCurrentLimiter verifySMSCodeLimiterOfPhone = new SimpleCurrentLimiter(60, 1);
+    public static SimpleCurrentLimiter verifySMSCodeLimiterOfIP = new SimpleCurrentLimiter(120, 1);
+    public static SimpleCurrentLimiter verifySMSCodeLimiterOfName = new SimpleCurrentLimiter(120, 1);
+    public static SimpleCurrentLimiter verifySMSCodeLimiterOfPhone = new SimpleCurrentLimiter(120, 1);
     public void register(final RequestContext context) {
         context.renderJSON(StatusCodes.ERR);
         final String ip = Requests.getRemoteAddr(context.getRequest());
@@ -530,7 +530,7 @@ public class LoginProcessor {
                 context.renderMsg(msg);
             }
         } else {
-            context.renderMsg("验证码发送频率，请稍候重试");
+            context.renderMsg("验证码发送频率过快，请稍候重试");
         }
     }
 
