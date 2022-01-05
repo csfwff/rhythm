@@ -94,6 +94,7 @@
                 class="fn-right"
                 onclick="Settings.getPhoneCaptcha('${csrfToken}')">获取短信验证码</button>
     </div>
+
     <div class="module-header" id="bind-email">
         <h2>${emailLabel}</h2>
     </div>
