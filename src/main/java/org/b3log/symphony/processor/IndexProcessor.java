@@ -343,7 +343,7 @@ public class IndexProcessor {
             // 是否领取过昨日奖励
             dataModel.put("collectedYesterdayLivenessReward", 1);
             dataModel.put("checkedIn", 0);
-            dataModel.put("userPhone", "");
+            dataModel.put("userPhone", "not-logged");
         }
 
         final List<JSONObject> recentArticles = articleQueryService.getIndexRecentArticles();
