@@ -401,5 +401,9 @@
     <#if isLoggedIn>
     setInterval(refreshActivities, 30000);
     </#if>
+
+    <#if userPhone == "">
+    Util.alert("为了确保账号的安全及正常使用，依照相关法规政策要求：<br>您需要绑定手机号后方可正常访问摸鱼派。<br><br><button onclick='location.href=\"${servePath}/settings/account#bind-phone\"'>点击这里前往设置</button>")
+    </#if>
 </script>
 </html>
