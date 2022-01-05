@@ -190,6 +190,46 @@ var Settings = {
     })
   },
   /**
+   * 更新手机
+   */
+  updatePhone: function (csrfToken) {
+    $('#phoneSubmitBtn').attr('disabled', 'disabled').css('opacity', '0.3')
+    $.ajax({
+      url: Label.servePath + '/settings/phone',
+      type: 'POST',
+      headers: {'csrfToken': csrfToken},
+      data: JSON.stringify({
+        userPhone: $('#phoneInput').val(),
+        captcha: $('#phoneCode').val(),
+      }),
+      success: function (result) {
+        if (0 === result.code) {
+          $('#phone_captch').show()
+          $('#phoneVerify').val('')
+          $('#phoneCodePanel').hide()
+          $('#phoneCode').val('')
+          $('#phoneSubmitBtn').hide()
+          $('#phoneGetBtn').show()
+          $('#phoneInput').prop('disabled', false)
+          $('#phone_captch img').click()
+          Util.alert(Label.updateSuccLabel)
+        } else {
+          if (result.code === 1) {
+            $('#phone_captch').show()
+            $('#phoneVerify').val('')
+            $('#phoneCodePanel').hide()
+            $('#phoneSubmitBtn').hide()
+            $('#phoneGetBtn').show()
+            $('#phoneInput').prop('disabled', false)
+            $('#phone_captch img').click()
+          }
+          Util.alert(result.msg)
+        }
+        $('#phoneSubmitBtn').removeAttr('disabled').css('opacity', '1')
+      },
+    })
+  },
+  /**
    * 获取邮箱验证码
    * @param csrfToken
    */
@@ -232,25 +272,24 @@ var Settings = {
       }),
       success: function (result) {
         if (0 === result.code) {
-          $('.home-account__captch').show()
+          $('#email_captch').show()
           $('#emailVerify').val('')
           $('#emailCodePanel').hide()
           $('#emailCode').val('')
           $('#emailSubmitBtn').hide()
           $('#emailGetBtn').show()
           $('#emailInput').prop('disabled', false)
-          $('.home-account__captch img').click()
+          $('#email_captch img').click()
           Util.alert(Label.updateSuccLabel)
         } else {
           if (result.code === 1) {
-            $('.home-account__captch').show()
+            $('#email_captch').show()
             $('#emailVerify').val('')
-            $('#emailCodePanel').hide()
             $('#emailCodePanel').hide()
             $('#emailSubmitBtn').hide()
             $('#emailGetBtn').show()
             $('#emailInput').prop('disabled', false)
-            $('.home-account__captch img').click()
+            $('#email_captch img').click()
           }
           Util.alert(result.msg)
         }
