@@ -228,6 +228,7 @@ public class SettingsProcessor {
         Dispatcher.post("/settings/email/vc", settingsProcessor::sendEmailVC, loginCheck::handle);
         Dispatcher.post("/settings/phone/vc", settingsProcessor::sendPhoneVC, loginCheck::handle);
         Dispatcher.post("/settings/email", settingsProcessor::updateEmail, loginCheck::handle);
+        Dispatcher.post("/settings/phone", settingsProcessor::updatePhone, loginCheck::handle);
         Dispatcher.post("/settings/i18n", settingsProcessor::updateI18n, loginCheck::handle, csrfMidware::check);
         Dispatcher.group().middlewares(loginCheck::handle, csrfMidware::fill).router().get().uris(new String[]{"/settings", "/settings/{page}"}).handler(settingsProcessor::showSettings);
         Dispatcher.post("/settings/geo/status", settingsProcessor::updateGeoStatus, loginCheck::handle, csrfMidware::check);
@@ -376,10 +377,10 @@ public class SettingsProcessor {
                 return;
             }
 
-            /*if (null != userQueryService.getUserByPhone(userPhone)) {
+            if (null != userQueryService.getUserByPhone(userPhone)) {
                 context.renderMsg("该手机号已绑定其他账号");
                 return;
-            }*/
+            }
 
             final String name = user.optString(User.USER_NAME);
             final String ip = Requests.getRemoteAddr(context.getRequest());
@@ -470,6 +471,48 @@ public class SettingsProcessor {
             context.renderMsg(e.getMessage());
         }
     }
+
+    /**
+     * Updates phone.
+     *
+     * @param context the specified context
+     */
+    public void updatePhone(final RequestContext context) {
+        context.renderJSON(StatusCodes.ERR);
+
+        final Request request = context.getRequest();
+        final JSONObject requestJSONObject = context.requestJSON();
+        final String captcha = requestJSONObject.optString(CaptchaProcessor.CAPTCHA);
+        final JSONObject currentUser = Sessions.getUser();
+        final String userId = currentUser.optString(Keys.OBJECT_ID);
+        try {
+            final JSONObject verifycode = verifycodeQueryService.getVerifycodeByUserId(Verifycode.TYPE_C_PHONE, Verifycode.BIZ_TYPE_C_BIND_PHONE, userId);
+            if (null == verifycode) {
+                final String msg = langPropsService.get("updateFailLabel") + " - " + langPropsService.get("captchaErrorLabel");
+                context.renderMsg(msg);
+                context.renderJSONValue(Keys.CODE, 2);
+                return;
+            }
+
+            if (!StringUtils.equals(verifycode.optString(Verifycode.CODE), captcha)) {
+                final String msg = langPropsService.get("updateFailLabel") + " - " + langPropsService.get("captchaErrorLabel");
+                context.renderMsg(msg);
+                context.renderJSONValue(Keys.CODE, 2);
+                return;
+            }
+
+            final JSONObject user = userQueryService.getUser(userId);
+            final String userPhone = verifycode.optString(Verifycode.RECEIVER);
+            user.put("userPhone", userPhone);
+            userMgmtService.updateUserPhone(userId, user);
+            verifycodeMgmtService.removeByCode(captcha);
+
+            context.renderJSON(StatusCodes.SUCC);
+        } catch (final ServiceException e) {
+            context.renderMsg(e.getMessage());
+        }
+    }
+
 
     /**
      * Updates email.
