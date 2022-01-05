@@ -71,16 +71,30 @@
 </div>
 
 <div class="module">
-    <div class="module-header">
+    <div class="module-header" id="bind-phone">
         <h2>绑定手机</h2>
     </div>
     <div class="module-panel form fn-clear">
         <label>手机号</label>
-        <input id="phoneInput" disabled="disabled" type="text" value="${currentUser.userPhone}" />
-        <br><br>
-        <a class="ft-gray" href="${servePath}">修改绑定手机号</a>
+        <input id="phoneInput" type="text" value="${currentUser.userPhone}" />
+
+        <div class="home-account__captch">
+            <label>${imageCaptchaLabel}</label>
+            <img class="fn-pointer" height="20px" src="${servePath}/captcha?v=01" onclick="this.src = '${servePath}/captcha?' + (new Date()).getTime()" />
+            <input id="phoneVerify" type="text" />
+        </div>
+        <div class="fn-none" id="phoneCodePanel">
+            <label>请输入短信验证码</label>
+            <input id="phoneCode" type="text" />
+        </div>
+        <div id="phoneTip" class="tip"></div><br/>
+        <button id="phoneSubmitBtn" class="fn-right fn-none"
+                onclick="Settings.updatePhone('${csrfToken}')">${submitLabel}</button>
+        <button id="phoneGetBtn"
+                class="fn-right"
+                onclick="Settings.getPhoneCaptcha('${csrfToken}')">获取短信验证码</button>
     </div>
-    <div class="module-header">
+    <div class="module-header" id="bind-email">
         <h2>${emailLabel}</h2>
     </div>
     <div class="module-panel form fn-clear">
@@ -89,7 +103,7 @@
 
         <div class="home-account__captch">
             <label>${imageCaptchaLabel}</label>
-            <img class="fn-pointer" height="20px" src="${servePath}/captcha" onclick="this.src = '${servePath}/captcha?' + (new Date()).getTime()" />
+            <img class="fn-pointer" height="20px" src="${servePath}/captcha?v=02" onclick="this.src = '${servePath}/captcha?' + (new Date()).getTime()" />
             <input id="emailVerify" type="text" />
         </div>
         <div class="fn-none" id="emailCodePanel">
