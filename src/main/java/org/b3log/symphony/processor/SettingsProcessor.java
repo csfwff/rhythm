@@ -376,11 +376,10 @@ public class SettingsProcessor {
                 return;
             }
 
-            if (null != userQueryService.getUserByPhone(userPhone)) {
-                final String msg = langPropsService.get("sendFailedLabel") + " - 该手机号已绑定其他账号";
-                context.renderMsg(msg);
+            /*if (null != userQueryService.getUserByPhone(userPhone)) {
+                context.renderMsg("该手机号已绑定其他账号");
                 return;
-            }
+            }*/
 
             final String name = user.optString(User.USER_NAME);
             final String ip = Requests.getRemoteAddr(context.getRequest());
