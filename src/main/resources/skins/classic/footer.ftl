@@ -53,6 +53,9 @@
                 <div class="ft-smaller fn-right">
                     <a href="https://beian.miit.gov.cn/" target="_blank">京ICP备2022000226号-1</a>
                 </div>
+                <div class="ft-smaller">
+                    Copyright © 2021 - 2022 W&P Tech. All Rights Reserved. 北京白与画科技有限公司 版权所有
+                </div>
             </div>
         </div>
     </div>
