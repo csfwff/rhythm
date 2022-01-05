@@ -29,11 +29,9 @@ import org.b3log.latke.http.Response;
 import org.b3log.latke.http.renderer.PngRenderer;
 import org.b3log.latke.ioc.BeanManager;
 import org.b3log.latke.ioc.Singleton;
-import org.b3log.latke.model.User;
 import org.b3log.latke.util.Requests;
 import org.b3log.latke.util.Strings;
 import org.b3log.symphony.model.Common;
-import org.b3log.symphony.util.Sessions;
 import org.json.JSONObject;
 import org.patchca.background.BackgroundFactory;
 import org.patchca.color.GradientColorFactory;
@@ -82,12 +80,12 @@ public class CaptchaProcessor {
     /**
      * Captcha length.
      */
-    private static final int CAPTCHA_LENGTH = 1;
+    private static final int CAPTCHA_LENGTH = 4;
 
     /**
      * Captcha chars.
      */
-    private static final String CHARS = "才寸下大丈与万上小口巾山千乞川亿个勺久凡及夕丸么广亡门义之尸弓己已子卫也女飞刃习叉马乡丰王井开夫天无元专云扎艺木五支厅不太犬区历尤友匹车巨牙屯比互切瓦止少日中冈贝内水见午牛手毛气升长仁什片仆化仇币仍仅斤爪反介父从今凶分乏公仓月氏勿欠风丹匀乌凤勾文六方火为斗忆订计户认心尺引丑巴孔队办以允予劝双书幻玉刊示末未击打巧正扑扒功扔去甘世古节本术可丙左厉右石布龙平灭轧东卡北占业旧帅归且旦目叶甲申叮电号田由史只央兄叼叫另叨叹四生失禾丘付仗代仙们仪白仔他斥瓜乎丛令用甩印乐句匆册犯外处冬鸟务包饥主市立闪兰半";
+    private static final String CHARS = "acdefhijklmnprstuvwxy234578";
 
     /**
      * Register request handlers.
@@ -124,7 +122,7 @@ public class CaptchaProcessor {
      *
      * @param context the specified context
      */
-    SimpleCurrentLimiter captchaCurrentLimiter = new SimpleCurrentLimiter(5, 3);
+    SimpleCurrentLimiter captchaCurrentLimiter = new SimpleCurrentLimiter(5, 5);
     public void get(final RequestContext context) {
         String address = Requests.getRemoteAddr(context.getRequest());
         if (captchaCurrentLimiter.access(address)) {
@@ -146,7 +144,7 @@ public class CaptchaProcessor {
                 randomWordFactory.setMaxLength(CAPTCHA_LENGTH);
                 cs.setWordFactory(randomWordFactory);
                 // 随机字体
-                List<String> fonts = getAvaialbeFonts();
+                List<String> fonts = getAvailableFonts();
                 cs.setFontFactory(new RandomFontFactory(fonts));
                 // 自定义验证码图片背景
                 MyCustomBackgroundFactory backgroundFactory = new MyCustomBackgroundFactory();
@@ -235,7 +233,7 @@ public class CaptchaProcessor {
                 randomWordFactory.setMaxLength(CAPTCHA_LENGTH);
                 cs.setWordFactory(randomWordFactory);
                 // 随机字体
-                List<String> fonts = getAvaialbeFonts();
+                List<String> fonts = getAvailableFonts();
                 cs.setFontFactory(new RandomFontFactory(fonts));
                 // 自定义验证码图片背景
                 MyCustomBackgroundFactory backgroundFactory = new MyCustomBackgroundFactory();
@@ -282,13 +280,13 @@ public class CaptchaProcessor {
         }
     }
 
-    private static List<String> getAvaialbeFonts() {
+    private static List<String> getAvailableFonts() {
         final List<String> ret = new ArrayList<>();
 
         final GraphicsEnvironment e = GraphicsEnvironment.getLocalGraphicsEnvironment();
         final Font[] fonts = e.getAllFonts();
         for (final Font f : fonts) {
-            if (Strings.contains(f.getFontName(), new String[]{"文泉驿微米黑", "文泉驿等宽微米黑", "文泉驿正黑", "文泉驿等宽正黑", "文泉驿点阵正黑", "文鼎ＰＬ新宋", "AR PL UMing CN", "Arial-Black"})) {
+            if (Strings.contains(f.getFontName(), new String[]{"Verdana", "DejaVu Sans Mono", "Tahoma"})) {
                 ret.add(f.getFontName());
             }
         }
