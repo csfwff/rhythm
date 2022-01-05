@@ -99,6 +99,11 @@ public final class Verifycode {
      */
     public static final int BIZ_TYPE_C_BIND_EMAIL = 3;
 
+    /**
+     * Business type - Bind phone.
+     */
+    public static final int BIZ_TYPE_C_BIND_PHONE = 4;
+
     // Status constants
     /**
      * Status - Unsent.
