@@ -78,7 +78,7 @@
         <label>手机号</label>
         <input id="phoneInput" type="text" value="${currentUser.userPhone}" />
 
-        <div class="home-account__captch">
+        <div class="home-account__captch" id="phone_captch">
             <label>${imageCaptchaLabel}</label>
             <img class="fn-pointer" height="20px" src="${servePath}/captcha?v=01" onclick="this.src = '${servePath}/captcha?' + (new Date()).getTime()" />
             <input id="phoneVerify" type="text" />
@@ -102,7 +102,7 @@
         <label>${emailLabel}</label>
         <input id="emailInput" type="text" value="<#if !currentUser.userEmail?ends_with("sym.b3log.org")>${currentUser.userEmail}</#if>" />
 
-        <div class="home-account__captch">
+        <div class="home-account__captch" id="email_captch">
             <label>${imageCaptchaLabel}</label>
             <img class="fn-pointer" height="20px" src="${servePath}/captcha?v=02" onclick="this.src = '${servePath}/captcha?' + (new Date()).getTime()" />
             <input id="emailVerify" type="text" />

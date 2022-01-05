@@ -226,6 +226,7 @@ public class SettingsProcessor {
         Dispatcher.post("/settings/deactivate", settingsProcessor::deactivateUser, loginCheck::handle);
         Dispatcher.post("/settings/username", settingsProcessor::updateUserName, loginCheck::handle);
         Dispatcher.post("/settings/email/vc", settingsProcessor::sendEmailVC, loginCheck::handle);
+        Dispatcher.post("/settings/phone/vc", settingsProcessor::sendPhoneVC, loginCheck::handle);
         Dispatcher.post("/settings/email", settingsProcessor::updateEmail, loginCheck::handle);
         Dispatcher.post("/settings/i18n", settingsProcessor::updateI18n, loginCheck::handle, csrfMidware::check);
         Dispatcher.group().middlewares(loginCheck::handle, csrfMidware::fill).router().get().uris(new String[]{"/settings", "/settings/{page}"}).handler(settingsProcessor::showSettings);

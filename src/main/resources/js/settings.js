@@ -162,6 +162,34 @@ var Settings = {
     })
   },
   /**
+   * 获取手机验证码
+   * @param csrfToken
+   */
+  getPhoneCaptcha: function (csrfToken) {
+    $('#phoneGetBtn').attr('disabled', 'disabled').css('opacity', '0.3')
+    $.ajax({
+      url: Label.servePath + '/settings/phone/vc',
+      type: 'POST',
+      headers: {'csrfToken': csrfToken},
+      data: JSON.stringify({
+        userPhone: $('#phoneInput').val(),
+        captcha: $('#phoneVerify').val(),
+      }),
+      success: function (result) {
+        if (0 === result.code) {
+          $('#phoneInput').prop('disabled', true)
+          $('#phone_captch').hide()
+          $('#phoneCodePanel').show()
+          $('#phoneCode').show().focus()
+          $('#phoneSubmitBtn').show()
+          $('#phoneGetBtn').hide()
+        }
+        Util.alert(result.msg)
+        $('#phoneGetBtn').removeAttr('disabled').css('opacity', '1')
+      },
+    })
+  },
+  /**
    * 获取邮箱验证码
    * @param csrfToken
    */
@@ -178,7 +206,7 @@ var Settings = {
       success: function (result) {
         if (0 === result.code) {
           $('#emailInput').prop('disabled', true)
-          $('.home-account__captch').hide()
+          $('#email_captch').hide()
           $('#emailCodePanel').show()
           $('#emailCode').show().focus()
           $('#emailSubmitBtn').show()
