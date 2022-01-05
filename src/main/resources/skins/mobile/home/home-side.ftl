@@ -53,7 +53,7 @@
             </div>
 
             <div>
-                <a href="https://pwl.icu/article/1630575841478" target="_blank">
+                <a href="https://fishpi.cn/article/1630575841478" target="_blank">
                     <img style="height: 26px;margin-top: 5px;" src="
                     <#if user.roleName == '管理员'>
                     https://pwl.stackoverflow.wiki/adminRole.png

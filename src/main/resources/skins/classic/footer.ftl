@@ -33,14 +33,16 @@
                 <div>
                     <a href="https://github.com/csfwff/rhythm" target="_blank">Rhythm 社区引擎</a>
                     &nbsp;｜&nbsp;
-                    <a href="https://pwl.icu/article/1637143985245" target="_blank">摸鱼派聊天室客户端 (PC)</a>
+                    <a href="https://fishpi.cn/article/1637143985245" target="_blank">摸鱼派聊天室客户端 (PC)</a>
                     &nbsp;｜&nbsp;
-                    <a href="https://pwl.icu/article/1638189205758" target="_blank">摸鱼派聊天室 IntelliJ IDEA 插件</a>
+                    <a href="https://fishpi.cn/article/1638189205758" target="_blank">摸鱼派聊天室 IntelliJ IDEA 插件</a>
                 </div>
                 <div>
                     <a href="https://zhuanlan.zhihu.com/p/445372463" target="_blank">摸鱼派聊天室 VSCode 插件</a>
                     &nbsp;｜&nbsp;
-                    <a href="https://pwl.icu/article/1639648815789" target="_blank">摸鱼派聊天室 Chrome 插件</a>
+                    <a href="https://fishpi.cn/article/1639648815789" target="_blank">摸鱼派聊天室 Chrome 插件</a>
+                    &nbsp;｜&nbsp;
+                    <a href="https://fishpi.cn/article/1641291342622" target="_blank">摸鱼派聊天室安卓 APK 应用</a>
                 </div>
             </div>
             <div class="footer-nav fn-clear" style="margin-top: 15px; margin-bottom: 15px">

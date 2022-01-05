@@ -290,7 +290,7 @@ public class ActivityProcessor {
                 }
             } catch (NullPointerException e) {
                 context.renderJSON(StatusCodes.ERR);
-                context.renderMsg("存储数据失败！原因：你还没有登录摸鱼派，请前往摸鱼派 https://pwl.icu 登录账号后重试。");
+                context.renderMsg("存储数据失败！原因：你还没有登录摸鱼派，请前往摸鱼派 https://fishpi.cn 登录账号后重试。");
             }
         } catch (Exception e) {
             context.renderJSON(StatusCodes.ERR);

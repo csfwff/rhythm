@@ -104,7 +104,7 @@
         </div>
         <div class='author'>
             <p>
-                <a href="https://pwl.icu">摸鱼派</a>·鱼游
+                <a href="https://fishpi.cn">摸鱼派</a>·鱼游
                 Created by <a href="http://veerasundar.com"><strong>Veera Sundar</strong></a>.
             </p>
         </div>

@@ -1449,7 +1449,7 @@ var Util = {
         }
         html += '            <div class="user-card__icons fn__flex">\n' +
             '                <div class="fn__flex-1">\n' +
-            '                    <a href="https://pwl.icu/article/1630575841478" class="tooltipped__n tooltipped-new"\n' +
+            '                    <a href="https://fishpi.cn/article/1630575841478" class="tooltipped__n tooltipped-new"\n' +
             '                       aria-label="用户分组：' + userRole + '">\n';
         switch (userRole) {
           case '管理员':
