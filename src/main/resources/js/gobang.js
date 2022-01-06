@@ -203,7 +203,7 @@ var GobangChannel = {
             console.log("Connected to gobang channel websocket.")
             setInterval(function () {
                 GobangChannel.ws.send('zephyr test')
-            }, 1000 * 3)
+            }, 1000 * 55)
         };
 
         GobangChannel.ws.onmessage = function (evt) {
