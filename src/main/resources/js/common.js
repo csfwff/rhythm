@@ -1569,7 +1569,7 @@ var Util = {
       console.log("Connected to user channel websocket.")
       setInterval(function () {
         userChannel.send('-hb-')
-      }, 1000 * 60 * 5)
+      }, 1000 * 3)
     }
 
     userChannel.onmessage = function (evt) {
