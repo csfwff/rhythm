@@ -46,6 +46,9 @@
                     &nbsp;｜&nbsp;
                     <a href="https://fishpi.cn/article/1641291342622" target="_blank">摸鱼派聊天室安卓 APK 应用</a>
                 </div>
+                <div>
+                    <a href="https://fishpi.cn/article/1641135630423" target="_blank">摸鱼派聊天室 Python 客户端</a>
+                </div>
             </div>
             <div class="footer-nav fn-clear" style="margin-top: 15px; margin-bottom: 15px">
                 <a rel="help" href="${servePath}/article/1630569106133">${aboutLabel}</a>

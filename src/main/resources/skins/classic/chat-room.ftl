@@ -41,7 +41,8 @@
                     <a style="line-height: 30px;text-decoration: none;color: #1296db;" href="https://fishpi.cn/article/1638189205758" target="_blank">IDEA插件</a><span style="color: #577e8d">&nbsp;&nbsp;|&nbsp;</span>
                     <a style="line-height: 30px;text-decoration: none;color: #1296db;" href="https://zhuanlan.zhihu.com/p/445372463" target="_blank">VSCode插件</a><span style="color: #577e8d">&nbsp;&nbsp;|&nbsp;</span>
                     <a style="line-height: 30px;text-decoration: none;color: #1296db;" href="https://fishpi.cn/article/1639648815789" target="_blank">Chrome插件</a><span style="color: #577e8d">&nbsp;&nbsp;|&nbsp;</span>
-                    <a style="line-height: 30px;text-decoration: none;color: #1296db;" href="https://fishpi.cn/article/1641291342622" target="_blank">安卓APK</a>
+                    <a style="line-height: 30px;text-decoration: none;color: #1296db;" href="https://fishpi.cn/article/1641291342622" target="_blank">安卓APK</a>&nbsp;&nbsp;|&nbsp;</span>
+                    <a style="line-height: 30px;text-decoration: none;color: #1296db;" href="https://fishpi.cn/article/1641135630423" target="_blank">Python客户端</a>
                 </div>
                 <#if hasSystemTitle>
                 <h2>${systemTitle}</h2>
