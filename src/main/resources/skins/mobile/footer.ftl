@@ -29,11 +29,16 @@
             友情链接
         </div>
         <div>
-            <a target="_blank" href="https://www.cxy521.com/">程序员导航</a>
+            <a target="_blank" href="https://www.cxy521.com/">程序员导航</a><br>
+            <a target="_blank" href="https://www.lundao.pub">「论道」社区</a>
         </div>
         <div class="fn-hr5"></div>
-        <div>
+        <div style="margin-top: 5px">
+            <div>探索</div>
             <a href="https://github.com/csfwff/rhythm" target="_blank">Rhythm 社区引擎</a>
+        </div>
+        <div class="ft-smaller" style="padding: 10px 15px 0 15px">
+            Copyright © 2021 - 2022 W&P Tech. All Rights Reserved. 北京白与画科技有限公司 版权所有
         </div>
         <br>
     </div>

@@ -26,7 +26,9 @@
         <div class="fn-flex-1">
             <div class="footer-nav fn-clear ft-smaller">
                 友情链接&nbsp;
-                <a target="_blank" href="https://www.cxy521.com/">程序员导航</a>
+                <a style="margin-right: 0px; padding-right: 0px" target="_blank" href="https://www.cxy521.com/">程序员导航</a>
+                &nbsp;｜&nbsp;
+                <a style="margin-right: 0px; padding-right: 0px" target="_blank" href="https://www.lundao.pub">「论道」社区</a>
             </div>
             <div class="fn-clear ft-smaller">
                 <div style="margin-top: 5px">探索</div>
@@ -52,11 +54,11 @@
                 <a href="${servePath}/tags">${tagLabel}</a>
                 <a href="${servePath}/statistic">${dataStatLabel}</a>
                 <a href="${servePath}/article/1636516552191">开放 API</a>
-                <div class="ft-smaller fn-right">
-                    <a href="https://beian.miit.gov.cn/" target="_blank">京ICP备2022000226号-1</a>
-                </div>
                 <div class="ft-smaller">
                     Copyright © 2021 - 2022 W&P Tech. All Rights Reserved. 北京白与画科技有限公司 版权所有
+                    <div class="ft-smaller fn-right">
+                        <a href="https://beian.miit.gov.cn/" target="_blank">京ICP备2022000226号-1</a>
+                    </div>
                 </div>
             </div>
         </div>
