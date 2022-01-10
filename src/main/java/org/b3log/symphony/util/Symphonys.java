@@ -853,6 +853,16 @@ public final class Symphonys {
      */
     public static final Map<String, Set<String>> URL_PERMISSION_RULES = new HashMap<>();
 
+    /**
+     * 腾讯云SMS相关
+     */
+    public static final String TEN_SMS_SECRET_ID = get("ten.sms.secretId");
+    public static final String TEN_SMS_SECRET_KEY = get("ten.sms.secretKey");
+    public static final String TEN_SMS_DIYU = get("ten.sms.diyu");
+    public static final String TEN_SMS_SDK_APPID = get("ten.sms.sdkAppId");
+    public static final String TEN_SMS_SIGN_NAME = get("ten.sms.signName");
+    public static final String TEN_SMS_TEMPLATE_ID = get("ten.sms.templateId");
+
     static {
         // Loads permission URL rules
         final String prefix = "permission.rule.url.";

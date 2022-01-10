@@ -22,21 +22,30 @@
     <div class="wrapper ft-smaller">
         <br>
         <div>
+            <a href="https://beian.miit.gov.cn/" target="_blank">京ICP备2022000226号-1</a>
+        </div>
+        <br>
+        <div>
             友情链接
         </div>
         <div>
-            <a target="_blank" href="https://www.cxy521.com/">程序员导航</a>
+            <a target="_blank" href="https://www.cxy521.com/">程序员导航</a><br>
+            <a target="_blank" href="https://www.lundao.pub">「论道」社区</a>
         </div>
         <div class="fn-hr5"></div>
-        <div>
+        <div style="margin-top: 5px">
+            <div>探索</div>
             <a href="https://github.com/csfwff/rhythm" target="_blank">Rhythm 社区引擎</a>
+        </div>
+        <div class="ft-smaller" style="padding: 10px 15px 0 15px">
+            Copyright © 2021 - 2022 W&P Tech. All Rights Reserved. 北京白与画科技有限公司 版权所有
         </div>
         <br>
     </div>
 </div>
 <script src="${staticServePath}/js/symbol-defs${miniPostfix}.js?${staticResourceVersion}"></script>
 <script src="${staticServePath}/js/lib/compress/libs.min.js?${staticResourceVersion}"></script>
-<script src="https://cdn.jsdelivr.net/npm/vditor@3.8.4/dist/index.min.js"></script>
+<script src="https://unpkg.zhimg.com/vditor@3.8.10/dist/index.min.js"></script>
 <script src="${staticServePath}/js/common${miniPostfix}.js?${staticResourceVersion}"></script>
 <script>
   var Label = {

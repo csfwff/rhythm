@@ -119,6 +119,17 @@ public class UserRepository extends AbstractRepository {
     }
 
     /**
+     * Gets a user by the specified phone.
+     * @param phone the specified phone
+     * @return user, returns {@code null} if not found
+     * @throws RepositoryException repository exception
+     */
+    public JSONObject getByPhone(final String phone) throws RepositoryException {
+        final Query query = new Query().setPageCount(1).setFilter(new PropertyFilter("userPhone", FilterOperator.EQUAL, phone));
+        return getFirst(query);
+    }
+
+    /**
      * Gets the administrators.
      *
      * @return administrators, returns an empty list if not found or error

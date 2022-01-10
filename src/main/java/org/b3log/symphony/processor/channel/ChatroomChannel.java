@@ -50,7 +50,7 @@ public class ChatroomChannel implements WebSocketChannel {
     /**
      * Online user information storage.
      */
-    public static final Map<WebSocketSession, JSONObject> onlineUsers = new HashMap<>();
+    public static final Map<WebSocketSession, JSONObject> onlineUsers = Collections.synchronizedMap(new HashMap<>());
 
     /**
      * Called when the socket connection with the browser is established.
@@ -164,7 +164,7 @@ public class ChatroomChannel implements WebSocketChannel {
      * 获得聊天室在线人数和在线成员信息
      * @return
      */
-    private JSONObject getOnline() {
+    public JSONObject getOnline() {
         try {
             // 使用 HashMap 去重
             Map<String, JSONObject> filteredOnlineUsers = new HashMap<>();

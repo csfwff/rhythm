@@ -38,7 +38,7 @@ var ChatRoom = {
       $('.list').height($(window).height() - 173)
     } */
 
-    // 没用登录就不需要编辑器初始化了
+    // 没有登录就不需要编辑器初始化了
     if ($('#chatContent').length === 0) {
       return false
     }
@@ -99,12 +99,12 @@ var ChatRoom = {
     })
 
     // img preview
-    $('.chat-room').on('click', '.vditor-reset img', function () {
-      if ($(this).hasClass('emoji')) {
-        return;
-      }
-      window.open($(this).attr('src'));
-    });
+    // $('.chat-room').on('click', '.vditor-reset img', function () {
+    //   if ($(this).hasClass('emoji')) {
+    //     return;
+    //   }
+    //   window.open($(this).attr('src'));
+    // });
 
     // 表情包初始化
     // 加载表情
@@ -143,6 +143,26 @@ var ChatRoom = {
       Util.alert("" +
           "<div class=\"form fn__flex-column\">\n" +
           "<label>\n" +
+          "  <div class=\"ft__smaller ft__fade\" style=\"float: left\">红包类型</div>\n" +
+          "  <div class=\"fn-hr5 fn__5\"></div>\n" +
+          "  <select id=\"redPacketType\">\n" +
+          "  <option value=\"random\" selected>拼手气红包</option>" +
+          "  <option value=\"average\">普通红包</option>" +
+          "  <option value=\"specify\">专属红包</option>" +
+          "  <option value=\"heartbeat\">心跳红包</option>" +
+          "  </select>\n" +
+          "</label>\n" +
+          "<label id = \"who\" style=\"display:none;\">\n" +
+          "  <div class=\"ft__smaller ft__fade\" style=\"float: left\">发给谁</div>\n" +
+          "  <div class=\"fn-hr5 fn__5\"></div>\n" +
+          "  <div id=\"recivers\" class=\"chats__users\">\n" +
+          "                            </div> \n" +
+          "  <select id=\"userOption\" multiple=\"multiple\" style='height: 150px; left: 50px'>\n" +
+          "  </select>\n" +
+          "  <div id=\"chatUsernameSelectedPanel\" class=\"completed-panel\"\n" +
+          "                             style=\"height:170px;display:none;left:auto;top:auto;cursor:pointer;\"></div> \n" +
+          "</label>\n" +
+          "<label>\n" +
           "  <div class=\"ft__smaller ft__fade\" style=\"float: left\">积分</div>\n" +
           "  <div class=\"fn-hr5 fn__5\"></div>\n" +
           "  <input type=\"number\" min=\"32\" max=\"20000\" required=\"\" value=\"32\" id=\"redPacketMoney\" onkeypress=\"return(/[\\d]/.test(String.fromCharCode(event.keyCode)))\">\n" +
@@ -166,6 +186,58 @@ var ChatRoom = {
           "</div>" +
           "", "发红包");
 
+      $("#userOption").on('change', function () {
+        var users = $("#userOption").val()
+        var userInfos = []
+        for (index in users) {
+          userInfos.push(onelineUsers.get(users[index]))
+        }
+        $("#recivers").html("");
+        $("#redPacketCount").val(userInfos.length);
+        for (var userInfo in userInfos) {
+          $("#recivers").append("<a target=\"_blank\" data-name=\"" + userInfos[userInfo].userName + "\"\n" +
+              "href=\"" + userInfos[userInfo].homePage + "\">\n" +
+              "<img style='margin-bottom: 10px' class=\"avatar avatar-small\" aria-label=\"" + userInfos[userInfo].userName + "\"\n" +
+              "src=\"" + userInfos[userInfo].userAvatarURL + "\">\n" +
+              "</a>");
+        }
+      });
+
+      var onelineUsers = new Map();
+
+      $("#redPacketType").on('change',function () {
+         let type = $("#redPacketType").val();
+        if (type === 'specify') {
+          $('#who').removeAttr("style");
+          $("#redPacketCount").val("1");
+          $('#redPacketCount').attr("readOnly","true");
+          $.ajax({
+            url: Label.servePath + '/chat-room/online-users',
+            type: 'GET',
+            cache: false,
+            success: function (result) {
+              console.log(result)
+              if (0 == result.code) {
+                $("#userOption").html("");
+                for (var userIndex in result.data.users) {
+                  var user = result.data.users[userIndex]
+                  onelineUsers.set(user.userName,user)
+                  $("#userOption").append("<option value=\""+user.userName+"\">"+user.userName+"</option>\n");
+                }
+              } else {
+                console.log("获取聊天室在线成员信息失败")
+              }
+            },
+            error: function (result) {
+              console.log("获取聊天室在线成员信息失败")
+            }
+          })
+        } else {
+          $('#who').css('display','none')
+          $('#redPacketCount').removeAttr("readOnly");
+        }
+      });
+
       $("#redPacketMoney").unbind();
       $("#redPacketCount").unbind();
 
@@ -182,6 +254,40 @@ var ChatRoom = {
         $("#redPacketAmount").text($("#redPacketMoney").val());
       });
 
+      $('#redPacketMoney,#redPacketCount').bind('input propertychange', function() {
+        let type = $("#redPacketType").val();
+        if (type === 'average') {
+          $("#redPacketAmount").text($("#redPacketMoney").val() * $("#redPacketCount").val());
+          $("#redPacketMsg").val("平分红包，人人有份！");
+        } else if (type === 'random') {
+          $("#redPacketAmount").text($("#redPacketMoney").val());
+          $("#redPacketMsg").val("摸鱼者，事竟成！");
+        } else if (type === 'specify') {
+          $("#redPacketAmount").text($("#redPacketMoney").val() * $("#redPacketCount").val());
+          $("#redPacketMsg").val("试试看，这是给你的红包吗？");
+        } else if (type === 'heartbeat') {
+          $("#redPacketAmount").text($("#redPacketMoney").val());
+          $("#redPacketMsg").val("玩的就是心跳！");
+        }
+      });
+
+      $("#redPacketType").on('change', function () {
+        let type = $("#redPacketType").val();
+        if (type === 'average') {
+          $("#redPacketAmount").text($("#redPacketMoney").val() * $("#redPacketCount").val());
+          $("#redPacketMsg").val("平分红包，人人有份！");
+        } else if (type === 'random') {
+          $("#redPacketAmount").text($("#redPacketMoney").val());
+          $("#redPacketMsg").val("摸鱼者，事竟成！");
+        } else if (type === 'specify') {
+          $("#redPacketAmount").text($("#redPacketMoney").val() * $("#redPacketCount").val());
+          $("#redPacketMsg").val("试试看，这是给你的红包吗？");
+        } else if (type === 'heartbeat') {
+          $("#redPacketAmount").text($("#redPacketMoney").val());
+          $("#redPacketMsg").val("玩的就是心跳！");
+        }
+      });
+
       $("#redPacketCount").on('change', function () {
         if (Number($("#redPacketCount").val()) > Number($("#redPacketMoney").val())) {
           $("#redPacketCount").val($("#redPacketMoney").val());
@@ -196,16 +302,31 @@ var ChatRoom = {
       });
 
       $("#redPacketConfirm").on('click', function () {
+        let type = $("#redPacketType").val();
         let money = $("#redPacketMoney").val();
         let count = $("#redPacketCount").val();
         let msg = $("#redPacketMsg").val();
+        let recivers = $("#userOption").val();
+        if (type === '' || type === null || type === undefined) {
+          type = "random";
+        }
+        if (recivers === undefined) {
+          recivers = []
+        }
+        if(recivers.length == 0 && type === 'specify') {
+          $('#chatContentTip').
+          addClass('error').
+          html('<ul><li>请选择红包发送对象</li></ul>')
+        }
         if (msg === '') {
           msg = '摸鱼者，事竟成！';
         }
         let content = {
+          type:  type,
           money: money,
           count: count,
-          msg: msg
+          msg: msg,
+          recivers:recivers
         }
         let requestJSONObject = {
           content: "[redpacket]" + JSON.stringify(content) + "[/redpacket]",
@@ -232,16 +353,31 @@ var ChatRoom = {
       })
 
       $("#xRedPacketConfirm").on('click', function () {
+        let type = $("#redPacketType").val();
         let money = $("#redPacketMoney").val();
         let count = $("#redPacketCount").val();
         let msg = $("#redPacketMsg").val();
+        let recivers = $("#userOption").val();
+        if (type === '' || type === null || type === undefined) {
+          type = "random";
+        }
+        if (recivers === undefined) {
+          recivers = []
+        }
+        if(recivers.length == 0 && type === 'specify') {
+          $('#chatContentTip').
+          addClass('error').
+          html('<ul><li>请选择红包发送对象</li></ul>')
+        }
         if (msg === '') {
           msg = '摸鱼者，事竟成！';
         }
         let content = {
+          type:  type,
           money: money,
           count: count,
-          msg: msg
+          msg: msg,
+          recivers:recivers
         }
         let requestJSONObject = {
           content: "[redpacket]" + JSON.stringify(content) + "[/redpacket]",
@@ -271,35 +407,46 @@ var ChatRoom = {
         }
       })
     });
+
+  //  加载挂件
+    ChatRoom.loadAvatarPendant();
   },
+  /**
+   * 删除表情包
+   * @param url
+   */
+  confirmed: false,
   delEmoji: function (url) {
-    let emojis = ChatRoom.getEmojis();
-    for (let i = 0; i < emojis.length; i++) {
-      if (emojis[i] === url) {
-        emojis.splice(i, 1);
-      }
-    }
-    $.ajax({
-      url: Label.servePath + "/api/cloud/sync",
-      method: "POST",
-      data: JSON.stringify({
-        gameId: "emojis",
-        data: emojis
-      }),
-      headers: {'csrfToken': Label.csrfToken},
-      async: false,
-      success: function (result) {
-        if (result.code === 0) {
-          Util.notice("success", 1500, "表情包删除成功。");
-          ChatRoom.loadEmojis();
-          setTimeout(function () {
-            $("#emojiBtn").click();
-          }, 50)
-        } else {
-          Util.notice("warning", 1500, "表情包删除失败：" + result.msg);
+    if (ChatRoom.confirmed === true || confirm("确定要删除该表情包吗？")) {
+      ChatRoom.confirmed = true;
+      let emojis = ChatRoom.getEmojis();
+      for (let i = 0; i < emojis.length; i++) {
+        if (emojis[i] === url) {
+          emojis.splice(i, 1);
         }
       }
-    });
+      $.ajax({
+        url: Label.servePath + "/api/cloud/sync",
+        method: "POST",
+        data: JSON.stringify({
+          gameId: "emojis",
+          data: emojis
+        }),
+        headers: {'csrfToken': Label.csrfToken},
+        async: false,
+        success: function (result) {
+          if (result.code === 0) {
+            Util.notice("success", 1500, "表情包删除成功。");
+            ChatRoom.loadEmojis();
+            setTimeout(function () {
+              $("#emojiBtn").click();
+            }, 50)
+          } else {
+            Util.notice("warning", 1500, "表情包删除失败：" + result.msg);
+          }
+        }
+      });
+    }
   },
   /**
    * 加载表情
@@ -458,12 +605,16 @@ var ChatRoom = {
    * 发送聊天内容
    * @returns {undefined}
    */
+  isSend:false,
   send: function () {
+    if(ChatRoom.isSend){
+      return;
+    }
+    ChatRoom.isSend = true;
     var content = ChatRoom.editor.getValue()
     var requestJSONObject = {
       content: content,
     }
-
     $.ajax({
       url: Label.servePath + '/chat-room/send',
       type: 'POST',
@@ -492,6 +643,7 @@ var ChatRoom = {
           html('<ul><li>' + result.statusText + '</li></ul>')
       },
       complete: function (jqXHR, textStatus) {
+        ChatRoom.isSend = false;
         $('.form button.red').removeAttr('disabled').css('opacity', '1')
       },
     })
@@ -504,27 +656,28 @@ var ChatRoom = {
     NProgress.start();
     setTimeout(function () {
       page++;
-      $.ajax({
-        url: Label.servePath + '/chat-room/more?page=' + page,
-        type: 'GET',
-        cache: false,
-        async: false,
-        success: function(result) {
-          if (result.data.length !== 0) {
-            for (let i in result.data) {
-              let data = result.data[i];
-              let liHtml = ChatRoom.renderMessage(data.userNickname, data.userName, data.userAvatarURL, data.time, data.content, data.oId, Label.currentUser, Label.level3Permitted);
-              $('#chats').append(liHtml);
-              $('#chats>div.fn-none').show();
-              $('#chats>div.fn-none').removeClass("fn-none");
-              ChatRoom.resetMoreBtnListen();
+      if (Label.hasMore) {
+        $.ajax({
+          url: Label.servePath + '/chat-room/more?page=' + page,
+          type: 'GET',
+          cache: false,
+          async: false,
+          success: function (result) {
+            if (result.data.length !== 0) {
+              for (let i in result.data) {
+                let data = result.data[i];
+                ChatRoom.renderMsg(data, 'more');
+                ChatRoom.resetMoreBtnListen();
+              }
+              Util.listenUserCard();
+              ChatRoom.imageViewer()
+            } else {
+              alert("没有更多聊天消息了！");
+              Label.hasMore = false;
             }
-            Util.listenUserCard();
-          } else {
-            alert("没有更多聊天消息了！");
           }
-        }
-      });
+        });
+      }
       NProgress.done();
     }, 0);
   },
@@ -616,16 +769,29 @@ var ChatRoom = {
     }
   },
   /**
+   * 复读机
+   */
+  repeat: function (id) {
+    let md = '';
+    $.ajax({
+      url: Label.servePath + '/cr/raw/' + id,
+      method: 'get',
+      async: false,
+      success: function (result) {
+        md = result.replace(/(<!--).*/g, "");
+      }
+    });
+    ChatRoom.editor.setValue(md);
+    ChatRoom.send();
+    $(window).scrollTop(0);
+  },
+  /**
    * 艾特某个人
    */
   at: function (userName, id, justAt) {
+    ChatRoom.editor.focus();
     if (justAt === true) {
-      let value = ChatRoom.editor.getValue();
-      if (value !== "\n") {
-        ChatRoom.editor.setValue("@" + userName + "  : " + value);
-      } else {
-        ChatRoom.editor.setValue("@" + userName + "  : ");
-      }
+      ChatRoom.editor.insertValue("@" + userName + "  \n", !1);
     } else {
       let md = '';
       $.ajax({
@@ -637,21 +803,16 @@ var ChatRoom = {
           md = md.replace(/\n/g, "\n> ");
         }
       });
-      let value = ChatRoom.editor.getValue();
-      if (value !== "\n") {
-        ChatRoom.editor.setValue("@" + userName + "  引用：\n> " + md + "\n并说：" + value);
-      } else {
-        ChatRoom.editor.setValue("@" + userName + "  引用：\n> " + md + "\n并说：");
-      }
+      ChatRoom.editor.insertValue("\n##### 引用 @" + userName + "  \n> " + md + "\n", !1);
     }
-    ChatRoom.editor.focus();
+    $(window).scrollTop(0);
   },
   /**
    * 渲染抢到红包的人的列表
    *
    * @param who
    */
-  renderRedPacket: function (usersJSON, count, got) {
+  renderRedPacket: function (usersJSON, count, got, recivers) {
     let hasGot = false;
     let highest = -1;
     if (count === got) {
@@ -685,7 +846,7 @@ var ChatRoom = {
           currentUserAvatar +
           "    <div class=\"fn__flex-1\" style=\"text-align: left !important;\">\n" +
           "        <h2 class=\"list__user\"><a href=\"" + Label.servePath + "/member/" + currentUserName +"\">" + currentUserName + "</a></h2>\n";
-      if (currentUserMoney === highest) {
+      if (currentUserMoney > 0 && currentUserMoney === highest) {
         highest = -1;
         html += "<span class='green small btn'>来自老王的认可</span><br>\n";
       } else if (currentUserMoney === 0) {
@@ -701,6 +862,16 @@ var ChatRoom = {
     }
     if (!hasGot) {
       $("#redPacketIGot").text("你错过了这个红包");
+    }
+
+    console.log(recivers)
+    if (recivers.length > 0) {
+      index = recivers.indexOf(Label.currentUser);
+      console.log(index)
+      if (index === -1) {
+        $("#msg").text("这个红包属于 " + recivers)
+        $("#redPacketIGot").text("这个红包不属于你");
+      }
     }
   },
   /**
@@ -736,7 +907,7 @@ var ChatRoom = {
             "        <a href=\"" + Label.servePath + "/member/" + result.info.userName + "\">" + result.info.userName + "</a>'s 红包\n" +
             "    </div>\n" +
             "    <div class=\"fn-hr5\"></div>\n" +
-            "    <div class=\"ft__smaller ft__fade\">\n" +
+            "    <div id = \"msg\" class=\"ft__smaller ft__fade\">\n" +
             result.info.msg + "\n" +
             "    </div>\n" +
             "    <div class=\"hongbao__count\" id='redPacketIGot'>\n" +
@@ -747,7 +918,7 @@ var ChatRoom = {
             "<div class=\"list\"><ul id=\"redPacketList\">\n" +
             "</ul></div>" +
             "", "红包");
-        ChatRoom.renderRedPacket(result.who, result.info.count, result.info.got)
+        ChatRoom.renderRedPacket(result.who, result.info.count, result.info.got, result.recivers)
         if (result.info.count === result.info.got) {
           $("#chatroom" + oId).find(".hongbao__item").css("opacity", ".36");
           $("#chatroom" + oId).find(".redPacketDesc").html("已经被抢光啦");
@@ -768,33 +939,49 @@ var ChatRoom = {
   /**
    * 渲染聊天室消息
    */
-  renderMessage: function (userNickname, userName, userAvatarURL, time, content, oId, currentUser, isAdmin, addPlusOne) {
+  renderMsg: function (data, more) {
     let isRedPacket = false;
+    let isPlusOne = Label.latestMessage === data.md;
     try {
-      let msgJSON = $.parseJSON(content.replace("<p>", "").replace("</p>", ""));
+      let msgJSON = $.parseJSON(data.content.replace("<p>", "").replace("</p>", ""));
       if (msgJSON.msgType === "redPacket") {
         isRedPacket = true;
+        let type = "未知类型红包";
+        switch (msgJSON.type) {
+          case "random":
+            type = "拼手气红包";
+            break;
+          case "average":
+            type = "普通红包";
+            break;
+          case "specify":
+            type = "专属红包";
+            break;
+          case "heartbeat":
+            type = "心跳红包 (慎抢)";
+            break;
+        }
         if (Number(msgJSON.count) === Number(msgJSON.got)) {
-          content = '' +
-              '<div style="opacity: .36;" class="hongbao__item fn__flex-inline" onclick="ChatRoom.unpackRedPacket(\'' + oId + '\')">\n' +
+          data.content = '' +
+              '<div style="opacity: .36;" class="hongbao__item fn__flex-inline" onclick="ChatRoom.unpackRedPacket(\'' + data.oId + '\')">\n' +
               '    <svg class="ft__red hongbao__icon">\n' +
               '        <use xlink:href="#redPacketIcon"></use>\n' +
               '    </svg>\n' +
               '    <div>\n' +
-              '        <div>' + msgJSON.msg + '</div>\n' +
+              '        <div>' + msgJSON.msg + '<br><b>' + type + '</b></div>\n' +
               '        <div class="ft__smaller ft__fade redPacketDesc">\n' +
               '           已经被抢光啦\n' +
               '        </div>\n' +
               '    </div>\n' +
               '</div>';
         } else {
-          content = '' +
-              '<div class="hongbao__item fn__flex-inline" onclick="ChatRoom.unpackRedPacket(\'' + oId + '\')">\n' +
+          data.content = '' +
+              '<div class="hongbao__item fn__flex-inline" onclick="ChatRoom.unpackRedPacket(\'' + data.oId + '\')">\n' +
               '    <svg class="ft__red hongbao__icon">\n' +
               '        <use xlink:href="#redPacketIcon"></use>\n' +
               '    </svg>\n' +
               '    <div>\n' +
-              '        <div>' + msgJSON.msg + '</div>\n' +
+              '        <div>' + msgJSON.msg + '<br><b>' + type + '</b></div>\n' +
               '        <div class="ft__smaller ft__fade redPacketDesc">\n' +
               '        </div>\n' +
               '    </div>\n' +
@@ -802,28 +989,24 @@ var ChatRoom = {
         }
       }
     } catch (err) {}
-    try {
-      if (addPlusOne === true) {
-        content += "<span id='plusOne' onclick='ChatRoom.plusOne()'><svg style='width: 20px; height: 20px; cursor: pointer;'><use xlink:href='#plusOneIcon'></use></svg></span>";
-      }
-    } catch (err) {}
     let meTag1 = "";
     let meTag2 = "";
-    if (userNickname !== undefined && userNickname !== "") {
-      userNickname = userNickname + " (" + userName + ")"
+    if (data.userNickname !== undefined && data.userNickname !== "") {
+      data.userNickname = data.userNickname + " (" + data.userName + ")"
     } else {
-      userNickname = userName;
+      data.userNickname = data.userName;
     }
-    if (currentUser === userName) {
+    if (Label.currentUser === data.userName) {
       meTag1 = " chats__item--me";
-      meTag2 = "<a onclick=\"ChatRoom.revoke(" + oId + ")\" class=\"item\">撤回</a>\n";
+      meTag2 = "<a onclick=\"ChatRoom.revoke(" + data.oId + ")\" class=\"item\">撤回</a>\n";
     }
-    if (isAdmin) {
-      meTag2 = "<a onclick=\"ChatRoom.revoke(" + oId + ")\" class=\"item\"><svg><use xlink:href=\"#userrole\"></use></svg> 撤回</a>\n";
+    // isAdmin
+    if (Label.level3Permitted) {
+      meTag2 = "<a onclick=\"ChatRoom.revoke(" + data.oId + ")\" class=\"item\"><svg><use xlink:href=\"#userrole\"></use></svg> 撤回</a>\n";
     }
     try {
       // 判断是否可以收藏为表情包
-      let emojiContent = content.replace("<p>", "").replace("</p>", "");
+      let emojiContent = data.content.replace("<p>", "").replace("</p>", "");
       let emojiDom = Util.parseDom(emojiContent);
       let canCollect = false;
       let srcs = "";
@@ -844,22 +1027,32 @@ var ChatRoom = {
       }
     } catch (err) {}
     let newHTML = '<div class="fn-none">';
-    newHTML += '<div id="chatroom' + oId + '" class="fn__flex chats__item' + meTag1 + '">\n' +
-        '    <a href="/member/' + userName + '" style="height: 38px">\n' +
-        '        <div class="avatar tooltipped__user" aria-label="' + userName + '" style="background-image: url(\'' + userAvatarURL + '\');"></div>\n' +
+    newHTML += '<div id="chatroom' + data.oId + '" class="fn__flex chats__item' + meTag1 + '">\n' +
+        '    <a href="/member/' + data.userName + '" style="height: 38px">\n' +
+        '        <div class="avatar tooltipped__user" aria-label="' + data.userName + '" style="background-image: url(\'' + data.userAvatarURL + '\');"></div>\n' +
         '    </a>\n' +
         '    <div class="chats__content">\n' +
         '        <div class="chats__arrow"></div>\n';
-    if (currentUser !== userName) {
-      newHTML += '<div class="ft__fade ft__smaller" style="padding-bottom: 3px;border-bottom: 1px solid #eee">\n' +
-          '    <span class="ft-gray">' + userNickname + '</span>\n' +
-          '</div>';
+
+    let display = Label.currentUser === data.userName && !isPlusOne ? 'display: none;' : ''
+    newHTML += '<div id="userName" class="ft__fade ft__smaller" style="' + display + 'padding-bottom: 3px;border-bottom: 1px solid #eee">\n' +
+        '    <span class="ft-gray">' + data.userNickname + '</span>\n';
+    if (data.sysMetal !== undefined && data.sysMetal !== "") {
+      let list = JSON.parse(data.sysMetal).list;
+      if (list !== undefined) {
+        for (let i = 0; i < list.length; i++) {
+          let m = list[i];
+          newHTML += "<img title='" + m.description + "' src='" + Util.genMetal(m.name, m.attr) + "'/>";
+        }
+      }
     }
+    newHTML += '</div>';
+
     newHTML += '        <div style="margin-top: 4px" class="vditor-reset ft__smaller ' + Label.chatRoomPictureStatus + '">\n' +
-        '            ' + content + '\n' +
+        '            ' + data.content + '\n' +
         '        </div>\n' +
         '        <div class="ft__smaller ft__fade fn__right date-bar">\n' +
-        '            ' + time + '\n' +
+        '            ' + data.time + '\n' +
         '                <span class="fn__space5"></span>\n';
     if (!isRedPacket) {
       newHTML += '                <details class="details action__item fn__flex-center">\n' +
@@ -867,8 +1060,9 @@ var ChatRoom = {
           '                        ···\n' +
           '                    </summary>\n' +
           '                    <details-menu class="fn__layer">\n' +
-          '                        <a onclick=\"ChatRoom.at(\'' + userName + '\', \'' + oId + '\', true)\" class="item">@' + userName + '</a>\n' +
-          '                        <a onclick=\"ChatRoom.at(\'' + userName + '\', \'' + oId + '\', false)\" class="item">引用</a>\n' +
+          '                        <a onclick=\"ChatRoom.at(\'' + data.userName + '\', \'' + data.oId + '\', true)\" class="item">@' + data.userName + '</a>\n' +
+          '                        <a onclick=\"ChatRoom.at(\'' + data.userName + '\', \'' + data.oId + '\', false)\" class="item">引用</a>\n' +
+          '                        <a onclick=\"ChatRoom.repeat(\'' + data.oId + '\')\" class="item">复读机</a>\n' +
           meTag2 +
           '                    </details-menu>\n' +
           '                </details>\n';
@@ -876,8 +1070,150 @@ var ChatRoom = {
     newHTML += '        </div>\n' +
         '    </div>\n' +
         '</div></div>';
+    if (more) {
+      $('#chats').append(newHTML);
+      let $fn = $('#chats>div.fn-none');
+      $fn.show();
+      $fn.removeClass("fn-none");
+    }
+    // 堆叠复读机消息
+    else if (isPlusOne) {
+      let plusN = ++Label.plusN;
+      if (plusN === 1) {
+        let stackedHtml = "<div id='stacked' class='fn__flex' style='position:relative;display:none;'>" +
+            "<span id='plusOne' onclick='ChatRoom.plusOne()' style='display:block;margin-left: 20px'><svg style='width: 30px; height: 20px; cursor: pointer;'><use xlink:href='#plusOneIcon'></use></svg></span>" +
+            "</div>"
+        $('#chats').prepend(stackedHtml);
+        let latest = $('#chats>div.latest');
+        $('#stacked').prepend(latest);
+        latest.find('#userName').show();
+        latest.removeClass('latest');
+      }
+      let $stacked = $('#stacked');
+      if (plusN !== 1) {
+        $stacked.fadeOut(100);
+      }
+      setTimeout(function () {
+        $stacked.append(newHTML);
+        $stacked.height($stacked.height() + 27 + 'px')
 
-    return newHTML;
-  }
+        let $fn = $('#stacked>div.fn-none');
+        $fn.show();
+        $fn.css('left', plusN * 9 + 'px');
+        $fn.css('top', plusN * 27 + 'px');
+        $fn.css('position', 'absolute');
+        $fn.find('.chats__content').css('background-color', plusN % 2 === 0 ? 'rgb(240 245 254)' : 'rgb(245 245 245)');
+        $fn.removeClass("fn-none");
+
+        $stacked.fadeIn(200);
+      }, 100);
+    } else {
+      $('#plusOne').remove();
+      if (data.md) {
+        Label.latestMessage = data.md;
+        Label.plusN = 0;
+      }
+      let $chats = $('#chats');
+      $chats.find('.latest').removeClass('latest');
+      $chats.prepend(newHTML);
+      let $fn = $('#chats>div.fn-none');
+      $fn.slideDown(200);
+      $fn.addClass("latest");
+      $fn.removeClass("fn-none");
+    }
+  },
+  /**
+   * 看图插件dom
+   */
+  imgViewer: null,
+  /**
+   * 看图插件等待更新状态
+   */
+  imgWaitting: false,
+  /**
+   * 全屏看图插件渲染
+   */
+  imageViewer: function() {
+    // console.log("新消息")
+    //没有新图片就不重载
+    if (this.imgViewer && $("div.vditor-reset.ft__smaller img:not(.ft__smaller,.emoji)").length === this.imgViewer.length)
+        return
+    // console.log("包含图片")
+    this.imgViewer = this.imgViewer || new Viewer(document.querySelector('#chats'),{
+        inline: false,
+        className: "PWLimgViwer",
+        filter: (img)=>!img.parentElement.classList.contains("ft__smaller") && !img.classList.contains("emoji"),
+        title() {
+            let ele = this.images[$(".PWLimgViwer .viewer-active").attr("data-index")];
+            while (ele = ele.parentElement,
+            !ele.querySelector(".avatar"));
+            return "From @" + ele.querySelector(".avatar").getAttribute("aria-label")
+        }
+    });
+    const delayshow = function() {
+        setTimeout(()=>{
+            if (!ChatRoom.imgViewer.isShown) {
+                ChatRoom.imgWaitting = false;
+                // console.log("重载")
+                ChatRoom.imgViewer.update()
+            } else {
+                // console.log("等待")
+                delayshow()
+            }
+        }
+        , 1000)
+        return true
+    }
+    // console.log("前", this.imgWaitting)
+    this.imgWaitting = this.imgWaitting || delayshow()
+    // console.log("后", this.imgWaitting)
+ },
+
+ /**
+  * 按时间加载头像挂件
+  * */
+ loadAvatarPendant: function(){
+   let year = new Date().getFullYear();
+   let month = new Date().getMonth() + 1;
+   let day = new Date().getDate();
+   let formatDate = `${year}-${month}-${day}`;
+   let SpringFestivalDateList = {
+     2021:["2021-02-11","2021-02-17"],
+     2022:["2022-01-31","2022-02-06"],
+     2023:["2023-01-21","2023-01-07"],
+     2024:["2024-02-09","2024-02-15"],
+     2025:["2025-01-28","2025-02-03"],
+     2026:["2026-02-16","2026-01-22"],
+   }
+   let MidAutumnFestivalDateList = {
+     2021:["2021-09-19","2021-09-21"],
+     2022:["2022-09-10","2022-09-12"],
+     2023:["2023-09-29","2023-10-01"],
+     2024:["2024-09-17","2024-09-19"],
+     2025:["2025-10-06","2025-10-09"],
+     2026:["2026-09-25","2026-09-27"],
+   }
+  //  国庆头像挂件
+   let chatRoom = document.querySelector('body')
+   if(month === 10 && day <= 7){
+     chatRoom.classList.add('NationalDay')
+     return;
+   }
+   //  圣诞节头像挂件
+   if((month === 12 && day >= 24) && (month === 12 && day <= 25)){
+     chatRoom.classList.add('Christmas')
+     return;
+   }
+   //  中秋头像挂件
+   if(new Date(MidAutumnFestivalDateList[year][0]) <= new Date(formatDate) && new Date(MidAutumnFestivalDateList[year][1]) >= new Date(formatDate)){
+     chatRoom.classList.add('MidAutumnFestival')
+     return;
+   }
+  //  春节头像挂件
+   if(new Date(SpringFestivalDateList[year][0]) <= new Date(formatDate) && new Date(SpringFestivalDateList[year][1]) >= new Date(formatDate)){
+     chatRoom.classList.add('SpringFestival')
+     return;
+   }
+ }
 }
 

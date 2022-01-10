@@ -47,7 +47,7 @@ var ArticleChannel = {
             console.log("Connected to article channel websocket.")
             setInterval(function () {
                 ArticleChannel.ws.send('-hb-')
-            }, 1000 * 30)
+            }, 1000 * 55)
         }
 
         ArticleChannel.ws.onmessage = function (evt) {
@@ -169,7 +169,7 @@ var ArticleListChannel = {
             console.log("Connected to article list channel websocket.")
             setInterval(function () {
                 ArticleListChannel.ws.send('-hb-')
-            }, 1000 * 30)
+            }, 1000 * 55)
         }
 
         ArticleListChannel.ws.onmessage = function (evt) {
@@ -226,7 +226,7 @@ var IdleTalkChannel = {
             console.log("Connected to idle talk channel websocket.")
             setInterval(function () {
                 IdleTalkChannel.ws.send('-hb-')
-            }, 1000 * 30)
+            }, 1000 * 55)
         }
 
         IdleTalkChannel.ws.onmessage = function (evt) {
@@ -345,7 +345,7 @@ var ChatRoomChannel = {
             console.log("Connected to chat room channel websocket.")
             setInterval(function () {
                 ChatRoomChannel.ws.send('-hb-')
-            }, 1000 * 30)
+            }, 1000 * 55)
         }
 
         ChatRoomChannel.ws.onmessage = function (evt) {
@@ -368,11 +368,12 @@ var ChatRoomChannel = {
                         spell += ' (' + got + '/' + count + ')';
                     }
                     // 通知
-                    let html = "<div style='color: rgb(50 50 50);margin-bottom: 10px;text-align: center;'>" +
+                    let html = "<div class='redPacketNotice' style='color: rgb(50 50 50);margin-bottom: 8px;text-align: center;display: none;'>" +
                         "<svg><use xlink:href='#redPacketIcon'></use></svg>&nbsp;" +
                         spell +
                         "</div>";
                     $('#chats').prepend(html);
+                    $(".redPacketNotice").slideDown(500);
                     break;
                 case 'online':
                     $('#onlineCnt').text(data.onlineChatCnt);
@@ -395,21 +396,8 @@ var ChatRoomChannel = {
                 case 'msg':
                     // Chatroom
                     if ($("#chatRoomIndex").length === 0 && $("#chatroom" + data.oId).length <= 0) {
-                        let liHTML;
-                        $("#plusOne").remove();
-                        if (data.md === Label.latestMessage) {
-                            // +1 功能
-                            liHTML = ChatRoom.renderMessage(data.userNickname, data.userName, data.userAvatarURL, data.time, data.content, data.oId, Label.currentUser, Label.level3Permitted, true);
-                        } else {
-                            liHTML = ChatRoom.renderMessage(data.userNickname, data.userName, data.userAvatarURL, data.time, data.content, data.oId, Label.currentUser, Label.level3Permitted);
-                        }
-                        $('#chats').prepend(liHTML);
-                        $('#chats>div.fn-none').slideDown(200);
-                        $('#chats>div.fn-none').removeClass("fn-none");
+                        ChatRoom.renderMsg(data);
                         ChatRoom.resetMoreBtnListen();
-                        if (data.md !== undefined) {
-                            Label.latestMessage = data.md;
-                        }
                     }
 
                     // index
@@ -450,6 +438,7 @@ var ChatRoomChannel = {
                     }
                     $("#chatRoomIndex li:first").slideDown(200);
                     Util.listenUserCard();
+                    ChatRoom.imageViewer()
                     break;
             }
         }
@@ -486,7 +475,7 @@ var GobangChannel = {
             console.log("Connected to gobang channel websocket.")
             setInterval(function () {
                 GobangChannel.ws.send('zephyr test')
-            }, 1000 * 30)
+            }, 1000 * 55)
         }
 
         GobangChannel.ws.onmessage = function (evt) {

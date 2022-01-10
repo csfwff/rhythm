@@ -663,6 +663,6 @@ public final class UserExt {
      * @return user link
      */
     public static String getUserLink(final String userName) {
-        return "<a href=\"" + Latkes.getServePath() + "/member/" + userName + "\">" + userName + "</a> ";
+        return "<a href=\"" + Latkes.getServePath() + "/member/" + userName + "\" class=\"name-at\" aria-label=\"" + userName + "\">" + userName + "</a> ";
     }
 }

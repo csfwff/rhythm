@@ -218,6 +218,14 @@
                                     ${qnaOfferLabel}
                                 </div>
                             </#if>
+                            <div class="article__stats usersInteracts article__stats--a">
+                                <#if article.sysMetal != "[]">
+                                    <span class="article__cnt">作者勋章</span>
+                                    <#list article.sysMetal?eval as metal>
+                                        <img title="${metal.description}" src="https://unv-shield.librian.net/api/unv_shield?scale=0.79&txt=${metal.name}&${metal.attr}"/>
+                                    </#list>
+                                </#if>
+                            </div>
                         </div>
                         <br>
                         <#if article.thankedCnt != 0>
@@ -244,14 +252,14 @@
                         </#if>
                     </div>
                     <div class="fn__clear article__view">
-                    <span class="fn__flex-inline tooltipped__n tooltipped-n tooltipped" aria-label="总访问计数">
-                        <svg><use xlink:href="#iconTop"></use></svg>
-                        <#if article.articleViewCount < 1000>
-                            ${article.articleViewCount}
-                        <#else>
-                            ${article.articleViewCntDisplayFormat}
-                        </#if>
-                    </span>
+                        <span class="fn__flex-inline tooltipped__n tooltipped-n tooltipped" aria-label="总访问计数">
+                            <svg><use xlink:href="#iconTop"></use></svg>
+                            <#if article.articleViewCount < 1000>
+                                ${article.articleViewCount}
+                            <#else>
+                                ${article.articleViewCntDisplayFormat}
+                            </#if>
+                        </span>
                     </div>
                 </div>
             </div>
@@ -355,6 +363,9 @@
                                                 <#if 0 == comment.commenter.userUAStatus><span class="cmt-via ft-fade"
                                                                                                data-ua="${comment.commentUA}"></span></#if>
                                             </span>
+                                            &nbsp;<#list comment.sysMetal?eval as metal>
+                                                <img title="${metal.description}" src="https://unv-shield.librian.net/api/unv_shield?scale=0.79&txt=${metal.name}&${metal.attr}"/>
+                                            </#list>
                                             <a class="ft-a-title fn-right tooltipped tooltipped-nw"
                                                aria-label="${goCommentLabel}"
                                                href="javascript:Comment.goComment('${servePath}/article/${article.oId}?p=${comment.paginationCurrentPageNum}&m=${userCommentViewMode}#${comment.oId}')">
@@ -472,18 +483,20 @@
         </div>
     </#if>
 
+    <#if showSideAd>
     <#if ADLabel!="">
         <div class="module">
             <div class="module-header">
                 <h2>
                     ${sponsorLabel}
-                    <a href="${servePath}/about" class="fn-right ft-13 ft-gray" target="_blank">${wantPutOnLabel}</a>
+                    <a href="${servePath}/settings/system" class="fn-right ft-13 ft-gray" target="_blank">${wantPutOnLabel}</a>
                 </h2>
             </div>
             <div class="module-panel ad fn-clear">
                 ${ADLabel}
             </div>
         </div>
+    </#if>
     </#if>
 </div>
 

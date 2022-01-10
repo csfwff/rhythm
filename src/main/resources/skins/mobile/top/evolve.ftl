@@ -21,6 +21,17 @@
 <#include "macro-top.ftl">
 <@top "online">
     <h2 class="sub-head">进化排行榜</h2>
+    <div class="module-header fn-clear">
+        <span class="fn-left ft-fade">
+            <a <#if type == "achievement">class="ft-gray" </#if> href="${servePath}/top/evolve?type=achievement">成就榜</a>
+            &nbsp;|&nbsp;
+            <a <#if type == "know">class="ft-gray" </#if> href="${servePath}/top/evolve?type=know">芝士榜</a>
+            &nbsp;|&nbsp;
+            <a <#if type == "reset">class="ft-gray" </#if> href="${servePath}/top/evolve?type=reset">重开榜</a>
+            &nbsp;|&nbsp;
+            <a <#if type == "days">class="ft-gray" </#if> href="${servePath}/top/evolve?type=days">爆肝榜</a>
+        </span>
+    </div>
     <div class="list">
         <ul>
             <#list topUsers as user>
@@ -50,9 +61,26 @@
                                     <#if 0 == user.profile.userAppRole>${hackerLabel}<#else>${painterLabel}</#if>
                                 </div>
                             </div>
-                            <div class="cmts tooltipped tooltipped-w" aria-label="本周目知识消耗 ${user.data.know}，共获得成就 ${user.data.trick} 个">
-                                获得成就 ${user.data.trick} 个<br>
-                            </div>
+                            <#if type == "achievement">
+                                <div class="cmts tooltipped tooltipped-w" aria-label="共获得成就 ${user.data.top.achievement} 个">
+                                    获得成就 ${user.data.top.achievement} 个<br>
+                                </div>
+                            </#if>
+                            <#if type == "know">
+                                <div class="cmts tooltipped tooltipped-w" aria-label="累计知识消耗 ${user.data.top.know}; 当前周期: ${user.data.stats.know}">
+                                    知识消耗 ${user.data.top.know} <br>
+                                </div>
+                            </#if>
+                            <#if type == "reset">
+                                <div class="cmts tooltipped tooltipped-w" aria-label="核爆重置: ${user.data.stats.mad} 次; 播种重置: ${user.data.stats.bioseed} 次; 黑洞重置: ${user.data.stats.blackhole} 次; 飞升重置: ${user.data.stats.ascend} 次; 大灾变重置: ${user.data.stats.cataclysm} 次; 恶魔灌注: ${user.data.stats.descend} 次">
+                                    重置 ${user.data.top.reset} 次<br>
+                                </div>
+                            </#if>
+                            <#if type == "days">
+                                <div class="cmts tooltipped tooltipped-w" aria-label="累计游戏天数 ${user.data.top.days} 天; 当前周期: ${user.data.stats.days} 天">
+                                    游戏天数 ${user.data.top.days} 天<br>
+                                </div>
+                            </#if>
                         </div>
                     </div>
                 </li>

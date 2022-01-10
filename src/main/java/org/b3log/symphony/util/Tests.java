@@ -18,17 +18,36 @@
  */
 package org.b3log.symphony.util;
 
-import java.util.Random;
+import org.json.JSONObject;
+
+import java.util.*;
 
 public class Tests {
+    public static List<JSONObject> TAGS = Collections.synchronizedList(new ArrayList<JSONObject>() {
+        @Override
+        public boolean add(JSONObject o) {
+            if (size() == 5) {
+                remove(0);
+            }
+            return super.add(o);
+        }
+    });
+
     public static void main(String[] args) throws InterruptedException {
-        while (true) {
-            int money = 64;
-            Random random = new Random();
-            int cal = (money / 2);
-            int meGot = random.nextInt(money / 2);
-            System.out.println(1 / 2);
-            Thread.sleep(50);
+        //MD_CACHE = new ConcurrentHashMap<>();
+        for (int i = 0; i < 1000; i++) {
+            int finalI = i;
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    TAGS.add(new JSONObject().put("hi", finalI + ""));
+                }
+            }).start();
+        }
+        Thread.sleep(2000);
+        System.out.println(TAGS.size());
+        for (JSONObject object : TAGS) {
+            System.out.println(object);
         }
     }
 }

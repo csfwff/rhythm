@@ -122,6 +122,13 @@
                         ${article.articleTitleEmoj}
                     </a>
                 </h1>
+                <div style="margin-bottom: 3px">
+                    <#if article.sysMetal != "[]">
+                        <#list article.sysMetal?eval as metal>
+                            <img title="${metal.description}" src="https://unv-shield.librian.net/api/unv_shield?scale=0.79&txt=${metal.name}&${metal.attr}"/>
+                        </#list>
+                    </#if>
+                </div>
                 <div class="article-info">
                     <a rel="author" href="${servePath}/member/${article.articleAuthorName}"
                        title="${article.articleAuthorName}"><div class="avatar" style="background-image:url('${article.articleAuthorThumbnailURL48}')"></div></a>
@@ -277,6 +284,9 @@
                                                     </#if>
                                                     <#if 0 == comment.commenter.userUAStatus><span class="cmt-via ft-fade" data-ua="${comment.commentUA}"></span></#if>
                                                 </span>
+                                                &nbsp;<#list comment.sysMetal?eval as metal>
+                                                <img title="${metal.description}" src="https://unv-shield.librian.net/api/unv_shield?scale=0.79&txt=${metal.name}&${metal.attr}"/>
+                                                </#list>
                                                 <a class="ft-a-title fn-right tooltipped tooltipped-nw" aria-label="${goCommentLabel}"
                                                    href="javascript:Comment.goComment('${servePath}/article/${article.oId}?p=${comment.paginationCurrentPageNum}&m=${userCommentViewMode}#${comment.oId}')"><svg><use xlink:href="#down"></use></svg></a>
                                             </div>
@@ -389,18 +399,20 @@
                 </#if>
             </div>
             <div class="side wrapper">
+                <#if showSideAd>
                 <#if ADLabel!="">
                 <div class="module">
                     <div class="module-header">
                         <h2>
                             ${sponsorLabel}
-                            <a href="${servePath}/about" class="fn-right ft-13 ft-gray" target="_blank">${wantPutOnLabel}</a>
+                            <a href="${servePath}/settings/system" class="fn-right ft-13 ft-gray" target="_blank">${wantPutOnLabel}</a>
                         </h2>
                     </div>
                     <div class="module-panel ad fn-clear">
                         ${ADLabel}
                     </div>
                 </div>
+                </#if>
                 </#if>
                 <#if sideRelevantArticles?size != 0>
                 <div class="module">

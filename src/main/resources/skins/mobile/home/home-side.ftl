@@ -25,6 +25,9 @@
             <div id="userNicknameDom"><b>${user.userNickname}</b></div>
             <div class="ft-gray">${user.userName}</div>
 
+            <div id="metal">
+            </div>
+
             <div>
                 <#if isLoggedIn && (currentUser.userName != user.userName)>
                     <button class="green small" onclick="window.location.href = '${servePath}/idle-talk?toUser=${user.userName}'">
@@ -50,13 +53,13 @@
             </div>
 
             <div>
-                <a href="https://pwl.icu/article/1630575841478" target="_blank">
+                <a href="https://fishpi.cn/article/1630575841478" target="_blank">
                     <img style="height: 26px;margin-top: 5px;" src="
                     <#if user.roleName == '管理员'>
                     https://pwl.stackoverflow.wiki/adminRole.png
                     <#elseif user.roleName == 'OP'>
                     https://pwl.stackoverflow.wiki/opRole.png
-                    <#elseif user.roleName == '协警'>
+                    <#elseif user.roleName == '纪律委员'>
                     https://pwl.stackoverflow.wiki/policeRole.png
                     <#elseif user.roleName == '超级会员'>
                     https://pwl.stackoverflow.wiki/svipRole.png

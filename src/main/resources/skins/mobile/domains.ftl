@@ -55,18 +55,20 @@
                     </#list>
                 </div>
                 <div class="side">
+                    <#if showSideAd>
                     <#if ADLabel!="">
                     <div class="module">
                         <div class="module-header">
                             <h2>
-                                ${sponsorLabel} 
-                                <a href="${servePath}/about" class="fn-right ft-13 ft-gray" target="_blank">${wantPutOnLabel}</a>
+                                ${sponsorLabel}
+                                <a href="${servePath}/settings/system" class="fn-right ft-13 ft-gray" target="_blank">${wantPutOnLabel}</a>
                             </h2>
                         </div>
                         <div class="module-panel ad fn-clear">
                             ${ADLabel}
                         </div>
                     </div>
+                    </#if>
                     </#if>
                 </div>
             </div>

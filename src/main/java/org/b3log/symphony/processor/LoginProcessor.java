@@ -47,6 +47,7 @@ import org.b3log.symphony.service.*;
 import org.b3log.symphony.util.Sessions;
 import org.b3log.symphony.util.StatusCodes;
 import org.json.JSONObject;
+import pers.adlered.simplecurrentlimiter.main.SimpleCurrentLimiter;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -406,6 +407,7 @@ public class LoginProcessor {
      *
      * @param context the specified context
      */
+    public static SimpleCurrentLimiter verifyCodeLimiter = new SimpleCurrentLimiter(60, 2);
     public void showRegister(final RequestContext context) {
         if (Sessions.isLoggedIn()) {
             context.sendRedirect(Latkes.getServePath());
@@ -414,7 +416,6 @@ public class LoginProcessor {
 
         final AbstractFreeMarkerRenderer renderer = new SkinRenderer(context, null);
         final Map<String, Object> dataModel = renderer.getDataModel();
-        dataModel.put(Common.REFERRAL, "");
 
         boolean useInvitationLink = false;
 
@@ -422,8 +423,6 @@ public class LoginProcessor {
         if (!UserRegisterValidationMidware.invalidUserName(referral)) {
             final JSONObject referralUser = userQueryService.getUserByName(referral);
             if (null != referralUser) {
-                dataModel.put(Common.REFERRAL, referral);
-
                 final Map<String, JSONObject> permissions =
                         roleQueryService.getUserPermissionsGrantMap(referralUser.optString(Keys.OBJECT_ID));
                 final JSONObject useILPermission =
@@ -436,27 +435,28 @@ public class LoginProcessor {
         if (StringUtils.isBlank(code)) { // Register Step 1
             renderer.setTemplateName("verify/register.ftl");
         } else { // Register Step 2
-            final JSONObject verifycode = verifycodeQueryService.getVerifycode(code);
-            if (null == verifycode) {
-                dataModel.put(Keys.MSG, langPropsService.get("verifycodeExpiredLabel"));
-                renderer.setTemplateName("error/custom.ftl");
-            } else {
-                renderer.setTemplateName("verify/register2.ftl");
-
-                final String userId = verifycode.optString(Verifycode.USER_ID);
-                final JSONObject user = userQueryService.getUser(userId);
-                dataModel.put(User.USER, user);
-
-                if (UserExt.USER_STATUS_C_VALID == user.optInt(UserExt.USER_STATUS)
-                        || UserExt.NULL_USER_NAME.equals(user.optString(User.USER_NAME))) {
-                    dataModel.put(Keys.MSG, langPropsService.get("userExistLabel"));
+            final String ip = Requests.getRemoteAddr(context.getRequest());
+            if (verifyCodeLimiter.access(ip)) {
+                final JSONObject verifycode = verifycodeQueryService.getVerifycode(code);
+                if (null == verifycode) {
+                    dataModel.put(Keys.MSG, langPropsService.get("verifycodeExpiredLabel"));
                     renderer.setTemplateName("error/custom.ftl");
                 } else {
-                    referral = StringUtils.substringAfter(code, "r=");
-                    if (StringUtils.isNotBlank(referral)) {
-                        dataModel.put(Common.REFERRAL, referral);
+                    renderer.setTemplateName("verify/register2.ftl");
+
+                    final String userId = verifycode.optString(Verifycode.USER_ID);
+                    final JSONObject user = userQueryService.getUser(userId);
+                    dataModel.put(User.USER, user);
+
+                    if (UserExt.USER_STATUS_C_VALID == user.optInt(UserExt.USER_STATUS)
+                            || UserExt.NULL_USER_NAME.equals(user.optString(User.USER_NAME))) {
+                        dataModel.put(Keys.MSG, langPropsService.get("userExistLabel"));
+                        renderer.setTemplateName("error/custom.ftl");
                     }
                 }
+            } else {
+                dataModel.put(Keys.MSG, "验证码尝试次数过快，请稍候重试！");
+                renderer.setTemplateName("error/custom.ftl");
             }
         }
 
@@ -474,53 +474,63 @@ public class LoginProcessor {
      *
      * @param context the specified context
      */
+    public static SimpleCurrentLimiter verifySMSCodeLimiterOfIP = new SimpleCurrentLimiter(120, 1);
+    public static SimpleCurrentLimiter verifySMSCodeLimiterOfName = new SimpleCurrentLimiter(120, 1);
+    public static SimpleCurrentLimiter verifySMSCodeLimiterOfPhone = new SimpleCurrentLimiter(120, 1);
     public void register(final RequestContext context) {
         context.renderJSON(StatusCodes.ERR);
+        final String ip = Requests.getRemoteAddr(context.getRequest());
         final JSONObject requestJSONObject = context.getRequest().getJSON();
         final String name = requestJSONObject.optString(User.USER_NAME);
-        final String email = requestJSONObject.optString(User.USER_EMAIL);
-        final String invitecode = requestJSONObject.optString(Invitecode.INVITECODE);
-        final String referral = requestJSONObject.optString(Common.REFERRAL);
-
-        final JSONObject user = new JSONObject();
-        user.put(User.USER_NAME, name);
-        user.put(User.USER_EMAIL, email);
-        user.put(User.USER_PASSWORD, "");
-        final Locale locale = Locales.getLocale();
-        user.put(UserExt.USER_LANGUAGE, locale.getLanguage() + "_" + locale.getCountry());
-
-        try {
-            final String newUserId = userMgmtService.addUser(user);
-
-            final JSONObject verifycode = new JSONObject();
-            verifycode.put(Verifycode.BIZ_TYPE, Verifycode.BIZ_TYPE_C_REGISTER);
-            String code = RandomStringUtils.randomAlphanumeric(6);
-            if (StringUtils.isNotBlank(referral)) {
-                code += "r=" + referral;
-            }
-            verifycode.put(Verifycode.CODE, code);
-            verifycode.put(Verifycode.EXPIRED, DateUtils.addDays(new Date(), 1).getTime());
-            verifycode.put(Verifycode.RECEIVER, email);
-            verifycode.put(Verifycode.STATUS, Verifycode.STATUS_C_UNSENT);
-            verifycode.put(Verifycode.TYPE, Verifycode.TYPE_C_EMAIL);
-            verifycode.put(Verifycode.USER_ID, newUserId);
-            verifycodeMgmtService.addVerifycode(verifycode);
-
-            final String allowRegister = optionQueryService.getAllowRegister();
-            if ("2".equals(allowRegister) && StringUtils.isNotBlank(invitecode)) {
-                final JSONObject ic = invitecodeQueryService.getInvitecode(invitecode);
-                ic.put(Invitecode.USER_ID, newUserId);
-                ic.put(Invitecode.USE_TIME, System.currentTimeMillis());
-                final String icId = ic.optString(Keys.OBJECT_ID);
-
-                invitecodeMgmtService.updateInvitecode(icId, ic);
+        final String userPhone = requestJSONObject.optString("userPhone");
+        if (verifySMSCodeLimiterOfIP.access(ip) && verifySMSCodeLimiterOfName.access(name) && verifySMSCodeLimiterOfPhone.access(userPhone)) {
+            final String code = RandomStringUtils.randomNumeric(6);
+            if (!verifycodeMgmtService.sendVerifyCodeSMS(userPhone, code)) {
+                context.renderMsg("验证码发送失败，请稍候重试");
+                return;
             }
 
-            context.renderJSON(StatusCodes.SUCC).renderMsg(langPropsService.get("verifycodeSentLabel"));
-        } catch (final ServiceException e) {
-            final String msg = langPropsService.get("registerFailLabel") + " - " + e.getMessage();
-            LOGGER.log(Level.ERROR, msg + "[name={}, email={}]", name, email);
-            context.renderMsg(msg);
+            final String invitecode = requestJSONObject.optString(Invitecode.INVITECODE);
+
+            final JSONObject user = new JSONObject();
+            user.put(User.USER_NAME, name);
+            user.put("userPhone", userPhone);
+            user.put(User.USER_PASSWORD, "");
+            final Locale locale = Locales.getLocale();
+            user.put(UserExt.USER_LANGUAGE, locale.getLanguage() + "_" + locale.getCountry());
+
+            try {
+                final String newUserId = userMgmtService.addUser(user);
+
+                final JSONObject verifycode = new JSONObject();
+                verifycode.put(Verifycode.BIZ_TYPE, Verifycode.BIZ_TYPE_C_REGISTER);
+                verifycode.put(Verifycode.CODE, code);
+                verifycode.put(Verifycode.EXPIRED, DateUtils.addDays(new Date(), 1).getTime());
+                verifycode.put(Verifycode.RECEIVER, userPhone);
+                verifycode.put(Verifycode.STATUS, Verifycode.STATUS_C_UNSENT);
+                verifycode.put(Verifycode.TYPE, Verifycode.TYPE_C_PHONE);
+                verifycode.put(Verifycode.USER_ID, newUserId);
+                verifycodeMgmtService.addVerifycode(verifycode);
+                LOGGER.log(Level.INFO, "Generated a verify code for registering [userName={}, phone={}, code={}]", name, userPhone, code);
+
+                final String allowRegister = optionQueryService.getAllowRegister();
+                if ("2".equals(allowRegister) && StringUtils.isNotBlank(invitecode)) {
+                    final JSONObject ic = invitecodeQueryService.getInvitecode(invitecode);
+                    ic.put(Invitecode.USER_ID, newUserId);
+                    ic.put(Invitecode.USE_TIME, System.currentTimeMillis());
+                    final String icId = ic.optString(Keys.OBJECT_ID);
+
+                    invitecodeMgmtService.updateInvitecode(icId, ic);
+                }
+
+                context.renderJSON(StatusCodes.SUCC).renderMsg(langPropsService.get("verifycodeSentLabel"));
+            } catch (final ServiceException e) {
+                final String msg = langPropsService.get("registerFailLabel") + " - " + e.getMessage();
+                LOGGER.log(Level.ERROR, msg + "[name={}, phone={}]", name, userPhone);
+                context.renderMsg(msg);
+            }
+        } else {
+            context.renderMsg("验证码发送频率过快，请稍候重试");
         }
     }
 
@@ -530,88 +540,100 @@ public class LoginProcessor {
      * @param context the specified context
      */
     public void register2(final RequestContext context) {
-        context.renderJSON(StatusCodes.ERR);
+        final String ip = Requests.getRemoteAddr(context.getRequest());
+        if (verifyCodeLimiter.access(ip)) {
+            context.renderJSON(StatusCodes.ERR);
 
-        final Request request = context.getRequest();
-        final Response response = context.getResponse();
-        final JSONObject requestJSONObject = context.getRequest().getJSON();
+            final Request request = context.getRequest();
+            final Response response = context.getResponse();
+            final JSONObject requestJSONObject = context.getRequest().getJSON();
 
-        final String password = requestJSONObject.optString(User.USER_PASSWORD); // Hashed
-        final int appRole = requestJSONObject.optInt(UserExt.USER_APP_ROLE);
-        final String referral = requestJSONObject.optString(Common.REFERRAL);
-        final String userId = requestJSONObject.optString(UserExt.USER_T_ID);
-
-        String name = null;
-        String email = null;
-        try {
-            final JSONObject user = userQueryService.getUser(userId);
-            if (null == user) {
-                context.renderMsg(langPropsService.get("registerFailLabel") + " - " + "User Not Found");
-                return;
+            final String password = requestJSONObject.optString(User.USER_PASSWORD); // Hashed
+            final int appRole = requestJSONObject.optInt(UserExt.USER_APP_ROLE);
+            String referral = context.param("r");
+            if (referral == null) {
+                referral = "";
             }
+            final String userId = requestJSONObject.optString(UserExt.USER_T_ID);
 
-            name = user.optString(User.USER_NAME);
-            email = user.optString(User.USER_EMAIL);
-
-            user.put(UserExt.USER_APP_ROLE, appRole);
-            user.put(User.USER_PASSWORD, password);
-            user.put(UserExt.USER_STATUS, UserExt.USER_STATUS_C_VALID);
-
-            userMgmtService.addUser(user);
-
-            Sessions.login(response, userId, false);
-
-            final String ip = Requests.getRemoteAddr(request);
-            //userMgmtService.updateOnlineStatus(user.optString(Keys.OBJECT_ID), ip, true, true);
-
-            if (StringUtils.isNotBlank(referral) && !UserRegisterValidationMidware.invalidUserName(referral)) {
-                final JSONObject referralUser = userQueryService.getUserByName(referral);
-                if (null != referralUser) {
-                    final String referralId = referralUser.optString(Keys.OBJECT_ID);
-                    pointtransferMgmtService.transfer(Pointtransfer.ID_C_SYS, userId,
-                            Pointtransfer.TRANSFER_TYPE_C_INVITED_REGISTER,
-                            Pointtransfer.TRANSFER_SUM_C_INVITE_REGISTER, referralId, System.currentTimeMillis(), "");
-                    pointtransferMgmtService.transfer(Pointtransfer.ID_C_SYS, referralId,
-                            Pointtransfer.TRANSFER_TYPE_C_INVITE_REGISTER,
-                            Pointtransfer.TRANSFER_SUM_C_INVITE_REGISTER, userId, System.currentTimeMillis(), "");
-
-                    final JSONObject notification = new JSONObject();
-                    notification.put(Notification.NOTIFICATION_USER_ID, referralId);
-                    notification.put(Notification.NOTIFICATION_DATA_ID, userId);
-                    notificationMgmtService.addInvitationLinkUsedNotification(notification);
+            String name = null;
+            String phone = null;
+            try {
+                final JSONObject user = userQueryService.getUser(userId);
+                if (null == user) {
+                    context.renderMsg(langPropsService.get("registerFailLabel") + " - " + "User Not Found");
+                    return;
                 }
-            }
 
-            final JSONObject ic = invitecodeQueryService.getInvitecodeByUserId(userId);
-            if (null != ic && Invitecode.STATUS_C_UNUSED == ic.optInt(Invitecode.STATUS)) {
-                ic.put(Invitecode.STATUS, Invitecode.STATUS_C_USED);
-                ic.put(Invitecode.USER_ID, userId);
-                ic.put(Invitecode.USE_TIME, System.currentTimeMillis());
-                final String icId = ic.optString(Keys.OBJECT_ID);
+                name = user.optString(User.USER_NAME);
+                phone = user.optString("userPhone");
 
-                invitecodeMgmtService.updateInvitecode(icId, ic);
+                user.put(UserExt.USER_APP_ROLE, appRole);
+                user.put(User.USER_PASSWORD, password);
+                user.put(UserExt.USER_STATUS, UserExt.USER_STATUS_C_VALID);
 
-                final String icGeneratorId = ic.optString(Invitecode.GENERATOR_ID);
-                if (StringUtils.isNotBlank(icGeneratorId) && !Pointtransfer.ID_C_SYS.equals(icGeneratorId)) {
-                    pointtransferMgmtService.transfer(Pointtransfer.ID_C_SYS, icGeneratorId,
-                            Pointtransfer.TRANSFER_TYPE_C_INVITECODE_USED,
-                            Pointtransfer.TRANSFER_SUM_C_INVITECODE_USED, userId, System.currentTimeMillis(), "");
+                userMgmtService.addUser(user);
 
-                    final JSONObject notification = new JSONObject();
-                    notification.put(Notification.NOTIFICATION_USER_ID, icGeneratorId);
-                    notification.put(Notification.NOTIFICATION_DATA_ID, userId);
+                Sessions.login(response, userId, false);
 
-                    notificationMgmtService.addInvitecodeUsedNotification(notification);
+                //final String ip = Requests.getRemoteAddr(request);
+                //userMgmtService.updateOnlineStatus(user.optString(Keys.OBJECT_ID), ip, true, true);
+
+                if (StringUtils.isNotBlank(referral) && !UserRegisterValidationMidware.invalidUserName(referral)) {
+                    final JSONObject referralUser = userQueryService.getUserByName(referral);
+                    if (null != referralUser) {
+                        final String referralId = referralUser.optString(Keys.OBJECT_ID);
+                        pointtransferMgmtService.transfer(Pointtransfer.ID_C_SYS, userId,
+                                Pointtransfer.TRANSFER_TYPE_C_INVITED_REGISTER,
+                                Pointtransfer.TRANSFER_SUM_C_INVITE_REGISTER, referralId, System.currentTimeMillis(), "");
+                        pointtransferMgmtService.transfer(Pointtransfer.ID_C_SYS, referralId,
+                                Pointtransfer.TRANSFER_TYPE_C_INVITE_REGISTER,
+                                Pointtransfer.TRANSFER_SUM_C_INVITE_REGISTER, userId, System.currentTimeMillis(), "");
+
+                        final JSONObject notification = new JSONObject();
+                        notification.put(Notification.NOTIFICATION_USER_ID, referralId);
+                        notification.put(Notification.NOTIFICATION_DATA_ID, userId);
+                        notificationMgmtService.addInvitationLinkUsedNotification(notification);
+                    }
                 }
+
+                final JSONObject ic = invitecodeQueryService.getInvitecodeByUserId(userId);
+                if (null != ic && Invitecode.STATUS_C_UNUSED == ic.optInt(Invitecode.STATUS)) {
+                    ic.put(Invitecode.STATUS, Invitecode.STATUS_C_USED);
+                    ic.put(Invitecode.USER_ID, userId);
+                    ic.put(Invitecode.USE_TIME, System.currentTimeMillis());
+                    final String icId = ic.optString(Keys.OBJECT_ID);
+
+                    invitecodeMgmtService.updateInvitecode(icId, ic);
+
+                    final String icGeneratorId = ic.optString(Invitecode.GENERATOR_ID);
+                    if (StringUtils.isNotBlank(icGeneratorId) && !Pointtransfer.ID_C_SYS.equals(icGeneratorId)) {
+                        pointtransferMgmtService.transfer(Pointtransfer.ID_C_SYS, icGeneratorId,
+                                Pointtransfer.TRANSFER_TYPE_C_INVITECODE_USED,
+                                Pointtransfer.TRANSFER_SUM_C_INVITECODE_USED, userId, System.currentTimeMillis(), "");
+
+                        final JSONObject notification = new JSONObject();
+                        notification.put(Notification.NOTIFICATION_USER_ID, icGeneratorId);
+                        notification.put(Notification.NOTIFICATION_DATA_ID, userId);
+
+                        notificationMgmtService.addInvitecodeUsedNotification(notification);
+                    }
+                }
+
+                context.renderJSON(StatusCodes.SUCC);
+
+                LOGGER.log(Level.INFO, "Registered a user [name={}, phone={}]", name, phone);
+            } catch (final ServiceException e) {
+                final String msg = langPropsService.get("registerFailLabel") + " - " + e.getMessage();
+                LOGGER.log(Level.ERROR, msg + " [name={}, phone={}]", name, phone);
+                context.renderMsg(msg);
             }
-
-            context.renderJSON(StatusCodes.SUCC);
-
-            LOGGER.log(Level.INFO, "Registered a user [name={}, email={}]", name, email);
-        } catch (final ServiceException e) {
-            final String msg = langPropsService.get("registerFailLabel") + " - " + e.getMessage();
-            LOGGER.log(Level.ERROR, msg + " [name={}, email={}]", name, email);
-            context.renderMsg(msg);
+        } else {
+            final JSONObject requestJSONObject = context.getRequest().getJSON();
+            final String userId = requestJSONObject.optString(UserExt.USER_T_ID);
+            final String password = requestJSONObject.optString(User.USER_PASSWORD); // Hashed
+            LOGGER.log(Level.WARN, "Detected a user registration attack [ip={}, userId={}, password={}]", ip, userId, password);
+            context.renderMsg("频率过快，请稍候重试");
         }
     }
 
@@ -631,6 +653,10 @@ public class LoginProcessor {
             JSONObject user = userQueryService.getUserByName(nameOrEmail);
             if (null == user) {
                 user = userQueryService.getUserByEmail(nameOrEmail);
+            }
+
+            if (null == user) {
+                user = userQueryService.getUserByPhone(nameOrEmail);
             }
 
             if (null == user) {

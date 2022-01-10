@@ -27,18 +27,20 @@
     </div>
 </#if>
 
+<#if showSideAd>
 <#if ADLabel!="" && ((tag?? && tag.tagShowSideAd == 0) || !tag??)>
 <div class="module">
     <div class="module-header">
         <h2>
-            ${sponsorLabel} 
-            <a href="${servePath}/about" class="fn-right ft-13 ft-gray" target="_blank">${wantPutOnLabel}</a>
+            ${sponsorLabel}
+            <a href="${servePath}/settings/system" class="fn-right ft-13 ft-gray" target="_blank">${wantPutOnLabel}</a>
         </h2>
     </div>
     <div class="module-panel ad fn-clear">
         ${ADLabel}
     </div>
 </div>
+</#if>
 </#if>
 
 <div class="module">
@@ -108,7 +110,7 @@
                 <div<#if tag.tagDescription == ''> style="width:auto"</#if>>
                     <div>${tag.tagDescription}</div>
                     <span class="fn-right">
-                        <span class="ft-gray">${referenceLabel}</span> 
+                        <span class="ft-gray">${referenceLabel}</span>
                         ${tag.tagReferenceCount} &nbsp;
                         <span class="ft-gray">${cmtLabel}</span>
                         ${tag.tagCommentCount}&nbsp;

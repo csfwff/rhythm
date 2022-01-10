@@ -162,7 +162,10 @@ public class UserRegisterValidationMidware {
 
     public void handle(final RequestContext context) {
         final JSONObject requestJSONObject = context.requestJSON();
-        final String referral = requestJSONObject.optString(Common.REFERRAL);
+        String referral = context.param("r");
+        if (referral == null) {
+            referral = "";
+        }
 
         // check if admin allow to register
         final JSONObject option = optionQueryService.getOption(Option.ID_C_MISC_ALLOW_REGISTER);
@@ -178,7 +181,6 @@ public class UserRegisterValidationMidware {
             try {
                 final JSONObject referralUser = userQueryService.getUserByName(referral);
                 if (null != referralUser) {
-
                     final Map<String, JSONObject> permissions =
                             roleQueryService.getUserPermissionsGrantMap(referralUser.optString(Keys.OBJECT_ID));
                     final JSONObject useILPermission =
@@ -225,7 +227,7 @@ public class UserRegisterValidationMidware {
         }
 
         final String name = requestJSONObject.optString(User.USER_NAME);
-        final String email = requestJSONObject.optString(User.USER_EMAIL);
+        final String phone = requestJSONObject.optString("userPhone");
         final int appRole = requestJSONObject.optInt(UserExt.USER_APP_ROLE);
 
         if (UserExt.isReservedUserName(name)) {
@@ -240,14 +242,8 @@ public class UserRegisterValidationMidware {
             return;
         }
 
-        if (!Strings.isEmail(email)) {
-            context.renderJSON(new JSONObject().put(Keys.MSG, langPropsService.get("registerFailLabel") + " - " + langPropsService.get("invalidEmailLabel")));
-            context.abort();
-            return;
-        }
-
-        if (!UserExt.isValidMailDomain(email)) {
-            context.renderJSON(new JSONObject().put(Keys.MSG, langPropsService.get("registerFailLabel") + " - " + langPropsService.get("invalidEmail1Label")));
+        if (!isMobileNO(phone)) {
+            context.renderJSON(new JSONObject().put(Keys.MSG, langPropsService.get("registerFailLabel") + " - " + "手机号不合法"));
             context.abort();
             return;
         }
@@ -259,5 +255,14 @@ public class UserRegisterValidationMidware {
         }
 
         context.handle();
+    }
+
+    public static boolean isMobileNO(String mobiles) {
+        String telRegex = "[1]\\d{10}";
+        if (mobiles.isEmpty()) {
+            return false;
+        } else {
+            return mobiles.matches(telRegex);
+        }
     }
 }

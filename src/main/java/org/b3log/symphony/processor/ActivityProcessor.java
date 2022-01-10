@@ -172,7 +172,24 @@ public class ActivityProcessor {
         Dispatcher.post("/activity/gobang/start", activityProcessor::startGobang, loginCheck::handle);
         Dispatcher.post("/api/games/adarkroom/share", activityProcessor::shareADarkRoomScore, loginCheck::handle, csrfMidware::check);
         Dispatcher.post("/api/games/mofish/score", activityProcessor::shareMofishScore);
-        Dispatcher.get("/activity/catch-the-cat", activityProcessor::showCatchTheCat, csrfMidware::fill);
+        Dispatcher.get("/activity/catch-the-cat", activityProcessor::showCatchTheCat, loginCheck::handle, csrfMidware::fill);
+        Dispatcher.get("/activity/2048", activityProcessor::show2048, loginCheck::handle, csrfMidware::fill);
+        Dispatcher.get("/api/activity/is-collected-liveness", activityProcessor::isCollectedYesterdayLivenessRewardApi, loginCheck::handle);
+    }
+
+    /**
+     * 查询用户是否已经领取昨日奖励
+     * @param context
+     */
+    public void isCollectedYesterdayLivenessRewardApi(final RequestContext context) {
+        JSONObject currentUser = Sessions.getUser();
+        try {
+            currentUser = ApiProcessor.getUserByKey(context.param("apiKey"));
+        } catch (NullPointerException ignored) {
+        }
+        final String userId = currentUser.optString(Keys.OBJECT_ID);
+        boolean result = activityQueryService.isCollectedYesterdayLivenessReward(userId);
+        context.renderJSON(StatusCodes.SUCC).renderJSON(new JSONObject().put("isCollectedYesterdayLivenessReward", result));
     }
 
     /**
@@ -192,6 +209,27 @@ public class ActivityProcessor {
         final JSONObject user = Sessions.getUser();
         final String userId = user.optString(Keys.OBJECT_ID);
     }
+
+
+    /**
+     * 2048 game.
+     *
+     * @param context
+     */
+    public void show2048(final RequestContext context) {
+        final AbstractFreeMarkerRenderer renderer = new SkinRenderer(context, "activity/2048.ftl");
+        final Map<String, Object> dataModel = renderer.getDataModel();
+        dataModelService.fillHeaderAndFooter(context, dataModel);
+        dataModelService.fillRandomArticles(dataModel);
+        dataModelService.fillSideHotArticles(dataModel);
+        dataModelService.fillSideTags(dataModel);
+        dataModelService.fillLatestCmts(dataModel);
+
+        final JSONObject user = Sessions.getUser();
+        final String userId = user.optString(Keys.OBJECT_ID);
+    }
+
+
 
     /**
      * 上传摸鱼大闯关游戏成绩
@@ -252,7 +290,7 @@ public class ActivityProcessor {
                 }
             } catch (NullPointerException e) {
                 context.renderJSON(StatusCodes.ERR);
-                context.renderMsg("存储数据失败！原因：你还没有登录摸鱼派，请前往摸鱼派 https://pwl.icu 登录账号后重试。");
+                context.renderMsg("存储数据失败！原因：你还没有登录摸鱼派，请前往摸鱼派 https://fishpi.cn 登录账号后重试。");
             }
         } catch (Exception e) {
             context.renderJSON(StatusCodes.ERR);

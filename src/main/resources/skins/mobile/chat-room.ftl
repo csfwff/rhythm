@@ -26,6 +26,7 @@
         <@head title="${chatRoomLabel} - ${symphonyLabel}">
         <meta name="description" content="${chatRoomLabel}"/>
         </@head>
+        <link rel="stylesheet" href="${staticServePath}/css/viewer.min.css"/>
     </head>
     <body>
         <#include "header.ftl">
@@ -99,6 +100,7 @@
         <script src="${staticServePath}/js/lib/jquery/file-upload-9.10.1/jquery.fileupload.min.js"></script>
         <script src="${staticServePath}/js/channel${miniPostfix}.js?${staticResourceVersion}"></script>
         <script src="${staticServePath}/js/chat-room${miniPostfix}.js?${staticResourceVersion}"></script>
+        <script src="${staticServePath}/js/lib/viewer.min.js"></script>
         <script>
             Label.addBoldLabel = '${addBoldLabel}';
             Label.addItalicLabel = '${addItalicLabel}';
@@ -117,6 +119,8 @@
             Label.level3Permitted = ${level3Permitted?string("true", "false")};
             Label.chatRoomPictureStatus = "<#if 0 == chatRoomPictureStatus> blur</#if>";
             Label.latestMessage = "";
+            Label.plusN = 0;
+            Label.hasMore = true;
             ChatRoom.init();
             // Init [ChatRoom] channel
             ChatRoomChannel.init("${wsScheme}://${serverHost}:${serverPort}${contextPath}/chat-room-channel");

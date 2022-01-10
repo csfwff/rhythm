@@ -44,9 +44,7 @@ import org.b3log.symphony.util.Sessions;
 import org.b3log.symphony.util.StatusCodes;
 import org.json.JSONObject;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 
 /**
  * 专业团队，专业的 API 接口
@@ -73,7 +71,12 @@ public class ApiProcessor {
     /**
      * 存储用户的Key
      */
-    public static Map<String, JSONObject> keys = new HashMap<>();
+    public static Map<String, JSONObject> keys = Collections.synchronizedMap(new LinkedHashMap<String, JSONObject>() {
+        @Override
+        protected boolean removeEldestEntry(Map.Entry eldest) {
+            return size() > 1000;
+        }
+    });
 
     /**
      * Follow query service.
@@ -92,6 +95,12 @@ public class ApiProcessor {
      */
     @Inject
     private SystemSettingsService systemSettingsService;
+
+    /**
+     * Cloud service.
+     */
+    @Inject
+    private CloudService cloudService;
 
     /**
      * Register request handlers.
@@ -181,6 +190,7 @@ public class ApiProcessor {
             filteredUserProfile.put(Keys.OBJECT_ID, user.optString(Keys.OBJECT_ID));
             filteredUserProfile.put(UserExt.USER_NO, user.optString(UserExt.USER_NO));
             filteredUserProfile.put(UserExt.USER_APP_ROLE, user.optString(UserExt.USER_APP_ROLE));
+            filteredUserProfile.put("sysMetal", cloudService.getEnabledMetal(user.optString(Keys.OBJECT_ID)));
             final String userId = user.optString(Keys.OBJECT_ID);
             final long followerCnt = followQueryService.getFollowerCount(userId, Follow.FOLLOWING_TYPE_C_USER);
             filteredUserProfile.put("followerCount", followerCnt);
@@ -232,6 +242,16 @@ public class ApiProcessor {
             return;
         }
         context.renderJSON(StatusCodes.SUCC);
+    }
+
+    public static void removeKeyByUsername(String userName) {
+        for (Map.Entry<String, JSONObject> jsonObject : keys.entrySet()) {
+            String currentUserName = jsonObject.getValue().optString(User.USER_NAME);
+            if (userName.equals(currentUserName)) {
+                keys.remove(jsonObject.getKey());
+                System.out.println(userName);
+            }
+        }
     }
 
 }

@@ -19,7 +19,6 @@
 package pers.adlered.simplecurrentlimiter.main;
 
 import pers.adlered.simplecurrentlimiter.control.MainControl;
-import sun.applet.Main;
 
 /**
  * <h3>SimpleCurrentLimiter</h3>

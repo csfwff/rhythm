@@ -356,6 +356,7 @@ public class UserMgmtService {
 
         try {
             final String userEmail = requestJSONObject.optString(User.USER_EMAIL).trim().toLowerCase();
+            final String userPhone = requestJSONObject.optString("userPhone");
             final String userName = requestJSONObject.optString(User.USER_NAME);
             JSONObject user = userRepository.getByName(userName);
             if (null != user && (UserExt.USER_STATUS_C_VALID == user.optInt(UserExt.USER_STATUS)
@@ -372,7 +373,7 @@ public class UserMgmtService {
             boolean toUpdate = false;
             String ret = null;
             String avatarURL = null;
-            user = userRepository.getByEmail(userEmail);
+            user = userRepository.getByPhone(userPhone);
             int userNo = 0;
             if (null != user) {
                 if (UserExt.USER_STATUS_C_VALID == user.optInt(UserExt.USER_STATUS)
@@ -382,7 +383,7 @@ public class UserMgmtService {
                         transaction.rollback();
                     }
 
-                    throw new ServiceException(langPropsService.get("duplicatedEmailLabel"));
+                    throw new ServiceException("该手机号已注册");
                 }
 
                 toUpdate = true;
@@ -393,6 +394,7 @@ public class UserMgmtService {
 
             user = new JSONObject();
             user.put(User.USER_NAME, userName);
+            user.put("userPhone", userPhone);
             user.put(User.USER_EMAIL, userEmail);
             user.put(UserExt.USER_APP_ROLE, requestJSONObject.optInt(UserExt.USER_APP_ROLE));
             user.put(User.USER_PASSWORD, requestJSONObject.optString(User.USER_PASSWORD));
@@ -499,15 +501,15 @@ public class UserMgmtService {
                         byte[] avatarData;
 
                         final String hash = DigestUtils.md5Hex(ret);
-                        avatarData = Gravatars.getRandomAvatarData(hash); // https://github.com/b3log/symphony/issues/569
-                        if (null == avatarData) {
+                        /*avatarData = Gravatars.getRandomAvatarData(hash); // https://github.com/b3log/symphony/issues/569
+                        if (null == avatarData) {*/
                             final BufferedImage img = avatarQueryService.createAvatar(hash, 512);
                             final ByteArrayOutputStream baos = new ByteArrayOutputStream();
                             ImageIO.write(img, "jpg", baos);
                             baos.flush();
                             avatarData = baos.toByteArray();
                             baos.close();
-                        }
+                        /*}*/
 
                         if (Symphonys.QN_ENABLED) {
                             final Auth auth = Auth.create(Symphonys.UPLOAD_QINIU_AK, Symphonys.UPLOAD_QINIU_SK);
@@ -692,6 +694,36 @@ public class UserMgmtService {
             }
 
             LOGGER.log(Level.ERROR, "Updates a user[id=" + userId + "] failed", e);
+            throw new ServiceException(e);
+        }
+    }
+
+    /**
+     * Updates the specified user's phone by the given user id.
+     *
+     * @param userId the given user id
+     * @param user   the specified user, contains the new phone
+     * @throws ServiceException service exception
+     */
+    public void updateUserPhone(final String userId, final JSONObject user) throws ServiceException {
+        final String newPhone = user.optString("userPhone");
+
+        final Transaction transaction = userRepository.beginTransaction();
+
+        try {
+            if (null != userRepository.getByPhone(newPhone)) {
+                throw new ServiceException("手机号重复 [" + newPhone + "]");
+            }
+
+            userRepository.update(userId, user, "userPhone");
+
+            transaction.commit();
+        } catch (final RepositoryException e) {
+            if (transaction.isActive()) {
+                transaction.rollback();
+            }
+
+            LOGGER.log(Level.ERROR, "Updates phone of the user[id=" + userId + "] failed", e);
             throw new ServiceException(e);
         }
     }

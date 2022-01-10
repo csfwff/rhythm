@@ -804,6 +804,28 @@ public class NotificationMgmtService {
     }
 
     /**
+     * Adds a 'red packet' type in chat room notification with the specified request json object.
+     *
+     * @param requestJSONObject the specified request json object, for example,
+     *                          "userId"; "",
+     *                          "dataId": ""
+     * @throws ServiceException service exception
+     */
+    @Transactional
+    public void addRedPacketNotification(final JSONObject requestJSONObject) throws ServiceException {
+        try {
+            requestJSONObject.put(Notification.NOTIFICATION_DATA_TYPE, Notification.DATA_TYPE_C_RED_PACKET);
+
+            addNotification(requestJSONObject);
+        } catch (final RepositoryException e) {
+            final String msg = "Adds a notification [type=chat room at] failed";
+            LOGGER.log(Level.ERROR, msg, e);
+
+            throw new ServiceException(msg);
+        }
+    }
+
+    /**
      * Adds a 'article' type notification with the specified request json object.
      *
      * @param requestJSONObject the specified request json object, for example,

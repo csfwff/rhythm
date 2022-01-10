@@ -82,7 +82,7 @@
         }
         setInterval(function () {
             getActivityStatus();
-        }, 4000);
+        }, 30000);
     </script>
 </div>
 </#if>

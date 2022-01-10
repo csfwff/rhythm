@@ -111,6 +111,7 @@ public class CronMgmtService {
     @Inject
     private LivenessMgmtService livenessMgmtService;
 
+
     /**
      * Start all cron tasks.
      */
@@ -154,11 +155,11 @@ public class CronMgmtService {
             try {
                 Vocation.refresh();
             } catch (final Exception e) {
-                LOGGER.log(Level.ERROR, "Executes cron failed", e);
+                LOGGER.log(Level.ERROR, "Get vocation data failed");
             } finally {
                 Stopwatchs.release();
             }
-        }, delay, 30 * 60 * 1000, TimeUnit.MILLISECONDS);
+        }, delay, 10 * 60 * 1000, TimeUnit.MILLISECONDS);
         delay += 2000;
 
         Symphonys.SCHEDULED_EXECUTOR_SERVICE.scheduleAtFixedRate(() -> {

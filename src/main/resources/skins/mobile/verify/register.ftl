@@ -35,30 +35,31 @@
                     <div class="form">
                         <svg><use xlink:href="#logo"></use></svg>
 
-                        <div class="input-wrap">
-                            <svg><use xlink:href="#userrole"></use></svg>
-                            <input id="registerUserName" type="text" placeholder="${userNamePlaceholderLabel}" autocomplete="off" autofocus="autofocus" />
+                        <div id="regForm">
+                            <div class="input-wrap">
+                                <svg><use xlink:href="#userrole"></use></svg>
+                                <input id="registerUserName" type="text" placeholder="${userNamePlaceholderLabel}" autocomplete="off" autofocus="autofocus" />
+                            </div>
+                            <div class="input-wrap">
+                                <svg><use xlink:href="#phone"></use></svg>
+                                <input id="registerUserPhone" type="text" placeholder="手机号码" autocomplete="off" />
+                            </div>
+
+                            <div class="input-wrap<#if "2" != miscAllowRegister> fn-none</#if>">
+                                <svg><use xlink:href="#heart"></use></svg>
+                                <input id="registerInviteCode" type="text" placeholder="${invitecodePlaceholderLabel}" autocomplete="off" />
+                            </div>
+
+
+                            <div class="input-wrap<#if "2" == miscAllowRegister> fn-none</#if>">
+                                <img id="registerCaptchaImg" class="fn-pointer captcha-img " src="${servePath}/captcha" onclick="this.src = '${servePath}/captcha?' + (new Date()).getTime()" />
+                                <input type="text" id="registerCaptcha" class="captcha-input" placeholder="${captchaLabel}" />
+                            </div>
                         </div>
-                        <div class="input-wrap">
-                            <svg><use xlink:href="#email"></use></svg>
-                            <input id="registerUserEmail" type="text" placeholder="${emailPlaceholderLabel}" autocomplete="off" />
-                        </div>
-                        
-                        <div class="input-wrap<#if "2" != miscAllowRegister> fn-none</#if>">
-                            <svg><use xlink:href="#heart"></use></svg>
-                            <input id="registerInviteCode" type="text" placeholder="${invitecodePlaceholderLabel}" autocomplete="off" />
-                        </div>
-                        
-                        
-                        <div class="input-wrap<#if "2" == miscAllowRegister> fn-none</#if>">
-                            <img id="registerCaptchaImg" class="fn-pointer captcha-img " src="${servePath}/captcha" onclick="this.src = '${servePath}/captcha?' + (new Date()).getTime()" />
-                            <input type="text" id="registerCaptcha" class="captcha-input" placeholder="${captchaLabel}" />
-                        </div>
-                       
+
                         <div id="registerTip" class="tip"></div>
-                        <input id="referral" type="hidden" value="${referral}">
-                        <button class="green" id="registerBtn" onclick="Verify.register()">${registerLabel}</button>
-                        <button onclick="Util.goLogin()">${loginLabel}</button>
+                        <button class="green" id="registerBtn" onclick="Verify.register()">发送验证码</button>
+                        <button id="gotoLoginBtn" onclick="Util.goLogin()">${loginLabel}</button>
                     </div>
                 </div>
                 <div class="intro vditor-reset">
@@ -69,9 +70,6 @@
         <#include "../footer.ftl">
         <script src="${staticServePath}/js/verify${miniPostfix}.js?${staticResourceVersion}"></script>
         <script>
-            if ('${referral}' !== '') {
-                sessionStorage.setItem('r', '${referral}');
-            }
             Verify.init();
             Label.invalidUserNameLabel = "${invalidUserNameLabel}";
             Label.invalidEmailLabel = "${invalidEmailLabel}";

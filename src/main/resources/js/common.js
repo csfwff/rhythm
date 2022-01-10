@@ -33,6 +33,15 @@ var Util = {
   bling: undefined,
   isBlinging: false,
 
+  genMetal(name, attr) {
+    if (attr !== undefined && attr !== '') {
+      attr = '&' + attr;
+    } else {
+      attr = '';
+    }
+    return 'https://unv-shield.librian.net/api/unv_shield?scale=0.79&txt=' + name + attr;
+  },
+
   parseDom(arg) {
     var objE = document.createElement("div");
     objE.innerHTML = arg;
@@ -1365,9 +1374,9 @@ var Util = {
    */
   listenUserCard: function () {
     var cardLock = false;
-    $(".avatar, .avatar-small, .avatar-middle, .avatar-mid, .avatar-big").unbind();
+    $(".avatar, .avatar-small, .avatar-middle, .avatar-mid, .avatar-big, .name-at").unbind();
 
-    $(".avatar, .avatar-small, .avatar-middle, .avatar-mid, .avatar-big").hover(function () {
+    $(".avatar, .avatar-small, .avatar-middle, .avatar-mid, .avatar-big, .name-at").hover(function () {
       // 加载用户信息
       if ($(this).attr("aria-label") !== undefined) {
         let username = $(this).attr("aria-label");
@@ -1400,6 +1409,7 @@ var Util = {
         let canFollow = data.canFollow;
         let userNo = data.userNo;
         let userAppRole = data.userAppRole;
+        let sysMetal = JSON.parse(data.sysMetal);
         // 组合内容
         let html = "" +
             '<div class="user-card" id="userCardContent">\n' +
@@ -1410,8 +1420,8 @@ var Util = {
             '        <div class="user-card__meta">\n' +
             '            <div class="fn__ellipsis">\n' +
             '                <a class="user-card__name" href="' + Label.servePath + '/member/' + userName + '"><b>' + userNickname + '</b></a>\n' +
-            '                <a class="ft-gray ft-smaller" href="' + Label.servePath + '/member/' + userName + '"><b>' + userName + '</b></a>\n' +
-            '            </div>\n';
+            '                <a class="ft-gray ft-smaller" href="' + Label.servePath + '/member/' + userName + '"><b>' + userName + '</b></a>\n';
+        html += '            </div>\n';
         if (userIntro !== "") {
           html += '' +
               '            <div class="user-card__info vditor-reset">\n' +
@@ -1428,9 +1438,18 @@ var Util = {
                 '</div>\n';
           }
         }
+        let list = sysMetal.list;
+        if (list !== undefined && list.length !== 0) {
+          html += '<div class="user-card__info vditor-reset">';
+          for (let i = 0; i < list.length; i++) {
+            let m = list[i];
+            html += "<img title='" + m.description + "' src='" + Util.genMetal(m.name, m.attr) + "'/>";
+          }
+          html += '</div>';
+        }
         html += '            <div class="user-card__icons fn__flex">\n' +
             '                <div class="fn__flex-1">\n' +
-            '                    <a href="https://pwl.icu/article/1630575841478" class="tooltipped__n tooltipped-new"\n' +
+            '                    <a href="https://fishpi.cn/article/1630575841478" class="tooltipped__n tooltipped-new"\n' +
             '                       aria-label="用户分组：' + userRole + '">\n';
         switch (userRole) {
           case '管理员':
@@ -1439,7 +1458,7 @@ var Util = {
           case 'OP':
             html += '<img style="height: 20px;margin: 0px;" src="https://pwl.stackoverflow.wiki/opRole.png"/>';
             break;
-          case '协警':
+          case '纪律委员':
             html += '<img style="height: 20px;margin: 0px;" src="https://pwl.stackoverflow.wiki/policeRole.png"/>';
             break;
           case '超级会员':
@@ -1501,7 +1520,6 @@ var Util = {
           $("#userCardContent").addClass("user-card--bg");
           $("#userCardContent").css("background-image", "url(" + cardBg + ")");
           $("#userCardContent > div").attr("style", "background-image: linear-gradient(90deg, rgba(214, 227, 235, 0.36), rgba(255, 255, 255, 0.76), rgba(255, 255, 255, 0.76));");
-          //$("#userCardContent > div").addClass("user-card-bottom-bg);
           $("#userCardContent > div > a > div").css("width", "105px");
           $("#userCardContent > div > a > div").css("height", "105px");
           $("#userCardContent > div > a > div").css("top", "80px");
@@ -1551,7 +1569,7 @@ var Util = {
       console.log("Connected to user channel websocket.")
       setInterval(function () {
         userChannel.send('-hb-')
-      }, 1000 * 60 * 5)
+      }, 1000 * 55)
     }
 
     userChannel.onmessage = function (evt) {
@@ -1839,6 +1857,12 @@ var Validate = {
       case 'imgStyle':
         if (val === '' ||
           (val !== '' && (!/^\w+:\/\//.test(val) || val.length > 100))) {
+          isValidate = false
+        }
+        break
+      case 'phone' :
+        if (!/^[1][0-9]{10}$/.test(
+          data.target.val())) {
           isValidate = false
         }
         break
@@ -2159,3 +2183,5 @@ function Rotate(id) {
     return (d >= 0 && this.lastIndexOf(endStr) === d);
   }
 }
+
+

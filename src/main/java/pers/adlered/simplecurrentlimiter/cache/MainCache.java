@@ -20,7 +20,8 @@ package pers.adlered.simplecurrentlimiter.cache;
 
 import pers.adlered.simplecurrentlimiter.cache.pair.CachePair;
 
-import java.util.HashMap;
+import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
@@ -32,7 +33,12 @@ import java.util.Map;
  **/
 public class MainCache {
     // 缓存 存储CachePair
-    public Map<String, CachePair> cachePairMap = new HashMap<>();
+    public Map<String, CachePair> cachePairMap = Collections.synchronizedMap(new LinkedHashMap<String, CachePair>() {
+        @Override
+        protected boolean removeEldestEntry(Map.Entry eldest) {
+            return size() > 1000;
+        }
+    });
     // 过期时间（毫秒）
     public long expireTime = -1;
     // 时间单位次数

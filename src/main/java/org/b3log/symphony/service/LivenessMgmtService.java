@@ -31,6 +31,7 @@ import org.b3log.latke.repository.annotation.Transactional;
 import org.b3log.latke.service.annotation.Service;
 import org.b3log.latke.util.Stopwatchs;
 import org.b3log.symphony.model.Liveness;
+import org.b3log.symphony.processor.UserProcessor;
 import org.b3log.symphony.repository.LivenessRepository;
 import org.b3log.symphony.util.Symphonys;
 import org.json.JSONObject;
@@ -111,6 +112,11 @@ public class LivenessMgmtService {
             }
 
             liveness.put(field, liveness.optInt(field) + 1);
+
+            final int livenessMax = Symphonys.ACTIVITY_YESTERDAY_REWARD_MAX;
+            final int currentLiveness = Liveness.calcPoint(liveness);
+            float livenessPercent = (float) (Math.round((float) currentLiveness / livenessMax * 100 * 100)) / 100;
+            UserProcessor.livenessCache.put(userId, livenessPercent);
 
             livenessRepository.update(liveness.optString(Keys.OBJECT_ID), liveness);
         } catch (final RepositoryException e) {

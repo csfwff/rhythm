@@ -27,6 +27,7 @@
     </@head>
     <link rel="stylesheet" href="${staticServePath}/css/index.css?${staticResourceVersion}"/>
     <link rel="canonical" href="${servePath}/community">
+    <link rel="stylesheet" href="${staticServePath}/css/viewer.min.css"/>
 </head>
 <body>
 <#include "header.ftl">
@@ -36,8 +37,12 @@
             <div class="module">
                 <div style="margin-bottom: 15px;">
                     <svg style="width: 12px; height: 12px;"><use xlink:href="#downloadIcon"></use></svg> 下载
-                    <a style="line-height: 30px;text-decoration: none;color: #1296db;" href="https://pwl.icu/article/1637143985245" target="_blank">PC客户端</a><span style="color: #577e8d">&nbsp;&nbsp;|&nbsp;</span>
-                    <a style="line-height: 30px;text-decoration: none;color: #1296db;" href="https://pwl.icu/article/1638189205758" target="_blank">IDEA插件端</a>
+                    <a style="line-height: 30px;text-decoration: none;color: #1296db;" href="https://fishpi.cn/article/1637143985245" target="_blank">PC客户端</a><span style="color: #577e8d">&nbsp;&nbsp;|&nbsp;</span>
+                    <a style="line-height: 30px;text-decoration: none;color: #1296db;" href="https://fishpi.cn/article/1638189205758" target="_blank">IDEA插件</a><span style="color: #577e8d">&nbsp;&nbsp;|&nbsp;</span>
+                    <a style="line-height: 30px;text-decoration: none;color: #1296db;" href="https://zhuanlan.zhihu.com/p/445372463" target="_blank">VSCode插件</a><span style="color: #577e8d">&nbsp;&nbsp;|&nbsp;</span>
+                    <a style="line-height: 30px;text-decoration: none;color: #1296db;" href="https://fishpi.cn/article/1639648815789" target="_blank">Chrome插件</a><span style="color: #577e8d">&nbsp;&nbsp;|&nbsp;</span>
+                    <a style="line-height: 30px;text-decoration: none;color: #1296db;" href="https://fishpi.cn/article/1641291342622" target="_blank">安卓APK</a>&nbsp;&nbsp;|&nbsp;</span>
+                    <a style="line-height: 30px;text-decoration: none;color: #1296db;" href="https://fishpi.cn/article/1641135630423" target="_blank">Python客户端</a>
                 </div>
                 <#if hasSystemTitle>
                 <h2>${systemTitle}</h2>
@@ -117,6 +122,7 @@
 <script src="${staticServePath}/js/lib/jquery/file-upload-9.10.1/jquery.fileupload.min.js"></script>
 <script src="${staticServePath}/js/channel${miniPostfix}.js?${staticResourceVersion}"></script>
 <script src="${staticServePath}/js/chat-room${miniPostfix}.js?${staticResourceVersion}"></script>
+<script src="${staticServePath}/js/lib/viewer.min.js"></script>
 <script>
     Label.addBoldLabel = '${addBoldLabel}';
     Label.addItalicLabel = '${addItalicLabel}';
@@ -135,6 +141,8 @@
     Label.level3Permitted = ${level3Permitted?string("true", "false")};
     Label.chatRoomPictureStatus = "<#if 0 == chatRoomPictureStatus> blur</#if>";
     Label.latestMessage = "";
+    Label.plusN = 0;
+    Label.hasMore = true;
     ChatRoom.init();
     // Init [ChatRoom] channel
     ChatRoomChannel.init("${wsScheme}://${serverHost}:${serverPort}${contextPath}/chat-room-channel");

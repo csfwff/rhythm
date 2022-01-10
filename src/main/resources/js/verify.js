@@ -28,7 +28,7 @@
  * @description Verify
  * @static
  */
-var Verify = {  
+var Verify = {
     /**
      * @description 登录
      */
@@ -84,34 +84,46 @@ var Verify = {
                     "type": 'string',
                     'max': 20
                 }, {
-                    "target": $("#registerUserEmail"),
-                    "msg": Label.invalidEmailLabel,
-                    "type": "email"
+                    "target": $("#registerUserPhone"),
+                    "msg": "手机号码不合法",
+                    "type": "phone"
                 }]})) {
             var requestJSONObject = {
                 userName: $("#registerUserName").val().replace(/(^\s*)|(\s*$)/g, ""),
-                userEmail: $("#registerUserEmail").val().replace(/(^\s*)|(\s*$)/g, ""),
+                userPhone: $("#registerUserPhone").val().replace(/(^\s*)|(\s*$)/g, ""),
                 invitecode: $("#registerInviteCode").val().replace(/(^\s*)|(\s*$)/g, ""),
-                captcha: $("#registerCaptcha").val(),
-                referral: sessionStorage.r || ''
+                captcha: $("#registerCaptcha").val()
             };
 
-            $("#registerBtn").attr('disabled', 'disabled');
+            let args = "";
+            if (Util.getParameterByName("r") !== '') {
+                args = "?r=" + Util.getParameterByName("r");
+            }
 
             $.ajax({
-                url: Label.servePath + "/register",
+                url: Label.servePath + "/register" + args,
                 type: "POST",
                 cache: false,
                 data: JSON.stringify(requestJSONObject),
                 success: function (result, textStatus) {
                     if (0 === result.code) {
                         $("#registerTip").addClass('succ').removeClass('error').html('<ul><li>' + result.msg + '</li></ul>');
-                        $("#registerBtn").attr('disabled', 'disabled');
+                        $("#regForm, #gotoLoginBtn").hide();
+                        $("#registerTip").before('' +
+                            '<div class="input-wrap">\n' +
+                            '    <svg><use xlink:href="#email"></use></svg>\n' +
+                            '    <input id="registerVerifyCode" type="text" placeholder="短信验证码" autocomplete="off" />\n' +
+                            '</div>');
+                        $("#registerBtn").text('验证');
+                        if (Util.getParameterByName("r") !== '') {
+                            $("#registerBtn").attr('onclick', 'location.href = Label.servePath + "/register?r=" + Util.getParameterByName("r") + "&code=" + $("#registerVerifyCode").val()');
+                        } else {
+                            $("#registerBtn").attr('onclick', 'location.href = Label.servePath + "/register?code=" + $("#registerVerifyCode").val()');
+                        }
                     } else {
                         $("#registerTip").addClass('error').removeClass('succ').html('<ul><li>' + result.msg + '</li></ul>');
                         $("#registerCaptchaImg").attr("src", Label.servePath + "/captcha?code=" + Math.random());
                         $("#registerCaptcha").val("");
-                        $("#registerBtn").removeAttr('disabled');
                     }
                 }
             });
@@ -140,8 +152,13 @@ var Verify = {
                 userId: $("#userId2").val()
             };
 
+            let args = "";
+            if (Util.getParameterByName("r") !== '') {
+                args = "?r=" + Util.getParameterByName("r");
+            }
+
             $.ajax({
-                url: Label.servePath + "/register2",
+                url: Label.servePath + "/register2" + args,
                 type: "POST",
                 cache: false,
                 data: JSON.stringify(requestJSONObject),

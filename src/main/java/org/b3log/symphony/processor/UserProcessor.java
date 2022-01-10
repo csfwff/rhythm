@@ -40,6 +40,7 @@ import org.b3log.symphony.processor.middleware.UserCheckMidware;
 import org.b3log.symphony.service.*;
 import org.b3log.symphony.util.*;
 import org.json.JSONObject;
+import pers.adlered.simplecurrentlimiter.main.SimpleCurrentLimiter;
 
 import java.util.*;
 
@@ -178,6 +179,22 @@ public class UserProcessor {
     private LivenessQueryService livenessQueryService;
 
     /**
+     * Cloud service.
+     */
+    @Inject
+    private CloudService cloudService;
+
+    /**
+     * Cache for liveness.
+     */
+    public static final Map<String, Float> livenessCache = Collections.synchronizedMap(new LinkedHashMap<String, Float>() {
+        @Override
+        protected boolean removeEldestEntry(Map.Entry eldest) {
+            return size() > 1000;
+        }
+    });
+
+    /**
      * Register request handlers.
      */
     public static void register() {
@@ -203,6 +220,20 @@ public class UserProcessor {
         Dispatcher.get("/users/emotions", userProcessor::getFrequentEmotions);
         Dispatcher.get("/user/{userName}", userProcessor::getUserInfo);
         Dispatcher.get("/user/liveness", userProcessor::getLiveness, loginCheck::handle);
+        Dispatcher.get("/user/{userName}/metal", userProcessor::getUserMetal, userCheckMidware::handle);
+    }
+
+    /**
+     * 获取用户已启用勋章
+     *
+     * @param context
+     */
+    public void getUserMetal(final RequestContext context) {
+        final String userName = context.pathVar("userName");
+        final JSONObject user = userQueryService.getUserByName(userName);
+        String userId = user.optString(Keys.OBJECT_ID);
+        JSONObject metal = new JSONObject(cloudService.getEnabledMetal(userId));
+        context.renderJSON(StatusCodes.SUCC).renderData(metal);
     }
 
     /**
@@ -210,17 +241,30 @@ public class UserProcessor {
      *
      * @param context
      */
+    SimpleCurrentLimiter livenessApiQueryCurrentLimiter = new SimpleCurrentLimiter(29, 1);
     public void getLiveness(final RequestContext context) {
+        if (context.param("apiKey") != null) {
+            if (!livenessApiQueryCurrentLimiter.access(context.param("apiKey"))) {
+                context.sendStatus(500);
+                return;
+            }
+        }
         JSONObject currentUser = Sessions.getUser();
         try {
             currentUser = ApiProcessor.getUserByKey(context.param("apiKey"));
         } catch (NullPointerException ignored) {
         }
         String userId = currentUser.optString(Keys.OBJECT_ID);
-        final int livenessMax = Symphonys.ACTIVITY_YESTERDAY_REWARD_MAX;
-        final int currentLiveness = livenessQueryService.getCurrentLivenessPoint(userId);
-        float liveness = (float) (Math.round((float) currentLiveness / livenessMax * 100 * 100)) / 100;
-        context.renderJSON(StatusCodes.SUCC).renderJSON(new JSONObject().put("liveness", liveness));
+        if (livenessCache.containsKey(userId)) {
+            float liveness = livenessCache.get(userId);
+            context.renderJSON(StatusCodes.SUCC).renderJSON(new JSONObject().put("liveness", liveness));
+        } else {
+            final int livenessMax = Symphonys.ACTIVITY_YESTERDAY_REWARD_MAX;
+            final int currentLiveness = livenessQueryService.getCurrentLivenessPoint(userId);
+            float liveness = (float) (Math.round((float) currentLiveness / livenessMax * 100 * 100)) / 100;
+            livenessCache.put(userId, liveness);
+            context.renderJSON(StatusCodes.SUCC).renderJSON(new JSONObject().put("liveness", liveness));
+        }
     }
 
     /**
@@ -244,6 +288,7 @@ public class UserProcessor {
         filteredUserProfile.put(Keys.OBJECT_ID, user.optString(Keys.OBJECT_ID));
         filteredUserProfile.put(UserExt.USER_NO, user.optString(UserExt.USER_NO));
         filteredUserProfile.put(UserExt.USER_APP_ROLE, user.optString(UserExt.USER_APP_ROLE));
+        filteredUserProfile.put("sysMetal", cloudService.getEnabledMetal(user.optString(Keys.OBJECT_ID)));
         final String userId = user.optString(Keys.OBJECT_ID);
         final long followerCnt = followQueryService.getFollowerCount(userId, Follow.FOLLOWING_TYPE_C_USER);
         filteredUserProfile.put("followerCount", followerCnt);
@@ -1086,5 +1131,21 @@ public class UserProcessor {
         final JSONObject role = roleQueryService.getRole(roleId);
         user.put(Role.ROLE_NAME, role.optString(Role.ROLE_NAME));
         user.put(UserExt.USER_T_CREATE_TIME, new Date(user.optLong(Keys.OBJECT_ID)));
+
+        // 获取用户个性化设定
+        final SystemSettingsService systemSettingsService = beanManager.getReference(SystemSettingsService.class);
+        final JSONObject systemSettings = systemSettingsService.getByUsrId(user.optString(Keys.OBJECT_ID));
+        if (Objects.isNull(systemSettings)) {
+            user.put("cardBg", "");
+        } else {
+            final String settingsJson = systemSettings.optString(SystemSettings.SETTINGS);
+            final JSONObject settings = new JSONObject(settingsJson);
+            final String cardBg = settings.optString("cardBg");
+            if (StringUtils.isBlank(cardBg)) {
+                user.put("cardBg", "");
+            } else {
+                user.put("cardBg", cardBg);
+            }
+        }
     }
 }

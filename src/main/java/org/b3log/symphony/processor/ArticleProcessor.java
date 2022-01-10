@@ -54,11 +54,9 @@ import org.b3log.symphony.processor.middleware.validate.UserRegisterValidationMi
 import org.b3log.symphony.repository.ArticleRepository;
 import org.b3log.symphony.service.*;
 import org.b3log.symphony.util.*;
-import org.json.JSONArray;
 import org.json.JSONObject;
 
 import javax.imageio.ImageIO;
-import javax.xml.ws.Dispatch;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
@@ -206,6 +204,12 @@ public class ArticleProcessor {
      */
     @Inject
     private PointtransferMgmtService pointtransferMgmtService;
+
+    /**
+     * Cloud service.
+     */
+    @Inject
+    private CloudService cloudService;
 
     /**
      * Register request handlers.
@@ -622,6 +626,14 @@ public class ArticleProcessor {
         article.put(Article.ARTICLE_T_AUTHOR_NAME, author.optString(User.USER_NAME));
         article.put(Article.ARTICLE_T_AUTHOR_URL, author.optString(User.USER_URL));
         article.put(Article.ARTICLE_T_AUTHOR_INTRO, author.optString(UserExt.USER_INTRO));
+
+        String metal = cloudService.getEnabledMetal(articleAuthorId);
+        if (!metal.equals("{}")) {
+            List<Object> list = new JSONObject(metal).optJSONArray("list").toList();
+            article.put("sysMetal", list);
+        } else {
+            article.put("sysMetal", new ArrayList<>());
+        }
 
         dataModel.put(Article.ARTICLE, article);
 

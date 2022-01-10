@@ -42,8 +42,7 @@
                     <div class="module-header">
                         <h2><svg style="width: 20px; height: 20px;"><use xlink:href="#idleChat"></use></svg> 私信</h2>
                         <div style="font-size: 12px;line-height: 18px; padding: 15px">
-                            您的私信内容经过加密，只有发信双方可以得知发信的具体内容，其他人无法知晓（包括管理员）<br>
-                            一旦以下情况之一发生，您的私信会被「双向销毁」：<br>
+                            您的私信内容经过加密，一旦以下情况任一发生，私信将会无法再次查看：<br>
                             1. 收信人查看信件正文；<br>
                             2. 发信人撤回信件；<br>
                             3. 信件超过12小时未读。<br><br>

@@ -28,7 +28,9 @@
     </@head>
 </head>
 <body class="index">
-${HeaderBannerLabel}
+<#if showTopAd>
+    ${HeaderBannerLabel}
+</#if>
 <#include "header.ftl">
 <@subNav '' ''/>
 <div class="main">
@@ -196,15 +198,17 @@ ${HeaderBannerLabel}
 <div class="fn-hr10"></div>
 <div class="main">
     <div class="wrapper">
+        <#if showSideAd>
         <#if ADLabel != ''>
             <div class="module">
                 <div class="module-header" style="background-color: #7ea5c8">
-                    <a href="${servePath}/about">${sponsorLabel}</a>
+                    ${sponsorLabel}
                 </div>
                 <div class="ad module-panel fn-clear">
                     ${ADLabel}
                 </div>
             </div>
+        </#if>
         </#if>
         <div class="module">
             <div class="module-header" style="background-color: #9cd462">
@@ -238,7 +242,7 @@ ${HeaderBannerLabel}
                     </li>
                     <li><a class="title" style="text-decoration: none" id="yesterday" onclick="yesterday()">领取昨日活跃奖励</a>
                     </li>
-                    <li><a class="title" href="${servePath}/activity/1A0001">${activity1A0001Label}</a></li>
+<!--                    <li><a class="title" href="${servePath}/activity/1A0001">${activity1A0001Label}</a></li>-->
                     <li><a class="title" href="${servePath}/activity/character">${characterLabel}</a></li>
                     <li><a class="title" href="${servePath}/charge/point"><span
                                     class="ft-red">❤</span>️ ${chargePointLabel}</a></li>
@@ -342,6 +346,13 @@ ${HeaderBannerLabel}
         }
         window.open($(this).attr('src'));
     });
+    $(function(){
+        let today = new Date();
+        if(today.getMonth() == 11 && today.getDate() == 13){
+        $('html').css("filter","grayscale(100%)")
+         $('html').css("-webkit-filter","grayscale(100%)")
+     }
+    });
 </script>
 <script>
     var liveness = ${liveness};
@@ -388,7 +399,11 @@ ${HeaderBannerLabel}
     }
     refreshActivities();
     <#if isLoggedIn>
-    setInterval(refreshActivities, 5000);
+    setInterval(refreshActivities, 30000);
+    </#if>
+
+    <#if userPhone == "">
+    Util.alert("为了确保账号的安全及正常使用，依照相关法规政策要求：<br>您需要绑定手机号后方可正常访问摸鱼派。<br><br><button onclick='location.href=\"${servePath}/settings/account#bind-phone\"'>点击这里前往设置</button>")
     </#if>
 </script>
 </html>
