@@ -152,7 +152,7 @@
                         <#elseif TGIF == '-1'>
                             <div class="index-user">
                             <#list niceUsers as user>
-                                <a class="niceUsersElement fn-hidden" rel="nofollow"
+                                <a class="niceUsersElement" rel="nofollow"
                                    href="${servePath}/member/${user.userName}">
                                     <span class="avatar-middle slogan"
                                           aria-label="${user.userName}"
@@ -184,7 +184,7 @@
                 <ul class="module-list">
                     <#list topCheckinUsers as user>
                         <#if user_index < 6>
-                            <li class="fn-flex rank topCheckInUsersElement fn-hidden">
+                            <li class="fn-flex rank topCheckInUsersElement">
                                 <#if user_index == 0 || user_index == 1 || user_index == 2>
                                 <span
                                         <#if user_index == 0>
@@ -226,7 +226,7 @@
                 <ul class="module-list">
                     <#list onlineTopUsers as user>
                         <#if user_index < 5>
-                            <li class="fn-flex rank topCheckInUsersElement fn-hidden">
+                            <li class="fn-flex rank topCheckInUsersElement">
                                 <#if user_index == 0 || user_index == 1 || user_index == 2>
                                 <span
                                         <#if user_index == 0>
@@ -759,7 +759,7 @@
 </script>
 <script>
     // 渐变输出
-    function elementFadeOut(element, speed) {
+    /*function elementFadeOut(element, speed) {
         let fadePicList = $(element);
         for (i = 0; i < fadePicList.length; i++) {
             let element = $(fadePicList[i]);
@@ -772,7 +772,7 @@
     }
 
     elementFadeOut(".niceUsersElement", 20);
-    elementFadeOut(".topCheckInUsersElement", 90);
+    elementFadeOut(".topCheckInUsersElement", 90);*/
 </script>
 <script>
     var liveness = ${liveness};
