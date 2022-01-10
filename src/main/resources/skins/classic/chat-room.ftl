@@ -35,20 +35,6 @@
     <div class="wrapper">
         <div class="content chat-room">
             <div class="module">
-                <div style="margin-bottom: 15px;">
-                    <svg style="width: 12px; height: 12px;"><use xlink:href="#downloadIcon"></use></svg> 下载
-                    <a style="line-height: 30px;text-decoration: none;color: #1296db;" href="https://fishpi.cn/article/1637143985245" target="_blank">PC客户端</a><span style="color: #577e8d">&nbsp;&nbsp;|&nbsp;</span>
-                    <a style="line-height: 30px;text-decoration: none;color: #1296db;" href="https://fishpi.cn/article/1638189205758" target="_blank">IDEA插件</a><span style="color: #577e8d">&nbsp;&nbsp;|&nbsp;</span>
-                    <a style="line-height: 30px;text-decoration: none;color: #1296db;" href="https://zhuanlan.zhihu.com/p/445372463" target="_blank">VSCode插件</a><span style="color: #577e8d">&nbsp;&nbsp;|&nbsp;</span>
-                    <a style="line-height: 30px;text-decoration: none;color: #1296db;" href="https://fishpi.cn/article/1639648815789" target="_blank">Chrome插件</a><span style="color: #577e8d">&nbsp;&nbsp;|&nbsp;</span>
-                    <a style="line-height: 30px;text-decoration: none;color: #1296db;" href="https://fishpi.cn/article/1641291342622" target="_blank">安卓APK</a>&nbsp;&nbsp;|&nbsp;</span>
-                    <a style="line-height: 30px;text-decoration: none;color: #1296db;" href="https://fishpi.cn/article/1641135630423" target="_blank">Python客户端</a>
-                </div>
-                <#if hasSystemTitle>
-                <h2>${systemTitle}</h2>
-                <#else>
-                <h2>${chatRoomLabel}</h2>
-                </#if>
                 <div class="fn-content">
                     <div class="reply">
                         <#if isLoggedIn>

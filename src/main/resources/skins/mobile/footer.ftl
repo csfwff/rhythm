@@ -37,6 +37,18 @@
             <div>探索</div>
             <a href="https://github.com/csfwff/rhythm" target="_blank">Rhythm 社区引擎</a>
         </div>
+        <div class="fn-hr5"></div>
+        <div style="margin-top: 5px">
+            <div>摸鱼派聊天室客户端</div>
+            <div style="margin-top: 3px">
+                <a href="https://fishpi.cn/article/1637143985245" target="_blank" title="PC 客户端"><svg style="vertical-align: -2px;"><use xlink:href="#ic-pc"></use></svg></a>&nbsp;
+                <a href="https://fishpi.cn/article/1638189205758" target="_blank" title="IntelliJ IDEA插件"><svg style="vertical-align: -2px;"><use xlink:href="#ic-idea"></use></svg></a>&nbsp;
+                <a href="https://fishpi.cn/article/1639648815789" target="_blank" title="Chrome 插件"><svg style="vertical-align: -2px;"><use xlink:href="#ic-chrome"></use></svg></a>&nbsp;
+                <a href="https://fishpi.cn/article/1641291342622" target="_blank" title="安卓 APK 应用"><svg style="vertical-align: -2px;"><use xlink:href="#ic-apk"></use></svg></a>&nbsp;
+                <a href="https://zhuanlan.zhihu.com/p/445372463" target="_blank" title="VSCode 插件"><svg style="vertical-align: -2px;"><use xlink:href="#ic-vscode"></use></svg></a>&nbsp;
+                <a href="https://fishpi.cn/article/1641135630423" target="_blank" title="Python 客户端"><svg style="vertical-align: -2px;"><use xlink:href="#ic-python"></use></svg></a>
+            </div>
+        </div>
         <div class="ft-smaller" style="padding: 10px 15px 0 15px">
             Copyright © 2021 - 2022 W&P Tech. All Rights Reserved. 北京白与画科技有限公司 版权所有
         </div>
