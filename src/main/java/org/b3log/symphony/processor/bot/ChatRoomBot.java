@@ -10,14 +10,14 @@ import org.b3log.latke.ioc.Inject;
 import org.b3log.latke.model.User;
 import org.b3log.latke.repository.RepositoryException;
 import org.b3log.latke.repository.Transaction;
-import org.b3log.symphony.model.Common;
-import org.b3log.symphony.model.Notification;
-import org.b3log.symphony.model.UserExt;
+import org.b3log.latke.service.ServiceException;
+import org.b3log.symphony.model.*;
 import org.b3log.symphony.processor.ApiProcessor;
 import org.b3log.symphony.processor.ChatroomProcessor;
 import org.b3log.symphony.processor.channel.ChatroomChannel;
 import org.b3log.symphony.repository.ChatRoomRepository;
 import org.b3log.symphony.service.NotificationMgmtService;
+import org.b3log.symphony.service.PointtransferMgmtService;
 import org.b3log.symphony.util.JSONs;
 import org.b3log.symphony.util.Sessions;
 import org.b3log.symphony.util.StatusCodes;
@@ -42,31 +42,38 @@ public class ChatRoomBot {
     /**
      * 警告记录池，不同的记录池有不同的次数
      */
-    SimpleCurrentLimiter RECORD_POOL_2_IN_24H = new SimpleCurrentLimiter(24 * 60 * 60, 2);
-    SimpleCurrentLimiter RECORD_POOL_3_IN_24H = new SimpleCurrentLimiter(24 * 60 * 60, 3);
-    SimpleCurrentLimiter RECORD_POOL_5_IN_24H = new SimpleCurrentLimiter(24 * 60 * 60, 5);
+    private static SimpleCurrentLimiter RECORD_POOL_2_IN_24H = new SimpleCurrentLimiter(24 * 60 * 60, 1);
+    private static SimpleCurrentLimiter RECORD_POOL_3_IN_24H = new SimpleCurrentLimiter(24 * 60 * 60, 2);
+    private static SimpleCurrentLimiter RECORD_POOL_5_IN_24H = new SimpleCurrentLimiter(24 * 60 * 60, 4);
 
     /**
      * 记录并分析消息是否可疑
      * @param context
      */
     public static boolean record(final RequestContext context) {
-        // ==? 前置参数 ?==
         final JSONObject requestJSONObject = (JSONObject) context.attr(Keys.REQUEST);
-        String content = requestJSONObject.optString(Common.CONTENT);
         JSONObject currentUser = Sessions.getUser();
         try {
             currentUser = ApiProcessor.getUserByKey(requestJSONObject.optString("apiKey"));
         } catch (NullPointerException ignored) {
         }
-        final String userName = currentUser.optString(User.USER_NAME);
+        // ==? 前置参数 ?==
+        String content = requestJSONObject.optString(Common.CONTENT);
+        String userName = currentUser.optString(User.USER_NAME);
+        String userId = currentUser.optString(Keys.OBJECT_ID);
         // ==! 前置参数 !==
 
         try {
             JSONObject checkContent = new JSONObject(content);
             if (checkContent.optString("msgType").equals("redPacket")) {
                 // 判定恶意发送非法红包
-                sendBotMsg("监测到 @" + userName + " 伪造发送红包数据包，警告一次。");
+                if (RECORD_POOL_2_IN_24H.access(userName)) {
+                    sendBotMsg("监测到 @" + userName + " 伪造发送红包数据包，警告一次。");
+                } else {
+                    sendBotMsg("由于 @" + userName + " 第二次伪造发送红包数据包，处以扣除积分 50 的处罚。");
+                    abusePoint(userId, 50, "机器人罚单-聊天室伪造发送红包数据包");
+                    RECORD_POOL_2_IN_24H.remove(userName);
+                }
             }
         } catch (Exception ignored) {
         }
@@ -114,6 +121,24 @@ public class ChatRoomBot {
             }
         } catch (Exception e) {
             LOGGER.log(Level.ERROR, "notify user failed", e);
+        }
+    }
+
+    // 扣除积分
+    public static void abusePoint(String userId, int point, String memo) {
+        final BeanManager beanManager = BeanManager.getInstance();
+        PointtransferMgmtService pointtransferMgmtService = beanManager.getReference(PointtransferMgmtService.class);
+        final String transferId = pointtransferMgmtService.transfer(userId, Pointtransfer.ID_C_SYS,
+                Pointtransfer.TRANSFER_TYPE_C_ABUSE_DEDUCT, point, memo, System.currentTimeMillis(), "");
+
+        NotificationMgmtService notificationMgmtService = beanManager.getReference(NotificationMgmtService.class);
+        final JSONObject notification = new JSONObject();
+        notification.put(Notification.NOTIFICATION_USER_ID, userId);
+        notification.put(Notification.NOTIFICATION_DATA_ID, transferId);
+        try {
+            notificationMgmtService.addAbusePointDeductNotification(notification);
+        } catch (ServiceException e) {
+            e.printStackTrace();
         }
     }
 }
