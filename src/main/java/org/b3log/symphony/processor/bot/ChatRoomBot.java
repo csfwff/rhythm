@@ -8,14 +8,14 @@ import org.b3log.latke.http.RequestContext;
 import org.b3log.latke.ioc.BeanManager;
 import org.b3log.latke.ioc.Inject;
 import org.b3log.latke.model.User;
-import org.b3log.latke.repository.RepositoryException;
-import org.b3log.latke.repository.Transaction;
+import org.b3log.latke.repository.*;
 import org.b3log.latke.service.ServiceException;
 import org.b3log.symphony.model.*;
 import org.b3log.symphony.processor.ApiProcessor;
 import org.b3log.symphony.processor.ChatroomProcessor;
 import org.b3log.symphony.processor.channel.ChatroomChannel;
 import org.b3log.symphony.repository.ChatRoomRepository;
+import org.b3log.symphony.repository.CloudRepository;
 import org.b3log.symphony.service.CloudService;
 import org.b3log.symphony.service.NotificationMgmtService;
 import org.b3log.symphony.service.PointtransferMgmtService;
@@ -76,6 +76,14 @@ public class ChatRoomBot {
         String userName = currentUser.optString(User.USER_NAME);
         String userId = currentUser.optString(Keys.OBJECT_ID);
         // ==! 前置参数 !==
+
+        // ==? 是否禁言中 ?==
+        int muteMinute = muted(userId);
+        if (muteMinute != -1) {
+            context.renderJSON(StatusCodes.ERR).renderMsg("你的消息被机器人打回，原因：正在禁言中，剩余时间 " + muteMinute + " 分钟");
+            return false;
+        }
+        // ==! 是否禁言中 !==
 
         // ==? 判定恶意发送非法红包 ?==
         try {
@@ -183,11 +191,23 @@ public class ChatRoomBot {
     // 禁言
     public static void mute(String userId, int minute) {
         final BeanManager beanManager = BeanManager.getInstance();
-        CloudService cloudService = beanManager.getReference(CloudService.class);
+        CloudRepository cloudRepository = beanManager.getReference(CloudRepository.class);
         int muteTime = minute * 1000 * 60;
         try {
-            cloudService.sync(userId, "sys-mute", ("" + (System.currentTimeMillis() + muteTime)));
-        } catch (ServiceException e) {
+            final Transaction transaction = cloudRepository.beginTransaction();
+            Query cloudDeleteQuery = new Query()
+                    .setFilter(CompositeFilterOperator.and(
+                            new PropertyFilter("userId", FilterOperator.EQUAL, userId),
+                            new PropertyFilter("gameId", FilterOperator.EQUAL, CloudService.SYS_MUTE)
+                    ));
+            cloudRepository.remove(cloudDeleteQuery);
+            JSONObject cloudJSON = new JSONObject();
+            cloudJSON.put("userId", userId)
+                    .put("gameId", CloudService.SYS_MUTE)
+                    .put("data", ("" + (System.currentTimeMillis() + muteTime)));
+            cloudRepository.add(cloudJSON);
+            transaction.commit();
+        } catch (RepositoryException e) {
             LOGGER.log(Level.ERROR, "Unable to mute [userId={}]", userId);
         }
     }
@@ -199,5 +219,33 @@ public class ChatRoomBot {
     }
 
     // 检查禁言
+    public static int muted(String userId) {
+        final BeanManager beanManager = BeanManager.getInstance();
+        CloudService cloudService = beanManager.getReference(CloudService.class);
+        CloudRepository cloudRepository = beanManager.getReference(CloudRepository.class);
 
+        String muteData = cloudService.getFromCloud(userId, CloudService.SYS_MUTE);
+        if (muteData.isEmpty()) {
+            return -1;
+        } else {
+            if (System.currentTimeMillis() > Long.parseLong(muteData)) {
+                try {
+                    final Transaction transaction = cloudRepository.beginTransaction();
+                    Query cloudDeleteQuery = new Query()
+                            .setFilter(CompositeFilterOperator.and(
+                                    new PropertyFilter("userId", FilterOperator.EQUAL, userId),
+                                    new PropertyFilter("gameId", FilterOperator.EQUAL, CloudService.SYS_MUTE)
+                            ));
+                    cloudRepository.remove(cloudDeleteQuery);
+                    transaction.commit();
+                } catch (RepositoryException e) {
+                    LOGGER.log(Level.ERROR, "Unable to unmute", e);
+                }
+                return -1;
+            } else {
+                long remainMinute = (Long.parseLong(muteData) - System.currentTimeMillis()) / 1000 / 60;
+                return (int) remainMinute;
+            }
+        }
+    }
 }
