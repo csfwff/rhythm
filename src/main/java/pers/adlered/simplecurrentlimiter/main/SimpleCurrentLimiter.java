@@ -52,6 +52,11 @@ public class SimpleCurrentLimiter {
         return mainControl.write(str);
     }
 
+    public void remove(String str) {
+        MainControl mainControl = getMainControl();
+        mainControl.remove(str);
+    }
+
     public void setExpireTimeMilli(long timeMilli) {
         MainControl mainControl = getMainControl();
         mainControl.setExpireTimeMilli(timeMilli);

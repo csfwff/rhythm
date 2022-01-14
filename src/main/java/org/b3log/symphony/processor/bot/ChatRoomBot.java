@@ -22,6 +22,7 @@ import org.b3log.symphony.util.JSONs;
 import org.b3log.symphony.util.Sessions;
 import org.b3log.symphony.util.StatusCodes;
 import org.json.JSONObject;
+import pers.adlered.simplecurrentlimiter.main.SimpleCurrentLimiter;
 
 import java.text.SimpleDateFormat;
 import java.util.List;
@@ -37,6 +38,13 @@ public class ChatRoomBot {
      * Logger.
      */
     private static final Logger LOGGER = LogManager.getLogger(ChatRoomBot.class);
+
+    /**
+     * 警告记录池，不同的记录池有不同的次数
+     */
+    SimpleCurrentLimiter RECORD_POOL_2_IN_24H = new SimpleCurrentLimiter(24 * 60 * 60, 2);
+    SimpleCurrentLimiter RECORD_POOL_3_IN_24H = new SimpleCurrentLimiter(24 * 60 * 60, 3);
+    SimpleCurrentLimiter RECORD_POOL_5_IN_24H = new SimpleCurrentLimiter(24 * 60 * 60, 5);
 
     /**
      * 记录并分析消息是否可疑

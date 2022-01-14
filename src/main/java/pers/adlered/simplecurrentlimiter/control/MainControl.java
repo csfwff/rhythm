@@ -60,6 +60,10 @@ public class MainControl extends MainCache {
         return isOK;
     }
 
+    public void remove(String str) {
+        this.cachePairMap.remove(str);
+    }
+
     public void setFrequencyTime(long frequencyTime) {
         this.frequencyTime = frequencyTime;
     }
