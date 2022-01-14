@@ -409,215 +409,215 @@ public class ChatroomProcessor {
     final private static SimpleCurrentLimiter chatRoomLivenessLimiter = new SimpleCurrentLimiter(30, 1);
 
     public synchronized void addChatRoomMsg(final RequestContext context) {
-        ChatRoomBot.record(context);
+        if (ChatRoomBot.record(context)) {
+            final JSONObject requestJSONObject = (JSONObject) context.attr(Keys.REQUEST);
+            String content = requestJSONObject.optString(Common.CONTENT);
 
-        final JSONObject requestJSONObject = (JSONObject) context.attr(Keys.REQUEST);
-        String content = requestJSONObject.optString(Common.CONTENT);
-
-        try {
-            JSONObject checkContent = new JSONObject(content);
-            if (checkContent.optString("msgType").equals("redPacket")) {
-                context.renderJSON(StatusCodes.ERR).renderMsg("你想干嘛？");
-                return;
-            }
-        } catch (Exception ignored) {
-        }
-
-        JSONObject currentUser = Sessions.getUser();
-        try {
-            currentUser = ApiProcessor.getUserByKey(requestJSONObject.optString("apiKey"));
-        } catch (NullPointerException ignored) {
-        }
-        final String userName = currentUser.optString(User.USER_NAME);
-
-        final long time = System.currentTimeMillis();
-        JSONObject msg = new JSONObject();
-        msg.put(User.USER_NAME, userName);
-        msg.put(UserExt.USER_AVATAR_URL, currentUser.optString(UserExt.USER_AVATAR_URL));
-        msg.put(Common.CONTENT, content);
-        msg.put(Common.TIME, time);
-        msg.put(UserExt.USER_NICKNAME, currentUser.optString(UserExt.USER_NICKNAME));
-        msg.put("sysMetal", cloudService.getEnabledMetal(currentUser.optString(Keys.OBJECT_ID)));
-
-        // 加活跃
-        try {
-            String userId = currentUser.optString(Keys.OBJECT_ID);
-            if (chatRoomLivenessLimiter.access(userId)) {
-                livenessMgmtService.incLiveness(userId, Liveness.LIVENESS_COMMENT);
-            }
-        } catch (Exception ignored) {
-        }
-
-        if (content.startsWith("[redpacket]") && content.endsWith("[/redpacket]")) {
             try {
-                String redpacketString = content.replaceAll("^\\[redpacket\\]", "").replaceAll("\\[/redpacket\\]$", "");
-                JSONObject redpacket = new JSONObject(redpacketString);
-                String type = redpacket.optString("type");
-                if (StringUtils.isBlank(type)) {
-                    type = "random";
-                }
-                int money = redpacket.optInt("money");
-                int count = redpacket.optInt("count");
-                String recivers = redpacket.optString("recivers");
-                String message = redpacket.optString("msg");
-                message = message.replaceAll("[^0-9a-zA-Z\\u4e00-\\u9fa5,，.。！!?？《》\\s]", "");
-                if (message.length() > 20) {
-                    message = message.substring(0, 20);
-                }
-                String userId = currentUser.optString(Keys.OBJECT_ID);
-                // 扣积分
-                if (money > 20000 || money < 32 || count > 1000 || count <= 0 || count > money) {
-                    context.renderJSON(StatusCodes.ERR).renderMsg("数据不合法！");
+                JSONObject checkContent = new JSONObject(content);
+                if (checkContent.optString("msgType").equals("redPacket")) {
+                    context.renderJSON(StatusCodes.ERR).renderMsg("你想干嘛？");
                     return;
                 }
+            } catch (Exception ignored) {
+            }
+
+            JSONObject currentUser = Sessions.getUser();
+            try {
+                currentUser = ApiProcessor.getUserByKey(requestJSONObject.optString("apiKey"));
+            } catch (NullPointerException ignored) {
+            }
+            final String userName = currentUser.optString(User.USER_NAME);
+
+            final long time = System.currentTimeMillis();
+            JSONObject msg = new JSONObject();
+            msg.put(User.USER_NAME, userName);
+            msg.put(UserExt.USER_AVATAR_URL, currentUser.optString(UserExt.USER_AVATAR_URL));
+            msg.put(Common.CONTENT, content);
+            msg.put(Common.TIME, time);
+            msg.put(UserExt.USER_NICKNAME, currentUser.optString(UserExt.USER_NICKNAME));
+            msg.put("sysMetal", cloudService.getEnabledMetal(currentUser.optString(Keys.OBJECT_ID)));
+
+            // 加活跃
+            try {
+                String userId = currentUser.optString(Keys.OBJECT_ID);
+                if (chatRoomLivenessLimiter.access(userId)) {
+                    livenessMgmtService.incLiveness(userId, Liveness.LIVENESS_COMMENT);
+                }
+            } catch (Exception ignored) {
+            }
+
+            if (content.startsWith("[redpacket]") && content.endsWith("[/redpacket]")) {
                 try {
-                    int toatlMoney = 0;
-                    switch (type) {
-                        case "average":
-                            toatlMoney = money * count;
-                            break;
-                        case "specify":
-                            if (StringUtils.isNotBlank(recivers)) {
-                                final JSONArray reciverArray = new JSONArray(recivers);
-                                final int length = reciverArray.length();
-                                if (length == 1 && userName.equals(reciverArray.optString(0))) {
-                                    context.renderJSON(StatusCodes.ERR).renderMsg("不允许自己给自己单独发专属红包! ");
-                                    return;
-                                }
-                                if (length > 0) {
-                                    toatlMoney = money * length;
+                    String redpacketString = content.replaceAll("^\\[redpacket\\]", "").replaceAll("\\[/redpacket\\]$", "");
+                    JSONObject redpacket = new JSONObject(redpacketString);
+                    String type = redpacket.optString("type");
+                    if (StringUtils.isBlank(type)) {
+                        type = "random";
+                    }
+                    int money = redpacket.optInt("money");
+                    int count = redpacket.optInt("count");
+                    String recivers = redpacket.optString("recivers");
+                    String message = redpacket.optString("msg");
+                    message = message.replaceAll("[^0-9a-zA-Z\\u4e00-\\u9fa5,，.。！!?？《》\\s]", "");
+                    if (message.length() > 20) {
+                        message = message.substring(0, 20);
+                    }
+                    String userId = currentUser.optString(Keys.OBJECT_ID);
+                    // 扣积分
+                    if (money > 20000 || money < 32 || count > 1000 || count <= 0 || count > money) {
+                        context.renderJSON(StatusCodes.ERR).renderMsg("数据不合法！");
+                        return;
+                    }
+                    try {
+                        int toatlMoney = 0;
+                        switch (type) {
+                            case "average":
+                                toatlMoney = money * count;
+                                break;
+                            case "specify":
+                                if (StringUtils.isNotBlank(recivers)) {
+                                    final JSONArray reciverArray = new JSONArray(recivers);
+                                    final int length = reciverArray.length();
+                                    if (length == 1 && userName.equals(reciverArray.optString(0))) {
+                                        context.renderJSON(StatusCodes.ERR).renderMsg("不允许自己给自己单独发专属红包! ");
+                                        return;
+                                    }
+                                    if (length > 0) {
+                                        toatlMoney = money * length;
+                                    } else {
+                                        context.renderJSON(StatusCodes.ERR).renderMsg("专属红包需要指定用户！");
+                                        return;
+                                    }
                                 } else {
                                     context.renderJSON(StatusCodes.ERR).renderMsg("专属红包需要指定用户！");
                                     return;
                                 }
-                            } else {
-                                context.renderJSON(StatusCodes.ERR).renderMsg("专属红包需要指定用户！");
-                                return;
-                            }
-                            break;
-                        case "random":
-                        case "heartbeat":
-                        default:
-                            toatlMoney = money;
-                    }
-                    final boolean succ = null != pointtransferMgmtService.transfer(userId, Pointtransfer.ID_C_SYS,
-                            Pointtransfer.TRANSFER_TYPE_C_ACTIVITY_SEND_RED_PACKET,
-                            toatlMoney, "", System.currentTimeMillis(), "");
-                    if (!succ) {
+                                break;
+                            case "random":
+                            case "heartbeat":
+                            default:
+                                toatlMoney = money;
+                        }
+                        final boolean succ = null != pointtransferMgmtService.transfer(userId, Pointtransfer.ID_C_SYS,
+                                Pointtransfer.TRANSFER_TYPE_C_ACTIVITY_SEND_RED_PACKET,
+                                toatlMoney, "", System.currentTimeMillis(), "");
+                        if (!succ) {
+                            context.renderJSON(StatusCodes.ERR).renderMsg("少年，你的积分不足！");
+                            return;
+                        }
+                    } catch (Exception e) {
                         context.renderJSON(StatusCodes.ERR).renderMsg("少年，你的积分不足！");
                         return;
                     }
-                } catch (Exception e) {
-                    context.renderJSON(StatusCodes.ERR).renderMsg("少年，你的积分不足！");
-                    return;
-                }
-                // 组合新的 JSON
-                JSONObject redPacketJSON = new JSONObject();
-                redPacketJSON.put("senderId", userId);
-                redPacketJSON.put("type", type);
-                redPacketJSON.put("money", money);
-                redPacketJSON.put("count", count);
-                redPacketJSON.put("msg", message);
-                redPacketJSON.put("recivers", recivers);
-                // 已经抢了这个红包的人数
-                redPacketJSON.put("got", 0);
-                // 已经抢了这个红包的人以及抢到的金额
-                redPacketJSON.put("who", new JSONArray());
-                // 红包特殊标识，堵漏洞
-                redPacketJSON.put("msgType", "redPacket");
+                    // 组合新的 JSON
+                    JSONObject redPacketJSON = new JSONObject();
+                    redPacketJSON.put("senderId", userId);
+                    redPacketJSON.put("type", type);
+                    redPacketJSON.put("money", money);
+                    redPacketJSON.put("count", count);
+                    redPacketJSON.put("msg", message);
+                    redPacketJSON.put("recivers", recivers);
+                    // 已经抢了这个红包的人数
+                    redPacketJSON.put("got", 0);
+                    // 已经抢了这个红包的人以及抢到的金额
+                    redPacketJSON.put("who", new JSONArray());
+                    // 红包特殊标识，堵漏洞
+                    redPacketJSON.put("msgType", "redPacket");
 
-                // 写入数据库
+                    // 写入数据库
+                    final Transaction transaction = chatRoomRepository.beginTransaction();
+                    try {
+                        msg.put(Common.CONTENT, redPacketJSON.toString());
+                        String oId = chatRoomRepository.add(new JSONObject().put("content", msg.toString()));
+                        msg.put("oId", oId);
+                    } catch (RepositoryException e) {
+                        LOGGER.log(Level.ERROR, "Cannot save ChatRoom message to the database.", e);
+                    }
+                    transaction.commit();
+                    switch (type) {
+                        case "heartbeat":
+                            //预分配红包
+                            RED_PACKET_BUCKET.put(msg.optString("oId"), allocateHeartbeatRedPacket(msg.optString("oId"), userId, money, count, 3));
+                            break;
+                        case "random":
+                            //预分配红包
+                            RED_PACKET_BUCKET.put(msg.optString("oId"), allocateRedPacket(msg.optString("oId"), userId, money, count, 2));
+                            break;
+                        case "specify":
+                            //发通知
+                            final JSONArray jsonArray = new JSONArray(recivers);
+                            for (Object o : jsonArray) {
+                                final String reciver = (String) o;
+                                final JSONObject user = userQueryService.getUserByName(reciver);
+                                if (Objects.isNull(user) || user.optString("oId").equals(currentUser.optString("oId"))) {
+                                    continue;
+                                }
+                                final JSONObject notification = new JSONObject();
+                                notification.put(Notification.NOTIFICATION_USER_ID, user.optString("oId"));
+                                notification.put(Notification.NOTIFICATION_DATA_ID, msg.optString("oId"));
+                                notificationMgmtService.addRedPacketNotification(notification);
+                            }
+                            break;
+                        default:
+                            //ignore
+                    }
+                    final JSONObject pushMsg = JSONs.clone(msg);
+                    pushMsg.put(Common.TIME, new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(msg.optLong(Common.TIME)));
+                    ChatroomChannel.notifyChat(pushMsg);
+
+                    try {
+                        final JSONObject user = userQueryService.getUser(userId);
+                        user.put(UserExt.USER_LATEST_CMT_TIME, System.currentTimeMillis());
+                        userMgmtService.updateUser(userId, user);
+                    } catch (final Exception e) {
+                        LOGGER.log(Level.ERROR, "Update user latest comment time failed", e);
+                    }
+
+                    context.renderJSON(StatusCodes.SUCC);
+                } catch (Exception e) {
+                    LOGGER.log(Level.INFO, "User " + userName + " failed to send a red packet.");
+                }
+            } else {
+                // 聊天室内容保存到数据库
                 final Transaction transaction = chatRoomRepository.beginTransaction();
                 try {
-                    msg.put(Common.CONTENT, redPacketJSON.toString());
                     String oId = chatRoomRepository.add(new JSONObject().put("content", msg.toString()));
                     msg.put("oId", oId);
                 } catch (RepositoryException e) {
                     LOGGER.log(Level.ERROR, "Cannot save ChatRoom message to the database.", e);
                 }
                 transaction.commit();
-                switch (type) {
-                    case "heartbeat":
-                        //预分配红包
-                        RED_PACKET_BUCKET.put(msg.optString("oId"), allocateHeartbeatRedPacket(msg.optString("oId"), userId, money, count, 3));
-                        break;
-                    case "random":
-                        //预分配红包
-                        RED_PACKET_BUCKET.put(msg.optString("oId"), allocateRedPacket(msg.optString("oId"), userId, money, count, 2));
-                        break;
-                    case "specify":
-                        //发通知
-                        final JSONArray jsonArray = new JSONArray(recivers);
-                        for (Object o : jsonArray) {
-                            final String reciver = (String) o;
-                            final JSONObject user = userQueryService.getUserByName(reciver);
-                            if (Objects.isNull(user) || user.optString("oId").equals(currentUser.optString("oId"))) {
-                                continue;
-                            }
-                            final JSONObject notification = new JSONObject();
-                            notification.put(Notification.NOTIFICATION_USER_ID, user.optString("oId"));
-                            notification.put(Notification.NOTIFICATION_DATA_ID, msg.optString("oId"));
-                            notificationMgmtService.addRedPacketNotification(notification);
-                        }
-                        break;
-                    default:
-                        //ignore
-                }
+                msg = msg.put("md", msg.optString(Common.CONTENT)).put(Common.CONTENT, processMarkdown(msg.optString(Common.CONTENT)));
                 final JSONObject pushMsg = JSONs.clone(msg);
                 pushMsg.put(Common.TIME, new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(msg.optLong(Common.TIME)));
                 ChatroomChannel.notifyChat(pushMsg);
 
+                context.renderJSON(StatusCodes.SUCC);
+
+
                 try {
+                    final List<JSONObject> atUsers = atUsers(msg.optString(Common.CONTENT), userName);
+                    if (Objects.nonNull(atUsers) && !atUsers.isEmpty()) {
+                        for (JSONObject user : atUsers) {
+                            final JSONObject notification = new JSONObject();
+                            notification.put(Notification.NOTIFICATION_USER_ID, user.optString("oId"));
+                            notification.put(Notification.NOTIFICATION_DATA_ID, msg.optString("oId"));
+                            notificationMgmtService.addChatRoomAtNotification(notification);
+                        }
+                    }
+                } catch (Exception e) {
+                    LOGGER.log(Level.ERROR, "notify user failed", e);
+                }
+
+                try {
+                    final String userId = currentUser.optString(Keys.OBJECT_ID);
                     final JSONObject user = userQueryService.getUser(userId);
                     user.put(UserExt.USER_LATEST_CMT_TIME, System.currentTimeMillis());
                     userMgmtService.updateUser(userId, user);
                 } catch (final Exception e) {
                     LOGGER.log(Level.ERROR, "Update user latest comment time failed", e);
                 }
-
-                context.renderJSON(StatusCodes.SUCC);
-            } catch (Exception e) {
-                LOGGER.log(Level.INFO, "User " + userName + " failed to send a red packet.");
-            }
-        } else {
-            // 聊天室内容保存到数据库
-            final Transaction transaction = chatRoomRepository.beginTransaction();
-            try {
-                String oId = chatRoomRepository.add(new JSONObject().put("content", msg.toString()));
-                msg.put("oId", oId);
-            } catch (RepositoryException e) {
-                LOGGER.log(Level.ERROR, "Cannot save ChatRoom message to the database.", e);
-            }
-            transaction.commit();
-            msg = msg.put("md", msg.optString(Common.CONTENT)).put(Common.CONTENT, processMarkdown(msg.optString(Common.CONTENT)));
-            final JSONObject pushMsg = JSONs.clone(msg);
-            pushMsg.put(Common.TIME, new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(msg.optLong(Common.TIME)));
-            ChatroomChannel.notifyChat(pushMsg);
-
-            context.renderJSON(StatusCodes.SUCC);
-
-
-            try {
-                final List<JSONObject> atUsers = atUsers(msg.optString(Common.CONTENT), userName);
-                if (Objects.nonNull(atUsers) && !atUsers.isEmpty()) {
-                    for (JSONObject user : atUsers) {
-                        final JSONObject notification = new JSONObject();
-                        notification.put(Notification.NOTIFICATION_USER_ID, user.optString("oId"));
-                        notification.put(Notification.NOTIFICATION_DATA_ID, msg.optString("oId"));
-                        notificationMgmtService.addChatRoomAtNotification(notification);
-                    }
-                }
-            } catch (Exception e) {
-                LOGGER.log(Level.ERROR, "notify user failed", e);
-            }
-
-            try {
-                final String userId = currentUser.optString(Keys.OBJECT_ID);
-                final JSONObject user = userQueryService.getUser(userId);
-                user.put(UserExt.USER_LATEST_CMT_TIME, System.currentTimeMillis());
-                userMgmtService.updateUser(userId, user);
-            } catch (final Exception e) {
-                LOGGER.log(Level.ERROR, "Update user latest comment time failed", e);
             }
         }
     }

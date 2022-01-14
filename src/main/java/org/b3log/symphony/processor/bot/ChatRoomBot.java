@@ -13,11 +13,14 @@ import org.b3log.latke.repository.Transaction;
 import org.b3log.symphony.model.Common;
 import org.b3log.symphony.model.Notification;
 import org.b3log.symphony.model.UserExt;
+import org.b3log.symphony.processor.ApiProcessor;
 import org.b3log.symphony.processor.ChatroomProcessor;
 import org.b3log.symphony.processor.channel.ChatroomChannel;
 import org.b3log.symphony.repository.ChatRoomRepository;
 import org.b3log.symphony.service.NotificationMgmtService;
 import org.b3log.symphony.util.JSONs;
+import org.b3log.symphony.util.Sessions;
+import org.b3log.symphony.util.StatusCodes;
 import org.json.JSONObject;
 
 import java.text.SimpleDateFormat;
@@ -35,8 +38,32 @@ public class ChatRoomBot {
      */
     private static final Logger LOGGER = LogManager.getLogger(ChatRoomBot.class);
 
-    public static void record(final RequestContext context) {
+    /**
+     * 记录并分析消息是否可疑
+     * @param context
+     */
+    public static boolean record(final RequestContext context) {
+        // ==? 前置参数 ?==
+        final JSONObject requestJSONObject = (JSONObject) context.attr(Keys.REQUEST);
+        String content = requestJSONObject.optString(Common.CONTENT);
+        JSONObject currentUser = Sessions.getUser();
+        try {
+            currentUser = ApiProcessor.getUserByKey(requestJSONObject.optString("apiKey"));
+        } catch (NullPointerException ignored) {
+        }
+        final String userName = currentUser.optString(User.USER_NAME);
+        // ==! 前置参数 !==
 
+        try {
+            JSONObject checkContent = new JSONObject(content);
+            if (checkContent.optString("msgType").equals("redPacket")) {
+                // 判定恶意发送非法红包
+                sendBotMsg("监测到 @" + userName + " 伪造发送红包数据包，警告一次。");
+            }
+        } catch (Exception ignored) {
+        }
+
+        return true;
     }
 
     // 以人工智障的身份发送消息
