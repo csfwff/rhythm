@@ -16,9 +16,7 @@ import org.b3log.symphony.processor.ChatroomProcessor;
 import org.b3log.symphony.processor.channel.ChatroomChannel;
 import org.b3log.symphony.repository.ChatRoomRepository;
 import org.b3log.symphony.repository.CloudRepository;
-import org.b3log.symphony.service.CloudService;
-import org.b3log.symphony.service.NotificationMgmtService;
-import org.b3log.symphony.service.PointtransferMgmtService;
+import org.b3log.symphony.service.*;
 import org.b3log.symphony.util.JSONs;
 import org.b3log.symphony.util.Sessions;
 import org.b3log.symphony.util.StatusCodes;
@@ -75,6 +73,45 @@ public class ChatRoomBot {
         String userId = currentUser.optString(Keys.OBJECT_ID);
         // ==! 前置参数 !==
 
+        // ==? 指令 ?==
+        if (content.startsWith("执法")) {
+            try {
+                String cmd1 = content.replaceAll("(执法)(\\s)+", "");
+                String cmd2 = cmd1.split("\\s")[0];
+                switch (cmd2) {
+                    case "禁言":
+                        if (DataModelService.hasPermission(currentUser.optString(User.USER_ROLE), 3)) {
+                            try {
+                                String user = cmd1.split("\\s")[1].replaceAll("^(@)", "");
+                                String time = cmd1.split("\\s")[2];
+                                int minute = Integer.parseInt(time);
+                                final BeanManager beanManager = BeanManager.getInstance();
+                                UserQueryService userQueryService = beanManager.getReference(UserQueryService.class);
+                                JSONObject targetUser = userQueryService.getUserByName(user);
+                                if (null == targetUser) {
+                                    sendBotMsg("指令执行失败，用户不存在。");
+                                } else {
+                                    muteAndNotice(user, targetUser.optString(Keys.OBJECT_ID), minute);
+                                }
+                            } catch (Exception e) {
+                                sendBotMsg("指令执行失败，禁言格式：执法 禁言 @[用户名] [时间 `单位: 分钟` `如不填此项将查询剩余禁言时间`]");
+                            }
+                        } else {
+                            sendBotMsg("指令执行失败，权限不足。");
+                        }
+                        break;
+                    default:
+                        sendBotMsg("#### 执法帮助菜单\n" +
+                                "##### （如无特殊备注，则需要纪律委员及以上分组才可执行）\n\n" +
+                                "**禁言指定用户** 执法 禁言 @[用户名] [时间 `单位: 分钟` `如不填此项将查询剩余禁言时间`]");
+                }
+                return true;
+            } catch (Exception ignored) {
+                sendBotMsg("指令执行失败。");
+            }
+        }
+        // ==! 指令 !==
+
         // ==? 是否禁言中 ?==
         int muteTime = muted(userId);
         int muteMinute = muteTime % ( 24  *  60  *  60 ) % ( 60  *  60 ) /  60;
@@ -113,9 +150,7 @@ public class ChatRoomBot {
                     sendBotMsg("监测到 @" + userName + "  疑似使用自动复读机插件，请不要频繁复读。");
                 }
             } else {
-                sendBotMsg("由于 @" + userName + "  频繁复读，现处以撤回消息、禁言 15 分钟、扣除积分 30 的处罚。");
-                pass = false;
-                reason = "请注意，你已经频繁复读";
+                sendBotMsg("由于 @" + userName + "  频繁复读，现处以禁言 15 分钟、扣除积分 30 的处罚。");
                 mute(userId, 15);
                 abusePoint(userId, 30, "机器人罚单-聊天室复读频率过高");
                 RECORD_POOL_3_IN_15M.remove(userName);
