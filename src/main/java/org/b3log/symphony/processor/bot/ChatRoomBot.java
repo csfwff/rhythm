@@ -16,6 +16,7 @@ import org.b3log.symphony.processor.ApiProcessor;
 import org.b3log.symphony.processor.ChatroomProcessor;
 import org.b3log.symphony.processor.channel.ChatroomChannel;
 import org.b3log.symphony.repository.ChatRoomRepository;
+import org.b3log.symphony.service.CloudService;
 import org.b3log.symphony.service.NotificationMgmtService;
 import org.b3log.symphony.service.PointtransferMgmtService;
 import org.b3log.symphony.util.JSONs;
@@ -81,9 +82,9 @@ public class ChatRoomBot {
             JSONObject checkContent = new JSONObject(content);
             if (checkContent.optString("msgType").equals("redPacket")) {
                 if (RECORD_POOL_2_IN_24H.access(userName)) {
-                    sendBotMsg("监测到 @" + userName + " 伪造发送红包数据包，警告一次。");
+                    sendBotMsg("监测到 @" + userName + "  伪造发送红包数据包，警告一次。");
                 } else {
-                    sendBotMsg("由于 @" + userName + " 第二次伪造发送红包数据包，现处以扣除积分 50 的处罚。");
+                    sendBotMsg("由于 @" + userName + "  第二次伪造发送红包数据包，现处以扣除积分 50 的处罚。");
                     abusePoint(userId, 50, "机器人罚单-聊天室伪造发送红包数据包");
                     RECORD_POOL_2_IN_24H.remove(userName);
                 }
@@ -97,14 +98,15 @@ public class ChatRoomBot {
             // 与上条内容相同
             if (RECORD_POOL_3_IN_15M.access(userName)) {
                 if (RECORD_POOL_3_IN_15M.get(userName).getFrequency() == 2) {
-                    sendBotMsg("监测到 @" + userName + " 疑似使用自动复读机插件，请不要频繁复读。");
+                    sendBotMsg("监测到 @" + userName + "  疑似使用自动复读机插件，请不要频繁复读。");
                 }
             } else {
-                sendBotMsg("由于 @" + userName + " 频繁复读，现处以撤回消息、禁言 15 分钟、扣除积分 30 的处罚。");
-                abusePoint(userId, 30, "机器人罚单-聊天室复读频率过高");
-                RECORD_POOL_3_IN_15M.remove(userName);
+                sendBotMsg("由于 @" + userName + "  频繁复读，现处以撤回消息、禁言 15 分钟、扣除积分 30 的处罚。");
                 pass = false;
                 reason = "请注意，你已经频繁复读";
+                mute(userId, 15);
+                abusePoint(userId, 30, "机器人罚单-聊天室复读频率过高");
+                RECORD_POOL_3_IN_15M.remove(userName);
             }
         }
         // ==! 判定复读机 !==
@@ -174,7 +176,28 @@ public class ChatRoomBot {
         try {
             notificationMgmtService.addAbusePointDeductNotification(notification);
         } catch (ServiceException e) {
-            e.printStackTrace();
+            LOGGER.log(Level.ERROR, "Unable to send abuse notify", e);
         }
     }
+
+    // 禁言
+    public static void mute(String userId, int minute) {
+        final BeanManager beanManager = BeanManager.getInstance();
+        CloudService cloudService = beanManager.getReference(CloudService.class);
+        int muteTime = minute * 1000 * 60;
+        try {
+            cloudService.sync(userId, "sys-mute", ("" + (System.currentTimeMillis() + muteTime)));
+        } catch (ServiceException e) {
+            LOGGER.log(Level.ERROR, "Unable to mute [userId={}]", userId);
+        }
+    }
+
+    // 禁言并提醒
+    public static void muteAndNotice(String username, String userId, int minute) {
+        sendBotMsg("提醒：@" + username + "  被管理员禁言 " + minute + " 分钟。");
+        mute(userId, minute);
+    }
+
+    // 检查禁言
+
 }
