@@ -78,9 +78,15 @@ public class ChatRoomBot {
         // ==! 前置参数 !==
 
         // ==? 是否禁言中 ?==
-        int muteMinute = muted(userId);
-        if (muteMinute != -1) {
-            context.renderJSON(StatusCodes.ERR).renderMsg("你的消息被机器人打回，原因：正在禁言中，剩余时间 " + muteMinute + " 分钟");
+        int muteTime = muted(userId);
+        int muteMinute = muteTime % ( 24  *  60  *  60 ) % ( 60  *  60 ) /  60;
+        int muteSecond = muteTime % ( 24  *  60  *  60 ) % ( 60  *  60 ) %  60;
+        if (muteTime != -1) {
+            if (muteMinute != 0) {
+                context.renderJSON(StatusCodes.ERR).renderMsg("你的消息被机器人打回，原因：正在禁言中，剩余时间 " + muteMinute + " 分钟 " + muteSecond + " 秒");
+            } else {
+                context.renderJSON(StatusCodes.ERR).renderMsg("你的消息被机器人打回，原因：正在禁言中，剩余时间 " + muteSecond + " 秒");
+            }
             return false;
         }
         // ==! 是否禁言中 !==
@@ -243,7 +249,7 @@ public class ChatRoomBot {
                 }
                 return -1;
             } else {
-                long remainMinute = (Long.parseLong(muteData) - System.currentTimeMillis()) / 1000 / 60;
+                long remainMinute = (Long.parseLong(muteData) - System.currentTimeMillis()) / 1000;
                 return (int) remainMinute;
             }
         }
