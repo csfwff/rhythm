@@ -25,8 +25,7 @@ import org.json.JSONObject;
 import pers.adlered.simplecurrentlimiter.main.SimpleCurrentLimiter;
 
 import java.text.SimpleDateFormat;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 /**
  * 人工智障
@@ -42,15 +41,29 @@ public class ChatRoomBot {
     /**
      * 警告记录池，不同的记录池有不同的次数
      */
-    private static SimpleCurrentLimiter RECORD_POOL_2_IN_24H = new SimpleCurrentLimiter(24 * 60 * 60, 1);
-    private static SimpleCurrentLimiter RECORD_POOL_3_IN_24H = new SimpleCurrentLimiter(24 * 60 * 60, 2);
-    private static SimpleCurrentLimiter RECORD_POOL_5_IN_24H = new SimpleCurrentLimiter(24 * 60 * 60, 4);
+    private static final SimpleCurrentLimiter RECORD_POOL_2_IN_24H = new SimpleCurrentLimiter(24 * 60 * 60, 1);
+    private static final SimpleCurrentLimiter RECORD_POOL_3_IN_15M = new SimpleCurrentLimiter(15 * 60, 2);
+    private static final SimpleCurrentLimiter RECORD_POOL_5_IN_24H = new SimpleCurrentLimiter(24 * 60 * 60, 4);
+
+    /**
+     * 对应关系池
+     */
+    private static final Map<String, String> RECORD_MAP = Collections.synchronizedMap(new LinkedHashMap<String, String>() {
+        @Override
+        protected boolean removeEldestEntry(Map.Entry eldest) {
+            return size() > 100;
+        }
+    });
+
+    private static String latestMessage = "";
 
     /**
      * 记录并分析消息是否可疑
      * @param context
      */
     public static boolean record(final RequestContext context) {
+        boolean pass = true;
+        String reason = "";
         final JSONObject requestJSONObject = (JSONObject) context.attr(Keys.REQUEST);
         JSONObject currentUser = Sessions.getUser();
         try {
@@ -63,21 +76,44 @@ public class ChatRoomBot {
         String userId = currentUser.optString(Keys.OBJECT_ID);
         // ==! 前置参数 !==
 
+        // ==? 判定恶意发送非法红包 ?==
         try {
             JSONObject checkContent = new JSONObject(content);
             if (checkContent.optString("msgType").equals("redPacket")) {
-                // 判定恶意发送非法红包
                 if (RECORD_POOL_2_IN_24H.access(userName)) {
                     sendBotMsg("监测到 @" + userName + " 伪造发送红包数据包，警告一次。");
                 } else {
-                    sendBotMsg("由于 @" + userName + " 第二次伪造发送红包数据包，处以扣除积分 50 的处罚。");
+                    sendBotMsg("由于 @" + userName + " 第二次伪造发送红包数据包，现处以扣除积分 50 的处罚。");
                     abusePoint(userId, 50, "机器人罚单-聊天室伪造发送红包数据包");
                     RECORD_POOL_2_IN_24H.remove(userName);
                 }
             }
         } catch (Exception ignored) {
         }
+        // ==! 判定恶意发送非法红包 !==
 
+        // ==? 判定复读机 ?==
+        if (content.equals(latestMessage)) {
+            // 与上条内容相同
+            if (RECORD_POOL_3_IN_15M.access(userName)) {
+                if (RECORD_POOL_3_IN_15M.get(userName).getFrequency() == 2) {
+                    sendBotMsg("监测到 @" + userName + " 疑似使用自动复读机插件，请不要频繁复读。");
+                }
+            } else {
+                sendBotMsg("由于 @" + userName + " 频繁复读，现处以撤回消息、禁言 15 分钟、扣除积分 30 的处罚。");
+                abusePoint(userId, 30, "机器人罚单-聊天室复读频率过高");
+                RECORD_POOL_3_IN_15M.remove(userName);
+                pass = false;
+                reason = "请注意，你已经频繁复读";
+            }
+        }
+        // ==! 判定复读机 !==
+
+        latestMessage = content;
+        if (!pass) {
+            context.renderJSON(StatusCodes.ERR).renderMsg("你的消息被机器人打回，原因：" + reason);
+            return false;
+        }
         return true;
     }
 

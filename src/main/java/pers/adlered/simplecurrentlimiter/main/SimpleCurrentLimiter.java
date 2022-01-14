@@ -18,6 +18,7 @@
  */
 package pers.adlered.simplecurrentlimiter.main;
 
+import pers.adlered.simplecurrentlimiter.cache.pair.CachePair;
 import pers.adlered.simplecurrentlimiter.control.MainControl;
 
 /**
@@ -55,6 +56,11 @@ public class SimpleCurrentLimiter {
     public void remove(String str) {
         MainControl mainControl = getMainControl();
         mainControl.remove(str);
+    }
+
+    public CachePair get(String str) {
+        MainControl mainControl = getMainControl();
+        return mainControl.getPair(str);
     }
 
     public void setExpireTimeMilli(long timeMilli) {
