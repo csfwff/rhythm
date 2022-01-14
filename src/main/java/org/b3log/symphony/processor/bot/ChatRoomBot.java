@@ -58,10 +58,7 @@ public class ChatRoomBot {
 
     private static String latestMessage = "";
 
-    /**
-     * 记录并分析消息是否可疑
-     * @param context
-     */
+    // 记录并分析消息是否可疑
     public static boolean record(final RequestContext context) {
         boolean pass = true;
         String reason = "";
