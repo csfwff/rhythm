@@ -980,7 +980,7 @@ public final class Symphonys {
      * @param key the specified key
      * @return string property value corresponding to the specified key, returns {@code null} if not found
      */
-    private static String get(final String key) {
+    public static String get(final String key) {
         return CFG.getProperty(key);
     }
 
