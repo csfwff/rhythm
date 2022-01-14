@@ -260,7 +260,7 @@ public class DataModelService {
     private void fillHeader(final RequestContext context, final Map<String, Object> dataModel) {
         fillMinified(dataModel);
         String staticResourceVersion = Symphonys.get("staticResourceVersion");
-        if (null == staticResourceVersion) {
+        if (null == staticResourceVersion || staticResourceVersion.isEmpty()) {
             staticResourceVersion = Latkes.getStaticResourceVersion();
         }
         dataModel.put(Common.STATIC_RESOURCE_VERSION, staticResourceVersion);
