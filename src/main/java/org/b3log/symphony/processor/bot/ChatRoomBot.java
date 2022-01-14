@@ -4,6 +4,7 @@ import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.b3log.latke.Keys;
+import org.b3log.latke.http.RequestContext;
 import org.b3log.latke.ioc.BeanManager;
 import org.b3log.latke.ioc.Inject;
 import org.b3log.latke.model.User;
@@ -33,6 +34,10 @@ public class ChatRoomBot {
      * Logger.
      */
     private static final Logger LOGGER = LogManager.getLogger(ChatRoomBot.class);
+
+    public static void record(final RequestContext context) {
+
+    }
 
     // 以人工智障的身份发送消息
     public static void sendBotMsg(String content) {

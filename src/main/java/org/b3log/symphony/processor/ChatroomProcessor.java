@@ -409,7 +409,7 @@ public class ChatroomProcessor {
     final private static SimpleCurrentLimiter chatRoomLivenessLimiter = new SimpleCurrentLimiter(30, 1);
 
     public synchronized void addChatRoomMsg(final RequestContext context) {
-        ChatRoomBot.sendBotMsg("hi");
+        ChatRoomBot.record(context);
 
         final JSONObject requestJSONObject = (JSONObject) context.attr(Keys.REQUEST);
         String content = requestJSONObject.optString(Common.CONTENT);
