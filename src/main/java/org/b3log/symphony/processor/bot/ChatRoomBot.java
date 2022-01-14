@@ -94,7 +94,7 @@ public class ChatRoomBot {
                                     muteAndNotice(user, targetUser.optString(Keys.OBJECT_ID), minute);
                                 }
                             } catch (Exception e) {
-                                sendBotMsg("指令执行失败，禁言格式：执法 禁言 @[用户名] [时间 `单位: 分钟` `如不填此项将查询剩余禁言时间`]");
+                                sendBotMsg("指令执行失败，禁言命令的正确格式：\n执法 禁言 @[用户名] [时间 `单位: 分钟` `如不填此项将查询剩余禁言时间` `设置为0将解除禁言`]");
                             }
                         } else {
                             sendBotMsg("指令执行失败，权限不足。");
