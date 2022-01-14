@@ -34,6 +34,7 @@ import org.b3log.latke.ioc.Singleton;
 import org.b3log.latke.model.User;
 import org.b3log.latke.repository.*;
 import org.b3log.symphony.model.*;
+import org.b3log.symphony.processor.bot.ChatRoomBot;
 import org.b3log.symphony.processor.channel.ChatroomChannel;
 import org.b3log.symphony.processor.middleware.AnonymousViewCheckMidware;
 import org.b3log.symphony.processor.middleware.LoginCheckMidware;
@@ -408,6 +409,8 @@ public class ChatroomProcessor {
     final private static SimpleCurrentLimiter chatRoomLivenessLimiter = new SimpleCurrentLimiter(30, 1);
 
     public synchronized void addChatRoomMsg(final RequestContext context) {
+        ChatRoomBot.sendBotMsg("hi");
+
         final JSONObject requestJSONObject = (JSONObject) context.attr(Keys.REQUEST);
         String content = requestJSONObject.optString(Common.CONTENT);
 
@@ -619,7 +622,7 @@ public class ChatroomProcessor {
         }
     }
 
-    private List<JSONObject> atUsers(String content, String currentUser) {
+    public List<JSONObject> atUsers(String content, String currentUser) {
         final Document document = Jsoup.parse(content);
         final Elements elements = document.select("p");
         if (elements.isEmpty()) return new ArrayList<>();
@@ -822,7 +825,7 @@ public class ChatroomProcessor {
         }
     }
 
-    private static String processMarkdown(String content) {
+    public static String processMarkdown(String content) {
         try {
             JSONObject checkContent = new JSONObject(content);
             if (checkContent.optString("msgType").equals("redPacket")) {
