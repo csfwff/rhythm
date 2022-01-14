@@ -275,6 +275,10 @@ public class UserProcessor {
     public void getUserInfo(final RequestContext context) {
         final String userName = context.pathVar("userName");
         final JSONObject user = userQueryService.getUserByName(userName);
+        if (null == user) {
+            context.renderJSON(StatusCodes.ERR);
+            return;
+        }
         final JSONObject filteredUserProfile = new JSONObject();
         filteredUserProfile.put(User.USER_NAME, user.optString(User.USER_NAME));
         filteredUserProfile.put(UserExt.USER_ONLINE_FLAG, user.optBoolean(UserExt.USER_ONLINE_FLAG));
