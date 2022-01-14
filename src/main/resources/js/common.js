@@ -1372,6 +1372,7 @@ var Util = {
   /**
    * @description 监听用户名片
    */
+  userCardCache: new Map(),
   listenUserCard: function () {
     var cardLock = false;
     $(".avatar, .avatar-small, .avatar-middle, .avatar-mid, .avatar-big, .name-at").unbind();
@@ -1382,16 +1383,21 @@ var Util = {
         let username = $(this).attr("aria-label");
         // 请求数据
         let data;
-        $.ajax({
-          url: Label.servePath + "/user/" + username,
-          type: "GET",
-          cache: false,
-          async: false,
-          headers: {'csrfToken': Label.csrfToken},
-          success: function (result) {
-            data = result;
-          }
-        });
+        if (Util.userCardCache.has(username)) {
+          data = Util.userCardCache.get(username);
+        } else {
+          $.ajax({
+            url: Label.servePath + "/user/" + username,
+            type: "GET",
+            cache: false,
+            async: false,
+            headers: {'csrfToken': Label.csrfToken},
+            success: function (result) {
+              data = result;
+              Util.userCardCache.set(username, data);
+            }
+          });
+        }
         let followerCount = data.followerCount;
         let followingUserCount = data.followingUserCount;
         let oId = data.oId;
