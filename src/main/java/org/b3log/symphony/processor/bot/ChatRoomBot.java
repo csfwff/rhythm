@@ -71,6 +71,7 @@ public class ChatRoomBot {
             currentUser = ApiProcessor.getUserByKey(requestJSONObject.optString("apiKey"));
         } catch (NullPointerException ignored) {
         }
+
         // ==? 前置参数 ?==
         String content = requestJSONObject.optString(Common.CONTENT);
         String userName = currentUser.optString(User.USER_NAME);
