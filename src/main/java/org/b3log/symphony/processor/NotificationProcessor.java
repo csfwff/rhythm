@@ -295,6 +295,20 @@ public class NotificationProcessor {
                 notificationMgmtService.makeRead(userId, Notification.DATA_TYPE_C_FOLLOWING_ARTICLE_UPDATE);
                 notificationMgmtService.makeRead(userId, Notification.DATA_TYPE_C_FOLLOWING_ARTICLE_COMMENT);
                 break;
+            case "point":
+                notificationMgmtService.makeRead(userId, Notification.DATA_TYPE_C_POINT_ARTICLE_REWARD);
+                notificationMgmtService.makeRead(userId, Notification.DATA_TYPE_C_POINT_ARTICLE_THANK);
+                notificationMgmtService.makeRead(userId, Notification.DATA_TYPE_C_POINT_CHARGE);
+                notificationMgmtService.makeRead(userId, Notification.DATA_TYPE_C_POINT_COMMENT_ACCEPT);
+                notificationMgmtService.makeRead(userId, Notification.DATA_TYPE_C_POINT_COMMENT_THANK);
+                notificationMgmtService.makeRead(userId, Notification.DATA_TYPE_C_POINT_EXCHANGE);
+                notificationMgmtService.makeRead(userId, Notification.DATA_TYPE_C_POINT_PERFECT_ARTICLE);
+                notificationMgmtService.makeRead(userId, Notification.DATA_TYPE_C_POINT_TRANSFER);
+                notificationMgmtService.makeRead(userId, Notification.DATA_TYPE_C_ABUSE_POINT_DEDUCT);
+                notificationMgmtService.makeRead(userId, Notification.DATA_TYPE_C_INVITECODE_USED);
+                notificationMgmtService.makeRead(userId, Notification.DATA_TYPE_C_INVITATION_LINK_USED);
+                notificationMgmtService.makeRead(userId, Notification.DATA_TYPE_C_POINT_REPORT_HANDLED);
+                break;
             default:
                 context.renderJSON(StatusCodes.ERR);
                 return;
