@@ -205,46 +205,53 @@ public class ChatRoomBot {
     }
 
     // 以人工智障的身份发送消息
-    public static void sendBotMsg(String content) {
-        final long time = System.currentTimeMillis();
-        JSONObject msg = new JSONObject();
-        msg.put(User.USER_NAME, "摸鱼派官方巡逻机器人");
-        msg.put(UserExt.USER_AVATAR_URL, "https://pwl.stackoverflow.wiki/2022/01/robot3-89631199.png");
-        msg.put(Common.CONTENT, content);
-        msg.put(Common.TIME, time);
-        msg.put(UserExt.USER_NICKNAME, "人工智障");
-        msg.put("sysMetal", "");
-        // 聊天室内容保存到数据库
-        final BeanManager beanManager = BeanManager.getInstance();
-        ChatRoomRepository chatRoomRepository = beanManager.getReference(ChatRoomRepository.class);
-        final Transaction transaction = chatRoomRepository.beginTransaction();
-        try {
-            String oId = chatRoomRepository.add(new JSONObject().put("content", msg.toString()));
-            msg.put("oId", oId);
-        } catch (RepositoryException e) {
-            LOGGER.log(Level.ERROR, "Cannot save ChatRoom bot message to the database.", e);
-        }
-        transaction.commit();
-        msg = msg.put("md", msg.optString(Common.CONTENT)).put(Common.CONTENT, ChatroomProcessor.processMarkdown(msg.optString(Common.CONTENT)));
-        final JSONObject pushMsg = JSONs.clone(msg);
-        pushMsg.put(Common.TIME, new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(msg.optLong(Common.TIME)));
-        ChatroomChannel.notifyChat(pushMsg);
-
-        try {
-            ChatroomProcessor chatroomProcessor = beanManager.getReference(ChatroomProcessor.class);
-            NotificationMgmtService notificationMgmtService = beanManager.getReference(NotificationMgmtService.class);
-            final List<JSONObject> atUsers = chatroomProcessor.atUsers(msg.optString(Common.CONTENT), "admin");
-            if (Objects.nonNull(atUsers) && !atUsers.isEmpty()) {
-                for (JSONObject user : atUsers) {
-                    final JSONObject notification = new JSONObject();
-                    notification.put(Notification.NOTIFICATION_USER_ID, user.optString("oId"));
-                    notification.put(Notification.NOTIFICATION_DATA_ID, msg.optString("oId"));
-                    notificationMgmtService.addChatRoomAtNotification(notification);
-                }
+    public synchronized static void sendBotMsg(String content) {
+        new Thread(() -> {
+            try {
+                Thread.sleep(100);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
             }
-        } catch (Exception e) {
-            LOGGER.log(Level.ERROR, "notify user failed", e);
-        }
+            final long time = System.currentTimeMillis();
+            JSONObject msg = new JSONObject();
+            msg.put(User.USER_NAME, "摸鱼派官方巡逻机器人");
+            msg.put(UserExt.USER_AVATAR_URL, "https://pwl.stackoverflow.wiki/2022/01/robot3-89631199.png");
+            msg.put(Common.CONTENT, content);
+            msg.put(Common.TIME, time);
+            msg.put(UserExt.USER_NICKNAME, "人工智障");
+            msg.put("sysMetal", "");
+            // 聊天室内容保存到数据库
+            final BeanManager beanManager = BeanManager.getInstance();
+            ChatRoomRepository chatRoomRepository = beanManager.getReference(ChatRoomRepository.class);
+            final Transaction transaction = chatRoomRepository.beginTransaction();
+            try {
+                String oId = chatRoomRepository.add(new JSONObject().put("content", msg.toString()));
+                msg.put("oId", oId);
+            } catch (RepositoryException e) {
+                LOGGER.log(Level.ERROR, "Cannot save ChatRoom bot message to the database.", e);
+            }
+            transaction.commit();
+            msg = msg.put("md", msg.optString(Common.CONTENT)).put(Common.CONTENT, ChatroomProcessor.processMarkdown(msg.optString(Common.CONTENT)));
+            final JSONObject pushMsg = JSONs.clone(msg);
+            pushMsg.put(Common.TIME, new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(msg.optLong(Common.TIME)));
+            ChatroomChannel.notifyChat(pushMsg);
+
+            try {
+                ChatroomProcessor chatroomProcessor = beanManager.getReference(ChatroomProcessor.class);
+                NotificationMgmtService notificationMgmtService = beanManager.getReference(NotificationMgmtService.class);
+                final List<JSONObject> atUsers = chatroomProcessor.atUsers(msg.optString(Common.CONTENT), "admin");
+                if (Objects.nonNull(atUsers) && !atUsers.isEmpty()) {
+                    for (JSONObject user : atUsers) {
+                        final JSONObject notification = new JSONObject();
+                        notification.put(Notification.NOTIFICATION_USER_ID, user.optString("oId"));
+                        notification.put(Notification.NOTIFICATION_DATA_ID, msg.optString("oId"));
+                        notificationMgmtService.addChatRoomAtNotification(notification);
+                    }
+                }
+            } catch (Exception e) {
+                LOGGER.log(Level.ERROR, "notify user failed", e);
+            }
+        }).start();
     }
 
     // 扣除积分
