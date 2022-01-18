@@ -203,11 +203,12 @@ public class ChatRoomBot {
                 return false;
             }
             // 二次确认
-            if (RECORD_MAP.getOrDefault(userId, "").equals(content)) {
-                RECORD_MAP.remove(userId);
+            String key = userId + "_twice_confirm";
+            if (RECORD_MAP.getOrDefault(key, "").equals(content)) {
+                RECORD_MAP.remove(key);
             } else {
                 context.renderJSON(StatusCodes.ERR).renderMsg("你的消息被机器人打回，原因：你处于风控名单，需要二次确认是否发送消息，请再次点击发送按钮确认发送。剩余风控时间为：" + risksControlDay + " 天 " + risksControlHour + " 小时 " + risksControlMinute + " 分 " + risksControlSecond + " 秒。");
-                RECORD_MAP.put(userId, content);
+                RECORD_MAP.put(key, content);
                 return false;
             }
         }
