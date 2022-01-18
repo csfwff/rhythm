@@ -120,13 +120,11 @@ public class ChatRoomBot {
                                 if (time.isEmpty()) {
                                     int muted = muted(targetUserId);
                                     if (muted != -1) {
+                                        int muteDay = muted / (24 * 60 * 60);
+                                        int muteHour = muted % (24 * 60 * 60) / (60 * 60);
                                         int muteMinute = muted % (24 * 60 * 60) % (60 * 60) / 60;
                                         int muteSecond = muted % (24 * 60 * 60) % (60 * 60) % 60;
-                                        if (muteMinute != 0) {
-                                            sendBotMsg("查询结果：该用户剩余禁言时间为：" + muteMinute + " 分 " + muteSecond + " 秒。");
-                                        } else {
-                                            sendBotMsg("查询结果：该用户剩余禁言时间为：" + muteSecond + " 秒。");
-                                        }
+                                        sendBotMsg("查询结果：该用户剩余禁言时间为：" + muteDay + " 天 " + muteHour + " 小时 " + muteMinute + " 分 " + muteSecond + " 秒。");
                                     } else {
                                         sendBotMsg("查询结果：该用户当前未被禁言。");
                                     }
@@ -157,11 +155,11 @@ public class ChatRoomBot {
                                 if (time.isEmpty()) {
                                     int risksControlled = risksControlled(targetUserId);
                                     if (risksControlled != -1) {
-                                        int muteDay = risksControlled / (24 * 60 * 60);
-                                        int muteHour = risksControlled % (24 * 60 * 60) / (60 * 60);
-                                        int muteMinute = risksControlled % (24 * 60 * 60) % (60 * 60) / 60;
-                                        int muteSecond = risksControlled % (24 * 60 * 60) % (60 * 60) % 60;
-                                        sendBotMsg("查询结果：该用户剩余风控时间为：" + muteDay + " 天 " + muteHour + " 小时 " + muteMinute + " 分 " + muteSecond + " 秒。");
+                                        int risksControlDay = risksControlled / (24 * 60 * 60);
+                                        int risksControlHour = risksControlled % (24 * 60 * 60) / (60 * 60);
+                                        int risksControlMinute = risksControlled % (24 * 60 * 60) % (60 * 60) / 60;
+                                        int risksControlSecond = risksControlled % (24 * 60 * 60) % (60 * 60) % 60;
+                                        sendBotMsg("查询结果：该用户剩余风控时间为：" + risksControlDay + " 天 " + risksControlHour + " 小时 " + risksControlMinute + " 分 " + risksControlSecond + " 秒。");
                                     } else {
                                         sendBotMsg("查询结果：该用户当前未被风控。");
                                     }
