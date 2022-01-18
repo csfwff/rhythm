@@ -81,6 +81,7 @@ public class ChatroomProcessor {
 
 
     private static final String PARTICIPANTS = "participants";
+
     /**
      * Chat messages.
      */

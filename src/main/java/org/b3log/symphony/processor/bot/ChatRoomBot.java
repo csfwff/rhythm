@@ -185,6 +185,19 @@ public class ChatRoomBot {
         }
         // ==! 指令 !==
 
+        // ==? 风控 ?==
+        int risksControlled = risksControlled(userId);
+        // 单图片
+        if (content.startsWith("![") && content.endsWith(")\n")) {
+            int risksControlDay = risksControlled / (24 * 60 * 60);
+            int risksControlHour = risksControlled % (24 * 60 * 60) / (60 * 60);
+            int risksControlMinute = risksControlled % (24 * 60 * 60) % (60 * 60) / 60;
+            int risksControlSecond = risksControlled % (24 * 60 * 60) % (60 * 60) % 60;
+            context.renderJSON(StatusCodes.ERR).renderMsg("你的消息被机器人打回，原因：你处于风控名单，不允许发送单图片内容。剩余风控时间为：" + risksControlDay + " 天 " + risksControlHour + " 小时 " + risksControlMinute + " 分 " + risksControlSecond + " 秒。");
+            return false;
+        }
+        // ==! 风控 !==
+
         // ==? 是否禁言中 ?==
         int muted = muted(userId);
         int muteDay = muted / (24 * 60 * 60);
@@ -420,8 +433,6 @@ public class ChatRoomBot {
         if (risksControlData.isEmpty()) {
             return -1;
         } else {
-            System.out.println(System.currentTimeMillis());
-            System.out.println(Long.parseLong(risksControlData));
             if (System.currentTimeMillis() > Long.parseLong(risksControlData)) {
                 try {
                     final Transaction transaction = cloudRepository.beginTransaction();
