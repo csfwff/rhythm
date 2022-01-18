@@ -110,6 +110,10 @@ public class ChatRoomBot {
                                 final BeanManager beanManager = BeanManager.getInstance();
                                 UserQueryService userQueryService = beanManager.getReference(UserQueryService.class);
                                 JSONObject targetUser = userQueryService.getUserByName(user);
+                                if (null == targetUser) {
+                                    sendBotMsg("指令执行失败，用户不存在。");
+                                    break;
+                                }
                                 String targetUserId = targetUser.optString(Keys.OBJECT_ID);
                                 if (time.isEmpty()) {
                                     int muted = muted(targetUserId);
@@ -147,6 +151,10 @@ public class ChatRoomBot {
                                 final BeanManager beanManager = BeanManager.getInstance();
                                 UserQueryService userQueryService = beanManager.getReference(UserQueryService.class);
                                 JSONObject targetUser = userQueryService.getUserByName(user);
+                                if (null == targetUser) {
+                                    sendBotMsg("指令执行失败，用户不存在。");
+                                    break;
+                                }
                                 String targetUserId = targetUser.optString(Keys.OBJECT_ID);
                                 if (time.isEmpty()) {
                                     int muted = muted(targetUserId);
