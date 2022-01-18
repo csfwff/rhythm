@@ -228,7 +228,7 @@ public class CronMgmtService {
             } finally {
                 Stopwatchs.release();
             }
-        }, delay, 5 * 1000, TimeUnit.MILLISECONDS);
+        }, delay, 15 * 60 * 1000, TimeUnit.MILLISECONDS);
         delay += 2000;
     }
 
