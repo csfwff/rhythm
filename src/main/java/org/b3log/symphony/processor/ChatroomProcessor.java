@@ -233,6 +233,19 @@ public class ChatroomProcessor {
                 return;
             }
             // ==! 是否禁言中 !==
+            // ==? 风控判断 ?==
+            int risksControlled = ChatRoomBot.risksControlled(userId);
+            int risksControlDay = risksControlled / (24 * 60 * 60);
+            int risksControlHour = risksControlled % (24 * 60 * 60) / (60 * 60);
+            int risksControlMinute = risksControlled % (24 * 60 * 60) % (60 * 60) / 60;
+            int risksControlSecond = risksControlled % (24 * 60 * 60) % (60 * 60) % 60;
+            if (risksControlled != -1) {
+                if (!openRedPacketLimiter.access(userId)) {
+                    context.renderJSON(StatusCodes.ERR).renderMsg("抢红包失败，原因：你处于风控名单，每30分钟只能抢一个红包。剩余风控时间为：" + risksControlDay + " 天 " + risksControlHour + " 小时 " + risksControlMinute + " 分 " + risksControlSecond + " 秒。");
+                    return;
+                }
+            }
+            // ==! 风控判断 !==
             String userName = currentUser.optString(User.USER_NAME);
             final JSONObject requestJSONObject = context.requestJSON();
             String oId = requestJSONObject.optString("oId");
@@ -419,7 +432,8 @@ public class ChatroomProcessor {
      * @param context the specified context
      */
     final private static SimpleCurrentLimiter chatRoomLivenessLimiter = new SimpleCurrentLimiter(30, 1);
-    final private static SimpleCurrentLimiter risksControlMessageLimiter = new SimpleCurrentLimiter(30 * 60, 1);
+    final private static SimpleCurrentLimiter risksControlMessageLimiter = new SimpleCurrentLimiter(15 * 60, 1);
+    final private static SimpleCurrentLimiter openRedPacketLimiter = new SimpleCurrentLimiter(30 * 60, 1);
 
     public synchronized void addChatRoomMsg(final RequestContext context) {
         if (ChatRoomBot.record(context)) {
