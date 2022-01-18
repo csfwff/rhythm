@@ -885,43 +885,47 @@ var ChatRoom = {
         oId: oId
       }),
       success: function (result) {
-        let iGot = "抢红包人数较多，加载中...";
-        Util.alert("" +
-            "<style>" +
-            ".dialog-header-bg {" +
-            "border-radius: 4px 4px 0px 0px; background-color: rgb(210, 63, 49); color: rgb(255, 255, 255);" +
-            "}" +
-            ".dialog-main {" +
-            "height: 456px;" +
-            "overflow: auto;" +
-            "}" +
-            "</style>" +
-            "<div class=\"fn-hr5\"></div>\n" +
-            "<div class=\"fn-hr5\"></div>\n" +
-            "<div class=\"fn-hr5\"></div>\n" +
-            "<div class=\"fn-hr5\"></div>\n" +
-            "<div class=\"ft__center\">\n" +
-            "    <div class=\"fn__flex-inline\">\n" +
-            "        <img class=\"avatar avatar--small\" src=\"" + result.info.userAvatarURL + "\" style=\"background-image: none; background-color: transparent; width: 20px; height: 20px; margin-right: 0px;\">\n" +
-            "        <div class=\"fn__space5\"></div>\n" +
-            "        <a href=\"" + Label.servePath + "/member/" + result.info.userName + "\">" + result.info.userName + "</a>'s 红包\n" +
-            "    </div>\n" +
-            "    <div class=\"fn-hr5\"></div>\n" +
-            "    <div id = \"msg\" class=\"ft__smaller ft__fade\">\n" +
-            result.info.msg + "\n" +
-            "    </div>\n" +
-            "    <div class=\"hongbao__count\" id='redPacketIGot'>\n" +
-            iGot +
-            "    </div>\n" +
-            "    <div class=\"ft__smaller ft__fade\">总计 " + result.info.got + "/" + result.info.count + "</div>\n" +
-            "</div>\n" +
-            "<div class=\"list\"><ul id=\"redPacketList\">\n" +
-            "</ul></div>" +
-            "", "红包");
-        ChatRoom.renderRedPacket(result.who, result.info.count, result.info.got, result.recivers)
-        if (result.info.count === result.info.got) {
-          $("#chatroom" + oId).find(".hongbao__item").css("opacity", ".36");
-          $("#chatroom" + oId).find(".redPacketDesc").html("已经被抢光啦");
+        if (result.code !== -1) {
+          let iGot = "抢红包人数较多，加载中...";
+          Util.alert("" +
+              "<style>" +
+              ".dialog-header-bg {" +
+              "border-radius: 4px 4px 0px 0px; background-color: rgb(210, 63, 49); color: rgb(255, 255, 255);" +
+              "}" +
+              ".dialog-main {" +
+              "height: 456px;" +
+              "overflow: auto;" +
+              "}" +
+              "</style>" +
+              "<div class=\"fn-hr5\"></div>\n" +
+              "<div class=\"fn-hr5\"></div>\n" +
+              "<div class=\"fn-hr5\"></div>\n" +
+              "<div class=\"fn-hr5\"></div>\n" +
+              "<div class=\"ft__center\">\n" +
+              "    <div class=\"fn__flex-inline\">\n" +
+              "        <img class=\"avatar avatar--small\" src=\"" + result.info.userAvatarURL + "\" style=\"background-image: none; background-color: transparent; width: 20px; height: 20px; margin-right: 0px;\">\n" +
+              "        <div class=\"fn__space5\"></div>\n" +
+              "        <a href=\"" + Label.servePath + "/member/" + result.info.userName + "\">" + result.info.userName + "</a>'s 红包\n" +
+              "    </div>\n" +
+              "    <div class=\"fn-hr5\"></div>\n" +
+              "    <div id = \"msg\" class=\"ft__smaller ft__fade\">\n" +
+              result.info.msg + "\n" +
+              "    </div>\n" +
+              "    <div class=\"hongbao__count\" id='redPacketIGot'>\n" +
+              iGot +
+              "    </div>\n" +
+              "    <div class=\"ft__smaller ft__fade\">总计 " + result.info.got + "/" + result.info.count + "</div>\n" +
+              "</div>\n" +
+              "<div class=\"list\"><ul id=\"redPacketList\">\n" +
+              "</ul></div>" +
+              "", "红包");
+          ChatRoom.renderRedPacket(result.who, result.info.count, result.info.got, result.recivers)
+          if (result.info.count === result.info.got) {
+            $("#chatroom" + oId).find(".hongbao__item").css("opacity", ".36");
+            $("#chatroom" + oId).find(".redPacketDesc").html("已经被抢光啦");
+          }
+        } else {
+          Util.alert(result.msg);
         }
       },
       error: function (result) {

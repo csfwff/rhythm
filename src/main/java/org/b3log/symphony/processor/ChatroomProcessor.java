@@ -221,6 +221,19 @@ public class ChatroomProcessor {
             } catch (NullPointerException ignored) {
             }
             String userId = currentUser.optString(Keys.OBJECT_ID);
+            // ==? 是否禁言中 ?==
+            int muteTime = ChatRoomBot.muted(userId);
+            int muteMinute = muteTime % ( 24  *  60  *  60 ) % ( 60  *  60 ) /  60;
+            int muteSecond = muteTime % ( 24  *  60  *  60 ) % ( 60  *  60 ) %  60;
+            if (muteTime != -1) {
+                if (muteMinute != 0) {
+                    context.renderJSON(StatusCodes.ERR).renderMsg("抢红包失败，原因：正在禁言中，剩余时间 " + muteMinute + " 分钟 " + muteSecond + " 秒");
+                } else {
+                    context.renderJSON(StatusCodes.ERR).renderMsg("抢红包失败，原因：正在禁言中，剩余时间 " + muteSecond + " 秒");
+                }
+                return;
+            }
+            // ==! 是否禁言中 !==
             String userName = currentUser.optString(User.USER_NAME);
             final JSONObject requestJSONObject = context.requestJSON();
             String oId = requestJSONObject.optString("oId");
