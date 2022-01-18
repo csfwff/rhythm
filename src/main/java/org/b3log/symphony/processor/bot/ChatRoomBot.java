@@ -157,21 +157,21 @@ public class ChatRoomBot {
                                 }
                                 String targetUserId = targetUser.optString(Keys.OBJECT_ID);
                                 if (time.isEmpty()) {
-                                    int muted = muted(targetUserId);
-                                    if (muted != -1) {
-                                        int muteMinute = muted % ( 24  *  60  *  60 ) % ( 60  *  60 ) /  60;
-                                        int muteSecond = muted % ( 24  *  60  *  60 ) % ( 60  *  60 ) %  60;
+                                    int risksControlled = risksControlled(targetUserId);
+                                    if (risksControlled != -1) {
+                                        int muteMinute = risksControlled % ( 24  *  60  *  60 ) % ( 60  *  60 ) /  60;
+                                        int muteSecond = risksControlled % ( 24  *  60  *  60 ) % ( 60  *  60 ) %  60;
                                         if (muteMinute != 0) {
-                                            sendBotMsg("查询结果：该用户剩余禁言时间为：" + muteMinute + " 分 " + muteSecond + " 秒。");
+                                            sendBotMsg("查询结果：该用户剩余风控时间为：" + muteMinute + " 分 " + muteSecond + " 秒。");
                                         } else {
-                                            sendBotMsg("查询结果：该用户剩余禁言时间为：" + muteSecond + " 秒。");
+                                            sendBotMsg("查询结果：该用户剩余风控时间为：" + muteSecond + " 秒。");
                                         }
                                     } else {
-                                        sendBotMsg("查询结果：该用户当前未被禁言。");
+                                        sendBotMsg("查询结果：该用户当前未被风控。");
                                     }
                                 } else {
                                     int minute = Integer.parseInt(time);
-                                    muteAndNotice(user, targetUserId, minute);
+                                    risksControlAndNotice(user, targetUserId, minute);
                                 }
                             } catch (Exception e) {
                                 sendBotMsg("指令执行失败，风控命令的正确格式：\n执法 风控 @[用户名] [时间 `单位：分钟` `如不填此项将查询剩余风控时间` `设置为0将解除风控`]");
@@ -411,6 +411,43 @@ public class ChatRoomBot {
             transaction.commit();
         } catch (RepositoryException e) {
             LOGGER.log(Level.ERROR, "Unable to risks control [userId={}]", userId);
+        }
+    }
+
+    // 风控并提醒
+    public static void risksControlAndNotice(String username, String userId, int minute) {
+        sendBotMsg("提醒：@" + username + "  被管理员加入风控名单 " + minute + " 分钟。");
+        risksControl(userId, minute);
+    }
+
+    // 检查风控
+    public static int risksControlled(String userId) {
+        final BeanManager beanManager = BeanManager.getInstance();
+        CloudService cloudService = beanManager.getReference(CloudService.class);
+        CloudRepository cloudRepository = beanManager.getReference(CloudRepository.class);
+
+        String risksControlData = cloudService.getFromCloud(userId, CloudService.SYS_RISK);
+        if (risksControlData.isEmpty()) {
+            return -1;
+        } else {
+            if (System.currentTimeMillis() > Long.parseLong(risksControlData)) {
+                try {
+                    final Transaction transaction = cloudRepository.beginTransaction();
+                    Query cloudDeleteQuery = new Query()
+                            .setFilter(CompositeFilterOperator.and(
+                                    new PropertyFilter("userId", FilterOperator.EQUAL, userId),
+                                    new PropertyFilter("gameId", FilterOperator.EQUAL, CloudService.SYS_RISK)
+                            ));
+                    cloudRepository.remove(cloudDeleteQuery);
+                    transaction.commit();
+                } catch (RepositoryException e) {
+                    LOGGER.log(Level.ERROR, "Unable to un-risks-control", e);
+                }
+                return -1;
+            } else {
+                long remainMinute = (Long.parseLong(risksControlData) - System.currentTimeMillis()) / 1000;
+                return (int) remainMinute;
+            }
         }
     }
 }
