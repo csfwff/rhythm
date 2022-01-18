@@ -186,15 +186,13 @@ public class ChatRoomBot {
         // ==! 指令 !==
 
         // ==? 是否禁言中 ?==
-        int muteTime = muted(userId);
-        int muteMinute = muteTime % (24 * 60 * 60) % (60 * 60) / 60;
-        int muteSecond = muteTime % (24 * 60 * 60) % (60 * 60) % 60;
-        if (muteTime != -1) {
-            if (muteMinute != 0) {
-                context.renderJSON(StatusCodes.ERR).renderMsg("你的消息被机器人打回，原因：正在禁言中，剩余时间 " + muteMinute + " 分钟 " + muteSecond + " 秒");
-            } else {
-                context.renderJSON(StatusCodes.ERR).renderMsg("你的消息被机器人打回，原因：正在禁言中，剩余时间 " + muteSecond + " 秒");
-            }
+        int muted = muted(userId);
+        int muteDay = muted / (24 * 60 * 60);
+        int muteHour = muted % (24 * 60 * 60) / (60 * 60);
+        int muteMinute = muted % (24 * 60 * 60) % (60 * 60) / 60;
+        int muteSecond = muted % (24 * 60 * 60) % (60 * 60) % 60;
+        if (muted != -1) {
+            context.renderJSON(StatusCodes.ERR).renderMsg("你的消息被机器人打回，原因：正在禁言中，剩余时间 " + muteDay + " 天 " + muteHour + " 小时 " + muteMinute + " 分 " + muteSecond + " 秒。");
             return false;
         }
         // ==! 是否禁言中 !==

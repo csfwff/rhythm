@@ -222,15 +222,13 @@ public class ChatroomProcessor {
             }
             String userId = currentUser.optString(Keys.OBJECT_ID);
             // ==? 是否禁言中 ?==
-            int muteTime = ChatRoomBot.muted(userId);
-            int muteMinute = muteTime % ( 24  *  60  *  60 ) % ( 60  *  60 ) /  60;
-            int muteSecond = muteTime % ( 24  *  60  *  60 ) % ( 60  *  60 ) %  60;
-            if (muteTime != -1) {
-                if (muteMinute != 0) {
-                    context.renderJSON(StatusCodes.ERR).renderMsg("抢红包失败，原因：正在禁言中，剩余时间 " + muteMinute + " 分钟 " + muteSecond + " 秒");
-                } else {
-                    context.renderJSON(StatusCodes.ERR).renderMsg("抢红包失败，原因：正在禁言中，剩余时间 " + muteSecond + " 秒");
-                }
+            int muted = ChatRoomBot.muted(userId);
+            int muteDay = muted / (24 * 60 * 60);
+            int muteHour = muted % (24 * 60 * 60) / (60 * 60);
+            int muteMinute = muted % (24 * 60 * 60) % (60 * 60) / 60;
+            int muteSecond = muted % (24 * 60 * 60) % (60 * 60) % 60;
+            if (muted != -1) {
+                context.renderJSON(StatusCodes.ERR).renderMsg("抢红包失败，原因：正在禁言中，剩余时间 " + muteDay + " 天 " + muteHour + " 小时 " + muteMinute + " 分 " + muteSecond + " 秒。");
                 return;
             }
             // ==! 是否禁言中 !==
