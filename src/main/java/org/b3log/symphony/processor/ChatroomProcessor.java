@@ -419,6 +419,7 @@ public class ChatroomProcessor {
      * @param context the specified context
      */
     final private static SimpleCurrentLimiter chatRoomLivenessLimiter = new SimpleCurrentLimiter(30, 1);
+    final private static SimpleCurrentLimiter risksControlMessageLimiter = new SimpleCurrentLimiter(30 * 60, 1);
 
     public synchronized void addChatRoomMsg(final RequestContext context) {
         if (ChatRoomBot.record(context)) {
@@ -451,12 +452,24 @@ public class ChatroomProcessor {
             msg.put("sysMetal", cloudService.getEnabledMetal(currentUser.optString(Keys.OBJECT_ID)));
 
             // 加活跃
-            try {
-                String userId = currentUser.optString(Keys.OBJECT_ID);
-                if (chatRoomLivenessLimiter.access(userId)) {
-                    livenessMgmtService.incLiveness(userId, Liveness.LIVENESS_COMMENT);
+            String userId = currentUser.optString(Keys.OBJECT_ID);
+            int risksControlled = ChatRoomBot.risksControlled(userId);
+            if (risksControlled != -1) {
+                if (risksControlMessageLimiter.access(userId)) {
+                    try {
+                        if (chatRoomLivenessLimiter.access(userId)) {
+                            livenessMgmtService.incLiveness(userId, Liveness.LIVENESS_COMMENT);
+                        }
+                    } catch (Exception ignored) {
+                    }
                 }
-            } catch (Exception ignored) {
+            } else {
+                try {
+                    if (chatRoomLivenessLimiter.access(userId)) {
+                        livenessMgmtService.incLiveness(userId, Liveness.LIVENESS_COMMENT);
+                    }
+                } catch (Exception ignored) {
+                }
             }
 
             if (content.startsWith("[redpacket]") && content.endsWith("[/redpacket]")) {
@@ -475,7 +488,6 @@ public class ChatroomProcessor {
                     if (message.length() > 20) {
                         message = message.substring(0, 20);
                     }
-                    String userId = currentUser.optString(Keys.OBJECT_ID);
                     // 扣积分
                     if (money > 20000 || money < 32 || count > 1000 || count <= 0 || count > money) {
                         context.renderJSON(StatusCodes.ERR).renderMsg("数据不合法！");
@@ -549,15 +561,15 @@ public class ChatroomProcessor {
                     transaction.commit();
                     switch (type) {
                         case "heartbeat":
-                            //预分配红包
+                            // 预分配红包
                             RED_PACKET_BUCKET.put(msg.optString("oId"), allocateHeartbeatRedPacket(msg.optString("oId"), userId, money, count, 3));
                             break;
                         case "random":
-                            //预分配红包
+                            // 预分配红包
                             RED_PACKET_BUCKET.put(msg.optString("oId"), allocateRedPacket(msg.optString("oId"), userId, money, count, 2));
                             break;
                         case "specify":
-                            //发通知
+                            // 发通知
                             final JSONArray jsonArray = new JSONArray(recivers);
                             for (Object o : jsonArray) {
                                 final String reciver = (String) o;
@@ -572,7 +584,7 @@ public class ChatroomProcessor {
                             }
                             break;
                         default:
-                            //ignore
+                            // ignore
                     }
                     final JSONObject pushMsg = JSONs.clone(msg);
                     pushMsg.put(Common.TIME, new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(msg.optLong(Common.TIME)));
@@ -623,7 +635,6 @@ public class ChatroomProcessor {
                 }
 
                 try {
-                    final String userId = currentUser.optString(Keys.OBJECT_ID);
                     final JSONObject user = userQueryService.getUser(userId);
                     user.put(UserExt.USER_LATEST_CMT_TIME, System.currentTimeMillis());
                     userMgmtService.updateUser(userId, user);
