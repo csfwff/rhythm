@@ -619,7 +619,6 @@ public class ChatroomProcessor {
 
                 context.renderJSON(StatusCodes.SUCC);
 
-
                 try {
                     final List<JSONObject> atUsers = atUsers(msg.optString(Common.CONTENT), userName);
                     if (Objects.nonNull(atUsers) && !atUsers.isEmpty()) {
