@@ -168,7 +168,12 @@ public class ChatRoomBot {
                                     risksControlAndNotice(user, targetUserId, minute);
                                 }
                             } catch (Exception e) {
-                                sendBotMsg("指令执行失败，风控命令的正确格式：\n执法 风控 @[用户名] [时间 `单位：分钟` `如不填此项将查询剩余风控时间` `设置为0将解除风控`]");
+                                sendBotMsg("指令执行失败，风控命令的正确格式：\n执法 风控 @[用户名] [时间 `单位：分钟` `如不填此项将查询剩余风控时间` `设置为0将解除风控`]\n\n" +
+                                        "风控内容：\n" +
+                                        "* 每次发消息，需要二次确认\n" +
+                                        "* 限制发送最少字数、不允许单发一张图片\n" +
+                                        "* 限制通过聊天室获取的活跃度，每15分钟仅有效1条\n" +
+                                        "* 每30分钟只允许抢一次红包");
                             }
                             break;
                         default:
