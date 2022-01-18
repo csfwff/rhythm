@@ -73,6 +73,7 @@ public class ChatRoomBot {
     });
 
     private static String latestMessage = "";
+    private static String allLatestMessage = "";
 
     // 记录并分析消息是否可疑
     public static boolean record(final RequestContext context) {
@@ -140,7 +141,7 @@ public class ChatRoomBot {
                         break;
                     default:
                         sendBotMsg("#### 执法帮助菜单\n" +
-                                "##### （如无特殊备注，则需要纪律委员及以上分组才可执行）\n\n" +
+                                "（如无特殊备注，则需要纪律委员及以上分组才可执行）\n\n" +
                                 "**禁言指定用户** 执法 禁言 @[用户名] [时间 `单位: 分钟` `如不填此项将查询剩余禁言时间` `设置为0将解除禁言`]");
                 }
                 return true;
@@ -197,6 +198,7 @@ public class ChatRoomBot {
         // ==! 判定复读机 !==
 
         latestMessage = content;
+        allLatestMessage = content;
         if (!pass) {
             context.renderJSON(StatusCodes.ERR).renderMsg("你的消息被机器人打回，原因：" + reason);
             return false;
@@ -235,6 +237,8 @@ public class ChatRoomBot {
             final JSONObject pushMsg = JSONs.clone(msg);
             pushMsg.put(Common.TIME, new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(msg.optLong(Common.TIME)));
             ChatroomChannel.notifyChat(pushMsg);
+
+            allLatestMessage = content;
 
             try {
                 ChatroomProcessor chatroomProcessor = beanManager.getReference(ChatroomProcessor.class);
@@ -330,6 +334,18 @@ public class ChatRoomBot {
                 long remainMinute = (Long.parseLong(muteData) - System.currentTimeMillis()) / 1000;
                 return (int) remainMinute;
             }
+        }
+    }
+
+    // 定期发送提醒
+    public static void notice() {
+        String msg = "摸鱼办第一纪律委提醒您：\n" +
+                "聊天千万条，友善第一条；\n" +
+                "灌水不规范，扣分两行泪。\n" +
+                "我正在认真巡逻中，不要被我逮到哦～ :doge:\n" +
+                "详细社区守则请看：[摸鱼守则](https://fishpi.cn/article/1631779202219)";
+        if (!msg.equals(allLatestMessage)) {
+            sendBotMsg(msg);
         }
     }
 }
