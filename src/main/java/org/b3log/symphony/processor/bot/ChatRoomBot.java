@@ -141,7 +141,43 @@ public class ChatRoomBot {
                         break;
                     case "风控":
                         if (DataModelService.hasPermission(currentUser.optString(User.USER_ROLE), 3)) {
-
+                            try {
+                                String user = cmd1.split("\\s")[1].replaceAll("^(@)", "");
+                                String time = "";
+                                try {
+                                    time = cmd1.split("\\s")[2];
+                                } catch (Exception ignored) {
+                                }
+                                final BeanManager beanManager = BeanManager.getInstance();
+                                UserQueryService userQueryService = beanManager.getReference(UserQueryService.class);
+                                JSONObject targetUser = userQueryService.getUserByName(user);
+                                String targetUserId = targetUser.optString(Keys.OBJECT_ID);
+                                if (time.isEmpty()) {
+                                    int muted = muted(targetUserId);
+                                    if (muted != -1) {
+                                        int muteMinute = muted % ( 24  *  60  *  60 ) % ( 60  *  60 ) /  60;
+                                        int muteSecond = muted % ( 24  *  60  *  60 ) % ( 60  *  60 ) %  60;
+                                        if (muteMinute != 0) {
+                                            sendBotMsg("查询结果：该用户剩余禁言时间为：" + muteMinute + " 分 " + muteSecond + " 秒。");
+                                        } else {
+                                            sendBotMsg("查询结果：该用户剩余禁言时间为：" + muteSecond + " 秒。");
+                                        }
+                                    } else {
+                                        sendBotMsg("查询结果：该用户当前未被禁言。");
+                                    }
+                                } else {
+                                    int minute = Integer.parseInt(time);
+                                    if (null == targetUser) {
+                                        sendBotMsg("指令执行失败，用户不存在。");
+                                    } else {
+                                        muteAndNotice(user, targetUserId, minute);
+                                    }
+                                }
+                            } catch (Exception e) {
+                                sendBotMsg("指令执行失败，风控命令的正确格式：\n执法 风控 @[用户名] [时间 `单位：分钟` `如不填此项将查询剩余风控时间` `设置为0将解除风控`]");
+                            }
+                        } else {
+                            sendBotMsg("指令执行失败，权限不足。");
                         }
                         break;
                     default:
