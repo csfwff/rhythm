@@ -49,6 +49,7 @@ public class CloudService {
     final public static String SYS_BAG = "sys-bag";
     final public static String SYS_MEDAL = "sys-medal";
     final public static String SYS_MUTE = "sys-mute";
+    final public static String SYS_RISK = "sys-risk";
 
     /**
      * 上传存档

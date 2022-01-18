@@ -126,11 +126,7 @@ public class ChatRoomBot {
                                     }
                                 } else {
                                     int minute = Integer.parseInt(time);
-                                    if (null == targetUser) {
-                                        sendBotMsg("指令执行失败，用户不存在。");
-                                    } else {
-                                        muteAndNotice(user, targetUserId, minute);
-                                    }
+                                    muteAndNotice(user, targetUserId, minute);
                                 }
                             } catch (Exception e) {
                                 sendBotMsg("指令执行失败，禁言命令的正确格式：\n执法 禁言 @[用户名] [时间 `单位: 分钟` `如不填此项将查询剩余禁言时间` `设置为0将解除禁言`]");
@@ -167,11 +163,7 @@ public class ChatRoomBot {
                                     }
                                 } else {
                                     int minute = Integer.parseInt(time);
-                                    if (null == targetUser) {
-                                        sendBotMsg("指令执行失败，用户不存在。");
-                                    } else {
-                                        muteAndNotice(user, targetUserId, minute);
-                                    }
+                                    muteAndNotice(user, targetUserId, minute);
                                 }
                             } catch (Exception e) {
                                 sendBotMsg("指令执行失败，风控命令的正确格式：\n执法 风控 @[用户名] [时间 `单位：分钟` `如不填此项将查询剩余风控时间` `设置为0将解除风控`]");
@@ -387,6 +379,30 @@ public class ChatRoomBot {
                 "详细社区守则请看：[摸鱼守则](https://fishpi.cn/article/1631779202219)";
         if (!msg.equals(allLatestMessage)) {
             sendBotMsg(msg);
+        }
+    }
+
+    // 风控
+    public static void risksControl(String userId, int minute) {
+        final BeanManager beanManager = BeanManager.getInstance();
+        CloudRepository cloudRepository = beanManager.getReference(CloudRepository.class);
+        int risksControlTime = minute * 1000 * 60;
+        try {
+            final Transaction transaction = cloudRepository.beginTransaction();
+            Query cloudDeleteQuery = new Query()
+                    .setFilter(CompositeFilterOperator.and(
+                            new PropertyFilter("userId", FilterOperator.EQUAL, userId),
+                            new PropertyFilter("gameId", FilterOperator.EQUAL, CloudService.SYS_RISK)
+                    ));
+            cloudRepository.remove(cloudDeleteQuery);
+            JSONObject cloudJSON = new JSONObject();
+            cloudJSON.put("userId", userId)
+                    .put("gameId", CloudService.SYS_RISK)
+                    .put("data", ("" + (System.currentTimeMillis() + risksControlTime)));
+            cloudRepository.add(cloudJSON);
+            transaction.commit();
+        } catch (RepositoryException e) {
+            LOGGER.log(Level.ERROR, "Unable to risks control [userId={}]", userId);
         }
     }
 }
