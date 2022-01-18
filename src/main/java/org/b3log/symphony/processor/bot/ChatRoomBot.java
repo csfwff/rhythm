@@ -24,11 +24,13 @@ import org.apache.logging.log4j.Logger;
 import org.b3log.latke.Keys;
 import org.b3log.latke.http.RequestContext;
 import org.b3log.latke.ioc.BeanManager;
-import org.b3log.latke.ioc.Inject;
 import org.b3log.latke.model.User;
 import org.b3log.latke.repository.*;
 import org.b3log.latke.service.ServiceException;
-import org.b3log.symphony.model.*;
+import org.b3log.symphony.model.Common;
+import org.b3log.symphony.model.Notification;
+import org.b3log.symphony.model.Pointtransfer;
+import org.b3log.symphony.model.UserExt;
 import org.b3log.symphony.processor.ApiProcessor;
 import org.b3log.symphony.processor.ChatroomProcessor;
 import org.b3log.symphony.processor.channel.ChatroomChannel;
@@ -93,13 +95,13 @@ public class ChatRoomBot {
         // ==! 前置参数 !==
 
         // ==? 指令 ?==
-        if (content.startsWith("执法")) {
-            try {
-                String cmd1 = content.replaceAll("(执法)(\\s)+", "");
-                String cmd2 = cmd1.split("\\s")[0];
-                switch (cmd2) {
-                    case "禁言":
-                        if (DataModelService.hasPermission(currentUser.optString(User.USER_ROLE), 3)) {
+        if (DataModelService.hasPermission(currentUser.optString(User.USER_ROLE), 3)) {
+            if (content.startsWith("执法")) {
+                try {
+                    String cmd1 = content.replaceAll("(执法)(\\s)+", "");
+                    String cmd2 = cmd1.split("\\s")[0];
+                    switch (cmd2) {
+                        case "禁言":
                             try {
                                 String user = cmd1.split("\\s")[1].replaceAll("^(@)", "");
                                 String time = "";
@@ -118,8 +120,8 @@ public class ChatRoomBot {
                                 if (time.isEmpty()) {
                                     int muted = muted(targetUserId);
                                     if (muted != -1) {
-                                        int muteMinute = muted % ( 24  *  60  *  60 ) % ( 60  *  60 ) /  60;
-                                        int muteSecond = muted % ( 24  *  60  *  60 ) % ( 60  *  60 ) %  60;
+                                        int muteMinute = muted % (24 * 60 * 60) % (60 * 60) / 60;
+                                        int muteSecond = muted % (24 * 60 * 60) % (60 * 60) % 60;
                                         if (muteMinute != 0) {
                                             sendBotMsg("查询结果：该用户剩余禁言时间为：" + muteMinute + " 分 " + muteSecond + " 秒。");
                                         } else {
@@ -135,12 +137,8 @@ public class ChatRoomBot {
                             } catch (Exception e) {
                                 sendBotMsg("指令执行失败，禁言命令的正确格式：\n执法 禁言 @[用户名] [时间 `单位: 分钟` `如不填此项将查询剩余禁言时间` `设置为0将解除禁言`]");
                             }
-                        } else {
-                            sendBotMsg("指令执行失败，权限不足。");
-                        }
-                        break;
-                    case "风控":
-                        if (DataModelService.hasPermission(currentUser.optString(User.USER_ROLE), 3)) {
+                            break;
+                        case "风控":
                             try {
                                 String user = cmd1.split("\\s")[1].replaceAll("^(@)", "");
                                 String time = "";
@@ -159,13 +157,11 @@ public class ChatRoomBot {
                                 if (time.isEmpty()) {
                                     int risksControlled = risksControlled(targetUserId);
                                     if (risksControlled != -1) {
-                                        int muteMinute = risksControlled % ( 24  *  60  *  60 ) % ( 60  *  60 ) /  60;
-                                        int muteSecond = risksControlled % ( 24  *  60  *  60 ) % ( 60  *  60 ) %  60;
-                                        if (muteMinute != 0) {
-                                            sendBotMsg("查询结果：该用户剩余风控时间为：" + muteMinute + " 分 " + muteSecond + " 秒。");
-                                        } else {
-                                            sendBotMsg("查询结果：该用户剩余风控时间为：" + muteSecond + " 秒。");
-                                        }
+                                        int muteDay = risksControlled / (24 * 60 * 60);
+                                        int muteHour = risksControlled % (24 * 60 * 60) / (60 * 60);
+                                        int muteMinute = risksControlled % (24 * 60 * 60) % (60 * 60) / 60;
+                                        int muteSecond = risksControlled % (24 * 60 * 60) % (60 * 60) % 60;
+                                        sendBotMsg("查询结果：该用户剩余风控时间为：" + muteDay + " 天 " + muteHour + " 小时 " + muteMinute + " 分 " + muteSecond + " 秒。");
                                     } else {
                                         sendBotMsg("查询结果：该用户当前未被风控。");
                                     }
@@ -176,27 +172,25 @@ public class ChatRoomBot {
                             } catch (Exception e) {
                                 sendBotMsg("指令执行失败，风控命令的正确格式：\n执法 风控 @[用户名] [时间 `单位：分钟` `如不填此项将查询剩余风控时间` `设置为0将解除风控`]");
                             }
-                        } else {
-                            sendBotMsg("指令执行失败，权限不足。");
-                        }
-                        break;
-                    default:
-                        sendBotMsg("#### 执法帮助菜单\n" +
-                                "如无特殊备注，则需要纪律委员及以上分组才可执行\n\n" +
-                                "* **禁言指定用户** 执法 禁言 @[用户名] [时间 `单位: 分钟` `如不填此项将查询剩余禁言时间` `设置为0将解除禁言`]\n" +
-                                "* **风控模式** 执法 风控 @[用户名] [时间 `单位：分钟` `如不填此项将查询剩余风控时间` `设置为0将解除风控`]");
+                            break;
+                        default:
+                            sendBotMsg("#### 执法帮助菜单\n" +
+                                    "如无特殊备注，则需要纪律委员及以上分组才可执行\n\n" +
+                                    "* **禁言指定用户** 执法 禁言 @[用户名] [时间 `单位: 分钟` `如不填此项将查询剩余禁言时间` `设置为0将解除禁言`]\n" +
+                                    "* **风控模式** 执法 风控 @[用户名] [时间 `单位：分钟` `如不填此项将查询剩余风控时间` `设置为0将解除风控`]");
+                    }
+                    return true;
+                } catch (Exception ignored) {
+                    sendBotMsg("指令执行失败。");
                 }
-                return true;
-            } catch (Exception ignored) {
-                sendBotMsg("指令执行失败。");
             }
         }
         // ==! 指令 !==
 
         // ==? 是否禁言中 ?==
         int muteTime = muted(userId);
-        int muteMinute = muteTime % ( 24  *  60  *  60 ) % ( 60  *  60 ) /  60;
-        int muteSecond = muteTime % ( 24  *  60  *  60 ) % ( 60  *  60 ) %  60;
+        int muteMinute = muteTime % (24 * 60 * 60) % (60 * 60) / 60;
+        int muteSecond = muteTime % (24 * 60 * 60) % (60 * 60) % 60;
         if (muteTime != -1) {
             if (muteMinute != 0) {
                 context.renderJSON(StatusCodes.ERR).renderMsg("你的消息被机器人打回，原因：正在禁言中，剩余时间 " + muteMinute + " 分钟 " + muteSecond + " 秒");
@@ -321,7 +315,7 @@ public class ChatRoomBot {
     public static void mute(String userId, int minute) {
         final BeanManager beanManager = BeanManager.getInstance();
         CloudRepository cloudRepository = beanManager.getReference(CloudRepository.class);
-        int muteTime = minute * 1000 * 60;
+        long muteTime = (long) minute * 1000 * 60;
         try {
             final Transaction transaction = cloudRepository.beginTransaction();
             Query cloudDeleteQuery = new Query()
@@ -394,7 +388,7 @@ public class ChatRoomBot {
     public static void risksControl(String userId, int minute) {
         final BeanManager beanManager = BeanManager.getInstance();
         CloudRepository cloudRepository = beanManager.getReference(CloudRepository.class);
-        int risksControlTime = minute * 1000 * 60;
+        long risksControlTime = (long) minute * 1000 * 60;
         try {
             final Transaction transaction = cloudRepository.beginTransaction();
             Query cloudDeleteQuery = new Query()
@@ -430,6 +424,8 @@ public class ChatRoomBot {
         if (risksControlData.isEmpty()) {
             return -1;
         } else {
+            System.out.println(System.currentTimeMillis());
+            System.out.println(Long.parseLong(risksControlData));
             if (System.currentTimeMillis() > Long.parseLong(risksControlData)) {
                 try {
                     final Transaction transaction = cloudRepository.beginTransaction();
