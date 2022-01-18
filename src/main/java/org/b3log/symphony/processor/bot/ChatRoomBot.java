@@ -139,6 +139,11 @@ public class ChatRoomBot {
                             sendBotMsg("指令执行失败，权限不足。");
                         }
                         break;
+                    case "风控":
+                        if (DataModelService.hasPermission(currentUser.optString(User.USER_ROLE), 3)) {
+
+                        }
+                        break;
                     default:
                         sendBotMsg("#### 执法帮助菜单\n" +
                                 "如无特殊备注，则需要纪律委员及以上分组才可执行\n\n" +
