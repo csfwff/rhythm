@@ -248,17 +248,19 @@ public class ChatRoomBot {
         // ==! 判定恶意发送非法红包 !==
 
         // ==? 判定复读机 ?==
-        if (content.equals(latestMessage)) {
-            // 与上条内容相同
-            if (RECORD_POOL_3_IN_15M.access(userName)) {
-                if (RECORD_POOL_3_IN_15M.get(userName).getFrequency() == 2) {
-                    sendBotMsg("监测到 @" + userName + "  疑似使用自动复读机插件，请不要频繁复读。");
+        if (!content.startsWith("[redpacket]") && !content.endsWith("[/redpacket]")) {
+            if (content.equals(latestMessage)) {
+                // 与上条内容相同
+                if (RECORD_POOL_3_IN_15M.access(userName)) {
+                    if (RECORD_POOL_3_IN_15M.get(userName).getFrequency() == 2) {
+                        sendBotMsg("监测到 @" + userName + "  疑似使用自动复读机插件，请不要频繁复读。");
+                    }
+                } else {
+                    sendBotMsg("由于 @" + userName + "  频繁复读，现处以禁言 15 分钟、扣除积分 30 的处罚。");
+                    mute(userId, 15);
+                    abusePoint(userId, 30, "机器人罚单-聊天室复读频率过高");
+                    RECORD_POOL_3_IN_15M.remove(userName);
                 }
-            } else {
-                sendBotMsg("由于 @" + userName + "  频繁复读，现处以禁言 15 分钟、扣除积分 30 的处罚。");
-                mute(userId, 15);
-                abusePoint(userId, 30, "机器人罚单-聊天室复读频率过高");
-                RECORD_POOL_3_IN_15M.remove(userName);
             }
         }
         // ==! 判定复读机 !==
