@@ -141,8 +141,9 @@ public class ChatRoomBot {
                         break;
                     default:
                         sendBotMsg("#### 执法帮助菜单\n" +
-                                "（如无特殊备注，则需要纪律委员及以上分组才可执行）\n\n" +
-                                "**禁言指定用户** 执法 禁言 @[用户名] [时间 `单位: 分钟` `如不填此项将查询剩余禁言时间` `设置为0将解除禁言`]");
+                                "如无特殊备注，则需要纪律委员及以上分组才可执行\n\n" +
+                                "* **禁言指定用户** 执法 禁言 @[用户名] [时间 `单位: 分钟` `如不填此项将查询剩余禁言时间` `设置为0将解除禁言`]\n" +
+                                "* **风控模式** 执法 风控 @[用户名] [时间 `单位：分钟` `如不填此项将查询剩余风控时间` `设置为0将解除风控`]");
                 }
                 return true;
             } catch (Exception ignored) {
@@ -237,7 +238,6 @@ public class ChatRoomBot {
             final JSONObject pushMsg = JSONs.clone(msg);
             pushMsg.put(Common.TIME, new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(msg.optLong(Common.TIME)));
             ChatroomChannel.notifyChat(pushMsg);
-
             allLatestMessage = content;
 
             try {
