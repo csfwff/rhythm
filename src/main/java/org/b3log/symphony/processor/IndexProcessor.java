@@ -140,6 +140,28 @@ public class IndexProcessor {
         Dispatcher.get("/games/evolve/", indexProcessor::showEvolve, loginCheck::handle);
         Dispatcher.get("/user/checkedIn", indexProcessor::isCheckedIn, loginCheck::handle);
         Dispatcher.get("/oldAlmanac", indexProcessor::showOldAlmanac, anonymousViewCheckMidware::handle);
+        Dispatcher.get("/api/articles", indexProcessor::articles, anonymousViewCheckMidware::handle);
+    }
+
+    /**
+     * 帖子列表
+     * type:
+     * 0-最新文章
+     * 1-热门文章
+     * 2-优选文章
+     * 3-最新回复文章
+     */
+    public void articles(final RequestContext context) {
+        try {
+            int type = Integer.parseInt(context.param("type"));
+            int pageSize = Integer.parseInt(context.param("pageSize"));
+            int page = Integer.parseInt(context.param("page"));
+            final JSONObject result = articleQueryService.getRecentArticles(type, page, pageSize);
+            context.renderJSON(result);
+        } catch (Exception e) {
+            e.printStackTrace();
+            context.renderJSON(StatusCodes.ERR).renderMsg("获取过程中出现错误，请检查参数是否正确");
+        }
     }
 
     /**
