@@ -222,7 +222,7 @@ public class CronMgmtService {
 
         Symphonys.SCHEDULED_EXECUTOR_SERVICE.scheduleAtFixedRate(() -> {
             try {
-                ChatRoomBot.notice();
+                //ChatRoomBot.notice();
             } catch (final Exception e) {
                 LOGGER.log(Level.ERROR, "Executes cron failed", e);
             } finally {
