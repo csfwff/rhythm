@@ -43,6 +43,7 @@ import org.b3log.symphony.service.*;
 import org.b3log.symphony.util.Sessions;
 import org.b3log.symphony.util.StatusCodes;
 import org.json.JSONObject;
+import pers.adlered.simplecurrentlimiter.main.SimpleCurrentLimiter;
 
 import java.util.*;
 
@@ -122,10 +123,17 @@ public class ApiProcessor {
     /**
      * 通过用户名和密码进行登录，然后发放Key通行证
      */
+    SimpleCurrentLimiter loginCurrentLimiter = new SimpleCurrentLimiter(10 * 60, 5);
     public void getKey(final RequestContext context) {
-        context.renderJSON(StatusCodes.ERR).renderMsg(langPropsService.get("loginFailLabel"));
         final JSONObject requestJSONObject = context.requestJSON();
         final String nameOrEmail = requestJSONObject.optString("nameOrEmail");
+
+        if (!loginCurrentLimiter.access(nameOrEmail)) {
+            context.renderJSON(StatusCodes.ERR).renderMsg("登录频率过快，请5分钟后重试。");
+            return;
+        }
+
+        context.renderJSON(StatusCodes.ERR).renderMsg(langPropsService.get("loginFailLabel"));
 
         try {
             JSONObject user = userQueryService.getUserByName(nameOrEmail);
