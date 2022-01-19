@@ -454,7 +454,7 @@
                                        href="${servePath}${article.articlePermalink}">${article.articleTitleEmoj}</a>
                                     <a class="fn-right count ft-gray ft-smaller"
                                        href="${servePath}${article.articlePermalink}">
-                                        <svg style="padding-top: 1px">
+                                        <svg style="padding-top: 1px;vertical-align: -2px;">
                                             <use xlink:href="#coin"></use>
                                         </svg> ${article.articleQnAOfferPoint?c}</a>
                                 </li>
