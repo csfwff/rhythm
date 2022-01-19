@@ -142,6 +142,10 @@ public class ApiProcessor {
             }
 
             if (null == user) {
+                user = userQueryService.getUserByPhone(nameOrEmail);
+            }
+
+            if (null == user) {
                 context.renderMsg(langPropsService.get("notFoundUserLabel"));
                 return;
             }
