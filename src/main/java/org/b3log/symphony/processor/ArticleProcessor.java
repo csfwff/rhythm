@@ -239,6 +239,7 @@ public class ArticleProcessor {
         Dispatcher.post("/article/thank", articleProcessor::thankArticle, loginCheck::handle, permissionMidware::check);
         Dispatcher.post("/article/stick", articleProcessor::stickArticle, loginCheck::handle, permissionMidware::check);
         Dispatcher.get("/article/random/{size}", articleProcessor::randomArticles);
+        Dispatcher.get("/api/article/{articleId}", articleProcessor::getArticle);
     }
 
     /**
@@ -593,6 +594,20 @@ public class ArticleProcessor {
 
         dataModel.put(Common.REQUISITE, requisite);
         dataModel.put(Common.REQUISITE_MSG, requisiteMsg);
+    }
+
+    /**
+     * API 获取文章
+     * @param context
+     */
+    public void getArticle(final RequestContext context) {
+        final String articleId = context.pathVar("articleId");
+        final JSONObject article = articleQueryService.getArticleById(articleId);
+        if (null == article) {
+            context.renderJSON(StatusCodes.ERR).renderMsg("文章不存在");
+            return;
+        }
+        context.renderJSON(StatusCodes.SUCC).renderJSON(article);
     }
 
     /**
