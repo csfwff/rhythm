@@ -50,6 +50,10 @@
                 <a href="https://fishpi.cn/article/1641661864119" target="_blank" title="Golang 客户端"><svg style="vertical-align: -2px;"><use xlink:href="#ic-golang"></use></svg></a>
             </div>
         </div>
+        <div class="fn-hr5"></div>
+        <div style="margin-top: 5px">
+            <a href="https://qm.qq.com/cgi-bin/qm/qr?k=dpq3N-bezENSsshZERxvTw2dV85WtTdV&jump_from=webapi" target="_blank"><svg style="vertical-align: -2px;"><use xlink:href="#ic-qgroup"></use></svg> 公告/反馈QQ群</a>
+        </div>
         <div class="ft-smaller" style="padding: 10px 15px 0 15px">
             Copyright © 2021 - 2022 W&P Tech. All Rights Reserved. 北京白与画科技有限公司 版权所有
         </div>
