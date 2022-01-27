@@ -22,7 +22,8 @@
     <div class="wrapper ft-smaller">
         <br>
         <div>
-            <a href="https://beian.miit.gov.cn/" target="_blank">京ICP备2022000226号-1</a>
+            <a href="https://beian.miit.gov.cn/" target="_blank">京ICP备2022000226号-1</a><br>
+            <a target="_blank" href="http://www.beian.gov.cn/portal/registerSystemInfo?recordcode=11011302003886" style="display:inline-block;text-decoration:none;height:20px;line-height:20px;"><img src="https://mbdp01.bdstatic.com/static/landing-pc/img/icon_police.7296bdfd.png" style="float:left;"/><p style="float:left;height:20px;line-height:20px;margin: 0px 0px 0px 5px;">京公网安备 11011302003886号</p></a>
         </div>
         <br>
         <div>
