@@ -253,6 +253,11 @@ public final class Common {
     public static final String TIME = "time";
 
     /**
+     * Key of date
+     */
+    public static final String DATE = "date";
+
+    /**
      * Key of rewarded count.
      */
     public static final String REWARED_COUNT = "rewardedCnt";

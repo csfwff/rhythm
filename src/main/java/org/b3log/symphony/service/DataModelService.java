@@ -77,6 +77,9 @@ public class DataModelService {
     @Inject
     private ArticleQueryService articleQueryService;
 
+    @Inject
+    public SponsorService sponsorService;
+
     /**
      * Tag query service.
      */
@@ -189,6 +192,24 @@ public class DataModelService {
         Stopwatchs.start("Fills random articles");
         try {
             dataModel.put(Common.SIDE_RANDOM_ARTICLES, articleQueryService.getSideRandomArticles());
+        } finally {
+            Stopwatchs.end();
+        }
+    }
+
+    public void fillSponsors(final Map<String, Object> dataModel) {
+        Stopwatchs.start("Fills sponsor user list info");
+        try {
+            List<JSONObject> sponsors = sponsorService.list();
+            String recent;
+            if (Objects.isNull(sponsors) || sponsors.isEmpty()) {
+                sponsors = Collections.emptyList();
+                recent = "2021-12-15";
+            } else {
+                recent = sponsors.get(0).optString(Common.DATE);
+            }
+            dataModel.put(Sponsor.SPONSORS, sponsors);
+            dataModel.put("recent", recent);
         } finally {
             Stopwatchs.end();
         }

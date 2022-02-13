@@ -742,4 +742,19 @@ public class UserQueryService {
             return 0;
         }
     }
+
+    public String getUserName(final String userId) {
+        try {
+            final Query query = new Query()
+                    .setFilter(new PropertyFilter(Keys.OBJECT_ID, FilterOperator.EQUAL, userId))
+                    .select(User.USER_NAME);
+            JSONObject result = userRepository.get(query);
+            final List<JSONObject> results = (List<JSONObject>) result.opt(Keys.RESULTS);
+            return results.get(0).optString(User.USER_NAME);
+        } catch (final RepositoryException e) {
+            LOGGER.log(Level.WARN, "Gets user name failed", e);
+
+            return "someone101";
+        }
+    }
 }

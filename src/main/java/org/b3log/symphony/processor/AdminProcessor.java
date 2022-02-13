@@ -322,6 +322,9 @@ public class AdminProcessor {
     @Inject
     private CloudService cloudService;
 
+    @Inject
+    private SponsorService sponsorService;
+
     /**
      * Register request handlers.
      */
@@ -1695,7 +1698,6 @@ public class AdminProcessor {
 
         final String pointStr = context.param(Common.POINT);
         final String memo = context.param("memo");
-
         if (StringUtils.isBlank(pointStr) || StringUtils.isBlank(memo) || !Strings.isNumeric(memo.split("-")[0])) {
             LOGGER.warn("Charge point memo format error");
 
@@ -1714,6 +1716,15 @@ public class AdminProcessor {
             notification.put(Notification.NOTIFICATION_USER_ID, userId);
             notification.put(Notification.NOTIFICATION_DATA_ID, transferId);
             notificationMgmtService.addPointChargeNotification(notification);
+            //保存捐赠记录
+            final JSONObject record = new JSONObject();
+            record.put(UserExt.USER_T_ID, userId);
+            record.put("time", System.currentTimeMillis());
+            final String[] memos = memo.split("-");
+            final String message = memos.length < 2 || StringUtils.isBlank(memos[1]) ? "没有填写捐助信息 :)" : memo.split("-")[1];
+            record.put(Sponsor.SPONSOR_MESSAGE, message);
+            record.put(Sponsor.AMOUNT, Double.parseDouble(memos[0]));
+            sponsorService.add(record);
         } catch (final NumberFormatException | ServiceException e) {
             final AbstractFreeMarkerRenderer renderer = new SkinRenderer(context, "admin/error.ftl");
             final Map<String, Object> dataModel = renderer.getDataModel();

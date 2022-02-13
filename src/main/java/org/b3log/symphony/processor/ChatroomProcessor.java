@@ -854,10 +854,7 @@ public class ChatroomProcessor {
                     .addSort(Keys.OBJECT_ID, SortDirection.DESCENDING));
             List<JSONObject> msgs = messageList.stream().map(msg -> new JSONObject(msg.optString("content")).put("oId", msg.optString(Keys.OBJECT_ID))).collect(Collectors.toList());
             msgs = msgs.stream().map(msg -> JSONs.clone(msg).put(Common.TIME, new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(msg.optLong(Common.TIME)))).collect(Collectors.toList());
-            msgs = msgs.stream().map(msg -> {
-                msg.put("md", msg.optString("content"));
-                return JSONs.clone(msg.put("content", processMarkdown(msg.optString("content"))));
-            }).collect(Collectors.toList());
+            msgs = msgs.stream().map(msg -> JSONs.clone(msg.put("content", processMarkdown(msg.optString("content"))))).collect(Collectors.toList());
             return msgs;
         } catch (RepositoryException e) {
             return new LinkedList<>();
