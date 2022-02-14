@@ -204,7 +204,7 @@ public class DataModelService {
             String recent;
             if (Objects.isNull(sponsors) || sponsors.isEmpty()) {
                 sponsors = Collections.emptyList();
-                recent = "2021-12-15";
+                recent = "2022-01-21";
             } else {
                 recent = sponsors.get(0).optString(Common.DATE);
             }
