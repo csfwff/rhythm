@@ -83,10 +83,29 @@
                 }
             </style>
             <div style="padding: 10px 0px 10px 15px">
-                <h6>上次更新日期：2021-12-15</h6>
+                <h6>上次更新日期：${recent}</h6>
             </div>
             <div class="list">
                 <ul>
+                    <#list sponsors as sponsor>
+                        <li class="fn__flex">
+                            <div class="ft-nowrap">
+                                ${sponsor.date}<br>
+                                <span class="ft-gray">${sponsor.time}</span>
+                            </div>
+                            <span class="fn__space5"></span>
+                            <span class="fn__space5"></span>
+                            <div class="ft__gray fn__flex-1">
+                                ${sponsor.message}
+                            </div>
+                            <span class="fn__space5"></span>
+                            <span class="fn__space5"></span>
+                            <b class="ft__original7" style="width: 90px">${sponsor.amount} RMB</b>
+                            <div class="ft__gray" style="width: 70px;text-align: right">
+                                <a href="${servePath}/member/${sponsor.userName}" class="tooltipped__user">${sponsor.userName}</a>
+                            </div>
+                        </li>
+                    </#list>
                     <li class="fn__flex">
                         <div class="ft-nowrap">
                             2021-12-15<br>
