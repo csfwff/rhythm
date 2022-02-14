@@ -345,6 +345,11 @@ public final class UserExt {
      */
     public static final String USER_APP_ROLE = "userAppRole";
 
+    /**
+     * key of user role
+     */
+    public static final String USER_ROLE = "userRole";
+
     //// Transient ////
     /**
      * Key of user create time.

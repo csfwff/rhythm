@@ -1970,6 +1970,40 @@
           "description": "游戏存档"
         }
       ]
+    },
+    {
+      "name": "sponsor",
+      "description": "赞助名单",
+      "keys": [
+        {
+          "name": "oId",
+          "type": "String",
+          "length": 19,
+          "description": "主键"
+        },
+        {
+          "name": "userId",
+          "type": "String",
+          "length": 19,
+          "description": "用户ID"
+        },
+        {
+          "name": "time",
+          "type": "long",
+          "description": "时间"
+        },
+        {
+          "name": "amount",
+          "type": "double",
+          "description": "金额"
+        },
+        {
+          "name": "message",
+          "type": "String",
+          "length": 255,
+          "description": "捐赠人留言"
+        }
+      ]
     }
   ]
 }
