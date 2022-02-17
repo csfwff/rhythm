@@ -21,6 +21,7 @@ package org.b3log.symphony.processor;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.time.DateFormatUtils;
+import org.apache.commons.lang.time.DateUtils;
 import org.b3log.latke.Keys;
 import org.b3log.latke.Latkes;
 import org.b3log.latke.http.Dispatcher;
@@ -124,6 +125,12 @@ public class IndexProcessor {
     private PointtransferMgmtService pointtransferMgmtService;
 
     /**
+     * Pointtransfer query service.
+     */
+    @Inject
+    private PointtransferQueryService pointtransferQueryService;
+
+    /**
      * Register request handlers.
      */
     public static void register() {
@@ -189,9 +196,13 @@ public class IndexProcessor {
         dataModelService.fillHeaderAndFooter(context, dataModel);
         // 发放积分
         JSONObject currentUser = Sessions.getUser();
-        pointtransferMgmtService.transfer(Pointtransfer.ID_C_SYS, currentUser.optString(Keys.OBJECT_ID),
-                Pointtransfer.TRANSFER_TYPE_C_ACTIVITY_PLAY_HANDLE,
-                60, "", System.currentTimeMillis(), "");
+        // 校验该用户今日是否已经获得汉兜每日奖励
+        List<JSONObject> list = pointtransferQueryService.getLatestPointtransfers(currentUser.optString(Keys.OBJECT_ID), Pointtransfer.TRANSFER_TYPE_C_ACTIVITY_PLAY_HANDLE, 1);
+        if (list.isEmpty() || !DateUtils.isSameDay(new Date(), new Date(list.get(0).optLong("time")))) {
+            pointtransferMgmtService.transfer(Pointtransfer.ID_C_SYS, currentUser.optString(Keys.OBJECT_ID),
+                    Pointtransfer.TRANSFER_TYPE_C_ACTIVITY_PLAY_HANDLE,
+                    60, "", System.currentTimeMillis(), "");
+        }
     }
 
     /**
