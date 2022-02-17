@@ -1,3 +1,23 @@
+<#--
+
+    Rhythm - A modern community (forum/BBS/SNS/blog) platform written in Java.
+    Modified version from Symphony, Thanks Symphony :)
+    Copyright (C) 2012-present, b3log.org
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU Affero General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU Affero General Public License for more details.
+
+    You should have received a copy of the GNU Affero General Public License
+    along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+-->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -12,9 +32,9 @@
   <meta name="twitter:image" content="https://handle.antfu.me/og.png"/>
   <meta name="twitter:card" content="summary_large_image"/>
   <meta name="twitter:creator" content="antfu7"/>
-  <script type="module" crossorigin src="assets/index.bf23f960.js"></script>
-  <link rel="modulepreload" href="assets/vendor.1d256264.js">
-  <link rel="stylesheet" href="assets/index.84457388.css">
+  <script type="module" crossorigin src="https://pwl.stackoverflow.wiki/handle/assets/index.bf23f960.js"></script>
+  <link rel="modulepreload" href="https://pwl.stackoverflow.wiki/handle/assets/vendor.1d256264.js">
+  <link rel="stylesheet" href="https://pwl.stackoverflow.wiki/handle/assets/index.84457388.css">
 </head>
 <body>
   <div id="app"></div>
