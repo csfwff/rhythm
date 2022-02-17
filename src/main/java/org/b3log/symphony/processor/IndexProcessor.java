@@ -135,6 +135,7 @@ public class IndexProcessor {
         Dispatcher.get("/hot", indexProcessor::showHotArticles, anonymousViewCheckMidware::handle);
         Dispatcher.get("/perfect", indexProcessor::showPerfectArticles, anonymousViewCheckMidware::handle);
         Dispatcher.get("/charge/point", indexProcessor::showChargePoint, anonymousViewCheckMidware::handle);
+        Dispatcher.get("/games/handle/", indexProcessor::showHandle, loginCheck::handle);
         Dispatcher.get("/games/adarkroom/", indexProcessor::showADarkRoom, loginCheck::handle);
         Dispatcher.get("/games/lifeRestart/view/", indexProcessor::showLifeRestart, loginCheck::handle);
         Dispatcher.get("/games/evolve/", indexProcessor::showEvolve, loginCheck::handle);
@@ -171,6 +172,12 @@ public class IndexProcessor {
 
     public void showADarkRoom(final RequestContext context) {
         final AbstractFreeMarkerRenderer renderer = new SkinRenderer(context, "games/adarkroom/index.ftl");
+        final Map<String, Object> dataModel = renderer.getDataModel();
+        dataModelService.fillHeaderAndFooter(context, dataModel);
+    }
+
+    public void showHandle(final RequestContext context) {
+        final AbstractFreeMarkerRenderer renderer = new SkinRenderer(context, "games/handle/index.ftl");
         final Map<String, Object> dataModel = renderer.getDataModel();
         dataModelService.fillHeaderAndFooter(context, dataModel);
     }
