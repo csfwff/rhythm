@@ -551,6 +551,8 @@ public class PointtransferQueryService {
                         break;
                     case Pointtransfer.TRANSFER_TYPE_C_ACTIVITY_SEND_TGIF:
                         break;
+                    case Pointtransfer.TRANSFER_TYPE_C_ACTIVITY_PLAY_HANDLE:
+                        break;
                     default:
                         LOGGER.warn("Invalid point type [" + type + "]");
                 }

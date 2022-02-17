@@ -39,6 +39,7 @@ import org.b3log.latke.util.Stopwatchs;
 import org.b3log.symphony.Server;
 import org.b3log.symphony.model.Article;
 import org.b3log.symphony.model.Common;
+import org.b3log.symphony.model.Pointtransfer;
 import org.b3log.symphony.model.UserExt;
 import org.b3log.symphony.processor.middleware.AnonymousViewCheckMidware;
 import org.b3log.symphony.processor.middleware.LoginCheckMidware;
@@ -117,6 +118,12 @@ public class IndexProcessor {
     private LivenessQueryService livenessQueryService;
 
     /**
+     * Pointtransfer management service.
+     */
+    @Inject
+    private PointtransferMgmtService pointtransferMgmtService;
+
+    /**
      * Register request handlers.
      */
     public static void register() {
@@ -181,7 +188,10 @@ public class IndexProcessor {
         final Map<String, Object> dataModel = renderer.getDataModel();
         dataModelService.fillHeaderAndFooter(context, dataModel);
         // 发放积分
-
+        JSONObject currentUser = Sessions.getUser();
+        pointtransferMgmtService.transfer(Pointtransfer.ID_C_SYS, currentUser.optString(Keys.OBJECT_ID),
+                Pointtransfer.TRANSFER_TYPE_C_ACTIVITY_PLAY_HANDLE,
+                60, "", System.currentTimeMillis(), "");
     }
 
     /**

@@ -423,6 +423,11 @@ public final class Pointtransfer {
     public static final int TRANSFER_TYPE_C_ACTIVITY_SEND_TGIF = 42;
 
     /**
+     * Transfer type - Activity - Play the game Handle.
+     */
+    public static final int TRANSFER_TYPE_C_ACTIVITY_PLAY_HANDLE = 43;
+
+    /**
      * Transfer sum - 摆龙门阵.
      */
     public static final int TRANSFER_SUM_C_BLMZ = 5;
