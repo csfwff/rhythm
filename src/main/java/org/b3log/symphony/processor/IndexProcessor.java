@@ -180,6 +180,8 @@ public class IndexProcessor {
         final AbstractFreeMarkerRenderer renderer = new SkinRenderer(context, "games/handle/index.ftl");
         final Map<String, Object> dataModel = renderer.getDataModel();
         dataModelService.fillHeaderAndFooter(context, dataModel);
+        // 发放积分
+
     }
 
     /**
