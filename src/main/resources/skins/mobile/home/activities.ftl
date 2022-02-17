@@ -85,6 +85,21 @@
                             <li>
                                 <div class='fn-flex'>
                                     <div class="avatar"
+                                         style="background-image:url('${staticServePath}/games/handle/favicon.svg')"></div>
+                                    <div class="fn-flex-1">
+                                        <h2 class="ft-13">
+                                            <a href="${servePath}/games/handle/" target="_blank">汉兜</a>
+                                        </h2>
+                                        <span class="ft-fade vditor-reset">
+                                                汉兜是一款猜四字词语的有趣游戏，你有十次的机会猜一个四字词语。<br>
+                                                <b>每天首次游戏获积分奖励</b>，快来猜猜吧！
+                                            </span>
+                                    </div>
+                                </div>
+                            </li>
+                            <li>
+                                <div class='fn-flex'>
+                                    <div class="avatar"
                                          style="background-image:url('${staticServePath}/images/restart.png')"></div>
                                     <div class="fn-flex-1">
                                         <h2 class="ft-13">
