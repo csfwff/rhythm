@@ -39,7 +39,7 @@ var Util = {
     } else {
       attr = '';
     }
-    return 'https://unv-shield.librian.net/api/unv_shield?scale=0.79&txt=' + name + attr;
+    return 'https://fishpi.cn/gen?scale=0.79&txt=' + name + attr;
   },
 
   parseDom(arg) {
