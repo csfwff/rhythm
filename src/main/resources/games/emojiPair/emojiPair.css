@@ -1,0 +1,56 @@
+#btnArea{
+    display: flex;
+    flex-wrap: wrap;
+    max-width: 360px;
+    margin: auto;
+}
+.game_content div.btn[id^=b] {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    max-width: 25%;
+    flex-basis: 25%;
+    font-size: 60px !important;
+    font-family: "Apple Color Emoji", "Segoe UI Emoji", NotoColorEmoji, "Segoe UI Symbol", "Android Emoji", EmojiSymbols;
+}
+.foundTxt {
+    font-size: 24px !important;
+}
+#hintBtn {
+    position: absolute;
+}
+#endTxt {
+    position: absolute;
+}
+#replayBtn {
+    margin: auto;
+    transform-origin: initial !important;
+}
+#replayBtn svg {
+    margin: auto;
+    display: block;
+}
+.end {
+    position: absolute;
+    top: 0;
+    left: 0;
+    padding-top: 270px;
+}
+#container {
+    width: 100%;
+    height: 100%;
+    font-weight: 500;
+    letter-spacing: -0.75px;
+    position: relative;
+}
+
+#container {
+    max-width: 100%;
+}
+
+.fs {
+    width:100%;
+    height:100%;
+    transform: none !important;
+    padding: 1rem 1rem 4rem;
+}
