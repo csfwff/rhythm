@@ -125,6 +125,25 @@ function updateTime(){
 
         clearInterval(timeInt);
         timeInt = undefined;
+        if (!found) {
+            TweenMax.set('.foundTxt', {textContent:'Found: 0', fontWeight:500});
+            TweenMax.set('.rewardTxt', {textContent:''});
+        } else {
+            $.ajax({
+                url: '/api/games/emojiPair/score',
+                type: 'POST',
+                data: JSON.stringify({"founds": found}),
+                cache: false,
+                headers: {'csrfToken': Label.csrfToken},
+                success: function (result, textStatus) {
+                    if (0 === result.code) {
+                        TweenMax.set('.rewardTxt', {textContent: hint + " " + found + "积分奖励已到账 " + hint, fontSize: 35});
+                    } else {
+                        TweenMax.set('.rewardTxt', {textContent: ''});
+                    }
+                }
+            });
+        }
         TweenMax.set('.endTxt', {textContent: hint + " Try again? " + hint, fontSize: 25});
 
         new TimelineMax()

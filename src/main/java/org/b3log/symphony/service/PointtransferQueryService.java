@@ -553,6 +553,8 @@ public class PointtransferQueryService {
                         break;
                     case Pointtransfer.TRANSFER_TYPE_C_ACTIVITY_PLAY_HANDLE:
                         break;
+                    case Pointtransfer.TRANSFER_TYPE_C_ACTIVITY_PLAY_EMOJI_PAIR:
+                        break;
                     default:
                         LOGGER.warn("Invalid point type [" + type + "]");
                 }

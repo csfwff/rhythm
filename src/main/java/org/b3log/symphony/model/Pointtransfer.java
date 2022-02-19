@@ -426,6 +426,10 @@ public final class Pointtransfer {
      * Transfer type - Activity - Play the game Handle.
      */
     public static final int TRANSFER_TYPE_C_ACTIVITY_PLAY_HANDLE = 43;
+    /**
+     * Transfer type - Activity - Play the game Handle.
+     */
+    public static final int TRANSFER_TYPE_C_ACTIVITY_PLAY_EMOJI_PAIR = 44;
 
     /**
      * Transfer sum - 摆龙门阵.

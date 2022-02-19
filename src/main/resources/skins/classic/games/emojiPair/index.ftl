@@ -14,6 +14,11 @@
     <meta name="HandheldFriendly" content="true" />
     <meta http-equiv="cleartype" content="on" />
     <script src="${staticServePath}/js/common${miniPostfix}.js?${staticResourceVersion}"></script>
+    <script>
+        var Label = {
+            csrfToken: '${csrfToken}'
+        }
+    </script>
 <body>
 <div class="content_right">
     <div class="pages_header banner-animation container">
@@ -54,6 +59,7 @@
                             <div id="b1" class="btn"></div>
                         </div>
                         <div class="end">
+                            <div class="rewardTxt"></div>
                             <div class="endTxt"></div>
                             <div id="replayBtn">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="240" height="240" viewBox="0 0 240 240">
@@ -71,7 +77,6 @@
                 <script type="text/javascript" src="../../../../games/emojiPair/game.js"></script>
                 <script type="text/javascript" src="../../../../games/emojiPair/emojiPair.js"></script>
                 <link rel="stylesheet" type="text/css" href="../../../../games/emojiPair/emojiPair.css">
-
             </div>
         </div></div></div></div></div>
         <div class="small" style="text-align: right">
