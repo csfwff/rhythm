@@ -60,10 +60,10 @@
         <ul id="breezemoonList">
             <#list userHomeBreezemoons as item>
                 <li class="fn-flex" id="${item.oId}">
-                    <a class="tooltipped tooltipped-n avatar"
+                    <a class="avatar"
                        style="background-image:url('${item.breezemoonAuthorThumbnailURL48}')"
                        rel="nofollow" href="${servePath}/member/${item.breezemoonAuthorName}"
-                       aria-label="Vanessa">
+                    >
                     </a>
                     <div class="fn-flex-1">
                         <div class="ft-fade">
