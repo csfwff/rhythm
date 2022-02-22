@@ -116,7 +116,7 @@
                                             justify-content: center;align-items: center;">😘</div>
                                         <div class="fn-flex-1">
                                             <h2>
-                                                <a href="${servePath}/games/emojiPair">Emoji真假小黄脸</a>
+                                                <a href="${servePath}/games/emojiPair">Emoji 真假小黄脸</a>
                                             </h2>
                                             <span class="ft-fade vditor-reset">
                                                 调皮的小黄脸玩起了真假美猴王的游戏，在众黄脸中找出他们吧！

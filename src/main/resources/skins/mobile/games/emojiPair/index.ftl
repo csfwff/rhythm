@@ -44,7 +44,7 @@
     <div class="pages_header banner-animation container">
         <div class="pages_info">
             <div class="pages_name capitalize col-auto line">
-                <h1>Emoji真假小黄脸</h1>
+                <h1>Emoji 真假小黄脸</h1>
                 <br>
                 <p class="small">调皮的小黄脸玩起了真假美猴王的游戏<br/>在众黄脸中找出他们吧！</p>
             </div>

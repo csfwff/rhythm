@@ -99,6 +99,7 @@ public class TopProcessor {
         Dispatcher.get("/top/mofish", topProcessor::showMofish, anonymousViewCheckMidware::handle);
         Dispatcher.get("/top/lifeRestart", topProcessor::showLifeRestart, anonymousViewCheckMidware::handle);
         Dispatcher.get("/top/evolve", topProcessor::showEvolve, anonymousViewCheckMidware::handle);
+        Dispatcher.get("/top/emoji", topProcessor::showEmoji, anonymousViewCheckMidware::handle);
     }
 
     /**
@@ -215,6 +216,24 @@ public class TopProcessor {
      */
     public void showADR(final RequestContext context) {
         final AbstractFreeMarkerRenderer renderer = new SkinRenderer(context, "top/adr.ftl");
+        final Map<String, Object> dataModel = renderer.getDataModel();
+        final List<JSONObject> users = activityQueryService.getTopADR(Symphonys.TOP_CNT);
+        dataModel.put("topUsers", users);
+
+        dataModelService.fillHeaderAndFooter(context, dataModel);
+        dataModelService.fillRandomArticles(dataModel);
+        dataModelService.fillSideHotArticles(dataModel);
+        dataModelService.fillSideTags(dataModel);
+        dataModelService.fillLatestCmts(dataModel);
+    }
+
+    /**
+     * Shows emoji score ranking list.
+     *
+     * @param context
+     */
+    public void showEmoji(final RequestContext context) {
+        final AbstractFreeMarkerRenderer renderer = new SkinRenderer(context, "top/emoji.ftl");
         final Map<String, Object> dataModel = renderer.getDataModel();
         final List<JSONObject> users = activityQueryService.getTopADR(Symphonys.TOP_CNT);
         dataModel.put("topUsers", users);
