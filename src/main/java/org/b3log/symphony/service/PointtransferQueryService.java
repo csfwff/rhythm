@@ -554,6 +554,11 @@ public class PointtransferQueryService {
                     case Pointtransfer.TRANSFER_TYPE_C_ACTIVITY_PLAY_HANDLE:
                         break;
                     case Pointtransfer.TRANSFER_TYPE_C_ACTIVITY_PLAY_EMOJI_PAIR:
+                        if (dataId.isEmpty()) {
+                            desTemplate = desTemplate.replace("{score}", "?");
+                        } else {
+                            desTemplate = desTemplate.replace("{score}", dataId);
+                        }
                         break;
                     default:
                         LOGGER.warn("Invalid point type [" + type + "]");

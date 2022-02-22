@@ -265,26 +265,30 @@ public class ActivityProcessor {
      */
     public void shareEmojiPairScore(final RequestContext context) {
         try {
-            int founds = context.requestJSON().optInt("founds");
+            final int founds = context.requestJSON().optInt("founds");
             final JSONObject user = Sessions.getUser();
             if (user == null) {
                 context.renderJSON(StatusCodes.ERR);
                 return;
             }
-            if (founds > 30) {
-                founds = 30;
+            int gives = founds;
+            if (gives > 30) {
+                gives = 30;
             }
             List<JSONObject> list = pointtransferQueryService.getLatestPointtransfers(user.optString(Keys.OBJECT_ID), Pointtransfer.TRANSFER_TYPE_C_ACTIVITY_PLAY_EMOJI_PAIR, 1);
             if (list.isEmpty() || !DateUtils.isSameDay(new Date(), new Date(list.get(0).optLong("time")))) {
                 pointtransferMgmtService.transfer(Pointtransfer.ID_C_SYS, user.optString(Keys.OBJECT_ID),
-                        Pointtransfer.TRANSFER_TYPE_C_ACTIVITY_PLAY_EMOJI_PAIR, founds,
-                        "", System.currentTimeMillis(), "");
+                        Pointtransfer.TRANSFER_TYPE_C_ACTIVITY_PLAY_EMOJI_PAIR, gives,
+                        "" + founds, System.currentTimeMillis(), "");
                 context.renderJSON(StatusCodes.SUCC);
                 context.renderMsg("数据上传成功！");
-                return;
+            } else {
+                pointtransferMgmtService.transfer(Pointtransfer.ID_C_SYS, user.optString(Keys.OBJECT_ID),
+                        Pointtransfer.TRANSFER_TYPE_C_ACTIVITY_PLAY_EMOJI_PAIR, 0,
+                        "" + founds, System.currentTimeMillis(), "");
+                context.renderJSON(StatusCodes.ERR);
+                context.renderMsg("存储数据失败！原因：本日已达奖励上限");
             }
-            context.renderJSON(StatusCodes.ERR);
-            context.renderMsg("存储数据失败！原因：本日已达奖励上限");
         } catch (Exception e) {
             context.renderJSON(StatusCodes.ERR);
             context.renderMsg("存储数据失败！原因：未知原因");
