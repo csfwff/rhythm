@@ -145,9 +145,10 @@ public class RoleQueryService {
      */
     public JSONObject getRole(final String roleId) {
         try {
-            final JSONObject ret = roleRepository.get(roleId);
+            JSONObject ret = roleRepository.get(roleId);
 
             if (!Strings.isNumeric(roleId)) {
+                ret = new JSONObject();
                 ret.put(Role.ROLE_NAME, langPropsService.get(roleId + "NameLabel"));
             }
 
