@@ -152,6 +152,7 @@ public class IndexProcessor {
         Dispatcher.get("/games/handle/", indexProcessor::showHandle, loginCheck::handle);
         Dispatcher.get("/games/adarkroom/", indexProcessor::showADarkRoom, loginCheck::handle);
         Dispatcher.get("/games/lifeRestart/view/", indexProcessor::showLifeRestart, loginCheck::handle);
+        Dispatcher.get("/games/emojiPair", indexProcessor::showEmojiPair, loginCheck::handle);
         Dispatcher.get("/games/evolve/", indexProcessor::showEvolve, loginCheck::handle);
         Dispatcher.get("/user/checkedIn", indexProcessor::isCheckedIn, loginCheck::handle);
         Dispatcher.get("/oldAlmanac", indexProcessor::showOldAlmanac, anonymousViewCheckMidware::handle);
@@ -174,6 +175,12 @@ public class IndexProcessor {
 
     public void showEvolve(final RequestContext context) {
         final AbstractFreeMarkerRenderer renderer = new SkinRenderer(context, "games/evolve/index.ftl");
+        final Map<String, Object> dataModel = renderer.getDataModel();
+        dataModelService.fillHeaderAndFooter(context, dataModel);
+    }
+
+    public void showEmojiPair(final RequestContext context) {
+        final AbstractFreeMarkerRenderer renderer = new SkinRenderer(context, "games/emojiPair/index.ftl");
         final Map<String, Object> dataModel = renderer.getDataModel();
         dataModelService.fillHeaderAndFooter(context, dataModel);
     }

@@ -35,6 +35,7 @@ import org.b3log.latke.model.User;
 import org.b3log.latke.service.LangPropsService;
 import org.b3log.latke.service.ServiceException;
 import org.b3log.symphony.model.Common;
+import org.b3log.symphony.model.Liveness;
 import org.b3log.symphony.model.Pointtransfer;
 import org.b3log.symphony.model.UserExt;
 import org.b3log.symphony.processor.middleware.CSRFMidware;
@@ -172,6 +173,7 @@ public class ActivityProcessor {
         Dispatcher.post("/activity/gobang/start", activityProcessor::startGobang, loginCheck::handle);
         Dispatcher.post("/api/games/adarkroom/share", activityProcessor::shareADarkRoomScore, loginCheck::handle, csrfMidware::check);
         Dispatcher.post("/api/games/mofish/score", activityProcessor::shareMofishScore);
+        Dispatcher.post("/api/games/emojiPair/score", activityProcessor::shareEmojiPairScore, loginCheck::handle, csrfMidware::check);
         Dispatcher.get("/activity/catch-the-cat", activityProcessor::showCatchTheCat, loginCheck::handle, csrfMidware::fill);
         Dispatcher.get("/activity/2048", activityProcessor::show2048, loginCheck::handle, csrfMidware::fill);
         Dispatcher.get("/api/activity/is-collected-liveness", activityProcessor::isCollectedYesterdayLivenessRewardApi, loginCheck::handle);
@@ -251,6 +253,32 @@ public class ActivityProcessor {
             }
             context.renderJSON(StatusCodes.SUCC);
             context.renderMsg("数据上传成功！");
+        } catch (Exception e) {
+            context.renderJSON(StatusCodes.ERR);
+            context.renderMsg("存储数据失败！原因：未知原因");
+        }
+    }
+
+
+    /**
+     * 上传emoji小黄脸游戏成绩
+     *
+     * @param context
+     */
+    public void shareEmojiPairScore(final RequestContext context) {
+        try {
+            final int founds = context.requestJSON().optInt("founds");
+            final JSONObject user = Sessions.getUser();
+            if(user == null) {
+                context.renderJSON(StatusCodes.ERR);
+                return;
+            }
+            pointtransferMgmtService.transfer(Pointtransfer.ID_C_SYS, user.optString(Keys.OBJECT_ID),
+                    Pointtransfer.TRANSFER_TYPE_C_ACTIVITY_PLAY_EMOJI_PAIR, founds,
+                    "", System.currentTimeMillis(), "");
+            context.renderJSON(StatusCodes.SUCC);
+            context.renderMsg("数据上传成功！");
+
         } catch (Exception e) {
             context.renderJSON(StatusCodes.ERR);
             context.renderMsg("存储数据失败！原因：未知原因");
