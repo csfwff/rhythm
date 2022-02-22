@@ -53,7 +53,7 @@ public class ChangeRoleHandler extends AbstractEventListener<JSONObject> {
         if (!author.optString(User.USER_ROLE).equals(Role.ROLE_ID_C_DEFAULT)) {
             return;
         } else {
-            author.put(User.USER_ROLE, Role.ROLE_ID_C_MEMBER);
+            author.put(User.USER_ROLE, "1630553360689");
         }
 
         try {
