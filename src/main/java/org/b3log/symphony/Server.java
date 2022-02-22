@@ -205,6 +205,8 @@ public final class Server extends BaseServer {
         eventManager.registerListener(articleAddAudioHandler);
         final ArticleUpdateAudioHandler articleUpdateAudioHandler = beanManager.getReference(ArticleUpdateAudioHandler.class);
         eventManager.registerListener(articleUpdateAudioHandler);
+        final ChangeRoleHandler roleHandler = beanManager.getReference(ChangeRoleHandler.class);
+        eventManager.registerListener(roleHandler);
 
         final TagCache tagCache = beanManager.getReference(TagCache.class);
         tagCache.loadTags();

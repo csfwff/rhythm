@@ -772,6 +772,8 @@ public class ArticleMgmtService {
             final JSONObject eventData = new JSONObject();
             eventData.put(Article.ARTICLE, article);
             eventData.put(Article.ARTICLE_T_NOTIFY_FOLLOWERS, requestJSONObject.optBoolean(Article.ARTICLE_T_NOTIFY_FOLLOWERS));
+            eventData.put(Article.ARTICLE_TAGS, requestJSONObject.optString(Article.ARTICLE_TAGS));
+            eventData.put("author", author);
             eventManager.fireEventAsynchronously(new Event<>(EventTypes.ADD_ARTICLE, eventData));
 
             return ret;
