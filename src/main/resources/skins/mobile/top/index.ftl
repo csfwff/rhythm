@@ -123,6 +123,17 @@
                                     <div class="ft-fade ft-smaller">人生重开模拟器成就排名</div>
                                 </div>
                             </li>
+                            <li class="fn__flex">
+                                <div class="avatar" style=" font-size: 2rem; margin-bottom: 0.5rem;display: flex;
+                                            justify-content: center;align-items: center;">😘</div>
+                                <div class="fn-flex-1">
+                                    <h2>
+                                        <a class="title"
+                                           href="${servePath}/top/emoji">Emoji 真假小黄脸排行榜</a>
+                                    </h2>
+                                    <div class="ft-fade ft-smaller">Emoji 真假小黄脸成绩排名</div>
+                                </div>
+                            </li>
                         </ul>
                         <br/>
                     </div>
