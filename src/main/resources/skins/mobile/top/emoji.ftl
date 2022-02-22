@@ -20,15 +20,16 @@
 -->
 <#include "macro-top.ftl">
 <@top "online">
-<h2 class="sub-head">Emoji 真假小黄脸 游戏总分排行</h2>
-<div class="list">
+<h2 class="ranking-title">Emoji 真假小黄脸 游戏总分排行</h2>
+<div class="list top">
     <ul>
         <#list topUsers as user>
         <li>
             <div class="fn-flex">
                 <a rel="nofollow"
+                   class="tooltipped tooltipped-se"
                    href="${servePath}/member/${user.userName}"
-                   ><div class="avatar" aria-label="${user.userName}" style="background-image:url('${user.userAvatarURL}')"></div></a>
+                   aria-label="${user.userName}"><div class="avatar" style="background-image:url('${user.userAvatarURL}')"></div></a>
                 <div class="has-view fn-flex-1">
                     <h2>
                         ${user_index + 1}.

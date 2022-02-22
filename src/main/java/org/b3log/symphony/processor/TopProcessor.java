@@ -235,7 +235,7 @@ public class TopProcessor {
     public void showEmoji(final RequestContext context) {
         final AbstractFreeMarkerRenderer renderer = new SkinRenderer(context, "top/emoji.ftl");
         final Map<String, Object> dataModel = renderer.getDataModel();
-        final List<JSONObject> users = activityQueryService.getTopADR(Symphonys.TOP_CNT);
+        final List<JSONObject> users = activityQueryService.getTopEmoji(Symphonys.TOP_CNT);
         dataModel.put("topUsers", users);
 
         dataModelService.fillHeaderAndFooter(context, dataModel);
