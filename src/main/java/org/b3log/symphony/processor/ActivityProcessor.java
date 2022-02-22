@@ -267,7 +267,7 @@ public class ActivityProcessor {
         try {
             int founds = context.requestJSON().optInt("founds");
             final JSONObject user = Sessions.getUser();
-            if(user == null) {
+            if (user == null) {
                 context.renderJSON(StatusCodes.ERR);
                 return;
             }
