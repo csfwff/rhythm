@@ -15,6 +15,7 @@ import org.b3log.symphony.service.UserMgmtService;
 import org.json.JSONObject;
 
 import java.util.Arrays;
+import java.util.List;
 
 /**
  * 新人报道自动切换角色
@@ -45,7 +46,8 @@ public class ChangeRoleHandler extends AbstractEventListener<JSONObject> {
             return;
         }
         final String[] tagArray = tags.split(",");
-        if (tagArray.length == 0 || !Arrays.asList(tagArray).contains("新人报道")) {
+        final List<String> arrays = Arrays.asList(tagArray);
+        if (tagArray.length == 0 || (!arrays.contains("新人报到") && !arrays.contains("新人报道"))) {
             return;
         }
         if (!author.optString(User.USER_ROLE).equals(Role.ROLE_ID_C_DEFAULT)) {
