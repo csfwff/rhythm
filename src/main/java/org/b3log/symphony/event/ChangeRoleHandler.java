@@ -45,7 +45,7 @@ public class ChangeRoleHandler extends AbstractEventListener<JSONObject> {
             return;
         }
         final String[] tagArray = tags.split(",");
-        if (tagArray.length == 0 || !Arrays.asList(tagArray).contains("新人报道")) {
+        if (tagArray.length == 0 || !Arrays.asList(tagArray).contains("新人报到")) {
             return;
         }
         if (!author.optString(User.USER_ROLE).equals(Role.ROLE_ID_C_DEFAULT)) {
