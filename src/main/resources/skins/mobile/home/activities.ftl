@@ -121,7 +121,8 @@
                                             <a href="${servePath}/games/emojiPair">Emoji 真假小黄脸</a>
                                         </h2>
                                         <span class="ft-fade vditor-reset">
-                                                调皮的小黄脸玩起了真假美猴王的游戏，在众黄脸中找出他们吧！
+                                                调皮的小黄脸玩起了真假美猴王的游戏，在众黄脸中找出他们吧！<br>
+                                                <b>每天首次游戏获积分奖励</b>，封顶30积分
                                             </span>
                                     </div>
                                 </div>
