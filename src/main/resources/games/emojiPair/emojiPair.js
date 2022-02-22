@@ -137,7 +137,11 @@ function updateTime(){
                 headers: {'csrfToken': Label.csrfToken},
                 success: function (result, textStatus) {
                     if (0 === result.code) {
-                        TweenMax.set('.rewardTxt', {textContent: hint + " " + found + "积分奖励已到账 " + hint, fontSize: 35});
+                        if (found > 30) {
+                            TweenMax.set('.rewardTxt', {textContent: hint + " 30积分奖励已到账 " + hint, fontSize: 35});
+                        } else {
+                            TweenMax.set('.rewardTxt', {textContent: hint + " " + found + "积分奖励已到账 " + hint, fontSize: 35});
+                        }
                     } else {
                         TweenMax.set('.rewardTxt', {textContent: ''});
                     }
