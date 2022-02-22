@@ -19,6 +19,7 @@
 package org.b3log.symphony.processor;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.time.DateUtils;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -49,10 +50,7 @@ import org.b3log.symphony.util.Symphonys;
 import org.json.JSONObject;
 import pers.adlered.simplecurrentlimiter.main.SimpleCurrentLimiter;
 
-import java.util.Calendar;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Activity processor.
@@ -267,18 +265,26 @@ public class ActivityProcessor {
      */
     public void shareEmojiPairScore(final RequestContext context) {
         try {
-            final int founds = context.requestJSON().optInt("founds");
+            int founds = context.requestJSON().optInt("founds");
             final JSONObject user = Sessions.getUser();
             if(user == null) {
                 context.renderJSON(StatusCodes.ERR);
                 return;
             }
-            pointtransferMgmtService.transfer(Pointtransfer.ID_C_SYS, user.optString(Keys.OBJECT_ID),
-                    Pointtransfer.TRANSFER_TYPE_C_ACTIVITY_PLAY_EMOJI_PAIR, founds,
-                    "", System.currentTimeMillis(), "");
-            context.renderJSON(StatusCodes.SUCC);
-            context.renderMsg("数据上传成功！");
-
+            if (founds > 30) {
+                founds = 30;
+            }
+            List<JSONObject> list = pointtransferQueryService.getLatestPointtransfers(user.optString(Keys.OBJECT_ID), Pointtransfer.TRANSFER_TYPE_C_ACTIVITY_PLAY_EMOJI_PAIR, 1);
+            if (list.isEmpty() || !DateUtils.isSameDay(new Date(), new Date(list.get(0).optLong("time")))) {
+                pointtransferMgmtService.transfer(Pointtransfer.ID_C_SYS, user.optString(Keys.OBJECT_ID),
+                        Pointtransfer.TRANSFER_TYPE_C_ACTIVITY_PLAY_EMOJI_PAIR, founds,
+                        "", System.currentTimeMillis(), "");
+                context.renderJSON(StatusCodes.SUCC);
+                context.renderMsg("数据上传成功！");
+                return;
+            }
+            context.renderJSON(StatusCodes.ERR);
+            context.renderMsg("存储数据失败！原因：本日已达奖励上限");
         } catch (Exception e) {
             context.renderJSON(StatusCodes.ERR);
             context.renderMsg("存储数据失败！原因：未知原因");
