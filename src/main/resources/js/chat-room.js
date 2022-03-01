@@ -416,11 +416,14 @@ var ChatRoom = {
    */
   toggleOnlineAvatar: function () {
     if ($("#chatRoomOnlineCnt").css("display") === 'none') {
-      $("#toggleAvatarBtn").html('<use xlink:href="#showLess"></use>');
-      $("#chatRoomOnlineCnt").slideDown(500);
+      $("#chatRoomOnlineCnt").html(Label.onlineAvatarData);
+      setTimeout(function () {
+        $("#toggleAvatarBtn").html('<use xlink:href="#showLess"></use>');
+        $("#chatRoomOnlineCnt").slideDown(200);
+      }, 100);
     } else {
       $("#toggleAvatarBtn").html('<use xlink:href="#showMore"></use>');
-      $("#chatRoomOnlineCnt").slideUp(500);
+      $("#chatRoomOnlineCnt").slideUp(200);
     }
   },
   /**

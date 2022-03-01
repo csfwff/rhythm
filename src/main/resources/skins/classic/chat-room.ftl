@@ -137,6 +137,7 @@
     ChatRoomChannel.init("${wsScheme}://${serverHost}:${serverPort}${contextPath}/chat-room-channel");
     var page = 0;
     ChatRoom.more();
+    Label.onlineAvatarData = "";
 </script>
 <script>
     $(window).scroll(

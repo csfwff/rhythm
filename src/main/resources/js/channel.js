@@ -378,14 +378,14 @@ var ChatRoomChannel = {
                 case 'online':
                     $('#onlineCnt').text(data.onlineChatCnt);
                     $('#indexOnlineChatCnt').text(data.onlineChatCnt);
-                    $("#chatRoomOnlineCnt").html("");
+                    Label.onlineAvatarData = "";
                     for (var user in data.users) {
                         let userInfo = data.users[user];
-                        $("#chatRoomOnlineCnt").append("<a target=\"_blank\" data-name=\"" + userInfo.userName + "\"\n" +
+                        Label.onlineAvatarData += "<a target=\"_blank\" data-name=\"" + userInfo.userName + "\"\n" +
                             "href=\"" + userInfo.homePage + "\">\n" +
                             "<img style='margin-bottom: 10px' class=\"avatar avatar-small\" aria-label=\"" + userInfo.userName + "\"\n" +
                             "src=\"" + userInfo.userAvatarURL + "\">\n" +
-                            "</a>");
+                            "</a>";
                     }
                     Util.listenUserCard();
                     break;
