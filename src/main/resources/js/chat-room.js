@@ -412,6 +412,18 @@ var ChatRoom = {
     ChatRoom.loadAvatarPendant();
   },
   /**
+   * 切换显示/隐藏在线人数头像
+   */
+  toggleOnlineAvatar: function () {
+    if ($("#chatRoomOnlineCnt").css("display") === 'none') {
+      $("#toggleAvatarBtn").html('<use xlink:href="#showLess"></use>');
+      $("#chatRoomOnlineCnt").slideDown(500);
+    } else {
+      $("#toggleAvatarBtn").html('<use xlink:href="#showMore"></use>');
+      $("#chatRoomOnlineCnt").slideUp(500);
+    }
+  },
+  /**
    * 删除表情包
    * @param url
    */

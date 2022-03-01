@@ -77,8 +77,11 @@
                                 <div class="fn-left online-cnt">${onlineVisitorCountLabel} <span id="onlineCnt"></span>
                                 </div>
                                 <div class="tip fn-left" id="chatContentTip"></div>
+                                <a onclick="ChatRoom.toggleOnlineAvatar()" style="cursor:pointer;">
+                                    <svg style="vertical-align: -10px;" id="toggleAvatarBtn"><use xlink:href="#showMore"></use></svg>
+                                </a>
                             </div>
-                            <div id="chatRoomOnlineCnt" class="chats__users">
+                            <div id="chatRoomOnlineCnt" class="chats__users" style="display: none">
                             </div>
                         <#else>
                             <div class="comment-login">
