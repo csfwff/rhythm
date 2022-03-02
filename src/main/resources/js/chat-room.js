@@ -416,7 +416,7 @@ var ChatRoom = {
     Util.alert("" +
         "<div class=\"form fn__flex-column\">\n" +
         "<label>\n" +
-        "  <div class=\"ft__smaller\" style=\"float: left\">修改话题需要16积分，将自动从账户中扣除</div>\n" +
+        "  <div class=\"ft__smaller\" style=\"float: left\">修改话题需要16积分，将自动从账户中扣除；最大长度16字符，不合法字符将被自动过滤。</div>\n" +
         "  <div class=\"fn-hr5 fn__5\"></div>\n" +
         "  <input type=\"text\" id=\"discuss-new-title\">\n" +
         "</label>\n" +
@@ -441,17 +441,13 @@ var ChatRoom = {
       data: JSON.stringify(requestJSONObject),
       success: function (result) {
         if (0 !== result.code) {
-          $('#chatContentTip').
-          addClass('error').
-          html('<ul><li>' + result.msg + '</li></ul>')
+          Util.notice("danger", 3000, result.msg);
         } else {
           Util.notice("success", 3000, "话题修改成功，所有人可见。<br>16积分已扣除。");
         }
       },
       error: function (result) {
-        $('#chatContentTip').
-        addClass('error').
-        html('<ul><li>' + result.statusText + '</li></ul>')
+        Util.notice("danger", 3000, result.statusText);
       }
     })
   },

@@ -626,6 +626,14 @@ public class ChatroomProcessor {
                     return;
                 }
                 String setdiscussString = content.replaceAll("^\\[setdiscuss\\]", "").replaceAll("\\[/setdiscuss\\]$", "");
+                setdiscussString = setdiscussString.replaceAll("[^0-9a-zA-Z\\u4e00-\\u9fa5,，.。！!?？《》]", "");
+                if (setdiscussString.length() > 16) {
+                    setdiscussString = setdiscussString.substring(0, 16);
+                }
+                if (setdiscussString.isEmpty()) {
+                    context.renderJSON(StatusCodes.ERR).renderMsg("这样不好玩哦～");
+                    return;
+                }
                 ChatroomChannel.discussing = setdiscussString;
                 ChatroomChannel.sendOnlineMsg();
                 context.renderJSON(StatusCodes.SUCC);
