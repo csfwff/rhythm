@@ -410,6 +410,14 @@ var ChatRoom = {
   //  加载挂件
     ChatRoom.loadAvatarPendant();
   },
+
+  useDiscuss: function () {
+    let history = ChatRoom.editor.getValue();
+    ChatRoom.editor.setValue("*`# " + $("#discuss-title").html() + " #`*  ");
+    ChatRoom.editor.insertValue( history, 0);
+    ChatRoom.editor.focus();
+  },
+
   /**
    * 切换显示/隐藏在线人数头像
    */
