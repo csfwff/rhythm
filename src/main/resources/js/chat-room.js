@@ -681,7 +681,9 @@ var ChatRoom = {
             if (result.data.length !== 0) {
               for (let i in result.data) {
                 let data = result.data[i];
-                ChatRoom.renderMsg(data, 'more');
+                if ($("#chatroom" + data.oId).length === 0) {
+                  ChatRoom.renderMsg(data, 'more');
+                }
                 ChatRoom.resetMoreBtnListen();
               }
               Util.listenUserCard();
