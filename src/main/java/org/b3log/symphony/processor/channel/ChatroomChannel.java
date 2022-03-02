@@ -53,6 +53,11 @@ public class ChatroomChannel implements WebSocketChannel {
     public static final Map<WebSocketSession, JSONObject> onlineUsers = Collections.synchronizedMap(new HashMap<>());
 
     /**
+     * 当前讨论话题
+     */
+    public static final String discussing = "暂无";
+
+    /**
      * Called when the socket connection with the browser is established.
      *
      * @param session session
@@ -71,15 +76,7 @@ public class ChatroomChannel implements WebSocketChannel {
 
         SESSIONS.add(session);
 
-        synchronized (SESSIONS) {
-            final Iterator<WebSocketSession> i = SESSIONS.iterator();
-            // i 是每个客户端，遍历给他们发送 SESSIONS.size()，也就是在线人数
-            while (i.hasNext()) {
-                final WebSocketSession s = i.next();
-                final String msgStr = getOnline().toString();
-                s.sendText(msgStr);
-            }
-        }
+        sendOnlineMsg();
     }
 
     /**
@@ -150,14 +147,7 @@ public class ChatroomChannel implements WebSocketChannel {
 
         SESSIONS.remove(session);
 
-        synchronized (SESSIONS) {
-            final Iterator<WebSocketSession> i = SESSIONS.iterator();
-            while (i.hasNext()) {
-                final WebSocketSession s = i.next();
-                final String msgStr = getOnline().toString();
-                s.sendText(msgStr);
-            }
-        }
+        sendOnlineMsg();
     }
 
     /**
@@ -191,11 +181,22 @@ public class ChatroomChannel implements WebSocketChannel {
             result.put(Common.ONLINE_CHAT_CNT, filteredOnlineUsers.size());
             result.put(Common.TYPE, "online");
             result.put("users", onlineArray);
+            result.put("discussing", discussing);
 
             return result;
         } catch (Exception e) {
             e.printStackTrace();
         }
         return new JSONObject().put(Common.ONLINE_CHAT_CNT, 99999).put(Common.TYPE, "online").put("users", new JSONArray());
+    }
+
+    // 发送在线信息
+    public void sendOnlineMsg() {
+        synchronized (SESSIONS) {
+            for (WebSocketSession s : SESSIONS) {
+                final String msgStr = getOnline().toString();
+                s.sendText(msgStr);
+            }
+        }
     }
 }

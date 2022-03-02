@@ -376,6 +376,7 @@ var ChatRoomChannel = {
                     $(".redPacketNotice").slideDown(500);
                     break;
                 case 'online':
+                    $("#discuss-title").text(data.discussing);
                     $('#onlineCnt').text(data.onlineChatCnt);
                     $('#indexOnlineChatCnt').text(data.onlineChatCnt);
                     Label.onlineAvatarData = "";

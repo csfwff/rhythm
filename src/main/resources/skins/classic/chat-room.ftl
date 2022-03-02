@@ -38,7 +38,7 @@
                 <div class="fn-content" style="padding-top: 0;">
                     <div class="discuss_title">
                         <a style="text-decoration: none; display: inline-block; cursor: default">
-                            <span style="color: #616161">当前话题：</span><span class="ft-green"># <span id="discuss-title">暂无</span> #</span>
+                            <span style="color: #616161">当前话题：</span><span class="ft-green"># <span id="discuss-title">加载中...</span> #</span>
                         </a>
                         <div style="padding-left: 5px;display: inline-block;vertical-align: -2px;">
                             <a onclick="ChatRoom.setDiscuss()" class="ft-a-title tooltipped tooltipped-se" aria-label="编辑话题" style="text-decoration: none;">

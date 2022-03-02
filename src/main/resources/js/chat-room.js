@@ -203,7 +203,6 @@ var ChatRoom = {
       });
 
       var onelineUsers = new Map();
-
       $("#redPacketType").on('change',function () {
          let type = $("#redPacketType").val();
         if (type === 'specify') {
