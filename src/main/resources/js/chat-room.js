@@ -718,7 +718,7 @@ var ChatRoom = {
   groupRevokeProcess: false,
   startGroupRevoke: function () {
     $("#groupRevoke").attr("onclick", "ChatRoom.stopGroupRevoke()");
-    $("#groupRevoke").html("<svg><use xlink:href=\"#administration\"></use></svg>\n" +
+    $("#groupRevoke").html("<svg style=\"vertical-align: -2px;\"><use xlink:href=\"#administration\"></use></svg>\n" +
         "关闭批量撤回");
     Util.notice("warning", 6000, "批量撤回已启动，已在消息中添加便捷撤回按钮。<br>使用完成后请记得关闭此功能。");
     ChatRoom.groupRevokeProcess = true;
@@ -742,7 +742,7 @@ var ChatRoom = {
    */
   stopGroupRevoke: function () {
     $("#groupRevoke").attr("onclick", "ChatRoom.startGroupRevoke()");
-    $("#groupRevoke").html("<svg><use xlink:href=\"#administration\"></use></svg>\n" +
+    $("#groupRevoke").html("<svg style=\"vertical-align: -2px;\"><use xlink:href=\"#administration\"></use></svg>\n" +
         "批量撤回");
     Util.notice("success", 1500, "批量撤回已关闭。");
     ChatRoom.groupRevokeProcess = false;

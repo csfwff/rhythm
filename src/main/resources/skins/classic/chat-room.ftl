@@ -35,11 +35,19 @@
     <div class="wrapper">
         <div class="content chat-room">
             <div class="module" style="margin-bottom: 0">
-                <div class="fn-content">
-                    <div>
-                        <a class="discuss_title">
-                            当前话题：<span class="ft-green">#齐哥的产后护理#</span>
+                <div class="fn-content" style="padding-top: 0;">
+                    <div class="discuss_title">
+                        <a style="text-decoration: none; display: inline-block; cursor: default">
+                            <span style="color: #616161">当前话题：</span><span class="ft-green"># 齐哥的产后护理 #</span>
                         </a>
+                        <div style="padding-left: 5px;display: inline-block;vertical-align: -2px;">
+                            <a class="ft-a-title tooltipped tooltipped-se" aria-label="编辑话题" style="text-decoration: none;">
+                                <svg><use xlink:href="#edit-discuss"></use></svg>
+                            </a>
+                            <a class="ft-a-title tooltipped tooltipped-se" aria-label="引用话题" style="text-decoration: none;">
+                                <svg><use xlink:href="#pound"></use></svg>
+                            </a>
+                        </div>
                     </div>
                     <div class="reply">
                         <#if isLoggedIn>
@@ -70,7 +78,7 @@
                                 <div class="fn-right">
                                     <#if level3Permitted == true>
                                         <button id="groupRevoke" onclick="ChatRoom.startGroupRevoke()" class="button">
-                                            <svg><use xlink:href="#administration"></use></svg>
+                                            <svg style="vertical-align: -2px;"><use xlink:href="#administration"></use></svg>
                                             批量撤回
                                         </button>
                                     </#if>
