@@ -50,7 +50,7 @@ var ChatRoom = {
         mode: 'editor',
       },
       resize: {
-        enable: true,
+        enable: false,
         position: 'bottom',
       },
       toolbar: [
@@ -91,7 +91,6 @@ var ChatRoom = {
           ],
         }],
       height: 150,
-      counter: 40960,
       placeholder: '说点什么吧！',
       ctrlEnter: function () {
         ChatRoom.send()

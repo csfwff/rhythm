@@ -112,7 +112,6 @@ var IdleTalk = {
                 position: 'top',
             },
             height: 200,
-            counter: 40960,
             placeholder: '私信内容（最长20480个字）'
         })
 

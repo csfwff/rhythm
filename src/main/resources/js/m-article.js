@@ -439,7 +439,6 @@ var Comment = {
         position: 'top',
       },
       height: 200,
-      counter: 40960,
       placeholder: Label.commentEditorPlaceholderLabel,
       ctrlEnter: function () {
         Comment.add(Label.articleOId, Label.csrfToken,

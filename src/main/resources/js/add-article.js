@@ -286,7 +286,6 @@ var AddArticle = {
         }
       },
       height: 360,
-      counter: 40960,
       placeholder: $('#articleContent').data('placeholder'),
       input: function () {
         if (Label.articleType === 3) {
@@ -410,7 +409,6 @@ var AddArticle = {
           enable: false,
         },
         height: 200,
-        counter: 40960,
         placeholder: $('#articleRewardContent').data('placeholder'),
         after: function () {
           if ($('#articleRewardContent').next().val() !== '') {

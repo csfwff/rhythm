@@ -36,6 +36,11 @@
         <div class="content chat-room">
             <div class="module" style="margin-bottom: 0">
                 <div class="fn-content">
+                    <div>
+                        <a class="discuss_title">
+                            当前话题：<span class="ft-green">#齐哥的产后护理#</span>
+                        </a>
+                    </div>
                     <div class="reply">
                         <#if isLoggedIn>
                             <div id="chatContent"></div><br>
