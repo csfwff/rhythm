@@ -357,7 +357,7 @@ var ChatRoomChannel = {
                     let newDiscuss = data.newDiscuss;
                     // 通知
                     let discussHtml = "<div class='newDiscussNotice' style='color: rgb(50 50 50);margin-bottom: 8px;text-align: center;display: none;'>" +
-                        "<svg><use xlink:href='#pound'></use></svg>&nbsp;" + '<a href="' + Label.servePath + '/member/' + whoChanged + '" target="_blank">' + whoChanged + "</a> 编辑了话题：<a href='javascript:void(0)'>" +
+                        "<svg><use xlink:href='#pound'></use></svg>&nbsp;" + '<a href="' + Label.servePath + '/member/' + whoChanged + '" target="_blank">' + whoChanged + "</a> 编辑了话题：<a href='javascript:void(0)' style='text-decoration: none'>" +
                         newDiscuss +
                         "</a></div>";
                     $('#chats').prepend(discussHtml);
