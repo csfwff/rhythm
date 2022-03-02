@@ -65,7 +65,7 @@
                                 <div class="fn-right">
                                     <#if level3Permitted == true>
                                         <button id="groupRevoke" onclick="ChatRoom.startGroupRevoke()" class="button">
-                                            <svg><use xlink:href="#userrole"></use></svg>
+                                            <svg><use xlink:href="#administration"></use></svg>
                                             批量撤回
                                         </button>
                                     </#if>

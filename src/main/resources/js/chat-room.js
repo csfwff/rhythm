@@ -719,7 +719,7 @@ var ChatRoom = {
   groupRevokeProcess: false,
   startGroupRevoke: function () {
     $("#groupRevoke").attr("onclick", "ChatRoom.stopGroupRevoke()");
-    $("#groupRevoke").html("<svg><use xlink:href=\"#userrole\"></use></svg>\n" +
+    $("#groupRevoke").html("<svg><use xlink:href=\"#administration\"></use></svg>\n" +
         "关闭批量撤回");
     Util.notice("warning", 6000, "批量撤回已启动，已在消息中添加便捷撤回按钮。<br>使用完成后请记得关闭此功能。");
     ChatRoom.groupRevokeProcess = true;
@@ -743,7 +743,7 @@ var ChatRoom = {
    */
   stopGroupRevoke: function () {
     $("#groupRevoke").attr("onclick", "ChatRoom.startGroupRevoke()");
-    $("#groupRevoke").html("<svg><use xlink:href=\"#userrole\"></use></svg>\n" +
+    $("#groupRevoke").html("<svg><use xlink:href=\"#administration\"></use></svg>\n" +
         "批量撤回");
     Util.notice("success", 1500, "批量撤回已关闭。");
     ChatRoom.groupRevokeProcess = false;
@@ -1023,7 +1023,7 @@ var ChatRoom = {
     }
     // isAdmin
     if (Label.level3Permitted) {
-      meTag2 = "<a onclick=\"ChatRoom.revoke(" + data.oId + ")\" class=\"item\"><svg><use xlink:href=\"#userrole\"></use></svg> 撤回</a>\n";
+      meTag2 = "<a onclick=\"ChatRoom.revoke(" + data.oId + ")\" class=\"item\"><svg><use xlink:href=\"#administration\"></use></svg> 撤回</a>\n";
     }
     try {
       // 判断是否可以收藏为表情包
