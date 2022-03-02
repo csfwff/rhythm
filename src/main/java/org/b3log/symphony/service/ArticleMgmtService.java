@@ -1275,7 +1275,7 @@ public class ArticleMgmtService {
                 }
 
                 if (!ids.contains(articleId)) {
-                    throw new ServiceException(langPropsService.get("stickExistLabel"));
+                    // throw new ServiceException(langPropsService.get("stickExistLabel"));
                 }
             }
 
