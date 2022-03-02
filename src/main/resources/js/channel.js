@@ -362,6 +362,7 @@ var ChatRoomChannel = {
                         "</a></div>";
                     $('#chats').prepend(discussHtml);
                     $(".newDiscussNotice").slideDown(500);
+                    $("#discuss-title").text(newDiscuss);
                     break;
                 case 'redPacketStatus':
                     let whoGive = data.whoGive;

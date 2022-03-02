@@ -635,7 +635,6 @@ public class ChatroomProcessor {
                     return;
                 }
                 ChatroomChannel.discussing = setdiscussString;
-                ChatroomChannel.sendOnlineMsg();
                 // 广播话题情况
                 JSONObject discussStatus = new JSONObject();
                 discussStatus.put(Common.TYPE, "discussChanged");
