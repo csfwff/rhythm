@@ -422,10 +422,39 @@ var ChatRoom = {
         "</label>\n" +
         "<div class=\"fn-hr5\"></div>\n" +
         "<div class=\"fn__flex\" style=\"margin-top: 15px; justify-content: flex-end;\">\n" +
-        "  <button class=\"btn btn--confirm\" onclick=';Util.closeAlert();'>设置</button>\n" +
+        "  <button class=\"btn btn--confirm\" onclick='ChatRoom.updateDiscussData($(\"#discuss-new-title\").val());Util.closeAlert();'>设置</button>\n" +
         "</div>\n" +
         "</div>" +
-        "", "设置话题");  },
+        "", "设置话题");
+    },
+  /**
+   * 设置话题
+   */
+  updateDiscussData: function (discuss) {
+    let requestJSONObject = {
+      content: "[setdiscuss]" + discuss + "[/setdiscuss]",
+    }
+    $.ajax({
+      url: Label.servePath + '/chat-room/send',
+      type: 'POST',
+      cache: false,
+      data: JSON.stringify(requestJSONObject),
+      success: function (result) {
+        if (0 !== result.code) {
+          $('#chatContentTip').
+          addClass('error').
+          html('<ul><li>' + result.msg + '</li></ul>')
+        } else {
+          Util.notice("success", 3000, "话题修改成功，所有人可见。<br>16积分已扣除。");
+        }
+      },
+      error: function (result) {
+        $('#chatContentTip').
+        addClass('error').
+        html('<ul><li>' + result.statusText + '</li></ul>')
+      }
+    })
+  },
   /**
    * 引用话题
    */

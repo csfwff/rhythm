@@ -55,7 +55,7 @@ public class ChatroomChannel implements WebSocketChannel {
     /**
      * 当前讨论话题
      */
-    public static final String discussing = "暂无";
+    public static String discussing = "暂无";
 
     /**
      * Called when the socket connection with the browser is established.
@@ -154,7 +154,7 @@ public class ChatroomChannel implements WebSocketChannel {
      * 获得聊天室在线人数和在线成员信息
      * @return
      */
-    public JSONObject getOnline() {
+    public static JSONObject getOnline() {
         try {
             // 使用 HashMap 去重
             Map<String, JSONObject> filteredOnlineUsers = new HashMap<>();
@@ -191,7 +191,7 @@ public class ChatroomChannel implements WebSocketChannel {
     }
 
     // 发送在线信息
-    public void sendOnlineMsg() {
+    public static void sendOnlineMsg() {
         synchronized (SESSIONS) {
             for (WebSocketSession s : SESSIONS) {
                 final String msgStr = getOnline().toString();

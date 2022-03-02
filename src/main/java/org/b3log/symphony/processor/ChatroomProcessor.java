@@ -616,6 +616,19 @@ public class ChatroomProcessor {
                 } catch (Exception e) {
                     LOGGER.log(Level.INFO, "User " + userName + " failed to send a red packet.");
                 }
+            } else if (content.startsWith("[setdiscuss]") && content.endsWith("[/setdiscuss]")) {
+                // 扣钱
+                final boolean succ = null != pointtransferMgmtService.transfer(userId, Pointtransfer.ID_C_SYS,
+                        Pointtransfer.TRANSFER_TYPE_C_ACTIVITY_SET_DISCUSS,
+                        16, "", System.currentTimeMillis(), "");
+                if (!succ) {
+                    context.renderJSON(StatusCodes.ERR).renderMsg("少年，你的积分不足！");
+                    return;
+                }
+                String setdiscussString = content.replaceAll("^\\[setdiscuss\\]", "").replaceAll("\\[/setdiscuss\\]$", "");
+                ChatroomChannel.discussing = setdiscussString;
+                ChatroomChannel.sendOnlineMsg();
+                context.renderJSON(StatusCodes.SUCC);
             } else {
                 // 聊天室内容保存到数据库
                 final Transaction transaction = chatRoomRepository.beginTransaction();

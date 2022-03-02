@@ -560,6 +560,8 @@ public class PointtransferQueryService {
                             desTemplate = desTemplate.replace("{score}", dataId);
                         }
                         break;
+                    case Pointtransfer.TRANSFER_TYPE_C_ACTIVITY_SET_DISCUSS:
+                        break;
                     default:
                         LOGGER.warn("Invalid point type [" + type + "]");
                 }
