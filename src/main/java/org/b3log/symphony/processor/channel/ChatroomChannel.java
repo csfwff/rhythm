@@ -76,7 +76,9 @@ public class ChatroomChannel implements WebSocketChannel {
 
         SESSIONS.add(session);
 
-        sendOnlineMsg();
+        // 单独发送在线信息
+        final String msgStr = getOnline().toString();
+        session.sendText(msgStr);
     }
 
     /**
@@ -137,7 +139,7 @@ public class ChatroomChannel implements WebSocketChannel {
      *
      * @param session the specified session
      */
-    private void removeSession(final WebSocketSession session) {
+    private synchronized void removeSession(final WebSocketSession session) {
         try {
             onlineUsers.remove(session);
         } catch (NullPointerException ignored) {
@@ -146,8 +148,6 @@ public class ChatroomChannel implements WebSocketChannel {
         }
 
         SESSIONS.remove(session);
-
-        sendOnlineMsg();
     }
 
     /**
@@ -191,11 +191,15 @@ public class ChatroomChannel implements WebSocketChannel {
     }
 
     // 发送在线信息
-    public static void sendOnlineMsg() {
+    public synchronized static void sendOnlineMsg() {
         synchronized (SESSIONS) {
             for (WebSocketSession s : SESSIONS) {
                 final String msgStr = getOnline().toString();
                 s.sendText(msgStr);
+                try {
+                    Thread.sleep(10);
+                } catch (Exception ignored) {
+                }
             }
         }
     }
