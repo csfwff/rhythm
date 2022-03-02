@@ -281,7 +281,10 @@ var Util = {
    * @description 关闭 alert
    */
   closeAlert: function () {
-    $("#alertDialogPanel,.dialog-background").remove()
+    $("#alertDialogPanel,.dialog-background").fadeOut(200);
+    setTimeout(function () {
+      $("#alertDialogPanel,.dialog-background").remove();
+    }, 200);
   },
   /**
    * @description alert

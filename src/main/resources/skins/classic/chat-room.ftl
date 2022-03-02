@@ -41,7 +41,7 @@
                             <span style="color: #616161">当前话题：</span><span class="ft-green"># <span id="discuss-title">暂无</span> #</span>
                         </a>
                         <div style="padding-left: 5px;display: inline-block;vertical-align: -2px;">
-                            <a class="ft-a-title tooltipped tooltipped-se" aria-label="编辑话题" style="text-decoration: none;">
+                            <a onclick="ChatRoom.setDiscuss()" class="ft-a-title tooltipped tooltipped-se" aria-label="编辑话题" style="text-decoration: none;">
                                 <svg><use xlink:href="#edit-discuss"></use></svg>
                             </a>
                             <a onclick="ChatRoom.useDiscuss()" class="ft-a-title tooltipped tooltipped-se" aria-label="引用话题" style="text-decoration: none;">

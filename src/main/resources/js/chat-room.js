@@ -215,7 +215,7 @@ var ChatRoom = {
             type: 'GET',
             cache: false,
             success: function (result) {
-              console.log(result)
+              // console.log(result)
               if (0 == result.code) {
                 $("#userOption").html("");
                 for (var userIndex in result.data.users) {
@@ -224,11 +224,11 @@ var ChatRoom = {
                   $("#userOption").append("<option value=\""+user.userName+"\">"+user.userName+"</option>\n");
                 }
               } else {
-                console.log("获取聊天室在线成员信息失败")
+                // console.log("获取聊天室在线成员信息失败")
               }
             },
             error: function (result) {
-              console.log("获取聊天室在线成员信息失败")
+              // console.log("获取聊天室在线成员信息失败")
             }
           })
         } else {
@@ -410,14 +410,32 @@ var ChatRoom = {
   //  加载挂件
     ChatRoom.loadAvatarPendant();
   },
-
+  /**
+   * 设置话题
+   */
+  setDiscuss: function () {
+    Util.alert("" +
+        "<div class=\"form fn__flex-column\">\n" +
+        "<label>\n" +
+        "  <div class=\"ft__smaller\" style=\"float: left\">修改话题需要16积分，将自动从账户中扣除</div>\n" +
+        "  <div class=\"fn-hr5 fn__5\"></div>\n" +
+        "  <input type=\"text\" id=\"discuss-new-title\">\n" +
+        "</label>\n" +
+        "<div class=\"fn-hr5\"></div>\n" +
+        "<div class=\"fn__flex\" style=\"margin-top: 15px; justify-content: flex-end;\">\n" +
+        "  <button class=\"btn btn--confirm\" onclick=';Util.closeAlert();'>设置</button>\n" +
+        "</div>\n" +
+        "</div>" +
+        "", "设置话题");  },
+  /**
+   * 引用话题
+   */
   useDiscuss: function () {
     let history = ChatRoom.editor.getValue();
     ChatRoom.editor.setValue("*`# " + $("#discuss-title").html() + " #`*  ");
     ChatRoom.editor.insertValue( history, 0);
     ChatRoom.editor.focus();
   },
-
   /**
    * 切换显示/隐藏在线人数头像
    */
@@ -888,13 +906,15 @@ var ChatRoom = {
       $("#redPacketIGot").text("你错过了这个红包");
     }
 
-    console.log(recivers)
-    if (recivers.length > 0) {
-      index = recivers.indexOf(Label.currentUser);
-      console.log(index)
-      if (index === -1) {
-        $("#msg").text("这个红包属于 " + recivers)
-        $("#redPacketIGot").text("这个红包不属于你");
+    if (undefined !== recivers) {
+      // console.log(recivers)
+      if (recivers.length > 0) {
+        index = recivers.indexOf(Label.currentUser);
+        // console.log(index)
+        if (index === -1) {
+          $("#msg").text("这个红包属于 " + recivers)
+          $("#redPacketIGot").text("这个红包不属于你");
+        }
       }
     }
   },
