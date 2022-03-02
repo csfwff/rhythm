@@ -34,7 +34,7 @@
 <div class="main">
     <div class="wrapper">
         <div class="content chat-room">
-            <div class="module">
+            <div class="module" style="margin-bottom: 0">
                 <div class="fn-content">
                     <div class="reply">
                         <#if isLoggedIn>
@@ -92,7 +92,7 @@
                     </div>
                 </div>
             </div>
-            <div class="list module pd__15" id="comments" style="height: 100%">
+            <div class="list module pd__15" id="comments" style="height: 100%; padding-top: 0">
                 <div id="chats">
                 </div>
                 <#if !isLoggedIn><div style="color:rgba(0,0,0,0.54);">登录后查看更多</div></#if>

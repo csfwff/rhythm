@@ -92,7 +92,7 @@ var ChatRoom = {
         }],
       height: 150,
       counter: 40960,
-      placeholder: '说点什么吧！每天一次撤回机会，三思而后行哦。',
+      placeholder: '说点什么吧！',
       ctrlEnter: function () {
         ChatRoom.send()
       },
