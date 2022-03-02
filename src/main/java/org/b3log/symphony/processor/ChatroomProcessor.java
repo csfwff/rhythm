@@ -636,6 +636,13 @@ public class ChatroomProcessor {
                 }
                 ChatroomChannel.discussing = setdiscussString;
                 ChatroomChannel.sendOnlineMsg();
+                // 广播话题情况
+                JSONObject discussStatus = new JSONObject();
+                discussStatus.put(Common.TYPE, "discussChanged");
+                discussStatus.put("whoChanged", userName);
+                discussStatus.put("newDiscuss", setdiscussString);
+                ChatroomChannel.notifyChat(discussStatus);
+
                 context.renderJSON(StatusCodes.SUCC);
             } else {
                 // 聊天室内容保存到数据库

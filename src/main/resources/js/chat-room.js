@@ -416,13 +416,13 @@ var ChatRoom = {
     Util.alert("" +
         "<div class=\"form fn__flex-column\">\n" +
         "<label>\n" +
-        "  <div class=\"ft__smaller\" style=\"float: left\">修改话题需要16积分，将自动从账户中扣除；最大长度16字符，不合法字符将被自动过滤。</div>\n" +
+        "  <div class=\"ft__smaller\" style=\"float: left\">修改话题需要16积分，将自动从账户中扣除；<br>最大长度16字符，不合法字符将被自动过滤。</div>\n" +
         "  <div class=\"fn-hr5 fn__5\"></div>\n" +
         "  <input type=\"text\" id=\"discuss-new-title\">\n" +
         "</label>\n" +
         "<div class=\"fn-hr5\"></div>\n" +
         "<div class=\"fn__flex\" style=\"margin-top: 15px; justify-content: flex-end;\">\n" +
-        "  <button class=\"btn btn--confirm\" onclick='ChatRoom.updateDiscussData($(\"#discuss-new-title\").val());Util.closeAlert();'>设置</button>\n" +
+        "  <button class=\"btn btn--confirm\" onclick='ChatRoom.updateDiscussData($(\"#discuss-new-title\").val());Util.closeAlert();'>设置 <span class='count'><svg style='vertical-align: -2px;'><use xlink:href=\"#iconPoints\"></use></svg> 16</span></button>\n" +
         "</div>\n" +
         "</div>" +
         "", "设置话题");
