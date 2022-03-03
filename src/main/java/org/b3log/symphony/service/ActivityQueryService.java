@@ -332,7 +332,7 @@ public class ActivityQueryService {
         try {
             Query query = new Query()
                     .setFilter(new PropertyFilter("gameId", FilterOperator.EQUAL, 40));
-            final List<JSONObject> gameData = cloudRepository.getList(query);
+            List<JSONObject> gameData = cloudRepository.getList(query);
 
             // 排序并剪切
             gameData.sort((o1, o2) -> {
@@ -341,7 +341,7 @@ public class ActivityQueryService {
                 return Long.compare(x, y);
             });
             if (gameData.size() > fetchSize) {
-                gameData.subList(0, fetchSize);
+                gameData = gameData.subList(0, fetchSize);
             }
 
             // 渲染用户信息
