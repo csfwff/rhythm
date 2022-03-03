@@ -326,6 +326,13 @@
                             <b>聊天室</b>
                         </a>
                     </div>
+                    <div class="metro-item">
+                        <a class="preview" href="${servePath}/buy">
+                            <img style="border-radius: 0"
+                                 src="https://pwl.stackoverflow.wiki/2022/03/ss-61cf1b96.png">
+                            <b>系统商店</b>
+                        </a>
+                    </div>
                 </div>
 
                 <div class="metro-border fn-flex">
@@ -334,6 +341,7 @@
                     <div class="yellow"></div>
                     <div class="red"></div>
                     <div class="purple"></div>
+                    <div class="green"></div>
                 </div>
             </div>
         </div>

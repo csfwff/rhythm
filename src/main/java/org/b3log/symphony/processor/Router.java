@@ -107,6 +107,8 @@ public final class Router {
         IdleTalkProcessor.register();
         // API
         ApiProcessor.register();
+        // 商店
+        ShopProcessor.register();
 
         final BeanManager beanManager = BeanManager.getInstance();
         final LoginCheckMidware loginCheck = beanManager.getReference(LoginCheckMidware.class);
