@@ -374,7 +374,7 @@ public class ActivityQueryService {
             final List<JSONObject> gameDataFirst = cloudRepository.getList(query);
 
             // 排序并剪切
-            final List<JSONObject> gameData = new ArrayList<>();
+            List<JSONObject> gameData = new ArrayList<>();
             for (JSONObject data : gameDataFirst) {
                 try {
                     JSONObject data2 = new JSONObject(data.optString("data"));
@@ -391,7 +391,7 @@ public class ActivityQueryService {
                 return i2 - i1;
             });
             if (gameData.size() > fetchSize) {
-                gameData.subList(0, fetchSize);
+                gameData = gameData.subList(0, fetchSize);
             }
 
             // 渲染用户信息
