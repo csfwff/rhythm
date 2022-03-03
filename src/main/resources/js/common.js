@@ -1640,6 +1640,7 @@ var Util = {
               "</div>\n" +
               "", "紧急公告");
           Util.alert(text);
+          $(".dialog-background").attr("onclick", "")
           break;
       }
     }
