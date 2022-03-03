@@ -33,6 +33,27 @@ var Util = {
   bling: undefined,
   isBlinging: false,
 
+  /**
+   * 插入紧急公告模板
+   * @param num
+   */
+  insertWarnBroadcastModel: function (num) {
+    let model = '';
+    switch (num) {
+      case 1:
+        model = '摸鱼派社区即将进行升级维护，预计停服时间：<b>5分钟</b><br>' +
+            '请在维护时间后刷新页面进入摸鱼派，感谢你的理解～<br>' +
+            '摸鱼这么久了，去给自己倒杯咖啡吧 ☕️';
+        break;
+      case 2:
+        model = '摸鱼派社区即将进行升级维护，预计停服时间：<b>20秒</b><br>' +
+            '请在维护时间后刷新页面进入摸鱼派，感谢你的理解～<br>' +
+            '摸鱼这么久了，去给自己倒杯咖啡吧 ☕️';
+        break;
+    }
+    $("[name='warnBroadcastText']").val(model);
+  },
+
   genMetal(name, attr) {
     if (attr !== undefined && attr !== '') {
       attr = '&' + attr;

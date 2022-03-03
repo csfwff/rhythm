@@ -76,6 +76,8 @@
                 <label>公告内容</label>
                 <textarea rows="20" name="warnBroadcastText"></textarea>
                 <br/><br/>
+                <button type="button" onclick="Util.insertWarnBroadcastModel(1)">模版：维护5分钟</button>
+                <button type="button" onclick="Util.insertWarnBroadcastModel(2)">模版：维护20秒</button>
                 <button type="submit" class="green fn-right">${submitLabel}</button>
             </form>
         </div>
