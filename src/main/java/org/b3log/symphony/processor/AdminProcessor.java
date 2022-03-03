@@ -408,6 +408,16 @@ public class AdminProcessor {
         Dispatcher.post("/admin/domain/{domainId}/remove-tag", adminProcessor::removeDomainTag, middlewares);
         Dispatcher.post("/admin/search/index", adminProcessor::rebuildArticleSearchIndex, middlewares);
         Dispatcher.post("/admin/search-index-article", adminProcessor::rebuildOneArticleSearchIndex, middlewares);
+        Dispatcher.post("/admin/broadcast/warn", adminProcessor::warnBroadcast, middlewares);
+    }
+
+    /**
+     * Warn broadcast.
+     * @param context
+     */
+    public void warnBroadcast(final RequestContext context) {
+        String warnBroadcastText = context.param("warnBroadcastText");
+        System.out.println(warnBroadcastText);
     }
 
     /**

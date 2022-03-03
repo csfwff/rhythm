@@ -75,5 +75,23 @@
             </form>
         </div>
     </div>
+
+    <div class="module">
+        <div class="module-header">
+            <h2>紧急公告发布</h2>
+        </div>
+        <div class="module-panel form fn-clear form--admin">
+            <form action="${servePath}/admin/broadcast/warn" method="POST">
+                <div class="fn__flex">
+                    <label>
+                        <div>公告内容</div>
+                        <textarea rows="20" name="warnBroadcastText"></textarea>
+                    </label>
+                </div>
+                <br/>
+                <button type="submit" class="green fn-right">${submitLabel}</button>
+            </form>
+        </div>
+    </div>
 </div>
 </@admin>
