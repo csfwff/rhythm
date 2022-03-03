@@ -469,6 +469,9 @@ var ChatRoom = {
       setTimeout(function () {
         $("#toggleAvatarBtn").html('<use xlink:href="#showLess"></use>');
         $("#chatRoomOnlineCnt").slideDown(200);
+        setTimeout(function () {
+          Util.listenUserCard();
+        }, 200);
       }, 100);
     } else {
       $("#toggleAvatarBtn").html('<use xlink:href="#showMore"></use>');
