@@ -1602,6 +1602,22 @@ var Util = {
           break;
         case 'warnBroadcast':
           let text = data.warnBroadcastText;
+          let who = data.who;
+          Util.alert("" +
+              "<style>" +
+              ".dialog-header-bg {" +
+              "border-radius: 4px 4px 0px 0px; background-color: rgb(151,49,210); color: rgb(255, 255, 255);" +
+              "}" +
+              ".dialog-main {" +
+              "height: 170px;" +
+              "overflow: auto;" +
+              "}" +
+              "</style>" +
+              "<div class=\"fn-hr5\"></div>\n" +
+              "<div class=\"ft__center\">\n" +
+              "<div><h1>摸鱼派社区紧急公告</h1><br>" + text + "<br><br>——紧急公告发布人：" + who + "</div>" +
+              "</div>\n" +
+              "", "紧急公告");
           Util.alert(text);
           break;
       }

@@ -432,9 +432,10 @@ public class AdminProcessor {
         final JSONObject cmd = new JSONObject();
         cmd.put(Common.COMMAND, "warnBroadcast");
         cmd.put("warnBroadcastText", warnBroadcastText);
+        cmd.put("who", username);
         UserChannel.sendCmdToAll(cmd);
         // 聊天室消息警告
-        ChatRoomBot.sendBotMsg("## :warning::warning::warning::warning::warning::warning::warning::warning::warning::warning:\n### 紧急公告\n\n\n" + warnBroadcastText + "\n\n\n——紧急公告发布人：" + username + "\n## :warning::warning::warning::warning::warning::warning::warning::warning::warning::warning:");
+        ChatRoomBot.sendBotMsg("## :warning::warning::warning::warning::warning::warning::warning::warning::warning::warning:\n### 摸鱼派社区紧急公告\n\n\n" + warnBroadcastText + "\n\n\n——紧急公告发布人：" + username + "\n## :warning::warning::warning::warning::warning::warning::warning::warning::warning::warning:");
 
         LOGGER.log(Level.WARN, "{} has sent a warning broadcast [warnBroadcastText={}]", username, warnBroadcastText);
         operationMgmtService.addOperation(Operation.newOperation(request, Operation.OPERATION_CODE_C_UPDATE_MISC, "Type=Broadcast"));
