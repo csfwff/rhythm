@@ -181,6 +181,17 @@ public class UserChannel implements WebSocketChannel {
         }
     }
 
+    public static void sendCmdToAll(final JSONObject message) {
+        final String msgStr = message.toString();
+
+        for (final String userId : SESSIONS.keySet()) {
+            final Set<WebSocketSession> sessions = SESSIONS.get(userId);
+            for (final WebSocketSession session : sessions) {
+                session.sendText(msgStr);
+            }
+        }
+    }
+
     /**
      * Removes the specified session.
      *

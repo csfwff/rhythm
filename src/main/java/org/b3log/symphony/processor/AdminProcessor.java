@@ -45,6 +45,8 @@ import org.b3log.latke.util.Paginator;
 import org.b3log.latke.util.Strings;
 import org.b3log.symphony.event.ArticleBaiduSender;
 import org.b3log.symphony.model.*;
+import org.b3log.symphony.processor.bot.ChatRoomBot;
+import org.b3log.symphony.processor.channel.UserChannel;
 import org.b3log.symphony.processor.middleware.LoginCheckMidware;
 import org.b3log.symphony.processor.middleware.PermissionMidware;
 import org.b3log.symphony.processor.middleware.validate.UserRegister2ValidationMidware;
@@ -416,8 +418,27 @@ public class AdminProcessor {
      * @param context
      */
     public void warnBroadcast(final RequestContext context) {
+        final Request request = context.getRequest();
+        JSONObject currentUser = Sessions.getUser();
+        try {
+            currentUser = ApiProcessor.getUserByKey(context.param("apiKey"));
+        } catch (NullPointerException ignored) {
+        }
+        String username = currentUser.optString(User.USER_NAME);
         String warnBroadcastText = context.param("warnBroadcastText");
-        System.out.println(warnBroadcastText);
+
+        // 发布紧急公告
+        // 弹窗警告
+        final JSONObject cmd = new JSONObject();
+        cmd.put(Common.COMMAND, "warnBroadcast");
+        cmd.put("warnBroadcastText", warnBroadcastText);
+        UserChannel.sendCmdToAll(cmd);
+        // 聊天室消息警告
+        ChatRoomBot.sendBotMsg("## :warning::warning::warning::warning::warning::warning::warning::warning::warning::warning:\n### 紧急公告\n\n\n" + warnBroadcastText + "\n\n\n——紧急公告发布人：" + username + "\n## :warning::warning::warning::warning::warning::warning::warning::warning::warning::warning:");
+
+        LOGGER.log(Level.WARN, "{} has sent a warning broadcast [warnBroadcastText={}]", username, warnBroadcastText);
+        operationMgmtService.addOperation(Operation.newOperation(request, Operation.OPERATION_CODE_C_UPDATE_MISC, "Type=Broadcast"));
+        context.sendRedirect(Latkes.getServePath() + "/admin/misc");
     }
 
     /**

@@ -1600,6 +1600,10 @@ var Util = {
             Util.notice("warning", 3000, "叮咚！你收到了一条私信。<a href='/idle-talk'>点击查看</a>");
           }
           break;
+        case 'warnBroadcast':
+          let text = data.warnBroadcastText;
+          Util.alert(text);
+          break;
       }
     }
 
