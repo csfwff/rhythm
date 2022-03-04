@@ -166,6 +166,11 @@ public class NotificationProcessor {
             case "broadcast":
                 notificationMgmtService.removeNotifications(userId, Notification.DATA_TYPE_C_BROADCAST);
                 break;
+            case "sys-announce":
+                notificationMgmtService.removeNotifications(userId, Notification.DATA_TYPE_C_SYS_ANNOUNCE_ARTICLE);
+                notificationMgmtService.removeNotifications(userId, Notification.DATA_TYPE_C_SYS_ANNOUNCE_NEW_USER);
+                notificationMgmtService.removeNotifications(userId, Notification.DATA_TYPE_C_SYS_ANNOUNCE_ROLE_CHANGED);
+                break;
             default:
                 context.renderJSON(StatusCodes.ERR);
                 return;
