@@ -152,6 +152,10 @@ var Count = {
             leftTime = leftHour + ":" + leftMinute + ":" + leftSecond;
             document.getElementById("countRemain").innerText = leftTime;
         }, 1000);
+    },
+
+    save: function () {
+        localStorage.setItem("count", JSON.stringify(data));
     }
 }
 
