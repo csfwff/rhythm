@@ -1,5 +1,6 @@
 var Count = {
 
+    generateInterval: setInterval(function () {}),
     data: {},
     time: "",
 
@@ -10,14 +11,16 @@ var Count = {
             localStorage.setItem("count", "{}");
             data = {};
         }
-        // 初始化样式
-        Count.initStyle();
-        // 初始化HTML
-        Count.initHtml();
-        // 初始化时间，930代表早上9点半，1800代表下午6点
-        Count.time = data.time === undefined ? "1800" : data.time;
-        // 开始倒计时
-        Count.start();
+        if (data.status !== 'disabled') {
+            // 初始化样式
+            Count.initStyle();
+            // 初始化HTML
+            Count.initHtml();
+            // 初始化时间，930代表早上9点半，1800代表下午6点
+            Count.time = data.time === undefined ? "1800" : data.time;
+            // 开始倒计时
+            Count.start();
+        }
     },
 
     initHtml: function () {
@@ -29,7 +32,7 @@ var Count = {
                 wrap.setAttribute("style", "left:" + data.left + "px;top:" + data.top + "px;");
             }
         }
-        wrap.innerHTML = "<a class='time_box' >距离下班<br><span id='countRemain'></span></a>";
+        wrap.innerHTML = "<a class='time_box' id='countRemainBox'>距离下班:<br><span id='countRemain'></span></a>";
         var first = document.body.firstChild;
         document.body.insertBefore(wrap, first);
         // 获取拖拽实验对象
@@ -146,22 +149,33 @@ var Count = {
         let leftHour = Math.floor(leftTime / (1000 * 60 * 60) % 24);
         let leftMinute = Math.floor(leftTime / (1000 * 60) % 60);
         let leftSecond = Math.floor(leftTime / 1000 % 60);
-        if (leftHour < 10) {
-            leftHour = "0" + leftHour;
+        if (leftHour >= 0 && leftMinute >= 0 && leftSecond >= 0) {
+            if (leftHour < 10) {
+                leftHour = "0" + leftHour;
+            }
+            if (leftMinute < 10) {
+                leftMinute = "0" + leftMinute;
+            }
+            if (leftSecond < 10) {
+                leftSecond = "0" + leftSecond;
+            }
+            leftTime = leftHour + ":" + leftMinute + ":" + leftSecond;
+            if (leftHour === "00" && leftMinute === "02" && leftSecond === "00") {
+                Util.notice("danger", 3000, "马上就要下班啦，赶快收拾收拾吧～");
+            }
+            if (leftHour === "00" && leftMinute === "00" && leftSecond === "00") {
+                Util.notice("success", 3000, "下班了！下班了！下班了！！！");
+            }
+            document.getElementById("countRemain").innerText = leftTime;
+        } else {
+            document.getElementById("countRemainBox").innerText = "下班\n时间到 🎉";
+            clearInterval(Count.generateInterval);
         }
-        if (leftMinute < 10) {
-            leftMinute = "0" + leftMinute;
-        }
-        if (leftSecond < 10) {
-            leftSecond = "0" + leftSecond;
-        }
-        leftTime = leftHour + ":" + leftMinute + ":" + leftSecond;
-        document.getElementById("countRemain").innerText = leftTime;
     },
 
     start: function () {
         Count.generate();
-        setInterval(function () {
+        Count.generateInterval = setInterval(function () {
             Count.generate();
         }, 1000);
     },

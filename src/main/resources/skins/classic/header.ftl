@@ -120,6 +120,9 @@
                         <a href="${servePath}/charge/point"><span class="ft-red">❤</span>️ ${chargePointLabel}</a>
                     </li>
                     <li>
+                        <a href="javascript:void(0)" onclick="Count.settings()">⏰ 下班倒计时</a>
+                    </li>
+                    <li>
                         <a href="${servePath}/settings/help">${helpLabel}</a>
                     </li>
                     <li>
