@@ -23,15 +23,19 @@ var Count = {
         var wrap = document.createElement("div");
         wrap.setAttribute("class", "time_content");
         wrap.setAttribute("id", "timeContent");
+        if (data.left !== undefined && data.top !== undefined) {
+            if (document.documentElement.clientHeight > data.top && document.documentElement.clientWidth > data.left) {
+                wrap.setAttribute("style", "left:" + data.left + "px;top:" + data.top + "px;");
+            }
+        }
         wrap.innerHTML = "<a class='time_box' >距离下班<br><span id='countRemain'></span></a>";
         var first = document.body.firstChild;
         document.body.insertBefore(wrap, first);
-        // 拖拽
-        //获取拖拽实验对象
+        // 获取拖拽实验对象
         let el = document.getElementById("timeContent");
-        //在该对象上绑定鼠标点击事件
+        // 在该对象上绑定鼠标点击事件
         el.onmousedown = (e) => {
-            //鼠标按下，计算鼠标触点距离元素左侧的距离
+            // 鼠标按下，计算鼠标触点距离元素左侧的距离
             let disX = e.clientX - el.offsetLeft;
             let disY = e.clientY - el.offsetTop;
             let latestT;
@@ -42,6 +46,9 @@ var Count = {
                 let P = e.clientY - disY;
                 latestT = t;
                 latestP = P;
+                data.left = t;
+                data.top = P;
+                Count.save();
                 // 移动当前元素
                 if (t >= 0 && t <= window.innerWidth - el.offsetWidth) {
                     el.style.left = t + 'px';
