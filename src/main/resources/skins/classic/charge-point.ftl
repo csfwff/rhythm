@@ -121,7 +121,7 @@
                             </div>
                             <span class="fn__space5"></span>
                             <span class="fn__space5"></span>
-                            <b class="ft__original7" style="width: 90px">16.00 RMB</b>
+                            <b class="ft__original7" style="width: 90px">16 RMB</b>
                             <div class="ft__gray" style="width: 70px;text-align: right">
                                 <a href="https://fishpi.cn/member/imlinhanchao" class="tooltipped__user">imlinhanchao</a>
                             </div>
@@ -138,7 +138,7 @@
                             </div>
                             <span class="fn__space5"></span>
                             <span class="fn__space5"></span>
-                            <b class="ft__original7" style="width: 90px">20.00 RMB</b>
+                            <b class="ft__original7" style="width: 90px">20 RMB</b>
                             <div class="ft__gray" style="width: 70px;text-align: right">
                                 <a href="https://fishpi.cn/member/SImov" class="tooltipped__user">SImov</a>
                             </div>
@@ -155,7 +155,7 @@
                             </div>
                             <span class="fn__space5"></span>
                             <span class="fn__space5"></span>
-                            <b class="ft__original7" style="width: 90px">20.00 RMB</b>
+                            <b class="ft__original7" style="width: 90px">20 RMB</b>
                             <div class="ft__gray" style="width: 70px;text-align: right">
                                 <a href="https://fishpi.cn/member/daxing" class="tooltipped__user">daxing</a>
                             </div>
@@ -189,7 +189,7 @@
                             </div>
                             <span class="fn__space5"></span>
                             <span class="fn__space5"></span>
-                            <b class="ft__original7" style="width: 90px">16.00 RMB</b>
+                            <b class="ft__original7" style="width: 90px">16 RMB</b>
                             <div class="ft__gray" style="width: 70px;text-align: right">
                                 <a href="https://fishpi.cn/member/Alex05" class="tooltipped__user">Alex05</a>
                             </div>
@@ -206,7 +206,7 @@
                             </div>
                             <span class="fn__space5"></span>
                             <span class="fn__space5"></span>
-                            <b class="ft__original7" style="width: 90px">10.00 RMB</b>
+                            <b class="ft__original7" style="width: 90px">10 RMB</b>
                             <div class="ft__gray" style="width: 70px;text-align: right">
                                 <a href="https://fishpi.cn/member/qwer123" class="tooltipped__user">qwer123</a>
                             </div>
@@ -223,7 +223,7 @@
                             </div>
                             <span class="fn__space5"></span>
                             <span class="fn__space5"></span>
-                            <b class="ft__original7" style="width: 90px">20.00 RMB</b>
+                            <b class="ft__original7" style="width: 90px">20 RMB</b>
                             <div class="ft__gray" style="width: 70px;text-align: right">
                                 <a href="https://fishpi.cn/member/min" class="tooltipped__user">min</a>
                             </div>
@@ -257,7 +257,7 @@
                             </div>
                             <span class="fn__space5"></span>
                             <span class="fn__space5"></span>
-                            <b class="ft__original7" style="width: 90px">50.00 RMB</b>
+                            <b class="ft__original7" style="width: 90px">50 RMB</b>
                             <div class="ft__gray" style="width: 70px;text-align: right">
                                 <a href="https://fishpi.cn/member/MBL186" class="tooltipped__user">MBL186</a>
                             </div>
@@ -274,7 +274,7 @@
                             </div>
                             <span class="fn__space5"></span>
                             <span class="fn__space5"></span>
-                            <b class="ft__original7" style="width: 90px">20.00 RMB</b>
+                            <b class="ft__original7" style="width: 90px">20 RMB</b>
                             <div class="ft__gray" style="width: 70px;text-align: right">
                                 <a href="https://fishpi.cn/member/bongbongdan" class="tooltipped__user">bongbongdan</a>
                             </div>
@@ -291,7 +291,7 @@
                             </div>
                             <span class="fn__space5"></span>
                             <span class="fn__space5"></span>
-                            <b class="ft__original7" style="width: 90px">20.00 RMB</b>
+                            <b class="ft__original7" style="width: 90px">20 RMB</b>
                             <div class="ft__gray" style="width: 70px;text-align: right">
                                 <a href="https://fishpi.cn/member/BiuXiaoXiong" class="tooltipped__user">BiuXiaoXiong</a>
                             </div>
@@ -308,7 +308,7 @@
                             </div>
                             <span class="fn__space5"></span>
                             <span class="fn__space5"></span>
-                            <b class="ft__original7" style="width: 90px">20.00 RMB</b>
+                            <b class="ft__original7" style="width: 90px">20 RMB</b>
                             <div class="ft__gray" style="width: 70px;text-align: right">
                                 <a href="https://fishpi.cn/member/Fairyfox" class="tooltipped__user">Fairyfox</a>
                             </div>
@@ -325,7 +325,7 @@
                             </div>
                             <span class="fn__space5"></span>
                             <span class="fn__space5"></span>
-                            <b class="ft__original7" style="width: 90px">20.00 RMB</b>
+                            <b class="ft__original7" style="width: 90px">20 RMB</b>
                             <div class="ft__gray" style="width: 70px;text-align: right">
                                 <a href="https://fishpi.cn/member/SImov" class="tooltipped__user">SImov</a>
                             </div>
@@ -342,7 +342,7 @@
                             </div>
                             <span class="fn__space5"></span>
                             <span class="fn__space5"></span>
-                            <b class="ft__original7" style="width: 90px">20.00 RMB</b>
+                            <b class="ft__original7" style="width: 90px">20 RMB</b>
                             <div class="ft__gray" style="width: 70px;text-align: right">
                                 <a href="https://fishpi.cn/member/iwpz" class="tooltipped__user">iwpz</a>
                             </div>
@@ -359,7 +359,7 @@
                             </div>
                             <span class="fn__space5"></span>
                             <span class="fn__space5"></span>
-                            <b class="ft__original7" style="width: 90px">10.00 RMB</b>
+                            <b class="ft__original7" style="width: 90px">10 RMB</b>
                             <div class="ft__gray" style="width: 70px;text-align: right">
                                 <a href="https://fishpi.cn/member/LLaamar" class="tooltipped__user">LLaamar</a>
                             </div>
@@ -376,7 +376,7 @@
                             </div>
                             <span class="fn__space5"></span>
                             <span class="fn__space5"></span>
-                            <b class="ft__original7" style="width: 90px">30.00 RMB</b>
+                            <b class="ft__original7" style="width: 90px">30 RMB</b>
                             <div class="ft__gray" style="width: 70px;text-align: right">
                                 <a href="https://fishpi.cn/member/Suvern" class="tooltipped__user">Suvern</a>
                             </div>
@@ -393,7 +393,7 @@
                             </div>
                             <span class="fn__space5"></span>
                             <span class="fn__space5"></span>
-                            <b class="ft__original7" style="width: 90px">20.00 RMB</b>
+                            <b class="ft__original7" style="width: 90px">20 RMB</b>
                             <div class="ft__gray" style="width: 70px;text-align: right">
                                 <a href="https://fishpi.cn/member/xuwujing" class="tooltipped__user">xuwujing</a>
                             </div>
@@ -410,7 +410,7 @@
                             </div>
                             <span class="fn__space5"></span>
                             <span class="fn__space5"></span>
-                            <b class="ft__original7" style="width: 90px">50.00 RMB</b>
+                            <b class="ft__original7" style="width: 90px">50 RMB</b>
                             <div class="ft__gray" style="width: 70px;text-align: right">
                                 <a href="https://fishpi.cn/member/danbai" class="tooltipped__user">danbai</a>
                             </div>
@@ -444,7 +444,7 @@
                             </div>
                             <span class="fn__space5"></span>
                             <span class="fn__space5"></span>
-                            <b class="ft__original7" style="width: 90px">20.00 RMB</b>
+                            <b class="ft__original7" style="width: 90px">20 RMB</b>
                             <div class="ft__gray" style="width: 70px;text-align: right">
                                 <a href="https://fishpi.cn/member/FreerKnight" class="tooltipped__user">FreerKnight</a>
                             </div>
@@ -461,7 +461,7 @@
                             </div>
                             <span class="fn__space5"></span>
                             <span class="fn__space5"></span>
-                            <b class="ft__original7" style="width: 90px">10.00 RMB</b>
+                            <b class="ft__original7" style="width: 90px">10 RMB</b>
                             <div class="ft__gray" style="width: 70px;text-align: right">
                                 <a href="https://fishpi.cn/member/camden" class="tooltipped__user">camden</a>
                             </div>
