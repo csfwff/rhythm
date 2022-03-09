@@ -72,6 +72,7 @@
 <script src="${staticServePath}/js/lib/compress/libs.min.js?${staticResourceVersion}"></script>
 <script src="https://unpkg.zhimg.com/vditor@3.8.10/dist/index.min.js"></script>
 <script src="${staticServePath}/js/common${miniPostfix}.js?${staticResourceVersion}"></script>
+<script src="${staticServePath}/js/count${miniPostfix}.js?${staticResourceVersion}"></script>
 <script>
     var Label = {
         commentEditorPlaceholderLabel: '${commentEditorPlaceholderLabel}',
