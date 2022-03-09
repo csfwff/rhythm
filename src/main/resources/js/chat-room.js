@@ -179,7 +179,6 @@ var ChatRoom = {
           "<div class=\"fn-hr5\"></div>\n" +
           "<div class=\"fn__flex\" style=\"margin-top: 15px\">\n" +
           "  <div class=\"fn__flex-1 fn__flex-center\" style=\"text-align: left;\">总计：<span id=\"redPacketAmount\">32</span> 积分</div>\n" +
-          "  <button class=\"btn btn--confirm red\" id=\"xRedPacketConfirm\" style='margin-right: 10px'>十连发!</button>\n" +
           "  <button class=\"btn btn--confirm\" id=\"redPacketConfirm\">发送</button>\n" +
           "</div>\n" +
           "</div>" +
@@ -349,64 +348,9 @@ var ChatRoom = {
         })
         Util.closeAlert();
       })
-
-      $("#xRedPacketConfirm").on('click', function () {
-        let type = $("#redPacketType").val();
-        let money = $("#redPacketMoney").val();
-        let count = $("#redPacketCount").val();
-        let msg = $("#redPacketMsg").val();
-        let recivers = $("#userOption").val();
-        if (type === '' || type === null || type === undefined) {
-          type = "random";
-        }
-        if (recivers === undefined) {
-          recivers = []
-        }
-        if(recivers.length == 0 && type === 'specify') {
-          $('#chatContentTip').
-          addClass('error').
-          html('<ul><li>请选择红包发送对象</li></ul>')
-        }
-        if (msg === '') {
-          msg = '摸鱼者，事竟成！';
-        }
-        let content = {
-          type:  type,
-          money: money,
-          count: count,
-          msg: msg,
-          recivers:recivers
-        }
-        let requestJSONObject = {
-          content: "[redpacket]" + JSON.stringify(content) + "[/redpacket]",
-        }
-        Util.closeAlert();
-        for (let i = 1; i < 11; i++) {
-          setTimeout(function () {
-            $.ajax({
-              url: Label.servePath + '/chat-room/send',
-              type: 'POST',
-              cache: false,
-              data: JSON.stringify(requestJSONObject),
-              success: function (result) {
-                if (0 !== result.code) {
-                  $('#chatContentTip').
-                  addClass('error').
-                  html('<ul><li>' + result.msg + '</li></ul>')
-                }
-              },
-              error: function (result) {
-                $('#chatContentTip').
-                addClass('error').
-                html('<ul><li>' + result.statusText + '</li></ul>')
-              }
-            })
-          }, i * 500);
-        }
-      })
     });
 
-  //  加载挂件
+    //  加载挂件
     ChatRoom.loadAvatarPendant();
   },
   /**
