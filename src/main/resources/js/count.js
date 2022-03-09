@@ -8,6 +8,7 @@ var Count = {
         if (data === null) {
             // 初始化
             localStorage.setItem("count", "{}");
+            data = {};
         }
         // 初始化样式
         Count.initStyle();
@@ -79,6 +80,9 @@ var Count = {
             "   width: 80px;" +
             "   z-index: 1999;" +
             "}" +
+            ".time_content a.time_box:hover {" +
+            "   background-color: rgb(252 252 252 / 96%);" +
+            "}" +
             ".time_content a.time_box {" +
             "   position: relative;" +
             "   display: -webkit-box;" +
@@ -113,56 +117,115 @@ var Count = {
         document.body.appendChild(style_element);
     },
 
-    settings: function () {
-        alert("set")
+    generate: function () {
+        // 生成设定时间为Date
+        let year = new Date().getFullYear();
+        let month = new Date().getMonth() + 1;
+        let day = new Date().getDate();
+        if (month < 10) {
+            month = "0" + month;
+        }
+        if (day < 10) {
+            day = "0" + day;
+        }
+        let dateString = year + "-" + month + "-" + day;
+        let hh = "18";
+        let mm = "00";
+        if (Count.time.length === 3) {
+            hh = "0" + Count.time.substr(0, 1);
+            mm = Count.time.substr(1, 2);
+        } else if (Count.time.length === 4) {
+            hh = Count.time.substr(0, 2);
+            mm = Count.time.substr(2, 2);
+        }
+        dateString = dateString + " " + hh + ":" + mm + ":00";
+        let setDate = new Date(dateString.replace(/-/g, '/'));
+        // 计算倒计时
+        let nowDate = new Date();
+        let leftTime = setDate.getTime() - nowDate.getTime();
+        let leftHour = Math.floor(leftTime / (1000 * 60 * 60) % 24);
+        let leftMinute = Math.floor(leftTime / (1000 * 60) % 60);
+        let leftSecond = Math.floor(leftTime / 1000 % 60);
+        if (leftHour < 10) {
+            leftHour = "0" + leftHour;
+        }
+        if (leftMinute < 10) {
+            leftMinute = "0" + leftMinute;
+        }
+        if (leftSecond < 10) {
+            leftSecond = "0" + leftSecond;
+        }
+        leftTime = leftHour + ":" + leftMinute + ":" + leftSecond;
+        document.getElementById("countRemain").innerText = leftTime;
     },
 
     start: function () {
+        Count.generate();
         setInterval(function () {
-            // 生成设定时间为Date
-            let year = new Date().getFullYear();
-            let month = new Date().getMonth() + 1;
-            let day = new Date().getDate();
-            if (month < 10) {
-                month = "0" + month;
-            }
-            if (day < 10) {
-                day = "0" + day;
-            }
-            let dateString = year + "-" + month + "-" + day;
-            let hh;
-            let mm;
-            if (Count.time.length === 3) {
-                hh = "0" + Count.time.substr(0, 1);
-                mm = Count.time.substr(1, 2);
-            } else {
-                hh = Count.time.substr(0, 2);
-                mm = Count.time.substr(2, 2);
-            }
-            dateString = dateString + " " + hh + ":" + mm + ":00";
-            let setDate = new Date(dateString.replace(/-/g, '/'));
-            // 计算倒计时
-            let nowDate = new Date();
-            let leftTime = setDate.getTime() - nowDate.getTime();
-            let leftHour = Math.floor(leftTime / (1000 * 60 * 60) % 24);
-            let leftMinute = Math.floor(leftTime / (1000 * 60) % 60);
-            let leftSecond = Math.floor(leftTime / 1000 % 60);
-            if (leftHour < 10) {
-                leftHour = "0" + leftHour;
-            }
-            if (leftMinute < 10) {
-                leftMinute = "0" + leftMinute;
-            }
-            if (leftSecond < 10) {
-                leftSecond = "0" + leftSecond;
-            }
-            leftTime = leftHour + ":" + leftMinute + ":" + leftSecond;
-            document.getElementById("countRemain").innerText = leftTime;
+            Count.generate();
         }, 1000);
     },
 
     save: function () {
         localStorage.setItem("count", JSON.stringify(data));
+    },
+
+    settings: function () {
+        Util.alert("" +
+            "<div class=\"form fn__flex-column\">\n" +
+            "<label>\n" +
+            "  <div class=\"ft__smaller ft__fade\" style=\"float: left\">状态（关闭后可点击右上角头像找到下班倒计时设定）</div>\n" +
+            "  <div class=\"fn-hr5 fn__5\"></div>\n" +
+            "  <select id=\"countSettingStatus\">\n" +
+            "  <option value=\"enabled\" selected>开启</option>" +
+            "  <option value=\"disabled\">关闭</option>" +
+            "  </select>\n" +
+            "</label>\n" +
+            "<label>\n" +
+            "  <div class=\"ft__smaller ft__fade\" style=\"float: left\">下班时间</div>\n" +
+            "  <div class=\"fn-hr5 fn__5\"></div>\n" +
+            "  <input id=\"countSettingsTime\" type=\"time\"/>\n" +
+            "</label>\n" +
+            "<div class=\"fn-hr5\"></div>\n" +
+            "<div class=\"fn__flex\" style=\"margin-top: 15px\">\n" +
+            "<div class=\"fn__flex-1 fn__flex-center\" style=\"text-align: left;\"></div>\n" +
+            "  <button class=\"btn btn--confirm\" onclick='Count.saveSettings()'>保存</button>\n" +
+            "</div>\n" +
+            "</div>" +
+            "", "下班倒计时设定");
+        setTimeout(function () {
+            let hh = "18";
+            let mm = "00";
+            if (Count.time.length === 3) {
+                hh = "0" + Count.time.substr(0, 1);
+                mm = Count.time.substr(1, 2);
+            } else if (Count.time.length === 4) {
+                hh = Count.time.substr(0, 2);
+                mm = Count.time.substr(2, 2);
+            }
+            document.getElementById("countSettingsTime").value = hh + ":" + mm;
+            switch (data.status) {
+                case 'enabled':
+                    document.getElementById("countSettingStatus").value = "enabled";
+                    break;
+                case 'disabled':
+                    document.getElementById("countSettingStatus").value = "disabled";
+                    break;
+            }
+        }, 500);
+    },
+
+    saveSettings: function () {
+        let setTime = document.getElementById("countSettingsTime").value.replace(":", "");
+        if (setTime !== "") {
+            // 保存时间
+            data.time = "" + setTime;
+        }
+        // 保存状态
+        data.status = document.getElementById("countSettingStatus").value;
+        Count.save();
+        Util.closeAlert();
+        location.reload();
     }
 }
 
