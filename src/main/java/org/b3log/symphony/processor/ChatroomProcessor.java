@@ -465,26 +465,7 @@ public class ChatroomProcessor {
             msg.put(UserExt.USER_NICKNAME, currentUser.optString(UserExt.USER_NICKNAME));
             msg.put("sysMetal", cloudService.getEnabledMetal(currentUser.optString(Keys.OBJECT_ID)));
 
-            // 加活跃
             String userId = currentUser.optString(Keys.OBJECT_ID);
-            int risksControlled = ChatRoomBot.risksControlled(userId);
-            if (risksControlled != -1) {
-                if (risksControlMessageLimiter.access(userId)) {
-                    try {
-                        if (chatRoomLivenessLimiter.access(userId)) {
-                            livenessMgmtService.incLiveness(userId, Liveness.LIVENESS_COMMENT);
-                        }
-                    } catch (Exception ignored) {
-                    }
-                }
-            } else {
-                try {
-                    if (chatRoomLivenessLimiter.access(userId)) {
-                        livenessMgmtService.incLiveness(userId, Liveness.LIVENESS_COMMENT);
-                    }
-                } catch (Exception ignored) {
-                }
-            }
 
             if (content.startsWith("[redpacket]") && content.endsWith("[/redpacket]")) {
                 try {
@@ -644,6 +625,26 @@ public class ChatroomProcessor {
 
                 context.renderJSON(StatusCodes.SUCC);
             } else {
+                // 加活跃
+                int risksControlled = ChatRoomBot.risksControlled(userId);
+                if (risksControlled != -1) {
+                    if (risksControlMessageLimiter.access(userId)) {
+                        try {
+                            if (chatRoomLivenessLimiter.access(userId)) {
+                                livenessMgmtService.incLiveness(userId, Liveness.LIVENESS_COMMENT);
+                            }
+                        } catch (Exception ignored) {
+                        }
+                    }
+                } else {
+                    try {
+                        if (chatRoomLivenessLimiter.access(userId)) {
+                            livenessMgmtService.incLiveness(userId, Liveness.LIVENESS_COMMENT);
+                        }
+                    } catch (Exception ignored) {
+                    }
+                }
+
                 // 聊天室内容保存到数据库
                 final Transaction transaction = chatRoomRepository.beginTransaction();
                 try {
