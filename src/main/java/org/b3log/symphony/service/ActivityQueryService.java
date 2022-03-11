@@ -36,6 +36,7 @@ import org.checkerframework.checker.units.qual.C;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 /**
@@ -173,9 +174,10 @@ public class ActivityQueryService {
      * @return users, returns an empty list if not found
      */
     public List<JSONObject> getTopCheckinUsers(final int fetchSize) {
+        String today = new SimpleDateFormat("yyyyMMdd").format(new Date());
         final List<JSONObject> ret = new ArrayList<>();
-        final Query query = new Query().addSort(UserExt.USER_LONGEST_CHECKIN_STREAK, SortDirection.DESCENDING).
-                addSort(UserExt.USER_CURRENT_CHECKIN_STREAK, SortDirection.DESCENDING).
+        final Query query = new Query().addSort(UserExt.USER_CURRENT_CHECKIN_STREAK, SortDirection.DESCENDING).
+                setFilter(new PropertyFilter(UserExt.USER_CURRENT_CHECKIN_STREAK_END, FilterOperator.EQUAL, today)).
                 setPage(1, fetchSize);
         try {
             final JSONObject result = userRepository.get(query);

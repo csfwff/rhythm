@@ -175,7 +175,7 @@
             </div>
 
             <div class="index-head-title">
-                <div style="float:left;font-size:13px;margin:5px 0 10px 0; font-weight:bold;">签到排行</div>
+                <div style="float:left;font-size:13px;margin:5px 0 10px 0; font-weight:bold;">今日连签排行</div>
                 <div style="float:right;font-size:13px;margin:5px 0 0 0;"><a href="${servePath}/top/checkin">更多</a>
                 </div>
                 <div style="clear:both;"></div>
@@ -206,10 +206,9 @@
                                 <a rel="nofollow" class="title fn-flex-1"
                                    aria-label="${pointLabel} ${user.userPoint?c}"
                                    href="${servePath}/member/${user.userName}">${user.userName}</a>
-                                <a class="fn-right count ft-gray ft-smaller"
+                                <a class="tooltipped tooltipped-s fn-right count ft-gray ft-smaller"
                                    aria-label="${checkinStreakPart0Label}${user.userLongestCheckinStreak}${checkinStreakPart1Label}${user.userCurrentCheckinStreak}${checkinStreakPart2Label}"
-                                   href="${servePath}/top/checkin">${user.userCurrentCheckinStreak}/<span
-                                            class="ft-red">${user.userLongestCheckinStreak}</span></a>
+                                   href="${servePath}/top/checkin">${user.userCurrentCheckinStreak}${checkinStreakPart2Label}</a>
                             </li>
                         </#if>
                     </#list>

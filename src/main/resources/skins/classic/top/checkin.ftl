@@ -50,7 +50,7 @@
                             <#if 0 == user.userAppRole>${hackerLabel}<#else>${painterLabel}</#if>
                         </div>
                     </div>
-                    <div class="cmts tooltipped tooltipped-w" aria-label="${pointLabel} ${user.userPoint?c}">
+                    <div class="cmts tooltipped tooltipped-w" aria-label="${checkinStreakPart0Label}${user.userLongestCheckinStreak}${checkinStreakPart1Label}${user.userCurrentCheckinStreak}${checkinStreakPart2Label}">
                         ${user.userCurrentCheckinStreak}/<span class="ft-red">${user.userLongestCheckinStreak}</span>
                     </div>
                 </div>
