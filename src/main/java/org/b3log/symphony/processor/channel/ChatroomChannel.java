@@ -127,11 +127,7 @@ public class ChatroomChannel implements WebSocketChannel {
 
         synchronized (SESSIONS) {
             for (WebSocketSession session : SESSIONS) {
-                new Thread(() -> session.sendText(msgStr)).start();
-                try {
-                    Thread.sleep(10);
-                } catch (Exception ignored) {
-                }
+                session.sendText(msgStr);
             }
         }
     }
