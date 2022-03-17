@@ -127,7 +127,7 @@ public class ChatroomChannel implements WebSocketChannel {
 
         synchronized (SESSIONS) {
             for (WebSocketSession session : SESSIONS) {
-                session.sendText(msgStr);
+                new Thread(() -> session.sendText(msgStr)).start();
                 try {
                     Thread.sleep(10);
                 } catch (Exception ignored) {
@@ -197,7 +197,7 @@ public class ChatroomChannel implements WebSocketChannel {
         synchronized (SESSIONS) {
             final String msgStr = getOnline().toString();
             for (WebSocketSession s : SESSIONS) {
-                s.sendText(msgStr);
+                new Thread(() -> s.sendText(msgStr)).start();
                 try {
                     Thread.sleep(500);
                 } catch (Exception ignored) {
