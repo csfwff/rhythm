@@ -126,10 +126,12 @@ public class ChatroomChannel implements WebSocketChannel {
         final String msgStr = message.toString();
 
         synchronized (SESSIONS) {
-            final Iterator<WebSocketSession> i = SESSIONS.iterator();
-            while (i.hasNext()) {
-                final WebSocketSession session = i.next();
+            for (WebSocketSession session : SESSIONS) {
                 session.sendText(msgStr);
+                try {
+                    Thread.sleep(10);
+                } catch (Exception ignored) {
+                }
             }
         }
     }
@@ -193,11 +195,11 @@ public class ChatroomChannel implements WebSocketChannel {
     // 发送在线信息
     public synchronized static void sendOnlineMsg() {
         synchronized (SESSIONS) {
+            final String msgStr = getOnline().toString();
             for (WebSocketSession s : SESSIONS) {
-                final String msgStr = getOnline().toString();
                 s.sendText(msgStr);
                 try {
-                    Thread.sleep(10);
+                    Thread.sleep(500);
                 } catch (Exception ignored) {
                 }
             }
