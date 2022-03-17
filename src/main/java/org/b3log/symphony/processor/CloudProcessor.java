@@ -108,7 +108,8 @@ public class CloudProcessor {
         String data = cloudService.getFromCloud(userId, gameId);
         if (gameId.equals("emojis")) {
             try {
-                List<String> emojis = Arrays.asList(data.replaceAll("^\\[|]$", "").split(","));
+                data = data.replaceAll("^\\[|]$", "").replaceAll("(?!\"),(?!\")", "");
+                List<String> emojis = Arrays.asList(data.split(","));
                 Collections.reverse(emojis);
                 data = String.valueOf(emojis);
             } catch (Exception ignored) {
