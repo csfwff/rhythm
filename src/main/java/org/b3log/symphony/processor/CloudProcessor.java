@@ -106,15 +106,6 @@ public class CloudProcessor {
         JSONObject requestJSONObject = context.requestJSON();
         String gameId = requestJSONObject.optString("gameId");
         String data = cloudService.getFromCloud(userId, gameId);
-        if (gameId.equals("emojis")) {
-            try {
-                data = data.replaceAll("^\\[|]$", "").replaceAll("(?!\"),(?!\")", "");
-                List<String> emojis = Arrays.asList(data.split(","));
-                Collections.reverse(emojis);
-                data = String.valueOf(emojis);
-            } catch (Exception ignored) {
-            }
-        }
 
         context.renderJSON(StatusCodes.SUCC).renderData(data);
     }

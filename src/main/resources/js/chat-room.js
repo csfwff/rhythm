@@ -436,6 +436,7 @@ var ChatRoom = {
           emojis.splice(i, 1);
         }
       }
+      emojis.reverse();
       $.ajax({
         url: Label.servePath + "/api/cloud/sync",
         method: "POST",
@@ -563,6 +564,7 @@ var ChatRoom = {
     for (let i = 0; i < arguments.length; i++) {
       let url = arguments[i];
       let emojis = ChatRoom.getEmojis();
+      emojis.reverse();
       for (let i = 0; i < emojis.length; i++) {
         if (emojis[i] === url) {
           emojis.splice(i, 1);
@@ -610,6 +612,7 @@ var ChatRoom = {
         }
       },
     });
+    ret.reverse();
     return ret;
   },
   /**

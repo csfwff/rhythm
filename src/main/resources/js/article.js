@@ -278,6 +278,7 @@ var Comment = {
           emojis.splice(i, 1);
         }
       }
+      emojis.reverse();
       $.ajax({
         url: Label.servePath + "/api/cloud/sync",
         method: "POST",
@@ -389,6 +390,7 @@ var Comment = {
     for (let i = 0; i < arguments.length; i++) {
       let url = arguments[i];
       let emojis = Comment.getEmojis();
+      emojis.reverse();
       for (let i = 0; i < emojis.length; i++) {
         if (emojis[i] === url) {
           emojis.splice(i, 1);
@@ -436,6 +438,7 @@ var Comment = {
         }
       },
     });
+    ret.reverse();
     return ret;
   },
   /**
