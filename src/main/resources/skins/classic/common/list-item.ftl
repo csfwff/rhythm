@@ -46,6 +46,13 @@
         <@icon article.articlePerfect article.articleType></@icon>
         <a class="ft-a-title" data-id="${article.oId}" data-type="${article.articleType}" rel="bookmark" href="${servePath}${article.articlePermalink}">${article.articleTitleEmoj}
         </a>
+        <#if article.offered>
+            <a href="${servePath}${article.articlePermalink}#comments">
+                <svg style="color: green" fill="currentColor;" width="14px" height="14px" display="inline" stroke="currentColor;" stroke-width="0">
+                    <use xlink:href="#iconAdopt"></use>
+                </svg>
+            </a>
+        </#if>
     </h2>
     <div class="fn-flex">
         <div class="fn-flex-1">
