@@ -1498,6 +1498,12 @@ public class ArticleQueryService {
         final String tagsStr = article.optString(Article.ARTICLE_TAGS);
         final List<JSONObject> tags = tagQueryService.buildTagObjs(tagsStr);
         article.put(Article.ARTICLE_T_TAG_OBJS, (Object) tags);
+
+        // q&a status
+        if (Article.ARTICLE_TYPE_C_QNA == article.optInt(Article.ARTICLE_TYPE)) {
+            final String articleAuthorId = article.optString(Article.ARTICLE_AUTHOR_ID);
+            article.put(Common.OFFERED, rewardQueryService.isRewarded(articleAuthorId, articleId, Reward.TYPE_C_ACCEPT_COMMENT));
+        }
     }
 
     /**
