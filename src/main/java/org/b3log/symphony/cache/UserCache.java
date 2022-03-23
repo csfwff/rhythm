@@ -81,78 +81,12 @@ public class UserCache {
     private static final List<JSONObject> ADMINS_CACHE = new CopyOnWriteArrayList<>();
 
     /**
-     * Nice users cache.
-     */
-    private static final List<JSONObject> NICE_USERS = new ArrayList<>();
-
-    /**
      * Gets admins.
      *
      * @return admins
      */
     public List<JSONObject> getAdmins() {
         return ADMINS_CACHE;
-    }
-
-    /**
-     * Gets nice users.
-     *
-     * @return nice users.
-     */
-    public List<JSONObject> getNiceUsers(int fetchSize) {
-        if (NICE_USERS.isEmpty()) {
-            return Collections.emptyList();
-        }
-
-        final List<JSONObject> ret = new ArrayList<>();
-        int realLen = NICE_USERS.size();
-        final List<Integer> indices = CollectionUtils.getRandomIntegers(0, realLen, fetchSize);
-        for (final Integer index : indices) {
-            ret.add(NICE_USERS.get(index));
-        }
-
-        return JSONs.clone(ret);
-    }
-
-    /**
-     * Load nice users.
-     */
-    public void loadNiceUsers() {
-        final BeanManager beanManager = BeanManager.getInstance();
-        final UserRepository userRepository = beanManager.getReference(UserRepository.class);
-        final AvatarQueryService avatarQueryService = beanManager.getReference(AvatarQueryService.class);
-
-        final List<JSONObject> ret = new ArrayList<>();
-
-        final int RANGE_SIZE = 64;
-        int fetchSize = 64;
-
-        try {
-            final Query userQuery = new Query().
-                    setPage(1, RANGE_SIZE).setPageCount(1).
-                    setFilter(new PropertyFilter(UserExt.USER_STATUS, FilterOperator.EQUAL, UserExt.USER_STATUS_C_VALID)).
-                    addSort(UserExt.USER_ARTICLE_COUNT, SortDirection.DESCENDING).
-                    addSort(UserExt.USER_COMMENT_COUNT, SortDirection.DESCENDING);
-            final List<JSONObject> rangeUsers = userRepository.getList(userQuery);
-            final int realLen = rangeUsers.size();
-            if (realLen < fetchSize) {
-                fetchSize = realLen;
-            }
-
-            final List<Integer> indices = CollectionUtils.getRandomIntegers(0, realLen, fetchSize);
-            for (final Integer index : indices) {
-                ret.add(rangeUsers.get(index));
-            }
-
-            for (final JSONObject selectedUser : ret) {
-                avatarQueryService.fillUserAvatarURL(selectedUser);
-            }
-
-            NICE_USERS.clear();
-            NICE_USERS.addAll(ret);
-        } catch (final Exception e) {
-            LOGGER.log(Level.ERROR, "Get nice users failed", e);
-        }
     }
 
     /**

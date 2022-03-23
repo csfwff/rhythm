@@ -142,7 +142,6 @@ public class CacheMgmtService {
             return;
         }
         try {
-            userCache.loadNiceUsers();
             indexProcessor.loadIndexData();
         } finally {
             unlock(lockName);

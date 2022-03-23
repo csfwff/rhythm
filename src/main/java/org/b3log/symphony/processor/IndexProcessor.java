@@ -374,6 +374,10 @@ public class IndexProcessor {
         final List<JSONObject> recentArticles = articleQueryService.getIndexRecentArticles();
         dataModel.put(Common.RECENT_ARTICLES, recentArticles);
 
+        // 活跃用户
+        final List<JSONObject> niceUsers = userQueryService.getNiceUsers(10);
+        dataModel.put(Common.NICE_USERS, niceUsers);
+
         indexModelCache.clear();
         indexModelCache.putAll(dataModel);
     }
@@ -428,11 +432,10 @@ public class IndexProcessor {
         final List<JSONObject> perfectArticles = articleQueryService.getIndexPerfectArticles();
         dataModel.put(Common.PERFECT_ARTICLES, perfectArticles);
 
-        final List<JSONObject> niceUsers = userQueryService.getNiceUsers(10);
-        dataModel.put(Common.NICE_USERS, niceUsers);
-
         dataModel.put(Common.MESSAGES, ChatroomProcessor.getMessages(1));
         dataModel.put(Common.FISHING_PI_VERSION, Server.FISHING_PI_VERSION);
+
+        makeIndexData(dataModel);
 
         // TGIF
         Calendar calendar = Calendar.getInstance();
@@ -452,8 +455,6 @@ public class IndexProcessor {
             // 不是周五
             dataModel.put("TGIF", "-1");
         }
-
-        makeIndexData(dataModel);
 
         dataModelService.fillHeaderAndFooter(context, dataModel);
         dataModelService.fillIndexTags(dataModel);
