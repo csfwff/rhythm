@@ -38,6 +38,7 @@ import org.b3log.latke.util.Locales;
 import org.b3log.latke.util.Paginator;
 import org.b3log.latke.util.Stopwatchs;
 import org.b3log.symphony.Server;
+import org.b3log.symphony.cache.ArticleCache;
 import org.b3log.symphony.model.Article;
 import org.b3log.symphony.model.Common;
 import org.b3log.symphony.model.Pointtransfer;
@@ -45,10 +46,7 @@ import org.b3log.symphony.model.UserExt;
 import org.b3log.symphony.processor.middleware.AnonymousViewCheckMidware;
 import org.b3log.symphony.processor.middleware.LoginCheckMidware;
 import org.b3log.symphony.service.*;
-import org.b3log.symphony.util.Markdowns;
-import org.b3log.symphony.util.Sessions;
-import org.b3log.symphony.util.StatusCodes;
-import org.b3log.symphony.util.Symphonys;
+import org.b3log.symphony.util.*;
 import org.json.JSONObject;
 
 import java.io.InputStream;
@@ -129,6 +127,12 @@ public class IndexProcessor {
      */
     @Inject
     private PointtransferQueryService pointtransferQueryService;
+
+    /**
+     * Article cache.
+     */
+    @Inject
+    private ArticleCache articleCache;
 
     /**
      * Register request handlers.
@@ -345,15 +349,19 @@ public class IndexProcessor {
         dataModel.put(Common.CURRENT, StringUtils.substringAfter(context.requestURI(), "/watch"));
     }
 
+    public static void makeIndexData(Map<String, Object> dataModel) {
+
+    }
+
     /**
      * Shows index.
      *
      * @param context the specified context
      */
     public void showIndex(final RequestContext context) {
+        DelayHelper.print();
         final AbstractFreeMarkerRenderer renderer = new SkinRenderer(context, "index.ftl");
         final Map<String, Object> dataModel = renderer.getDataModel();
-
         final JSONObject currentUser = Sessions.getUser();
         if (null != currentUser) {
             // 自定义首页跳转 https://github.com/b3log/symphony/issues/774
@@ -372,7 +380,9 @@ public class IndexProcessor {
                             // 有奖励，返回true
                             && livenessQueryService.getYesterdayLiveness(userId) != null
                     ) ? 0 : 1);
+
             dataModel.put("checkedIn", activityQueryService.isCheckedinToday(userId) ? 1 : 0);
+
             // 用户手机号
             dataModel.put("userPhone", currentUser.optString("userPhone"));
         } else {
@@ -382,31 +392,47 @@ public class IndexProcessor {
             dataModel.put("checkedIn", 0);
             dataModel.put("userPhone", "not-logged");
         }
+        DelayHelper.print();
 
         final List<JSONObject> recentArticles = articleQueryService.getIndexRecentArticles();
         dataModel.put(Common.RECENT_ARTICLES, recentArticles);
+        DelayHelper.print();
+
 
         final List<JSONObject> perfectArticles = articleQueryService.getIndexPerfectArticles();
         dataModel.put(Common.PERFECT_ARTICLES, perfectArticles);
+        DelayHelper.print();
+
 
         final List<JSONObject> niceUsers = userQueryService.getNiceUsers(10);
         dataModel.put(Common.NICE_USERS, niceUsers);
+        DelayHelper.print();
 
-        final JSONObject result = articleQueryService.getQuestionArticles(0, 1, 10);
+
+        final JSONObject result = articleCache.getQuestionArticles();
         final List<JSONObject> qaArticles = (List<JSONObject>) result.get(Article.ARTICLES);
         dataModel.put(Common.QNA,qaArticles);
+        DelayHelper.print();
+
 
         dataModel.put(Common.MESSAGES, ChatroomProcessor.getMessages(1));
         dataModel.put(Common.FISHING_PI_VERSION, Server.FISHING_PI_VERSION);
+        DelayHelper.print();
+
 
         // 签到排行
         final List<JSONObject> users = activityQueryService.getTopCheckinUsers(6);
         dataModel.put(Common.TOP_CHECKIN_USERS, users);
+        DelayHelper.print();
+
         // 在线时间排行
         final List<JSONObject> onlineTopUsers = activityQueryService.getTopOnlineTimeUsers(5);
         dataModel.put("onlineTopUsers", onlineTopUsers);
+        DelayHelper.print();
+
         // 随机文章
         dataModel.put("indexRandomArticles", ArticleProcessor.getRandomArticles(12));
+        DelayHelper.print();
 
         // TGIF
         Calendar calendar = Calendar.getInstance();
@@ -432,6 +458,7 @@ public class IndexProcessor {
         //dataModelService.fillSideTags(dataModel);
 
         dataModel.put(Common.SELECTED, Common.INDEX);
+        DelayHelper.print();
     }
 
     /**

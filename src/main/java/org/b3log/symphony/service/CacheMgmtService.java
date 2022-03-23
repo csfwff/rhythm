@@ -137,6 +137,7 @@ public class CacheMgmtService {
         try {
             articleCache.loadIndexRecentArticles();
             userCache.loadNiceUsers();
+            articleCache.loadQuestionArticles();
         } finally {
             unlock(lockName);
         }

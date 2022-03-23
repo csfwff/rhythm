@@ -88,6 +88,11 @@ public class ArticleCache {
     private static final List<JSONObject> RECENT_ARTICLES = new ArrayList<>();
 
     /**
+     * Index question articles cache.
+     */
+    private static JSONObject QUESTION_ARTICLES = new JSONObject();
+
+    /**
      * Gets side hot articles.
      *
      * @return side hot articles
@@ -208,6 +213,21 @@ public class ArticleCache {
         }
 
         return JSONs.clone(PERFECT_ARTICLES);
+    }
+
+    public JSONObject getQuestionArticles() {
+        if (QUESTION_ARTICLES.isEmpty()) {
+            loadQuestionArticles();
+        }
+
+        return JSONs.clone(QUESTION_ARTICLES);
+    }
+
+    public void loadQuestionArticles() {
+        final BeanManager beanManager = BeanManager.getInstance();
+        final ArticleQueryService articleQueryService = beanManager.getReference(ArticleQueryService.class);
+
+        QUESTION_ARTICLES = articleQueryService.getQuestionArticles(0, 1, 10);
     }
 
     /**
