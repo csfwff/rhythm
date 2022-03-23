@@ -31,6 +31,7 @@ import org.b3log.latke.service.annotation.Service;
 import org.b3log.symphony.cache.ArticleCache;
 import org.b3log.symphony.cache.DomainCache;
 import org.b3log.symphony.cache.TagCache;
+import org.b3log.symphony.cache.UserCache;
 import org.b3log.symphony.model.Common;
 import org.b3log.symphony.processor.StatisticProcessor;
 import org.b3log.symphony.processor.UserProcessor;
@@ -97,6 +98,12 @@ public class CacheMgmtService {
     private OptionQueryService optionQueryService;
 
     /**
+     * User cache.
+     */
+    @Inject
+    private UserCache userCache;
+
+    /**
      * Refreshes all caches.
      */
     public void refreshCache() {
@@ -129,6 +136,7 @@ public class CacheMgmtService {
         }
         try {
             articleCache.loadIndexRecentArticles();
+            userCache.loadNiceUsers();
         } finally {
             unlock(lockName);
         }
