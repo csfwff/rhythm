@@ -63,6 +63,7 @@ public class ChatRoomBot {
     private static final SimpleCurrentLimiter RECORD_POOL_2_IN_24H = new SimpleCurrentLimiter(24 * 60 * 60, 1);
     private static final SimpleCurrentLimiter RECORD_POOL_6_IN_15M = new SimpleCurrentLimiter(15 * 60, 5);
     private static final SimpleCurrentLimiter RECORD_POOL_5_IN_24H = new SimpleCurrentLimiter(24 * 60 * 60, 4);
+    private static final SimpleCurrentLimiter RECORD_POOL_2_IN_5M = new SimpleCurrentLimiter(5 * 60, 2);
 
     /**
      * 对应关系池
@@ -270,6 +271,15 @@ public class ChatRoomBot {
             }
         }
         // ==! 判定复读机 !==
+
+        // ==? 发红包频率限制 ?==
+        if (content.startsWith("[redpacket]") && content.endsWith("[/redpacket]")) {
+            if (!RECORD_POOL_2_IN_5M.access(userName)) {
+                context.renderJSON(StatusCodes.ERR).renderMsg("你的红包被机器人打回，原因：红包发送频率过快，每5分钟仅允许发送2个红包，请稍候重试");
+                return false;
+            }
+        }
+        // ==! 发红包频率限制 !==
 
         latestMessage = content;
         allLatestMessage = content;
