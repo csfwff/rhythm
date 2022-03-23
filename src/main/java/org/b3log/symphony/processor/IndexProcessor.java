@@ -378,6 +378,13 @@ public class IndexProcessor {
         final List<JSONObject> niceUsers = userQueryService.getNiceUsers(10);
         dataModel.put(Common.NICE_USERS, niceUsers);
 
+        // 优选文章
+        final List<JSONObject> perfectArticles = articleQueryService.getIndexPerfectArticles();
+        dataModel.put(Common.PERFECT_ARTICLES, perfectArticles);
+
+        // 摸鱼派版本
+        dataModel.put(Common.FISHING_PI_VERSION, Server.FISHING_PI_VERSION);
+
         indexModelCache.clear();
         indexModelCache.putAll(dataModel);
     }
@@ -429,11 +436,7 @@ public class IndexProcessor {
             dataModel.put("userPhone", "not-logged");
         }
 
-        final List<JSONObject> perfectArticles = articleQueryService.getIndexPerfectArticles();
-        dataModel.put(Common.PERFECT_ARTICLES, perfectArticles);
-
         dataModel.put(Common.MESSAGES, ChatroomProcessor.getMessages(1));
-        dataModel.put(Common.FISHING_PI_VERSION, Server.FISHING_PI_VERSION);
 
         makeIndexData(dataModel);
 
@@ -458,7 +461,6 @@ public class IndexProcessor {
 
         dataModelService.fillHeaderAndFooter(context, dataModel);
         dataModelService.fillIndexTags(dataModel);
-        //dataModelService.fillSideTags(dataModel);
 
         dataModel.put(Common.SELECTED, Common.INDEX);
     }
