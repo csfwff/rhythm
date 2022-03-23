@@ -1223,48 +1223,7 @@ public class ArticleQueryService {
      * @return recent articles, returns an empty list if not found
      */
     public List<JSONObject> getIndexRecentArticles() {
-        List<JSONObject> ret;
-        try {
-            Stopwatchs.start("Query index recent articles");
-            try {
-                final int fetchSize = 12;
-                Query query = new Query().
-                        setFilter(CompositeFilterOperator.and(
-                                new PropertyFilter(Article.ARTICLE_TYPE, FilterOperator.NOT_EQUAL, Article.ARTICLE_TYPE_C_DISCUSSION),
-                                new PropertyFilter(Article.ARTICLE_STATUS, FilterOperator.EQUAL, Article.ARTICLE_STATUS_C_VALID),
-                                new PropertyFilter(Article.ARTICLE_SHOW_IN_LIST, FilterOperator.NOT_EQUAL, Article.ARTICLE_SHOW_IN_LIST_C_NOT))).
-                        setPageCount(1).setPage(1, fetchSize).
-                        addSort(Article.ARTICLE_LATEST_CMT_TIME, SortDirection.DESCENDING);
-                ret = articleRepository.getList(query);
-
-                final List<JSONObject> stickArticles = getStickArticles();
-                if (!stickArticles.isEmpty()) {
-                    final Iterator<JSONObject> i = ret.iterator();
-                    while (i.hasNext()) {
-                        final JSONObject article = i.next();
-                        for (final JSONObject stickArticle : stickArticles) {
-                            if (article.optString(Keys.OBJECT_ID).equals(stickArticle.optString(Keys.OBJECT_ID))) {
-                                i.remove();
-                            }
-                        }
-                    }
-
-                    ret.addAll(0, stickArticles);
-                    final int size = ret.size() < fetchSize ? ret.size() : fetchSize;
-                    ret = ret.subList(0, size);
-                }
-            } finally {
-                Stopwatchs.end();
-            }
-
-            organizeArticles(ret);
-
-            return ret;
-        } catch (final RepositoryException e) {
-            LOGGER.log(Level.ERROR, "Gets index recent articles failed", e);
-
-            return Collections.emptyList();
-        }
+        return articleCache.getIndexRecentArticles();
     }
 
     /**
@@ -2123,7 +2082,7 @@ public class ArticleQueryService {
         );
     }
 
-    private List<JSONObject> getStickArticles() {
+    public List<JSONObject> getStickArticles() {
         final Query query = new Query().
                 setFilter(CompositeFilterOperator.and(
                         new PropertyFilter(Article.ARTICLE_STICK, FilterOperator.NOT_EQUAL, 0L),

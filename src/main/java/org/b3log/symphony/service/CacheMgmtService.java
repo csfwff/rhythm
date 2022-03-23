@@ -122,6 +122,18 @@ public class CacheMgmtService {
         }
     }
 
+    public void refreshIndexCache() {
+        final String lockName = "refreshCaches";
+        if (!lock(lockName)) {
+            return;
+        }
+        try {
+            articleCache.loadIndexRecentArticles();
+        } finally {
+            unlock(lockName);
+        }
+    }
+
     private void statusReport() {
         final JSONObject ret = new JSONObject();
         ret.put(Common.ONLINE_VISITOR_CNT, optionQueryService.getOnlineVisitorCount());
