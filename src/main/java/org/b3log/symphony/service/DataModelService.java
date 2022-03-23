@@ -36,7 +36,6 @@ import org.b3log.symphony.Server;
 import org.b3log.symphony.cache.DomainCache;
 import org.b3log.symphony.model.*;
 import org.b3log.symphony.processor.IdleTalkProcessor;
-import org.b3log.symphony.util.DelayHelper;
 import org.b3log.symphony.util.Markdowns;
 import org.b3log.symphony.util.Sessions;
 import org.b3log.symphony.util.Symphonys;
@@ -397,7 +396,6 @@ public class DataModelService {
      * @param dataModel the specified data model
      */
     private void fillPersonalNav(final Map<String, Object> dataModel) {
-        DelayHelper.start();
         Stopwatchs.start("Fills personal nav");
         try {
             final boolean isLoggedIn = Sessions.isLoggedIn();
@@ -418,12 +416,10 @@ public class DataModelService {
             dataModel.put(Common.IS_ADMIN_LOGGED_IN, Role.ROLE_ID_C_ADMIN.equals(userRole));
             avatarQueryService.fillUserAvatarURL(curUser);
             final String userId = curUser.optString(Keys.OBJECT_ID);
-            DelayHelper.step();
 
             final long followingArticleCnt = followQueryService.getFollowingCount(userId, Follow.FOLLOWING_TYPE_C_ARTICLE);
             final long followingTagCnt = followQueryService.getFollowingCount(userId, Follow.FOLLOWING_TYPE_C_TAG);
             final long followingUserCnt = followQueryService.getFollowingCount(userId, Follow.FOLLOWING_TYPE_C_USER);
-            DelayHelper.step();
 
             curUser.put(Common.FOLLOWING_ARTICLE_CNT, followingArticleCnt);
             curUser.put(Common.FOLLOWING_TAG_CNT, followingTagCnt);
@@ -439,21 +435,17 @@ public class DataModelService {
             dataModel.put(Common.CURRENT_USER, curUser);
 
             final JSONObject role = roleQueryService.getRole(userRole);
-            DelayHelper.step();
             curUser.put(Role.ROLE_NAME, role.optString(Role.ROLE_NAME));
 
             // final int unreadNotificationCount = notificationQueryService.getUnreadNotificationCount(curUser.optString(Keys.OBJECT_ID));
             dataModel.put(Notification.NOTIFICATION_T_UNREAD_COUNT, 0); // AJAX polling
 
             dataModel.put(Common.IS_DAILY_CHECKIN, activityQueryService.isCheckedinToday(userId));
-            DelayHelper.step();
 
             final int livenessMax = Symphonys.ACTIVITY_YESTERDAY_REWARD_MAX;
             final int currentLiveness = livenessQueryService.getCurrentLivenessPoint(userId);
-            DelayHelper.step();
 
             dataModel.put(Liveness.LIVENESS, (float) (Math.round((float) currentLiveness / livenessMax * 100 * 100)) / 100);
-            DelayHelper.end();
         } finally {
             Stopwatchs.end();
         }
