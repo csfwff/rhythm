@@ -137,7 +137,7 @@ public class CacheMgmtService {
     }
 
     public void refreshIndexCache() {
-        final String lockName = "refreshCaches";
+        final String lockName = "refreshIndexCaches";
         if (!lock(lockName)) {
             return;
         }
