@@ -83,16 +83,6 @@ public class ArticleCache {
     private static final List<JSONObject> PERFECT_ARTICLES = new ArrayList<>();
 
     /**
-     * Recent articles cache.
-     */
-    private static final List<JSONObject> RECENT_ARTICLES = new ArrayList<>();
-
-    /**
-     * Index question articles cache.
-     */
-    private static JSONObject QUESTION_ARTICLES = new JSONObject();
-
-    /**
      * Gets side hot articles.
      *
      * @return side hot articles
@@ -213,83 +203,6 @@ public class ArticleCache {
         }
 
         return JSONs.clone(PERFECT_ARTICLES);
-    }
-
-    public JSONObject getQuestionArticles() {
-        if (QUESTION_ARTICLES.isEmpty()) {
-            loadQuestionArticles();
-        }
-
-        return JSONs.clone(QUESTION_ARTICLES);
-    }
-
-    public void loadQuestionArticles() {
-        final BeanManager beanManager = BeanManager.getInstance();
-        final ArticleQueryService articleQueryService = beanManager.getReference(ArticleQueryService.class);
-
-        QUESTION_ARTICLES = articleQueryService.getQuestionArticles(0, 1, 10);
-    }
-
-    /**
-     * Gets index recent articles.
-     *
-     * @return index recent articles
-     */
-    public List<JSONObject> getIndexRecentArticles() {
-        if (RECENT_ARTICLES.isEmpty()) {
-            return Collections.emptyList();
-        }
-
-        return JSONs.clone(RECENT_ARTICLES);
-    }
-
-    /**
-     * 加载最近文章缓存
-     */
-    public void loadIndexRecentArticles() {
-        final BeanManager beanManager = BeanManager.getInstance();
-        final ArticleRepository articleRepository = beanManager.getReference(ArticleRepository.class);
-        final ArticleQueryService articleQueryService = beanManager.getReference(ArticleQueryService.class);
-        List<JSONObject> ret;
-        try {
-            Stopwatchs.start("Query index recent articles");
-            try {
-                final int fetchSize = 12;
-                Query query = new Query().
-                        setFilter(CompositeFilterOperator.and(
-                                new PropertyFilter(Article.ARTICLE_TYPE, FilterOperator.NOT_EQUAL, Article.ARTICLE_TYPE_C_DISCUSSION),
-                                new PropertyFilter(Article.ARTICLE_STATUS, FilterOperator.EQUAL, Article.ARTICLE_STATUS_C_VALID),
-                                new PropertyFilter(Article.ARTICLE_SHOW_IN_LIST, FilterOperator.NOT_EQUAL, Article.ARTICLE_SHOW_IN_LIST_C_NOT))).
-                        setPageCount(1).setPage(1, fetchSize).
-                        addSort(Article.ARTICLE_LATEST_CMT_TIME, SortDirection.DESCENDING);
-                ret = articleRepository.getList(query);
-
-                final List<JSONObject> stickArticles = articleQueryService.getStickArticles();
-                if (!stickArticles.isEmpty()) {
-                    final Iterator<JSONObject> i = ret.iterator();
-                    while (i.hasNext()) {
-                        final JSONObject article = i.next();
-                        for (final JSONObject stickArticle : stickArticles) {
-                            if (article.optString(Keys.OBJECT_ID).equals(stickArticle.optString(Keys.OBJECT_ID))) {
-                                i.remove();
-                            }
-                        }
-                    }
-
-                    ret.addAll(0, stickArticles);
-                    final int size = ret.size() < fetchSize ? ret.size() : fetchSize;
-                    ret = ret.subList(0, size);
-                }
-            } finally {
-                Stopwatchs.end();
-            }
-
-            articleQueryService.organizeArticles(ret);
-            RECENT_ARTICLES.clear();
-            RECENT_ARTICLES.addAll(ret);
-        } catch (final RepositoryException e) {
-            LOGGER.log(Level.ERROR, "Gets index recent articles failed", e);
-        }
     }
 
     /**

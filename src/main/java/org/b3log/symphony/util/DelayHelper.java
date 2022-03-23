@@ -8,7 +8,7 @@ public class DelayHelper {
     private static int times = 0;
     private static long previousTime = 0L;
 
-    public static void print() {
+    public static void step() {
         times++;
         final long timeNow = System.currentTimeMillis();
         final String timeNowStr = new SimpleDateFormat("mm:ss.SS").format(new Date(timeNow));
@@ -29,5 +29,15 @@ public class DelayHelper {
     public static void clear() {
         previousTime = 0L;
         times = 0;
+    }
+
+    public static void start() {
+        clear();
+        step();
+    }
+
+    public static void end() {
+        step();
+        clear();
     }
 }

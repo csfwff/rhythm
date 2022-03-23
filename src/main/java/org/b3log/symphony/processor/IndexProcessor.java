@@ -349,8 +349,41 @@ public class IndexProcessor {
         dataModel.put(Common.CURRENT, StringUtils.substringAfter(context.requestURI(), "/watch"));
     }
 
-    public static void makeIndexData(Map<String, Object> dataModel) {
+    private static final Map<String, Object> indexModelCache = new HashMap<>();
 
+    public void loadIndexData() {
+        Map<String, Object> dataModel = new HashMap<>();
+
+        // 签到排行
+        final List<JSONObject> users = activityQueryService.getTopCheckinUsers(6);
+        dataModel.put(Common.TOP_CHECKIN_USERS, users);
+
+        // 在线时间排行
+        final List<JSONObject> onlineTopUsers = activityQueryService.getTopOnlineTimeUsers(5);
+        dataModel.put("onlineTopUsers", onlineTopUsers);
+
+        // 随机文章
+        dataModel.put("indexRandomArticles", ArticleProcessor.getRandomArticles(12));
+
+        // 问题文章
+        final JSONObject result = articleQueryService.getQuestionArticles(0, 1, 10);
+        final List<JSONObject> qaArticles = (List<JSONObject>) result.get(Article.ARTICLES);
+        dataModel.put(Common.QNA,qaArticles);
+
+        // 最近文章
+        final List<JSONObject> recentArticles = articleQueryService.getIndexRecentArticles();
+        dataModel.put(Common.RECENT_ARTICLES, recentArticles);
+
+        indexModelCache.clear();
+        indexModelCache.putAll(dataModel);
+    }
+
+    public void makeIndexData(Map<String, Object> dataModel) {
+        if (indexModelCache.isEmpty()) {
+            loadIndexData();
+        }
+
+        dataModel.putAll(indexModelCache);
     }
 
     /**
@@ -359,7 +392,6 @@ public class IndexProcessor {
      * @param context the specified context
      */
     public void showIndex(final RequestContext context) {
-        DelayHelper.print();
         final AbstractFreeMarkerRenderer renderer = new SkinRenderer(context, "index.ftl");
         final Map<String, Object> dataModel = renderer.getDataModel();
         final JSONObject currentUser = Sessions.getUser();
@@ -392,47 +424,15 @@ public class IndexProcessor {
             dataModel.put("checkedIn", 0);
             dataModel.put("userPhone", "not-logged");
         }
-        DelayHelper.print();
-
-        final List<JSONObject> recentArticles = articleQueryService.getIndexRecentArticles();
-        dataModel.put(Common.RECENT_ARTICLES, recentArticles);
-        DelayHelper.print();
-
 
         final List<JSONObject> perfectArticles = articleQueryService.getIndexPerfectArticles();
         dataModel.put(Common.PERFECT_ARTICLES, perfectArticles);
-        DelayHelper.print();
-
 
         final List<JSONObject> niceUsers = userQueryService.getNiceUsers(10);
         dataModel.put(Common.NICE_USERS, niceUsers);
-        DelayHelper.print();
-
-
-        final JSONObject result = articleCache.getQuestionArticles();
-        final List<JSONObject> qaArticles = (List<JSONObject>) result.get(Article.ARTICLES);
-        dataModel.put(Common.QNA,qaArticles);
-        DelayHelper.print();
-
 
         dataModel.put(Common.MESSAGES, ChatroomProcessor.getMessages(1));
         dataModel.put(Common.FISHING_PI_VERSION, Server.FISHING_PI_VERSION);
-        DelayHelper.print();
-
-
-        // 签到排行
-        final List<JSONObject> users = activityQueryService.getTopCheckinUsers(6);
-        dataModel.put(Common.TOP_CHECKIN_USERS, users);
-        DelayHelper.print();
-
-        // 在线时间排行
-        final List<JSONObject> onlineTopUsers = activityQueryService.getTopOnlineTimeUsers(5);
-        dataModel.put("onlineTopUsers", onlineTopUsers);
-        DelayHelper.print();
-
-        // 随机文章
-        dataModel.put("indexRandomArticles", ArticleProcessor.getRandomArticles(12));
-        DelayHelper.print();
 
         // TGIF
         Calendar calendar = Calendar.getInstance();
@@ -453,12 +453,13 @@ public class IndexProcessor {
             dataModel.put("TGIF", "-1");
         }
 
+        makeIndexData(dataModel);
+
         dataModelService.fillHeaderAndFooter(context, dataModel);
         dataModelService.fillIndexTags(dataModel);
         //dataModelService.fillSideTags(dataModel);
 
         dataModel.put(Common.SELECTED, Common.INDEX);
-        DelayHelper.print();
     }
 
     /**

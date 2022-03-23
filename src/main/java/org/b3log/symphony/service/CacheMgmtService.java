@@ -33,6 +33,7 @@ import org.b3log.symphony.cache.DomainCache;
 import org.b3log.symphony.cache.TagCache;
 import org.b3log.symphony.cache.UserCache;
 import org.b3log.symphony.model.Common;
+import org.b3log.symphony.processor.IndexProcessor;
 import org.b3log.symphony.processor.StatisticProcessor;
 import org.b3log.symphony.processor.UserProcessor;
 import org.b3log.symphony.processor.channel.ArticleChannel;
@@ -104,6 +105,12 @@ public class CacheMgmtService {
     private UserCache userCache;
 
     /**
+     * Index processor.
+     */
+    @Inject
+    private IndexProcessor indexProcessor;
+
+    /**
      * Refreshes all caches.
      */
     public void refreshCache() {
@@ -135,9 +142,8 @@ public class CacheMgmtService {
             return;
         }
         try {
-            articleCache.loadIndexRecentArticles();
             userCache.loadNiceUsers();
-            articleCache.loadQuestionArticles();
+            indexProcessor.loadIndexData();
         } finally {
             unlock(lockName);
         }
