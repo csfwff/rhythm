@@ -19,7 +19,7 @@
 
 -->
 <#include "macro-head.ftl">
-<#include "common/sub-nav.ftl">
+<#include "common/index-nav.ftl">
 <!DOCTYPE html>
 <html>
 <head>
@@ -27,175 +27,120 @@
         <meta name="description" content="${symDescriptionLabel}"/>
     </@head>
 </head>
-<body class="index">
+<body class="index" style="background-color: #f6f6f6;">
 <#if showTopAd>
     ${HeaderBannerLabel}
 </#if>
-<#include "header.ftl">
-<@subNav '' ''/>
-<div class="main">
-    <div class="wrapper fn-clear">
-        <div class="module">
-            <div class="module-header" style="background-color: #97cf76;">
-                <a href="${servePath}/recent">${latestLabel}</a>
-            </div>
-            <div class="module-panel">
-                <style>
-                    .cb-stick {
-                        position: absolute;
-                        top: 0;
-                        left: 0;
-                        border-width: 10px 10px 10px 10px;
-                        border-color: #999 transparent transparent #999;
-                        border-style: solid;
-                    }
+<div class="mobile-head">
+    <#include "header.ftl">
+    <@indexNav ''/>
+</div>
+<div style="height: 74px;width: 1px;" ></div>
 
-                    .icon-pin {
-                        position: absolute;
-                        top: -9px;
-                        left: -11px;
-                        color: #FFF;
-                    }
-                </style>
-                <ul class="module-list">
-                    <#list recentArticles as article>
-                        <li<#if !article_has_next> class="last"</#if>>
-                            <#if article.articleStick != 0>
-                                <span class="cb-stick tooltipped tooltipped-e" aria-label="管理置顶"><svg class="icon-pin"><use
-                                                xlink:href="#pin"></use></svg></span>
-                            </#if>
-                            <a rel="nofollow" href="${servePath}/member/${article.articleAuthorName}">
-                                    <span class="avatar-small tooltipped tooltipped-se slogan"
-                                          aria-label="${article.articleAuthorName}"
-                                          style="background-image:url('${article.articleAuthorThumbnailURL210}')"></span>
-                            </a>
-                            <a rel="nofollow" class="title fn-ellipsis"
-                               href="${servePath}${article.articlePermalink}">${article.articleTitleEmoj}</a>
-                            <a class="fn-right count ft-gray ft-smaller"
-                               href="${servePath}${article.articlePermalink}"><#if article.articleViewCount < 1000>
-                                    ${article.articleViewCount}<#else>${article.articleViewCntDisplayFormat}</#if></a>
-                        </li>
-                    </#list>
-                </ul>
-            </div>
-        </div>
-        <div class="module-panel">
-            <div class="module-header" style="background-color: #69b6df;">
-                <a onclick="randomArticles()" style="text-decoration: none;">
-                    <svg id="randomArticlesRefreshSvg">
-                        <use xlink:href="#refresh"></use>
-                    </svg>
-                    换点别的&nbsp;&nbsp;
-                    随便看看
-                </a>
-            </div>
-            <ul class="module-list" id="randomArticles">
-                <#if indexRandomArticles??>
-                    <#list indexRandomArticles as article>
-                        <li class="fn-flex">
-                            <a rel="nofollow" href="${servePath}/member/${article.articleAuthorName}">
-                                    <span class="avatar-small tooltipped tooltipped-se slogan"
-                                          aria-label="${article.articleAuthorName}"
-                                          style="background-image:url('${article.articleAuthorThumbnailURL210}')"></span>
-                            </a>
-                            <a rel="nofollow" class="title fn-ellipsis fn-flex-1"
-                               href="${servePath}${article.articlePermalink}">${article.articleTitleEmoj}</a>
-                            <a class="fn-right count ft-gray ft-smaller"
-                               href="${servePath}${article.articlePermalink}"><#if article.articleViewCount < 1000>
-                                    ${article.articleViewCount}<#else>${article.articleViewCntDisplayFormat}</#if></a>
-                        </li>
-                    </#list>
-                </#if>
-            </ul>
-        </div>
-        <div class="module">
-            <div class="module-header" style="background-color: #dfb169;">
-                <a href="${servePath}/perfect">${perfectLabel}</a>
-            </div>
-            <div class="module-panel">
-                <ul class="module-list">
-                    <#list perfectArticles as article>
-                        <li<#if !article_has_next> class="last"</#if>>
-                            <a rel="nofollow" href="${servePath}/member/${article.articleAuthorName}">
-                                    <span class="avatar-small tooltipped tooltipped-se slogan"
-                                          aria-label="${article.articleAuthorName}"
-                                          style="background-image:url('${article.articleAuthorThumbnailURL210}')"></span>
-                            </a>
-                            <a rel="nofollow" class="title fn-ellipsis"
-                               href="${servePath}${article.articlePermalink}">${article.articleTitleEmoj}</a>
-                            <a class="fn-right count ft-gray ft-smaller"
-                               href="${servePath}${article.articlePermalink}">${article.articleViewCount}</a>
-                        </li>
-                    </#list>
-                </ul>
-            </div>
-        </div>
-        <div class="module">
-            <div class="module-header" style="background-color: #69dfac;">
-                <a href="${servePath}/cr">聊天室</a>
-            </div>
-            <div class="module-panel">
-                <div style="margin: 15px 0 5px 0">
-                    <a href="${servePath}/cr">点击加入聊天</a>
-                </div>
-                <ul class="module-list" id="chatRoomIndex">
-                    <#if messages?size != 0>
-                        <#list messages as msg>
-                            <#if msg_index <= 9>
-                                <li class="fn-flex" id="chatindex${msg.oId}">
-                                    <a rel="nofollow" href="${servePath}/member/${msg.userName}">
-                                        <div class="avatar tooltipped tooltipped-n"
-                                             aria-label="${msg.userName}"
-                                             style="background-image:url('${msg.userAvatarURL}')"></div>
-                                    </a>
-                                    <div class="fn-flex-1">
-                                        <div class="ft-smaller">
-                                            <a rel="nofollow" href="${servePath}/member/${msg.userName}">
-                                                <#if msg.userNickname?? && msg.userNickname?length gt 1>
-                                                    <span class="ft-gray">${msg.userNickname} ( ${msg.userName} )</span>
-                                                <#else>
-                                                    <span class="ft-gray">${msg.userName}</span>
-                                                </#if>                                            </a>
-                                        </div>
-                                        <div class="vditor-reset comment<#if 0 == chatRoomPictureStatus> blur</#if>">
-                                            <#assign text=msg.content>
-                                            <#if text?contains("\"msgType\":\"redPacket\"")>
-                                                [收到红包，请在完整版聊天室查看]
-                                            <#else>
-                                                ${text}
-                                            </#if>
-                                        </div>
-                                    </div>
-                                </li>
-                            </#if>
-                        </#list>
-                    <#else>
-                        <li class="ft-center ft-gray" id="emptyChatRoom">${chickenEggLabel}</li>
-                    </#if>
-                </ul>
-            </div>
-        </div>
-    </div>
+<div class="main" >
+
+    <ul>
+        <#if recentArticles??>
+        <#list recentArticles as article>
+            <#include "common/list-item.ftl">
+        </#list>
+        </#if>
+    </ul>
 </div>
 <#if tags?size != 0>
-    <div class="index-wrap">
-        <div class="wrapper">
-            <ul class="tag-desc fn-clear">
-                <#list tags as tag>
-                    <li>
-                        <a rel="nofollow" href="${servePath}/tag/${tag.tagURI}">
-                            <#if tag.tagIconPath!="">
-                                <img src="${tag.tagIconPath}" alt="${tag.tagTitle}"/>
-                            </#if>
-                            ${tag.tagTitle}
-                        </a>
-                    </li>
-                </#list>
-            </ul>
-        </div>
+    <div class="module_new">
+        <h2 class="module__title ft__fade fn__clear">
+            推荐标签
+            <div class="fn__right">
+                <a class="ft__gray" href="${servePath}/domains">领域</a>
+                &nbsp;•&nbsp;
+                <a class="ft__gray" href="${servePath}/tags">标签</a>
+            </div>
+        </h2>
+    </div>
+    <div class="tags fn__clear">
+        <#list tags as tag>
+            <a class="fn__clear tag" href="${servePath}/tag/${tag.tagURI}">
+                <#if tag.tagIconPath!="">
+                    <img src="${tag.tagIconPath}" alt="${tag.tagTitle}"/>
+                </#if>
+                <span class="fn__left"> ${tag.tagTitle}</span>
+            </a>
+        </#list>
+
     </div>
 </#if>
 <div class="fn-hr10"></div>
+
+<#if  niceUsers?size!=0>
+    <div class="module_new">
+        <h2 class="module__title ft__fade fn__clear">
+            用户
+        </h2>
+    </div>
+    <div class="module__body">
+        <#list niceUsers as user>
+            <a  rel="nofollow"
+               href="${servePath}/member/${user.userName}">
+                <img class="avatar avatar--index" src="${user.userAvatarURL48}" style="background-image: none; background-color: transparent;" >
+
+            </a>
+        </#list>
+    </div>
+
+    <div class="fn-hr10"></div>
+</#if>
+
+
+
+
+
+<div class="module_new">
+    <h2 class="module__title ft__fade fn__clear">
+        <div class="module__title ft__fade fn__clear">
+
+            <a class="ft__gray" href="${servePath}/pre-post">${postArticleLabel}</a>
+        </div>
+    </h2>
+</div>
+
+
+<ul class="menu">
+    <#if TGIF == '0'>
+        <li  class="menu__item">
+            <a class="title" onclick="window.location.href=Label.servePath+'/post?type=0&tags=摸鱼周报&title=摸鱼周报 ${yyyyMMdd}'">
+                <b>每周五的摸鱼周报时间到了！</b>
+                <br>
+                今天还没有人写摸鱼周报哦，抢在第一名写摸鱼周报，获得 <b style="color:orange">1000 积分</b> 奖励！
+            </a>
+        </li>
+    <#elseif TGIF == '-1'>
+    <#else>
+        <li class="menu__item">
+            <a class="title" href="${TGIF}">
+                <b>每周五的摸鱼周报时间到了！</b>
+                <br>
+                今天已经有人写了摸鱼周报哦，快来看看吧~
+            </a>
+        </li>
+    </#if>
+    <li class="menu__item"><a class="title" style="text-decoration: none" id="livenessToday">
+        </a>
+    </li>
+    <li class="menu__item"><a class="title" style="text-decoration: none" id="checkIn">
+        </a>
+    </li >
+    <li class="menu__item"><a class="title" style="text-decoration: none" id="yesterday" onclick="yesterday()">领取昨日活跃奖励</a>
+    </li>
+    <!--                    <li><a class="title" href="${servePath}/activity/1A0001">${activity1A0001Label}</a></li>-->
+    <li class="menu__item"><a class="title" href="${servePath}/activity/character">${characterLabel}</a></li>
+    <li class="menu__item"><a class="title" href="${servePath}/charge/point"><span
+                    class="ft-red">❤</span>️ ${chargePointLabel}</a></li>
+    <li class="menu__item"><a class="title" href="${servePath}/top">排行榜</a></li>
+    <li class="menu__item"><a class="title" href="${servePath}/buy">系统商店</a></li>
+</ul>
+
+
 <div class="main">
     <div class="wrapper">
         <#if showSideAd>
@@ -210,47 +155,6 @@
             </div>
         </#if>
         </#if>
-        <div class="module">
-            <div class="module-header" style="background-color: #9cd462">
-                <a href="${servePath}/pre-post">${postArticleLabel}</a>
-            </div>
-            <div class="module-panel">
-                <ul class="module-list">
-                    <#if TGIF == '0'>
-                        <li>
-                            <a class="title" onclick="window.location.href=Label.servePath+'/post?type=0&tags=摸鱼周报&title=摸鱼周报 ${yyyyMMdd}'">
-                                <b>每周五的摸鱼周报时间到了！</b>
-                                <br>
-                                今天还没有人写摸鱼周报哦，抢在第一名写摸鱼周报，获得 <b style="color:orange">1000 积分</b> 奖励！
-                            </a>
-                        </li>
-                    <#elseif TGIF == '-1'>
-                    <#else>
-                        <li>
-                            <a class="title" href="${TGIF}">
-                                <b>每周五的摸鱼周报时间到了！</b>
-                                <br>
-                                今天已经有人写了摸鱼周报哦，快来看看吧~
-                            </a>
-                        </li>
-                    </#if>
-                    <li><a class="title" style="text-decoration: none" id="livenessToday">
-                        </a>
-                    </li>
-                    <li><a class="title" style="text-decoration: none" id="checkIn">
-                        </a>
-                    </li>
-                    <li><a class="title" style="text-decoration: none" id="yesterday" onclick="yesterday()">领取昨日活跃奖励</a>
-                    </li>
-<!--                    <li><a class="title" href="${servePath}/activity/1A0001">${activity1A0001Label}</a></li>-->
-                    <li><a class="title" href="${servePath}/activity/character">${characterLabel}</a></li>
-                    <li><a class="title" href="${servePath}/charge/point"><span
-                                    class="ft-red">❤</span>️ ${chargePointLabel}</a></li>
-                    <li><a class="title" href="${servePath}/top">排行榜</a></li>
-                    <li><a class="title" href="${servePath}/buy">系统商店</a></li>
-                </ul>
-            </div>
-        </div>
     </div>
 </div>
 
