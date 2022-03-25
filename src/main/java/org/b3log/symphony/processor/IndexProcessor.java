@@ -385,6 +385,9 @@ public class IndexProcessor {
         // 摸鱼派版本
         dataModel.put(Common.FISHING_PI_VERSION, Server.FISHING_PI_VERSION);
 
+        // 假期信息
+        dataModel.put("vocationData", Vocation.vocationData);
+
         indexModelCache.clear();
         indexModelCache.putAll(dataModel);
     }
