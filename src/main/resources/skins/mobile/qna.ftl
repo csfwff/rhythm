@@ -37,6 +37,13 @@
 
 </div>
 <div style="height: 74px;width: 1px;" ></div>
+<div class="recent__nav">
+    <a pjax-title="${qnaLabel} - ${symphonyLabel}" href="${servePath}/qna" class="recent__nav-item  <#if '' == current>recent__nav-check</#if>">${defaultLabel}</a>
+    <a pjax-title="${qnaLabel} - ${symphonyLabel}" href="${servePath}/qna/unanswered" class="recent__nav-item  <#if '/unanswered' == current>recent__nav-check</#if>">${unansweredLabel}</a>
+    <a pjax-title="${qnaLabel} - ${symphonyLabel}"href="${servePath}/qna/reward"class="recent__nav-item  <#if '/reward' == current>recent__nav-check</#if>">${highRewardLabel}</a>
+    <a pjax-title="${qnaLabel} - ${symphonyLabel}" href="${servePath}/qna/hot"class="recent__nav-item  <#if '/hot' == current>recent__nav-check</#if>">${hotArticlesLabel}</a>
+</div>
+
 <div class="main">
 <#--    <@subNav 'qna' ''/>-->
     <div class="content fn-clear">
