@@ -20,6 +20,7 @@
 -->
 <#include "macro-head.ftl">
 <#include "macro-list.ftl">
+<#include "common/index-nav.ftl">
 <!DOCTYPE html>
 <html lang="zh-cmn-Hans">
     <head>
@@ -28,7 +29,12 @@
         </@head>
     </head>
     <body>
+    <div class="mobile-head">
         <#include "header.ftl">
+        <@indexNav "watch"/>
+
+    </div>
+    <div style="height: 74px;width: 1px;" ></div>
         <div class="main">
             <div class="content fn-clear">
                     <div class="domains fn-flex">

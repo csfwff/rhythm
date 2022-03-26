@@ -22,6 +22,7 @@
 <#include "macro-list.ftl">
 <#include "macro-pagination.ftl">
 <#include "common/sub-nav.ftl">
+<#include "common/index-nav.ftl">
 <!DOCTYPE html>
 <html>
     <head>
@@ -30,9 +31,21 @@
         </@head>
     </head>
     <body>
+    <div class="mobile-head">
         <#include "header.ftl">
+        <@indexNav "recent"/>
+
+    </div>
+    <div style="height: 74px;width: 1px;" ></div>
+    <div class="recent__nav">
+        <a pjax-title="${latestLabel} - ${symphonyLabel}" href="${servePath}/recent" class="recent__nav-item ">默认</a>
+        <a pjax-title="${latestLabel} - ${symphonyLabel}" href="${servePath}/recent/hot" class="recent__nav-item ">热议</a>
+        <a pjax-title="${goodCmtsLabel} - ${symphonyLabel}"href="${servePath}/recent/good"class="recent__nav-item ">好评</a>
+        <a pjax-title="${recentCommentLabel} - ${symphonyLabel}" href="${servePath}/recent/reply"class="recent__nav-item  ">最近回帖</a>
+        <a pjax-title="${perfectLabel} - ${symphonyLabel}" href="${servePath}/perfect" class="recent__nav-item  recent__nav-check">优选</a>
+    </div>
         <div class="main">
-            <@subNav 'perfect' ''/>
+<#--            <@subNav 'perfect' ''/>-->
             <div class="content fn-clear">
                 <@list listData=perfectArticles/>
                 <@pagination url="${servePath}/perfect"/>

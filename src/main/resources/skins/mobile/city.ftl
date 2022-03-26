@@ -22,6 +22,7 @@
 <#include "macro-list.ftl">
 <#include "macro-pagination.ftl">
 <#include "common/sub-nav.ftl">
+<#include "common/index-nav.ftl">
 <!DOCTYPE html>
 <html>
     <head>
@@ -29,9 +30,14 @@
         </@head>
     </head>
     <body>
+    <div class="mobile-head">
         <#include "header.ftl">
+        <@indexNav "city"/>
+
+    </div>
+    <div style="height: 74px;width: 1px;" ></div>
         <div class="main">
-            <@subNav 'city/my' ''/>
+<#--            <@subNav 'city/my' ''/>-->
             <div class="content fn-clear">
                 <#if articles?size gt 0>
                 <div class="fn-clear">

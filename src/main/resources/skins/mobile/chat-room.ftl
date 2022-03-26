@@ -20,6 +20,7 @@
 -->
 <#include "macro-head.ftl">
 <#include "common/sub-nav.ftl">
+<#include "common/index-nav.ftl">
 <!DOCTYPE html>
 <html>
     <head>
@@ -29,9 +30,14 @@
         <link rel="stylesheet" href="${staticServePath}/css/viewer.min.css"/>
     </head>
     <body>
+    <div class="mobile-head">
         <#include "header.ftl">
+        <@indexNav "recent"/>
+
+    </div>
+    <div style="height: 74px;width: 1px;" ></div>
         <div class="main">
-            <@subNav 'community' ''/>
+<#--            <@subNav 'community' ''/>-->
             <div class="wrapper">
                 <div class="content chat-room">
                     <div class="discuss_title">

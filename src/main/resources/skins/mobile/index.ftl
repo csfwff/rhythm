@@ -133,6 +133,7 @@
     <li class="menu__item"><a class="title" style="text-decoration: none" id="yesterday" onclick="yesterday()">领取昨日活跃奖励</a>
     </li>
     <!--                    <li><a class="title" href="${servePath}/activity/1A0001">${activity1A0001Label}</a></li>-->
+    <li class="menu__item"><a class="title" href="${servePath}/cr">聊天室</a></li>
     <li class="menu__item"><a class="title" href="${servePath}/activity/character">${characterLabel}</a></li>
     <li class="menu__item"><a class="title" href="${servePath}/charge/point"><span
                     class="ft-red">❤</span>️ ${chargePointLabel}</a></li>

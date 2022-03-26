@@ -22,6 +22,7 @@
 <#include "macro-list.ftl">
 <#include "common/sub-nav.ftl">
 <#include "macro-pagination.ftl">
+<#include "common/index-nav.ftl">
 <!DOCTYPE html>
 <html>
 <head>
@@ -30,9 +31,14 @@
 </@head>
 </head>
 <body>
-<#include "header.ftl">
+<div class="mobile-head">
+    <#include "header.ftl">
+    <@indexNav "qna"/>
+
+</div>
+<div style="height: 74px;width: 1px;" ></div>
 <div class="main">
-    <@subNav 'qna' ''/>
+<#--    <@subNav 'qna' ''/>-->
     <div class="content fn-clear">
         <@list listData=latestArticles/>
         <@pagination url="${servePath}/recent"/>
