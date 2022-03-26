@@ -21,7 +21,11 @@
 <#macro indexNav type>
     <div class="index-top__nav">
         <a href="${servePath}/recent"<#if 'recent' == type> class="item--current"</#if>>最新</a>
-        <a href="${servePath}/domains"<#if 'domains' == type> class="item--current"</#if>>领域</a>
+        <#list domains as domian>
+            <#if domian_index == 0>
+                <a href="${servePath}/domain/${domian.domainURI}"<#if 'domains' == type> class="item--current"</#if>>领域</a>
+            </#if>
+        </#list>
         <a href="${servePath}/qna"<#if 'qna' == type> class="item--current"</#if>>问答</a>
         <#if isLoggedIn && "" != currentUser.userCity>
             <a href="${servePath}/city/my"<#if 'city' == type> class="item--current"</#if>>${currentUser.userCity}</a>
