@@ -34,19 +34,18 @@ import org.b3log.latke.ioc.Inject;
 import org.b3log.latke.ioc.Singleton;
 import org.b3log.latke.model.Pagination;
 import org.b3log.latke.service.LangPropsService;
+import org.b3log.latke.util.CollectionUtils;
 import org.b3log.latke.util.Locales;
 import org.b3log.latke.util.Paginator;
 import org.b3log.latke.util.Stopwatchs;
 import org.b3log.symphony.Server;
 import org.b3log.symphony.cache.ArticleCache;
-import org.b3log.symphony.model.Article;
-import org.b3log.symphony.model.Common;
-import org.b3log.symphony.model.Pointtransfer;
-import org.b3log.symphony.model.UserExt;
+import org.b3log.symphony.model.*;
 import org.b3log.symphony.processor.middleware.AnonymousViewCheckMidware;
 import org.b3log.symphony.processor.middleware.LoginCheckMidware;
 import org.b3log.symphony.service.*;
 import org.b3log.symphony.util.*;
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.io.InputStream;
@@ -135,6 +134,12 @@ public class IndexProcessor {
     private ArticleCache articleCache;
 
     /**
+     * Breezemoon query service.
+     */
+    @Inject
+    private BreezemoonQueryService breezemoonQueryService;
+
+    /**
      * Register request handlers.
      */
     public static void register() {
@@ -160,6 +165,52 @@ public class IndexProcessor {
         Dispatcher.get("/games/evolve/", indexProcessor::showEvolve, loginCheck::handle);
         Dispatcher.get("/user/checkedIn", indexProcessor::isCheckedIn, loginCheck::handle);
         Dispatcher.get("/oldAlmanac", indexProcessor::showOldAlmanac, anonymousViewCheckMidware::handle);
+        Dispatcher.get("/breezemoons", indexProcessor::showBreezemoons, anonymousViewCheckMidware::handle);
+    }
+
+    /**
+     * 清风明月大列表
+     */
+    public void showBreezemoons(final RequestContext context) {
+        final Request request = context.getRequest();
+
+        final AbstractFreeMarkerRenderer renderer = new SkinRenderer(context, "breezemoons.ftl");
+        final Map<String, Object> dataModel = renderer.getDataModel();
+        final int pageNum = Paginator.getPage(request);
+        final int pageSize = 60;
+        final int windowSize = 15;
+
+        final JSONObject requestJSONObject = new JSONObject();
+        requestJSONObject.put(Pagination.PAGINATION_CURRENT_PAGE_NUM, pageNum);
+        requestJSONObject.put(Pagination.PAGINATION_PAGE_SIZE, pageSize);
+        requestJSONObject.put(Pagination.PAGINATION_WINDOW_SIZE, windowSize);
+
+        final List<String> fields = new ArrayList<>();
+        fields.add(Keys.OBJECT_ID);
+        fields.add(Breezemoon.BREEZEMOON_CONTENT);
+        fields.add(Breezemoon.BREEZEMOON_CREATED);
+        fields.add(Breezemoon.BREEZEMOON_AUTHOR_ID);
+        final JSONObject result = breezemoonQueryService.getBreezemoons(requestJSONObject, fields);
+        final List<JSONObject> bms = (List<JSONObject>) result.opt(Breezemoon.BREEZEMOONS);
+        breezemoonQueryService.organizeBreezemoons("", bms);
+        dataModel.put(Breezemoon.BREEZEMOONS, bms);
+
+        final JSONObject pagination = result.optJSONObject(Pagination.PAGINATION);
+        final int pageCount = pagination.optInt(Pagination.PAGINATION_PAGE_COUNT);
+        final JSONArray pageNums = pagination.optJSONArray(Pagination.PAGINATION_PAGE_NUMS);
+        dataModel.put(Pagination.PAGINATION_FIRST_PAGE_NUM, pageNums.opt(0));
+        dataModel.put(Pagination.PAGINATION_LAST_PAGE_NUM, pageNums.opt(pageNums.length() - 1));
+        dataModel.put(Pagination.PAGINATION_CURRENT_PAGE_NUM, pageNum);
+        dataModel.put(Pagination.PAGINATION_PAGE_COUNT, pageCount);
+        dataModel.put(Pagination.PAGINATION_PAGE_NUMS, CollectionUtils.jsonArrayToList(pageNums));
+
+        dataModelService.fillHeaderAndFooter(context, dataModel);
+        dataModelService.fillRandomArticles(dataModel);
+        dataModelService.fillSideHotArticles(dataModel);
+        dataModelService.fillSideTags(dataModel);
+        dataModelService.fillLatestCmts(dataModel);
+
+        dataModel.put(Common.CURRENT, StringUtils.substringAfter(context.requestURI(), "/recent"));
     }
 
     /**
