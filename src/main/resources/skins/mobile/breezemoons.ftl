@@ -28,14 +28,12 @@
         <@head title="${breezemoonLabel} - ${symphonyLabel}">
         <meta name="description" content="${symDescriptionLabel}"/>
         </@head>
-        <link rel="stylesheet" href="${staticServePath}/css/index.css?${staticResourceVersion}" />
     </head>
     <body>
         <#include "header.ftl">
         <div class="main">
             <div class="wrapper">
                 <div class="content fn-clear" id="recent-pjax-container">
-                    <#if pjax><!---- pjax {#recent-pjax-container} start ----></#if>
                     <#if 0 < breezemoons?size>
                         <div class="module">
                             <div class="article-list list">
@@ -62,18 +60,14 @@
                             </div>
                         </div>
                     </#if>
-                    <div class="module">
-                        <@pagination url="${servePath}/breezemoons${current}" pjaxTitle="${breezemoonLabel} - ${symphonyLabel}"/>
-                    </div>
-                    <#if pjax><!---- pjax {#recent-pjax-container} end ----></#if>
                 </div>
+                <@pagination url="${servePath}/breezemoons"/>
 
                 <div class="side">
                     <#include "side.ftl">
                 </div>
             </div>
         </div>
-        <#include "common/domains.ftl">
         <#include "footer.ftl">
         <@listScript/>
         <script>
