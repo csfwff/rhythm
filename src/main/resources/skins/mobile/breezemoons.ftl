@@ -22,6 +22,7 @@
 <#include "macro-list.ftl">
 <#include "macro-pagination.ftl">
 <#include "common/title-icon.ftl">
+<#include "common/index-nav.ftl">
 <!DOCTYPE html>
 <html>
 <head>
@@ -32,6 +33,11 @@
 <body>
 <#include "header.ftl">
 <div class="main">
+    <div class="mobile-head">
+        <#include "header.ftl">
+        <@indexNav "breezemoons"/>
+    </div>
+    <div style="height: 30px;width: 1px;" ></div>
     <div class="content fn-clear">
         <br>
         <#if 0 < breezemoons?size>

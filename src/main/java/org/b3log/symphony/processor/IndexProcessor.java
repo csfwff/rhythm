@@ -177,7 +177,7 @@ public class IndexProcessor {
         final AbstractFreeMarkerRenderer renderer = new SkinRenderer(context, "breezemoons.ftl");
         final Map<String, Object> dataModel = renderer.getDataModel();
         final int pageNum = Paginator.getPage(request);
-        final int pageSize = 25;
+        final int pageSize = 32;
         final int windowSize = 15;
 
         final JSONObject result = breezemoonQueryService.getBreezemoons("", "", pageNum, pageSize, windowSize);

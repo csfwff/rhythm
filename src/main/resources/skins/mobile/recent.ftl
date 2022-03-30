@@ -30,7 +30,7 @@
         <meta name="description" content="${symDescriptionLabel}"/>
         </@head>
     </head>
-    <body >
+    <body>
         <div class="mobile-head">
             <#include "header.ftl">
             <@indexNav "recent"/>
