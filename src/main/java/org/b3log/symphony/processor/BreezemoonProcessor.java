@@ -201,10 +201,15 @@ public class BreezemoonProcessor {
             return;
         }
 
+        JSONObject user = Sessions.getUser();
+        try {
+            user = ApiProcessor.getUserByKey(requestJSONObject.optString("apiKey"));
+        } catch (NullPointerException ignored) {
+        }
+
         final JSONObject breezemoon = new JSONObject();
         final String breezemoonContent = requestJSONObject.optString(Breezemoon.BREEZEMOON_CONTENT);
         breezemoon.put(Breezemoon.BREEZEMOON_CONTENT, breezemoonContent);
-        final JSONObject user = Sessions.getUser();
         final String authorId = user.optString(Keys.OBJECT_ID);
         breezemoon.put(Breezemoon.BREEZEMOON_AUTHOR_ID, authorId);
         final String ip = Requests.getRemoteAddr(request);
