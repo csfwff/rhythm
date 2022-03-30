@@ -473,7 +473,7 @@
 
             <div class="index-recent fn-flex-1">
                 <div class="index-head-title">
-                    <div style="float:left;font-size:13px;margin:5px 0 10px 0; font-weight:bold;">清风明月</div>
+                    <div style="float:left;font-size:13px;margin:5px 0 10px 0; font-weight:bold;cursor: pointer" onclick="location.href='${servePath}/breezemoons'">清风明月</div>
                     <a href="${servePath}/article/1630938317106" title="清风明月是什么？"
                        style="float: right; margin: 5px 0 10px 0">
                         <svg>

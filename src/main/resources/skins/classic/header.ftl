@@ -33,7 +33,7 @@
         <a pjax-title="${breezemoonLabel} - ${symphonyLabel}"
            href="${servePath}/breezemoons"<#if selected?? && 'breezemoons' == selected> class="current"</#if>>
             <svg>
-                <use xlink:href="#refresh"></use>
+                <use xlink:href="#breezemoons"></use>
             </svg> ${breezemoonLabel}</a>
         <a pjax-title="${qnaLabel} - ${symphonyLabel}"
            href="${servePath}/qna"<#if selected?? && 'qna' == selected> class="current"</#if>>

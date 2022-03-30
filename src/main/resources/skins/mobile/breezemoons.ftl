@@ -46,18 +46,23 @@
                     <ul class="stick">
                         <#list breezemoons as bm>
                             <li>
-                                <div class="fn-clear ft-smaller list-info">
-                                    <a class="ft-a-title" data-id="${bm.oId}" rel="bookmark"
-                                       href="${servePath}/member/${bm.breezemoonAuthorName}">
-                                        ${bm.breezemoonAuthorName}</a>
-                                    <span class="fn-right ft-fade">
-                                                ${bm.timeAgo}
-                                            </span>
-                                </div>
                                 <div class="fn-flex">
                                     <div class="fn-flex-1">
-                                        <a style="color: #3b3b3b" class="abstract"
-                                           href="${servePath}/member/${bm.breezemoonAuthorName}/breezemoons/${bm.oId}">
+                                        <div class="fn-flex">
+                                            <a rel="nofollow" href="${servePath}/member/${bm.breezemoonAuthorName}"><div class="avatar" aria-label="${bm.breezemoonAuthorName}" style="background-image:url('${bm.breezemoonAuthorThumbnailURL48}')"></div></a>
+                                            <div class="fn-ellipsis ft-fade ft-smaller list-info">
+                                                <a rel="nofollow" class="author" href="${servePath}/member/${bm.breezemoonAuthorName}">
+                                                    ${bm.breezemoonAuthorName}
+                                                </a>
+                                                <br>
+                                                ${bm.timeAgo}
+                                                <#if "" != bm.breezemoonCity>
+                                                    <a href="${servePath}/city/${bm.breezemoonCity}" target="_blank" class="ft-gray" rel="nofollow">${bm.breezemoonCity}</a>
+                                                </#if>
+                                                <br>
+                                            </div>
+                                        </div>
+                                        <a style="color: #3b3b3b" class="abstract" href="${servePath}/member/${bm.breezemoonAuthorName}/breezemoons/${bm.oId}">
                                             ${bm.breezemoonContent}
                                         </a>
                                     </div>
