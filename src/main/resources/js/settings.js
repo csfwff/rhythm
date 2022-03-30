@@ -973,6 +973,7 @@ var Settings = {
           case 'success':
           case 'cache':
             $('.home-menu a').removeClass('current')
+            Util.listenUserCard()
             switch (location.pathname) {
               case '/member/' + Label.userName:
               case '/member/' + Label.userName + '/comments':

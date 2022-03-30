@@ -91,6 +91,7 @@
         callback: function () {
             Util.parseMarkdown()
             Util.parseHljs()
+            Util.listenUserCard()
         },
     })
     NProgress.configure({showSpinner: false})

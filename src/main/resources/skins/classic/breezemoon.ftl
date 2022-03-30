@@ -55,6 +55,7 @@
                                 <a class="avatar"
                                    style="background-image:url('${item.breezemoonAuthorThumbnailURL48}')"
                                    rel="nofollow" href="${servePath}/member/${item.breezemoonAuthorName}"
+                                   aria-label="${item.breezemoonAuthorName}"
                                 >
                                 </a>
                                 <div class="fn-flex-1">
@@ -125,7 +126,8 @@
             return 0 > href.indexOf('${servePath}/watch')
         },
         callback: function () {
-            Breezemoon.init()
+            Breezemoon.init();
+            Util.listenUserCard();
         },
     })
     NProgress.configure({showSpinner: false})

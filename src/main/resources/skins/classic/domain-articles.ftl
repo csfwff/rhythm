@@ -93,7 +93,8 @@
                                 }
                             });
                             Util.parseMarkdown();
-                            Util.parseHljs()
+                            Util.parseHljs();
+                            Util.listenUserCard();
                         case 'error':
                             break;
                         case 'hash':

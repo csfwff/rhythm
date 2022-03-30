@@ -74,7 +74,8 @@
             return 0 > href.indexOf('${servePath}/watch')
         },
         callback: function () {
-            Breezemoon.init()
+            Breezemoon.init();
+            Util.listenUserCard();
         },
     })
     NProgress.configure({showSpinner: false})
