@@ -23,45 +23,46 @@
 <#include "common/index-nav.ftl">
 <!DOCTYPE html>
 <html>
-    <head>
-        <@head title="${domainLabel} - ${symphonyLabel}">
+<head>
+    <@head title="${domainLabel} - ${symphonyLabel}">
         <meta name="description" content="${symDescriptionLabel}"/>
-        </@head>
-    </head>
-    <body>
-    <div class="mobile-head">
-        <#include "header.ftl">
-<#--        <@indexNav "domains"/>-->
-        <div class="index-top__nav">
-            <a href="${servePath}/domains">${domainCnt} Domains</a>
-            <a href="${servePath}/tags">${tagCnt} Tags</a>
-        </div>
+    </@head>
+</head>
+<body>
+<div class="mobile-head">
+    <#include "header.ftl">
+    <@indexNav "domains"/>
 
-    </div>
-    <div style="height: 74px;width: 1px;" ></div>
-        <div class="main">
-                <div class="content fn-clear">
-                    <#list allDomains as domain>
-                    <div class="module" style="margin-bottom: 0px;">
-                        <div class="module-header">
-                            <h2>${domain.domainTitle}</h2>
-                            <a class="ft-gray fn-right" rel="nofollow" href="${servePath}/domain/${domain.domainURI}">${domain.domainTags?size} Tags</a>
-                        </div>
-                        <div class="module-panel">
-                            <ul class="tags fn-clear" style="margin: 0px">
-                                <#list domain.domainTags as tag>
+</div>
+<div style="height: 74px;width: 1px;" ></div>
+<div class="main">
+    <div class="wrapper">
+        <div class='domains-count'>
+            Domains: <b>${domainCnt}</b><br/>
+            Tags: <b>${tagCnt}</b>
+        </div>
+        <div class="content fn-clear">
+            <#list allDomains as domain>
+                <div class="module">
+                    <div class="module-header">
+                        <h2>${domain.domainTitle}</h2>
+                        <a class="ft-gray fn-right" rel="nofollow" href="${servePath}/domain/${domain.domainURI}">${domain.domainTags?size} Tags</a>
+                    </div>
+                    <div class="module-panel">
+                        <ul class="tags fn-clear">
+                            <#list domain.domainTags as tag>
                                 <li>
                                     <a class="tag" rel="nofollow" href="${servePath}/tag/${tag.tagURI}">${tag.tagTitle}</a>
                                 </li>
-                                </#list>
-                            </ul>
-                        </div>
+                            </#list>
+                        </ul>
                     </div>
-                    </#list>
                 </div>
-                <div class="side">
-                    <#if showSideAd>
-                    <#if ADLabel!="">
+            </#list>
+        </div>
+        <div class="side">
+            <#if showSideAd>
+                <#if ADLabel!="">
                     <div class="module">
                         <div class="module-header">
                             <h2>
@@ -73,12 +74,12 @@
                             ${ADLabel}
                         </div>
                     </div>
-                    </#if>
-                    </#if>
-                </div>
-
+                </#if>
+            </#if>
         </div>
-        <#include "footer.ftl">
-        <@listScript/>
-    </body>
+    </div>
+</div>
+<#include "footer.ftl">
+<@listScript/>
+</body>
 </html>

@@ -22,7 +22,6 @@
 <#include "macro-list.ftl">
 <#include "macro-pagination.ftl">
 <#include "common/sub-nav.ftl">
-<#include "common/index-nav.ftl">
 <!DOCTYPE html>
 <html>
 <head>
@@ -33,18 +32,9 @@
     ${domain.domainCSS}
 </head>
 <body>
-<div class="mobile-head">
-    <#include "header.ftl">
-    <@indexNav "domains"/>
-</div>
-<div style="height: 74px;width: 1px;" ></div>
-<div class="recent__nav">
-    <#list domains as domainItem>
-        <a pjax-title="${domainItem.domainTitle} - ${domainLabel} - ${symphonyLabel}" href="${servePath}/domain/${domainItem.domainURI}" class="recent__nav-item <#if domainItem.domainURI == domain.domainURI>recent__nav-check</#if>">${domainItem.domainTitle}</a>
-    </#list>
-</div>
+<#include "header.ftl">
 <div class="main">
-    <#--            <@subNav '' '${domain.domainURI}'/>-->
+    <@subNav '' '${domain.domainURI}'/>
     <div class="content fn-clear">
         <@list listData=latestArticles/>
         <@pagination url="${servePath}/domain/${domain.domainURI}"/>

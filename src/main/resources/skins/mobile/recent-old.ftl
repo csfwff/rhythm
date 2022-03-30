@@ -20,31 +20,25 @@
 -->
 <#include "macro-head.ftl">
 <#include "macro-list.ftl">
-<#include "common/index-nav.ftl">
+<#include "common/sub-nav.ftl">
+<#include "macro-pagination.ftl">
 <!DOCTYPE html>
-<html lang="zh-cmn-Hans">
-    <head>
-        <@head title="${followLabel} - ${symphonyLabel}">
+<html>
+<head>
+    <@head title="${latestLabel} - ${symphonyLabel}">
         <meta name="description" content="${symDescriptionLabel}"/>
-        </@head>
-    </head>
-    <body>
-    <div class="mobile-head">
-        <#include "header.ftl">
-        <@indexNav "watch"/>
-
-    </div>
-    <div style="height: 74px;width: 1px;" ></div>
-        <div class="main">
-            <div class="content fn-clear">
-                    <div class="domains fn-flex">
-                        <a class="<#if "" == current>selected</#if>" href="${servePath}/watch">${followingTagsLabel}</a>
-                        <a class="<#if "/users" == current>selected</#if>" href="${servePath}/watch/users">${followingUsersLabel}</a>
-                        <a class="<#if "/breezemoon" == current>selected</#if>" href="${servePath}/watch/breezemoons">${breezemoonLabel}</a>
-                    </div>
-                <@list listData=watchingArticles/>
-            </div>
-            <#if domains?size != 0>
+    </@head>
+</head>
+<body>
+<#include "header.ftl">
+<div class="main">
+    <@subNav 'recent' ''/>
+    <div class="content fn-clear">
+        <@list listData=stickArticles/>
+        <@list listData=latestArticles/>
+        <@pagination url="${servePath}/recent"/>
+        <#if domains?size != 0>
+            <div class="wrapper">
                 <div class="module">
                     <div class="module-header">
                         <h2>${domainNavLabel}</h2>
@@ -67,10 +61,14 @@
                         </ul>
                     </div>
                 </div>
-            </#if>
-            <#include "side.ftl">
-        </div>
-        <#include "footer.ftl">
-        <@listScript/>
-    </body>
+            </div>
+        </#if>
+    </div>
+    <div class="side wrapper">
+        <#include "side.ftl">
+    </div>
+</div>
+<#include "footer.ftl">
+<@listScript/>
+</body>
 </html>
