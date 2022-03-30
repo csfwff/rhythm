@@ -177,22 +177,11 @@ public class IndexProcessor {
         final AbstractFreeMarkerRenderer renderer = new SkinRenderer(context, "breezemoons.ftl");
         final Map<String, Object> dataModel = renderer.getDataModel();
         final int pageNum = Paginator.getPage(request);
-        final int pageSize = 60;
+        final int pageSize = 25;
         final int windowSize = 15;
 
-        final JSONObject requestJSONObject = new JSONObject();
-        requestJSONObject.put(Pagination.PAGINATION_CURRENT_PAGE_NUM, pageNum);
-        requestJSONObject.put(Pagination.PAGINATION_PAGE_SIZE, pageSize);
-        requestJSONObject.put(Pagination.PAGINATION_WINDOW_SIZE, windowSize);
-
-        final List<String> fields = new ArrayList<>();
-        fields.add(Keys.OBJECT_ID);
-        fields.add(Breezemoon.BREEZEMOON_CONTENT);
-        fields.add(Breezemoon.BREEZEMOON_CREATED);
-        fields.add(Breezemoon.BREEZEMOON_AUTHOR_ID);
-        final JSONObject result = breezemoonQueryService.getBreezemoons(requestJSONObject, fields);
+        final JSONObject result = breezemoonQueryService.getBreezemoons("", "", pageNum, pageSize, windowSize);
         final List<JSONObject> bms = (List<JSONObject>) result.opt(Breezemoon.BREEZEMOONS);
-        breezemoonQueryService.organizeBreezemoons("", bms);
         dataModel.put(Breezemoon.BREEZEMOONS, bms);
 
         final JSONObject pagination = result.optJSONObject(Pagination.PAGINATION);

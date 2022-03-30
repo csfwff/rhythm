@@ -238,7 +238,7 @@ public class BreezemoonQueryService {
         } else {
             filter = CompositeFilterOperator.and(new PropertyFilter(Breezemoon.BREEZEMOON_AUTHOR_ID, FilterOperator.NOT_EQUAL, authorId), statusFilter);
         }
-        final Query query = new Query().setFilter(filter).addSort(Keys.OBJECT_ID, SortDirection.DESCENDING).setPage(page, 20);
+        final Query query = new Query().setFilter(filter).addSort(Keys.OBJECT_ID, SortDirection.DESCENDING).setPage(page, pageSize);
         JSONObject result;
         try {
             result = breezemoonRepository.get(query);
