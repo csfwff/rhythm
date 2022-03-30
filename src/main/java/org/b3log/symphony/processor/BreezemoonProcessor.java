@@ -109,7 +109,7 @@ public class BreezemoonProcessor {
 
         final BreezemoonProcessor breezemoonProcessor = beanManager.getReference(BreezemoonProcessor.class);
         Dispatcher.get("/watch/breezemoons", breezemoonProcessor::showWatchBreezemoon, loginCheck::handle, csrfMidware::fill);
-        Dispatcher.post("/breezemoon", breezemoonProcessor::addBreezemoon, loginCheck::handle, csrfMidware::check, permissionMidware::check);
+        Dispatcher.post("/breezemoon", breezemoonProcessor::addBreezemoon, loginCheck::handle, permissionMidware::check);
         Dispatcher.put("/breezemoon/{id}", breezemoonProcessor::updateBreezemoon, loginCheck::handle, csrfMidware::check, permissionMidware::check);
         Dispatcher.delete("/breezemoon/{id}", breezemoonProcessor::removeBreezemoon, loginCheck::handle, csrfMidware::check, permissionMidware::check);
         Dispatcher.get("/api/breezemoons", breezemoonProcessor::getBreezemoons, anonymousViewCheckMidware::handle);
