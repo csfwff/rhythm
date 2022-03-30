@@ -34,8 +34,8 @@
         <#include "header.ftl">
         <div class="main">
             <div class="wrapper">
-                <div class="content fn-clear" id="recent-pjax-container">
-                    <#if pjax><!---- pjax {#recent-pjax-container} start ----></#if>
+                <div class="content fn-clear" id="breezemoons-pjax-container">
+                    <#if pjax><!---- pjax {#breezemoons-pjax-container} start ----></#if>
                     <#if 0 < breezemoons?size>
                         <div class="module">
                             <div class="article-list list">
@@ -65,7 +65,7 @@
                     <div class="module">
                         <@pagination url="${servePath}/breezemoons${current}" pjaxTitle="${breezemoonLabel} - ${symphonyLabel}"/>
                     </div>
-                    <#if pjax><!---- pjax {#recent-pjax-container} end ----></#if>
+                    <#if pjax><!---- pjax {#breezemoons-pjax-container} end ----></#if>
                 </div>
 
                 <div class="side">
@@ -79,7 +79,7 @@
         <script>
             $.pjax({
                 selector: 'a',
-                container: '#recent-pjax-container',
+                container: '#breezemoons-pjax-container',
                 show: '',
                 cache: false,
                 storage: true,
@@ -93,10 +93,10 @@
                 }
             });
             NProgress.configure({ showSpinner: false });
-            $('#recent-pjax-container').bind('pjax.start', function(){
+            $('#breezemoons-pjax-container').bind('pjax.start', function(){
                 NProgress.start();
             });
-            $('#recent-pjax-container').bind('pjax.end', function(){
+            $('#breezemoons-pjax-container').bind('pjax.end', function(){
                 NProgress.done();
             });
         </script>

@@ -200,6 +200,7 @@ public class IndexProcessor {
         dataModelService.fillLatestCmts(dataModel);
 
         dataModel.put(Common.CURRENT, StringUtils.substringAfter(context.requestURI(), "/recent"));
+        dataModel.put(Common.SELECTED, Breezemoon.BREEZEMOONS);
     }
 
     /**
