@@ -314,6 +314,11 @@ public class NotificationProcessor {
                 notificationMgmtService.makeRead(userId, Notification.DATA_TYPE_C_INVITATION_LINK_USED);
                 notificationMgmtService.makeRead(userId, Notification.DATA_TYPE_C_POINT_REPORT_HANDLED);
                 break;
+            case "sys-announce":
+                notificationMgmtService.makeRead(userId, Notification.DATA_TYPE_C_SYS_ANNOUNCE_ARTICLE);
+                notificationMgmtService.makeRead(userId, Notification.DATA_TYPE_C_SYS_ANNOUNCE_NEW_USER);
+                notificationMgmtService.makeRead(userId, Notification.DATA_TYPE_C_SYS_ANNOUNCE_ROLE_CHANGED);
+                break;
             default:
                 context.renderJSON(StatusCodes.ERR);
                 return;
