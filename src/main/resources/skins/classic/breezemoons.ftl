@@ -96,7 +96,8 @@
                 },
                 callback: function () {
                     Util.parseMarkdown();
-                    Util.parseHljs()
+                    Util.parseHljs();
+                    Util.listenUserCard();
                 }
             });
             NProgress.configure({ showSpinner: false });
