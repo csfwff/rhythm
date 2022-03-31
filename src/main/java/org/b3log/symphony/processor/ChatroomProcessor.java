@@ -264,157 +264,173 @@ public class ChatroomProcessor {
             } else {
                 recivers = new JSONArray(redPacket.optString("recivers"));
             }
+            if (redPacket.has("gesture")) {
+                info.put("gesture", redPacket.optInt("gesture"));
+            }
 
             String msgType = redPacket.optString("msgType");
-            if (msgType.equals("redPacket")) {
-                // 红包正常，可以抢了
-                int money = redPacket.optInt("money");
-                int countMoney = money;
-                int count = redPacket.optInt("count");
-                int got = redPacket.optInt("got");
-                JSONArray who = redPacket.optJSONArray("who");
-                // 根据抢的人数判断是否已经抢光了
-                if (got >= count) {
+            if (!msgType.equals("redPacket") || !redPacket.has("type")) {
+                context.renderJSON(StatusCodes.ERR).renderMsg("红包非法");
+                return;
+            }
+            // 红包正常，可以抢了
+            int money = redPacket.optInt("money");
+            int countMoney = money;
+            int count = redPacket.optInt("count");
+            int got = redPacket.optInt("got");
+            JSONArray who = redPacket.optJSONArray("who");
+            // 根据抢的人数判断是否已经抢光了
+            if (got >= count) {
+                context.renderJSON(new JSONObject().put("who", who).put("info", info).put("recivers", recivers));
+                return;
+            }
+            // 开始领取红包
+            int meGot = 0;
+            if ("average".equals(redPacket.getString("type"))) {
+                // 普通红包逻辑
+                if (redPacketIsOpened(who, userId)) {
+                    context.renderJSON(new JSONObject().put("who", who).put("info", info));
+                    return;
+                }
+                meGot = money;
+            } else if ("specify".equals(redPacket.getString("type"))) {
+                //专属红包逻辑
+                final boolean isReciver = recivers.toList().stream().anyMatch(x -> {
+                    final String reciver = (String) x;
+                    return reciver.equals(userName);
+                });
+                if (!isReciver) {
                     context.renderJSON(new JSONObject().put("who", who).put("info", info).put("recivers", recivers));
                     return;
                 }
-                // 开始领取红包
-                int meGot = 0;
-                if (redPacket.has("type") && "average".equals(redPacket.getString("type"))) {
-                    // 普通红包逻辑
-                    for (Object o : who) {
-                        JSONObject currentWho = (JSONObject) o;
-                        String uId = currentWho.optString("userId");
-                        if (uId.equals(userId)) {
-                            context.renderJSON(new JSONObject().put("who", who).put("info", info));
-                            return;
-                        }
-                    }
-                    meGot = money;
-                } else if (redPacket.has("type") && "specify".equals(redPacket.getString("type"))) {
-                    //专属红包逻辑
-                    final boolean isReciver = recivers.toList().stream().anyMatch(x -> {
-                        final String reciver = (String) x;
-                        if (reciver.equals(userName)) {
-                            return true;
-                        } else {
-                            return false;
-                        }
-                    });
-                    if (!isReciver) {
-                        context.renderJSON(new JSONObject().put("who", who).put("info", info).put("recivers", recivers));
-                        return;
-                    }
-                    for (Object o : who) {
-                        JSONObject currentWho = (JSONObject) o;
-                        String uId = currentWho.optString("userId");
-                        if (uId.equals(userId)) {
-                            context.renderJSON(new JSONObject().put("who", who).put("info", info).put("recivers", recivers));
-                            return;
-                        }
-                    }
-                    meGot = money;
-                } else if (redPacket.has("type") && "random".equals(redPacket.getString("type"))) {
-                    boolean hasZero = false;
-                    for (Object o : who) {
-                        JSONObject currentWho = (JSONObject) o;
-                        String uId = currentWho.optString("userId");
-                        if (uId.equals(userId)) {
-                            context.renderJSON(new JSONObject().put("who", who).put("info", info));
-                            return;
-                        }
-                        int userMoney = currentWho.optInt("userMoney");
-                        if (userMoney == 0) {
-                            hasZero = true;
-                        }
-                        money -= userMoney;
-                    }
-                    if (RED_PACKET_BUCKET.isEmpty() || !RED_PACKET_BUCKET.containsKey(oId)) {
-                        //服务器重启或者宕机导致的红包缓存失效，走原来的逻辑
-                        // 随机一个红包金额 1-N
-                        Random random = new Random();
-                        // 如果是最后一个红包了，给他一切
-                        int coefficient = 2;
-                        if ((countMoney / 2) <= money) {
-                            coefficient = 1;
-                        }
-                        if (money > 0) {
-                            if (count == got + 1) {
-                                meGot = money;
-                            } else {
-                                if (!hasZero) {
-                                    meGot = random.nextInt((money / coefficient) + 1);
-                                } else {
-                                    meGot = random.nextInt((money / coefficient) + 1) + 1;
-                                }
-                            }
-                        }
-                    } else {
-                        meGot = RED_PACKET_BUCKET.get(oId).packs.poll();
-                    }
-                } else {
-                    for (Object o : who) {
-                        JSONObject currentWho = (JSONObject) o;
-                        String uId = currentWho.optString("userId");
-                        if (uId.equals(userId)) {
-                            context.renderJSON(new JSONObject().put("who", who).put("info", info));
-                            return;
-                        }
-                    }
-                    if (!RED_PACKET_BUCKET.containsKey(oId)) {
-                        context.renderJSON(StatusCodes.ERR).renderMsg("红包失效");
-                        return;
-                    }
-                    meGot = RED_PACKET_BUCKET.get(oId).packs.poll();
-                }
-                // 随机成功了
-                // 修改聊天室数据库
-                JSONObject source = new JSONObject(chatRoomService.getChatMsg(oId).optString("content"));
-                JSONObject source2 = new JSONObject(source.optString("content"));
-                source2.put("got", got + 1);
-                JSONArray source3 = source2.optJSONArray("who");
-                source3.put(new JSONObject().put("userMoney", meGot).put("userId", userId).put("userName", userName).put("time", new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(System.currentTimeMillis())).put("avatar", userQueryService.getUser(userId).optString(UserExt.USER_AVATAR_URL)));
-                source2.put("who", source3);
-                source.put("content", source2);
-                final Transaction transaction = chatRoomRepository.beginTransaction();
-                chatRoomRepository.update(oId, new JSONObject().put("content", source.toString()));
-                transaction.commit();
-                // 把钱转给用户
-                final boolean succ = null != pointtransferMgmtService.transfer(Pointtransfer.ID_C_SYS, userId,
-                        Pointtransfer.TRANSFER_TYPE_C_ACTIVITY_RECEIVE_RED_PACKET,
-                        meGot, "", System.currentTimeMillis(), "");
-                if (!succ) {
-                    context.renderJSON(StatusCodes.ERR).renderMsg("发送积分失败");
+                if (redPacketIsOpened(who, userId)) {
+                    context.renderJSON(new JSONObject().put("who", who).put("info", info).put("recivers", recivers));
                     return;
                 }
-                info.put("got", redPacket.optInt("got") + 1);
-                context.renderJSON(new JSONObject().put("who", source3).put("info", info).put("recivers", recivers));
-                // 广播红包情况
-                JSONObject redPacketStatus = new JSONObject();
-                redPacketStatus.put(Common.TYPE, "redPacketStatus");
-                redPacketStatus.put("whoGive", source.optString(User.USER_NAME));
-                redPacketStatus.put("whoGot", userName);
-                redPacketStatus.put("got", got + 1);
-                redPacketStatus.put("count", count);
-                redPacketStatus.put("oId", oId);
-
-                if ("random".equals(redPacket.getString("type")) && redPacketStatus.optInt("got") == redPacketStatus.optInt("count")) {
-                    RED_PACKET_BUCKET.remove(oId);
-                } else if ("specify".equals(redPacket.getString("type"))) {
-                    // 通知标为已读
-                    notificationMgmtService.makeRead(currentUser.optString(Keys.OBJECT_ID), Notification.DATA_TYPE_C_RED_PACKET);
-                } else if ("random".equals(redPacket.getString("type")) && redPacketStatus.optInt("got") == redPacketStatus.optInt("count")) {
-                    RED_PACKET_BUCKET.remove(oId);
+                if (redPacketIsOpened(who, userId)) {
+                    context.renderJSON(new JSONObject().put("who", who).put("info", info).put("recivers", recivers));
+                    return;
                 }
-
-                ChatroomChannel.notifyChat(redPacketStatus);
+                meGot = money;
+            } else if ("random".equals(redPacket.getString("type"))) {
+                boolean hasZero = false;
+                for (Object o : who) {
+                    JSONObject currentWho = (JSONObject) o;
+                    String uId = currentWho.optString("userId");
+                    if (uId.equals(userId)) {
+                        context.renderJSON(new JSONObject().put("who", who).put("info", info));
+                        return;
+                    }
+                    int userMoney = currentWho.optInt("userMoney");
+                    if (userMoney == 0) {
+                        hasZero = true;
+                    }
+                    money -= userMoney;
+                }
+                if (RED_PACKET_BUCKET.isEmpty() || !RED_PACKET_BUCKET.containsKey(oId)) {
+                    //服务器重启或者宕机导致的红包缓存失效，走原来的逻辑
+                    // 随机一个红包金额 1-N
+                    Random random = new Random();
+                    // 如果是最后一个红包了，给他一切
+                    int coefficient = 2;
+                    if ((countMoney / 2) <= money) {
+                        coefficient = 1;
+                    }
+                    if (money > 0) {
+                        if (count == got + 1) {
+                            meGot = money;
+                        } else {
+                            if (!hasZero) {
+                                meGot = random.nextInt((money / coefficient) + 1);
+                            } else {
+                                meGot = random.nextInt((money / coefficient) + 1) + 1;
+                            }
+                        }
+                    }
+                } else {
+                    meGot = RED_PACKET_BUCKET.get(oId).packs.poll();
+                }
+            } else if ("rockPaperScissors".equals(redPacket.getString("type"))) {
+                if (sender.optString("oId").equals(userId)) {
+                    context.renderJSON(new JSONObject().put("who", who).put("info", info));
+                    return;
+                }
+                if (redPacketIsOpened(who, userId)) {
+                    context.renderJSON(new JSONObject().put("who", who).put("info", info));
+                    return;
+                }
+                int gesture = requestJSONObject.optInt("gesture", -1);
+                if (gesture < 0) {
+                    context.renderJSON(StatusCodes.ERR).renderMsg("红包失效");
+                    return;
+                }
+                int senderGesture = redPacket.optInt("gesture");
+                if (senderGesture - gesture == 1 || senderGesture - gesture == -2) {
+                    meGot = money;
+                } else if(senderGesture != gesture)  {
+                    meGot = -money * 2;
+                }
+            } else {
+                if (redPacketIsOpened(who, userId)) {
+                    context.renderJSON(new JSONObject().put("who", who).put("info", info));
+                    return;
+                }
+                if (!RED_PACKET_BUCKET.containsKey(oId)) {
+                    context.renderJSON(StatusCodes.ERR).renderMsg("红包失效");
+                    return;
+                }
+                meGot = RED_PACKET_BUCKET.get(oId).packs.poll();
+            }
+            // 随机成功了
+            // 修改聊天室数据库
+            JSONObject source = new JSONObject(chatRoomService.getChatMsg(oId).optString("content"));
+            JSONObject source2 = new JSONObject(source.optString("content"));
+            source2.put("got", got + 1);
+            JSONArray source3 = source2.optJSONArray("who");
+            source3.put(new JSONObject().put("userMoney", meGot).put("userId", userId).put("userName", userName).put("time", new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(System.currentTimeMillis())).put("avatar", userQueryService.getUser(userId).optString(UserExt.USER_AVATAR_URL)));
+            source2.put("who", source3);
+            source.put("content", source2);
+            final Transaction transaction = chatRoomRepository.beginTransaction();
+            chatRoomRepository.update(oId, new JSONObject().put("content", source.toString()));
+            transaction.commit();
+            // 把钱转给用户
+            final boolean succ = null != pointtransferMgmtService.transfer(Pointtransfer.ID_C_SYS, userId,
+                    Pointtransfer.TRANSFER_TYPE_C_ACTIVITY_RECEIVE_RED_PACKET,
+                    meGot, "", System.currentTimeMillis(), "");
+            if ("rockPaperScissors".equals(redPacket.getString("type")) && meGot <= 0) {
+                pointtransferMgmtService.transfer(Pointtransfer.ID_C_SYS, redPacket.optString("senderId"),
+                        Pointtransfer.TRANSFER_TYPE_C_ACTIVITY_RECEIVE_RED_PACKET,
+                        meGot < 0 ? money * 2 : money, "", System.currentTimeMillis(), "");
+            }
+            if (!succ) {
+                context.renderJSON(StatusCodes.ERR).renderMsg("发送积分失败");
                 return;
             }
+            info.put("got", redPacket.optInt("got") + 1);
+            context.renderJSON(new JSONObject().put("who", source3).put("info", info).put("recivers", recivers));
+            // 广播红包情况
+            JSONObject redPacketStatus = new JSONObject();
+            redPacketStatus.put(Common.TYPE, "redPacketStatus");
+            redPacketStatus.put("whoGive", source.optString(User.USER_NAME));
+            redPacketStatus.put("whoGot", userName);
+            redPacketStatus.put("got", got + 1);
+            redPacketStatus.put("count", count);
+            redPacketStatus.put("oId", oId);
+
+            if ("random".equals(redPacket.getString("type")) && redPacketStatus.optInt("got") == redPacketStatus.optInt("count")) {
+                RED_PACKET_BUCKET.remove(oId);
+            } else if ("specify".equals(redPacket.getString("type"))) {
+                // 通知标为已读
+                notificationMgmtService.makeRead(currentUser.optString(Keys.OBJECT_ID), Notification.DATA_TYPE_C_RED_PACKET);
+            } else if ("random".equals(redPacket.getString("type")) && redPacketStatus.optInt("got") == redPacketStatus.optInt("count")) {
+                RED_PACKET_BUCKET.remove(oId);
+            }
+
+            ChatroomChannel.notifyChat(redPacketStatus);
         } catch (Exception e) {
             context.renderJSON(StatusCodes.ERR).renderMsg("红包非法");
             LOGGER.log(Level.ERROR, "Open Red Packet failed on ChatRoomProcessor.");
         }
-        context.renderJSON(StatusCodes.ERR).renderMsg("红包非法");
     }
 
 
@@ -491,6 +507,15 @@ public class ChatroomProcessor {
                     try {
                         int toatlMoney = 0;
                         switch (type) {
+                            case "rockPaperScissors":
+                                int gesture = redpacket.optInt("gesture");
+                                if (gesture < 0 || gesture > 2) {
+                                    context.renderJSON(StatusCodes.ERR).renderMsg("数据不合法！");
+                                    return;
+                                }
+                                count = 1;
+                                toatlMoney = money;
+                                break;
                             case "average":
                                 toatlMoney = money * count;
                                 break;
@@ -537,6 +562,7 @@ public class ChatroomProcessor {
                     redPacketJSON.put("count", count);
                     redPacketJSON.put("msg", message);
                     redPacketJSON.put("recivers", recivers);
+                    redPacketJSON.put("gesture", redpacket.optString("gesture"));
                     // 已经抢了这个红包的人数
                     redPacketJSON.put("got", 0);
                     // 已经抢了这个红包的人以及抢到的金额
@@ -555,6 +581,10 @@ public class ChatroomProcessor {
                     }
                     transaction.commit();
                     switch (type) {
+                        case "rockPaperScissors":
+                            redPacketJSON.remove("gesture");
+                            msg.put(Common.CONTENT, redPacketJSON.toString());
+                            break;
                         case "heartbeat":
                             // 预分配红包
                             RED_PACKET_BUCKET.put(msg.optString("oId"), allocateHeartbeatRedPacket(msg.optString("oId"), userId, money, count, 3));
@@ -909,6 +939,17 @@ public class ChatroomProcessor {
         content = MediaPlayers.renderVideo(content);
 
         return content;
+    }
+
+    private boolean redPacketIsOpened(JSONArray who, String userId) {
+        for (Object o : who) {
+            JSONObject currentWho = (JSONObject) o;
+            String uId = currentWho.optString("userId");
+            if (uId.equals(userId)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private static RedPacket allocateHeartbeatRedPacket(String id, String sendId, int money, int count, int zeroCount) {

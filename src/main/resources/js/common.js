@@ -307,6 +307,10 @@ var Util = {
       $("#alertDialogPanel,.dialog-background").remove();
     }, 200);
   },
+
+  clearAlert() {
+    $("#alertDialogPanel,.dialog-background").remove();
+  },
   /**
    * @description alert
    * @param {String} content alert 内容
