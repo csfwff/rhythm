@@ -90,7 +90,8 @@ public class AlipayProcessor {
             if (context.param("note") != null) {
                 note = context.param("note");
             }
-
+            note = note.replaceAll("[^0-9a-zA-Z\\u4e00-\\u9fa5,，.。！!?？《》]", "");
+            note = note.substring(0, 32);
             JSONObject biz = new JSONObject();
             biz.put("out_trade_no", OUT_TRADE_NO);
             biz.put("total_amount", total_amount);
@@ -178,7 +179,6 @@ public class AlipayProcessor {
                 if (result.optJSONObject("alipay_trade_query_response").optString("code").equals("10000")) {
                     String total_amount = entry.getValue().optString("total_amount");
                     String note = entry.getValue().optString("note");
-                    note = note.replaceAll("[^0-9a-zA-Z\\u4e00-\\u9fa5,，.。！!?？《》]", "");
                     String userId = entry.getValue().optString("userId");
                     // 添加捐助信息
                     final BeanManager beanManager = BeanManager.getInstance();

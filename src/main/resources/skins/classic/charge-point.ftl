@@ -29,26 +29,58 @@
 </head>
 <body>
 <#include "header.ftl">
+<style>
+    input {
+        background-color: var(--background-secondary-color);
+        border: 1px solid var(--input-border-color);
+        border-radius: 3px;
+        box-shadow: inset 0 1px 2px rgb(27 31 35 / 8%);
+        box-sizing: border-box;
+        color: var(--text-color);
+        line-height: 20px;
+        padding: 7px 8px;
+        width: 100%;
+    }
+
+    input:focus {
+        border: 1px solid #4285f4;
+        box-shadow: inset 0 1px 2px rgb(27 31 35 / 8%), 0 0 0 0.2em #dbedff;
+    }
+</style>
 <div class="main">
     <div class="wrapper">
         <div class="content">
             <div class="module">
                 <h2 class="sub-head"><span class="ft-red">❤</span> 捐助摸鱼派</h2>
-                <div style="padding: 15px">
+                <div style="padding: 15px 50px">
                     <p>鱼油你好！摸鱼派是由<a href="https://github.com/Programming-With-Love" target="_blank">用爱发电开源组织</a>衍生的科技社区。我们希望构建一个属于科技爱好者们、以<b>摸鱼</b>为社区精神的综合性社区。</p>
                     <p>摸鱼派的运营资金由 <em>摸鱼派管理组</em> 自掏腰包，如果你喜欢摸鱼派的氛围，欢迎通过捐助支持我们继续运营下去！你捐助的所有资金，我们都会在当前页面公示，收到的资金会被<b>完全用于摸鱼派的社区运营</b> :)</p><br>
-                    <p style="color: rgba(205,80,0,0.91)"><b>请一定要在扫码时填写备注</b> <em>你的社区用户名+写给我们的话</em>，不要当不留名的雷锋哦！作为答谢，我们会向你的摸鱼派账号赠送对应的积分 😄 积分赠送标准为80积分/1元，<b>请不要为了充积分而捐助哦！</b></p><br>
+                    <p style="color: rgba(205,80,0,0.91)">感谢你的捐助！作为答谢，我们会向你的摸鱼派账号赠送对应的积分 😄 积分赠送标准为80积分/1元，<b>请不要为了充积分而捐助哦！</b></p><br>
                     <div style="text-align: center">
-                        <b style="color: #3caf36">
-                            <svg viewBox="0 0 1024 1024" style="width: 20px; height: 20px"><path d="M380.8 636.8c-3.2 3.2-9.6 3.2-16 3.2-12.8 0-22.4-6.4-28.8-19.2l-3.2-6.4-91.2-209.6c0-3.2-3.2-6.4-3.2-6.4 0-9.6 6.4-16 16-16 3.2 0 6.4 0 9.6 3.2l107.2 78.4c12.8 9.6 28.8 9.6 44.8 6.4l512-233.6C836.8 128 684.8 54.4 513.6 54.4 235.2 54.4 8 248 8 488c0 129.6 70.4 249.6 174.4 329.6 12.8 9.6 16 25.6 12.8 38.4L171.2 944c0 3.2-3.2 9.6-3.2 12.8 0 9.6 6.4 16 16 16 3.2 0 6.4 0 9.6-3.2l110.4-67.2c9.6-6.4 16-9.6 25.6-9.6 6.4 0 9.6 0 16 3.2 54.4 16 110.4 25.6 164.8 25.6 278.4 0 505.6-196.8 505.6-433.6 0-72-22.4-142.4-57.6-203.2L377.6 633.6l3.2 3.2z" fill="#54d11c" p-id="2422"></path></svg>
-                            请使用微信扫码</b><br>
-                        <img src="${servePath}/images/donate_wechat.png" style="height:256px"/>
+                        <input id="doMoney" style="display: inline; width: 20%" type="text" placeholder="捐助金额">
+                        <input id="doNote" style="display: inline; width: 70%" type="text" placeholder="捐助附言，最多32字">
+                    </div>
+                    <div style="text-align: right; margin-top: 15px">
+                        <button onclick="doAlipay()"><svg style="vertical-align: -2px;"><use xlink:href="#alipay"></use></svg> 使用支付宝捐助</button>
                     </div>
                 </div>
+                <script>
+                    function doAlipay() {
+                        let doMoney = $("#doMoney").val();
+                        let doNote = $("#doNote").val();
+                        if (doMoney === "" || doNote === "") {
+                            Util.alert("请填写捐助金额和捐助附言 :)");
+                        } else if (isNaN(doMoney)) {
+                            Util.alert("金额不合法！");
+                        } else {
+                            location.href = "${servePath}/pay/alipay?total_amount=" + doMoney + "&note=" + doNote + "&subject_type=001";
+                        }
+                    }
+                </script>
                 <h2 class="sub-head"><span class="ft-red">🤗</span> 捐助称号回馈</h2>
-                <div style="padding: 15px">
+                <div style="padding: 15px 50px">
                     <p>感谢你的捐助，作为回馈，当你<b>累计</b>捐助至某个金额时，我们会赠送一个称号作为回馈：</p>
-                    <div style="padding-bottom: 5px"></div>
+                    <div style="padding-bottom: 15px"></div>
                     <div class="TGIF__item" style="display: flex; justify-content: center">
                         <div>
                             <img src="https://fishpi.cn/gen?scale=0.79&txt=%E6%91%B8%E9%B1%BC%E6%B4%BE%E7%B2%89%E4%B8%9D&url=https://pwl.stackoverflow.wiki/2021/12/ht1-d8149de4.jpg&backcolor=ffffff&fontcolor=ff3030" />
@@ -66,9 +98,6 @@
                     </div>
                 </div>
                 <h2 class="sub-head">😘 感谢你们</h2>
-                <div style="padding: 10px 0px 10px 15px">
-                    <h6>上次更新日期：${recent}</h6>
-                </div>
                 <style>
                     .fn__space5 {
                         width: 5px;
