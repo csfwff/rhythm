@@ -138,6 +138,7 @@
             Label.uploadFileLabel = '${uploadFileLabel}';
             Label.insertEmojiLabel = '${insertEmojiLabel}';
             Label.currentUser = '<#if currentUser??>${currentUser.userName}</#if>';
+            Label.currentUserId = '<#if currentUser??>${currentUser.oId}</#if>';
             Label.level3Permitted = ${level3Permitted?string("true", "false")};
             Label.chatRoomPictureStatus = "<#if 0 == chatRoomPictureStatus> blur</#if>";
             Label.latestMessage = "";

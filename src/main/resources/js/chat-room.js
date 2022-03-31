@@ -149,6 +149,16 @@ var ChatRoom = {
           "  <option value=\"average\">普通红包</option>" +
           "  <option value=\"specify\">专属红包</option>" +
           "  <option value=\"heartbeat\">心跳红包</option>" +
+          "  <option value=\"rockPaperScissors\">猜拳红包</option>" +
+          "  </select>\n" +
+          "</label>\n" +
+          "<label id=\"gesture\" style=\"display:none;\">\n" +
+          "  <div class=\"ft__smaller ft__fade\" style=\"float: left\">出拳</div>\n" +
+          "  <div class=\"fn-hr5 fn__5\"></div>\n" +
+          "  <select id=\"gestureType\">\n" +
+          "  <option value=\"0\" selected>石头</option>" +
+          "  <option value=\"1\">剪刀</option>" +
+          "  <option value=\"2\">布</option>" +
           "  </select>\n" +
           "</label>\n" +
           "<label id = \"who\" style=\"display:none;\">\n" +
@@ -231,7 +241,13 @@ var ChatRoom = {
           })
         } else {
           $('#who').css('display','none')
+          $('#gesture').css('display','none')
           $('#redPacketCount').removeAttr("readOnly");
+        }
+        if (type === 'rockPaperScissors') {
+          $('#gesture').removeAttr("style");
+          $("#redPacketCount").val("1");
+          $('#redPacketCount').attr("readOnly","true");
         }
       });
 
@@ -265,6 +281,8 @@ var ChatRoom = {
         } else if (type === 'heartbeat') {
           $("#redPacketAmount").text($("#redPacketMoney").val());
           $("#redPacketMsg").val("玩的就是心跳！");
+        } else if (type === 'rockPaperScissors') {
+          $("#redPacketAmount").text($("#redPacketMoney").val());
         }
       });
 
@@ -282,6 +300,8 @@ var ChatRoom = {
         } else if (type === 'heartbeat') {
           $("#redPacketAmount").text($("#redPacketMoney").val());
           $("#redPacketMsg").val("玩的就是心跳！");
+        } else if (type === 'rockPaperScissors') {
+          $("#redPacketMsg").val("石头剪刀布！");
         }
       });
 
@@ -304,6 +324,7 @@ var ChatRoom = {
         let count = $("#redPacketCount").val();
         let msg = $("#redPacketMsg").val();
         let recivers = $("#userOption").val();
+        let gesture = $("#gestureType").val();
         if (type === '' || type === null || type === undefined) {
           type = "random";
         }
@@ -323,7 +344,8 @@ var ChatRoom = {
           money: money,
           count: count,
           msg: msg,
-          recivers:recivers
+          recivers: recivers,
+          gesture: gesture
         }
         let requestJSONObject = {
           content: "[redpacket]" + JSON.stringify(content) + "[/redpacket]",
@@ -892,6 +914,18 @@ var ChatRoom = {
       }
     }
   },
+  selectGesture: function (oId) {
+    Util.alert("<div class=\"form fn__flex-column\">\n" +
+        "<label id=\"gestureRadio\">\n" +
+        "  <input type=\"radio\" name=\"gesture\" value=\"0\" checked>石头\n" +
+        "  <input type=\"radio\" name=\"gesture\" value=\"1\">剪刀\n" +
+        "  <input type=\"radio\" name=\"gesture\" value=\"2\">布\n" +
+        "</label>\n" +
+        "<div class=\"fn__flex\" style=\"margin-top: 15px\">\n" +
+        "  <button class=\"btn btn--confirm\" onclick=\"Util.clearAlert()\;ChatRoom.unpackRedPacket(" + oId + ")\">出拳</button>\n" +
+        "</div>\n" +
+        "</div>", '出拳');
+  },
   /**
    * 拆开红包
    */
@@ -900,11 +934,28 @@ var ChatRoom = {
       url: Label.servePath + "/chat-room/red-packet/open",
       method: "POST",
       data: JSON.stringify({
-        oId: oId
+        oId: oId,
+        gesture: $("#gestureRadio>input[name=gesture]:checked").val()
       }),
       success: function (result) {
         if (result.code !== -1) {
           let iGot = "抢红包人数较多，加载中...";
+          let gesture = "";
+          if (result.info.gesture !== undefined) {
+            gesture = result.info.userName + "出拳: ";
+            switch(result.info.gesture) {
+              case 0:
+                gesture += " 石头";
+                break;
+              case 1:
+                gesture += " 剪刀";
+                break;
+              case 2:
+                gesture += " 布";
+                break;
+              default:
+            }
+          }
           Util.alert("" +
               "<style>" +
               ".dialog-header-bg {" +
@@ -926,6 +977,7 @@ var ChatRoom = {
               "        <a href=\"" + Label.servePath + "/member/" + result.info.userName + "\">" + result.info.userName + "</a>'s 红包\n" +
               "    </div>\n" +
               "    <div class=\"fn-hr5\"></div>\n" +
+              (gesture ? ("<div class=\"ft__smaller ft__fade\">" + gesture + "</div>\n") : "") +
               "    <div id = \"msg\" class=\"ft__smaller ft__fade\">\n" +
               result.info.msg + "\n" +
               "    </div>\n" +
@@ -939,7 +991,7 @@ var ChatRoom = {
               "", "红包");
           ChatRoom.renderRedPacket(result.who, result.info.count, result.info.got, result.recivers)
           if (result.info.count === result.info.got) {
-            $("#chatroom" + oId).find(".hongbao__item").css("opacity", ".36");
+            $("#chatroom" + oId).find(".hongbao__item").css("opacity", ".36").attr('onclick', "ChatRoom.unpackRedPacket(" + oId + ")");
             $("#chatroom" + oId).find(".redPacketDesc").html("已经被抢光啦");
           }
         } else {
@@ -969,6 +1021,7 @@ var ChatRoom = {
       if (msgJSON.msgType === "redPacket") {
         isRedPacket = true;
         let type = "未知类型红包";
+        let onclick = 'ChatRoom.unpackRedPacket(\'' + data.oId + '\')';
         switch (msgJSON.type) {
           case "random":
             type = "拼手气红包";
@@ -981,6 +1034,12 @@ var ChatRoom = {
             break;
           case "heartbeat":
             type = "心跳红包 (慎抢)";
+            break;
+          case "rockPaperScissors":
+            type = "石头剪刀布红包";
+            if (msgJSON.senderId != Label.currentUserId) {
+              onclick = 'ChatRoom.selectGesture(\'' + data.oId + '\')';
+            }
             break;
         }
         if (Number(msgJSON.count) === Number(msgJSON.got)) {
@@ -998,7 +1057,7 @@ var ChatRoom = {
               '</div>';
         } else {
           data.content = '' +
-              '<div class="hongbao__item fn__flex-inline" onclick="ChatRoom.unpackRedPacket(\'' + data.oId + '\')">\n' +
+              '<div class="hongbao__item fn__flex-inline" onclick="' + onclick + '">\n' +
               '    <svg class="ft__red hongbao__icon">\n' +
               '        <use xlink:href="#redPacketIcon"></use>\n' +
               '    </svg>\n' +
