@@ -1748,7 +1748,7 @@ public class AdminProcessor {
             notification.put(Notification.NOTIFICATION_USER_ID, userId);
             notification.put(Notification.NOTIFICATION_DATA_ID, transferId);
             notificationMgmtService.addPointChargeNotification(notification);
-            //保存捐赠记录
+            // 保存捐赠记录
             final JSONObject record = new JSONObject();
             record.put(UserExt.USER_T_ID, userId);
             record.put("time", System.currentTimeMillis());
