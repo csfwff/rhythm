@@ -716,7 +716,7 @@ public class IndexProcessor {
     public void showChargePoint(final RequestContext context) {
         if (context.param("out_trade_no") != null) {
             // 触发交易检查
-            new Thread(AlipayProcessor::checkTrades).start();
+            AlipayProcessor.checkTrades();
             context.sendRedirect(Latkes.getServePath() + "/charge/point");
             return;
         }
