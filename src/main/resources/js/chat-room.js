@@ -922,7 +922,7 @@ var ChatRoom = {
         "  <input type=\"radio\" name=\"gesture\" value=\"2\">布\n" +
         "</label>\n" +
         "<div class=\"fn__flex\" style=\"margin-top: 15px\">\n" +
-        "  <button class=\"btn btn--confirm\" onclick=\"Util.clearAlert()\;ChatRoom.unpackRedPacket(" + oId + ")\">出拳</button>\n" +
+        "  <button class=\"btn btn--confirm\" onclick=\"ChatRoom.unpackRedPacket(" + oId + ")\;Util.clearAlert()\">出拳</button>\n" +
         "</div>\n" +
         "</div>", '出拳');
   },
