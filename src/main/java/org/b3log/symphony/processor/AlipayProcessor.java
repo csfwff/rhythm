@@ -24,6 +24,7 @@ import org.b3log.symphony.model.Sponsor;
 import org.b3log.symphony.model.UserExt;
 import org.b3log.symphony.processor.middleware.CSRFMidware;
 import org.b3log.symphony.processor.middleware.LoginCheckMidware;
+import org.b3log.symphony.service.CloudService;
 import org.b3log.symphony.service.NotificationMgmtService;
 import org.b3log.symphony.service.PointtransferMgmtService;
 import org.b3log.symphony.service.SponsorService;
@@ -184,9 +185,10 @@ public class AlipayProcessor {
                     PointtransferMgmtService pointtransferMgmtService = beanManager.getReference(PointtransferMgmtService.class);
                     NotificationMgmtService notificationMgmtService = beanManager.getReference(NotificationMgmtService.class);
                     SponsorService sponsorService = beanManager.getReference(SponsorService.class);
+                    CloudService cloudService = beanManager.getReference(CloudService.class);
                     int point;
                     double total = Double.parseDouble(total_amount);
-                    point = ((int) total) * 100;
+                    point = ((int) total) * 80;
                     if (point == 0) {
                         point = 1;
                     }
@@ -205,6 +207,20 @@ public class AlipayProcessor {
                     record.put(Sponsor.SPONSOR_MESSAGE, note);
                     record.put(Sponsor.AMOUNT, total);
                     sponsorService.add(record);
+                    // 统计用户总积分
+                    double sum = sponsorService.getSum(userId);
+                    // 三清
+                    cloudService.removeMetal(userId, L1_NAME);
+                    cloudService.removeMetal(userId, L2_NAME);
+                    cloudService.removeMetal(userId, L3_NAME);
+                    // 赋予勋章
+                    if (sum >= 1024) {
+                        cloudService.giveMetal(userId, L3_NAME, L3_DESC, L3_ATTR, "");
+                    } else if (sum >= 256) {
+                        cloudService.giveMetal(userId, L2_NAME, L2_DESC, L2_ATTR, "");
+                    } else if (sum >= 16) {
+                        cloudService.giveMetal(userId, L1_NAME, L1_DESC, L1_ATTR, "");
+                    }
                     // 删除键
                     iterator.remove();
                 }
@@ -212,4 +228,17 @@ public class AlipayProcessor {
         } catch (Exception ignored) {
         }
     }
+
+    // 勋章信息
+    final static String L1_NAME = "摸鱼派粉丝";
+    final static String L1_DESC = "捐助摸鱼派达16RMB";
+    final static String L1_ATTR = "url=https://pwl.stackoverflow.wiki/2021/12/ht1-d8149de4.jpg&backcolor=ffffff&fontcolor=ff3030";
+
+    final static String L2_NAME = "摸鱼派忠粉";
+    final static String L2_DESC = "捐助摸鱼派达256RMB";
+    final static String L2_ATTR = "url=https://pwl.stackoverflow.wiki/2021/12/ht2-bea67b29.jpg&backcolor=87cefa&fontcolor=efffff";
+
+    final static String L3_NAME = "摸鱼派铁粉";
+    final static String L3_DESC = "捐助摸鱼派达1024RMB";
+    final static String L3_ATTR = "url=https://pwl.stackoverflow.wiki/2021/12/ht3-b97ea102.jpg&backcolor=ee3a8c&fontcolor=ffffff";
 }

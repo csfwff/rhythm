@@ -18,10 +18,7 @@
  */
 package org.b3log.symphony.repository;
 
-import org.b3log.latke.repository.AbstractRepository;
-import org.b3log.latke.repository.Query;
-import org.b3log.latke.repository.RepositoryException;
-import org.b3log.latke.repository.SortDirection;
+import org.b3log.latke.repository.*;
 import org.b3log.latke.repository.annotation.Repository;
 import org.b3log.symphony.model.Sponsor;
 import org.json.JSONObject;
@@ -49,4 +46,10 @@ public class SponsorRepository extends AbstractRepository {
         return getList(query);
     }
 
+    public List<JSONObject> listByUserId(String userId) throws RepositoryException {
+        final Query query = new Query()
+                .setFilter(new PropertyFilter("userId", FilterOperator.EQUAL, userId))
+                .addSort("time", SortDirection.DESCENDING);
+        return getList(query);
+    }
 }

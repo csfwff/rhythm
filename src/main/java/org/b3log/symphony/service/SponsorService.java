@@ -18,6 +18,7 @@
  */
 package org.b3log.symphony.service;
 
+import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.b3log.latke.Keys;
@@ -77,6 +78,20 @@ public class SponsorService {
         } catch (RepositoryException e) {
             LOGGER.warn("add sponsor record list failed !");
             return Collections.emptyList();
+        }
+    }
+
+    public double getSum(String userId) {
+        try {
+            List<JSONObject> data = repository.listByUserId(userId);
+            double sum = 0;
+            for (JSONObject i : data) {
+                sum += i.optDouble("amount");
+            }
+            return sum;
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, "Cannot get user sum", e);
+            return 0;
         }
     }
 }
