@@ -91,7 +91,9 @@ public class AlipayProcessor {
                 note = context.param("note");
             }
             note = note.replaceAll("[^0-9a-zA-Z\\u4e00-\\u9fa5,，.。！!?？《》]", "");
-            note = note.substring(0, 32);
+            if (note.length() > 32) {
+                note = note.substring(0, 32);
+            }
             JSONObject biz = new JSONObject();
             biz.put("out_trade_no", OUT_TRADE_NO);
             biz.put("total_amount", total_amount);
