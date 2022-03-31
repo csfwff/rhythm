@@ -29,6 +29,7 @@ import org.apache.commons.lang.time.DateUtils;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.util.Strings;
 import org.b3log.latke.Keys;
 import org.b3log.latke.Latkes;
 import org.b3log.latke.ioc.Inject;
@@ -373,7 +374,7 @@ public class UserMgmtService {
             boolean toUpdate = false;
             String ret = null;
             String avatarURL = null;
-            user = userRepository.getByPhone(userPhone);
+            user = Strings.isBlank(userPhone) ? null : userRepository.getByPhone(userPhone);
             int userNo = 0;
             if (null != user) {
                 if (UserExt.USER_STATUS_C_VALID == user.optInt(UserExt.USER_STATUS)
