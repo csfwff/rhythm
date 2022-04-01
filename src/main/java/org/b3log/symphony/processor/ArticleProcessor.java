@@ -969,6 +969,11 @@ public class ArticleProcessor {
                 if (checkArticle == null) {
                     // 没有 TGIF
                     if (articleTitle.equals(articleTitleShouldBe)) {
+                        // 检查 TGIF 帖子质量
+                        if (articleContent.length() < 256) {
+                            context.renderMsg("您的摸鱼周报字数不合格，请认真对待！<br>请注意：根据摸鱼守则，摸鱼周报应该是抒发一周所想的灵感篇章，而不是为了水积分而随意撰写的一两句话，请保证摸鱼周报有个人情感、话题性，发送摸鱼周报带有明显水帖行为的，将取消摸鱼周报的帖子标识（恢复本周摸鱼周报的开放权限），并扣除奖励的积分，并处罚金 1000 积分。");
+                            return;
+                        }
                         // 发放奖励
                         pointtransferMgmtService.transfer(Pointtransfer.ID_C_SYS, currentUser.optString(Keys.OBJECT_ID),
                                 Pointtransfer.TRANSFER_TYPE_C_ACTIVITY_SEND_TGIF,
