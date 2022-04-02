@@ -258,9 +258,6 @@ var ChatRoom = {
         if ($("#redPacketMoney").val() === "") {
           $("#redPacketMoney").val("32");
         }
-        if ($("#redPacketMoney").val() > 20000) {
-          $("#redPacketMoney").val("20000");
-        }
         if ($("#redPacketMoney").val() < 32) {
           $("#redPacketMoney").val("32");
         }
@@ -309,8 +306,8 @@ var ChatRoom = {
         if (Number($("#redPacketCount").val()) > Number($("#redPacketMoney").val())) {
           $("#redPacketCount").val($("#redPacketMoney").val());
         } else {
-          if ($("#redPacketCount").val() > 1000) {
-            $("#redPacketCount").val("1000");
+          if ($("#redPacketCount").val() > 100) {
+            $("#redPacketCount").val("100");
           }
           if ($("#redPacketCount").val() <= 0) {
             $("#redPacketCount").val("1");

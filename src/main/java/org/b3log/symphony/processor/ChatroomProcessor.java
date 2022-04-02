@@ -40,6 +40,7 @@ import org.b3log.symphony.processor.middleware.AnonymousViewCheckMidware;
 import org.b3log.symphony.processor.middleware.LoginCheckMidware;
 import org.b3log.symphony.processor.middleware.validate.ChatMsgAddValidationMidware;
 import org.b3log.symphony.repository.ChatRoomRepository;
+import org.b3log.symphony.repository.UserRepository;
 import org.b3log.symphony.service.*;
 import org.b3log.symphony.util.*;
 import org.json.JSONArray;
@@ -173,6 +174,9 @@ public class ChatroomProcessor {
 
     @Inject
     private ChatroomChannel chatroomChannel;
+
+    @Inject
+    private UserRepository userRepository;
 
     /**
      * Register request handlers.
@@ -501,8 +505,24 @@ public class ChatroomProcessor {
                         message = message.substring(0, 20);
                     }
                     // 扣积分
-                    if (money > 20000 || money < 32 || count > 1000 || count <= 0 || count > money) {
-                        context.renderJSON(StatusCodes.ERR).renderMsg("数据不合法！");
+                    if (money > calcRedpacketMax()) {
+                        context.renderJSON(StatusCodes.ERR).renderMsg("红包发送失败！根据社区成员积分储蓄中位数，当前红包最大限额为" + calcRedpacketMax() + "！");
+                        return;
+                    }
+                    if (money < 32) {
+                        context.renderJSON(StatusCodes.ERR).renderMsg("红包最小金额为32！");
+                        return;
+                    }
+                    if (count < 1) {
+                        context.renderJSON(StatusCodes.ERR).renderMsg("红包最少发1份！");
+                        return;
+                    }
+                    if (count > 100) {
+                        context.renderJSON(StatusCodes.ERR).renderMsg("红包最多发100份！");
+                        return;
+                    }
+                    if (count > money) {
+                        context.renderJSON(StatusCodes.ERR).renderMsg("红包个数不能大于总金额！");
                         return;
                     }
                     try {
@@ -716,6 +736,43 @@ public class ChatroomProcessor {
                 }
             }
         }
+    }
+
+    /**
+     * 计算红包限额
+     *
+     * @return int
+     */
+    private static long CRM_CACHE_TIME = System.currentTimeMillis();
+    private static int CRM_CACHE_POINT = 500;
+    public static int calcRedpacketMax() {
+        final BeanManager beanManager = BeanManager.getInstance();
+        final UserRepository userRepository = beanManager.getReference(UserRepository.class);
+
+        if (((System.currentTimeMillis() - CRM_CACHE_TIME) / 1000) > 30) {
+            // 刷新缓存
+            try {
+                // 计算红包限额
+                List<JSONObject> userCount = userRepository.select("select count(*) from symphony_user");
+                JSONObject userCount2 = userCount.get(0);
+                int count = (int) Double.parseDouble(userCount2.optString("count(*)"));
+                int middle = count / 2;
+                List<JSONObject> user = userRepository.select("select userPoint from symphony_user limit " + middle + ",1");
+                JSONObject user2 = user.get(0);
+                int userPoint = (int) Double.parseDouble(user2.optString("userPoint"));
+                if (userPoint > 5000) {
+                    userPoint = 5000;
+                }
+                if (userPoint < 500) {
+                    userPoint = 500;
+                }
+                CRM_CACHE_POINT = userPoint;
+            } catch (Exception e) {
+                CRM_CACHE_POINT = 500;
+            }
+            CRM_CACHE_TIME = System.currentTimeMillis();
+        }
+        return CRM_CACHE_POINT;
     }
 
     public List<JSONObject> atUsers(String content, String currentUser) {
