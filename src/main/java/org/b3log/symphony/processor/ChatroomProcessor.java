@@ -770,7 +770,8 @@ public class ChatroomProcessor {
                 }
                 CRM_CACHE_POINT = userPoint;
             } catch (Exception e) {
-                CRM_CACHE_POINT = 500;
+                LOGGER.log(Level.ERROR, "Calc red packet failed", e);
+                CRM_CACHE_POINT = 501;
             }
             CRM_CACHE_TIME = System.currentTimeMillis();
         }
