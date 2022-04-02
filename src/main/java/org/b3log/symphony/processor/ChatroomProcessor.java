@@ -500,30 +500,32 @@ public class ChatroomProcessor {
                     String recivers = redpacket.optString("recivers");
                     String message = redpacket.optString("msg");
                     int gesture = redpacket.optInt("gesture", -1);
-                    message = message.replaceAll("[^0-9a-zA-Z\\u4e00-\\u9fa5,，.。！!?？《》\\s]", "");
-                    if (message.length() > 20) {
-                        message = message.substring(0, 20);
-                    }
-                    // 扣积分
-                    if (money > calcRedpacketMax()) {
-                        context.renderJSON(StatusCodes.ERR).renderMsg("红包发送失败！根据社区成员积分储蓄中位数，当前红包最大限额为" + calcRedpacketMax() + "！");
-                        return;
-                    }
-                    if (money < 32) {
-                        context.renderJSON(StatusCodes.ERR).renderMsg("红包最小金额为32！");
-                        return;
-                    }
-                    if (count < 1) {
-                        context.renderJSON(StatusCodes.ERR).renderMsg("红包最少发1份！");
-                        return;
-                    }
-                    if (count > 100) {
-                        context.renderJSON(StatusCodes.ERR).renderMsg("红包最多发100份！");
-                        return;
-                    }
-                    if (count > money) {
-                        context.renderJSON(StatusCodes.ERR).renderMsg("红包个数不能大于总金额！");
-                        return;
+                    if (!userName.equals("admin")) {
+                        message = message.replaceAll("[^0-9a-zA-Z\\u4e00-\\u9fa5,，.。！!?？《》\\s]", "");
+                        if (message.length() > 20) {
+                            message = message.substring(0, 20);
+                        }
+                        // 扣积分
+                        if (money > calcRedpacketMax()) {
+                            context.renderJSON(StatusCodes.ERR).renderMsg("红包发送失败！根据社区成员积分储蓄中位数，当前红包最大限额为" + calcRedpacketMax() + "！");
+                            return;
+                        }
+                        if (money < 32) {
+                            context.renderJSON(StatusCodes.ERR).renderMsg("红包最小金额为32！");
+                            return;
+                        }
+                        if (count < 1) {
+                            context.renderJSON(StatusCodes.ERR).renderMsg("红包最少发1份！");
+                            return;
+                        }
+                        if (count > 100) {
+                            context.renderJSON(StatusCodes.ERR).renderMsg("红包最多发100份！");
+                            return;
+                        }
+                        if (count > money) {
+                            context.renderJSON(StatusCodes.ERR).renderMsg("红包个数不能大于总金额！");
+                            return;
+                        }
                     }
                     try {
                         int toatlMoney = 0;
