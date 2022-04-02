@@ -166,6 +166,18 @@ public class IndexProcessor {
         Dispatcher.get("/user/checkedIn", indexProcessor::isCheckedIn, loginCheck::handle);
         Dispatcher.get("/oldAlmanac", indexProcessor::showOldAlmanac, anonymousViewCheckMidware::handle);
         Dispatcher.get("/breezemoons", indexProcessor::showBreezemoons, anonymousViewCheckMidware::handle);
+        Dispatcher.get("/privacy", indexProcessor::showPrivacy, anonymousViewCheckMidware::handle);
+    }
+
+    /**
+     * 隐私政策
+     *
+     * @param context
+     */
+    public void showPrivacy(final RequestContext context) {
+        final AbstractFreeMarkerRenderer renderer = new SkinRenderer(context, "privacy.ftl");
+        final Map<String, Object> dataModel = renderer.getDataModel();
+        dataModelService.fillHeaderAndFooter(context, dataModel);
     }
 
     /**
