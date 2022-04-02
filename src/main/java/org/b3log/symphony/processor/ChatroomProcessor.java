@@ -751,7 +751,7 @@ public class ChatroomProcessor {
         final BeanManager beanManager = BeanManager.getInstance();
         final UserRepository userRepository = beanManager.getReference(UserRepository.class);
 
-        if (((System.currentTimeMillis() - CRM_CACHE_TIME) / 1000) > 30) {
+        if (((System.currentTimeMillis() - CRM_CACHE_TIME) / 1000) > 5 * 60) {
             // 刷新缓存
             try {
                 // 计算红包限额
