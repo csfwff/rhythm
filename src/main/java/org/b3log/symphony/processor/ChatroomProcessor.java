@@ -264,7 +264,7 @@ public class ChatroomProcessor {
             } else {
                 recivers = new JSONArray(redPacket.optString("recivers"));
             }
-            if (redPacket.has("gesture")) {
+            if (redPacket.has("gesture") && StringUtils.isNotBlank(redPacket.optString("gesture"))) {
                 info.put("gesture", redPacket.optInt("gesture"));
             }
 
@@ -368,7 +368,7 @@ public class ChatroomProcessor {
                 if (senderGesture - gesture == 1 || senderGesture - gesture == -2) {
                     meGot = money;
                 } else if(senderGesture != gesture)  {
-                    meGot = -money * 2;
+                    meGot = -money;
                 }
             } else {
                 if (redPacketIsOpened(who, userId)) {
@@ -495,6 +495,7 @@ public class ChatroomProcessor {
                     int count = redpacket.optInt("count");
                     String recivers = redpacket.optString("recivers");
                     String message = redpacket.optString("msg");
+                    int gesture = redpacket.optInt("gesture", -1);
                     message = message.replaceAll("[^0-9a-zA-Z\\u4e00-\\u9fa5,，.。！!?？《》\\s]", "");
                     if (message.length() > 20) {
                         message = message.substring(0, 20);
@@ -508,7 +509,6 @@ public class ChatroomProcessor {
                         int toatlMoney = 0;
                         switch (type) {
                             case "rockPaperScissors":
-                                int gesture = redpacket.optInt("gesture");
                                 if (gesture < 0 || gesture > 2) {
                                     context.renderJSON(StatusCodes.ERR).renderMsg("数据不合法！");
                                     return;
@@ -562,7 +562,9 @@ public class ChatroomProcessor {
                     redPacketJSON.put("count", count);
                     redPacketJSON.put("msg", message);
                     redPacketJSON.put("recivers", recivers);
-                    redPacketJSON.put("gesture", redpacket.optString("gesture"));
+                    if (gesture >= 0 && gesture <= 2) {
+                        redPacketJSON.put("gesture", gesture);
+                    }
                     // 已经抢了这个红包的人数
                     redPacketJSON.put("got", 0);
                     // 已经抢了这个红包的人以及抢到的金额
