@@ -101,17 +101,21 @@ public class PointTransferValidationMidware {
         }
 
         if (currentUser.optString(User.USER_NAME).equals(toUser.optString(User.USER_NAME))) {
-            context.renderJSON(new JSONObject().put(Keys.MSG, langPropsService.get("cannotTransferSelfLabel")));
-            context.abort();
-            return;
+            if (!currentUser.optString(User.USER_NAME).equals("admin")) {
+                context.renderJSON(new JSONObject().put(Keys.MSG, langPropsService.get("cannotTransferSelfLabel")));
+                context.abort();
+                return;
+            }
         }
 
         final int balanceMinLimit = Symphonys.POINT_TRANSER_MIN;
         final int balance = currentUser.optInt(UserExt.USER_POINT);
         if (balance - amount < balanceMinLimit) {
-            context.renderJSON(new JSONObject().put(Keys.MSG, langPropsService.get("insufficientBalanceLabel")));
-            context.abort();
-            return;
+            if (!currentUser.optString(User.USER_NAME).equals("admin")) {
+                context.renderJSON(new JSONObject().put(Keys.MSG, langPropsService.get("insufficientBalanceLabel")));
+                context.abort();
+                return;
+            }
         }
 
         String memo = StringUtils.trim(requestJSONObject.optString(Pointtransfer.MEMO));

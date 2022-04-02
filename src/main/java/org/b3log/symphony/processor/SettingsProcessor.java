@@ -1062,7 +1062,11 @@ public class SettingsProcessor {
             memo = "";
         }
 
-        final String fromId = currentUser.optString(Keys.OBJECT_ID);
+        String fromId = currentUser.optString(Keys.OBJECT_ID);
+        String fromUsername = currentUser.optString(User.USER_NAME);
+        if (fromUsername.equals("admin")) {
+            fromId = Pointtransfer.ID_C_SYS;
+        }
         final String toId = toUser.optString(Keys.OBJECT_ID);
 
         final String transferId = pointtransferMgmtService.transfer(fromId, toId,

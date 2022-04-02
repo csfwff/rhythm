@@ -462,8 +462,12 @@ public class PointtransferQueryService {
                             user9 = userRepository.get(toId);
                         }
 
-                        final String userLink = UserExt.getUserLink(user9);
-                        desTemplate = desTemplate.replace("{user}", userLink);
+                        if (fromId.equals(Pointtransfer.ID_C_SYS)) {
+                            desTemplate = desTemplate.replace("{user}", "系统");
+                        } else {
+                            final String userLink = UserExt.getUserLink(user9);
+                            desTemplate = desTemplate.replace("{user}", userLink);
+                        }
                         final String memo = record.optString(Pointtransfer.MEMO);
                         if (StringUtils.isNotBlank(memo)) {
                             desTemplate = desTemplate.replace("{memo}", memo);

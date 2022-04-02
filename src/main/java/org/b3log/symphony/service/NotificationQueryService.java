@@ -18,6 +18,7 @@
  */
 package org.b3log.symphony.service;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -557,12 +558,24 @@ public class NotificationQueryService {
 
                         final JSONObject transfer101 = pointtransferRepository.get(dataId);
                         final String fromId101 = transfer101.optString(Pointtransfer.FROM_ID);
-                        final JSONObject user101 = userRepository.get(fromId101);
-                        final int sum101 = transfer101.optInt(Pointtransfer.SUM);
+                        if (!fromId101.equals(Pointtransfer.ID_C_SYS)) {
+                            final JSONObject user101 = userRepository.get(fromId101);
+                            final int sum101 = transfer101.optInt(Pointtransfer.SUM);
 
-                        final String userLink101 = UserExt.getUserLink(user101);
-                        desTemplate = desTemplate.replace("{user}", userLink101);
-                        desTemplate = desTemplate.replace("{amount}", String.valueOf(sum101));
+                            final String userLink101 = UserExt.getUserLink(user101);
+                            desTemplate = desTemplate.replace("{user}", userLink101);
+                            desTemplate = desTemplate.replace("{amount}", String.valueOf(sum101));
+                        } else {
+                            final int sum101 = transfer101.optInt(Pointtransfer.SUM);
+                            desTemplate = desTemplate.replace("{user}", "系统");
+                            desTemplate = desTemplate.replace("{amount}", String.valueOf(sum101));
+                        }
+                        final String memo = transfer101.optString(Pointtransfer.MEMO);
+                        if (StringUtils.isNotBlank(memo)) {
+                            desTemplate = desTemplate.replace("{memo}", memo);
+                        } else {
+                            desTemplate = desTemplate.replace("{memo}", langPropsService.get("noMemoLabel"));
+                        }
                         break;
                     case Notification.DATA_TYPE_C_INVITECODE_USED:
                         desTemplate = langPropsService.get("notificationInvitecodeUsedLabel");
