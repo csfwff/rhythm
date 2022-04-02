@@ -336,13 +336,24 @@ var ChatRoom = {
         if (msg === '') {
           msg = '摸鱼者，事竟成！';
         }
-        let content = {
-          type:  type,
-          money: money,
-          count: count,
-          msg: msg,
-          recivers: recivers,
-          gesture: gesture
+        let content;
+        if (type !== "rockPaperScissors") {
+          content = {
+            type:  type,
+            money: money,
+            count: count,
+            msg: msg,
+            recivers: recivers
+          }
+        } else {
+          content = {
+            type:  type,
+            money: money,
+            count: count,
+            msg: msg,
+            recivers: recivers,
+            gesture: gesture
+          }
         }
         let requestJSONObject = {
           content: "[redpacket]" + JSON.stringify(content) + "[/redpacket]",
