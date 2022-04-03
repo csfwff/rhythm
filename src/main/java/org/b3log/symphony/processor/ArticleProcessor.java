@@ -27,10 +27,14 @@ import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.b3log.latke.Keys;
+import org.b3log.latke.Latkes;
 import org.b3log.latke.http.Dispatcher;
 import org.b3log.latke.http.Request;
 import org.b3log.latke.http.RequestContext;
 import org.b3log.latke.http.renderer.AbstractFreeMarkerRenderer;
+import org.b3log.latke.http.renderer.AbstractResponseRenderer;
+import org.b3log.latke.http.renderer.JsonRenderer;
+import org.b3log.latke.http.renderer.ResponseRenderer;
 import org.b3log.latke.ioc.BeanManager;
 import org.b3log.latke.ioc.Inject;
 import org.b3log.latke.ioc.Singleton;
@@ -39,10 +43,7 @@ import org.b3log.latke.model.User;
 import org.b3log.latke.repository.RepositoryException;
 import org.b3log.latke.service.LangPropsService;
 import org.b3log.latke.service.ServiceException;
-import org.b3log.latke.util.Paginator;
-import org.b3log.latke.util.Requests;
-import org.b3log.latke.util.Stopwatchs;
-import org.b3log.latke.util.Strings;
+import org.b3log.latke.util.*;
 import org.b3log.symphony.cache.DomainCache;
 import org.b3log.symphony.model.*;
 import org.b3log.symphony.processor.middleware.AnonymousViewCheckMidware;
@@ -63,6 +64,7 @@ import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.util.List;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Article processor.
@@ -211,6 +213,9 @@ public class ArticleProcessor {
     @Inject
     private CloudService cloudService;
 
+    @Inject
+    private TagQueryService tagQueryService;
+
     /**
      * Register request handlers.
      */
@@ -239,6 +244,174 @@ public class ArticleProcessor {
         Dispatcher.post("/article/thank", articleProcessor::thankArticle, loginCheck::handle, permissionMidware::check);
         Dispatcher.post("/article/stick", articleProcessor::stickArticle, loginCheck::handle, permissionMidware::check);
         Dispatcher.get("/article/random/{size}", articleProcessor::randomArticles);
+        Dispatcher.group().middlewares(loginCheck::handle).router().get().uris(new String[]{"/api/articles/recent", "/api/articles/recent/hot", "/api/articles/recent/good", "/api/articles/recent/reply"}).handler(articleProcessor::getArticles);
+        Dispatcher.group().middlewares(loginCheck::handle).router().get().uris(new String[]{"/api/articles/tag/{tagURI}", "/api/articles/tag/{tagURI}/hot", "/api/articles/tag/{tagURI}/good", "/api/articles/tag/{tagURI}/reply", "/api/articles/tag/{tagURI}/perfect"}).handler(articleProcessor::getTagArticles);
+        Dispatcher.get("/api/articles/domain/{domainURI}", articleProcessor::getDomainArticles, loginCheck::handle);
+    }
+
+    private AbstractResponseRenderer buildJsonRenderer() {
+        JsonRenderer renderer = new JsonRenderer();
+        renderer.setJSONObject(new JSONObject());
+        return renderer;
+    }
+
+
+    /**
+     * api for get articles by domain
+     *
+     * @param context the specified context
+     */
+    public void getDomainArticles(final RequestContext context) {
+        context.setRenderer(buildJsonRenderer());
+        final String domainURI = context.pathVar("domainURI");
+        final Request request = context.getRequest();
+
+        final Map<String, Object> dataModel = new HashMap<>();
+        final int pageNum = Paginator.getPage(request);
+        final String size = context.param("size");
+        int pageSize = StringUtils.isBlank(size) ? 0 : Integer.parseInt(size);
+        pageSize = pageSize <= 0 ? Symphonys.ARTICLE_LIST_CNT : pageSize;
+
+        final JSONObject domain = domainQueryService.getByURI(domainURI);
+        if (null == domain) {
+            context.renderCodeMsg(404, String.format("domain: %s 不存在!", domainURI));
+            return;
+        }
+
+        final List<JSONObject> tags = domainQueryService.getTags(domain.optString(Keys.OBJECT_ID));
+        domain.put(Domain.DOMAIN_T_TAGS, (Object) tags);
+        dataModel.put(Domain.DOMAIN, domain);
+        final String domainId = domain.optString(Keys.OBJECT_ID);
+
+        final JSONObject result = articleQueryService.getDomainArticles(domainId, pageNum, pageSize);
+        final List<JSONObject> allArticles = (List<JSONObject>) result.get(Article.ARTICLES);
+
+        final JSONObject pagination = result.getJSONObject(Pagination.PAGINATION);
+        dataModel.put("pagination", pagination);
+        dataModel.put(Article.ARTICLES, articleDesensitize(allArticles));
+
+        context.renderJSON(new JSONObject().put("data", dataModel)).renderCode(StatusCodes.SUCC).renderMsg("");
+    }
+
+    /**
+     * api for get articles by tag
+     *
+     * @param context the specified context
+     */
+    public void getTagArticles(final RequestContext context) {
+        context.setRenderer(buildJsonRenderer());
+        final String tagURI = context.pathVar("tagURI");
+        final Request request = context.getRequest();
+
+        final Map<String, Object> dataModel = new HashMap<>();
+        final int pageNum = Paginator.getPage(request);
+        final String size = context.param("size");
+        int pageSize = StringUtils.isBlank(size) ? 0 : Integer.parseInt(size);
+        pageSize = pageSize <= 0 ? Symphonys.ARTICLE_LIST_CNT : pageSize;
+
+
+        final JSONObject tag = tagQueryService.getTagByURI(tagURI);
+        if (null == tag) {
+            context.renderCodeMsg(404, String.format("tag: %s 不存在!", tagURI));
+            return;
+        }
+
+        tag.put(Common.IS_RESERVED, tagQueryService.isReservedTag(tag.optString(Tag.TAG_TITLE)));
+        dataModel.put(Tag.TAG, tag);
+        final String tagId = tag.optString(Keys.OBJECT_ID);
+        final List<JSONObject> relatedTags = tagQueryService.getRelatedTags(tagId, Symphonys.TAG_RELATED_TAGS_CNT);
+        tag.put(Tag.TAG_T_RELATED_TAGS, (Object) relatedTags);
+
+        String sortModeStr = StringUtils.substringAfter(context.requestURI(), "/tag/" + tagURI);
+        int sortMode;
+        switch (sortModeStr) {
+            case "":
+                sortMode = 0;
+                break;
+            case "/hot":
+                sortMode = 1;
+                break;
+            case "/good":
+                sortMode = 2;
+                break;
+            case "/reply":
+                sortMode = 3;
+                break;
+            case "/perfect":
+                sortMode = 4;
+                break;
+            default:
+                sortMode = 0;
+        }
+
+        final List<JSONObject> articles = articleQueryService.getArticlesByTag(sortMode, tag, pageNum, pageSize);
+        dataModel.put(Article.ARTICLES, articleDesensitize(articles));
+
+        final int tagRefCnt = tag.getInt(Tag.TAG_REFERENCE_CNT);
+        final int pageCount = (int) Math.ceil(tagRefCnt / (double) pageSize);
+        final int windowSize = Symphonys.ARTICLE_LIST_WIN_SIZE;
+        final List<Integer> pageNums = Paginator.paginate(pageNum, pageSize, pageCount, windowSize);
+        JSONObject paginationRet = new JSONObject();
+        paginationRet.put(Pagination.PAGINATION_PAGE_COUNT, pageCount);
+        paginationRet.put(Pagination.PAGINATION_PAGE_NUMS, pageNums);
+
+        dataModel.put("pagination", paginationRet);
+
+        context.renderJSON(new JSONObject().put("data", dataModel)).renderCode(StatusCodes.SUCC).renderMsg("");
+    }
+
+
+    /**
+     * api for get articles
+     *
+     * @param context the specified context
+     */
+    public void getArticles(final RequestContext context) {
+        final Request request = context.getRequest();
+        final Map<String, Object> dataModel = new HashMap<>();
+        final int pageNum = Paginator.getPage(request);
+        final String size = context.param("size");
+        int pageSize = StringUtils.isBlank(size) ? 0 : Integer.parseInt(size);
+        pageSize = pageSize <= 0 ? Symphonys.ARTICLE_LIST_CNT : pageSize;
+
+        String sortModeStr = StringUtils.substringAfter(context.requestURI(), "/recent");
+        int sortMode;
+        switch (sortModeStr) {
+            case "":
+                sortMode = 0;
+                break;
+            case "/hot":
+                sortMode = 1;
+                break;
+            case "/good":
+                sortMode = 2;
+                break;
+            case "/reply":
+                sortMode = 3;
+                break;
+            default:
+                sortMode = 0;
+        }
+        final JSONObject result = articleQueryService.getRecentArticles(sortMode, pageNum, pageSize);
+        final List<JSONObject> allArticles = (List<JSONObject>) result.get(Article.ARTICLES);
+
+        final JSONObject pagination = result.getJSONObject(Pagination.PAGINATION);
+        dataModel.put("pagination", pagination);
+        dataModel.put(Article.ARTICLES, articleDesensitize(allArticles));
+
+        context.renderJSON(new JSONObject().put("data", dataModel)).renderCode(StatusCodes.SUCC).renderMsg("");
+    }
+
+    private List<JSONObject> articleDesensitize(List<JSONObject> articles) {
+        return articles.stream().peek(article -> {
+            article.remove("articleUA");
+            article.remove("articleOriginalContent");
+            article.remove("articlePreviewContent");
+            article.remove("articleContent");
+            JSONObject articleAuthor = article.optJSONObject("articleAuthor");
+            articleAuthor.remove("userLatestLoginIP");
+            articleAuthor.remove("userPassword");
+        }).collect(Collectors.toList());
     }
 
     /**
