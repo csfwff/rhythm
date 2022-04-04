@@ -451,6 +451,11 @@ public class ArticleProcessor {
                 final JSONObject commenter = comment.optJSONObject("commenter");
                 commenter.remove("userPassword");
                 commenter.remove("userLatestLoginIP");
+                commenter.remove("userPhone");
+                commenter.remove("userQQ");
+                commenter.remove("userCity");
+                commenter.remove("userCountry");
+                commenter.remove("userEmail");
                 comment.put(Comment.COMMENT_T_NICE, comment.optDouble(Comment.COMMENT_SCORE, 0D) >= niceCmtScore);
 
                 final String commentId = comment.optString(Keys.OBJECT_ID);
@@ -631,6 +636,11 @@ public class ArticleProcessor {
             JSONObject articleAuthor = article.optJSONObject("articleAuthor");
             articleAuthor.remove("userLatestLoginIP");
             articleAuthor.remove("userPassword");
+            articleAuthor.remove("userPhone");
+            articleAuthor.remove("userQQ");
+            articleAuthor.remove("userCity");
+            articleAuthor.remove("userCountry");
+            articleAuthor.remove("userEmail");
         }).collect(Collectors.toList());
     }
 
@@ -640,6 +650,11 @@ public class ArticleProcessor {
         JSONObject articleAuthor = article.optJSONObject("articleAuthor");
         articleAuthor.remove("userLatestLoginIP");
         articleAuthor.remove("userPassword");
+        articleAuthor.remove("userPhone");
+        articleAuthor.remove("userQQ");
+        articleAuthor.remove("userCity");
+        articleAuthor.remove("userCountry");
+        articleAuthor.remove("userEmail");
         article.put("articleAuthor", articleAuthor);
         return article;
     }
