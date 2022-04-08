@@ -34,10 +34,12 @@ import org.b3log.latke.util.Crypts;
 import org.b3log.latke.util.Requests;
 import org.b3log.symphony.model.Common;
 import org.b3log.symphony.model.UserExt;
+import org.b3log.symphony.processor.ApiProcessor;
 import org.b3log.symphony.repository.UserRepository;
 import org.b3log.symphony.service.UserMgmtService;
 import org.json.JSONObject;
 
+import java.util.Objects;
 import java.util.Set;
 
 /**
@@ -375,6 +377,22 @@ public final class Sessions {
      * @return the current user, returns {@code null} if not logged in
      */
     public static JSONObject currentUser(final Request request) {
+
+        //如何保证web端不会传apiKey参数?
+        final String apiKey = request.getParameter("apiKey");
+        if (Objects.nonNull(apiKey)) {
+            //support request for api
+            try {
+                JSONObject user = ApiProcessor.getUserByKey(apiKey);
+                if (Objects.nonNull(user)) {
+                    return user;
+                }
+
+            } catch (NullPointerException ignored) {
+            }
+            return null;
+        }
+
         final Set<Cookie> cookies = request.getCookies();
         if (cookies.isEmpty()) {
             return null;

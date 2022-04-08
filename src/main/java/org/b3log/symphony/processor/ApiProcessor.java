@@ -237,7 +237,13 @@ public class ApiProcessor {
         }
     }
 
-    public static JSONObject getUserByKey(String apiKey) throws NullPointerException {
+    /**
+     *
+     * @param apiKey
+     * @return userInfo
+     * @throws NullPointerException if apiKey is null or not found in keymaps
+     */
+    public static JSONObject getUserByKey(String apiKey) {
         if (apiKey != null) {
             if (ApiProcessor.keys.containsKey(apiKey)) {
                 return ApiProcessor.keys.get(apiKey);

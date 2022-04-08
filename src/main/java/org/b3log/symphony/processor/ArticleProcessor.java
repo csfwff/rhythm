@@ -27,10 +27,14 @@ import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.b3log.latke.Keys;
+import org.b3log.latke.Latkes;
 import org.b3log.latke.http.Dispatcher;
 import org.b3log.latke.http.Request;
 import org.b3log.latke.http.RequestContext;
 import org.b3log.latke.http.renderer.AbstractFreeMarkerRenderer;
+import org.b3log.latke.http.renderer.AbstractResponseRenderer;
+import org.b3log.latke.http.renderer.JsonRenderer;
+import org.b3log.latke.http.renderer.ResponseRenderer;
 import org.b3log.latke.ioc.BeanManager;
 import org.b3log.latke.ioc.Inject;
 import org.b3log.latke.ioc.Singleton;
@@ -39,10 +43,7 @@ import org.b3log.latke.model.User;
 import org.b3log.latke.repository.RepositoryException;
 import org.b3log.latke.service.LangPropsService;
 import org.b3log.latke.service.ServiceException;
-import org.b3log.latke.util.Paginator;
-import org.b3log.latke.util.Requests;
-import org.b3log.latke.util.Stopwatchs;
-import org.b3log.latke.util.Strings;
+import org.b3log.latke.util.*;
 import org.b3log.symphony.cache.DomainCache;
 import org.b3log.symphony.model.*;
 import org.b3log.symphony.processor.middleware.AnonymousViewCheckMidware;
@@ -63,6 +64,7 @@ import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.util.List;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Article processor.
@@ -211,6 +213,9 @@ public class ArticleProcessor {
     @Inject
     private CloudService cloudService;
 
+    @Inject
+    private TagQueryService tagQueryService;
+
     /**
      * Register request handlers.
      */
@@ -239,6 +244,419 @@ public class ArticleProcessor {
         Dispatcher.post("/article/thank", articleProcessor::thankArticle, loginCheck::handle, permissionMidware::check);
         Dispatcher.post("/article/stick", articleProcessor::stickArticle, loginCheck::handle, permissionMidware::check);
         Dispatcher.get("/article/random/{size}", articleProcessor::randomArticles);
+        Dispatcher.group().middlewares(loginCheck::handle).router().get().uris(new String[]{"/api/articles/recent", "/api/articles/recent/hot", "/api/articles/recent/good", "/api/articles/recent/reply"}).handler(articleProcessor::getArticles);
+        Dispatcher.group().middlewares(loginCheck::handle).router().get().uris(new String[]{"/api/articles/tag/{tagURI}", "/api/articles/tag/{tagURI}/hot", "/api/articles/tag/{tagURI}/good", "/api/articles/tag/{tagURI}/reply", "/api/articles/tag/{tagURI}/perfect"}).handler(articleProcessor::getTagArticles);
+        Dispatcher.get("/api/articles/domain/{domainURI}", articleProcessor::getDomainArticles, loginCheck::handle);
+        Dispatcher.get("/api/article/{id}", articleProcessor::showArticleApi, loginCheck::handle);
+    }
+
+    private AbstractResponseRenderer buildJsonRenderer() {
+        JsonRenderer renderer = new JsonRenderer();
+        renderer.setJSONObject(new JSONObject());
+        return renderer;
+    }
+
+    /**
+     * api for get article details
+     *
+     * @param context the specified context
+     */
+    public void showArticleApi(final RequestContext context) {
+        final AbstractResponseRenderer renderer = buildJsonRenderer();
+        context.setRenderer(renderer);
+
+        final Map<String, Object> dataModel = new HashMap<>();
+        final String articleId = context.pathVar("id");
+        final Request request = context.getRequest();
+
+        final JSONObject article = articleQueryService.getArticleById(articleId);
+        if (null == article) {
+            context.renderCodeMsg(404, "帖子不存在!");
+            return;
+        }
+
+        final String articleAuthorId = article.optString(Article.ARTICLE_AUTHOR_ID);
+        JSONObject author;
+        if (Article.ARTICLE_ANONYMOUS_C_PUBLIC == article.optInt(Article.ARTICLE_ANONYMOUS)) {
+            author = userQueryService.getUser(articleAuthorId);
+        } else {
+            author = userQueryService.getAnonymousUser();
+        }
+        Escapes.escapeHTML(author);
+        article.put(Article.ARTICLE_T_AUTHOR_NAME, author.optString(User.USER_NAME));
+        article.put(Article.ARTICLE_T_AUTHOR_URL, author.optString(User.USER_URL));
+        article.put(Article.ARTICLE_T_AUTHOR_INTRO, author.optString(UserExt.USER_INTRO));
+
+        String metal = cloudService.getEnabledMetal(articleAuthorId);
+        if (!metal.equals("{}")) {
+            List<Object> list = new JSONObject(metal).optJSONArray("list").toList();
+            author.put("sysMetal", list);
+        } else {
+            author.put("sysMetal", new ArrayList<>());
+        }
+
+
+
+        article.put(Common.IS_MY_ARTICLE, false);
+        article.put(Article.ARTICLE_T_AUTHOR, author);
+        article.put(Common.REWARDED, false);
+        article.put(Common.REWARED_COUNT, rewardQueryService.rewardedCount(articleId, Reward.TYPE_C_ARTICLE));
+        article.put(Article.ARTICLE_REVISION_COUNT, revisionQueryService.count(articleId, Revision.DATA_TYPE_C_ARTICLE));
+
+        articleQueryService.processArticleContent(article);
+
+        final int cmtViewMode = 0;
+        JSONObject currentUser = Sessions.getUser();
+        String currentUserId = currentUser.optString(Keys.OBJECT_ID);
+
+        final boolean isMyArticle = currentUserId.equals(articleAuthorId);
+        article.put(Common.IS_MY_ARTICLE, isMyArticle);
+
+        final boolean isFollowing = followQueryService.isFollowing(currentUserId, articleId, Follow.FOLLOWING_TYPE_C_ARTICLE);
+        article.put(Common.IS_FOLLOWING, isFollowing);
+
+        final boolean isWatching = followQueryService.isFollowing(currentUserId, articleId, Follow.FOLLOWING_TYPE_C_ARTICLE_WATCH);
+        article.put(Common.IS_WATCHING, isWatching);
+
+        final int articleVote = voteQueryService.isVoted(currentUserId, articleId);
+        article.put(Article.ARTICLE_T_VOTE, articleVote);
+
+        if (isMyArticle) {
+            article.put(Common.REWARDED, true);
+        } else {
+            article.put(Common.REWARDED, rewardQueryService.isRewarded(currentUserId, articleId, Reward.TYPE_C_ARTICLE));
+        }
+
+
+        //加活跃
+        livenessMgmtService.incLiveness(currentUserId, Liveness.LIVENESS_PV);
+
+
+        if (!Sessions.isBot()) {
+            final long created = System.currentTimeMillis();
+            final long expired = DateUtils.addMonths(new Date(created), 1).getTime();
+            final String ip = Requests.getRemoteAddr(request);
+            final String ua = Headers.getHeader(request, Common.USER_AGENT, "");
+            final String referer = Headers.getHeader(request, "Referer", "");
+            final JSONObject visit = new JSONObject();
+            visit.put(Visit.VISIT_IP, ip);
+            visit.put(Visit.VISIT_CITY, "");
+            visit.put(Visit.VISIT_CREATED, created);
+            visit.put(Visit.VISIT_DEVICE_ID, "");
+            visit.put(Visit.VISIT_EXPIRED, expired);
+            visit.put(Visit.VISIT_REFERER_URL, referer);
+            visit.put(Visit.VISIT_UA, ua);
+            visit.put(Visit.VISIT_URL, "/article/" + articleId);
+            visit.put(Visit.VISIT_USER_ID, "");
+            visit.put(Visit.VISIT_USER_ID, currentUser);
+
+            articleMgmtService.incArticleViewCount(visit);
+        }
+
+        // Fill article thank
+        Stopwatchs.start("Fills article thank");
+        try {
+            article.put(Common.THANKED, rewardQueryService.isRewarded(currentUserId, articleId, Reward.TYPE_C_THANK_ARTICLE));
+            article.put(Common.THANKED_COUNT, article.optInt(Article.ARTICLE_THANK_CNT));
+            if (Article.ARTICLE_TYPE_C_QNA == article.optInt(Article.ARTICLE_TYPE)) {
+                article.put(Common.OFFERED, rewardQueryService.isRewarded(articleAuthorId, articleId, Reward.TYPE_C_ACCEPT_COMMENT));
+                final JSONObject offeredComment = commentQueryService.getOfferedComment(cmtViewMode, articleId);
+                article.put(Article.ARTICLE_T_OFFERED_COMMENT, offeredComment);
+                if (null != offeredComment) {
+                    if (Comment.COMMENT_VISIBLE_C_AUTHOR == offeredComment.optInt(Comment.COMMENT_VISIBLE)) {
+                        final String commentAuthorId = offeredComment.optString(Comment.COMMENT_AUTHOR_ID);
+                        if ((!StringUtils.equals(currentUserId, commentAuthorId) && !StringUtils.equals(currentUserId, articleAuthorId))) {
+                            offeredComment.put(Comment.COMMENT_CONTENT, langPropsService.get("onlySelfAndArticleAuthorVisibleLabel"));
+                        }
+                    }
+                    final String offeredCmtId = offeredComment.optString(Keys.OBJECT_ID);
+                    final int rewardCount = offeredComment.optInt(Comment.COMMENT_THANK_CNT);
+                    offeredComment.put(Common.REWARED_COUNT, rewardCount);
+                    offeredComment.put(Common.REWARDED, rewardQueryService.isRewarded(currentUserId, offeredCmtId, Reward.TYPE_C_COMMENT));
+                }
+            }
+        } finally {
+            Stopwatchs.end();
+        }
+
+        int pageNum = Paginator.getPage(request);
+        final int pageSize = Symphonys.ARTICLE_COMMENTS_CNT;
+        final int windowSize = Symphonys.ARTICLE_COMMENTS_WIN_SIZE;
+        final int commentCnt = article.getInt(Article.ARTICLE_COMMENT_CNT);
+        final int pageCount = (int) Math.ceil((double) commentCnt / (double) pageSize);
+        // 回帖分页 SEO https://github.com/b3log/symphony/issues/813
+        if (UserExt.USER_COMMENT_VIEW_MODE_C_TRADITIONAL == cmtViewMode) {
+            if (0 < pageCount && pageNum > pageCount) {
+                pageNum = pageCount;
+            }
+        } else {
+            if (pageNum > pageCount) {
+                pageNum = 1;
+            }
+        }
+        final List<Integer> pageNums = Paginator.paginate(pageNum, pageSize, pageCount, windowSize);
+
+        JSONObject pagination = new JSONObject();
+        pagination.put(Pagination.PAGINATION_PAGE_COUNT, pageCount);
+        pagination.put(Pagination.PAGINATION_PAGE_NUMS, pageNums);
+        dataModel.put("pagination", pagination);
+
+        if (!article.optBoolean(Common.DISCUSSION_VIEWABLE)) {
+            article.put(Article.ARTICLE_T_COMMENTS, (Object) Collections.emptyList());
+            article.put(Article.ARTICLE_T_NICE_COMMENTS, (Object) Collections.emptyList());
+            return;
+        }
+
+        final List<JSONObject> niceComments = commentQueryService.getNiceComments(cmtViewMode, articleId, 3);
+        article.put(Article.ARTICLE_T_NICE_COMMENTS, (Object) niceComments);
+
+        double niceCmtScore = Double.MAX_VALUE;
+        if (!niceComments.isEmpty()) {
+            niceCmtScore = niceComments.get(niceComments.size() - 1).optDouble(Comment.COMMENT_SCORE, 0D);
+
+            for (final JSONObject comment : niceComments) {
+                String thankTemplate = langPropsService.get("thankConfirmLabel");
+                thankTemplate = thankTemplate.replace("{point}", String.valueOf(Symphonys.POINT_THANK_COMMENT))
+                        .replace("{user}", comment.optJSONObject(Comment.COMMENT_T_COMMENTER).optString(User.USER_NAME));
+                comment.put(Comment.COMMENT_T_THANK_LABEL, thankTemplate);
+
+                final String commentId = comment.optString(Keys.OBJECT_ID);
+
+                comment.put(Common.REWARDED, rewardQueryService.isRewarded(currentUserId, commentId, Reward.TYPE_C_COMMENT));
+                final int commentVote = voteQueryService.isVoted(currentUserId, commentId);
+                comment.put(Comment.COMMENT_T_VOTE, commentVote);
+
+                comment.put(Common.REWARED_COUNT, comment.optInt(Comment.COMMENT_THANK_CNT));
+
+                // https://github.com/b3log/symphony/issues/682
+                if (Comment.COMMENT_VISIBLE_C_AUTHOR == comment.optInt(Comment.COMMENT_VISIBLE)) {
+                    final String commentAuthorId = comment.optString(Comment.COMMENT_AUTHOR_ID);
+                    if ((!StringUtils.equals(currentUserId, commentAuthorId) && !StringUtils.equals(currentUserId, articleAuthorId))) {
+                        comment.put(Comment.COMMENT_CONTENT, langPropsService.get("onlySelfAndArticleAuthorVisibleLabel"));
+                    }
+                }
+            }
+        }
+
+        // Load comments
+        final List<JSONObject> articleComments = commentQueryService.getArticleComments(articleId, pageNum, pageSize, cmtViewMode);
+        article.put(Article.ARTICLE_T_COMMENTS, (Object) articleComments);
+
+        // Fill comment thank
+        Stopwatchs.start("Fills comment thank");
+        try {
+            for (final JSONObject comment : articleComments) {
+                comment.remove("commentUA");
+                comment.remove("commentIP");
+                final JSONObject commenter = comment.optJSONObject("commenter");
+                commenter.remove("userPassword");
+                commenter.remove("userLatestLoginIP");
+                commenter.remove("userPhone");
+                commenter.remove("userQQ");
+                commenter.remove("userCity");
+                commenter.remove("userCountry");
+                commenter.remove("userEmail");
+                comment.put(Comment.COMMENT_T_NICE, comment.optDouble(Comment.COMMENT_SCORE, 0D) >= niceCmtScore);
+
+                final String commentId = comment.optString(Keys.OBJECT_ID);
+
+                comment.put(Common.REWARDED,
+                        rewardQueryService.isRewarded(currentUserId, commentId, Reward.TYPE_C_COMMENT));
+                final int commentVote = voteQueryService.isVoted(currentUserId, commentId);
+                comment.put(Comment.COMMENT_T_VOTE, commentVote);
+                comment.put(Common.REWARED_COUNT, comment.optInt(Comment.COMMENT_THANK_CNT));
+
+                // https://github.com/b3log/symphony/issues/682
+                if (Comment.COMMENT_VISIBLE_C_AUTHOR == comment.optInt(Comment.COMMENT_VISIBLE)) {
+                    final String commentAuthorId = comment.optString(Comment.COMMENT_AUTHOR_ID);
+                    if ((!StringUtils.equals(currentUserId, commentAuthorId) && !StringUtils.equals(currentUserId, articleAuthorId))) {
+                        comment.put(Comment.COMMENT_CONTENT, langPropsService.get("onlySelfAndArticleAuthorVisibleLabel"));
+                    }
+                }
+            }
+        } finally {
+            Stopwatchs.end();
+        }
+        dataModel.put(Article.ARTICLE, articleDesensitize(article));
+        context.renderJSON(new JSONObject().put("data", dataModel)).renderCode(StatusCodes.SUCC).renderMsg("");
+    }
+
+
+    /**
+     * api for get articles by domain
+     *
+     * @param context the specified context
+     */
+    public void getDomainArticles(final RequestContext context) {
+        context.setRenderer(buildJsonRenderer());
+        final String domainURI = context.pathVar("domainURI");
+        final Request request = context.getRequest();
+
+        final Map<String, Object> dataModel = new HashMap<>();
+        final int pageNum = Paginator.getPage(request);
+        final String size = context.param("size");
+        int pageSize = StringUtils.isBlank(size) ? 0 : Integer.parseInt(size);
+        pageSize = pageSize <= 0 ? Symphonys.ARTICLE_LIST_CNT : pageSize;
+
+        final JSONObject domain = domainQueryService.getByURI(domainURI);
+        if (null == domain) {
+            context.renderCodeMsg(404, String.format("domain: %s 不存在!", domainURI));
+            return;
+        }
+
+        final List<JSONObject> tags = domainQueryService.getTags(domain.optString(Keys.OBJECT_ID));
+        domain.put(Domain.DOMAIN_T_TAGS, (Object) tags);
+        dataModel.put(Domain.DOMAIN, domain);
+        final String domainId = domain.optString(Keys.OBJECT_ID);
+
+        final JSONObject result = articleQueryService.getDomainArticles(domainId, pageNum, pageSize);
+        final List<JSONObject> allArticles = (List<JSONObject>) result.get(Article.ARTICLES);
+
+        final JSONObject pagination = result.getJSONObject(Pagination.PAGINATION);
+        dataModel.put("pagination", pagination);
+        dataModel.put(Article.ARTICLES, articlesDesensitize(allArticles));
+
+        context.renderJSON(new JSONObject().put("data", dataModel)).renderCode(StatusCodes.SUCC).renderMsg("");
+    }
+
+    /**
+     * api for get articles by tag
+     *
+     * @param context the specified context
+     */
+    public void getTagArticles(final RequestContext context) {
+        context.setRenderer(buildJsonRenderer());
+        final String tagURI = context.pathVar("tagURI");
+        final Request request = context.getRequest();
+
+        final Map<String, Object> dataModel = new HashMap<>();
+        final int pageNum = Paginator.getPage(request);
+        final String size = context.param("size");
+        int pageSize = StringUtils.isBlank(size) ? 0 : Integer.parseInt(size);
+        pageSize = pageSize <= 0 ? Symphonys.ARTICLE_LIST_CNT : pageSize;
+
+
+        final JSONObject tag = tagQueryService.getTagByURI(tagURI);
+        if (null == tag) {
+            context.renderCodeMsg(404, String.format("tag: %s 不存在!", tagURI));
+            return;
+        }
+
+        tag.put(Common.IS_RESERVED, tagQueryService.isReservedTag(tag.optString(Tag.TAG_TITLE)));
+        dataModel.put(Tag.TAG, tag);
+        final String tagId = tag.optString(Keys.OBJECT_ID);
+        final List<JSONObject> relatedTags = tagQueryService.getRelatedTags(tagId, Symphonys.TAG_RELATED_TAGS_CNT);
+        tag.put(Tag.TAG_T_RELATED_TAGS, (Object) relatedTags);
+
+        String sortModeStr = StringUtils.substringAfter(context.requestURI(), "/tag/" + tagURI);
+        int sortMode;
+        switch (sortModeStr) {
+            case "":
+                sortMode = 0;
+                break;
+            case "/hot":
+                sortMode = 1;
+                break;
+            case "/good":
+                sortMode = 2;
+                break;
+            case "/reply":
+                sortMode = 3;
+                break;
+            case "/perfect":
+                sortMode = 4;
+                break;
+            default:
+                sortMode = 0;
+        }
+
+        final List<JSONObject> articles = articleQueryService.getArticlesByTag(sortMode, tag, pageNum, pageSize);
+        dataModel.put(Article.ARTICLES, articlesDesensitize(articles));
+
+        final int tagRefCnt = tag.getInt(Tag.TAG_REFERENCE_CNT);
+        final int pageCount = (int) Math.ceil(tagRefCnt / (double) pageSize);
+        final int windowSize = Symphonys.ARTICLE_LIST_WIN_SIZE;
+        final List<Integer> pageNums = Paginator.paginate(pageNum, pageSize, pageCount, windowSize);
+        JSONObject paginationRet = new JSONObject();
+        paginationRet.put(Pagination.PAGINATION_PAGE_COUNT, pageCount);
+        paginationRet.put(Pagination.PAGINATION_PAGE_NUMS, pageNums);
+
+        dataModel.put("pagination", paginationRet);
+
+        context.renderJSON(new JSONObject().put("data", dataModel)).renderCode(StatusCodes.SUCC).renderMsg("");
+    }
+
+
+    /**
+     * api for get articles
+     *
+     * @param context the specified context
+     */
+    public void getArticles(final RequestContext context) {
+        final Request request = context.getRequest();
+        final Map<String, Object> dataModel = new HashMap<>();
+        final int pageNum = Paginator.getPage(request);
+        final String size = context.param("size");
+        int pageSize = StringUtils.isBlank(size) ? 0 : Integer.parseInt(size);
+        pageSize = pageSize <= 0 ? Symphonys.ARTICLE_LIST_CNT : pageSize;
+
+        String sortModeStr = StringUtils.substringAfter(context.requestURI(), "/recent");
+        int sortMode;
+        switch (sortModeStr) {
+            case "":
+                sortMode = 0;
+                break;
+            case "/hot":
+                sortMode = 1;
+                break;
+            case "/good":
+                sortMode = 2;
+                break;
+            case "/reply":
+                sortMode = 3;
+                break;
+            default:
+                sortMode = 0;
+        }
+        final JSONObject result = articleQueryService.getRecentArticles(sortMode, pageNum, pageSize);
+        final List<JSONObject> allArticles = (List<JSONObject>) result.get(Article.ARTICLES);
+
+        final JSONObject pagination = result.getJSONObject(Pagination.PAGINATION);
+        dataModel.put("pagination", pagination);
+        dataModel.put(Article.ARTICLES, articlesDesensitize(allArticles));
+
+        context.renderJSON(new JSONObject().put("data", dataModel)).renderCode(StatusCodes.SUCC).renderMsg("");
+    }
+
+    private List<JSONObject> articlesDesensitize(List<JSONObject> articles) {
+        return articles.stream().peek(article -> {
+            article.remove("articleUA");
+            article.remove("articleOriginalContent");
+            article.remove("articleContent");
+            JSONObject articleAuthor = article.optJSONObject("articleAuthor");
+            articleAuthor.remove("userLatestLoginIP");
+            articleAuthor.remove("userPassword");
+            articleAuthor.remove("userPhone");
+            articleAuthor.remove("userQQ");
+            articleAuthor.remove("userCity");
+            articleAuthor.remove("userCountry");
+            articleAuthor.remove("userEmail");
+        }).collect(Collectors.toList());
+    }
+
+    private JSONObject articleDesensitize(final JSONObject article) {
+        article.remove("articleUA");
+        article.remove("articleOriginalContent");
+        JSONObject articleAuthor = article.optJSONObject("articleAuthor");
+        articleAuthor.remove("userLatestLoginIP");
+        articleAuthor.remove("userPassword");
+        articleAuthor.remove("userPhone");
+        articleAuthor.remove("userQQ");
+        articleAuthor.remove("userCity");
+        articleAuthor.remove("userCountry");
+        articleAuthor.remove("userEmail");
+        article.put("articleAuthor", articleAuthor);
+        return article;
     }
 
     /**
