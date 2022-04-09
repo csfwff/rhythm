@@ -370,12 +370,35 @@ var ChatRoomChannel = {
                     let got = data.got;
                     let count = data.count;
                     let oId = data.oId;
-                    let spell = '<a href="' + Label.servePath + '/member/' + whoGot + '" target="_blank">' + whoGot + '</a> 抢到了 <a href="' + Label.servePath + '/member/' + whoGive + '" target="_blank">' + whoGive + '</a> 的 <a style="cursor: pointer" onclick="ChatRoom.unpackRedPacket(\'' + oId + '\')">红包</a>';
+                    let dice = data.dice
+                    let spell
+                    if (dice === null || dice === undefined) {
+                        spell = '<a href="' + Label.servePath + '/member/' + whoGot + '" target="_blank">' + whoGot + '</a> 抢到了 <a href="' + Label.servePath + '/member/' + whoGive + '" target="_blank">' + whoGive + '</a> 的 <a style="cursor: pointer" onclick="ChatRoom.unpackRedPacket(\'' + oId + '\')">红包</a>';
+                    }else {
+                        let bet
+                        switch (dice.bet) {
+                            case 'big':
+                                bet = "大"
+                                break
+                            case 'small':
+                                bet = "小"
+                                break
+                            case 'leopard':
+                                bet = "豹子"
+                                break
+                        }
+                        let chips = dice.chips;
+                        spell = '<a href="' + Label.servePath + '/member/' + whoGot + '" target="_blank">' + whoGot + '</a> 在 <a href="' + Label.servePath + '/member/' + whoGive + '" target="_blank">' + whoGive + '</a> 的 <a style="cursor: pointer" onclick="ChatRoom.bet(\'' + oId + '\')">盘口</a> 下注' + chips + '积分买' + bet;
+                    }
                     // 红包抢光了，修改状态
                     if (got === count) {
                         $("#chatroom" + data.oId).find(".hongbao__item").css("opacity", ".36");
                         $("#chatroom" + data.oId).find(".redPacketDesc").html("已经被抢光啦");
-                        spell += '，红包已被领完 (' + got + '/' + count + ')';
+                        if (dice === null || dice === undefined) {
+                            spell += '，红包已被领完 (' + got + '/' + count + ')';
+                        } else {
+                            spell += '，已封盘 (' + got + '/' + count + ')';
+                        }
                     } else {
                         spell += ' (' + got + '/' + count + ')';
                     }

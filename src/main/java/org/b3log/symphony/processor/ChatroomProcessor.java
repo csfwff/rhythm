@@ -57,6 +57,8 @@ import java.util.concurrent.ThreadLocalRandom;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 
 /**
@@ -283,11 +285,46 @@ public class ChatroomProcessor {
             int count = redPacket.optInt("count");
             int got = redPacket.optInt("got");
             JSONArray who = redPacket.optJSONArray("who");
+            JSONObject dice = requestJSONObject.optJSONObject("dice");
             // 根据抢的人数判断是否已经抢光了
             if (got >= count) {
-                context.renderJSON(new JSONObject().put("who", who).put("info", info).put("recivers", recivers));
+                JSONObject ret = new JSONObject().put("who", who).put("info", info).put("recivers", recivers);
+                if ("dice".equals(redPacket.getString("type"))) {
+                    ret.put("diceRet", redPacket.optJSONObject("diceRet"));
+                    context.renderJSON(ret);
+                    return;
+                }
+                context.renderJSON(ret);
                 return;
             }
+
+            if ("dice".equals(redPacket.getString("type"))) {
+                if (redPacketIsOpened(who, userId) || userId.equals(redPacket.optString("senderId"))) {
+                    context.renderJSON(new JSONObject().put("who", who).put("info", info));
+                    return;
+                }
+
+                if (Objects.isNull(dice) || dice.isEmpty()) {
+                    context.renderJSON(StatusCodes.ERR).renderMsg("投注失败，参数非法！");
+                    return;
+                }
+                String bet = dice.optString("bet");
+                String chips = dice.optString("chips");
+                if (org.apache.commons.lang3.StringUtils.isBlank(bet) || (!org.apache.commons.lang3.StringUtils.equals("big", bet)
+                        && !org.apache.commons.lang3.StringUtils.equals("small", bet)
+                        && !org.apache.commons.lang3.StringUtils.equals("leopard", bet))) {
+                    context.renderJSON(StatusCodes.ERR).renderMsg("投注失败，参数非法！");
+                    return;
+                }
+                if (org.apache.commons.lang3.StringUtils.isBlank(bet) || !org.apache.commons.lang3.StringUtils.isNumeric(chips)) {
+                    int chipsI = Integer.parseInt(chips);
+                    if (chipsI < 32 || chipsI > 100) {
+                        context.renderJSON(StatusCodes.ERR).renderMsg("投注失败，参数非法！");
+                        return;
+                    }
+                }
+            }
+
             // 开始领取红包
             int meGot = 0;
             if ("average".equals(redPacket.getString("type"))) {
@@ -297,6 +334,46 @@ public class ChatroomProcessor {
                     return;
                 }
                 meGot = money;
+            } else if ("dice".equals(redPacket.getString("type"))) {
+                boolean closed = false;
+                //记录投注人信息
+                JSONObject source = new JSONObject(chatRoomService.getChatMsg(oId).optString("content"));
+                JSONObject source2 = new JSONObject(source.optString("content"));
+                source2.put("got", got + 1);
+                JSONArray source3 = source2.optJSONArray("who");
+                source3.put(new JSONObject().put("dice", dice).put("userId", userId).put("userName", userName).put("time", new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(System.currentTimeMillis())).put("avatar", userQueryService.getUser(userId).optString(UserExt.USER_AVATAR_URL)));
+                source2.put("who", source3);
+                //需要封盘
+                if (got == count - 1) {
+                    Dice calcRet = allocateDice();
+                    String s = com.alibaba.fastjson.JSONObject.toJSONString(calcRet);
+                    source2.put("diceRet", new JSONObject(s));
+                    closed = true;
+                }
+                source.put("content", source2);
+
+                final Transaction transaction = chatRoomRepository.beginTransaction();
+                chatRoomRepository.update(oId, new JSONObject().put("content", source.toString()));
+                transaction.commit();
+
+                if (closed) {
+                    //结算
+                    allocateMoney(source2);
+                }
+
+                // 广播红包情况
+                JSONObject redPacketStatus = new JSONObject();
+                redPacketStatus.put(Common.TYPE, "redPacketStatus");
+                redPacketStatus.put("whoGive", source.optString(User.USER_NAME));
+                redPacketStatus.put("whoGot", userName);
+                redPacketStatus.put("got", got + 1);
+                redPacketStatus.put("count", count);
+                redPacketStatus.put("oId", oId);
+                redPacketStatus.put("dice", dice);
+                ChatroomChannel.notifyChat(redPacketStatus);
+                info.put("got", redPacket.optInt("got") + 1);
+                context.renderJSON(new JSONObject().put("who", source3).put("diceRet", source2.optJSONObject("diceRet")).put("info", info).put("recivers", recivers).put("dice", true));
+                return;
             } else if ("specify".equals(redPacket.getString("type"))) {
                 //专属红包逻辑
                 final boolean isReciver = recivers.toList().stream().anyMatch(x -> {
@@ -371,7 +448,7 @@ public class ChatroomProcessor {
                 int senderGesture = redPacket.optInt("gesture");
                 if (senderGesture - gesture == 1 || senderGesture - gesture == -2) {
                     meGot = money;
-                } else if(senderGesture != gesture)  {
+                } else if (senderGesture != gesture) {
                     meGot = -money;
                 }
             } else {
@@ -435,6 +512,35 @@ public class ChatroomProcessor {
             context.renderJSON(StatusCodes.ERR).renderMsg("红包非法");
             LOGGER.log(Level.ERROR, "Open Red Packet failed on ChatRoomProcessor.");
         }
+    }
+
+    private void allocateMoney(final JSONObject jsonObject) {
+        final JSONObject diceRet = jsonObject.optJSONObject("diceRet");
+        final String bookmaker = jsonObject.optString("senderId");
+        final String winnerResult = diceRet.optString("winnerResult");
+        final JSONArray who = jsonObject.optJSONArray("who");
+        for (Object o : who) {
+            final JSONObject userInfo = (JSONObject) o;
+            final JSONObject diceInfo = userInfo.optJSONObject("dice");
+            final String userId = userInfo.optString("userId");
+            int point = Integer.parseInt(diceInfo.optString("chips"));
+            final String bet = diceInfo.optString("bet");
+            //转账
+            if (org.apache.commons.lang3.StringUtils.equals(winnerResult, bet)) {
+                if ("leopard".equals(winnerResult)) {
+                    point *= 6;
+                }
+                pointtransferMgmtService.transfer(bookmaker, userId,
+                        Pointtransfer.TRANSFER_TYPE_C_ACTIVITY_SEND_RED_PACKET,
+                        point, "", System.currentTimeMillis(), "");
+            } else {
+                //通杀
+                pointtransferMgmtService.transfer(userId, bookmaker,
+                        Pointtransfer.TRANSFER_TYPE_C_ACTIVITY_RECEIVE_RED_PACKET,
+                        point, "", System.currentTimeMillis(), "");
+            }
+        }
+
     }
 
 
@@ -530,6 +636,18 @@ public class ChatroomProcessor {
                     try {
                         int toatlMoney = 0;
                         switch (type) {
+                            case "dice":
+                                toatlMoney = 250;
+                                int userPoint = currentUser.optInt("userPoint");
+                                if (userPoint < 1500 * 6) {
+                                    context.renderJSON(StatusCodes.ERR).renderMsg("少年,资产不足以开盘!");
+                                    return;
+                                }
+                                if (count > 15) {
+                                    context.renderJSON(StatusCodes.ERR).renderMsg("开盘人数不成超过15人,小赌怡情！");
+                                    return;
+                                }
+                                break;
                             case "rockPaperScissors":
                                 if (gesture < 0 || gesture > 2) {
                                     context.renderJSON(StatusCodes.ERR).renderMsg("数据不合法！");
@@ -747,6 +865,7 @@ public class ChatroomProcessor {
      */
     private static long CRM_CACHE_TIME = System.currentTimeMillis();
     private static int CRM_CACHE_POINT = 500;
+
     public static int calcRedpacketMax() {
         final BeanManager beanManager = BeanManager.getInstance();
         final UserRepository userRepository = beanManager.getReference(UserRepository.class);
@@ -1014,6 +1133,29 @@ public class ChatroomProcessor {
         return false;
     }
 
+    private static Dice allocateDice() {
+        final ThreadLocalRandom random = ThreadLocalRandom.current();
+        final int[] randoms = new int[3];
+        final HashSet<Integer> hash = new HashSet<>(4);
+        for (int i = 0; i < 3; i++) {
+            int rand = random.nextInt(1, 7);
+            randoms[i] = rand;
+            hash.add(rand);
+        }
+        Dice dice = new Dice(Boolean.TRUE, null, randoms);
+        if (hash.size() == 1) {
+            dice.winnerResult = "leopard";
+            return dice;
+        }
+        int sum = IntStream.of(randoms[0], randoms[1], randoms[2]).sum();
+        if (sum <= 10) {
+            dice.winnerResult = "small";
+        } else {
+            dice.winnerResult = "big";
+        }
+        return dice;
+    }
+
     private static RedPacket allocateHeartbeatRedPacket(String id, String sendId, int money, int count, int zeroCount) {
         if (zeroCount >= count) {
             zeroCount = 1;
@@ -1119,6 +1261,27 @@ public class ChatroomProcessor {
         Collections.shuffle(redPacket.packs);
         return redPacket;
     }
+
+    public static class Dice {
+        public boolean closed;
+        public int[] diceParticles;
+        public String winnerResult;
+
+        public Dice() {
+        }
+
+        ;
+
+        public Dice(boolean closed, String winnerResult, int... diceParticles) {
+            this.closed = closed;
+            if (diceParticles.length != 3) {
+                throw new IllegalArgumentException("骰子个数非法");
+            }
+            this.diceParticles = diceParticles;
+            this.winnerResult = winnerResult;
+        }
+    }
+
 
     public static class RedPacket {
         public String id;

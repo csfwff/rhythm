@@ -150,6 +150,7 @@ var ChatRoom = {
           "  <option value=\"specify\">专属红包</option>" +
           "  <option value=\"heartbeat\">心跳红包</option>" +
           "  <option value=\"rockPaperScissors\">猜拳红包</option>" +
+          "  <option value=\"dice\">摇骰子</option>" +
           "  </select>\n" +
           "</label>\n" +
           "<label id=\"gesture\" style=\"display:none;\">\n" +
@@ -171,13 +172,13 @@ var ChatRoom = {
           "  <div id=\"chatUsernameSelectedPanel\" class=\"completed-panel\"\n" +
           "                             style=\"height:170px;display:none;left:auto;top:auto;cursor:pointer;\"></div> \n" +
           "</label>\n" +
-          "<label>\n" +
+          "<label id='redPacketMoneyLabel'>\n" +
           "  <div class=\"ft__smaller ft__fade\" style=\"float: left\">积分</div>\n" +
           "  <div class=\"fn-hr5 fn__5\"></div>\n" +
           "  <input type=\"number\" min=\"32\" max=\"20000\" required=\"\" value=\"32\" id=\"redPacketMoney\" onkeypress=\"return(/[\\d]/.test(String.fromCharCode(event.keyCode)))\">\n" +
           "</label>\n" +
-          "<label>\n" +
-          "  <div class=\"ft__smaller ft__fade\" style=\"float: left\">个数</div>\n" +
+          "<label id='redPacketCountLabel'>\n" +
+          "  <div class=\"ft__smaller ft__fade\" style=\"float: left\" id=\"countx\">个数</div>\n" +
           "  <div class=\"fn-hr5 fn__5\"></div>\n" +
           "  <input type=\"number\" min=\"1\" max=\"1000\" required=\"\" value=\"2\" id=\"redPacketCount\" onkeypress=\"return(/[\\d]/.test(String.fromCharCode(event.keyCode)))\">\n" +
           "</label>\n" +
@@ -188,7 +189,7 @@ var ChatRoom = {
           "</label>\n" +
           "<div class=\"fn-hr5\"></div>\n" +
           "<div class=\"fn__flex\" style=\"margin-top: 15px\">\n" +
-          "  <div class=\"fn__flex-1 fn__flex-center\" style=\"text-align: left;\">总计：<span id=\"redPacketAmount\">32</span> 积分</div>\n" +
+          "  <div id='totalAmount' class=\"fn__flex-1 fn__flex-center\" style=\"text-align: left;\">总计：<span id=\"redPacketAmount\">32</span> 积分</div>\n" +
           "  <button class=\"btn btn--confirm\" id=\"redPacketConfirm\">发送</button>\n" +
           "</div>\n" +
           "</div>" +
@@ -243,11 +244,20 @@ var ChatRoom = {
           $('#who').css('display','none')
           $('#gesture').css('display','none')
           $('#redPacketCount').removeAttr("readOnly");
+          $('#redPacketMoneyLabel').removeAttr("style");
+          $('#totalAmount').css('display','inline')
+          $("#countx").text("个数");
         }
         if (type === 'rockPaperScissors') {
           $('#gesture').removeAttr("style");
           $("#redPacketCount").val("1");
           $('#redPacketCount').attr("readOnly","true");
+        }
+        if (type === 'dice') {
+          $('#redPacketMoneyLabel').css('display','none')
+          $('#totalAmount').css('display','none')
+          $("#countx").text("开盘人数");
+          $("#redPacketCount").val("3");
         }
       });
 
@@ -299,10 +309,22 @@ var ChatRoom = {
           $("#redPacketMsg").val("玩的就是心跳！");
         } else if (type === 'rockPaperScissors') {
           $("#redPacketMsg").val("石头剪刀布！");
+        } else if (type === 'dice') {
+          $("#redPacketMsg").val("买定离手！");
         }
       });
 
       $("#redPacketCount").on('change', function () {
+        let type = $("#redPacketType").val();
+        if (type === 'dice') {
+          if ($("#redPacketCount").val() > 15) {
+            $("#redPacketCount").val("15");
+          }
+          if ($("#redPacketCount").val() <= 3) {
+            $("#redPacketCount").val("3");
+          }
+        }
+
         if (Number($("#redPacketCount").val()) > Number($("#redPacketMoney").val())) {
           $("#redPacketCount").val($("#redPacketMoney").val());
         } else {
@@ -858,9 +880,15 @@ var ChatRoom = {
    *
    * @param who
    */
-  renderRedPacket: function (usersJSON, count, got, recivers) {
+  renderRedPacket: function (usersJSON, count, got, recivers, diceRet) {
     let hasGot = false;
     let highest = -1;
+    let winner
+    let diceParticles
+    if (diceRet !== undefined) {
+      winner = diceRet.winnerResult;
+      diceParticles = diceRet.diceParticles
+    }
     if (count === got) {
       for (let i = 0; i < usersJSON.length; i++) {
         let current = usersJSON[i];
@@ -872,16 +900,36 @@ var ChatRoom = {
     for (let i = 0; i < usersJSON.length; i++) {
       let current = usersJSON[i];
       let currentUserMoney = current.userMoney;
+      let dice = current.dice
       let currentUserName = current.userName;
       if (currentUserName === Label.currentUser) {
-        if (currentUserMoney > 0) {
-          $("#redPacketIGot").text("抢到了 " + currentUserMoney + " 积分");
-        } else if (currentUserMoney == 0) {
-          $("#redPacketIGot").text("恭喜你，抢了个寂寞");
+        if (currentUserMoney !== undefined) {
+          if (currentUserMoney > 0) {
+            $("#redPacketIGot").text("抢到了 " + currentUserMoney + " 积分");
+          } else if (currentUserMoney == 0) {
+            $("#redPacketIGot").text("恭喜你，抢了个寂寞");
+          } else {
+            $("#redPacketIGot").text("什么运气，你竟然被反向抢红包了");
+          }
         } else {
-          $("#redPacketIGot").text("什么运气，你竟然被反向抢红包了");
+          if (dice !== undefined) {
+            $("#redPacketIGot").text("押注 " + dice.chips + " 积分");
+          }
         }
         hasGot = true;
+      }
+      let bet = dice.bet
+      let userNameInfo = currentUserName
+      switch (bet) {
+        case 'big':
+          userNameInfo = currentUserName + " (" + "押大" +")";
+          break
+        case 'small':
+          userNameInfo = currentUserName + " (" + "押小" +")";
+          break
+        case 'leopard':
+          userNameInfo = currentUserName + " (" + "豹子" +")";
+          break
       }
       let currentUserTime = current.time;
       let currentUserAvatar = "";
@@ -891,7 +939,7 @@ var ChatRoom = {
       let html = "<li class=\"fn__flex menu__item\">\n" +
           currentUserAvatar +
           "    <div class=\"fn__flex-1\" style=\"text-align: left !important;\">\n" +
-          "        <h2 class=\"list__user\"><a href=\"" + Label.servePath + "/member/" + currentUserName +"\">" + currentUserName + "</a></h2>\n";
+          "        <h2 class=\"list__user\"><a href=\"" + Label.servePath + "/member/" + currentUserName +"\">" + userNameInfo + "</a></h2>\n";
       if (currentUserMoney > 0 && currentUserMoney === highest) {
         highest = -1;
         html += "<span class='green small btn'>来自老王的认可</span><br>\n";
@@ -900,9 +948,23 @@ var ChatRoom = {
       } else if (currentUserMoney < 0) {
         html += "<span class='yellow small btn'>抢红包有风险</span><br>\n";
       }
+      if (winner !== undefined) {
+        if (winner === dice.bet) {
+          html += "<span class='green small btn'>赌神</span><br>\n";
+        } else {
+          html += "<span class='red small btn'>赌博有风险</span><br>\n";
+        }
+      }
+
+      let money;
+      if (currentUserMoney === undefined && dice !== undefined) {
+        money = dice.chips
+      } else {
+        money = currentUserMoney
+      }
       html += "<span class=\"ft__fade ft__smaller\">" + currentUserTime + "</span>\n" +
           "    </div>\n" +
-          "    <div class=\"fn__flex-center\">" + currentUserMoney + " 积分</div>\n" +
+          "    <div class=\"fn__flex-center\">" + money + " 积分</div>\n" +
           "</li>\n";
       $("#redPacketList").append(html);
     }
@@ -921,7 +983,54 @@ var ChatRoom = {
         }
       }
     }
+
+    if (undefined !== winner) {
+      let content = " "
+      let sum = 0
+      for (key in diceParticles) {
+        sum += diceParticles[key]
+      }
+      switch (winner) {
+        case "big":
+          content += sum +"点大"
+          break
+        case "small":
+          content += sum +"点小"
+          break
+        case "leopard":
+          content += "豹子通杀"
+          break
+      }
+      $("#redPacketIGot").text(diceParticles + content);
+    }
   },
+
+  bet: function (oId) {
+    Util.alert("<div class=\"form fn__flex-column\">\n" +
+        "<label id=\"betRadio\">\n" +
+        "  <input type=\"radio\" name=\"bet\" value=\"big\" checked>大\n" +
+        "  <input type=\"radio\" name=\"bet\" value=\"small\">小\n" +
+        "  <input type=\"radio\" name=\"bet\" value=\"leopard\">豹子\n" +
+        "  <div class=\"ft__smaller ft__fade\" style=\"float: left\">筹码</div>\n" +
+        "  <div class=\"fn-hr5 fn__5\"></div>\n" +
+        "  <input type=\"number\" min=\"32\" max=\"100\" required=\"\" value=\"32\" id=\"chipsLabel\" name='chips' onkeypress=\"return(/[\\d]/.test(String.fromCharCode(event.keyCode)))\">\n" +
+        "</label>\n" +
+        "<div class=\"fn__flex\" style=\"margin-top: 15px\">\n" +
+        "  <button class=\"btn btn--confirm\" onclick=\"ChatRoom.unpackRedPacket(" + oId + ")\;Util.clearAlert()\">押注</button>\n" +
+        "</div>\n" +
+        "</div>", '买定离手');
+
+    $("#chipsLabel").on('change', function () {
+        if ($("#chipsLabel").val() > 100) {
+          $("#chipsLabel").val("100");
+        }
+        if ($("#chipsLabel").val() <= 32) {
+          $("#chipsLabel").val("32");
+        }
+      });
+  },
+
+
   selectGesture: function (oId) {
     Util.alert("<div class=\"form fn__flex-column\">\n" +
         "<label id=\"gestureRadio\">\n" +
@@ -943,7 +1052,11 @@ var ChatRoom = {
       method: "POST",
       data: JSON.stringify({
         oId: oId,
-        gesture: $("#gestureRadio>input[name=gesture]:checked").val()
+        gesture: $("#gestureRadio>input[name=gesture]:checked").val(),
+        dice: {
+          bet: $("#betRadio>input[name=bet]:checked").val(),
+          chips: $("#betRadio>input[name=chips]").val()
+        }
       }),
       success: function (result) {
         if (result.code !== -1) {
@@ -997,10 +1110,14 @@ var ChatRoom = {
               "<div class=\"list\"><ul id=\"redPacketList\">\n" +
               "</ul></div>" +
               "", "红包");
-          ChatRoom.renderRedPacket(result.who, result.info.count, result.info.got, result.recivers)
+          ChatRoom.renderRedPacket(result.who, result.info.count, result.info.got, result.recivers, result.diceRet)
           if (result.info.count === result.info.got) {
             $("#chatroom" + oId).find(".hongbao__item").css("opacity", ".36").attr('onclick', "ChatRoom.unpackRedPacket(" + oId + ")");
-            $("#chatroom" + oId).find(".redPacketDesc").html("已经被抢光啦");
+            if (result.dice === true) {
+              $("#chatroom" + oId).find(".redPacketDesc").html("已开盘");
+            } else {
+              $("#chatroom" + oId).find(".redPacketDesc").html("已经被抢光啦");
+            }
           }
         } else {
           Util.alert(result.msg);
@@ -1049,8 +1166,27 @@ var ChatRoom = {
               onclick = 'ChatRoom.selectGesture(\'' + data.oId + '\')';
             }
             break;
+          case "dice":
+            type = "摇骰子";
+            if (msgJSON.senderId !== Label.currentUserId) {
+              let dup = false
+              for (idx in msgJSON.who){
+                if (msgJSON.who[idx].userId === Label.currentUserId) {
+                    dup = true
+                    break
+                }
+              }
+              if (!dup) {
+                onclick = 'ChatRoom.bet(\'' + data.oId + '\')';
+              }
+            }
+            break
         }
         if (Number(msgJSON.count) === Number(msgJSON.got)) {
+          let content = "已经被抢光啦"
+          if (msgJSON.type === 'dice') {
+            content = "已开盘"
+          }
           data.content = '' +
               '<div style="opacity: .36;" class="hongbao__item fn__flex-inline" onclick="ChatRoom.unpackRedPacket(\'' + data.oId + '\')">\n' +
               '    <svg class="ft__red hongbao__icon">\n' +
@@ -1059,7 +1195,7 @@ var ChatRoom = {
               '    <div>\n' +
               '        <div>' + msgJSON.msg + '<br><b>' + type + '</b></div>\n' +
               '        <div class="ft__smaller ft__fade redPacketDesc">\n' +
-              '           已经被抢光啦\n' +
+                          content + '\n' +
               '        </div>\n' +
               '    </div>\n' +
               '</div>';
