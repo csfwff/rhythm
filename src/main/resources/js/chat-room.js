@@ -918,7 +918,10 @@ var ChatRoom = {
         }
         hasGot = true;
       }
-      let bet = dice.bet
+      let bet = '';
+      if (dice !== undefined) {
+        bet = dice.bet;
+      }
       let userNameInfo = currentUserName
       switch (bet) {
         case 'big':
