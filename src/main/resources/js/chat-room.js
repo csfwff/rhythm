@@ -950,9 +950,9 @@ var ChatRoom = {
       }
       if (winner !== undefined) {
         if (winner === dice.bet) {
-          html += "<span class='green small btn'>赌神</span><br>\n";
+          html += "<span class='green small btn'>运气好而已</span><br>\n";
         } else {
-          html += "<span class='red small btn'>赌博有风险</span><br>\n";
+          html += "<span class='red small btn'>别玩了</span><br>\n";
         }
       }
 

@@ -613,7 +613,7 @@ public class ChatroomProcessor {
                         }
                         // 扣积分
                         if (money > calcRedpacketMax()) {
-                            context.renderJSON(StatusCodes.ERR).renderMsg("红包发送失败！根据社区成员积分储蓄中位数，当前红包最大限额为" + calcRedpacketMax() + "！");
+                            context.renderJSON(StatusCodes.ERR).renderMsg("红包发送失败！根据社区成员积分储蓄平均数，当前红包最大限额为" + calcRedpacketMax() + "！");
                             return;
                         }
                         if (money < 32) {
@@ -874,13 +874,9 @@ public class ChatroomProcessor {
             // 刷新缓存
             try {
                 // 计算红包限额
-                List<JSONObject> userCount = userRepository.select("select count(*) from symphony_user");
-                JSONObject userCount2 = userCount.get(0);
-                int count = (int) Double.parseDouble(userCount2.optString("count(*)"));
-                int middle = count / 2;
-                List<JSONObject> user = userRepository.select("select userPoint from symphony_user limit " + middle + ",1");
-                JSONObject user2 = user.get(0);
-                int userPoint = (int) Double.parseDouble(user2.optString("userPoint"));
+                List<JSONObject> userPointAvg = userRepository.select("select round(avg(userPoint),0) from symphony_user where userRole!='adminRole' and userPoint!='0';");
+                int userPoint = userPointAvg.get(0).optInt("round(avg(userPoint),0)");
+
                 if (userPoint > 5000) {
                     userPoint = 5000;
                 }
