@@ -150,7 +150,6 @@ var ChatRoom = {
           "  <option value=\"specify\">专属红包</option>" +
           "  <option value=\"heartbeat\">心跳红包</option>" +
           "  <option value=\"rockPaperScissors\">猜拳红包</option>" +
-          "  <option value=\"dice\">摇骰子</option>" +
           "  </select>\n" +
           "</label>\n" +
           "<label id=\"gesture\" style=\"display:none;\">\n" +

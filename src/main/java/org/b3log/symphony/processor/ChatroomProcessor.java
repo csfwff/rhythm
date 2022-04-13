@@ -299,7 +299,10 @@ public class ChatroomProcessor {
             }
 
             if ("dice".equals(redPacket.getString("type"))) {
-                if (redPacketIsOpened(who, userId) || userId.equals(redPacket.optString("senderId"))) {
+                context.renderJSON(StatusCodes.ERR).renderMsg("暂不支持摇骰子红包！");
+                return;
+
+                /*if (redPacketIsOpened(who, userId) || userId.equals(redPacket.optString("senderId"))) {
                     context.renderJSON(new JSONObject().put("who", who).put("info", info));
                     return;
                 }
@@ -322,7 +325,7 @@ public class ChatroomProcessor {
                         context.renderJSON(StatusCodes.ERR).renderMsg("投注失败，参数非法！");
                         return;
                     }
-                }
+                }*/
             }
 
             // 开始领取红包
@@ -639,7 +642,9 @@ public class ChatroomProcessor {
                         int toatlMoney = 0;
                         switch (type) {
                             case "dice":
-                                toatlMoney = 250;
+                                context.renderJSON(StatusCodes.ERR).renderMsg("暂不支持摇骰子红包！");
+                                return;
+                                /*toatlMoney = 250;
                                 int userPoint = currentUser.optInt("userPoint");
                                 if (userPoint < 1500 * 6) {
                                     context.renderJSON(StatusCodes.ERR).renderMsg("少年,资产不足以开盘!");
@@ -649,7 +654,7 @@ public class ChatroomProcessor {
                                     context.renderJSON(StatusCodes.ERR).renderMsg("开盘人数不成超过15人,小赌怡情！");
                                     return;
                                 }
-                                break;
+                                break;*/
                             case "rockPaperScissors":
                                 if (gesture < 0 || gesture > 2) {
                                     context.renderJSON(StatusCodes.ERR).renderMsg("数据不合法！");
