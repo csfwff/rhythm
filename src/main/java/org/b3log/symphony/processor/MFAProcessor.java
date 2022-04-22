@@ -166,6 +166,16 @@ public class MFAProcessor {
         context.renderJSON(StatusCodes.ERR).renderMsg("未绑定2FA");
     }
 
+    public static boolean verifyLogin(String userId, long code) {
+        final BeanManager beanManager = BeanManager.getInstance();
+        final UserQueryService userQueryService = beanManager.getReference(UserQueryService.class);
+        String secret = userQueryService.getSecret2fa(userId);
+        if (secret.isEmpty()) {
+            return true;
+        }
+        return check(secret, code);
+    }
+
     public synchronized static boolean verify(String userId, long code) {
         try {
             final BeanManager beanManager = BeanManager.getInstance();
