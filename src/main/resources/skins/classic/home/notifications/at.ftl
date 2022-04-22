@@ -83,7 +83,7 @@
                 <div class="fn-flex-1">
                     <div class="fn-flex">
                         <h2 class="fn-flex-1">
-                            <div><a style="color: black" target="_blank" rel="nofollow" href="${servePath}/member/${notification.userName}">${notification.userName}</a> 在 <a style="color: black" href="${servePath}/cr?oId=${notification.oId}"> 聊天室 </a> @了你 </div>
+                            <div><a style="color: black" target="_blank" rel="nofollow" href="${servePath}/member/${notification.userName}">${notification.userName}</a> 在 <a style="color: black" href="${servePath}/cr?oId=${notification.dataId}"> 聊天室 </a> @了你 </div>
                         </h2>
                         <span class="ft-gray">
                         ${notification.createTime?string('yyyy-MM-dd HH:mm')}
@@ -101,7 +101,7 @@
             <div class="fn-flex-1">
                 <div class="fn-flex">
                     <h2 class="fn-flex-1">
-                        <div><a style="color: black" target="_blank" rel="nofollow" href="${servePath}/member/${notification.userName}">${notification.userName}</a> 在 <a style="color: black" href="${servePath}/cr?oId=${notification.oId}"> 聊天室 </a> 给你发了一个红包 </div>
+                        <div><a style="color: black" target="_blank" rel="nofollow" href="${servePath}/member/${notification.userName}">${notification.userName}</a> 在 <a style="color: black" href="${servePath}/cr?oId=${notification.dataId}"> 聊天室 </a> 给你发了一个红包 </div>
                     </h2>
                     <span class="ft-gray">
                     ${notification.createTime?string('yyyy-MM-dd HH:mm')}
