@@ -52,6 +52,18 @@ public class MFAProcessor {
     private static final Logger LOGGER = LogManager.getLogger(MFAProcessor.class);
 
     /**
+     * User query service.
+     */
+    @Inject
+    private UserQueryService userQueryService;
+
+    /**
+     * User management service.
+     */
+    @Inject
+    private UserMgmtService userMgmtService;
+
+    /**
      * Register request handlers.
      */
     public static void register() {
@@ -61,6 +73,7 @@ public class MFAProcessor {
         final MFAProcessor mfaProcessor = beanManager.getReference(MFAProcessor.class);
         Dispatcher.get("/mfa", mfaProcessor::getMFA, loginCheck::handle);
         Dispatcher.get("/mfa/verify", mfaProcessor::verifyMFA, loginCheck::handle);
+        Dispatcher.get("/mfa/remove", mfaProcessor::removeMFA, loginCheck::handle);
     }
 
     private static final Map<String, String> MFA_CACHE = Collections.synchronizedMap(new LinkedHashMap<String, String>() {
@@ -112,6 +125,23 @@ public class MFAProcessor {
             }
         } catch (Exception e) {
             context.renderJSON(StatusCodes.ERR).renderMsg("认证码不合法");
+        }
+    }
+
+    public synchronized void removeMFA(final RequestContext context) {
+        JSONObject currentUser = Sessions.getUser();
+        try {
+            currentUser = ApiProcessor.getUserByKey(context.param("apiKey"));
+        } catch (NullPointerException ignored) {
+        }
+        String userId = currentUser.optString(Keys.OBJECT_ID);
+        try {
+            final JSONObject user = userQueryService.getUser(userId);
+            user.put("secret2fa", "");
+            userMgmtService.updateUser(userId, user);
+            context.renderJSON(StatusCodes.SUCC).renderMsg("解绑成功");
+        } catch (Exception e) {
+            context.renderJSON(StatusCodes.ERR).renderMsg("解绑失败");
         }
     }
 
