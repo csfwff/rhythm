@@ -1658,6 +1658,12 @@
           "name": "onlineMinute",
           "type": "int",
           "description": "在线时间（分钟）"
+        },
+        {
+          "name": "secret2fa",
+          "type": "String",
+          "length": 255,
+          "description": "两步验证 Secret"
         }
       ]
     },
