@@ -83,6 +83,11 @@ public final class Report {
      */
     public static final int REPORT_DATA_TYPE_C_USER = 2;
 
+    /**
+     * Report data type - chat.
+     */
+    public static final int REPORT_DATA_TYPE_C_CHAT = 3;
+
     // Report type constants
     /**
      * Report type - Spam AD.

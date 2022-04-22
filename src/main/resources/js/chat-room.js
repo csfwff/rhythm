@@ -884,6 +884,30 @@ var ChatRoom = {
     $(window).scrollTop(0);
   },
   /**
+   * 一键举报
+   * @param id
+   */
+  report: function (id) {
+    $.ajax({
+      url: Label.servePath + '/report',
+      type: 'POST',
+      cache: false,
+      data: JSON.stringify({
+        reportDataId: id,
+        reportDataType: 3,
+        reportType: 49,
+        reportMemo: '',
+      }),
+      complete: function (result) {
+        if (result.responseJSON.code === 0) {
+          Util.alert('一键举报成功，感谢你的帮助！<br>管理员将进行审核，如情况属实系统会为举报人发放积分奖励，并对违规者进行相应处罚。');
+        } else {
+          Util.alert(result.responseJSON.msg);
+        }
+      },
+    })
+  },
+  /**
    * 艾特某个人
    */
   at: function (userName, id, justAt) {
@@ -1321,7 +1345,18 @@ var ChatRoom = {
           '                        <a onclick=\"ChatRoom.at(\'' + data.userName + '\', \'' + data.oId + '\', true)\" class="item">@' + data.userName + '</a>\n' +
           '                        <a onclick=\"ChatRoom.at(\'' + data.userName + '\', \'' + data.oId + '\', false)\" class="item">引用</a>\n' +
           '                        <a onclick=\"ChatRoom.repeat(\'' + data.oId + '\')\" class="item">复读机</a>\n' +
+          '                        <a onclick=\"ChatRoom.report(\'' + data.oId + '\')\" class="item"><svg><use xlink:href="#icon-report"></use></svg> 一键举报</a>\n' +
           meTag2 +
+          '                    </details-menu>\n' +
+          '                </details>\n';
+    } else {
+      newHTML += '                <details class="details action__item fn__flex-center">\n' +
+          '                    <summary>\n' +
+          '                        ···\n' +
+          '                    </summary>\n' +
+          '                    <details-menu class="fn__layer">\n' +
+          '                        <a onclick=\"ChatRoom.at(\'' + data.userName + '\', \'' + data.oId + '\', true)\" class="item">@' + data.userName + '</a>\n' +
+          '                        <a onclick=\"ChatRoom.report(\'' + data.oId + '\')\" class="item"><svg><use xlink:href="#icon-report"></use></svg> 一键举报</a>\n' +
           '                    </details-menu>\n' +
           '                </details>\n';
     }

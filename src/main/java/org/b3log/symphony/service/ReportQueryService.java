@@ -100,6 +100,12 @@ public class ReportQueryService {
     private CommentQueryService commentQueryService;
 
     /**
+     * Chat Room Service.
+     */
+    @Inject
+    private ChatRoomService chatRoomService;
+
+    /**
      * Gets report by the specified request json object.
      *
      * @param requestJSONObject the specified request json object, for example,
@@ -192,6 +198,11 @@ public class ReportQueryService {
                         report.put(Report.REPORT_T_DATA_TYPE_STR, langPropsService.get("accountLabel"));
                         final JSONObject reported = userRepository.get(dataId);
                         reportData = UserExt.getUserLink(reported);
+                        break;
+                    case Report.REPORT_DATA_TYPE_C_CHAT:
+                        report.put(Report.REPORT_T_DATA_TYPE_STR, langPropsService.get("chatLabel"));
+                        reportData = "<a href=\"" + Latkes.getServePath() + "/cr?oId=" + dataId +
+                                "\" target=\"_blank\">跳转至该消息</a>";
                         break;
                     default:
                         LOGGER.log(Level.ERROR, "Unknown report data type [" + dataType + "]");
