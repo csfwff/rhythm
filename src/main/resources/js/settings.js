@@ -88,7 +88,7 @@ var Settings = {
           // 没有MFA
           $("#mfaCode").append("<label><svg><use xlink:href=\"#unsafe\"></use></svg> 未在保护中</label><br><br><br>");
           $("#mfaCode").append("<p>" +
-              "    两步验证可以极大增强您的账户安全性，<a href=\"\" target=\"_blank\">使用指南</a><br>" +
+              "    两步验证可以极大增强您的账户安全性，<a href=\"https://fishpi.cn/article/1650648000379\" target=\"_blank\">使用指南</a><br>" +
               "    为防止意外丢失，建议您备份二维码下方的手动输入代码。<br>" +
               "    请使用两步验证器扫描二维码绑定 (推荐使用 Authenticator)" +
               "</p>");

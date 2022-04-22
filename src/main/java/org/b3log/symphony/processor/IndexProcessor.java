@@ -33,6 +33,7 @@ import org.b3log.latke.ioc.BeanManager;
 import org.b3log.latke.ioc.Inject;
 import org.b3log.latke.ioc.Singleton;
 import org.b3log.latke.model.Pagination;
+import org.b3log.latke.model.User;
 import org.b3log.latke.service.LangPropsService;
 import org.b3log.latke.util.CollectionUtils;
 import org.b3log.latke.util.Locales;
@@ -484,12 +485,27 @@ public class IndexProcessor {
 
             // 用户手机号
             dataModel.put("userPhone", currentUser.optString("userPhone"));
+
+            // 提示绑定2FA
+            boolean isAdmin = DataModelService.hasPermission(currentUser.optString(User.USER_ROLE), 3);
+            if (isAdmin) {
+                String secret = userQueryService.getSecret2fa(userId);
+                if (secret.isEmpty()) {
+                    dataModel.put("need2fa", "yes");
+                } else {
+                    dataModel.put("need2fa", "no");
+                }
+            } else {
+                dataModel.put("need2fa", "no");
+            }
         } else {
             dataModel.put(UserExt.CHAT_ROOM_PICTURE_STATUS, UserExt.USER_XXX_STATUS_C_ENABLED);
             // 是否领取过昨日奖励
             dataModel.put("collectedYesterdayLivenessReward", 1);
             dataModel.put("checkedIn", 0);
             dataModel.put("userPhone", "not-logged");
+            // 提示绑定2FA
+            dataModel.put("need2fa", "no");
         }
 
         dataModel.put(Common.MESSAGES, ChatroomProcessor.getMessages(1));
