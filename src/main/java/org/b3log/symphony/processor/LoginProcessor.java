@@ -703,7 +703,7 @@ public class LoginProcessor {
             if (userPassword.equals(requestJSONObject.optString(User.USER_PASSWORD))) {
                 long code;
                 try {
-                    code = Long.parseLong(context.param("mfaCode"));
+                    code = requestJSONObject.optLong("mfaCode");
                 } catch (Exception e) {
                     code = 0;
                 }

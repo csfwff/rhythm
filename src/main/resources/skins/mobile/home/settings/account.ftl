@@ -41,7 +41,7 @@
         <h2>两步验证</h2>
     </div>
     <div class="module-panel form fn-clear">
-        <div id="mfa">
+        <div id="mfaCode">
         </div>
     </div>
 </div>
