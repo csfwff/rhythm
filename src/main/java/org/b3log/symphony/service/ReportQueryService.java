@@ -32,6 +32,7 @@ import org.b3log.latke.service.LangPropsService;
 import org.b3log.latke.service.annotation.Service;
 import org.b3log.latke.util.Paginator;
 import org.b3log.symphony.model.Article;
+import org.b3log.symphony.model.Common;
 import org.b3log.symphony.model.Report;
 import org.b3log.symphony.model.UserExt;
 import org.b3log.symphony.repository.ArticleRepository;
@@ -162,6 +163,7 @@ public class ReportQueryService {
 
         final List<JSONObject> records = (List<JSONObject>) result.opt(Keys.RESULTS);
         final List<JSONObject> reports = new ArrayList<>();
+        String chatContent = "";
         for (final JSONObject record : records) {
             final JSONObject report = new JSONObject();
             report.put(Keys.OBJECT_ID, record.optString(Keys.OBJECT_ID));
@@ -201,6 +203,9 @@ public class ReportQueryService {
                         break;
                     case Report.REPORT_DATA_TYPE_C_CHAT:
                         report.put(Report.REPORT_T_DATA_TYPE_STR, langPropsService.get("chatLabel"));
+                        final JSONObject redPacket = chatRoomService.getChatMsg(dataId);
+                        final JSONObject content = new JSONObject(redPacket.optString(Common.CONTENT));
+                        chatContent = content.optString("content");
                         reportData = "<a href=\"" + Latkes.getServePath() + "/cr?oId=" + dataId +
                                 "\" target=\"_blank\">跳转至该消息</a>";
                         break;
@@ -253,6 +258,9 @@ public class ReportQueryService {
             memo = Markdowns.toHTML(memo);
             memo = Markdowns.clean(memo, "");
             report.put(Report.REPORT_MEMO, memo);
+            if (!chatContent.isEmpty()) {
+                report.put(Report.REPORT_MEMO, chatContent.replaceAll("\n\n", "<br>"));
+            }
             report.put(Report.REPORT_HANDLED, record.optInt(Report.REPORT_HANDLED));
             reports.add(report);
         }
