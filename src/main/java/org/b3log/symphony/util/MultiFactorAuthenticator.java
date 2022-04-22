@@ -15,7 +15,7 @@ public class MultiFactorAuthenticator {
     // this is a http api (GET request) to generate the QR code image to show in the website/app.
     private static final String IMAGE_QR_CODE_API = "https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=";
     // you can change it to any string.
-    private static final String SEED = "hooyah";
+    private static final String SEED = "thisisgoogleauthenticator";
     // taken from Google pam docs - we probably don't need to mess with these
     private static final String RANDOM_NUMBER_ALGORITHM = "SHA1PRNG";
     private static final int SECRET_SIZE = 10;

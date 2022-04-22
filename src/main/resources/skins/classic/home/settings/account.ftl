@@ -38,6 +38,16 @@
 
 <div class="module">
     <div class="module-header">
+        <h2>两步验证</h2>
+    </div>
+    <div class="module-panel form fn-clear">
+        <label>两步验证可以极大增强您的账户安全性，<a href="" target="_blank">使用指南</a></label>
+
+    </div>
+</div>
+
+<div class="module">
+    <div class="module-header">
         <h2>${userNameLabel} ${updateNameTipLabel}</h2>
     </div>
     <div class="module-panel form fn-clear">

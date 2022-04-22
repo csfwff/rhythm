@@ -764,4 +764,17 @@ public class UserQueryService {
             return "someone101";
         }
     }
+
+    public String getSecret2fa(final String userId) {
+        try {
+            final Query query = new Query()
+                    .setFilter(new PropertyFilter(Keys.OBJECT_ID, FilterOperator.EQUAL, userId))
+                    .select("secret2fa");
+            JSONObject result = userRepository.get(query);
+            final List<JSONObject> results = (List<JSONObject>) result.opt(Keys.RESULTS);
+            return results.get(0).optString("secret2fa");
+        } catch (final RepositoryException e) {
+            return "";
+        }
+    }
 }
