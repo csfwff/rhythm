@@ -957,8 +957,10 @@ public class ChatroomProcessor {
                 throw new NullPointerException();
             }
             dataModel.put("contextMode", "yes");
+            dataModel.put("contextOId", oId);
         } catch (Exception ignored) {
             dataModel.put("contextMode", "no");
+            dataModel.put("contextOId", '0');
         }
         dataModel.put(Common.ONLINE_CHAT_CNT, 0);
         final JSONObject currentUser = Sessions.getUser();
