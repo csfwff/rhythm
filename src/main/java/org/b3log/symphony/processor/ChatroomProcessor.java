@@ -951,7 +951,15 @@ public class ChatroomProcessor {
     public void showChatRoom(final RequestContext context) {
         final AbstractFreeMarkerRenderer renderer = new SkinRenderer(context, "chat-room.ftl");
         final Map<String, Object> dataModel = renderer.getDataModel();
-        dataModel.put(Common.MESSAGES, getMessages(1));
+        try {
+            String oId = context.param("oId");
+            if (oId == null) {
+                throw new NullPointerException();
+            }
+            dataModel.put("contextMode", "yes");
+        } catch (Exception ignored) {
+            dataModel.put("contextMode", "no");
+        }
         dataModel.put(Common.ONLINE_CHAT_CNT, 0);
         final JSONObject currentUser = Sessions.getUser();
         if (null != currentUser) {
