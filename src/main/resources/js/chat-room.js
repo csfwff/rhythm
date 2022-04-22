@@ -721,29 +721,60 @@ var ChatRoom = {
     NProgress.start();
     setTimeout(function () {
       page++;
+      let chatMessageLatestOId;
+      if (page !== 1) {
+        let chatMessages = $(".chats__item");
+        let chatMessageLatest = chatMessages[chatMessages.length - 1];
+        chatMessageLatestOId = $(chatMessageLatest).attr('id').replace('chatroom', '');
+      }
       if (Label.hasMore) {
-        $.ajax({
-          url: Label.servePath + '/chat-room/more?page=' + page,
-          type: 'GET',
-          cache: false,
-          async: false,
-          success: function (result) {
-            if (result.data.length !== 0) {
-              for (let i in result.data) {
-                let data = result.data[i];
-                if ($("#chatroom" + data.oId).length === 0) {
-                  ChatRoom.renderMsg(data, 'more');
+        if (page === 1) {
+          $.ajax({
+            url: Label.servePath + '/chat-room/more?page=' + page,
+            type: 'GET',
+            cache: false,
+            async: false,
+            success: function (result) {
+              if (result.data.length !== 0) {
+                for (let i in result.data) {
+                  let data = result.data[i];
+                  if ($("#chatroom" + data.oId).length === 0) {
+                    ChatRoom.renderMsg(data, 'more');
+                  }
+                  ChatRoom.resetMoreBtnListen();
                 }
-                ChatRoom.resetMoreBtnListen();
+                Util.listenUserCard();
+                ChatRoom.imageViewer()
+              } else {
+                alert("没有更多聊天消息了！");
+                Label.hasMore = false;
               }
-              Util.listenUserCard();
-              ChatRoom.imageViewer()
-            } else {
-              alert("没有更多聊天消息了！");
-              Label.hasMore = false;
             }
-          }
-        });
+          });
+        } else {
+          $.ajax({
+            url: Label.servePath + '/chat-room/getMessage?size=25&mode=1&oId=' + chatMessageLatestOId,
+            type: 'GET',
+            cache: false,
+            async: false,
+            success: function (result) {
+              if (result.data.length !== 0) {
+                for (let i in result.data) {
+                  let data = result.data[i];
+                  if ($("#chatroom" + data.oId).length === 0) {
+                    ChatRoom.renderMsg(data, 'more');
+                  }
+                  ChatRoom.resetMoreBtnListen();
+                }
+                Util.listenUserCard();
+                ChatRoom.imageViewer()
+              } else {
+                alert("没有更多聊天消息了！");
+                Label.hasMore = false;
+              }
+            }
+          });
+        }
       }
       NProgress.done();
     }, 0);
