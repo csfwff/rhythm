@@ -31,6 +31,44 @@
  */
 var Settings = {
   /**
+   * 解绑两步验证
+   */
+  removeMFA: function () {
+    $.ajax({
+      url: Label.servePath + '/mfa/remove',
+      type: 'GET',
+      cache: false,
+      success: function (result) {
+        if (0 === result.code) {
+          alert(result.msg);
+          location.reload();
+        } else {
+          Util.alert(result.msg);
+        }
+      }
+    });
+  },
+  /**
+   * 绑定两步验证
+   */
+  verifyMFA: function () {
+    let code = $("#mfaVerifyCode").val();
+    $.ajax({
+      url: Label.servePath + '/mfa/verify?code=' + code,
+      type: 'GET',
+      cache: false,
+      success: function (result) {
+        if (0 === result.code) {
+          alert(result.msg);
+          location.reload();
+        } else {
+          Util.alert(result.msg);
+          $("#mfaVerifyCode").val("");
+        }
+      }
+    });
+  },
+  /**
    * 初始化两步验证信息
    */
   initMFA: function () {
@@ -41,19 +79,34 @@ var Settings = {
       success: function (result) {
         if (0 === result.code) {
           // 已有MFA
+          $("#mfa").append("<label><svg><use xlink:href=\"#safe\"></use></svg> 验证器已启用，保护中</label><br><br><br>");
+          $("#mfa").append("<p>" +
+              "    您已绑定两步验证器，账户安全等级高。<br>如需更换绑定设备，请解绑后重新绑定。" +
+              "</p>");
+          $("#mfa").append("<br><button class=\"fn-right\" onclick=\"Settings.removeMFA()\">解绑</button>");
         } else {
           // 没有MFA
-          $("#mfa").append("<label>" +
+          $("#mfa").append("<label><svg><use xlink:href=\"#unsafe\"></use></svg> 未在保护中</label><br><br><br>");
+          $("#mfa").append("<p>" +
               "    两步验证可以极大增强您的账户安全性，<a href=\"\" target=\"_blank\">使用指南</a><br>" +
+              "    为防止意外丢失，建议您备份二维码下方的手动输入代码。<br>" +
               "    请使用两步验证器扫描二维码绑定 (推荐使用 Authenticator)" +
-              "</label>");
+              "</p>");
           $.ajax({
             url: Label.servePath + '/mfa',
             type: 'GET',
             cache: false,
             success: function (result) {
               if (0 === result.code) {
-
+                $("#mfa").append("<br>");
+                $("#mfa").append("<img src='" + result.qrCodeLink + "'/>");
+                $("#mfa").append("<br>");
+                $("#mfa").append("<p>或手动输入代码：" + result.secret + "</p>");
+                $("#mfa").append("<br>");
+                $("#mfa").append("<p>绑定成功后，请输入一次性密码用于验证，并点击绑定按钮：</p>");
+                $("#mfa").append("<input id=\"mfaVerifyCode\" type=\"text\" />")
+                $("#mfa").append("<br><br>");
+                $("#mfa").append("<button class=\"fn-right\" onclick=\"Settings.verifyMFA()\">绑定</button>");
               } else {
                 $("#mfa").append("获取2FA信息失败，请联系管理员");
               }
