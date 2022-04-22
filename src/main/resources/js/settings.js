@@ -31,6 +31,40 @@
  */
 var Settings = {
   /**
+   * 初始化两步验证信息
+   */
+  initMFA: function () {
+    $.ajax({
+      url: Label.servePath + '/mfa/enabled',
+      type: 'GET',
+      cache: false,
+      success: function (result) {
+        if (0 === result.code) {
+          // 已有MFA
+        } else {
+          // 没有MFA
+          $("#mfa").append("<label>" +
+              "    两步验证可以极大增强您的账户安全性，<a href=\"\" target=\"_blank\">使用指南</a><br>" +
+              "    请使用两步验证器扫描二维码绑定 (推荐使用 Authenticator)" +
+              "</label>");
+          $.ajax({
+            url: Label.servePath + '/mfa',
+            type: 'GET',
+            cache: false,
+            success: function (result) {
+              if (0 === result.code) {
+
+              } else {
+                $("#mfa").append("获取2FA信息失败，请联系管理员");
+              }
+            }
+          });
+
+        }
+      },
+    });
+  },
+  /**
    * 初始化背包
    */
   initBag: function (sysBag) {

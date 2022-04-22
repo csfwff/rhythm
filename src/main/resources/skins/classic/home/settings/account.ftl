@@ -41,8 +41,8 @@
         <h2>两步验证</h2>
     </div>
     <div class="module-panel form fn-clear">
-        <label>两步验证可以极大增强您的账户安全性，<a href="" target="_blank">使用指南</a></label>
-
+        <div id="mfa">
+        </div>
     </div>
 </div>
 

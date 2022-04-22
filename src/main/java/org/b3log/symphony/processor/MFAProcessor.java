@@ -74,6 +74,7 @@ public class MFAProcessor {
         Dispatcher.get("/mfa", mfaProcessor::getMFA, loginCheck::handle);
         Dispatcher.get("/mfa/verify", mfaProcessor::verifyMFA, loginCheck::handle);
         Dispatcher.get("/mfa/remove", mfaProcessor::removeMFA, loginCheck::handle);
+        Dispatcher.get("/mfa/enabled", mfaProcessor::enabledMFA, loginCheck::handle);
     }
 
     private static final Map<String, String> MFA_CACHE = Collections.synchronizedMap(new LinkedHashMap<String, String>() {
@@ -91,13 +92,18 @@ public class MFAProcessor {
         }
         JSONObject json = new JSONObject();
         String userId = currentUser.optString(Keys.OBJECT_ID);
+        String getSecret = userQueryService.getSecret2fa(userId);
+        if (!getSecret.isEmpty()) {
+            context.renderJSON(StatusCodes.ERR).renderMsg("已绑定2FA，无法获取新的Secret");
+            return;
+        }
         if (MFA_CACHE.containsKey(userId)) {
             String secret = MFA_CACHE.get(userId);
             String qrCodeLink = MultiFactorAuthenticator.getQRBarcodeURL(userId, secret);
             json.put("qrCodeLink", qrCodeLink);
             json.put("user", userId);
             json.put("secret", secret);
-            context.renderJSON(StatusCodes.SUCC).renderJSON(json);
+            context.renderJSON(json.put("code", 0));
         } else {
             String secret = MultiFactorAuthenticator.generateSecretKey();
             String qrCodeLink = MultiFactorAuthenticator.getQRBarcodeURL(userId, secret);
@@ -105,7 +111,7 @@ public class MFAProcessor {
             json.put("user", userId);
             json.put("secret", secret);
             MFA_CACHE.put(userId, secret);
-            context.renderJSON(StatusCodes.SUCC).renderJSON(json);
+            context.renderJSON(json.put("code", 0));
         }
     }
 
@@ -143,6 +149,21 @@ public class MFAProcessor {
         } catch (Exception e) {
             context.renderJSON(StatusCodes.ERR).renderMsg("解绑失败");
         }
+    }
+
+    public void enabledMFA(final RequestContext context) {
+        JSONObject currentUser = Sessions.getUser();
+        try {
+            currentUser = ApiProcessor.getUserByKey(context.param("apiKey"));
+        } catch (NullPointerException ignored) {
+        }
+        String userId = currentUser.optString(Keys.OBJECT_ID);
+        String secret = userQueryService.getSecret2fa(userId);
+        if (!secret.isEmpty()) {
+            context.renderJSON(StatusCodes.SUCC).renderMsg("已绑定2FA");
+            return;
+        }
+        context.renderJSON(StatusCodes.ERR).renderMsg("未绑定2FA");
     }
 
     public synchronized static boolean verify(String userId, long code) {

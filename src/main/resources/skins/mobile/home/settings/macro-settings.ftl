@@ -101,6 +101,7 @@
                     Label.unPreviewLabel = "${unPreviewLabel}";
                     <#if 'account' == type>Settings.initBag(${sysBag});</#if>
                     <#if 'account' == type>Settings.initMetal(${sysMetal});</#if>
+                    <#if 'account' == type>Settings.initMFA();</#if>
         </script>
     </body>
 </html>
