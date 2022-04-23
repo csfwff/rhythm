@@ -105,9 +105,6 @@ public class IdleTalkProcessor {
 
     private static void saveMessage(String senderId, String receiverId, JSONObject message) {
         String mapId = Ids.genTimeMillisId();
-        messages.put(mapId, message);
-        senderContext.put(senderId, mapId);
-        receiverContext.put(receiverId, mapId);
         // 写数据库
         try {
             final BeanManager beanManager = BeanManager.getInstance();
@@ -164,30 +161,6 @@ public class IdleTalkProcessor {
     }
 
     /**
-     * Clean Validated Messages (12 hours validation).
-     */
-    public static void cleanValidatedMessages() {
-        Long realTime = System.currentTimeMillis();
-        List<JSONObject> list = new ArrayList<>();
-        for (String timeStamp : messages.keySet()) {
-            Long messageTime = Long.parseLong(timeStamp) + 43200000;
-            if (messageTime < realTime) {
-                JSONObject message = messages.get(timeStamp);
-                String fromUserId = message.optString("fromUserId");
-                String toUserId = message.optString("toUserId");
-                JSONObject jsonObject = new JSONObject();
-                jsonObject.put("mapId", timeStamp);
-                jsonObject.put("senderId", fromUserId);
-                jsonObject.put("receiverId", toUserId);
-                list.add(jsonObject);
-            }
-        }
-        for (JSONObject jsonObject : list) {
-            removeMessage(jsonObject.optString("mapId"), jsonObject.optString("senderId"), jsonObject.optString("receiverId"));
-        }
-    }
-
-    /**
      * seek a message and remove.
      *
      * @param context
@@ -238,23 +211,27 @@ public class IdleTalkProcessor {
             context.renderJSON(StatusCodes.ERR).renderMsg("无法获取用户信息！");
             return;
         }
-        String mapId = context.param("mapId");
-        JSONObject message = messages.get(mapId);
-        String fromUserId = message.optString("fromUserId");
-        String toUserId = message.optString("toUserId");
-        if (fromUserId.equals(user.optString(Keys.OBJECT_ID))) {
-            messages.remove(mapId);
-            senderContext.remove(fromUserId, mapId);
-            receiverContext.remove(toUserId, mapId);
-            // 让发送者销毁
-            final JSONObject cmd = new JSONObject();
-            cmd.put(UserExt.USER_T_ID, toUserId);
-            cmd.put(Common.COMMAND, mapId);
-            cmd.put("youAre", "destroyIdleChatMessage");
-            IdleTalkChannel.sendCmd(cmd);
-            context.renderJSON(StatusCodes.SUCC);
-        } else {
-            context.renderJSON(StatusCodes.ERR).renderMsg("你没有撤回该消息的权限！");
+        try {
+            String mapId = context.param("mapId");
+            JSONObject message = chatRepository.getMessageById(mapId);
+            String fromUserId = message.optString("fromUserId");
+            String toUserId = message.optString("toUserId");
+            if (fromUserId.equals(user.optString(Keys.OBJECT_ID))) {
+                Transaction transaction = chatRepository.beginTransaction();
+                chatRepository.remove(mapId);
+                transaction.commit();
+                // 让发送者销毁
+                final JSONObject cmd = new JSONObject();
+                cmd.put(UserExt.USER_T_ID, toUserId);
+                cmd.put(Common.COMMAND, mapId);
+                cmd.put("youAre", "destroyIdleChatMessage");
+                IdleTalkChannel.sendCmd(cmd);
+                context.renderJSON(StatusCodes.SUCC);
+            } else {
+                context.renderJSON(StatusCodes.ERR).renderMsg("你没有撤回该消息的权限！");
+            }
+        } catch (RepositoryException e) {
+            LOGGER.log(Level.ERROR, "Unable to revoke", e);
         }
     }
 

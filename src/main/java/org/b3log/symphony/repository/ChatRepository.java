@@ -41,6 +41,14 @@ public class ChatRepository extends AbstractRepository {
         return getJsonObjects(query);
     }
 
+    public JSONObject getMessageById(final String id) throws RepositoryException {
+        final Query query = new Query().setFilter(
+                new PropertyFilter("oId", FilterOperator.EQUAL, id)
+        );
+        JSONObject result = getFirst(query);
+        return new JSONObject(result.optString("message")).put("mapId", result.optString("oId"));
+    }
+
     public List<JSONObject> getMessagesByReceiverId(final String receiverId) throws RepositoryException {
         final Query query = new Query().setFilter(
                 new PropertyFilter("receiverId", FilterOperator.EQUAL, receiverId)
