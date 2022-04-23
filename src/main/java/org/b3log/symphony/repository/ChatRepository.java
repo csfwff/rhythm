@@ -52,7 +52,7 @@ public class ChatRepository extends AbstractRepository {
         List<JSONObject> result = getList(query);
         List<JSONObject> message = new ArrayList<>();
         for (JSONObject r : result) {
-            message.add(new JSONObject(r.optString("message")));
+            message.add(new JSONObject(r.optString("message")).put("mapId", r.optString("oId")));
         }
         return message;
     }
