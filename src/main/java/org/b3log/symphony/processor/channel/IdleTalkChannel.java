@@ -28,6 +28,7 @@ import org.b3log.latke.ioc.Singleton;
 import org.b3log.latke.model.User;
 import org.b3log.symphony.model.Common;
 import org.b3log.symphony.model.UserExt;
+import org.b3log.symphony.processor.ApiProcessor;
 import org.b3log.symphony.service.UserMgmtService;
 import org.json.JSONObject;
 
@@ -58,9 +59,12 @@ public class IdleTalkChannel implements WebSocketChannel {
      */
     @Override
     public void onConnect(final WebSocketSession session) {
-        final Session httpSession = session.getHttpSession();
+        JSONObject user = new JSONObject(session.getHttpSession().getAttribute(User.USER));
+        try {
+            user = ApiProcessor.getUserByKey(session.getParameter("apiKey"));
+        } catch (NullPointerException ignored) {
+        }
 
-        final JSONObject user = new JSONObject(httpSession.getAttribute(User.USER));
         if (null == user) {
             return;
         }
