@@ -34,10 +34,4 @@ public class ChatRepository extends AbstractRepository {
         super("chat");
     }
 
-    public List<JSONObject> listByUserId(String userId) throws RepositoryException {
-        final Query query = new Query()
-                .setFilter(new PropertyFilter("userId", FilterOperator.EQUAL, userId))
-                .addSort("time", SortDirection.DESCENDING);
-        return getList(query);
-    }
 }

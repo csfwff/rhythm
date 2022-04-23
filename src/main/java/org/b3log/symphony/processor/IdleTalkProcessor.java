@@ -19,6 +19,7 @@
 package org.b3log.symphony.processor;
 
 import com.google.common.collect.HashMultimap;
+import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.b3log.latke.Keys;
@@ -30,6 +31,8 @@ import org.b3log.latke.ioc.BeanManager;
 import org.b3log.latke.ioc.Inject;
 import org.b3log.latke.ioc.Singleton;
 import org.b3log.latke.model.User;
+import org.b3log.latke.repository.RepositoryException;
+import org.b3log.latke.repository.Transaction;
 import org.b3log.latke.util.Ids;
 import org.b3log.symphony.model.Common;
 import org.b3log.symphony.model.Notification;
@@ -39,6 +42,7 @@ import org.b3log.symphony.processor.channel.IdleTalkChannel;
 import org.b3log.symphony.processor.channel.UserChannel;
 import org.b3log.symphony.processor.middleware.CSRFMidware;
 import org.b3log.symphony.processor.middleware.LoginCheckMidware;
+import org.b3log.symphony.repository.ChatRepository;
 import org.b3log.symphony.service.DataModelService;
 import org.b3log.symphony.service.PointtransferMgmtService;
 import org.b3log.symphony.service.UserQueryService;
@@ -76,6 +80,12 @@ public class IdleTalkProcessor {
      */
     @Inject
     private PointtransferMgmtService pointtransferMgmtService;
+
+    /**
+     * Chat repository.
+     */
+    @Inject
+    private ChatRepository chatRepository;
 
     /**
      * Messages saved at memory, it won't access database.
@@ -116,6 +126,20 @@ public class IdleTalkProcessor {
         messages.put(mapId, message);
         senderContext.put(senderId, mapId);
         receiverContext.put(receiverId, mapId);
+        // 写数据库
+        try {
+            final BeanManager beanManager = BeanManager.getInstance();
+            final ChatRepository chatRepository = beanManager.getReference(ChatRepository.class);
+            final Transaction transaction = chatRepository.beginTransaction();
+            JSONObject data = new JSONObject();
+            data.put("senderId", senderId);
+            data.put("receiverId", receiverId);
+            data.put("message", message);
+            chatRepository.add(data);
+            transaction.commit();
+        } catch (RepositoryException e) {
+            LOGGER.log(Level.ERROR, "Unable to save message", e);
+        }
         // 发送 WebSocket 通知
         // 先通知接收者来新消息了
         final JSONObject cmd = new JSONObject();
