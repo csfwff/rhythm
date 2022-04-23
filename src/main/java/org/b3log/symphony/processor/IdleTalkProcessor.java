@@ -93,13 +93,13 @@ public class IdleTalkProcessor {
     public static void register() {
         final BeanManager beanManager = BeanManager.getInstance();
         final LoginCheckMidware loginCheck = beanManager.getReference(LoginCheckMidware.class);
-        final CSRFMidware csrfMidware = beanManager.getReference(CSRFMidware.class);
 
         final IdleTalkProcessor idleTalkProcessor = beanManager.getReference(IdleTalkProcessor.class);
-        Dispatcher.get("/idle-talk", idleTalkProcessor::showIdleTalk, loginCheck::handle, csrfMidware::fill);
-        Dispatcher.post("/idle-talk/send", idleTalkProcessor::sendIdleTalk, loginCheck::handle, csrfMidware::check);
-        Dispatcher.get("/idle-talk/revoke", idleTalkProcessor::revoke, loginCheck::handle, csrfMidware::check);
-        Dispatcher.get("/idle-talk/seek", idleTalkProcessor::seek, loginCheck::handle, csrfMidware::check);
+        Dispatcher.get("/idle-talk", idleTalkProcessor::showIdleTalk, loginCheck::handle);
+        Dispatcher.get("/api/idle-talk", idleTalkProcessor::showIdleTalkApi, loginCheck::handle);
+        Dispatcher.post("/idle-talk/send", idleTalkProcessor::sendIdleTalk, loginCheck::handle);
+        Dispatcher.get("/idle-talk/revoke", idleTalkProcessor::revoke, loginCheck::handle);
+        Dispatcher.get("/idle-talk/seek", idleTalkProcessor::seek, loginCheck::handle);
     }
 
     /**
@@ -152,6 +152,10 @@ public class IdleTalkProcessor {
      */
     public void seek(final RequestContext context) {
         JSONObject user = Sessions.getUser();
+        try {
+            user = ApiProcessor.getUserByKey(context.param("apiKey"));
+        } catch (NullPointerException ignored) {
+        }
         if (user == null) {
             context.renderJSON(StatusCodes.ERR).renderMsg("无法获取用户信息！");
             return;
@@ -196,6 +200,10 @@ public class IdleTalkProcessor {
      */
     public void revoke(final RequestContext context) {
         JSONObject user = Sessions.getUser();
+        try {
+            user = ApiProcessor.getUserByKey(context.param("apiKey"));
+        } catch (NullPointerException ignored) {
+        }
         if (user == null) {
             context.renderJSON(StatusCodes.ERR).renderMsg("无法获取用户信息！");
             return;
@@ -247,6 +255,33 @@ public class IdleTalkProcessor {
      *
      * @param context
      */
+    public void showIdleTalkApi(final RequestContext context) {
+        JSONObject currentUser = Sessions.getUser();
+        try {
+            currentUser = ApiProcessor.getUserByKey(context.param("apiKey"));
+        } catch (NullPointerException ignored) {
+        }
+        final String userId = currentUser.optString(Keys.OBJECT_ID);
+        JSONObject responseJSON = new JSONObject();
+        try {
+            List<JSONObject> meSent = chatRepository.getMessagesBySenderId(userId);
+            List<JSONObject> meReceived = chatRepository.getMessagesByReceiverId(userId);
+            responseJSON.put("meSent", meSent);
+            responseJSON.put("meReceived", meReceived);
+        } catch (RepositoryException e) {
+            responseJSON.put("meSent", "");
+            responseJSON.put("meReceived", "");
+            LOGGER.log(Level.ERROR, "Get chats failed", e);
+        }
+
+        context.renderJSON(StatusCodes.SUCC).renderData(responseJSON);
+    }
+
+    /**
+     * Shows Idle Talk index.
+     *
+     * @param context
+     */
     public void showIdleTalk(final RequestContext context) {
         final AbstractFreeMarkerRenderer renderer = new SkinRenderer(context, "home/idle-talk.ftl");
         final Map<String, Object> dataModel = renderer.getDataModel();
@@ -273,7 +308,12 @@ public class IdleTalkProcessor {
      */
     public synchronized void sendIdleTalk(final RequestContext context) {
         // From
-        final JSONObject currentUser = Sessions.getUser();
+        final JSONObject requestJSONObject = context.requestJSON();
+        JSONObject currentUser = Sessions.getUser();
+        try {
+            currentUser = ApiProcessor.getUserByKey(requestJSONObject.optString("apiKey"));
+        } catch (NullPointerException ignored) {
+        }
         String fromUserId = currentUser.optString(Keys.OBJECT_ID);
         String fromUserName = currentUser.optString(User.USER_NAME);
         String fromUserAvatar = currentUser.optString(UserExt.USER_AVATAR_URL);
