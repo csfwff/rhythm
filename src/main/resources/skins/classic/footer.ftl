@@ -65,6 +65,7 @@
                 <a href="${servePath}/tags">${tagLabel}</a>
                 <a href="${servePath}/statistic">${dataStatLabel}</a>
                 <a href="${servePath}/article/1636516552191">开放 API</a>
+                <a href="${servePath}/privacy" target="_blank">隐私政策</a>
             </div>
         </div>
     </div>
