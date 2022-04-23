@@ -134,7 +134,7 @@ public class IdleTalkProcessor {
             JSONObject data = new JSONObject();
             data.put("senderId", senderId);
             data.put("receiverId", receiverId);
-            data.put("message", message);
+            data.put("message", message.toString());
             chatRepository.add(data);
             transaction.commit();
         } catch (RepositoryException e) {
@@ -296,10 +296,16 @@ public class IdleTalkProcessor {
         final Map<String, Object> dataModel = renderer.getDataModel();
         final JSONObject currentUser = Sessions.getUser();
         final String userId = currentUser.optString(Keys.OBJECT_ID);
-        List<JSONObject> meSent = getMessagesBySenderId(userId);
-        List<JSONObject> meReceived = getMessagesByReceiverId(userId);
-        dataModel.put("meSent", meSent);
-        dataModel.put("meReceived", meReceived);
+        try {
+            List<JSONObject> meSent = chatRepository.getMessagesBySenderId(userId);
+            List<JSONObject> meReceived = chatRepository.getMessagesByReceiverId(userId);
+            dataModel.put("meSent", meSent);
+            dataModel.put("meReceived", meReceived);
+        } catch (RepositoryException e) {
+            dataModel.put("meSent", "");
+            dataModel.put("meReceived", "");
+            LOGGER.log(Level.ERROR, "Get chats failed", e);
+        }
 
         dataModelService.fillHeaderAndFooter(context, dataModel);
     }

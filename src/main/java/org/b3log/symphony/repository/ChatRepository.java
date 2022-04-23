@@ -20,9 +20,9 @@ package org.b3log.symphony.repository;
 
 import org.b3log.latke.repository.*;
 import org.b3log.latke.repository.annotation.Repository;
-import org.b3log.symphony.model.Sponsor;
 import org.json.JSONObject;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Repository
@@ -34,4 +34,26 @@ public class ChatRepository extends AbstractRepository {
         super("chat");
     }
 
+    public List<JSONObject> getMessagesBySenderId(final String senderId) throws RepositoryException {
+        final Query query = new Query().setFilter(
+                new PropertyFilter("senderId", FilterOperator.EQUAL, senderId)
+        );
+        return getJsonObjects(query);
+    }
+
+    public List<JSONObject> getMessagesByReceiverId(final String receiverId) throws RepositoryException {
+        final Query query = new Query().setFilter(
+                new PropertyFilter("receiverId", FilterOperator.EQUAL, receiverId)
+        );
+        return getJsonObjects(query);
+    }
+
+    private List<JSONObject> getJsonObjects(Query query) throws RepositoryException {
+        List<JSONObject> result = getList(query);
+        List<JSONObject> message = new ArrayList<>();
+        for (JSONObject r : result) {
+            message.add(new JSONObject(r.optString("message")));
+        }
+        return message;
+    }
 }
