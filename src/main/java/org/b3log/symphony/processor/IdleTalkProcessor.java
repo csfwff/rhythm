@@ -103,24 +103,6 @@ public class IdleTalkProcessor {
     private static final HashMultimap<String, String> senderContext = HashMultimap.create();
     private static final HashMultimap<String, String> receiverContext = HashMultimap.create();
 
-    private static List<JSONObject> getMessagesBySenderId(String senderId) {
-        List<JSONObject> message = new ArrayList<>();
-        Set<String> sender = senderContext.get(senderId);
-        for (String s : sender) {
-            message.add(messages.get(s).put("mapId", s));
-        }
-        return message;
-    }
-
-    private static List<JSONObject> getMessagesByReceiverId(String receiverId) {
-        List<JSONObject> message = new ArrayList<>();
-        Set<String> receiver = receiverContext.get(receiverId);
-        for (String r : receiver) {
-            message.add(messages.get(r).put("mapId", r));
-        }
-        return message;
-    }
-
     private static void saveMessage(String senderId, String receiverId, JSONObject message) {
         String mapId = Ids.genTimeMillisId();
         messages.put(mapId, message);
