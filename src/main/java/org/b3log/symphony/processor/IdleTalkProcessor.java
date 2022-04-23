@@ -88,21 +88,27 @@ public class IdleTalkProcessor {
     private ChatRepository chatRepository;
 
     /**
-     * Messages saved at memory, it won't access database.
-     *
-     * <MapId, message JSON>
+     * Register request handlers.
      */
-    private static final HashMap<String, JSONObject> messages = new HashMap<>();
+    public static void register() {
+        final BeanManager beanManager = BeanManager.getInstance();
+        final LoginCheckMidware loginCheck = beanManager.getReference(LoginCheckMidware.class);
+        final CSRFMidware csrfMidware = beanManager.getReference(CSRFMidware.class);
+
+        final IdleTalkProcessor idleTalkProcessor = beanManager.getReference(IdleTalkProcessor.class);
+        Dispatcher.get("/idle-talk", idleTalkProcessor::showIdleTalk, loginCheck::handle, csrfMidware::fill);
+        Dispatcher.post("/idle-talk/send", idleTalkProcessor::sendIdleTalk, loginCheck::handle, csrfMidware::check);
+        Dispatcher.get("/idle-talk/revoke", idleTalkProcessor::revoke, loginCheck::handle, csrfMidware::check);
+        Dispatcher.get("/idle-talk/seek", idleTalkProcessor::seek, loginCheck::handle, csrfMidware::check);
+    }
 
     /**
-     * Context table map.
+     * Save message.
      *
-     * SenderContext: <SenderId, MapId>
-     * ReceiverContext: <ReceiverId, MapId>
+     * @param senderId
+     * @param receiverId
+     * @param message
      */
-    private static final HashMultimap<String, String> senderContext = HashMultimap.create();
-    private static final HashMultimap<String, String> receiverContext = HashMultimap.create();
-
     private static void saveMessage(String senderId, String receiverId, JSONObject message) {
         String mapId = Ids.genTimeMillisId();
         // 写数据库
@@ -137,21 +143,6 @@ public class IdleTalkProcessor {
         cmd.put(UserExt.USER_T_ID, senderId);
         cmd.put("youAre", "sender");
         IdleTalkChannel.sendCmd(cmd);
-    }
-
-    /**
-     * Register request handlers.
-     */
-    public static void register() {
-        final BeanManager beanManager = BeanManager.getInstance();
-        final LoginCheckMidware loginCheck = beanManager.getReference(LoginCheckMidware.class);
-        final CSRFMidware csrfMidware = beanManager.getReference(CSRFMidware.class);
-
-        final IdleTalkProcessor idleTalkProcessor = beanManager.getReference(IdleTalkProcessor.class);
-        Dispatcher.get("/idle-talk", idleTalkProcessor::showIdleTalk, loginCheck::handle, csrfMidware::fill);
-        Dispatcher.post("/idle-talk/send", idleTalkProcessor::sendIdleTalk, loginCheck::handle, csrfMidware::check);
-        Dispatcher.get("/idle-talk/revoke", idleTalkProcessor::revoke, loginCheck::handle, csrfMidware::check);
-        Dispatcher.get("/idle-talk/seek", idleTalkProcessor::seek, loginCheck::handle, csrfMidware::check);
     }
 
     /**
