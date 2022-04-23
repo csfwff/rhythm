@@ -171,32 +171,36 @@ public class IdleTalkProcessor {
             context.renderJSON(StatusCodes.ERR).renderMsg("无法获取用户信息！");
             return;
         }
-        String mapId = context.param("mapId");
-        JSONObject message = messages.get(mapId);
-        String fromUserId = message.optString("fromUserId");
-        String toUserId = message.optString("toUserId");
-        if (toUserId.equals(user.optString(Keys.OBJECT_ID))) {
-            // 渲染消息
-            String content = message.optString("content");
-            content = Emotions.toAliases(content);
-            content = Emotions.convert(content);
-            content = Markdowns.toHTML(content);
-            content = Markdowns.clean(content, "");
-            content = MediaPlayers.renderAudio(content);
-            content = MediaPlayers.renderVideo(content);
-            // 删除消息
-            messages.remove(mapId);
-            senderContext.remove(fromUserId, mapId);
-            receiverContext.remove(toUserId, mapId);
-            // 让发送者销毁
-            final JSONObject cmd = new JSONObject();
-            cmd.put(UserExt.USER_T_ID, fromUserId);
-            cmd.put(Common.COMMAND, mapId);
-            cmd.put("youAre", "destroyIdleChatMessage");
-            IdleTalkChannel.sendCmd(cmd);
-            context.renderJSON(StatusCodes.SUCC).renderData(content);
-        } else {
-            context.renderJSON(StatusCodes.ERR).renderMsg("你没有查看该消息的权限！");
+        try {
+            String mapId = context.param("mapId");
+            JSONObject message = chatRepository.getMessageById(mapId);
+            String fromUserId = message.optString("fromUserId");
+            String toUserId = message.optString("toUserId");
+            if (toUserId.equals(user.optString(Keys.OBJECT_ID))) {
+                // 渲染消息
+                String content = message.optString("content");
+                content = Emotions.toAliases(content);
+                content = Emotions.convert(content);
+                content = Markdowns.toHTML(content);
+                content = Markdowns.clean(content, "");
+                content = MediaPlayers.renderAudio(content);
+                content = MediaPlayers.renderVideo(content);
+                // 删除消息
+                Transaction transaction = chatRepository.beginTransaction();
+                chatRepository.remove(mapId);
+                transaction.commit();
+                // 让发送者销毁
+                final JSONObject cmd = new JSONObject();
+                cmd.put(UserExt.USER_T_ID, fromUserId);
+                cmd.put(Common.COMMAND, mapId);
+                cmd.put("youAre", "destroyIdleChatMessage");
+                IdleTalkChannel.sendCmd(cmd);
+                context.renderJSON(StatusCodes.SUCC).renderData(content);
+            } else {
+                context.renderJSON(StatusCodes.ERR).renderMsg("你没有查看该消息的权限！");
+            }
+        } catch (RepositoryException e) {
+            LOGGER.log(Level.ERROR, "Unable to seek chat", e);
         }
     }
 
