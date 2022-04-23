@@ -110,7 +110,7 @@ public class IdleTalkProcessor {
      * @param message
      */
     private static void saveMessage(String senderId, String receiverId, JSONObject message) {
-        String mapId = Ids.genTimeMillisId();
+        String mapId = null;
         // 写数据库
         try {
             final BeanManager beanManager = BeanManager.getInstance();
@@ -120,7 +120,7 @@ public class IdleTalkProcessor {
             data.put("senderId", senderId);
             data.put("receiverId", receiverId);
             data.put("message", message.toString());
-            chatRepository.add(data);
+            mapId = chatRepository.add(data);
             transaction.commit();
         } catch (RepositoryException e) {
             LOGGER.log(Level.ERROR, "Unable to save message", e);
