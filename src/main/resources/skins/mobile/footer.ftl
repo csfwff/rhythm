@@ -27,11 +27,12 @@
         </div>
         <br>
         <div>
-            友情链接
+            摸鱼好站
         </div>
         <div>
             <a target="_blank" href="https://www.cxy521.com/">程序员导航</a><br>
-            <a target="_blank" href="https://www.lundao.pub">「论道」社区</a>
+            <a target="_blank" href="https://www.lundao.pub/">论道社区</a><br>
+            <a target="_blank" href="https://bbs.foreverblog.cn/">十年之约论坛</a>
         </div>
         <div class="fn-hr5"></div>
         <div style="margin-top: 5px">

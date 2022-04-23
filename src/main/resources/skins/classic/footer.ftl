@@ -25,10 +25,12 @@
         </div>
         <div class="fn-flex-1">
             <div class="footer-nav fn-clear ft-smaller">
-                友情链接&nbsp;
+                摸鱼好站&nbsp;
                 <a style="margin-right: 0px; padding-right: 0px" target="_blank" href="https://www.cxy521.com/">程序员导航</a>
                 &nbsp;｜&nbsp;
-                <a style="margin-right: 0px; padding-right: 0px" target="_blank" href="https://www.lundao.pub">「论道」社区</a>
+                <a style="margin-right: 0px; padding-right: 0px" target="_blank" href="https://www.lundao.pub/">论道社区</a>
+                &nbsp;｜&nbsp;
+                <a style="margin-right: 0px; padding-right: 0px" target="_blank" href="https://bbs.foreverblog.cn/">十年之约论坛</a>
             </div>
             <div class="fn-clear ft-smaller">
                 <div style="margin-top: 5px">探索</div>
