@@ -139,12 +139,6 @@ public class IdleTalkProcessor {
         IdleTalkChannel.sendCmd(cmd);
     }
 
-    private static void removeMessage(String mapId, String senderId, String receiverId) {
-        messages.remove(mapId);
-        senderContext.remove(senderId, mapId);
-        receiverContext.remove(receiverId, mapId);
-    }
-
     /**
      * Register request handlers.
      */
@@ -246,7 +240,15 @@ public class IdleTalkProcessor {
      * @return
      */
     public static boolean hasUnreadChatMessage(String userId) {
-        return receiverContext.get(userId).size() != 0;
+        try {
+            final BeanManager beanManager = BeanManager.getInstance();
+            final ChatRepository chatRepository = beanManager.getReference(ChatRepository.class);
+            List<JSONObject> messages = chatRepository.getMessagesByReceiverId(userId);
+            return messages.size() != 0;
+        } catch (RepositoryException e) {
+            LOGGER.log(Level.ERROR, "Unable to get unread chat messages", e);
+            return false;
+        }
     }
 
     /**
