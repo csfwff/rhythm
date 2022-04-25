@@ -19,7 +19,7 @@
 
 -->
 <#include "macro-top.ftl">
-<@top "online">
+<@top "adr">
 <h2 class="ranking-title">ADR 游戏总分排行</h2>
 <div class="list top">
     <ul>

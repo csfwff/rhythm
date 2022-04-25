@@ -19,7 +19,7 @@
 
 -->
 <#include "macro-top.ftl">
-<@top "online">
+<@top "lifeRestart">
 <h2 class="sub-head">人生重开模拟器成就排行</h2>
 <div class="list">
     <ul>
