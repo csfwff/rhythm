@@ -111,6 +111,8 @@ public final class Router {
         ShopProcessor.register();
         // 支付宝
         AlipayProcessor.register();
+        // MFA
+        MFAProcessor.register();
 
         final BeanManager beanManager = BeanManager.getInstance();
         final LoginCheckMidware loginCheck = beanManager.getReference(LoginCheckMidware.class);

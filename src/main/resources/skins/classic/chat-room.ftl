@@ -150,7 +150,38 @@
     // Init [ChatRoom] channel
     ChatRoomChannel.init("${wsScheme}://${serverHost}:${serverPort}${contextPath}/chat-room-channel");
     var page = 0;
-    ChatRoom.more();
+    if ('${contextMode}' === 'no') {
+        ChatRoom.more();
+    } else {
+        page = 1;
+        let contextOId = '${contextOId}';
+        $.ajax({
+            url: Label.servePath + '/chat-room/getMessage?size=25&mode=0&oId=' + contextOId,
+            type: 'GET',
+            cache: false,
+            async: false,
+            success: function (result) {
+                if (result.data.length !== 0) {
+                    for (let i in result.data) {
+                        let data = result.data[i];
+                        if ($("#chatroom" + data.oId).length === 0) {
+                            ChatRoom.renderMsg(data, 'more');
+                        }
+                        ChatRoom.resetMoreBtnListen();
+                    }
+                    Util.listenUserCard();
+                    ChatRoom.imageViewer();
+                    let html = "<div class='redPacketNotice' style='color: rgb(50 50 50);margin-bottom: 8px;text-align: center;display: none;'>您当前处于指定消息预览模式，将显示指定消息的前后25条消息，如需查看最新消息请 <a onclick='location.href = \"/cr\"' style='cursor:pointer;'>点击这里</a></div>";
+                    $('#chats').prepend(html);
+                    $(".redPacketNotice").slideDown(500);
+                    location.hash = '#chatroom' + contextOId;
+                } else {
+                    alert("没有更多聊天消息了！");
+                    Label.hasMore = false;
+                }
+            }
+        });
+    }
     Label.onlineAvatarData = "";
 </script>
 <script>

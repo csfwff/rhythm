@@ -44,8 +44,10 @@
                         <div style="font-size: 12px;line-height: 18px; padding: 15px">
                             您的私信内容经过加密，一旦以下情况任一发生，私信将会无法再次查看：<br>
                             1. 收信人查看信件正文；<br>
-                            2. 发信人撤回信件；<br>
-                            3. 信件超过12小时未读。<br><br>
+                            2. 发信人撤回信件。<br><br>
+                            另请注意：<br>
+                            1. 如果消息未读且未被撤回，消息将会一直储存于邮箱中，不会被删除；<br>
+                            2. 私信消息会被服务器接收并存档，如涉及违规内容，我们可能会调取您的消息记录。<br><br>
                             <b>积分花费：5积分/条</b>
                         </div>
                         <div>
@@ -93,7 +95,7 @@
                             </#if>
                         </ul>
                     </div>
-                    <h3 style="padding: 40px 0 20px 0">发出但未被阅读的密信</h3>
+                    <h3 style="padding: 40px 0 20px 0">发出但未被阅读的私信</h3>
                     <div class="module-panel" style="padding-top: 15px;">
                         <ul id="sent" class="module-list">
                             <#if meSent?? && (meSent?size > 0)>

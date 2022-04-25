@@ -849,6 +849,7 @@ public class NotificationQueryService {
                 String description = "";
 
                 atNotification.put(Keys.OBJECT_ID, notification.optString(Keys.OBJECT_ID));
+                atNotification.put(Notification.NOTIFICATION_DATA_ID, dataId);
                 atNotification.put(Notification.NOTIFICATION_HAS_READ, notification.optBoolean(Notification.NOTIFICATION_HAS_READ));
                 atNotification.put(Common.CREATE_TIME, new Date(notification.optLong(Keys.OBJECT_ID)));
 

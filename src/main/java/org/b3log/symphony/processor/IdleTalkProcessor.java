@@ -19,6 +19,7 @@
 package org.b3log.symphony.processor;
 
 import com.google.common.collect.HashMultimap;
+import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.b3log.latke.Keys;
@@ -30,6 +31,8 @@ import org.b3log.latke.ioc.BeanManager;
 import org.b3log.latke.ioc.Inject;
 import org.b3log.latke.ioc.Singleton;
 import org.b3log.latke.model.User;
+import org.b3log.latke.repository.RepositoryException;
+import org.b3log.latke.repository.Transaction;
 import org.b3log.latke.util.Ids;
 import org.b3log.symphony.model.Common;
 import org.b3log.symphony.model.Notification;
@@ -39,6 +42,7 @@ import org.b3log.symphony.processor.channel.IdleTalkChannel;
 import org.b3log.symphony.processor.channel.UserChannel;
 import org.b3log.symphony.processor.middleware.CSRFMidware;
 import org.b3log.symphony.processor.middleware.LoginCheckMidware;
+import org.b3log.symphony.repository.ChatRepository;
 import org.b3log.symphony.service.DataModelService;
 import org.b3log.symphony.service.PointtransferMgmtService;
 import org.b3log.symphony.service.UserQueryService;
@@ -78,44 +82,49 @@ public class IdleTalkProcessor {
     private PointtransferMgmtService pointtransferMgmtService;
 
     /**
-     * Messages saved at memory, it won't access database.
-     *
-     * <MapId, message JSON>
+     * Chat repository.
      */
-    private static final HashMap<String, JSONObject> messages = new HashMap<>();
+    @Inject
+    private ChatRepository chatRepository;
 
     /**
-     * Context table map.
-     *
-     * SenderContext: <SenderId, MapId>
-     * ReceiverContext: <ReceiverId, MapId>
+     * Register request handlers.
      */
-    private static final HashMultimap<String, String> senderContext = HashMultimap.create();
-    private static final HashMultimap<String, String> receiverContext = HashMultimap.create();
+    public static void register() {
+        final BeanManager beanManager = BeanManager.getInstance();
+        final LoginCheckMidware loginCheck = beanManager.getReference(LoginCheckMidware.class);
 
-    private static List<JSONObject> getMessagesBySenderId(String senderId) {
-        List<JSONObject> message = new ArrayList<>();
-        Set<String> sender = senderContext.get(senderId);
-        for (String s : sender) {
-            message.add(messages.get(s).put("mapId", s));
-        }
-        return message;
+        final IdleTalkProcessor idleTalkProcessor = beanManager.getReference(IdleTalkProcessor.class);
+        Dispatcher.get("/idle-talk", idleTalkProcessor::showIdleTalk, loginCheck::handle);
+        Dispatcher.get("/api/idle-talk", idleTalkProcessor::showIdleTalkApi, loginCheck::handle);
+        Dispatcher.post("/idle-talk/send", idleTalkProcessor::sendIdleTalk, loginCheck::handle);
+        Dispatcher.get("/idle-talk/revoke", idleTalkProcessor::revoke, loginCheck::handle);
+        Dispatcher.get("/idle-talk/seek", idleTalkProcessor::seek, loginCheck::handle);
     }
 
-    private static List<JSONObject> getMessagesByReceiverId(String receiverId) {
-        List<JSONObject> message = new ArrayList<>();
-        Set<String> receiver = receiverContext.get(receiverId);
-        for (String r : receiver) {
-            message.add(messages.get(r).put("mapId", r));
-        }
-        return message;
-    }
-
+    /**
+     * Save message.
+     *
+     * @param senderId
+     * @param receiverId
+     * @param message
+     */
     private static void saveMessage(String senderId, String receiverId, JSONObject message) {
-        String mapId = Ids.genTimeMillisId();
-        messages.put(mapId, message);
-        senderContext.put(senderId, mapId);
-        receiverContext.put(receiverId, mapId);
+        String mapId = null;
+        // 写数据库
+        try {
+            final BeanManager beanManager = BeanManager.getInstance();
+            final ChatRepository chatRepository = beanManager.getReference(ChatRepository.class);
+            final Transaction transaction = chatRepository.beginTransaction();
+            JSONObject data = new JSONObject();
+            data.put("senderId", senderId);
+            data.put("receiverId", receiverId);
+            data.put("message", message.toString());
+            mapId = chatRepository.add(data);
+            transaction.commit();
+        } catch (RepositoryException e) {
+            LOGGER.log(Level.ERROR, "Unable to save message", e);
+        }
         // 发送 WebSocket 通知
         // 先通知接收者来新消息了
         final JSONObject cmd = new JSONObject();
@@ -136,51 +145,6 @@ public class IdleTalkProcessor {
         IdleTalkChannel.sendCmd(cmd);
     }
 
-    private static void removeMessage(String mapId, String senderId, String receiverId) {
-        messages.remove(mapId);
-        senderContext.remove(senderId, mapId);
-        receiverContext.remove(receiverId, mapId);
-    }
-
-    /**
-     * Register request handlers.
-     */
-    public static void register() {
-        final BeanManager beanManager = BeanManager.getInstance();
-        final LoginCheckMidware loginCheck = beanManager.getReference(LoginCheckMidware.class);
-        final CSRFMidware csrfMidware = beanManager.getReference(CSRFMidware.class);
-
-        final IdleTalkProcessor idleTalkProcessor = beanManager.getReference(IdleTalkProcessor.class);
-        Dispatcher.get("/idle-talk", idleTalkProcessor::showIdleTalk, loginCheck::handle, csrfMidware::fill);
-        Dispatcher.post("/idle-talk/send", idleTalkProcessor::sendIdleTalk, loginCheck::handle, csrfMidware::check);
-        Dispatcher.get("/idle-talk/revoke", idleTalkProcessor::revoke, loginCheck::handle, csrfMidware::check);
-        Dispatcher.get("/idle-talk/seek", idleTalkProcessor::seek, loginCheck::handle, csrfMidware::check);
-    }
-
-    /**
-     * Clean Validated Messages (12 hours validation).
-     */
-    public static void cleanValidatedMessages() {
-        Long realTime = System.currentTimeMillis();
-        List<JSONObject> list = new ArrayList<>();
-        for (String timeStamp : messages.keySet()) {
-            Long messageTime = Long.parseLong(timeStamp) + 43200000;
-            if (messageTime < realTime) {
-                JSONObject message = messages.get(timeStamp);
-                String fromUserId = message.optString("fromUserId");
-                String toUserId = message.optString("toUserId");
-                JSONObject jsonObject = new JSONObject();
-                jsonObject.put("mapId", timeStamp);
-                jsonObject.put("senderId", fromUserId);
-                jsonObject.put("receiverId", toUserId);
-                list.add(jsonObject);
-            }
-        }
-        for (JSONObject jsonObject : list) {
-            removeMessage(jsonObject.optString("mapId"), jsonObject.optString("senderId"), jsonObject.optString("receiverId"));
-        }
-    }
-
     /**
      * seek a message and remove.
      *
@@ -188,36 +152,44 @@ public class IdleTalkProcessor {
      */
     public void seek(final RequestContext context) {
         JSONObject user = Sessions.getUser();
+        try {
+            user = ApiProcessor.getUserByKey(context.param("apiKey"));
+        } catch (NullPointerException ignored) {
+        }
         if (user == null) {
             context.renderJSON(StatusCodes.ERR).renderMsg("无法获取用户信息！");
             return;
         }
-        String mapId = context.param("mapId");
-        JSONObject message = messages.get(mapId);
-        String fromUserId = message.optString("fromUserId");
-        String toUserId = message.optString("toUserId");
-        if (toUserId.equals(user.optString(Keys.OBJECT_ID))) {
-            // 渲染消息
-            String content = message.optString("content");
-            content = Emotions.toAliases(content);
-            content = Emotions.convert(content);
-            content = Markdowns.toHTML(content);
-            content = Markdowns.clean(content, "");
-            content = MediaPlayers.renderAudio(content);
-            content = MediaPlayers.renderVideo(content);
-            // 删除消息
-            messages.remove(mapId);
-            senderContext.remove(fromUserId, mapId);
-            receiverContext.remove(toUserId, mapId);
-            // 让发送者销毁
-            final JSONObject cmd = new JSONObject();
-            cmd.put(UserExt.USER_T_ID, fromUserId);
-            cmd.put(Common.COMMAND, mapId);
-            cmd.put("youAre", "destroyIdleChatMessage");
-            IdleTalkChannel.sendCmd(cmd);
-            context.renderJSON(StatusCodes.SUCC).renderData(content);
-        } else {
-            context.renderJSON(StatusCodes.ERR).renderMsg("你没有查看该消息的权限！");
+        try {
+            String mapId = context.param("mapId");
+            JSONObject message = chatRepository.getMessageById(mapId);
+            String fromUserId = message.optString("fromUserId");
+            String toUserId = message.optString("toUserId");
+            if (toUserId.equals(user.optString(Keys.OBJECT_ID))) {
+                // 渲染消息
+                String content = message.optString("content");
+                content = Emotions.toAliases(content);
+                content = Emotions.convert(content);
+                content = Markdowns.toHTML(content);
+                content = Markdowns.clean(content, "");
+                content = MediaPlayers.renderAudio(content);
+                content = MediaPlayers.renderVideo(content);
+                // 删除消息
+                Transaction transaction = chatRepository.beginTransaction();
+                chatRepository.remove(mapId);
+                transaction.commit();
+                // 让发送者销毁
+                final JSONObject cmd = new JSONObject();
+                cmd.put(UserExt.USER_T_ID, fromUserId);
+                cmd.put(Common.COMMAND, mapId);
+                cmd.put("youAre", "destroyIdleChatMessage");
+                IdleTalkChannel.sendCmd(cmd);
+                context.renderJSON(StatusCodes.SUCC).renderData(content);
+            } else {
+                context.renderJSON(StatusCodes.ERR).renderMsg("你没有查看该消息的权限！");
+            }
+        } catch (RepositoryException e) {
+            LOGGER.log(Level.ERROR, "Unable to seek chat", e);
         }
     }
 
@@ -228,27 +200,35 @@ public class IdleTalkProcessor {
      */
     public void revoke(final RequestContext context) {
         JSONObject user = Sessions.getUser();
+        try {
+            user = ApiProcessor.getUserByKey(context.param("apiKey"));
+        } catch (NullPointerException ignored) {
+        }
         if (user == null) {
             context.renderJSON(StatusCodes.ERR).renderMsg("无法获取用户信息！");
             return;
         }
-        String mapId = context.param("mapId");
-        JSONObject message = messages.get(mapId);
-        String fromUserId = message.optString("fromUserId");
-        String toUserId = message.optString("toUserId");
-        if (fromUserId.equals(user.optString(Keys.OBJECT_ID))) {
-            messages.remove(mapId);
-            senderContext.remove(fromUserId, mapId);
-            receiverContext.remove(toUserId, mapId);
-            // 让发送者销毁
-            final JSONObject cmd = new JSONObject();
-            cmd.put(UserExt.USER_T_ID, toUserId);
-            cmd.put(Common.COMMAND, mapId);
-            cmd.put("youAre", "destroyIdleChatMessage");
-            IdleTalkChannel.sendCmd(cmd);
-            context.renderJSON(StatusCodes.SUCC);
-        } else {
-            context.renderJSON(StatusCodes.ERR).renderMsg("你没有撤回该消息的权限！");
+        try {
+            String mapId = context.param("mapId");
+            JSONObject message = chatRepository.getMessageById(mapId);
+            String fromUserId = message.optString("fromUserId");
+            String toUserId = message.optString("toUserId");
+            if (fromUserId.equals(user.optString(Keys.OBJECT_ID))) {
+                Transaction transaction = chatRepository.beginTransaction();
+                chatRepository.remove(mapId);
+                transaction.commit();
+                // 让发送者销毁
+                final JSONObject cmd = new JSONObject();
+                cmd.put(UserExt.USER_T_ID, toUserId);
+                cmd.put(Common.COMMAND, mapId);
+                cmd.put("youAre", "destroyIdleChatMessage");
+                IdleTalkChannel.sendCmd(cmd);
+                context.renderJSON(StatusCodes.SUCC);
+            } else {
+                context.renderJSON(StatusCodes.ERR).renderMsg("你没有撤回该消息的权限！");
+            }
+        } catch (RepositoryException e) {
+            LOGGER.log(Level.ERROR, "Unable to revoke", e);
         }
     }
 
@@ -259,7 +239,42 @@ public class IdleTalkProcessor {
      * @return
      */
     public static boolean hasUnreadChatMessage(String userId) {
-        return receiverContext.get(userId).size() != 0;
+        try {
+            final BeanManager beanManager = BeanManager.getInstance();
+            final ChatRepository chatRepository = beanManager.getReference(ChatRepository.class);
+            List<JSONObject> messages = chatRepository.getMessagesByReceiverId(userId);
+            return messages.size() != 0;
+        } catch (RepositoryException e) {
+            LOGGER.log(Level.ERROR, "Unable to get unread chat messages", e);
+            return false;
+        }
+    }
+
+    /**
+     * Shows Idle Talk index.
+     *
+     * @param context
+     */
+    public void showIdleTalkApi(final RequestContext context) {
+        JSONObject currentUser = Sessions.getUser();
+        try {
+            currentUser = ApiProcessor.getUserByKey(context.param("apiKey"));
+        } catch (NullPointerException ignored) {
+        }
+        final String userId = currentUser.optString(Keys.OBJECT_ID);
+        JSONObject responseJSON = new JSONObject();
+        try {
+            List<JSONObject> meSent = chatRepository.getMessagesBySenderId(userId);
+            List<JSONObject> meReceived = chatRepository.getMessagesByReceiverId(userId);
+            responseJSON.put("meSent", meSent);
+            responseJSON.put("meReceived", meReceived);
+        } catch (RepositoryException e) {
+            responseJSON.put("meSent", "");
+            responseJSON.put("meReceived", "");
+            LOGGER.log(Level.ERROR, "Get chats failed", e);
+        }
+
+        context.renderJSON(StatusCodes.SUCC).renderData(responseJSON);
     }
 
     /**
@@ -272,10 +287,16 @@ public class IdleTalkProcessor {
         final Map<String, Object> dataModel = renderer.getDataModel();
         final JSONObject currentUser = Sessions.getUser();
         final String userId = currentUser.optString(Keys.OBJECT_ID);
-        List<JSONObject> meSent = getMessagesBySenderId(userId);
-        List<JSONObject> meReceived = getMessagesByReceiverId(userId);
-        dataModel.put("meSent", meSent);
-        dataModel.put("meReceived", meReceived);
+        try {
+            List<JSONObject> meSent = chatRepository.getMessagesBySenderId(userId);
+            List<JSONObject> meReceived = chatRepository.getMessagesByReceiverId(userId);
+            dataModel.put("meSent", meSent);
+            dataModel.put("meReceived", meReceived);
+        } catch (RepositoryException e) {
+            dataModel.put("meSent", "");
+            dataModel.put("meReceived", "");
+            LOGGER.log(Level.ERROR, "Get chats failed", e);
+        }
 
         dataModelService.fillHeaderAndFooter(context, dataModel);
     }
@@ -287,7 +308,12 @@ public class IdleTalkProcessor {
      */
     public synchronized void sendIdleTalk(final RequestContext context) {
         // From
-        final JSONObject currentUser = Sessions.getUser();
+        final JSONObject requestJSONObject = context.requestJSON();
+        JSONObject currentUser = Sessions.getUser();
+        try {
+            currentUser = ApiProcessor.getUserByKey(requestJSONObject.optString("apiKey"));
+        } catch (NullPointerException ignored) {
+        }
         String fromUserId = currentUser.optString(Keys.OBJECT_ID);
         String fromUserName = currentUser.optString(User.USER_NAME);
         String fromUserAvatar = currentUser.optString(UserExt.USER_AVATAR_URL);

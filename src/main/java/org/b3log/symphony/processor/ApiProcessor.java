@@ -168,6 +168,18 @@ public class ApiProcessor {
 
             final String userPassword = user.optString(User.USER_PASSWORD);
             if (userPassword.equals(requestJSONObject.optString(User.USER_PASSWORD))) {
+                final String userId = user.optString(Keys.OBJECT_ID);
+                long code;
+                try {
+                    code = requestJSONObject.optLong("mfaCode");
+                } catch (Exception e) {
+                    code = 0;
+                }
+                if (!MFAProcessor.verifyLogin(userId, code)) {
+                    context.renderMsg("两步验证失败，请填写正确的一次性密码");
+                    return;
+                }
+
                 final String key = RandomStringUtils.randomAlphanumeric(32);
                 context.renderCodeMsg(StatusCodes.SUCC, "");
                 context.renderJSONValue("Key", key);

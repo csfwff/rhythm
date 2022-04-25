@@ -701,6 +701,17 @@ public class LoginProcessor {
 
             final String userPassword = user.optString(User.USER_PASSWORD);
             if (userPassword.equals(requestJSONObject.optString(User.USER_PASSWORD))) {
+                long code;
+                try {
+                    code = requestJSONObject.optLong("mfaCode");
+                } catch (Exception e) {
+                    code = 0;
+                }
+                if (!MFAProcessor.verifyLogin(userId, code)) {
+                    context.renderMsg("两步验证失败，请填写正确的一次性密码");
+                    return;
+                }
+
                 final String token = Sessions.login(response, userId, requestJSONObject.optBoolean(Common.REMEMBER_LOGIN));
 
                 final String ip = Requests.getRemoteAddr(request);

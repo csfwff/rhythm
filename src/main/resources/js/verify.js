@@ -44,6 +44,7 @@ var Verify = {
             var requestJSONObject = {
                 nameOrEmail: $("#nameOrEmail").val().replace(/(^\s*)|(\s*$)/g, ""),
                 userPassword: calcMD5($("#loginPassword").val()),
+                mfaCode: $("#mfaCode").val(),
                 rememberLogin: $("#rememberLogin").prop("checked"),
                 captcha: $('#captchaLogin').val().replace(/(^\s*)|(\s*$)/g, "")
             };

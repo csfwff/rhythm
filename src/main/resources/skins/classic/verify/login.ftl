@@ -44,6 +44,10 @@
                             <svg><use xlink:href="#locked"></use></svg>
                             <input type="password" id="loginPassword" placeholder="${passwordLabel}" />
                         </div>
+                        <div class="input-wrap">
+                            <svg><use xlink:href="#mfa"></use></svg>
+                            <input type="text" id="mfaCode" placeholder="两步验证码 (未开启请留空)" />
+                        </div>
                         <div class="fn-none input-wrap">
                             <img id="captchaImg" class="captcha-img fn-pointer" />
                             <input type="text" id="captchaLogin" class="captcha-input" placeholder="${captchaLabel}" />
@@ -55,7 +59,7 @@
                             <a href="${servePath}/forget-pwd" class="fn-right">${forgetPwdLabel}</a>
                             <div class="fn-hr5"></div>
                         </div>
-                        
+
                         <div id="loginTip" class="tip"></div>
                         <button class="green" onclick="Verify.login('${goto}')">${loginLabel}</button>
                         <button onclick="Util.goRegister()">${registerLabel}</button>

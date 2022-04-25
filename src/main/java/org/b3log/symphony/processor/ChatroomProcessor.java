@@ -193,6 +193,7 @@ public class ChatroomProcessor {
         Dispatcher.post("/chat-room/send", chatroomProcessor::addChatRoomMsg, loginCheck::handle, chatMsgAddValidationMidware::handle);
         Dispatcher.get("/cr", chatroomProcessor::showChatRoom, anonymousViewCheckMidware::handle);
         Dispatcher.get("/chat-room/more", chatroomProcessor::getMore);
+        Dispatcher.get("/chat-room/getMessage", chatroomProcessor::getContextMessage);
         Dispatcher.get("/chat-room/online-users", chatroomProcessor::getChatRoomUsers);
         Dispatcher.get("/cr/raw/{id}", chatroomProcessor::getChatRaw, anonymousViewCheckMidware::handle);
         Dispatcher.delete("/chat-room/revoke/{oId}", chatroomProcessor::revokeMessage, loginCheck::handle);
@@ -950,7 +951,17 @@ public class ChatroomProcessor {
     public void showChatRoom(final RequestContext context) {
         final AbstractFreeMarkerRenderer renderer = new SkinRenderer(context, "chat-room.ftl");
         final Map<String, Object> dataModel = renderer.getDataModel();
-        dataModel.put(Common.MESSAGES, getMessages(1));
+        try {
+            String oId = context.param("oId");
+            if (oId == null) {
+                throw new NullPointerException();
+            }
+            dataModel.put("contextMode", "yes");
+            dataModel.put("contextOId", oId);
+        } catch (Exception ignored) {
+            dataModel.put("contextMode", "no");
+            dataModel.put("contextOId", '0');
+        }
         dataModel.put(Common.ONLINE_CHAT_CNT, 0);
         final JSONObject currentUser = Sessions.getUser();
         if (null != currentUser) {
@@ -986,6 +997,35 @@ public class ChatroomProcessor {
         } catch (RepositoryException e) {
             context.renderCodeMsg(StatusCodes.ERR, "Invalid chat id.");
             return;
+        }
+    }
+
+    /**
+     * 获取某个oId的聊天消息上下文
+     * @param context
+     */
+    public void getContextMessage(final RequestContext context) {
+        try {
+            String oId = context.param("oId");
+            int size = Integer.parseInt(context.param("size"));
+            int mode = Integer.parseInt(context.param("mode"));
+            JSONObject currentUser = Sessions.getUser();
+            try {
+                currentUser = ApiProcessor.getUserByKey(context.param("apiKey"));
+            } catch (NullPointerException ignored) {
+            }
+            if (null == currentUser) {
+                context.sendError(401);
+                context.abort();
+                return;
+            }
+            JSONObject ret = new JSONObject();
+            ret.put(Keys.CODE, StatusCodes.SUCC);
+            ret.put(Keys.MSG, "");
+            ret.put(Keys.DATA, getContent(oId, size, mode));
+            context.renderJSON(ret);
+        } catch (Exception e) {
+            context.sendStatus(500);
         }
     }
 
@@ -1095,6 +1135,46 @@ public class ChatroomProcessor {
                     .setPage(page, 25)
                     .addSort(Keys.OBJECT_ID, SortDirection.DESCENDING));
             List<JSONObject> msgs = messageList.stream().map(msg -> new JSONObject(msg.optString("content")).put("oId", msg.optString(Keys.OBJECT_ID))).collect(Collectors.toList());
+            msgs = msgs.stream().map(msg -> JSONs.clone(msg).put(Common.TIME, new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(msg.optLong(Common.TIME)))).collect(Collectors.toList());
+            msgs = msgs.stream().map(msg -> JSONs.clone(msg.put("content", processMarkdown(msg.optString("content"))))).collect(Collectors.toList());
+            return msgs;
+        } catch (RepositoryException e) {
+            return new LinkedList<>();
+        }
+    }
+
+    public static List<JSONObject> getContent(String oId, int size, int mode) {
+        try {
+            final BeanManager beanManager = BeanManager.getInstance();
+            final ChatRoomRepository chatRoomRepository = beanManager.getReference(ChatRoomRepository.class);
+            List<JSONObject> msgs = null;
+            /*
+               mode = 0; 显示本条及之前之后消息
+               mode = 1; 显示本条及之前消息
+               mode = 2; 显示本条及之后消息
+             */
+            switch (mode) {
+                case 0:
+                    msgs = chatRoomRepository.select(
+                            "(select * from symphony_chat_room where oId > '" + oId + "' order by oId asc limit " + size + ") union" +
+                                    "(select * from symphony_chat_room where oId = '" + oId + "') union" +
+                                    "(select * from symphony_chat_room where oId < '" + oId + "' order by oId desc limit " + size + ") order by oId desc;"
+                    );
+                    break;
+                case 1:
+                    msgs = chatRoomRepository.select(
+                            "select * from symphony_chat_room where oId <= '" + oId + "' order by oId desc limit " + (size + 1)
+                    );
+                    break;
+                case 2:
+                    msgs = chatRoomRepository.select(
+                            "(select * from symphony_chat_room where oId >= '" + oId + "' order by oId asc limit " + (size + 1) + ") order by oId desc"
+                    );
+                    break;
+                default:
+                    return new ArrayList<>();
+            }
+            msgs = msgs.stream().map(msg -> new JSONObject(msg.optString("content")).put("oId", msg.optString(Keys.OBJECT_ID))).collect(Collectors.toList());
             msgs = msgs.stream().map(msg -> JSONs.clone(msg).put(Common.TIME, new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(msg.optLong(Common.TIME)))).collect(Collectors.toList());
             msgs = msgs.stream().map(msg -> JSONs.clone(msg.put("content", processMarkdown(msg.optString("content"))))).collect(Collectors.toList());
             return msgs;
