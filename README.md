@@ -25,3 +25,8 @@ Rhythm 社区系统，超丰富的社区功能，基于 Symphony 社区版深度
 
 通过修改 Rhythm 源码，您可以为摸鱼派贡献 PR，采纳后的 PR 将被部署在摸鱼派的生产环境中 ❤️
 
+### 贡献者
+
+<a href="https://github.com/csfwff/rhythm/graphs/contributors">
+  <img src="https://contrib.rocks/image?repo=csfwff/rhythm" />
+</a>
