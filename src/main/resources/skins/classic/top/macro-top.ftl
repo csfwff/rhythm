@@ -48,6 +48,11 @@
                 <link rel="canonical" href="${servePath}/top/online">
             </@head>
         </#if>
+        <#if type == "mofish">
+            <@head title="摸鱼大闯关游戏排行 - ${symphonyLabel}">
+                <link rel="canonical" href="${servePath}/top/mofish">
+            </@head>
+        </#if>
         <link rel="stylesheet" href="${staticServePath}/css/index.css?${staticResourceVersion}" />
         <link rel="stylesheet" href="${staticServePath}/css/responsive.css?${staticResourceVersion}" />
     </head>
