@@ -19,7 +19,7 @@
 
 -->
 <#include "macro-top.ftl">
-<@top "online">
+<@top "mofish">
 <h2 class="ranking-title">摸鱼大闯关游戏排行</h2>
 <div class="list top">
     <ul>

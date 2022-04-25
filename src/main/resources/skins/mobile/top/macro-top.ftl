@@ -43,6 +43,10 @@
             <@head title="在线时间排行 - ${symphonyLabel}">
             </@head>
         </#if>
+        <#if type == "mofish">
+            <@head title="摸鱼大闯关游戏排行 - ${symphonyLabel}">
+            </@head>
+        </#if>
     </head>
     <body>
         <#include "../header.ftl">
