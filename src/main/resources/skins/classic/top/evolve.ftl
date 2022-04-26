@@ -19,7 +19,7 @@
 
 -->
 <#include "macro-top.ftl">
-<@top "online">
+<@top "evolve">
 <h2 class="sub-head">进化排行榜</h2>
 <div class="module-header fn-clear">
     <span class="fn-left ft-fade">

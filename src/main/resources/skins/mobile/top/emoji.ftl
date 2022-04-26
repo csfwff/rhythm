@@ -19,7 +19,7 @@
 
 -->
 <#include "macro-top.ftl">
-<@top "online">
+<@top "emoji">
 <h2 class="ranking-title">Emoji 真假小黄脸 游戏总分排行</h2>
 <div class="list top">
     <ul>

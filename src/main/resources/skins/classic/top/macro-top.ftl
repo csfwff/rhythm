@@ -48,9 +48,29 @@
                 <link rel="canonical" href="${servePath}/top/online">
             </@head>
         </#if>
+        <#if type == "evolve">
+            <@head title="进化排行榜 - ${symphonyLabel}">
+                <link rel="canonical" href="${servePath}/top/evolve">
+            </@head>
+        </#if>
+        <#if type == "adr">
+            <@head title="ADR 游戏总分排行 - ${symphonyLabel}">
+                <link rel="canonical" href="${servePath}/top/adr">
+            </@head>
+        </#if>
         <#if type == "mofish">
             <@head title="摸鱼大闯关游戏排行 - ${symphonyLabel}">
                 <link rel="canonical" href="${servePath}/top/mofish">
+            </@head>
+        </#if>
+        <#if type == "lifeRestart">
+            <@head title="人生重开模拟器成就排行 - ${symphonyLabel}">
+                <link rel="canonical" href="${servePath}/top/lifeRestart">
+            </@head>
+        </#if>
+        <#if type == "emoji">
+            <@head title="Emoji 真假小黄脸 游戏总分排行 - ${symphonyLabel}">
+                <link rel="canonical" href="${servePath}/top/emoji">
             </@head>
         </#if>
         <link rel="stylesheet" href="${staticServePath}/css/index.css?${staticResourceVersion}" />
