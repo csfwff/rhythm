@@ -58,7 +58,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
-import java.util.stream.Stream;
 
 
 /**
@@ -1022,7 +1021,7 @@ public class ChatroomProcessor {
             JSONObject ret = new JSONObject();
             ret.put(Keys.CODE, StatusCodes.SUCC);
             ret.put(Keys.MSG, "");
-            ret.put(Keys.DATA, getContent(oId, size, mode));
+            ret.put(Keys.DATA, getContext(oId, size, mode));
             context.renderJSON(ret);
         } catch (Exception e) {
             context.sendStatus(500);
@@ -1143,7 +1142,7 @@ public class ChatroomProcessor {
         }
     }
 
-    public static List<JSONObject> getContent(String oId, int size, int mode) {
+    public static List<JSONObject> getContext(String oId, int size, int mode) {
         try {
             final BeanManager beanManager = BeanManager.getInstance();
             final ChatRoomRepository chatRoomRepository = beanManager.getReference(ChatRoomRepository.class);
