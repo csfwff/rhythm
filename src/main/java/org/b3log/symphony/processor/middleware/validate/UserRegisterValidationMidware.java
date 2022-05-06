@@ -38,6 +38,7 @@ import org.b3log.symphony.service.UserQueryService;
 import org.json.JSONObject;
 
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * UserRegisterValidation for validate {@link org.b3log.symphony.processor.LoginProcessor} register(Type POST) method.
@@ -246,6 +247,16 @@ public class UserRegisterValidationMidware {
             context.renderJSON(new JSONObject().put(Keys.MSG, langPropsService.get("registerFailLabel") + " - " + "手机号不合法"));
             context.abort();
             return;
+        } else {
+            try {
+                if (Objects.nonNull(userQueryService.getUserByPhone(phone))) {
+                    context.renderJSON(new JSONObject().put(Keys.MSG, langPropsService.get("registerFailLabel") + " - " + "该手机号已注册"));
+                    context.abort();
+                    return;
+                }
+            } catch (Exception e) {
+                LOGGER.log(Level.WARN, "Query user by phone  [phone=" + phone + "] failed", e);
+            }
         }
 
         if (UserExt.USER_APP_ROLE_C_HACKER != appRole && UserExt.USER_APP_ROLE_C_PAINTER != appRole) {
