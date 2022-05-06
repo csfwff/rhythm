@@ -64,7 +64,7 @@
 </div>
 <script src="${staticServePath}/js/symbol-defs${miniPostfix}.js?${staticResourceVersion}"></script>
 <script src="${staticServePath}/js/lib/compress/libs.min.js?${staticResourceVersion}"></script>
-<script src="https://cdn.staticfile.org/vditor/3.8.12/index.min.js"></script>
+<script src="https://file.fishpi.cn/vditor/3.8.13/dist/index.min.js"></script>
 <script src="${staticServePath}/js/common${miniPostfix}.js?${staticResourceVersion}"></script>
 <script>
   var Label = {
