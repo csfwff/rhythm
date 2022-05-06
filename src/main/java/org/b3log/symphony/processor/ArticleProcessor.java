@@ -456,6 +456,7 @@ public class ArticleProcessor {
                 commenter.remove("userCity");
                 commenter.remove("userCountry");
                 commenter.remove("userEmail");
+                commenter.remove("secret2fa");
                 comment.put(Comment.COMMENT_T_NICE, comment.optDouble(Comment.COMMENT_SCORE, 0D) >= niceCmtScore);
 
                 final String commentId = comment.optString(Keys.OBJECT_ID);
