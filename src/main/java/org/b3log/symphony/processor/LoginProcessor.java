@@ -28,6 +28,7 @@ import org.b3log.latke.Keys;
 import org.b3log.latke.Latkes;
 import org.b3log.latke.http.*;
 import org.b3log.latke.http.renderer.AbstractFreeMarkerRenderer;
+import org.b3log.latke.http.renderer.JsonRenderer;
 import org.b3log.latke.ioc.BeanManager;
 import org.b3log.latke.ioc.Inject;
 import org.b3log.latke.ioc.Singleton;
@@ -180,6 +181,7 @@ public class LoginProcessor {
         Dispatcher.get("/reset-pwd", loginProcessor::showResetPwd);
         Dispatcher.post("/reset-pwd", loginProcessor::resetPwd);
         Dispatcher.get("/register", loginProcessor::showRegister);
+        Dispatcher.post("/verify", loginProcessor::verify);
         Dispatcher.post("/register", loginProcessor::register, userRegisterValidationMidware::handle);
         Dispatcher.post("/register2", loginProcessor::register2, userRegister2ValidationMidware::handle);
         Dispatcher.post("/login", loginProcessor::login);
@@ -403,6 +405,41 @@ public class LoginProcessor {
     }
 
     /**
+     * verify SMS code
+     *
+     * @param context the specified context
+     */
+    public void verify(final RequestContext context) {
+        JsonRenderer renderer = new JsonRenderer();
+        renderer.setJSONObject(new JSONObject());
+        context.setRenderer(renderer);
+        final String code = context.param("code");
+        if (StringUtils.isBlank(code)) {
+            context.renderCodeMsg(-1, "短信验证码为空");
+            return;
+        }
+        final String ip = Requests.getRemoteAddr(context.getRequest());
+        if (verifyCodeLimiter.access(ip)) {
+            final JSONObject verifycode = verifycodeQueryService.getVerifycode(code);
+            if (null == verifycode) {
+                context.renderCodeMsg(-1, "短信验证码不正确");
+            } else {
+                final String userId = verifycode.optString(Verifycode.USER_ID);
+                final JSONObject user = userQueryService.getUser(userId);
+                if (UserExt.USER_STATUS_C_VALID == user.optInt(UserExt.USER_STATUS)
+                        || UserExt.NULL_USER_NAME.equals(user.optString(User.USER_NAME))) {
+                    context.renderCodeMsg(-1, langPropsService.get("userExistLabel"));
+                    return;
+                }
+                context.renderJSON(new JSONObject().put("userId", userId)).renderCode(StatusCodes.SUCC).renderMsg("");
+            }
+        } else {
+            context.renderCodeMsg(-1, "验证码尝试次数过快，请稍候重试！");
+        }
+
+    }
+
+    /**
      * Shows registration page.
      *
      * @param context the specified context
@@ -561,7 +598,7 @@ public class LoginProcessor {
             try {
                 final JSONObject user = userQueryService.getUser(userId);
                 if (null == user) {
-                    context.renderMsg(langPropsService.get("registerFailLabel") + " - " + "User Not Found");
+                    context.renderMsg(langPropsService.get("registerFailLabel") + " - " + "User Not Found").renderCode(-1);
                     return;
                 }
 
@@ -626,14 +663,14 @@ public class LoginProcessor {
             } catch (final ServiceException e) {
                 final String msg = langPropsService.get("registerFailLabel") + " - " + e.getMessage();
                 LOGGER.log(Level.ERROR, msg + " [name={}, phone={}]", name, phone);
-                context.renderMsg(msg);
+                context.renderMsg(msg).renderCode(-1);
             }
         } else {
             final JSONObject requestJSONObject = context.getRequest().getJSON();
             final String userId = requestJSONObject.optString(UserExt.USER_T_ID);
             final String password = requestJSONObject.optString(User.USER_PASSWORD); // Hashed
             LOGGER.log(Level.WARN, "Detected a user registration attack [ip={}, userId={}, password={}]", ip, userId, password);
-            context.renderMsg("频率过快，请稍候重试");
+            context.renderMsg("频率过快，请稍候重试").renderCode(-1);
         }
     }
 
