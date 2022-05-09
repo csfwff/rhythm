@@ -449,56 +449,44 @@ public class AdminProcessor {
      * @param context
      */
     public void adjustBag(final RequestContext context) {
-        final JSONObject currentUser = Sessions.getUser();
         final String userId = context.pathVar("userId");
         final String item = context.param("item");
         final int sum = Integer.parseInt(context.param("sum"));
-        if (Role.ROLE_ID_C_ADMIN.equals(currentUser.optString(User.USER_ROLE))) {
-            final BeanManager beanManager = BeanManager.getInstance();
-            final CloudService cloudService = beanManager.getReference(CloudService.class);
-            cloudService.putBag(userId, item, sum, Integer.MAX_VALUE);
-        }
+        final BeanManager beanManager = BeanManager.getInstance();
+        final CloudService cloudService = beanManager.getReference(CloudService.class);
+        cloudService.putBag(userId, item, sum, Integer.MAX_VALUE);
         context.sendRedirect(Latkes.getServePath() + "/admin/user/" + userId);
     }
 
     public void giveMetal(final RequestContext context) {
-        final JSONObject currentUser = Sessions.getUser();
         final String userId = context.pathVar("userId");
         final String name = context.param("name");
         final String description = context.param("description");
         final String attr = context.param("attr");
         final String data = context.param("data");
-        if (Role.ROLE_ID_C_ADMIN.equals(currentUser.optString(User.USER_ROLE))) {
-            final BeanManager beanManager = BeanManager.getInstance();
-            final CloudService cloudService = beanManager.getReference(CloudService.class);
-            cloudService.giveMetal(userId, name, description, attr, data);
-        }
+        final BeanManager beanManager = BeanManager.getInstance();
+        final CloudService cloudService = beanManager.getReference(CloudService.class);
+        cloudService.giveMetal(userId, name, description, attr, data);
         context.sendRedirect(Latkes.getServePath() + "/admin/user/" + userId);
     }
 
     public void removeMFA(final RequestContext context) {
-        final JSONObject currentUser = Sessions.getUser();
         final String userId = context.pathVar("userId");
         try {
-            if (Role.ROLE_ID_C_ADMIN.equals(currentUser.optString(User.USER_ROLE))) {
-                final JSONObject user = userQueryService.getUser(userId);
-                user.put("secret2fa", "");
-                userMgmtService.updateUser(userId, user);
-            }
+            final JSONObject user = userQueryService.getUser(userId);
+            user.put("secret2fa", "");
+            userMgmtService.updateUser(userId, user);
         } catch (Exception ignored) {
         }
         context.sendRedirect(Latkes.getServePath() + "/admin/user/" + userId);
     }
 
     public void removeMetal(final RequestContext context) {
-        final JSONObject currentUser = Sessions.getUser();
         final String userId = context.pathVar("userId");
         final String name = context.param("name");
-        if (Role.ROLE_ID_C_ADMIN.equals(currentUser.optString(User.USER_ROLE))) {
-            final BeanManager beanManager = BeanManager.getInstance();
-            final CloudService cloudService = beanManager.getReference(CloudService.class);
-            cloudService.removeMetal(userId, name);
-        }
+        final BeanManager beanManager = BeanManager.getInstance();
+        final CloudService cloudService = beanManager.getReference(CloudService.class);
+        cloudService.removeMetal(userId, name);
         context.sendRedirect(Latkes.getServePath() + "/admin/user/" + userId);
     }
 
