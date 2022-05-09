@@ -1615,6 +1615,12 @@ public class AdminProcessor {
             user.put(User.USER_ROLE, oldRole);
         }
 
+        if (!Role.ROLE_ID_C_ADMIN.equals(currentUser.optString(User.USER_ROLE))) {
+            if (user.optString(User.USER_ROLE).equals(Role.ROLE_ID_C_ADMIN)) {
+                user.put(User.USER_ROLE, oldRole);
+            }
+        }
+
         try {
             userMgmtService.updateUser(userId, user);
             operationMgmtService.addOperation(Operation.newOperation(request, Operation.OPERATION_CODE_C_UPDATE_USER, userId));
