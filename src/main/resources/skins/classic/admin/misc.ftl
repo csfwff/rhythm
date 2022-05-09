@@ -76,6 +76,7 @@
         </div>
     </div>
 
+    <#if permissions["miscBroadCast"].permissionGrant>
     <div class="module">
         <div class="module-header">
             <h2>紧急公告发布</h2>
@@ -95,5 +96,6 @@
             </form>
         </div>
     </div>
+    </#if>
 </div>
 </@admin>
