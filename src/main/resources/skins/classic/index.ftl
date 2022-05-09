@@ -834,7 +834,7 @@
                     $("#sp2").html(i + "%");
                     if (i < 10) {
                         $("#sp1").css("background", "linear-gradient(to left, #f11616, #d71212)").css("box-shadow", "0 3px 3px -5px #c72222, 0 2px 5px #c72222");
-                    } else if (i > 10 && i < 100) {
+                    } else if (i >= 10 && i < 100) {
                         $("#sp1").css("background", "linear-gradient(to left, #24b0b7, #1dacb3)").css("box-shadow", "0 3px 3px -5px #22bfc7, 0 2px 5px #22bfc7");
                     } else if (i == 100) {
                         $("#sp1").css("background", "linear-gradient(to left, #29d120, #3caf36)").css("box-shadow", "#3caf36 0px 3px 3px -5px, #3caf36 0px 2px 5px");
