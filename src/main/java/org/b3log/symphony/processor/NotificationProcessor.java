@@ -242,6 +242,10 @@ public class NotificationProcessor {
         dataModel.put(Pagination.PAGINATION_PAGE_NUMS, pageNums);
 
         dataModelService.fillHeaderAndFooter(context, dataModel);
+
+        notificationMgmtService.makeRead(userId, Notification.DATA_TYPE_C_SYS_ANNOUNCE_NEW_USER);
+        notificationMgmtService.makeRead(userId, Notification.DATA_TYPE_C_SYS_ANNOUNCE_ARTICLE);
+        notificationMgmtService.makeRead(userId, Notification.DATA_TYPE_C_SYS_ANNOUNCE_ROLE_CHANGED);
     }
 
     /**
