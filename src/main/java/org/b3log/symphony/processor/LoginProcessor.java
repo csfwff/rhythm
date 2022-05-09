@@ -181,7 +181,7 @@ public class LoginProcessor {
         Dispatcher.get("/reset-pwd", loginProcessor::showResetPwd);
         Dispatcher.post("/reset-pwd", loginProcessor::resetPwd);
         Dispatcher.get("/register", loginProcessor::showRegister);
-        Dispatcher.post("/verify", loginProcessor::verify);
+        Dispatcher.get("/verify", loginProcessor::verify);
         Dispatcher.post("/register", loginProcessor::register, userRegisterValidationMidware::handle);
         Dispatcher.post("/register2", loginProcessor::register2, userRegister2ValidationMidware::handle);
         Dispatcher.post("/login", loginProcessor::login);
