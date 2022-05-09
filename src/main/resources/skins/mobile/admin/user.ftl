@@ -362,6 +362,7 @@
         </div>
     </div>
 
+    <#if permissions["userAdjustBag"].permissionGrant>
     <div class="module">
         <div class="module-header">
             <h2>物品发放</h2>
@@ -380,10 +381,12 @@
             </form>
         </div>
     </div>
+    </#if>
 
+    <#if permissions["userGiveMetal"].permissionGrant>
     <div class="module">
         <div class="module-header">
-            <h2>勋章发放 (仅admin可用)</h2>
+            <h2>勋章发放</h2>
         </div>
         <div class="module-panel form fn-clear form--admin">
             <form action="${servePath}/admin/user/${user.oId}/give-metal" method="POST">
@@ -426,10 +429,12 @@
             </div>
         </div>
     </div>
+    </#if>
 
+    <#if permissions["userRemoveMetal"].permissionGrant>
     <div class="module">
         <div class="module-header">
-            <h2>勋章移除 (仅admin可用)</h2>
+            <h2>勋章移除</h2>
         </div>
         <div class="module-panel form fn-clear form--admin">
             <form action="${servePath}/admin/user/${user.oId}/remove-metal" method="POST">
@@ -448,10 +453,12 @@
             </form>
         </div>
     </div>
+    </#if>
 
+    <#if permissions["userRemoveMFA"].permissionGrant>
     <div class="module">
         <div class="module-header">
-            <h2>两步认证令牌移除 (仅admin可用)</h2>
+            <h2>两步认证令牌移除</h2>
         </div>
         <div class="module-panel form fn-clear form--admin">
             <form action="${servePath}/admin/user/${user.oId}/remove-mfa" method="POST">
@@ -466,5 +473,6 @@
             </form>
         </div>
     </div>
+    </#if>
 </div>
 </@admin>

@@ -439,6 +439,31 @@ public final class Permission {
      */
     public static final String PERMISSION_ID_C_MENU_ADMIN_MISC = "menuAdminMisc";
 
+    /**
+     * Id - menu - admin - broad cast.
+     */
+    public static final String PERMISSION_ID_C_MISC_BROAD_CAST = "miscBroadCast";
+
+    /**
+     * Id - user - adjust bag
+     */
+    public static final String PERMISSION_ID_C_USER_ADJUST_BAG = "userAdjustBag";
+
+    /**
+     * Id - user - give metal
+     */
+    public static final String PERMISSION_ID_C_USER_GIVE_METAL = "userGiveMetal";
+
+    /**
+     * Id - user - remove metal
+     */
+    public static final String PERMISSION_ID_C_USER_REMOVE_METAL = "userRemoveMetal";
+
+    /**
+     * Id - user - remove MFA
+     */
+    public static final String PERMISSION_ID_C_USER_REMOVE_MFA = "userRemoveMFA";
+
     // Category constants
     /**
      * Category - common function.
