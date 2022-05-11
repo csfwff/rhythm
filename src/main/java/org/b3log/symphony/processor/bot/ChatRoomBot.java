@@ -18,6 +18,7 @@
  */
 package org.b3log.symphony.processor.bot;
 
+import org.apache.commons.lang.time.DateFormatUtils;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -74,6 +75,9 @@ public class ChatRoomBot {
             return size() > 100;
         }
     });
+
+    private static final Map<String, String> RP_LIMIT_1 = new HashMap<>();
+    private static final Map<String, String> RP_LIMIT_2 = new HashMap<>();
 
     private static String latestMessage = "";
     private static String allLatestMessage = "";
@@ -278,6 +282,30 @@ public class ChatRoomBot {
                 if (!RECORD_POOL_2_IN_1M.access(userName)) {
                     context.renderJSON(StatusCodes.ERR).renderMsg("你的红包被机器人打回，原因：红包发送频率过快，每分钟仅允许发送2个红包，请稍候重试");
                     return false;
+                }
+
+                // 心跳红包和猜拳红包限制
+                String redpacketString = content.replaceAll("^\\[redpacket\\]", "").replaceAll("\\[/redpacket\\]$", "");
+                JSONObject redpacket = new JSONObject(redpacketString);
+                String type = redpacket.optString("type");
+                final String date = DateFormatUtils.format(System.currentTimeMillis(), "yyyyMMdd");
+                switch (type) {
+                    case "heartbeat":
+                        if (RP_LIMIT_1.get(userName) == null || !RP_LIMIT_1.get(userName).equals(date)) {
+                            RP_LIMIT_1.put(userName, date);
+                        } else {
+                            context.renderJSON(StatusCodes.ERR).renderMsg("每天只能发送一个心跳红包哦～");
+                            return false;
+                        }
+                    break;
+                    case "rockPaperScissors":
+                        if (RP_LIMIT_2.get(userName) == null || !RP_LIMIT_2.get(userName).equals(date)) {
+                            RP_LIMIT_2.put(userName, date);
+                        } else {
+                            context.renderJSON(StatusCodes.ERR).renderMsg("每天只能发送一个猜拳红包哦～");
+                            return false;
+                        }
+                    break;
                 }
             }
         }
