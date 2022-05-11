@@ -273,10 +273,12 @@ public class ChatRoomBot {
         // ==! 判定复读机 !==
 
         // ==? 发红包频率限制 ?==
-        if (content.startsWith("[redpacket]") && content.endsWith("[/redpacket]")) {
-            if (!RECORD_POOL_2_IN_1M.access(userName)) {
-                context.renderJSON(StatusCodes.ERR).renderMsg("你的红包被机器人打回，原因：红包发送频率过快，每分钟仅允许发送2个红包，请稍候重试");
-                return false;
+        if (!userName.equals("admin")) {
+            if (content.startsWith("[redpacket]") && content.endsWith("[/redpacket]")) {
+                if (!RECORD_POOL_2_IN_1M.access(userName)) {
+                    context.renderJSON(StatusCodes.ERR).renderMsg("你的红包被机器人打回，原因：红包发送频率过快，每分钟仅允许发送2个红包，请稍候重试");
+                    return false;
+                }
             }
         }
         // ==! 发红包频率限制 !==
