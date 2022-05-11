@@ -443,20 +443,26 @@ public class ChatroomProcessor {
                     meGot = RED_PACKET_BUCKET.get(oId).packs.poll();
                 }
             } else if ("rockPaperScissors".equals(redPacket.getString("type"))) {
-                if (sender.optString("oId").equals(userId)) {
-                    context.renderJSON(new JSONObject().put("who", who).put("info", info));
-                    return;
-                }
                 if (redPacketIsOpened(who, userId)) {
                     context.renderJSON(new JSONObject().put("who", who).put("info", info));
                     return;
                 }
+
+                final RockPaperScissorRedPacket packet = (RockPaperScissorRedPacket) RED_PACKET_BUCKET.get(oId);
+                final int senderGesture = packet.getGesture();
+
+                if (sender.optString("oId").equals(userId)) {
+                    info.put("gesture", senderGesture);
+                    context.renderJSON(new JSONObject().put("who", who).put("info", info));
+                    return;
+                }
+
                 int gesture = requestJSONObject.optInt("gesture", -1);
                 if (gesture < 0) {
                     context.renderJSON(StatusCodes.ERR).renderMsg("红包失效");
                     return;
                 }
-                int senderGesture = redPacket.optInt("gesture");
+
                 if (senderGesture - gesture == 1 || senderGesture - gesture == -2) {
                     meGot = money;
                 } else if (senderGesture != gesture) {
@@ -478,6 +484,10 @@ public class ChatroomProcessor {
             JSONObject source = new JSONObject(chatRoomService.getChatMsg(oId).optString("content"));
             JSONObject source2 = new JSONObject(source.optString("content"));
             source2.put("got", got + 1);
+            if ("rockPaperScissors".equalsIgnoreCase(redPacket.getString("type"))) {
+                final RockPaperScissorRedPacket packet = (RockPaperScissorRedPacket) RED_PACKET_BUCKET.get(oId);
+                source2.put("gesture", packet.getGesture());
+            }
             JSONArray source3 = source2.optJSONArray("who");
             source3.put(new JSONObject().put("userMoney", meGot).put("userId", userId).put("userName", userName).put("time", new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(System.currentTimeMillis())).put("avatar", userQueryService.getUser(userId).optString(UserExt.USER_AVATAR_URL)));
             source2.put("who", source3);
@@ -514,10 +524,11 @@ public class ChatroomProcessor {
             } else if ("specify".equals(redPacket.getString("type"))) {
                 // 通知标为已读
                 notificationMgmtService.makeRead(currentUser.optString(Keys.OBJECT_ID), Notification.DATA_TYPE_C_RED_PACKET);
-            } else if ("random".equals(redPacket.getString("type")) && redPacketStatus.optInt("got") == redPacketStatus.optInt("count")) {
+            } else if ("heartbeat".equals(redPacket.getString("type")) && redPacketStatus.optInt("got") == redPacketStatus.optInt("count")) {
+                RED_PACKET_BUCKET.remove(oId);
+            } else if ("rockPaperScissors".equalsIgnoreCase(redPacket.getString("type"))) {
                 RED_PACKET_BUCKET.remove(oId);
             }
-
             if (count == got + 1) {
                 ChatroomChannel.notifyChat(redPacketStatus);
             }
@@ -717,9 +728,6 @@ public class ChatroomProcessor {
                     redPacketJSON.put("count", count);
                     redPacketJSON.put("msg", message);
                     redPacketJSON.put("recivers", recivers);
-                    if (gesture >= 0 && gesture <= 2) {
-                        redPacketJSON.put("gesture", gesture);
-                    }
                     // 已经抢了这个红包的人数
                     redPacketJSON.put("got", 0);
                     // 已经抢了这个红包的人以及抢到的金额
@@ -739,7 +747,7 @@ public class ChatroomProcessor {
                     transaction.commit();
                     switch (type) {
                         case "rockPaperScissors":
-                            redPacketJSON.remove("gesture");
+                            RED_PACKET_BUCKET.put(msg.optString("oId"), allocateRockRedPacket(msg.optString("oId"), gesture));
                             msg.put(Common.CONTENT, redPacketJSON.toString());
                             break;
                         case "heartbeat":
@@ -1246,6 +1254,13 @@ public class ChatroomProcessor {
         return dice;
     }
 
+    private static RedPacket allocateRockRedPacket(String id, int gesture) {
+        return new RockPaperScissorRedPacket.Builder()
+                .setId(id)
+                .setGesture(gesture)
+                .build();
+    }
+
     private static RedPacket allocateHeartbeatRedPacket(String id, String sendId, int money, int count, int zeroCount) {
         if (zeroCount >= count) {
             zeroCount = 1;
@@ -1372,6 +1387,81 @@ public class ChatroomProcessor {
         }
     }
 
+    public static class RockPaperScissorRedPacket extends RedPacket {
+        public int gesture;
+
+        public int getGesture() {
+            return gesture;
+        }
+
+        public void setGesture(int gesture) {
+            this.gesture = gesture;
+        }
+
+        private RockPaperScissorRedPacket(Builder builder) {
+            gesture = builder.gesture;
+            id = builder.id;
+            sendId = builder.sendId;
+            time = builder.time;
+            packs = builder.packs;
+            count = builder.count;
+            money = builder.money;
+        }
+
+
+        public static final class Builder {
+            private int gesture;
+            private String id;
+            private String sendId;
+            private long time;
+            private LinkedList<Integer> packs;
+            private int count;
+            private int money;
+
+            public Builder() {
+            }
+
+            public Builder setGesture(int val) {
+                gesture = val;
+                return this;
+            }
+
+            public Builder setId(String val) {
+                id = val;
+                return this;
+            }
+
+            public Builder setSendId(String val) {
+                sendId = val;
+                return this;
+            }
+
+            public Builder setTime(long val) {
+                time = val;
+                return this;
+            }
+
+            public Builder setPacks(LinkedList<Integer> val) {
+                packs = val;
+                return this;
+            }
+
+            public Builder setCount(int val) {
+                count = val;
+                return this;
+            }
+
+            public Builder setMoney(int val) {
+                money = val;
+                return this;
+            }
+
+            public RockPaperScissorRedPacket build() {
+                return new RockPaperScissorRedPacket(this);
+            }
+        }
+    }
+
 
     public static class RedPacket {
         public String id;
@@ -1380,6 +1470,9 @@ public class ChatroomProcessor {
         public LinkedList<Integer> packs;
         public int count;
         public int money;
+
+        public RedPacket() {
+        }
 
         private RedPacket(Builder builder) {
             id = builder.id;
