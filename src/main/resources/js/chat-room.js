@@ -246,6 +246,11 @@ var ChatRoom = {
           $('#redPacketMoneyLabel').removeAttr("style");
           $('#totalAmount').css('display','inline')
           $("#countx").text("个数");
+          $("#redPacketCount").val("1");
+        }
+        if (type === 'heartbeat') {
+          $("#countx").text("个数（最少5个）");
+          $("#redPacketCount").val("5");
         }
         if (type === 'rockPaperScissors') {
           $('#gesture').removeAttr("style");
@@ -319,8 +324,14 @@ var ChatRoom = {
           if ($("#redPacketCount").val() > 15) {
             $("#redPacketCount").val("15");
           }
-          if ($("#redPacketCount").val() <= 3) {
+          if ($("#redPacketCount").val() < 3) {
             $("#redPacketCount").val("3");
+          }
+        }
+
+        if (type === 'heartbeat') {
+          if ($("#redPacketCount").val() < 5) {
+            $("#redPacketCount").val("5");
           }
         }
 
