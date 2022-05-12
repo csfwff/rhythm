@@ -585,6 +585,11 @@ public class ChatroomProcessor {
     final private static SimpleCurrentLimiter risksControlMessageLimiter = new SimpleCurrentLimiter(15 * 60, 1);
     final private static SimpleCurrentLimiter openRedPacketLimiter = new SimpleCurrentLimiter(30 * 60, 1);
 
+    /**
+     * Send chatroom message.
+     *
+     * @param context Everything
+     */
     public synchronized void addChatRoomMsg(final RequestContext context) {
         if (ChatRoomBot.record(context)) {
             final JSONObject requestJSONObject = (JSONObject) context.attr(Keys.REQUEST);
@@ -634,6 +639,12 @@ public class ChatroomProcessor {
                         message = message.replaceAll("[^0-9a-zA-Z\\u4e00-\\u9fa5,，.。！!?？《》\\s]", "");
                         if (message.length() > 20) {
                             message = message.substring(0, 20);
+                        }
+                        if (type.equals("heartbeat")) {
+                            if (count < 5) {
+                                context.renderJSON(StatusCodes.ERR).renderMsg("心跳红包个数至少为5个！");
+                                return;
+                            }
                         }
                         // 扣积分
                         if (money > calcRedpacketMax()) {
