@@ -280,6 +280,18 @@ public class ChatRoomBot {
                     context.renderJSON(StatusCodes.ERR).renderMsg("你的红包被机器人打回，原因：红包发送频率过快，每分钟仅允许发送2个红包，请稍候重试");
                     return false;
                 }
+
+                // 心跳红包和猜拳红包限制
+                String redpacketString = content.replaceAll("^\\[redpacket\\]", "").replaceAll("\\[/redpacket\\]$", "");
+                JSONObject redpacket = new JSONObject(redpacketString);
+                String type = redpacket.optString("type");
+                int date = Integer.parseInt(DateFormatUtils.format(System.currentTimeMillis(), "HHmm"));
+                if (type.equals("heartbeat")) {
+                    if (date > 1800 || date < 830) {
+                        context.renderJSON(StatusCodes.ERR).renderMsg("这个时段无法发送心跳红包！允许时间：08:30-18:00");
+                        return false;
+                    }
+                }
             }
         }
         // ==! 发红包频率限制 !==
