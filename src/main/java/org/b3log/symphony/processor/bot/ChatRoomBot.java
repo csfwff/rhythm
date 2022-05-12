@@ -77,7 +77,6 @@ public class ChatRoomBot {
     });
 
     private static final Map<String, String> RP_LIMIT_1 = new HashMap<>();
-    private static final Map<String, String> RP_LIMIT_2 = new HashMap<>();
 
     private static String latestMessage = "";
     private static String allLatestMessage = "";
@@ -295,14 +294,6 @@ public class ChatRoomBot {
                             RP_LIMIT_1.put(userName, date);
                         } else {
                             context.renderJSON(StatusCodes.ERR).renderMsg("每天只能发送一个心跳红包哦～");
-                            return false;
-                        }
-                    break;
-                    case "rockPaperScissors":
-                        if (RP_LIMIT_2.get(userName) == null || !RP_LIMIT_2.get(userName).equals(date)) {
-                            RP_LIMIT_2.put(userName, date);
-                        } else {
-                            context.renderJSON(StatusCodes.ERR).renderMsg("每天只能发送一个猜拳红包哦～");
                             return false;
                         }
                     break;
