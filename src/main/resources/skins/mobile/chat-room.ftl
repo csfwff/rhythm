@@ -32,7 +32,7 @@
     <body>
     <div class="mobile-head">
         <#include "header.ftl">
-        <@indexNav "recent"/>
+        <@indexNav ""/>
 
     </div>
     <div style="height: 74px;width: 1px;" ></div>
