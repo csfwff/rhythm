@@ -138,28 +138,10 @@ var ArticleChannel = {
 
         ArticleChannel.ws.onclose = function () {
             console.log("Disconnected to article channel websocket.")
-            setInterval(function () {
-                $.ajax({
-                    url: Label.servePath + "/shop",
-                    method: "get",
-                    success: function() {
-                        location.reload();
-                    }
-                })
-            }, 1000);
         }
 
         ArticleChannel.ws.onerror = function (err) {
             console.log(err)
-            setInterval(function () {
-                $.ajax({
-                    url: Label.servePath + "/shop",
-                    method: "get",
-                    success: function() {
-                        location.reload();
-                    }
-                })
-            }, 1000);
         }
     },
 }
@@ -216,28 +198,10 @@ var ArticleListChannel = {
 
         ArticleListChannel.ws.onclose = function () {
             console.log("Disconnected to article list channel websocket.")
-            setInterval(function () {
-                $.ajax({
-                    url: Label.servePath + "/shop",
-                    method: "get",
-                    success: function() {
-                        location.reload();
-                    }
-                })
-            }, 1000);
         }
 
         ArticleListChannel.ws.onerror = function (err) {
             console.log('ERROR', err)
-            setInterval(function () {
-                $.ajax({
-                    url: Label.servePath + "/shop",
-                    method: "get",
-                    success: function() {
-                        location.reload();
-                    }
-                })
-            }, 1000);
         }
     },
 }
@@ -339,7 +303,7 @@ var IdleTalkChannel = {
                         location.reload();
                     }
                 })
-            }, 1000);
+            }, 10000);
         }
 
         IdleTalkChannel.ws.onerror = function (err) {
@@ -352,7 +316,7 @@ var IdleTalkChannel = {
                         location.reload();
                     }
                 })
-            }, 1000);
+            }, 10000);
         }
     },
 }
@@ -539,7 +503,7 @@ var ChatRoomChannel = {
                         location.reload();
                     }
                 })
-            }, 1000);
+            }, 10000);
         }
 
         ChatRoomChannel.ws.onerror = function (err) {
@@ -552,7 +516,7 @@ var ChatRoomChannel = {
                         location.reload();
                     }
                 })
-            }, 1000);
+            }, 10000);
         }
     },
 }
@@ -604,7 +568,7 @@ var GobangChannel = {
                         location.reload();
                     }
                 })
-            }, 1000);
+            }, 10000);
         }
 
         GobangChannel.ws.onerror = function (err) {
@@ -617,7 +581,7 @@ var GobangChannel = {
                         location.reload();
                     }
                 })
-            }, 1000);
+            }, 10000);
         }
     },
 }

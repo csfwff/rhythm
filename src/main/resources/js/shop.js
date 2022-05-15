@@ -142,7 +142,7 @@ var ShopChannel = {
                         location.reload();
                     }
                 })
-            }, 1000);
+            }, 10000);
         }
 
         ShopChannel.ws.onerror = function (info) {
@@ -155,7 +155,7 @@ var ShopChannel = {
                         location.reload();
                     }
                 })
-            }, 1000);
+            }, 10000);
         }
     },
 }

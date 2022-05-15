@@ -1650,28 +1650,10 @@ var Util = {
 
     userChannel.onclose = function () {
       console.log("Disconnected to user channel websocket.")
-      setInterval(function () {
-        $.ajax({
-          url: Label.servePath + "/shop",
-          method: "get",
-          success: function() {
-            location.reload();
-          }
-        })
-      }, 1000);
     }
 
     userChannel.onerror = function (err) {
       console.log('ERROR', err)
-      setInterval(function () {
-        $.ajax({
-          url: Label.servePath + "/shop",
-          method: "get",
-          success: function() {
-            location.reload();
-          }
-        })
-      }, 1000);
     }
   },
   /**

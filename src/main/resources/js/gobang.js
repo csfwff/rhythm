@@ -259,28 +259,10 @@ var GobangChannel = {
 
         GobangChannel.ws.onclose = function () {
             console.log("Disconnected to gobang channel websocket.")
-            setInterval(function () {
-                $.ajax({
-                    url: Label.servePath + "/shop",
-                    method: "get",
-                    success: function() {
-                        location.reload();
-                    }
-                })
-            }, 1000);
         };
 
         GobangChannel.ws.onerror = function (err) {
             console.log("ERROR", err);
-            setInterval(function () {
-                $.ajax({
-                    url: Label.servePath + "/shop",
-                    method: "get",
-                    success: function() {
-                        location.reload();
-                    }
-                })
-            }, 1000);
         };
     }
 };
