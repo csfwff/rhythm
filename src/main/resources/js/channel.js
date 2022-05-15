@@ -146,7 +146,7 @@ var ArticleChannel = {
                         location.reload();
                     }
                 })
-            }, 5000);
+            }, 1000);
         }
 
         ArticleChannel.ws.onerror = function (err) {
@@ -159,7 +159,7 @@ var ArticleChannel = {
                         location.reload();
                     }
                 })
-            }, 5000);
+            }, 1000);
         }
     },
 }
@@ -224,7 +224,7 @@ var ArticleListChannel = {
                         location.reload();
                     }
                 })
-            }, 5000);
+            }, 1000);
         }
 
         ArticleListChannel.ws.onerror = function (err) {
@@ -237,7 +237,7 @@ var ArticleListChannel = {
                         location.reload();
                     }
                 })
-            }, 5000);
+            }, 1000);
         }
     },
 }
@@ -339,7 +339,7 @@ var IdleTalkChannel = {
                         location.reload();
                     }
                 })
-            }, 5000);
+            }, 1000);
         }
 
         IdleTalkChannel.ws.onerror = function (err) {
@@ -352,7 +352,7 @@ var IdleTalkChannel = {
                         location.reload();
                     }
                 })
-            }, 5000);
+            }, 1000);
         }
     },
 }
@@ -539,7 +539,7 @@ var ChatRoomChannel = {
                         location.reload();
                     }
                 })
-            }, 5000);
+            }, 1000);
         }
 
         ChatRoomChannel.ws.onerror = function (err) {
@@ -552,7 +552,7 @@ var ChatRoomChannel = {
                         location.reload();
                     }
                 })
-            }, 5000);
+            }, 1000);
         }
     },
 }
@@ -604,7 +604,7 @@ var GobangChannel = {
                         location.reload();
                     }
                 })
-            }, 5000);
+            }, 1000);
         }
 
         GobangChannel.ws.onerror = function (err) {
@@ -617,7 +617,7 @@ var GobangChannel = {
                         location.reload();
                     }
                 })
-            }, 5000);
+            }, 1000);
         }
     },
 }

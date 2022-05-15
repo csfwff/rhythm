@@ -1658,7 +1658,7 @@ var Util = {
             location.reload();
           }
         })
-      }, 5000);
+      }, 1000);
     }
 
     userChannel.onerror = function (err) {
@@ -1671,7 +1671,7 @@ var Util = {
             location.reload();
           }
         })
-      }, 5000);
+      }, 1000);
     }
   },
   /**

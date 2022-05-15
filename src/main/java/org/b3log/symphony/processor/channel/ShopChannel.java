@@ -72,7 +72,7 @@ public class ShopChannel implements WebSocketChannel {
         SESSIONS.put(userId, userSessions);
 
         sendMsg(userId, getMOTD() +
-                "欢迎来到系统商店，<span style=\"color: #00bff3\">" + user.optString(User.USER_NAME) + "</span> ！<br>" +
+                "欢迎来到系统商店！<span style=\"color: #00bff3\">" + user.optString(User.USER_NAME) + "</span><br>" +
                 "<span style=\"color: #EABF04\">输入\"/help\"获取帮助信息。</span>"
         );
     }

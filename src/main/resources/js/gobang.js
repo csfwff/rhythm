@@ -267,7 +267,7 @@ var GobangChannel = {
                         location.reload();
                     }
                 })
-            }, 5000);
+            }, 1000);
         };
 
         GobangChannel.ws.onerror = function (err) {
@@ -280,7 +280,7 @@ var GobangChannel = {
                         location.reload();
                     }
                 })
-            }, 5000);
+            }, 1000);
         };
     }
 };
