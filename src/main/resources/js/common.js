@@ -1652,7 +1652,7 @@ var Util = {
       console.log("Disconnected to user channel websocket.")
       setInterval(function () {
         $.ajax({
-          url: Label.servePath + "/",
+          url: Label.servePath + "/shop",
           method: "get",
           success: function() {
             location.reload();
@@ -1665,7 +1665,7 @@ var Util = {
       console.log('ERROR', err)
       setInterval(function () {
         $.ajax({
-          url: Label.servePath + "/",
+          url: Label.servePath + "/shop",
           method: "get",
           success: function() {
             location.reload();

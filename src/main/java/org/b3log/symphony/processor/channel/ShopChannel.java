@@ -31,6 +31,7 @@ import org.json.JSONObject;
 
 import java.util.Collections;
 import java.util.Map;
+import java.util.Random;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -70,15 +71,52 @@ public class ShopChannel implements WebSocketChannel {
 
         SESSIONS.put(userId, userSessions);
 
-        sendMsg(userId, "<br>" +
-                ".------..------..------..------.<br>" +
-                "|S.--. ||H.--. ||O.--. ||P.--. |<br>" +
-                "| :/\\: || :/\\: || :/\\: || :/\\: |<br>" +
-                "| :\\/: || (__) || :\\/: || (__) |<br>" +
-                "| '--'S|| '--'H|| '--'O|| '--'P|<br>" +
-                "`------'`------'`------'`------'<br>" +
-                "欢迎来到系统商店，" + user.optString(User.USER_NAME) + "！"
+        sendMsg(userId, getMOTD() +
+                "欢迎来到系统商店，<span style=\"color: #00bff3\">" + user.optString(User.USER_NAME) + "</span> ！<br>" +
+                "<span style=\"color: #EABF04\">输入\"/help\"获取帮助信息。</span>"
         );
+    }
+
+    private String getMOTD() {
+        int total = 3;
+        Random random = new Random();
+        int num = random.nextInt(total);
+        switch (num) {
+            case 0:
+                return "<br><br>" +
+                        ".------..------..------..------.<br>" +
+                        "|S.--.&nbsp;||H.--.&nbsp;||O.--.&nbsp;||P.--.&nbsp;|<br>" +
+                        "|&nbsp;:/\\:&nbsp;||&nbsp;:/\\:&nbsp;||&nbsp;:/\\:&nbsp;||&nbsp;:/\\:&nbsp;|<br>" +
+                        "|&nbsp;:\\/:&nbsp;||&nbsp;(__)&nbsp;||&nbsp;:\\/:&nbsp;||&nbsp;(__)&nbsp;|<br>" +
+                        "|&nbsp;'--'S||&nbsp;'--'H||&nbsp;'--'O||&nbsp;'--'P|<br>" +
+                        "`------'`------'`------'`------'<br><br>";
+            case 1:
+                return "<br>" +
+                        "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<br>" +
+                        "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;>X<&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;***&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;xxx&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`&nbsp;&nbsp;___&nbsp;&nbsp;'&nbsp;&nbsp;&nbsp;<br>" +
+                        "&nbsp;&nbsp;&nbsp;&nbsp;(o&nbsp;o)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(o&nbsp;o)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(o&nbsp;o)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;&nbsp;(O&nbsp;o)&nbsp;&nbsp;-&nbsp;&nbsp;<br>" +
+                        "ooO--(_)--Ooo-ooO--(_)--Ooo-ooO--(_)--Ooo-ooO--(_)--Ooo-<br><br>";
+            case 2:
+                return "" +
+                        "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<br>" +
+                        "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;,--,&nbsp;&nbsp;&nbsp;&nbsp;,----..&nbsp;&nbsp;&nbsp;,-.----.&nbsp;&nbsp;&nbsp;&nbsp;<br>" +
+                        "&nbsp;&nbsp;.--.--.&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;,--.'|&nbsp;&nbsp;&nbsp;/&nbsp;&nbsp;&nbsp;/&nbsp;&nbsp;&nbsp;\\&nbsp;&nbsp;\\&nbsp;&nbsp;&nbsp;&nbsp;/&nbsp;&nbsp;\\&nbsp;&nbsp;&nbsp;<br>" +
+                        "&nbsp;/&nbsp;&nbsp;/&nbsp;&nbsp;&nbsp;&nbsp;'.&nbsp;&nbsp;&nbsp;&nbsp;,--,&nbsp;&nbsp;|&nbsp;:&nbsp;&nbsp;/&nbsp;&nbsp;&nbsp;.&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp;|&nbsp;&nbsp;&nbsp;:&nbsp;&nbsp;&nbsp;&nbsp;\\&nbsp;&nbsp;<br>" +
+                        "|&nbsp;&nbsp;:&nbsp;&nbsp;/`.&nbsp;/&nbsp;,---.'|&nbsp;&nbsp;:&nbsp;'&nbsp;.&nbsp;&nbsp;&nbsp;/&nbsp;&nbsp;&nbsp;;.&nbsp;&nbsp;\\|&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;.\\&nbsp;:&nbsp;<br>" +
+                        ";&nbsp;&nbsp;|&nbsp;&nbsp;|--`&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;|&nbsp;:&nbsp;_'&nbsp;|.&nbsp;&nbsp;&nbsp;;&nbsp;&nbsp;&nbsp;/&nbsp;&nbsp;`&nbsp;;.&nbsp;&nbsp;&nbsp;:&nbsp;&nbsp;|:&nbsp;|&nbsp;<br>" +
+                        "|&nbsp;&nbsp;:&nbsp;&nbsp;;_&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp;&nbsp;&nbsp;:&nbsp;|.'&nbsp;&nbsp;|;&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;;&nbsp;\\&nbsp;;&nbsp;||&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;\\&nbsp;:&nbsp;<br>" +
+                        "&nbsp;\\&nbsp;&nbsp;\\&nbsp;&nbsp;&nbsp;&nbsp;`.&nbsp;|&nbsp;&nbsp;&nbsp;'&nbsp;'&nbsp;&nbsp;;&nbsp;:|&nbsp;&nbsp;&nbsp;:&nbsp;&nbsp;|&nbsp;;&nbsp;|&nbsp;'|&nbsp;&nbsp;&nbsp;:&nbsp;.&nbsp;&nbsp;&nbsp;/&nbsp;<br>" +
+                        "&nbsp;&nbsp;`----.&nbsp;&nbsp;&nbsp;\\'&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;.'.&nbsp;|.&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;'&nbsp;'&nbsp;'&nbsp;:;&nbsp;&nbsp;&nbsp;|&nbsp;|`-'&nbsp;&nbsp;<br>" +
+                        "&nbsp;&nbsp;__&nbsp;\\&nbsp;&nbsp;\\&nbsp;&nbsp;||&nbsp;&nbsp;&nbsp;|&nbsp;:&nbsp;&nbsp;|&nbsp;''&nbsp;&nbsp;&nbsp;;&nbsp;&nbsp;\\;&nbsp;/&nbsp;&nbsp;||&nbsp;&nbsp;&nbsp;|&nbsp;;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<br>" +
+                        "&nbsp;/&nbsp;&nbsp;/`--'&nbsp;&nbsp;/'&nbsp;&nbsp;&nbsp;:&nbsp;|&nbsp;&nbsp;:&nbsp;;&nbsp;\\&nbsp;&nbsp;&nbsp;\\&nbsp;&nbsp;',&nbsp;&nbsp;/&nbsp;:&nbsp;&nbsp;&nbsp;'&nbsp;|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<br>" +
+                        "'--'.&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/&nbsp;|&nbsp;&nbsp;&nbsp;|&nbsp;'&nbsp;&nbsp;,/&nbsp;&nbsp;&nbsp;;&nbsp;&nbsp;&nbsp;:&nbsp;&nbsp;&nbsp;&nbsp;/&nbsp;&nbsp;:&nbsp;&nbsp;&nbsp;:&nbsp;:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<br>" +
+                        "&nbsp;&nbsp;`--'---'&nbsp;&nbsp;;&nbsp;&nbsp;&nbsp;:&nbsp;;--'&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;\\&nbsp;&nbsp;&nbsp;\\&nbsp;.'&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;|&nbsp;:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<br>" +
+                        "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;,/&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`---`&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`---'.|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<br>" +
+                        "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'---'&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`---`&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<br>" +
+                        "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<br><br>";
+            default:
+                return "";
+        }
     }
 
     /**

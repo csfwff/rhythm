@@ -136,7 +136,7 @@ var ShopChannel = {
             Shop.log('Client', '与服务端的连接已断开，正在尝试重连...');
             setInterval(function () {
                 $.ajax({
-                    url: Label.servePath + "/",
+                    url: Label.servePath + "/shop",
                     method: "get",
                     success: function() {
                         location.reload();
@@ -149,7 +149,7 @@ var ShopChannel = {
             Shop.log('Client', '连接出错，正在尝试重连...');
             setInterval(function () {
                 $.ajax({
-                    url: Label.servePath + "/",
+                    url: Label.servePath + "/shop",
                     method: "get",
                     success: function() {
                         location.reload();
