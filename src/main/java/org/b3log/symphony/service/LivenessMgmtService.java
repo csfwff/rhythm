@@ -127,6 +127,28 @@ public class LivenessMgmtService {
     }
 
     private static Map<String, String> gave2dayCards = new HashMap<>();
+
+    // 系统刚启动时运行，避免重复发放免签卡
+    public void initCheckLiveness() {
+        final String date = DateFormatUtils.format(System.currentTimeMillis(), "yyyyMMdd");
+        try {
+            List<JSONObject> userList = livenessRepository.getByDate(date);
+            for (JSONObject i : userList) {
+                String userId = i.optString(Liveness.LIVENESS_USER_ID);
+                JSONObject user = userQueryService.getUser(userId);
+                final int livenessMax = Symphonys.ACTIVITY_YESTERDAY_REWARD_MAX;
+                final int currentLiveness = livenessQueryService.getCurrentLivenessPoint(userId);
+                float liveness = (float) (Math.round((float) currentLiveness / livenessMax * 100 * 100)) / 100;
+                if (liveness == 100) {
+                    LOGGER.log(Level.INFO, "Ignore checkin card 2 days for " + user.optString(User.USER_NAME));
+                    gave2dayCards.put(userId, date);
+                }
+            }
+        } catch (RepositoryException e) {
+            LOGGER.log(Level.ERROR, "Init check liveness [" + date + "] failed", e);
+        }
+    }
+
     public void checkLiveness() {
         final BeanManager beanManager = BeanManager.getInstance();
         final ActivityMgmtService activityMgmtService = beanManager.getReference(ActivityMgmtService.class);

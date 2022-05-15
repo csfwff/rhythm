@@ -121,6 +121,8 @@ public class CronMgmtService {
     public void start() {
         long delay = 10000;
 
+        livenessMgmtService.initCheckLiveness();
+
         Symphonys.SCHEDULED_EXECUTOR_SERVICE.scheduleAtFixedRate(() -> {
             try {
                 ChatroomChannel.sendOnlineMsg();
