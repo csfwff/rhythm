@@ -28,28 +28,64 @@
  * @static
  */
 var Shop = {
+    history: [],
+    cursor: 1,
     init: function () {
         Shop.log("Client", "正在连接服务器，请稍等...");
         Shop.resetInput();
 
-        $('body').on('keypress', function(e) {
+        $('body').on('keydown', function(e) {
             if (e.keyCode === 13) {
                 let cmd = $(".i-cmd").text();
+                Shop.history[Shop.history.length] = cmd;
                 Shop.log("Input", cmd);
-                $.ajax({
-                    url: Label.servePath + "/shop",
-                    method: 'post',
-                    data: JSON.stringify(
-                        {
-                            "command": cmd
-                        }
-                    ),
-                    cache: false,
-                    async: true
-                });
+                if (cmd === '/history') {
+                    let histories = '';
+                    histories += "===== 命令历史 =====<br>";
+                    for (let i = 0; i < Shop.history.length; i++) {
+                        histories += i + "&nbsp;" + Shop.history[i] + "<br>";
+                    }
+                    Shop.log("Client", "<br>" + histories);
+                } else {
+                    $.ajax({
+                        url: Label.servePath + "/shop",
+                        method: 'post',
+                        data: JSON.stringify(
+                            {
+                                "command": cmd
+                            }
+                        ),
+                        cache: false,
+                        async: true
+                    });
+                }
                 setTimeout(function () {
                     Shop.resetInput();
+                    Shop.cursor = Shop.history.length;
                 }, 100);
+            } else if (e.keyCode === 38) {
+                // Up
+                if (Shop.cursor <= 0) {
+                    Shop.cursor = 1;
+                }
+                Shop.cursor--;
+                console.log(Shop.cursor);
+                $(".i-cmd").text(Shop.history[Shop.cursor]);
+            } else if (e.keyCode === 40) {
+                // Down
+                if (Shop.cursor > Shop.history.length - 1) {
+                    Shop.cursor = Shop.history.length - 2;
+                }
+                if (Shop.cursor <= -1) {
+                    Shop.cursor = -1;
+                }
+                Shop.cursor++;
+                console.log(Shop.cursor);
+                if (Shop.cursor === Shop.history.length) {
+                    $(".i-cmd").text("");
+                } else {
+                    $(".i-cmd").text(Shop.history[Shop.cursor]);
+                }
             }
         })
 
