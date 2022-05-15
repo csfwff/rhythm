@@ -96,8 +96,7 @@ var ShopChannel = {
      * @description Initializes message channel
      */
     init: function (channelServer) {
-        ShopChannel.ws = new ReconnectingWebSocket(channelServer)
-        ShopChannel.ws.reconnectInterval = 1000
+        ShopChannel.ws = new WebSocket(channelServer)
 
         ShopChannel.ws.onopen = function () {
             Shop.log('Client', '连接成功，已启动命令通道。')
@@ -112,11 +111,29 @@ var ShopChannel = {
         }
 
         ShopChannel.ws.onclose = function () {
-            Shop.log('Client', '与服务端的连接已断开，尝试重连中...');
+            Shop.log('Client', '与服务端的连接已断开，正在尝试重连...');
+            setInterval(function () {
+                $.ajax({
+                    url: "/",
+                    method: "get",
+                    success: function() {
+                        location.reload();
+                    }
+                })
+            }, 5000);
         }
 
         ShopChannel.ws.onerror = function (info) {
-            Shop.log('Client', '连接出错，尝试重连中...');
+            Shop.log('Client', '连接出错，正在尝试重连...');
+            setInterval(function () {
+                $.ajax({
+                    url: "/",
+                    method: "get",
+                    success: function() {
+                        location.reload();
+                    }
+                })
+            }, 5000);
         }
     },
 }

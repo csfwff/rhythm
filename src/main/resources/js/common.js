@@ -1596,8 +1596,7 @@ var Util = {
    * @static
    */
   initUserChannel: function (channelServer) {
-    var userChannel = new ReconnectingWebSocket(channelServer)
-    userChannel.reconnectInterval = 1000
+    var userChannel = new WebSocket(channelServer)
 
     userChannel.onopen = function () {
       console.log("Connected to user channel websocket.")
@@ -1651,10 +1650,28 @@ var Util = {
 
     userChannel.onclose = function () {
       console.log("Disconnected to user channel websocket.")
+      setInterval(function () {
+        $.ajax({
+          url: "/",
+          method: "get",
+          success: function() {
+            location.reload();
+          }
+        })
+      }, 5000);
     }
 
     userChannel.onerror = function (err) {
       console.log('ERROR', err)
+      setInterval(function () {
+        $.ajax({
+          url: "/",
+          method: "get",
+          success: function() {
+            location.reload();
+          }
+        })
+      }, 5000);
     }
   },
   /**

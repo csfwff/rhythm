@@ -196,8 +196,7 @@ var GobangChannel = {
      * @description Initializes message channel
      */
     init: function (channelServer) {
-        GobangChannel.ws = new ReconnectingWebSocket(channelServer);
-        GobangChannel.ws.reconnectInterval = 1000;
+        GobangChannel.ws = new WebSocket(channelServer);
 
         GobangChannel.ws.onopen = function () {
             console.log("Connected to gobang channel websocket.")
@@ -260,10 +259,28 @@ var GobangChannel = {
 
         GobangChannel.ws.onclose = function () {
             console.log("Disconnected to gobang channel websocket.")
+            setInterval(function () {
+                $.ajax({
+                    url: "/",
+                    method: "get",
+                    success: function() {
+                        location.reload();
+                    }
+                })
+            }, 5000);
         };
 
         GobangChannel.ws.onerror = function (err) {
             console.log("ERROR", err);
+            setInterval(function () {
+                $.ajax({
+                    url: "/",
+                    method: "get",
+                    success: function() {
+                        location.reload();
+                    }
+                })
+            }, 5000);
         };
     }
 };
