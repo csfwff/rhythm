@@ -79,7 +79,7 @@ public class ShopChannel implements WebSocketChannel {
                 "| :\\/: || (__) || :\\/: || (__) |<br>" +
                 "| '--'S|| '--'H|| '--'O|| '--'P|<br>" +
                 "`------'`------'`------'`------'<br>" +
-                "连接成功！欢迎来到系统商店，" + user.optString(User.USER_NAME) + "！");
+                "欢迎来到系统商店，" + user.optString(User.USER_NAME) + "！");
         sendMsg(cmd);
     }
 

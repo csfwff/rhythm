@@ -115,8 +115,8 @@ var ShopChannel = {
             Shop.log('Client', '与服务端的连接已断开，尝试重连中...');
         }
 
-        ShopChannel.ws.onerror = function (err) {
-            Shop.log('Client', '连接出错，请报告至管理员：' + err);
+        ShopChannel.ws.onerror = function (info) {
+            Shop.log('Client', '连接出错，尝试重连中...');
         }
     },
 }
