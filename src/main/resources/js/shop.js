@@ -84,3 +84,39 @@ var Shop = {
         $(".i-cmd").focus();
     }
 }
+
+var ShopChannel = {
+    /**
+     * WebSocket instance.
+     *
+     * @type WebSocket
+     */
+    ws: undefined,
+    /**
+     * @description Initializes message channel
+     */
+    init: function (channelServer) {
+        ShopChannel.ws = new ReconnectingWebSocket(channelServer)
+        ShopChannel.ws.reconnectInterval = 1000
+
+        ShopChannel.ws.onopen = function () {
+            Shop.log('Client', '连接成功，已启动命令通道。')
+            setInterval(function () {
+                ShopChannel.ws.send('-hb-')
+            }, 1000 * 55)
+        }
+
+        ShopChannel.ws.onmessage = function (evt) {
+            var data = JSON.parse(evt.data);
+            Shop.log('Server', data.message);
+        }
+
+        ShopChannel.ws.onclose = function () {
+            Shop.log('Client', '与服务端的连接已断开，尝试重连中...');
+        }
+
+        ShopChannel.ws.onerror = function (err) {
+            Shop.log('Client', '连接出错，请报告至管理员：' + err);
+        }
+    },
+}

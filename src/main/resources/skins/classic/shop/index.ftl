@@ -71,5 +71,9 @@
 
     Shop.init();
 </script>
+<script>
+    // Init [Shop] channel
+    ShopChannel.init("${wsScheme}://${serverHost}:${serverPort}${contextPath}/shop-channel");
+</script>
 </body>
 </html>

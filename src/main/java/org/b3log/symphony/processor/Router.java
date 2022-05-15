@@ -56,6 +56,8 @@ public final class Router {
         Dispatcher.webSocket("/user-channel", userChannel);
         final IdleTalkChannel idleTalkChannel = beanManager.getReference(IdleTalkChannel.class);
         Dispatcher.webSocket("/idle-talk-channel", idleTalkChannel);
+        final ShopChannel shopChannel = beanManager.getReference(ShopChannel.class);
+        Dispatcher.webSocket("/shop-channel", shopChannel);
 
         // 注册 HTTP 错误处理
         final ErrorProcessor errorProcessor = beanManager.getReference(ErrorProcessor.class);
