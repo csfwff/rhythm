@@ -18,15 +18,19 @@
  */
 package org.b3log.symphony.processor;
 
+import org.b3log.latke.Keys;
 import org.b3log.latke.http.Dispatcher;
 import org.b3log.latke.http.RequestContext;
 import org.b3log.latke.http.renderer.AbstractFreeMarkerRenderer;
 import org.b3log.latke.ioc.BeanManager;
 import org.b3log.latke.ioc.Inject;
 import org.b3log.latke.ioc.Singleton;
+import org.b3log.symphony.processor.channel.ShopChannel;
 import org.b3log.symphony.processor.middleware.LoginCheckMidware;
 import org.b3log.symphony.service.DataModelService;
+import org.b3log.symphony.util.Sessions;
 import org.b3log.symphony.util.StatusCodes;
+import org.json.JSONObject;
 
 import java.util.Map;
 
@@ -58,6 +62,23 @@ public class ShopProcessor {
     }
 
     public void runCmd(RequestContext context) {
-
+        final JSONObject requestJSONObject = context.requestJSON();
+        JSONObject currentUser = Sessions.getUser();
+        try {
+            currentUser = ApiProcessor.getUserByKey(requestJSONObject.optString("apiKey"));
+        } catch (NullPointerException ignored) {
+        }
+        String userId = currentUser.optString(Keys.OBJECT_ID);
+        String command = requestJSONObject.optString("command");
+        switch (command) {
+            case "/help":
+                ShopChannel.sendMsg(userId, "<br>" +
+                        "===== 系统商店帮助菜单 =====<br>" +
+                        "/help 打印帮助菜单");
+                break;
+            default:
+                ShopChannel.sendMsg(userId, "" +
+                        "命令有误，输入\"/help\"获取帮助信息。");
+        }
     }
 }
