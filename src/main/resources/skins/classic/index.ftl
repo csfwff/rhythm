@@ -326,7 +326,7 @@
                         </a>
                     </div>
                     <div class="metro-item">
-                        <a class="preview" href="${servePath}/buy">
+                        <a class="preview" href="${servePath}/shop">
                             <img style="border-radius: 0"
                                  src="https://pwl.stackoverflow.wiki/2022/03/ss-61cf1b96.png">
                             <b>系统商店</b>
