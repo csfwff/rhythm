@@ -62,6 +62,8 @@ public class ShopProcessor {
     }
 
     public void runCmd(RequestContext context) {
+        context.renderJSON(StatusCodes.SUCC);
+        context.renderMsg("OK");
         final JSONObject requestJSONObject = context.requestJSON();
         JSONObject currentUser = Sessions.getUser();
         try {
