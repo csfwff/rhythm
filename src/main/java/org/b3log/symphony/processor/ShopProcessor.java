@@ -22,14 +22,22 @@ import org.b3log.latke.http.Dispatcher;
 import org.b3log.latke.http.RequestContext;
 import org.b3log.latke.http.renderer.AbstractFreeMarkerRenderer;
 import org.b3log.latke.ioc.BeanManager;
+import org.b3log.latke.ioc.Inject;
 import org.b3log.latke.ioc.Singleton;
 import org.b3log.symphony.processor.middleware.LoginCheckMidware;
+import org.b3log.symphony.service.DataModelService;
 import org.b3log.symphony.util.StatusCodes;
 
 import java.util.Map;
 
 @Singleton
 public class ShopProcessor {
+
+    /**
+     * Data model service.
+     */
+    @Inject
+    private DataModelService dataModelService;
 
     /**
      * Register request handlers.
@@ -45,6 +53,7 @@ public class ShopProcessor {
     public void showShop(RequestContext context) {
         final AbstractFreeMarkerRenderer renderer = new SkinRenderer(context, "shop/index.ftl");
         final Map<String, Object> dataModel = renderer.getDataModel();
+        dataModelService.fillHeaderAndFooter(context, dataModel);
     }
 
 }
