@@ -42,12 +42,12 @@ var Util = {
     switch (num) {
       case 1:
         model = '摸鱼派社区即将进行升级维护，预计停服时间：<b>5分钟</b><br>' +
-            '请在维护时间后刷新页面进入摸鱼派，感谢你的理解～<br>' +
+            '维护完成后摸鱼派将自动刷新（客户端请手动重新登录），感谢你的理解～<br>' +
             '摸鱼这么久了，去给自己倒杯咖啡吧 ☕️';
         break;
       case 2:
         model = '摸鱼派社区即将进行升级维护，预计停服时间：<b>20秒</b><br>' +
-            '请在维护时间后刷新页面进入摸鱼派，感谢你的理解～<br>' +
+            '维护完成后摸鱼派将自动刷新（客户端请手动重新登录），感谢你的理解～<br>' +
             '摸鱼这么久了，去给自己倒杯咖啡吧 ☕️';
         break;
     }
@@ -1652,7 +1652,7 @@ var Util = {
       console.log("Disconnected to user channel websocket.")
       setInterval(function () {
         $.ajax({
-          url: "/",
+          url: Label.servePath + "/",
           method: "get",
           success: function() {
             location.reload();
@@ -1665,7 +1665,7 @@ var Util = {
       console.log('ERROR', err)
       setInterval(function () {
         $.ajax({
-          url: "/",
+          url: Label.servePath + "/",
           method: "get",
           success: function() {
             location.reload();

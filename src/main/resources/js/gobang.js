@@ -261,7 +261,7 @@ var GobangChannel = {
             console.log("Disconnected to gobang channel websocket.")
             setInterval(function () {
                 $.ajax({
-                    url: "/",
+                    url: Label.servePath + "/",
                     method: "get",
                     success: function() {
                         location.reload();
@@ -274,7 +274,7 @@ var GobangChannel = {
             console.log("ERROR", err);
             setInterval(function () {
                 $.ajax({
-                    url: "/",
+                    url: Label.servePath + "/",
                     method: "get",
                     success: function() {
                         location.reload();

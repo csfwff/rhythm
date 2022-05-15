@@ -140,7 +140,7 @@ var ArticleChannel = {
             console.log("Disconnected to article channel websocket.")
             setInterval(function () {
                 $.ajax({
-                    url: "/",
+                    url: Label.servePath + "/",
                     method: "get",
                     success: function() {
                         location.reload();
@@ -153,7 +153,7 @@ var ArticleChannel = {
             console.log(err)
             setInterval(function () {
                 $.ajax({
-                    url: "/",
+                    url: Label.servePath + "/",
                     method: "get",
                     success: function() {
                         location.reload();
@@ -218,7 +218,7 @@ var ArticleListChannel = {
             console.log("Disconnected to article list channel websocket.")
             setInterval(function () {
                 $.ajax({
-                    url: "/",
+                    url: Label.servePath + "/",
                     method: "get",
                     success: function() {
                         location.reload();
@@ -231,7 +231,7 @@ var ArticleListChannel = {
             console.log('ERROR', err)
             setInterval(function () {
                 $.ajax({
-                    url: "/",
+                    url: Label.servePath + "/",
                     method: "get",
                     success: function() {
                         location.reload();
@@ -333,7 +333,7 @@ var IdleTalkChannel = {
             console.log("Disconnected to idle talk channel websocket.")
             setInterval(function () {
                 $.ajax({
-                    url: "/",
+                    url: Label.servePath + "/",
                     method: "get",
                     success: function() {
                         location.reload();
@@ -346,7 +346,7 @@ var IdleTalkChannel = {
             console.log('ERROR', err)
             setInterval(function () {
                 $.ajax({
-                    url: "/",
+                    url: Label.servePath + "/",
                     method: "get",
                     success: function() {
                         location.reload();
@@ -533,7 +533,7 @@ var ChatRoomChannel = {
             console.log("Disconnected to chat room channel websocket.")
             setInterval(function () {
                 $.ajax({
-                    url: "/",
+                    url: Label.servePath + "/",
                     method: "get",
                     success: function() {
                         location.reload();
@@ -546,7 +546,7 @@ var ChatRoomChannel = {
             console.log('ERROR', err)
             setInterval(function () {
                 $.ajax({
-                    url: "/",
+                    url: Label.servePath + "/",
                     method: "get",
                     success: function() {
                         location.reload();
@@ -598,7 +598,7 @@ var GobangChannel = {
             console.log("Disconnected to gobang channel websocket.")
             setInterval(function () {
                 $.ajax({
-                    url: "/",
+                    url: Label.servePath + "/",
                     method: "get",
                     success: function() {
                         location.reload();
@@ -611,7 +611,7 @@ var GobangChannel = {
             console.log('ERROR', err)
             setInterval(function () {
                 $.ajax({
-                    url: "/",
+                    url: Label.servePath + "/",
                     method: "get",
                     success: function() {
                         location.reload();

@@ -34,6 +34,19 @@ var Shop = {
 
         $('body').on('keypress', function(e) {
             if (e.keyCode === 13) {
+                let cmd = $(".i-cmd").text();
+                Shop.log("Input", cmd);
+                $.ajax({
+                    url: Label.servePath + "/shop",
+                    method: 'post',
+                    data: JSON.stringify(
+                        {
+                            "command": cmd
+                        }
+                    ),
+                    cache: false,
+                    async: true
+                });
                 setTimeout(function () {
                     Shop.resetInput();
                 }, 100);
@@ -52,14 +65,23 @@ var Shop = {
         if (prefix === undefined) {
             prefix = 'N/A';
         }
-        let date = new Date();
-        prefix = '[' + ('0' + date.getHours()).slice(-2) + ':' + ('0' + date.getMinutes()).slice(-2) + ':' + ('0' + date.getSeconds()).slice(-2) + '&nbsp;' + prefix + ']&nbsp;';
-        $(".logs").append(
-            "\n" +
-            "<div class='subLog'>" +
-            prefix + log +
-            "</div>"
-        );
+        if (prefix === 'Input') {
+            $(".logs").append(
+                "\n" +
+                "<div class='subLog'>" +
+                ">&nbsp;" + log +
+                "</div>"
+            );
+        } else {
+            let date = new Date();
+            prefix = '[' + ('0' + date.getHours()).slice(-2) + ':' + ('0' + date.getMinutes()).slice(-2) + ':' + ('0' + date.getSeconds()).slice(-2) + '&nbsp;' + prefix + ']&nbsp;';
+            $(".logs").append(
+                "\n" +
+                "<div class='subLog'>" +
+                prefix + log +
+                "</div>"
+            );
+        }
     },
 
     resetInput: function (location, cmd) {
@@ -114,7 +136,7 @@ var ShopChannel = {
             Shop.log('Client', '与服务端的连接已断开，正在尝试重连...');
             setInterval(function () {
                 $.ajax({
-                    url: "/",
+                    url: Label.servePath + "/",
                     method: "get",
                     success: function() {
                         location.reload();
@@ -127,7 +149,7 @@ var ShopChannel = {
             Shop.log('Client', '连接出错，正在尝试重连...');
             setInterval(function () {
                 $.ajax({
-                    url: "/",
+                    url: Label.servePath + "/",
                     method: "get",
                     success: function() {
                         location.reload();
