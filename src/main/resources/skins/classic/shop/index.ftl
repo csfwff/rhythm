@@ -17,10 +17,59 @@
     <link rel="apple-touch-icon" href="${staticServePath}/images/faviconH.png">
     <link rel="search" type="application/opensearchdescription+xml" title="Rym" href="/opensearch.xml">
     ${siteVisitStatCode}
+    <script src="${staticServePath}/js/lib/compress/libs.min.js?${staticResourceVersion}"></script>
+    <script src="${staticServePath}/js/shop${miniPostfix}.js?${staticResourceVersion}"></script>
 </head>
 <body>
 <div class="main">
-
+    <div class="logs">
+    </div>
+    <div class="input">
+    </div>
 </div>
+<script>
+    var Label = {
+        commentEditorPlaceholderLabel: '${commentEditorPlaceholderLabel}',
+        langLabel: '${langLabel}',
+        luteAvailable: ${luteAvailable?c},
+        reportSuccLabel: '${reportSuccLabel}',
+        breezemoonLabel: '${breezemoonLabel}',
+        confirmRemoveLabel: "${confirmRemoveLabel}",
+        reloginLabel: "${reloginLabel}",
+        invalidPasswordLabel: "${invalidPasswordLabel}",
+        loginNameErrorLabel: "${loginNameErrorLabel}",
+        followLabel: "${followLabel}",
+        unfollowLabel: "${unfollowLabel}",
+        symphonyLabel: "${symphonyLabel}",
+        visionLabel: "${visionLabel}",
+        cmtLabel: "${cmtLabel}",
+        collectLabel: "${collectLabel}",
+        uncollectLabel: "${uncollectLabel}",
+        desktopNotificationTemplateLabel: "${desktopNotificationTemplateLabel}",
+        servePath: "${servePath}",
+        staticServePath: "${staticServePath}",
+        isLoggedIn: ${isLoggedIn?c},
+        funNeedLoginLabel: '${funNeedLoginLabel}',
+        notificationCommentedLabel: '${notificationCommentedLabel}',
+        notificationReplyLabel: '${notificationReplyLabel}',
+        notificationAtLabel: '${notificationAtLabel}',
+        notificationFollowingLabel: '${notificationFollowingLabel}',
+        pointLabel: '${pointLabel}',
+        sameCityLabel: '${sameCityLabel}',
+        systemLabel: '${systemLabel}',
+        newFollowerLabel: '${newFollowerLabel}',
+        makeAsReadLabel: '${makeAsReadLabel}',
+        imgMaxSize: ${imgMaxSize?c},
+        fileMaxSize: ${fileMaxSize?c},
+        <#if isLoggedIn>
+        currentUserName: '${currentUser.userName}',
+        </#if>
+        <#if csrfToken??>
+        csrfToken: '${csrfToken}'
+        </#if>
+    }
+
+    Shop.init();
+</script>
 </body>
 </html>

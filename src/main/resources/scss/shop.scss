@@ -16,14 +16,21 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 /**
- * 商店样式.
+ * Shop stylesheet.
  *
  * @author <a href="https://github.com/adlered">adlered</a>
  * @version 1.0.0.0, May 15, 2022
  */
 
 body {
-  background-color: #1A3C6C;
+  background-color: rgba(0, 0, 0, 0.86);
+}
+
+.logs {
+  color: #FFFFFF;
+}
+
+.subInput {
+  color: rgb(49, 139, 118);
 }
