@@ -70,17 +70,15 @@ public class ShopChannel implements WebSocketChannel {
 
         SESSIONS.put(userId, userSessions);
 
-        final JSONObject cmd = new JSONObject();
-        cmd.put(UserExt.USER_T_ID, userId);
-        cmd.put("message", "<br>" +
+        sendMsg(userId, "<br>" +
                 ".------..------..------..------.<br>" +
                 "|S.--. ||H.--. ||O.--. ||P.--. |<br>" +
                 "| :/\\: || :/\\: || :/\\: || :/\\: |<br>" +
                 "| :\\/: || (__) || :\\/: || (__) |<br>" +
                 "| '--'S|| '--'H|| '--'O|| '--'P|<br>" +
                 "`------'`------'`------'`------'<br>" +
-                "欢迎来到系统商店，" + user.optString(User.USER_NAME) + "！");
-        sendMsg(cmd);
+                "欢迎来到系统商店，" + user.optString(User.USER_NAME) + "！"
+        );
     }
 
     /**
@@ -115,11 +113,14 @@ public class ShopChannel implements WebSocketChannel {
     /**
      * Sends command to browsers.
      *
-     * @param message the specified message, for example,
+     * @param msg the specified message, for example,
      *                "userId": "",
      *                "cmd": ""
      */
-    public static void sendMsg(final JSONObject message) {
+    public static void sendMsg(String uid, String msg) {
+        JSONObject message = new JSONObject();
+        message.put(UserExt.USER_T_ID, uid);
+        message.put("message", msg);
         final String recvUserId = message.optString(UserExt.USER_T_ID);
         if (StringUtils.isBlank(recvUserId)) {
             return;

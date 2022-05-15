@@ -48,6 +48,7 @@ public class ShopProcessor {
 
         final ShopProcessor shopProcessor = beanManager.getReference(ShopProcessor.class);
         Dispatcher.get("/shop", shopProcessor::showShop, loginCheck::handle);
+        Dispatcher.post("/shop", shopProcessor::runCmd, loginCheck::handle);
     }
 
     public void showShop(RequestContext context) {
@@ -56,4 +57,7 @@ public class ShopProcessor {
         dataModelService.fillHeaderAndFooter(context, dataModel);
     }
 
+    public void runCmd(RequestContext context) {
+
+    }
 }
