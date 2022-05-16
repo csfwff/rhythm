@@ -27,6 +27,13 @@
         </div>
         <br>
         <div>
+            技术支持
+        </div>
+        <div>
+            <a href="mailto:chenhui@admin.fishpi.cn" target="_blank">chenhui@admin.fishpi.cn</a>
+        </div>
+        <br>
+        <div>
             摸鱼好站
         </div>
         <div>

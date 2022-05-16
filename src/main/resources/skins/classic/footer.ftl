@@ -37,6 +37,8 @@
                 <div>
                     <a href="https://github.com/csfwff/rhythm" target="_blank">Rhythm 社区引擎</a>
                     &nbsp;|&nbsp;
+                    技术支持 <a href="mailto:chenhui@admin.fishpi.cn" target="_blank">chenhui@admin.fishpi.cn</a>
+                    &nbsp;|&nbsp;
                     <a href="https://qm.qq.com/cgi-bin/qm/qr?k=dpq3N-bezENSsshZERxvTw2dV85WtTdV&jump_from=webapi" target="_blank"><svg style="vertical-align: -2px;"><use xlink:href="#ic-qgroup"></use></svg> 公告/反馈QQ群</a>
                     &nbsp;|&nbsp;
                     <a href="javascript:void(0)">摸鱼派聊天室客户端</a>&nbsp;&nbsp;
