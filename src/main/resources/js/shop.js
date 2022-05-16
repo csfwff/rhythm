@@ -86,6 +86,8 @@ var Shop = {
                 } else {
                     $(".i-cmd").text(Shop.history[Shop.cursor]);
                 }
+            } else if (e.keyCode === 9) {
+                $(".i-cmd").text(Shop.lenovo($(".i-cmd").text()));
             }
         })
 
@@ -95,6 +97,32 @@ var Shop = {
                 $(".i-cmd").focus();
             }, 100);
         });
+    },
+
+    lenovo: function (word) {
+        let words = [
+            "help",
+            "history"
+        ];
+        let splitWords = word.split(" ");
+        let latestWord = splitWords[splitWords.length - 1];
+        let result = '';
+        for (let i = 0; i < words.length; i++) {
+            let word = words[i];
+            if (word.startsWith(latestWord)) {
+                splitWords[splitWords.length - 1] = word;
+                for (let j = 0; j < splitWords.length; j++) {
+                    let rslt = splitWords[j];
+                    if (j === splitWords.length - 1) {
+                        result += rslt;
+                    } else {
+                        result += rslt + " ";
+                    }
+                }
+                break;
+            }
+        }
+        return result;
     },
 
     log: function (prefix, log) {
