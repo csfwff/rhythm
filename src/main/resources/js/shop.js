@@ -39,7 +39,7 @@ var Shop = {
                 let cmd = $(".i-cmd").text();
                 Shop.history[Shop.history.length] = cmd;
                 Shop.log("Input", cmd);
-                if (cmd === '/history') {
+                if (cmd === 'history') {
                     let histories = '';
                     histories += "===== 命令历史 =====<br>";
                     for (let i = 0; i < Shop.history.length; i++) {

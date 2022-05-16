@@ -72,16 +72,16 @@ public class ShopProcessor {
         }
         String userId = currentUser.optString(Keys.OBJECT_ID);
         String command = requestJSONObject.optString("command");
-        switch (command) {
-            case "/help":
+        switch (command.split(" ")[0]) {
+            case "help":
                 ShopChannel.sendMsg(userId, "<br>" +
                         "===== 系统商店帮助菜单 =====<br>" +
-                        "/help 打印帮助菜单<br>" +
-                        "/history 查看输入的历史命令 (支持通过上下按键快捷切换)");
+                        "help 打印帮助菜单<br>" +
+                        "history 查看输入的历史命令 (支持通过上下按键快捷切换)");
                 break;
             default:
                 ShopChannel.sendMsg(userId, "" +
-                        "命令有误，输入\"/help\"获取帮助信息。");
+                        "命令有误，输入\"help\"获取帮助信息。");
         }
     }
 }
