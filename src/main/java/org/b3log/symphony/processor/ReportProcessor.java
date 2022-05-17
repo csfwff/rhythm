@@ -74,7 +74,11 @@ public class ReportProcessor {
 
         final JSONObject requestJSONObject = context.requestJSON();
 
-        final JSONObject currentUser = Sessions.getUser();
+        JSONObject currentUser = Sessions.getUser();
+        try {
+            currentUser = ApiProcessor.getUserByKey(requestJSONObject.optString("apiKey"));
+        } catch (NullPointerException ignored) {
+        }
         final String userId = currentUser.optString(Keys.OBJECT_ID);
         final String dataId = requestJSONObject.optString(Report.REPORT_DATA_ID);
         final int dataType = requestJSONObject.optInt(Report.REPORT_DATA_TYPE);
