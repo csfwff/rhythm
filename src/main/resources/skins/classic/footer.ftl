@@ -41,8 +41,9 @@
                     &nbsp;|&nbsp;
                     <a href="https://qm.qq.com/cgi-bin/qm/qr?k=dpq3N-bezENSsshZERxvTw2dV85WtTdV&jump_from=webapi" target="_blank"><svg style="vertical-align: -2px;"><use xlink:href="#ic-qgroup"></use></svg> 公告/反馈QQ群</a>
                     &nbsp;|&nbsp;
-                    <a href="javascript:void(0)">摸鱼派聊天室客户端</a>&nbsp;&nbsp;
+                    <a href="javascript:void(0)">摸鱼派客户端</a>&nbsp;&nbsp;
                     <span>
+                        <a href="https://fishpi.cn/article/1653059669471" target="_blank" title="iOS 客户端"><svg style="vertical-align: -1px;"><use xlink:href="#ic-apple"></use></svg></a>&nbsp;
                         <a href="https://fishpi.cn/article/1637143985245" target="_blank" title="PC 客户端"><svg style="vertical-align: -2px;"><use xlink:href="#ic-pc"></use></svg></a>&nbsp;
                         <a href="https://fishpi.cn/article/1638189205758" target="_blank" title="IntelliJ IDEA插件"><svg style="vertical-align: -2px;"><use xlink:href="#ic-idea"></use></svg></a>&nbsp;
                         <a href="https://fishpi.cn/article/1639648815789" target="_blank" title="Chrome 插件"><svg style="vertical-align: -2px;"><use xlink:href="#ic-chrome"></use></svg></a>&nbsp;
