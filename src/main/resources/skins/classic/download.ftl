@@ -58,21 +58,24 @@
         line-height: 24px
     }
     .download__contain .item img {
-    height: 64px;
-    width: 64px;
-    margin-bottom: 18px
-}
-.download__link{
-    color:#035bd6;
-    transition: color .4s;
-    text-decoration:none;
-}
+        height: 64px;
+        width: 64px;
+        margin-bottom: 18px
+    }
+    .download__contain .item:hover {
+        box-shadow: 0 0 18px 16px rgb(53 72 91/10%)
+    }
+    .download__link{
+        color:#035bd6;
+        transition: color .4s;
+        text-decoration:none;
+    }
 
-.item__title{
-      font-size:32px;
-      font-weight:bold;
-      line-height:36px;
-}
+    .item__title{
+        font-size:32px;
+        font-weight:bold;
+        line-height:36px;
+    }
     </style>
 </@head>
 <link rel="stylesheet" href="${staticServePath}/css/index.css?${staticResourceVersion}" />
