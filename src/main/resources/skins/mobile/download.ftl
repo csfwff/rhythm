@@ -19,6 +19,7 @@
 
 -->
 <#include "macro-head.ftl">
+<#include "common/index-nav.ftl">
 <!DOCTYPE html>
 <html>
 <head>
@@ -29,10 +30,6 @@
       font-size:40px;
       font-weight:bold;
       line-height:45px;
-    }
-    .wrapper{
-        display:flex;
-        flex-direction:column;
     }
     .download__contain{
         margin:0 auto;
@@ -77,11 +74,15 @@
 </@head>
 <link rel="stylesheet" href="${staticServePath}/css/index.css?${staticResourceVersion}" />
 </head>
-<body>
-<#include "header.ftl">
-<div class="main" style="margin-bottom: 50px">
-    <div class="wrapper" style="max-width: 620px;position: relative;z-index: 1;margin-top: 30px">
-        <div style="text-align: center" >
+<body class="index">
+<div class="mobile-head">
+    <#include "header.ftl">
+    <@indexNav ''/>
+</div>
+<div style="height: 120px;width: 1px;" ></div>
+<div class="main" style="margin-bottom: 30px">
+    <div class="wrapper" style="max-width: 620px;position: relative;z-index: 1;">
+       <div style="text-align: center" >
             <h2 class="download__title">
                 摸鱼派客户端
             </h2>
@@ -91,17 +92,6 @@
         </div>
     </div>
     <div class="download__contain">
-        <div class="item">
-            <img src="${staticServePath}/images/clients/computer.png">
-            <h3 class="item__title">PC客户端</h3>
-            <div style="flex:1">Author:<a href="https://fishpi.cn/member/imlinhanchao">@imlinhanchao</a></div>
-            <div class="fn__flex">
-                <a class="download__link" href="https://github.com/imlinhanchao/pwl-chat/releases" target="_blank">Windows</a>
-            </div>
-             <div class="fn__flex">
-                <a class="download__link" href="https://github.com/imlinhanchao/pwl-chat/releases" target="_blank">MacOS</a>
-            </div>
-        </div>
         <div class="item">
             <img src="${staticServePath}/images/clients/android.png">
             <h3 class="item__title">Android 客户端</h3>
@@ -119,6 +109,17 @@
              <div style="flex:1">Author:<a href="https://fishpi.cn/member/Yui">@Yui</a>&nbsp;<a href="https://fishpi.cn/member/iwpz">@iwpz</a></div>
             <div class="fn__flex">
                 <a class="download__link" href="https://apps.apple.com/cn/app/%E6%91%B8%E9%B1%BC%E6%B4%BE/id1617385824" target="_blank">App Store</a>
+            </div>
+        </div>
+        <div class="item">
+            <img src="${staticServePath}/images/clients/computer.png">
+            <h3 class="item__title">PC客户端</h3>
+            <div style="flex:1">Author:<a href="https://fishpi.cn/member/imlinhanchao">@imlinhanchao</a></div>
+            <div class="fn__flex">
+                <a class="download__link" href="https://github.com/imlinhanchao/pwl-chat/releases" target="_blank">Windows</a>
+            </div>
+            <div class="fn__flex">
+                <a class="download__link" href="https://github.com/imlinhanchao/pwl-chat/releases" target="_blank">MacOS</a>
             </div>
         </div>
         <div class="item">
