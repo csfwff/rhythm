@@ -150,15 +150,17 @@
                             </div>
                         </div>
                         <#elseif TGIF == '-1'>
-                            <div class="index-user">
-                            <#list niceUsers as user>
-                                <a class="niceUsersElement" rel="nofollow"
-                                   href="${servePath}/member/${user.userName}">
-                                    <span class="avatar-middle slogan"
-                                          aria-label="${user.userName}"
-                                          style="background-image:url('${user.userAvatarURL48}');height:30px;width:30px;margin: 0px 10px 10px 0px"></span>
-                                </a>
-                            </#list>
+                            <div class="TGIF__item">
+                                <div style="float: left">
+                                    <svg style="width: 35px; height: 35px;"><use xlink:href="#logo"></use></svg>
+                                </div>
+                                <button class="green fn-right" style="margin-left: 5px" onclick="window.location.href=Label.servePath+'/download'">下载</button>
+
+                                <div style="padding-left:40px">
+                                    <b>随时随地摸鱼？</b>
+                                    <br>
+                                    下载摸鱼派客户端，想摸就摸！
+                                </div>
                             </div>
                         <#else>
                         <div class="TGIF__item">

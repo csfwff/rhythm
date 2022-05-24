@@ -112,14 +112,19 @@
             </div>
         </div>
         <div class="item">
-            <img src="${staticServePath}/images/clients/computer.png">
-            <h3 class="item__title">PC客户端</h3>
+            <img src="${staticServePath}/images/clients/windows.png">
+            <h3 class="item__title">Windows 客户端</h3>
             <div style="flex:1">Author:<a href="https://fishpi.cn/member/imlinhanchao">@imlinhanchao</a></div>
             <div class="fn__flex">
-                <a class="download__link" href="https://github.com/imlinhanchao/pwl-chat/releases" target="_blank">Windows</a>
+                <a class="download__link" href="https://github.com/imlinhanchao/pwl-chat/releases" target="_blank">Github Releases</a>
             </div>
+        </div>
+        <div class="item">
+            <img src="${staticServePath}/images/clients/macos.png">
+            <h3 class="item__title">macOS 客户端</h3>
+            <div style="flex:1">Author:<a href="https://fishpi.cn/member/imlinhanchao">@imlinhanchao</a></div>
             <div class="fn__flex">
-                <a class="download__link" href="https://github.com/imlinhanchao/pwl-chat/releases" target="_blank">MacOS</a>
+                <a class="download__link" href="https://github.com/imlinhanchao/pwl-chat/releases" target="_blank">Github Releases</a>
             </div>
         </div>
         <div class="item">

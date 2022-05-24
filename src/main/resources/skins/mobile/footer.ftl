@@ -48,7 +48,7 @@
         </div>
         <div class="fn-hr5"></div>
         <div style="margin-top: 5px">
-            <div>摸鱼派客户端</div>
+            <div><a href="${servePath}/download">摸鱼派客户端</a></div>
             <div style="margin-top: 3px">
                 <a href="https://fishpi.cn/article/1653059669471" target="_blank" title="iOS 客户端"><svg style="vertical-align: -1px;"><use xlink:href="#ic-apple"></use></svg></a>&nbsp;
                 <a href="https://fishpi.cn/article/1637143985245" target="_blank" title="PC 客户端"><svg style="vertical-align: -2px;"><use xlink:href="#ic-pc"></use></svg></a>&nbsp;
