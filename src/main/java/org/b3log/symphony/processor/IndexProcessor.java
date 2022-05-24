@@ -166,6 +166,7 @@ public class IndexProcessor {
         Dispatcher.get("/games/evolve/", indexProcessor::showEvolve, loginCheck::handle);
         Dispatcher.get("/user/checkedIn", indexProcessor::isCheckedIn, loginCheck::handle);
         Dispatcher.get("/oldAlmanac", indexProcessor::showOldAlmanac, anonymousViewCheckMidware::handle);
+        Dispatcher.get("/download", indexProcessor::showDownload, anonymousViewCheckMidware::handle);
         Dispatcher.get("/breezemoons", indexProcessor::showBreezemoons, anonymousViewCheckMidware::handle);
         Dispatcher.get("/privacy", indexProcessor::showPrivacy, anonymousViewCheckMidware::handle);
     }
@@ -709,6 +710,18 @@ public class IndexProcessor {
         dataModelService.fillLatestCmts(dataModel);
     }
 
+
+    /**
+     * Shows download.
+     *
+     * @param context the specified context
+     */
+    public void showDownload(final RequestContext context) {
+        //下载客户端
+        final AbstractFreeMarkerRenderer renderer = new SkinRenderer(context, "/download.ftl");
+        final Map<String, Object> dataModel = renderer.getDataModel();
+        dataModelService.fillHeaderAndFooter(context, dataModel);
+    }
 
 
     /**
