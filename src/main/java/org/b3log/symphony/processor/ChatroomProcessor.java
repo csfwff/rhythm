@@ -357,7 +357,7 @@ public class ChatroomProcessor {
                 //需要封盘
                 if (got == count - 1) {
                     Dice calcRet = allocateDice();
-                    String s = com.alibaba.fastjson.JSONObject.toJSONString(calcRet);
+                    String s = new JSONObject(calcRet).toString();
                     source2.put("diceRet", new JSONObject(s));
                     closed = true;
                 }
