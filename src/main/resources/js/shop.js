@@ -186,9 +186,6 @@ var ShopChannel = {
 
         ShopChannel.ws.onopen = function () {
             Shop.log('Client', '连接成功，已启动命令通道。')
-            setInterval(function () {
-                ShopChannel.ws.send('-hb-')
-            }, 1000 * 55)
         }
 
         ShopChannel.ws.onmessage = function (evt) {

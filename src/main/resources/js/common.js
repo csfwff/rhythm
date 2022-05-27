@@ -1600,9 +1600,6 @@ var Util = {
 
     userChannel.onopen = function () {
       console.log("Connected to user channel websocket.")
-      setInterval(function () {
-        userChannel.send('-hb-')
-      }, 1000 * 55)
     }
 
     userChannel.onmessage = function (evt) {

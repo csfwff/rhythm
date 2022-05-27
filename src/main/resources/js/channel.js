@@ -44,9 +44,6 @@ var ArticleChannel = {
 
         ArticleChannel.ws.onopen = function () {
             console.log("Connected to article channel websocket.")
-            setInterval(function () {
-                ArticleChannel.ws.send('-hb-')
-            }, 1000 * 55)
         }
 
         ArticleChannel.ws.onmessage = function (evt) {
@@ -165,9 +162,6 @@ var ArticleListChannel = {
 
         ArticleListChannel.ws.onopen = function () {
             console.log("Connected to article list channel websocket.")
-            setInterval(function () {
-                ArticleListChannel.ws.send('-hb-')
-            }, 1000 * 55)
         }
 
         ArticleListChannel.ws.onmessage = function (evt) {
@@ -221,9 +215,6 @@ var IdleTalkChannel = {
 
         IdleTalkChannel.ws.onopen = function () {
             console.log("Connected to idle talk channel websocket.")
-            setInterval(function () {
-                IdleTalkChannel.ws.send('-hb-')
-            }, 1000 * 55)
         }
 
         IdleTalkChannel.ws.onmessage = function (evt) {
@@ -357,9 +348,6 @@ var ChatRoomChannel = {
 
         ChatRoomChannel.ws.onopen = function () {
             console.log("Connected to chat room channel websocket.")
-            setInterval(function () {
-                ChatRoomChannel.ws.send('-hb-')
-            }, 1000 * 55)
         }
 
         ChatRoomChannel.ws.onmessage = function (evt) {
