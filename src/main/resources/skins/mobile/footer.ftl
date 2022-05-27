@@ -64,6 +64,16 @@
         <div style="margin-top: 5px">
             <a href="https://qm.qq.com/cgi-bin/qm/qr?k=dpq3N-bezENSsshZERxvTw2dV85WtTdV&jump_from=webapi" target="_blank"><svg style="vertical-align: -2px;"><use xlink:href="#ic-qgroup"></use></svg> 公告/反馈QQ群</a>
         </div>
+        <div class="fn-hr5"></div>
+        <div class="ft-smaller" style="display: inline-block">
+            <div onclick="window.open('https://www.tsyvps.com/aff/HEHTPGYL')" style="padding: 8px 0px; color: #0A6AB5; background-color: #ffffff; line-height: 20px; border-radius: 12px; width: 175px; margin-top: 15px;">
+                <div style="padding-left: 3px;">
+                    <img style="vertical-align: -3px; max-height: 15px;" src="https://file.fishpi.cn/2022/05/165184311051006-afb572fb.png">&nbsp;&nbsp;SCDN 由蓝易云支持<br>
+                    <span style="color: #616161">性价比主机，高防 CDN</span>
+                </div>
+            </div>
+        </div>
+        <div class="fn-hr5"></div>
         <div class="ft-smaller" style="padding: 10px 15px 0 15px">
             Copyright © 2021 - 2022 W&P Tech. All Rights Reserved. 北京白与画科技有限公司 版权所有
         </div>

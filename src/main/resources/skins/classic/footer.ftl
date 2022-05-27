@@ -21,9 +21,17 @@
 <div class="footer">
     <div class="wrapper">
         <div class="slogan">
-            摸鱼派 - 鱼油专属摸鱼社区<br>
+            摸鱼派 - 鱼油专属摸鱼社区
         </div>
         <div class="fn-flex-1">
+            <div class="fn-clear ft-smaller">
+                <div onclick="window.open('https://www.tsyvps.com/aff/HEHTPGYL')" style="padding: 8px 0px; color: #0A6AB5; background-color: #ffffff; line-height: 20px; border-radius: 12px; width: 175px; margin-bottom: 15px; cursor: pointer;">
+                    <div style="padding-left: 20px;">
+                        <img style="vertical-align: -3px; max-height: 15px;" src="https://file.fishpi.cn/2022/05/165184311051006-afb572fb.png">&nbsp;&nbsp;SCDN 由蓝易云支持<br>
+                        <span style="color: #616161">性价比主机，高防 CDN</span>
+                    </div>
+                </div>
+            </div>
             <div class="footer-nav fn-clear ft-smaller">
                 摸鱼好站&nbsp;
                 <a style="margin-right: 0px; padding-right: 0px" target="_blank" href="https://www.cxy521.com/">程序员导航</a>
