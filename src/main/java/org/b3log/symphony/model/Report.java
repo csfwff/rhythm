@@ -1,5 +1,6 @@
 /*
- * Symphony - A modern community (forum/BBS/SNS/blog) platform written in Java.
+ * Rhythm - A modern community (forum/BBS/SNS/blog) platform written in Java.
+ * Modified version from Symphony, Thanks Symphony :)
  * Copyright (C) 2012-present, b3log.org
  *
  * This program is free software: you can redistribute it and/or modify
@@ -81,6 +82,11 @@ public final class Report {
      * Report data type - user.
      */
     public static final int REPORT_DATA_TYPE_C_USER = 2;
+
+    /**
+     * Report data type - chat.
+     */
+    public static final int REPORT_DATA_TYPE_C_CHAT = 3;
 
     // Report type constants
     /**

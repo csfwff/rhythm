@@ -1,6 +1,7 @@
 <#--
 
-    Symphony - A modern community (forum/BBS/SNS/blog) platform written in Java.
+    Rhythm - A modern community (forum/BBS/SNS/blog) platform written in Java.
+    Modified version from Symphony, Thanks Symphony :)
     Copyright (C) 2012-present, b3log.org
 
     This program is free software: you can redistribute it and/or modify
@@ -22,7 +23,7 @@
         <div class="head-fn fn-left">
             <h1>
                 <a href="${servePath}" aria-label="${symphonyLabel}">
-                    <svg><use xlink:href="#logo"></use></svg>
+                    <svg class="swimming"><use xlink:href="#logo-white"></use></svg>
                 </a>
             </h1>
         </div>
@@ -35,6 +36,14 @@
             <a href="${servePath}/member/${currentUser.userName}" title="Home" class="<#if 'adminRole' != userRole>last </#if>nav-avatar">
                 <span class="avatar-small" style="background-image:url('${currentUser.userAvatarURL20}')"></span>
             </a>
+            <a href="${servePath}/idle-talk" title="私信"><svg id="idleTalkIconContainer"><use xlink:href="#idleChat"></use></svg></a>
+            <#if hasUnreadChatMessage?? && hasUnreadChatMessage>
+                <script>
+                    setTimeout(function () {
+                        Util.blingChat();
+                    }, 2000);
+                </script>
+            </#if>
             <a href="${servePath}/activities" title="${activityLabel}"><svg><use xlink:href="#flag"></use></svg></a>
             <#if permissions["commonAddArticle"].permissionGrant>
                 <a href="${servePath}/pre-post" title="${addArticleLabel}"><svg><use xlink:href="#addfile"></use></svg></a>

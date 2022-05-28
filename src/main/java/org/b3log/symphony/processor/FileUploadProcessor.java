@@ -1,5 +1,6 @@
 /*
- * Symphony - A modern community (forum/BBS/SNS/blog) platform written in Java.
+ * Rhythm - A modern community (forum/BBS/SNS/blog) platform written in Java.
+ * Modified version from Symphony, Thanks Symphony :)
  * Copyright (C) 2012-present, b3log.org
  *
  * This program is free software: you can redistribute it and/or modify
@@ -18,7 +19,9 @@
 package org.b3log.symphony.processor;
 
 import com.qiniu.storage.Configuration;
+import com.qiniu.storage.Region;
 import com.qiniu.storage.UploadManager;
+import com.qiniu.storage.model.DefaultPutRet;
 import com.qiniu.util.Auth;
 import jodd.http.HttpRequest;
 import jodd.http.HttpResponse;
@@ -56,6 +59,8 @@ import java.nio.file.Paths;
 import java.util.*;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import static org.b3log.symphony.util.Symphonys.QN_ENABLED;
 
@@ -90,7 +95,7 @@ public class FileUploadProcessor {
         final FileUploadProcessor fileUploadProcessor = beanManager.getReference(FileUploadProcessor.class);
         Dispatcher.get("/upload/{yyyy}/{MM}/{file}", fileUploadProcessor::getFile);
         Dispatcher.post("/upload", fileUploadProcessor::uploadFile);
-        Dispatcher.post("/fetch-upload", fileUploadProcessor::fetchUpload);
+        // Dispatcher.post("/fetch-upload", fileUploadProcessor::fetchUpload);
     }
 
     /**
@@ -152,7 +157,7 @@ public class FileUploadProcessor {
      *
      * @param context the specified context
      */
-    public void uploadFile(final RequestContext context) {
+    public synchronized void uploadFile(final RequestContext context) {
         final JSONObject result = Results.newFail();
         context.renderJSONPretty(result);
 
@@ -170,7 +175,8 @@ public class FileUploadProcessor {
         if (QN_ENABLED) {
             auth = Auth.create(Symphonys.UPLOAD_QINIU_AK, Symphonys.UPLOAD_QINIU_SK);
             uploadToken = auth.uploadToken(Symphonys.UPLOAD_QINIU_BUCKET);
-            uploadManager = new UploadManager(new Configuration());
+            Configuration cfg = new Configuration(Region.autoRegion());
+            uploadManager = new UploadManager(cfg);
         }
 
         final JSONObject data = new JSONObject();
@@ -225,18 +231,25 @@ public class FileUploadProcessor {
                 String url;
                 byte[] bytes;
                 suffix = Headers.getSuffix(file);
-                final String name = StringUtils.substringBeforeLast(fileName, ".");
+                String name = StringUtils.substringBeforeLast(fileName, ".");
                 final String uuid = StringUtils.substring(UUID.randomUUID().toString().replaceAll("-", ""), 0, 8);
+                String regex = "[a-zA-Z0-9\\u4e00-\\u9fa5]";
+                Matcher matcher = Pattern.compile(regex).matcher(name);
+                StringBuilder stringBuilder = new StringBuilder();
+                while (matcher.find()) {
+                    stringBuilder.append(matcher.group());
+                }
+                name = stringBuilder.toString();
                 fileName = name + '-' + uuid + "." + suffix;
                 fileName = genFilePath(fileName);
                 if (QN_ENABLED) {
                     bytes = fileBytes.get(i);
                     final String contentType = file.getContentType();
-                    uploadManager.asyncPut(bytes, fileName, uploadToken, null, contentType, false, (key, r) -> {
-                        LOGGER.log(Level.TRACE, "Uploaded [" + key + "], response [" + r.toString() + "]");
-                        countDownLatch.countDown();
-                    });
-                    url = Symphonys.UPLOAD_QINIU_DOMAIN + "/" + fileName;
+                    com.qiniu.http.Response response = uploadManager.put(bytes, fileName, uploadToken, null, contentType, false);
+                    //解析上传成功的结果
+                    JSONObject putRet = new JSONObject(response.bodyString());
+                    countDownLatch.countDown();
+                    url = Symphonys.UPLOAD_QINIU_DOMAIN + "/" + putRet.optString("key");
                     succMap.put(originalName, url);
                 } else {
                     final Path path = Paths.get(Symphonys.UPLOAD_LOCAL_DIR, fileName);

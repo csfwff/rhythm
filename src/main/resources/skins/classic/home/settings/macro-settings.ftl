@@ -1,6 +1,7 @@
 <#--
 
-    Symphony - A modern community (forum/BBS/SNS/blog) platform written in Java.
+    Rhythm - A modern community (forum/BBS/SNS/blog) platform written in Java.
+    Modified version from Symphony, Thanks Symphony :)
     Copyright (C) 2012-present, b3log.org
 
     This program is free software: you can redistribute it and/or modify
@@ -39,6 +40,7 @@
                         <div class="module-panel fn-oh">
                             <nav class="home-menu">
                                 <a href="${servePath}/settings"<#if 'profile' == type> class="current"</#if>>${profilesLabel}</a>
+                                <a href="${servePath}/settings/system"<#if 'system' == type> class="current"</#if>>个性化</a>
                                 <a href="${servePath}/settings/avatar"<#if 'avatar' == type> class="current"</#if>>${avatarLabel}</a>
                                 <a href="${servePath}/settings/account"<#if 'account' == type> class="current"</#if>>${accountLabel}</a>
                                 <a href="${servePath}/settings/invite"<#if 'invite' == type> class="current"</#if>>
@@ -76,6 +78,9 @@
             Label.invalidUserNicknameLabel = "${invalidUserNicknameLabel}";
             Label.previewLabel = "${previewLabel}";
             Label.unPreviewLabel = "${unPreviewLabel}";
+            <#if 'account' == type>Settings.initBag(${sysBag});</#if>
+            <#if 'account' == type>Settings.initMetal(${sysMetal});</#if>
+            <#if 'account' == type>Settings.initMFA();</#if>
         </script>
     </body>
 </html>

@@ -1,6 +1,7 @@
 <#--
 
-    Symphony - A modern community (forum/BBS/SNS/blog) platform written in Java.
+    Rhythm - A modern community (forum/BBS/SNS/blog) platform written in Java.
+    Modified version from Symphony, Thanks Symphony :)
     Copyright (C) 2012-present, b3log.org
 
     This program is free software: you can redistribute it and/or modify
@@ -74,5 +75,27 @@
             </form>
         </div>
     </div>
+
+    <#if permissions["miscBroadCast"].permissionGrant>
+    <div class="module">
+        <div class="module-header">
+            <h2>紧急公告发布</h2>
+        </div>
+        <div class="module-panel form fn-clear form--admin">
+            <form action="${servePath}/admin/broadcast/warn" method="POST">
+                <div class="fn__flex">
+                    <label>
+                        <div>公告内容</div>
+                        <textarea rows="20" name="warnBroadcastText"></textarea>
+                    </label>
+                </div>
+                <br/>
+                <button type="button" onclick="Util.insertWarnBroadcastModel(1)">模版：维护5分钟</button>
+                <button type="button" onclick="Util.insertWarnBroadcastModel(2)">模版：维护20秒</button>
+                <button type="submit" class="green fn-right">${submitLabel}</button>
+            </form>
+        </div>
+    </div>
+    </#if>
 </div>
 </@admin>

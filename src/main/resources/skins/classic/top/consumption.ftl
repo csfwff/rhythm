@@ -1,6 +1,7 @@
 <#--
 
-    Symphony - A modern community (forum/BBS/SNS/blog) platform written in Java.
+    Rhythm - A modern community (forum/BBS/SNS/blog) platform written in Java.
+    Modified version from Symphony, Thanks Symphony :)
     Copyright (C) 2012-present, b3log.org
 
     This program is free software: you can redistribute it and/or modify
@@ -26,9 +27,8 @@
         <li>
             <div class="fn-flex">
                 <a rel="nofollow"
-                   class="tooltipped tooltipped-se"
-                   href="${servePath}/member/${user.userName}" 
-                   aria-label="${user.userName}"><div class="avatar" style="background-image:url('${user.userAvatarURL}')"></div></a>
+                   href="${servePath}/member/${user.userName}"
+                   ><div class="avatar" aria-label="${user.userName}" style="background-image:url('${user.userAvatarURL}')"></div></a>
                 <div class="has-view fn-flex-1">
                     <h2>
                         ${user_index + 1}.
@@ -54,7 +54,6 @@
                         <a href="${servePath}/member/${user.userName}/points">
                             ${user.userUsedPoint?c}
                         </a>
-                        ~ ${yuanLabel}${user.money?c}
                     </div>
                 </div>
             </div>

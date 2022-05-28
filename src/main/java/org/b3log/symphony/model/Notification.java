@@ -1,5 +1,6 @@
 /*
- * Symphony - A modern community (forum/BBS/SNS/blog) platform written in Java.
+ * Rhythm - A modern community (forum/BBS/SNS/blog) platform written in Java.
+ * Modified version from Symphony, Thanks Symphony :)
  * Copyright (C) 2012-present, b3log.org
  *
  * This program is free software: you can redistribute it and/or modify
@@ -211,6 +212,16 @@ public final class Notification {
      * Data type - report handled.
      */
     public static final int DATA_TYPE_C_POINT_REPORT_HANDLED = 36;
+
+    /**
+     * Data type - @ from chat room.
+     */
+    public static final int DATA_TYPE_C_CHAT_ROOM_AT = 38;
+
+    /**
+     * Data type - 专属红包提醒
+     */
+    public static final int DATA_TYPE_C_RED_PACKET = 39;
 
     //// Transient ////
     /**

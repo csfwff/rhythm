@@ -1,5 +1,6 @@
 /*
- * Symphony - A modern community (forum/BBS/SNS/blog) platform written in Java.
+ * Rhythm - A modern community (forum/BBS/SNS/blog) platform written in Java.
+ * Modified version from Symphony, Thanks Symphony :)
  * Copyright (C) 2012-present, b3log.org
  *
  * This program is free software: you can redistribute it and/or modify
@@ -77,6 +78,11 @@ public final class Verifycode {
      */
     public static final int TYPE_C_EMAIL = 0;
 
+    /**
+     * Type - Phone.
+     */
+    public static final int TYPE_C_PHONE = 1;
+
     // Business type constants
     /**
      * Business type - Register.
@@ -92,6 +98,11 @@ public final class Verifycode {
      * Business type - Bind email.
      */
     public static final int BIZ_TYPE_C_BIND_EMAIL = 3;
+
+    /**
+     * Business type - Bind phone.
+     */
+    public static final int BIZ_TYPE_C_BIND_PHONE = 4;
 
     // Status constants
     /**

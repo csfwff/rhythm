@@ -1,6 +1,7 @@
 <#--
 
-    Symphony - A modern community (forum/BBS/SNS/blog) platform written in Java.
+    Rhythm - A modern community (forum/BBS/SNS/blog) platform written in Java.
+    Modified version from Symphony, Thanks Symphony :)
     Copyright (C) 2012-present, b3log.org
 
     This program is free software: you can redistribute it and/or modify
@@ -21,7 +22,11 @@
 <meta charset="utf-8" />
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" />
+<#if hasSystemTitle>
+<title>${systemTitle}</title>
+<#else>
 <title>${title}</title>
+</#if>
 <#nested>
 <link rel="preconnect" href="${staticServePath}">
 <meta name="copyright" content="B3log" />
@@ -30,6 +35,8 @@
 <link rel="stylesheet" href="${staticServePath}/css/base.css?${staticResourceVersion}" />
 <link rel="icon" type="image/png" href="${staticServePath}/images/favicon.png" />
 <link rel="apple-touch-icon" href="${staticServePath}/images/faviconH.png">
-<link rel="search" type="application/opensearchdescription+xml" title="Sym" href="/opensearch.xml">
+<link rel="search" type="application/opensearchdescription+xml" title="Rym" href="/opensearch.xml">
+<link rel="stylesheet" href="${staticServePath}/js/lib/tooltips/tooltips.min.css?${staticResourceVersion}">
+<#--<link rel="stylesheet" href="${staticServePath}/css/theme/dark.css?${staticResourceVersion}" />-->
 ${siteVisitStatCode}
 </#macro>

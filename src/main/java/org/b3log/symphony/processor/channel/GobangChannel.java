@@ -1,5 +1,6 @@
 /*
- * Symphony - A modern community (forum/BBS/SNS/blog) platform written in Java.
+ * Rhythm - A modern community (forum/BBS/SNS/blog) platform written in Java.
+ * Modified version from Symphony, Thanks Symphony :)
  * Copyright (C) 2012-present, b3log.org
  *
  * This program is free software: you can redistribute it and/or modify
@@ -251,12 +252,12 @@ public class GobangChannel implements WebSocketChannel {
                     //故当游戏结束时，可以按照player和anti移除两次（因为不知道哪个才是玩家1）
                     //总有一次能正确移除，分开写只是为了好看，没有逻辑原因
                     if (flag) {
-                        sendText.put("result", "You Win");
+                        sendText.put("result", "恭喜你胜利啦！获得奖励 " + Pointtransfer.TRANSFER_SUM_C_ACTIVITY_GOBANG_START * 2 + " 积分。<br>三秒后自动刷新...");
                         chessPlaying.remove(player);
                     }
                     SESSIONS.get(player).sendText(sendText.toString());
                     if (flag) {
-                        sendText.put("result", "You Lose");
+                        sendText.put("result", "你输啦！再接再厉吧～<br>三秒后自动刷新...");
                         chessPlaying.remove(anti);
                     }
                     SESSIONS.get(anti).sendText(sendText.toString());

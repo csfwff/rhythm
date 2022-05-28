@@ -1,5 +1,6 @@
 /*
- * Symphony - A modern community (forum/BBS/SNS/blog) platform written in Java.
+ * Rhythm - A modern community (forum/BBS/SNS/blog) platform written in Java.
+ * Modified version from Symphony, Thanks Symphony :)
  * Copyright (C) 2012-present, b3log.org
  *
  * This program is free software: you can redistribute it and/or modify
@@ -29,7 +30,7 @@ var gulp = require('gulp')
 var concat = require('gulp-concat')
 var cleanCSS = require('gulp-clean-css')
 var uglify = require('gulp-uglify')
-var sass = require('gulp-sass')
+var sass = require('gulp-sass')(require('sass'));
 var rename = require('gulp-rename')
 var del = require('del')
 
@@ -40,9 +41,20 @@ function sassProcess () {
     pipe(gulp.dest('./src/main/resources/css'))
 }
 
+function themeSassProcess () {
+  return gulp.src('./src/main/resources/scss/theme/*.scss').
+    pipe(sass({outputStyle: 'compressed', includePaths: ['node_modules']}).
+      on('error', sass.logError)).
+    pipe(gulp.dest('./src/main/resources/css/theme'))
+}
+
+
 function sassProcessWatch () {
   gulp.watch('./src/main/resources/scss/*.scss', sassProcess)
+  gulp.watch('./src/main/resources/scss/theme/*.scss', themeSassProcess)
 }
+
+
 
 gulp.task('watch', gulp.series(sassProcessWatch))
 

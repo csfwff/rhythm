@@ -1,5 +1,6 @@
 /*
- * Symphony - A modern community (forum/BBS/SNS/blog) platform written in Java.
+ * Rhythm - A modern community (forum/BBS/SNS/blog) platform written in Java.
+ * Modified version from Symphony, Thanks Symphony :)
  * Copyright (C) 2012-present, b3log.org
  *
  * This program is free software: you can redistribute it and/or modify
@@ -354,7 +355,7 @@ public final class Pointtransfer {
     /**
      * Transfer sum - Activity - Start Gobang.
      */
-    public static final int TRANSFER_SUM_C_ACTIVITY_GOBANG_START = Symphonys.POINT_ACTIVITY_GOBANG;
+    public static final int TRANSFER_SUM_C_ACTIVITY_GOBANG_START = 20;
 
     /**
      * Transfer type - Update Comment Outcome.
@@ -390,6 +391,55 @@ public final class Pointtransfer {
      * Transfer sum - Change Username.
      */
     public static final int TRANSFER_SUM_C_CHANGE_USERNAME = Symphonys.POINT_CHANGE_USERNAME;
+
+    /**
+     * Transfer type - 摆龙门阵.
+     */
+    public static final int TRANSFER_TYPE_C_BLMZ = 37;
+
+    /**
+     * Transfer type - Activity - ADR.
+     */
+    public static final int TRANSFER_TYPE_C_ACTIVITY_ADR = 38;
+
+    /**
+     * Transfer type - Activity - Mofish.
+     */
+    public static final int TRANSFER_TYPE_C_ACTIVITY_MOFISH = 39;
+
+    /**
+     * Transfer type - Activity - SendRedPacket.
+     */
+    public static final int TRANSFER_TYPE_C_ACTIVITY_SEND_RED_PACKET = 40;
+
+    /**
+     * Transfer type - Activity - ReceiveRedPacket.
+     */
+    public static final int TRANSFER_TYPE_C_ACTIVITY_RECEIVE_RED_PACKET = 41;
+
+    /**
+     * Transfer type - Activity - SendTGIF.
+     */
+    public static final int TRANSFER_TYPE_C_ACTIVITY_SEND_TGIF = 42;
+
+    /**
+     * Transfer type - Activity - Play the game Handle.
+     */
+    public static final int TRANSFER_TYPE_C_ACTIVITY_PLAY_HANDLE = 43;
+    /**
+     * Transfer type - Activity - Play the game Handle.
+     */
+    public static final int TRANSFER_TYPE_C_ACTIVITY_PLAY_EMOJI_PAIR = 44;
+    /**
+     * Transfer type - Activity - Set discuss title.
+     */
+    public static final int TRANSFER_TYPE_C_ACTIVITY_SET_DISCUSS = 45;
+
+    /**
+     * Transfer sum - 摆龙门阵.
+     */
+    public static final int TRANSFER_SUM_C_BLMZ = 5;
+
 
     /**
      * Private constructor.

@@ -1,6 +1,7 @@
 <#--
 
-    Symphony - A modern community (forum/BBS/SNS/blog) platform written in Java.
+    Rhythm - A modern community (forum/BBS/SNS/blog) platform written in Java.
+    Modified version from Symphony, Thanks Symphony :)
     Copyright (C) 2012-present, b3log.org
 
     This program is free software: you can redistribute it and/or modify
@@ -18,8 +19,5 @@
 
 -->
 <div class="ranking">
-    <svg class="ft-blue"><use xlink:href="#link"></use></svg> <a href="${servePath}/top/link">${linkRankLabel}</a>
-    <span>♠</span> <a href="${servePath}/top/balance">${wealthRankLabel}</a>
-    <span class="ft-red">♥</span>  <a href="${servePath}/top/consumption">${consumptionRankLabel}</a>
-    <span>♣</span> <a href="${servePath}/top/checkin">${checkinTopLabel}</a>
+    <br>
 </div>

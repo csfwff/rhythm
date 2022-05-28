@@ -1,6 +1,7 @@
 <#--
 
-    Symphony - A modern community (forum/BBS/SNS/blog) platform written in Java.
+    Rhythm - A modern community (forum/BBS/SNS/blog) platform written in Java.
+    Modified version from Symphony, Thanks Symphony :)
     Copyright (C) 2012-present, b3log.org
 
     This program is free software: you can redistribute it and/or modify
@@ -36,50 +37,126 @@
                             <ul>
                                 <li>
                                     <div class='fn-flex'>
-                                        <div class="avatar tooltipped tooltipped-ne"
-                                             aria-label="${activityDailyCheckinLabel}" style="background-image:url('${staticServePath}/images/activities/checkin.png')"></div>
+                                        <div class="avatar"
+                                             style="background-image:url('https://pwl.stackoverflow.wiki/evolve/evolved.ico')"></div>
                                         <div class="fn-flex-1">
                                             <h2>
-                                                <a href="${servePath}/activity/daily-checkin">${activityDailyCheckinLabel}</a>
+                                                <a href="${servePath}/games/evolve/">《进化-Evolve》</a>
                                             </h2>
                                             <span class="ft-fade vditor-reset">
-                                                每日签到随机获得 <code>[${pointActivityCheckinMin?c}, ${pointActivityCheckinMax?c}]</code>，每连续签到 10 天额外获得 <code>${pointActivityCheckinStreak?c}</code>
+                                                在本游戏中，您首先由原生质选择进化为某种智慧生物，然后带领他们走向繁荣昌盛，最后迈向星空，征服宇宙。<br>
+                                                支持第三方存档云同步（需手动在游戏设定中开启），参与 <a href="${servePath}/top/evolve">进化排行榜</a>
                                             </span>
                                         </div>
                                     </div>
                                 </li>
                                 <li>
                                     <div class='fn-flex'>
-                                        <div class="avatar tooltipped tooltipped-ne"
-                                             aria-label="${activityYesterdayLivenessRewardLabel}" style="background-image:url('${staticServePath}/images/activities/yesterday.png')"></div>
+                                        <div class="avatar"
+                                             style="background-image:url('https://pwl.stackoverflow.wiki/adarkroom/img/adr.png')"></div>
                                         <div class="fn-flex-1">
                                             <h2>
-                                                <a href="${servePath}/activity/yesterday-liveness-reward">${activityYesterdayLivenessRewardLabel}</a>
+                                                <a href="${servePath}/games/adarkroom/?lang=zh_cn">《A Dark Room》</a>
                                             </h2>
                                             <span class="ft-fade vditor-reset">
-                                                领取昨日活跃度奖励，目前最高可以获得 <code>${activitYesterdayLivenessRewardMaxPoint?c}</code>
+                                                极简主义的游戏杰作，有上世纪 ascii 游戏的遗风。<br>
+                                                支持存档云同步，参与 <a href="${servePath}/top/adr">${symphonyLabel} ADR 游戏总分排行榜</a>
                                             </span>
                                         </div>
                                     </div>
                                 </li>
                                 <li>
                                     <div class='fn-flex'>
-                                        <div class="avatar tooltipped tooltipped-ne"
-                                             aria-label="${activity1A0001Label}" style="background-image:url('${staticServePath}/images/activities/1A0001.png')"></div>
+                                        <div class="avatar"
+                                             style="background-image:url('${staticServePath}/images/mofish.png')"></div>
                                         <div class="fn-flex-1">
                                             <h2>
-                                                <a href="${servePath}/activity/1A0001">${activity1A0001Label}</a>
+                                                <a href="https://p.hancel.org/" target="_blank">摸鱼大闯关</a>
                                             </h2>
                                             <span class="ft-fade vditor-reset">
-                                                下注后，请在当天 16-24 点在本页面进行兑奖，逾期作废！
+                                                一个非常烧脑的 CTF 类闯关游（酷）戏（刑）。这个游戏的目标就只有一个：进入下一关。在大部分关卡中，你需要利用网页上的提示来找到密码并进入下一关。<br>
+                                                参与 <a href="${servePath}/top/mofish">摸鱼大闯关排行榜</a>
                                             </span>
                                         </div>
                                     </div>
                                 </li>
                                 <li>
                                     <div class='fn-flex'>
-                                        <div class="avatar tooltipped tooltipped-ne"
-                                             aria-label="${characterLabel}" style="background-image:url('${staticServePath}/images/activities/char.png')"></div>
+                                        <div class="avatar"
+                                             style="background-image:url('${staticServePath}/games/handle/favicon.svg')"></div>
+                                        <div class="fn-flex-1">
+                                            <h2>
+                                                <a href="${servePath}/games/handle/" target="_blank">汉兜</a>
+                                            </h2>
+                                            <span class="ft-fade vditor-reset">
+                                                汉兜是一款猜四字词语的有趣游戏，你有十次的机会猜一个四字词语。<br>
+                                                <b>每天首次游戏获积分奖励</b>，快来猜猜吧！
+                                            </span>
+                                        </div>
+                                    </div>
+                                </li>
+                                <li>
+                                    <div class='fn-flex'>
+                                        <div class="avatar"
+                                             style="background-image:url('${staticServePath}/images/restart.png')"></div>
+                                        <div class="fn-flex-1">
+                                            <h2>
+                                                <a href="${servePath}/games/lifeRestart/view/">人生重开模拟器</a>
+                                            </h2>
+                                            <span class="ft-fade vditor-reset">
+                                                如果你不满意现在的人生，那就来重开吧～<br>
+                                                支持存档云同步，参与 <a href="${servePath}/top/lifeRestart">人生重开模拟器成就排行榜</a>
+                                            </span>
+                                        </div>
+                                    </div>
+                                </li>
+                                <li>
+                                    <div class='fn-flex'>
+                                        <div class="avatar" style=" font-size: 2rem; margin-bottom: 0.5rem;display: flex;
+                                            justify-content: center;align-items: center;">😘</div>
+                                        <div class="fn-flex-1">
+                                            <h2>
+                                                <a href="${servePath}/games/emojiPair">Emoji 真假小黄脸</a>
+                                            </h2>
+                                            <span class="ft-fade vditor-reset">
+                                                调皮的小黄脸玩起了真假美猴王的游戏，在众黄脸中找出他们吧！<br>
+                                                <b>每天首次游戏获积分奖励</b>，封顶30积分，参与 <a href="${servePath}/top/emoji">Emoji 真假小黄脸排行榜</a>
+                                            </span>
+                                        </div>
+                                    </div>
+                                </li>
+                                <li>
+                                    <div class='fn-flex'>
+                                        <div class="avatar"
+                                             style="background-image:url('${staticServePath}/images/activities/cat.jpg')"></div>
+                                        <div class="fn-flex-1">
+                                            <h2>
+                                                <a href="${servePath}/activity/catch-the-cat">围住小猫</a>
+                                            </h2>
+                                            <span class="ft-fade vditor-reset">
+                                                你能围住这只调皮的小猫么？
+                                            </span>
+                                        </div>
+                                    </div>
+                                </li>
+                                <li>
+                                    <div class='fn-flex'>
+                                        <div class="avatar"
+                                             style="background-image:url('${staticServePath}/images/activities/2048.png')"></div>
+                                        <div class="fn-flex-1">
+                                            <h2>
+                                                <a href="${servePath}/activity/2048">2048</a>
+                                            </h2>
+                                            <span class="ft-fade vditor-reset">
+                                                加强版2048，来吧~
+                                            </span>
+                                        </div>
+                                    </div>
+                                </li>
+                                <li>
+                                    <div class='fn-flex'>
+                                        <div class="avatar"
+                                             style="background-image:url('${staticServePath}/images/activities/char.png')"></div>
                                         <div class="fn-flex-1">
                                             <h2>
                                                 <a href="${servePath}/activity/character">${characterLabel}</a>
@@ -90,8 +167,8 @@
                                 </li>
                                 <li>
                                     <div class='fn-flex'>
-                                        <div class="avatar tooltipped tooltipped-ne"
-                                             aria-label="${eatingSnakeLabel}" style="background-image:url('${staticServePath}/images/activities/snak.png')"></div>
+                                        <div class="avatar"
+                                             style="background-image:url('${staticServePath}/images/activities/snak.png')"></div>
                                         <div class="fn-flex-1">
                                             <h2>
                                                 <a href="${servePath}/activity/eating-snake">${eatingSnakeLabel}</a>
@@ -104,28 +181,14 @@
                                 </li>
                                 <li>
                                     <div class='fn-flex'>
-                                        <div class="avatar tooltipped tooltipped-ne"
-                                             aria-label="${gobangLabel}" style="background-image:url('${staticServePath}/images/activities/gobang.png')"></div>
+                                        <div class="avatar"
+                                             style="background-image:url('${staticServePath}/images/activities/gobang.png')"></div>
                                         <div class="fn-flex-1">
                                             <h2>
                                                 <a href="${servePath}/activity/gobang">${gobangLabel}</a>
                                             </h2>
                                             <span class="ft-fade vditor-reset">
                                             ${activityGobangTitleLabel}
-                                            </span>
-                                        </div>
-                                    </div>
-                                </li>
-                                <li>
-                                    <div class='fn-flex'>
-                                        <div class="avatar tooltipped tooltipped-ne"
-                                             aria-label="${chatRoomLabel}" style="background-image:url('${staticServePath}/images/activities/chat.png')"></div>
-                                        <div class="fn-flex-1">
-                                            <h2>
-                                                <a href="${servePath}/cr">${chatRoomLabel}</a>
-                                            </h2>
-                                            <span class="ft-fade vditor-reset">
-                                            ${activityChatTitleLabel}
                                             </span>
                                         </div>
                                     </div>

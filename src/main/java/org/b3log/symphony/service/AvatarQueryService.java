@@ -1,5 +1,6 @@
 /*
- * Symphony - A modern community (forum/BBS/SNS/blog) platform written in Java.
+ * Rhythm - A modern community (forum/BBS/SNS/blog) platform written in Java.
+ * Modified version from Symphony, Thanks Symphony :)
  * Copyright (C) 2012-present, b3log.org
  *
  * This program is free software: you can redistribute it and/or modify
@@ -97,10 +98,14 @@ public class AvatarQueryService {
             if (qiniuEnabled) {
                 final String qiniuDomain = Symphonys.UPLOAD_QINIU_DOMAIN;
 
-                if (!StringUtils.startsWith(avatarURL, qiniuDomain)) {
-                    return DEFAULT_AVATAR_URL + "?imageView2/1/w/" + size + "/h/" + size + "/interlace/0/q/100";
-                } else {
+                if (StringUtils.startsWith(avatarURL, "https://pwl.stackoverflow.wiki")) {
                     return avatarURL + "?imageView2/1/w/" + size + "/h/" + size + "/interlace/0/q/100";
+                } else {
+                    if (!StringUtils.startsWith(avatarURL, qiniuDomain)) {
+                        return DEFAULT_AVATAR_URL + "?imageView2/1/w/" + size + "/h/" + size + "/interlace/0/q/100";
+                    } else {
+                        return avatarURL + "?imageView2/1/w/" + size + "/h/" + size + "/interlace/0/q/100";
+                    }
                 }
             } else {
                 return avatarURL;
@@ -108,10 +113,14 @@ public class AvatarQueryService {
         } else if (qiniuEnabled) {
             final String qiniuDomain = Symphonys.UPLOAD_QINIU_DOMAIN;
 
-            if (!StringUtils.startsWith(avatarURL, qiniuDomain)) {
-                return DEFAULT_AVATAR_URL + "?imageView2/1/w/" + size + "/h/" + size + "/format/jpg/interlace/0/q/100";
-            } else {
+            if (StringUtils.startsWith(avatarURL, "https://pwl.stackoverflow.wiki")) {
                 return avatarURL + "?imageView2/1/w/" + size + "/h/" + size + "/format/jpg/interlace/0/q/100";
+            } else {
+                if (!StringUtils.startsWith(avatarURL, qiniuDomain)) {
+                    return DEFAULT_AVATAR_URL + "?imageView2/1/w/" + size + "/h/" + size + "/format/jpg/interlace/0/q/100";
+                } else {
+                    return avatarURL + "?imageView2/1/w/" + size + "/h/" + size + "/format/jpg/interlace/0/q/100";
+                }
             }
         } else {
             return avatarURL;

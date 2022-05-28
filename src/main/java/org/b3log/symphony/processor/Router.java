@@ -1,5 +1,6 @@
 /*
- * Symphony - A modern community (forum/BBS/SNS/blog) platform written in Java.
+ * Rhythm - A modern community (forum/BBS/SNS/blog) platform written in Java.
+ * Modified version from Symphony, Thanks Symphony :)
  * Copyright (C) 2012-present, b3log.org
  *
  * This program is free software: you can redistribute it and/or modify
@@ -22,6 +23,7 @@ import org.b3log.latke.ioc.BeanManager;
 import org.b3log.symphony.processor.channel.*;
 import org.b3log.symphony.processor.middleware.AnonymousViewCheckMidware;
 import org.b3log.symphony.processor.middleware.LoginCheckMidware;
+import org.b3log.symphony.util.Vocation;
 
 /**
  * 请求路由映射.
@@ -52,6 +54,10 @@ public final class Router {
         Dispatcher.webSocket("/gobang-game-channel", gobangChannel);
         final UserChannel userChannel = beanManager.getReference(UserChannel.class);
         Dispatcher.webSocket("/user-channel", userChannel);
+        final IdleTalkChannel idleTalkChannel = beanManager.getReference(IdleTalkChannel.class);
+        Dispatcher.webSocket("/idle-talk-channel", idleTalkChannel);
+        final ShopChannel shopChannel = beanManager.getReference(ShopChannel.class);
+        Dispatcher.webSocket("/shop-channel", shopChannel);
 
         // 注册 HTTP 错误处理
         final ErrorProcessor errorProcessor = beanManager.getReference(ErrorProcessor.class);
@@ -75,6 +81,8 @@ public final class Router {
         CaptchaProcessor.register();
         // 聊天室
         ChatroomProcessor.register();
+        // 云存储
+        CloudProcessor.register();
         // 回帖
         CommentProcessor.register();
         // 文件上传
@@ -97,6 +105,16 @@ public final class Router {
         UserProcessor.register();
         // 投票
         VoteProcessor.register();
+        // 龙门阵
+        IdleTalkProcessor.register();
+        // API
+        ApiProcessor.register();
+        // 商店
+        ShopProcessor.register();
+        // 支付宝
+        AlipayProcessor.register();
+        // MFA
+        MFAProcessor.register();
 
         final BeanManager beanManager = BeanManager.getInstance();
         final LoginCheckMidware loginCheck = beanManager.getReference(LoginCheckMidware.class);
@@ -126,6 +144,12 @@ public final class Router {
         final CityProcessor cityProcessor = beanManager.getReference(CityProcessor.class);
         Dispatcher.group().middlewares(loginCheck::handle).router().get().uris(new String[]{"/city/{city}", "/city/{city}/articles"}).handler(cityProcessor::showCityArticles);
         Dispatcher.get("/city/{city}/users", cityProcessor::showCityUsers, loginCheck::handle);
+        // 假期
+        final Vocation vocation = beanManager.getReference(Vocation.class);
+        Dispatcher.get("/api/vocation", vocation::vocation);
+        // 举报
+        final ReportProcessor reportProcessor = beanManager.getReference(ReportProcessor.class);
+        Dispatcher.post("/report", reportProcessor::report, loginCheck::handle);
 
         // 管理后台
         AdminProcessor.register();

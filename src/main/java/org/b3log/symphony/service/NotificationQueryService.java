@@ -1,5 +1,6 @@
 /*
- * Symphony - A modern community (forum/BBS/SNS/blog) platform written in Java.
+ * Rhythm - A modern community (forum/BBS/SNS/blog) platform written in Java.
+ * Modified version from Symphony, Thanks Symphony :)
  * Copyright (C) 2012-present, b3log.org
  *
  * This program is free software: you can redistribute it and/or modify
@@ -17,6 +18,7 @@
  */
 package org.b3log.symphony.service;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -30,6 +32,7 @@ import org.b3log.latke.service.LangPropsService;
 import org.b3log.latke.service.annotation.Service;
 import org.b3log.latke.util.Stopwatchs;
 import org.b3log.symphony.model.*;
+import org.b3log.symphony.processor.ChatroomProcessor;
 import org.b3log.symphony.repository.*;
 import org.b3log.symphony.util.Emotions;
 import org.b3log.symphony.util.Symphonys;
@@ -38,6 +41,7 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Notification query service.
@@ -125,6 +129,10 @@ public class NotificationQueryService {
      */
     @Inject
     private TagQueryService tagQueryService;
+
+
+    @Inject
+    private ChatRoomService chatRoomService;
 
     /**
      * Gets a notification by the specified id.
@@ -550,12 +558,24 @@ public class NotificationQueryService {
 
                         final JSONObject transfer101 = pointtransferRepository.get(dataId);
                         final String fromId101 = transfer101.optString(Pointtransfer.FROM_ID);
-                        final JSONObject user101 = userRepository.get(fromId101);
-                        final int sum101 = transfer101.optInt(Pointtransfer.SUM);
+                        if (!fromId101.equals(Pointtransfer.ID_C_SYS)) {
+                            final JSONObject user101 = userRepository.get(fromId101);
+                            final int sum101 = transfer101.optInt(Pointtransfer.SUM);
 
-                        final String userLink101 = UserExt.getUserLink(user101);
-                        desTemplate = desTemplate.replace("{user}", userLink101);
-                        desTemplate = desTemplate.replace("{amount}", String.valueOf(sum101));
+                            final String userLink101 = UserExt.getUserLink(user101);
+                            desTemplate = desTemplate.replace("{user}", userLink101);
+                            desTemplate = desTemplate.replace("{amount}", String.valueOf(sum101));
+                        } else {
+                            final int sum101 = transfer101.optInt(Pointtransfer.SUM);
+                            desTemplate = desTemplate.replace("{user}", "系统");
+                            desTemplate = desTemplate.replace("{amount}", String.valueOf(sum101));
+                        }
+                        final String memo = transfer101.optString(Pointtransfer.MEMO);
+                        if (StringUtils.isNotBlank(memo)) {
+                            desTemplate = desTemplate.replace("{memo}", memo);
+                        } else {
+                            desTemplate = desTemplate.replace("{memo}", langPropsService.get("noMemoLabel"));
+                        }
                         break;
                     case Notification.DATA_TYPE_C_INVITECODE_USED:
                         desTemplate = langPropsService.get("notificationInvitecodeUsedLabel");
@@ -803,6 +823,8 @@ public class NotificationQueryService {
         filters.add(new PropertyFilter(Notification.NOTIFICATION_USER_ID, FilterOperator.EQUAL, userId));
         final List<Filter> subFilters = new ArrayList<>();
         subFilters.add(new PropertyFilter(Notification.NOTIFICATION_DATA_TYPE, FilterOperator.EQUAL, Notification.DATA_TYPE_C_AT));
+        subFilters.add(new PropertyFilter(Notification.NOTIFICATION_DATA_TYPE, FilterOperator.EQUAL, Notification.DATA_TYPE_C_CHAT_ROOM_AT));
+        subFilters.add(new PropertyFilter(Notification.NOTIFICATION_DATA_TYPE, FilterOperator.EQUAL, Notification.DATA_TYPE_C_RED_PACKET));
         subFilters.add(new PropertyFilter(Notification.NOTIFICATION_DATA_TYPE, FilterOperator.EQUAL, Notification.DATA_TYPE_C_ARTICLE_NEW_FOLLOWER));
         subFilters.add(new PropertyFilter(Notification.NOTIFICATION_DATA_TYPE, FilterOperator.EQUAL, Notification.DATA_TYPE_C_ARTICLE_NEW_WATCHER));
         subFilters.add(new PropertyFilter(Notification.NOTIFICATION_DATA_TYPE, FilterOperator.EQUAL, Notification.DATA_TYPE_C_COMMENT_VOTE_UP));
@@ -827,10 +849,39 @@ public class NotificationQueryService {
                 String description = "";
 
                 atNotification.put(Keys.OBJECT_ID, notification.optString(Keys.OBJECT_ID));
+                atNotification.put(Notification.NOTIFICATION_DATA_ID, dataId);
                 atNotification.put(Notification.NOTIFICATION_HAS_READ, notification.optBoolean(Notification.NOTIFICATION_HAS_READ));
                 atNotification.put(Common.CREATE_TIME, new Date(notification.optLong(Keys.OBJECT_ID)));
 
                 switch (dataType) {
+                    case Notification.DATA_TYPE_C_RED_PACKET:
+                        final JSONObject redPacket = chatRoomService.getChatMsg(dataId);
+                        final JSONObject content = new JSONObject(redPacket.optString(Common.CONTENT));
+                        final JSONObject redPacketContent = new JSONObject(content.optString(Common.CONTENT));
+                        atNotification.put(Common.CONTENT, redPacketContent.optString("msg"));
+                        atNotification.put(UserExt.USER_AVATAR_URL, content.optString(UserExt.USER_AVATAR_URL));
+                        atNotification.put(Common.CREATE_TIME, new Date(content.optLong((Common.TIME))));
+                        atNotification.put(User.USER_NAME, content.optString(User.USER_NAME));
+                        rslts.add(atNotification);
+                        break;
+                    case Notification.DATA_TYPE_C_CHAT_ROOM_AT:
+                        final JSONObject chatMsg = chatRoomService.getChatMsg(dataId);
+                        if (Objects.isNull(chatMsg)) {
+                            description = langPropsService.get("removedLabel");
+                            atNotification.put(Common.DESCRIPTION, description);
+                            atNotification.put("deleted", true);
+                            rslts.add(atNotification);
+                            continue;
+                        } else {
+                            final JSONObject msg = new JSONObject(chatMsg.optString(Common.CONTENT));
+                            atNotification.put(Common.CONTENT, msg.optString(Common.CONTENT));
+                            atNotification.put(UserExt.USER_AVATAR_URL, msg.optString(UserExt.USER_AVATAR_URL));
+                            atNotification.put(Common.CREATE_TIME, new Date(msg.optLong((Common.TIME))));
+                            atNotification.put(User.USER_NAME, msg.optString(User.USER_NAME));
+                            atNotification.put("deleted", false);
+                        }
+                        rslts.add(atNotification);
+                        break;
                     case Notification.DATA_TYPE_C_AT:
                         final JSONObject comment = commentQueryService.getCommentById(dataId);
                         if (null != comment) {

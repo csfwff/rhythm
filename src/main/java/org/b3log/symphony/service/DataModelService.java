@@ -1,5 +1,6 @@
 /*
- * Symphony - A modern community (forum/BBS/SNS/blog) platform written in Java.
+ * Rhythm - A modern community (forum/BBS/SNS/blog) platform written in Java.
+ * Modified version from Symphony, Thanks Symphony :)
  * Copyright (C) 2012-present, b3log.org
  *
  * This program is free software: you can redistribute it and/or modify
@@ -34,6 +35,7 @@ import org.b3log.latke.util.Stopwatchs;
 import org.b3log.symphony.Server;
 import org.b3log.symphony.cache.DomainCache;
 import org.b3log.symphony.model.*;
+import org.b3log.symphony.processor.IdleTalkProcessor;
 import org.b3log.symphony.util.Markdowns;
 import org.b3log.symphony.util.Sessions;
 import org.b3log.symphony.util.Symphonys;
@@ -74,6 +76,9 @@ public class DataModelService {
      */
     @Inject
     private ArticleQueryService articleQueryService;
+
+    @Inject
+    public SponsorService sponsorService;
 
     /**
      * Tag query service.
@@ -135,6 +140,11 @@ public class DataModelService {
     @Inject
     private BreezemoonQueryService breezemoonQueryService;
 
+
+
+    @Inject
+    private SystemSettingsService settingsService;
+
     /**
      * Fills relevant articles.
      *
@@ -182,6 +192,24 @@ public class DataModelService {
         Stopwatchs.start("Fills random articles");
         try {
             dataModel.put(Common.SIDE_RANDOM_ARTICLES, articleQueryService.getSideRandomArticles());
+        } finally {
+            Stopwatchs.end();
+        }
+    }
+
+    public void fillSponsors(final Map<String, Object> dataModel) {
+        Stopwatchs.start("Fills sponsor user list info");
+        try {
+            List<JSONObject> sponsors = sponsorService.list();
+            String recent;
+            if (Objects.isNull(sponsors) || sponsors.isEmpty()) {
+                sponsors = Collections.emptyList();
+                recent = "2022-01-21";
+            } else {
+                recent = sponsors.get(0).optString(Common.DATE);
+            }
+            dataModel.put(Sponsor.SPONSORS, sponsors);
+            dataModel.put("recent", recent);
         } finally {
             Stopwatchs.end();
         }
@@ -252,7 +280,11 @@ public class DataModelService {
      */
     private void fillHeader(final RequestContext context, final Map<String, Object> dataModel) {
         fillMinified(dataModel);
-        dataModel.put(Common.STATIC_RESOURCE_VERSION, Latkes.getStaticResourceVersion());
+        String staticResourceVersion = Symphonys.get("staticResourceVersion");
+        if (null == staticResourceVersion || staticResourceVersion.isEmpty() || Latkes.getRuntimeMode().name().equals("DEVELOPMENT")) {
+            staticResourceVersion = Latkes.getStaticResourceVersion();
+        }
+        dataModel.put(Common.STATIC_RESOURCE_VERSION, staticResourceVersion);
         dataModel.put("esEnabled", Symphonys.ES_ENABLED);
         dataModel.put("algoliaEnabled", Symphonys.ALGOLIA_ENABLED);
         dataModel.put("algoliaAppId", Symphonys.ALGOLIA_APP_ID);
@@ -267,7 +299,7 @@ public class DataModelService {
         fillSideBreezemoons(dataModel);
         fillDomainNav(dataModel);
         fillPermission(dataModel);
-
+        fillSystemSettings(dataModel);
         dataModel.put(Common.CSRF_TOKEN, Sessions.getCSRFToken(context));
     }
 
@@ -345,6 +377,14 @@ public class DataModelService {
             Stopwatchs.end();
         }
 
+        try {
+            JSONObject user = Sessions.getUser();
+            if (null != user) {
+                dataModel.put("hasUnreadChatMessage", IdleTalkProcessor.hasUnreadChatMessage(user.optString(Keys.OBJECT_ID)));
+            }
+        } catch (Exception ignored) {
+        }
+
         final String serverScheme = Latkes.getServerScheme();
         dataModel.put(Common.WEBSOCKET_SCHEME, StringUtils.containsIgnoreCase(serverScheme, "https") ? "wss" : "ws");
         dataModel.put(Common.LUTE_AVAILABLE, Markdowns.LUTE_AVAILABLE);
@@ -364,6 +404,7 @@ public class DataModelService {
 
 
             if (!isLoggedIn) {
+                dataModel.put(Liveness.LIVENESS, 0);
                 return;
             }
 
@@ -397,12 +438,13 @@ public class DataModelService {
             curUser.put(Role.ROLE_NAME, role.optString(Role.ROLE_NAME));
 
             // final int unreadNotificationCount = notificationQueryService.getUnreadNotificationCount(curUser.optString(Keys.OBJECT_ID));
-            dataModel.put(Notification.NOTIFICATION_T_UNREAD_COUNT, 0); // AJAX polling 
+            dataModel.put(Notification.NOTIFICATION_T_UNREAD_COUNT, 0); // AJAX polling
 
             dataModel.put(Common.IS_DAILY_CHECKIN, activityQueryService.isCheckedinToday(userId));
 
             final int livenessMax = Symphonys.ACTIVITY_YESTERDAY_REWARD_MAX;
             final int currentLiveness = livenessQueryService.getCurrentLivenessPoint(userId);
+
             dataModel.put(Liveness.LIVENESS, (float) (Math.round((float) currentLiveness / livenessMax * 100 * 100)) / 100);
         } finally {
             Stopwatchs.end();
@@ -455,6 +497,77 @@ public class DataModelService {
         Stopwatchs.start("Fills lang");
         try {
             dataModel.putAll(langPropsService.getAll(Locales.getLocale()));
+        } finally {
+            Stopwatchs.end();
+        }
+    }
+
+    /**
+     * Fills the system settings.
+     *
+     * @param dataModel the specified data model
+     */
+    private void fillSystemSettings(final Map<String, Object> dataModel) {
+        Stopwatchs.start("Fills system settings");
+        try {
+            final boolean loggedIn = Sessions.isLoggedIn();
+            if (loggedIn) {
+                final JSONObject currentUser = Sessions.getUser();
+                if (Objects.isNull(currentUser)) {
+                    dataModel.put("hasSystemTitle", false);
+                    dataModel.put("cardBg", "");
+                    dataModel.put(SystemSettings.ONLINE_TIME_UNIT, "m");
+                    dataModel.put("showSideAd", true);
+                    dataModel.put("showTopAd", true);
+                } else {
+                    final JSONObject systemSettings = settingsService.getByUsrId(currentUser.optString(Keys.OBJECT_ID));
+                    if (Objects.isNull(systemSettings)) {
+                        dataModel.put("hasSystemTitle", false);
+                        dataModel.put("cardBg", "");
+                        dataModel.put(SystemSettings.ONLINE_TIME_UNIT, "m");
+                        dataModel.put("showSideAd", true);
+                        dataModel.put("showTopAd", false);
+                        return;
+                    }
+                    final String settingsJson = systemSettings.optString(SystemSettings.SETTINGS);
+                    final JSONObject settings = new JSONObject(settingsJson);
+                    final String systemTitle = settings.optString(SystemSettings.SYSTEM_TITLE);
+                    boolean showSideAd;
+                    try {
+                        showSideAd = settings.getBoolean("showSideAd");
+                    } catch (Exception e) {
+                        showSideAd = true;
+                    }
+                    final boolean showTopAd = settings.optBoolean("showTopAd");
+
+                    dataModel.put("showSideAd", showSideAd);
+                    dataModel.put("showTopAd", showTopAd);
+
+                    if (StringUtils.isBlank(systemTitle)) {
+                        dataModel.put("hasSystemTitle", false);
+                    } else {
+                        dataModel.put("hasSystemTitle", true);
+                        dataModel.put("systemTitle", systemTitle);
+                    }
+                    final String cardBg = settings.optString("cardBg");
+                    if (StringUtils.isBlank(cardBg)) {
+                        dataModel.put("cardBg", "");
+                    } else {
+                        dataModel.put("cardBg", cardBg);
+                    }
+                    final String unit = settings.optString(SystemSettings.ONLINE_TIME_UNIT);
+                    if (StringUtils.isBlank(unit)) {
+                        dataModel.put(SystemSettings.ONLINE_TIME_UNIT, "m");
+                    } else {
+                        dataModel.put(SystemSettings.ONLINE_TIME_UNIT, unit);
+                    }
+                }
+            } else {
+                dataModel.put("hasSystemTitle", false);
+                dataModel.put("cardBg", "");
+                dataModel.put("showSideAd", true);
+                dataModel.put("showTopAd", true);
+            }
         } finally {
             Stopwatchs.end();
         }
@@ -526,5 +639,29 @@ public class DataModelService {
      */
     private void fillSysInfo(final Map<String, Object> dataModel) {
         dataModel.put(Common.VERSION, Server.VERSION);
+    }
+
+    /**
+     * True if the user has the permission
+     * @param userRole
+     * @param level
+     * 1 : Admin only
+     * 2 : Admin and OP
+     * 3 : Admin and OP and AssisOP
+     * @return
+     */
+    public static boolean hasPermission(String userRole, int level) {
+        switch (level) {
+            case 1:
+                return Role.ROLE_ID_C_ADMIN.equals(userRole);
+            case 2:
+                return Role.ROLE_ID_C_ADMIN.equals(userRole) ||
+                        "1630552921050".equals(userRole);
+            case 3:
+                return Role.ROLE_ID_C_ADMIN.equals(userRole) ||
+                        "1630552921050".equals(userRole) ||
+                        "1630631382235".equals(userRole);
+        }
+        return false;
     }
 }

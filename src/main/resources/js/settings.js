@@ -1,5 +1,6 @@
 /*
- * Symphony - A modern community (forum/BBS/SNS/blog) platform written in Java.
+ * Rhythm - A modern community (forum/BBS/SNS/blog) platform written in Java.
+ * Modified version from Symphony, Thanks Symphony :)
  * Copyright (C) 2012-present, b3log.org
  *
  * This program is free software: you can redistribute it and/or modify
@@ -30,6 +31,195 @@
  */
 var Settings = {
   /**
+   * 解绑两步验证
+   */
+  removeMFA: function () {
+    $.ajax({
+      url: Label.servePath + '/mfa/remove',
+      type: 'GET',
+      cache: false,
+      success: function (result) {
+        if (0 === result.code) {
+          alert(result.msg);
+          location.reload();
+        } else {
+          Util.alert(result.msg);
+        }
+      }
+    });
+  },
+  /**
+   * 绑定两步验证
+   */
+  verifyMFA: function () {
+    let code = $("#mfaVerifyCode").val();
+    $.ajax({
+      url: Label.servePath + '/mfa/verify?code=' + code,
+      type: 'GET',
+      cache: false,
+      success: function (result) {
+        if (0 === result.code) {
+          alert(result.msg);
+          location.reload();
+        } else {
+          Util.alert(result.msg);
+          $("#mfaVerifyCode").val("");
+        }
+      }
+    });
+  },
+  /**
+   * 初始化两步验证信息
+   */
+  initMFA: function () {
+    $.ajax({
+      url: Label.servePath + '/mfa/enabled',
+      type: 'GET',
+      cache: false,
+      success: function (result) {
+        if (0 === result.code) {
+          // 已有MFA
+          $("#mfaCode").append("<label><svg><use xlink:href=\"#safe\"></use></svg> 验证器已启用，保护中</label><br><br><br>");
+          $("#mfaCode").append("<p>" +
+              "    您已绑定两步验证器，账户安全等级高。<br>如需更换绑定设备，请解绑后重新绑定。" +
+              "</p>");
+          $("#mfaCode").append("<br><button class=\"fn-right\" onclick=\"Settings.removeMFA()\">解绑</button>");
+        } else {
+          // 没有MFA
+          $("#mfaCode").append("<label><svg><use xlink:href=\"#unsafe\"></use></svg> 未在保护中</label><br><br><br>");
+          $("#mfaCode").append("<p>" +
+              "    两步验证可以极大增强您的账户安全性，<a href=\"https://fishpi.cn/article/1650648000379\" target=\"_blank\">使用指南</a><br>" +
+              "    为防止意外丢失，建议您备份二维码下方的手动输入代码。<br>" +
+              "    请使用两步验证器扫描二维码绑定 (推荐使用 Authenticator)" +
+              "</p>");
+          $.ajax({
+            url: Label.servePath + '/mfa',
+            type: 'GET',
+            cache: false,
+            success: function (result) {
+              if (0 === result.code) {
+                $("#mfaCode").append("<br>");
+                $("#mfaCode").append("<img src='" + result.qrCodeLink + "'/>");
+                $("#mfaCode").append("<br>");
+                $("#mfaCode").append("<p>或手动输入代码：" + result.secret + "</p>");
+                $("#mfaCode").append("<br>");
+                $("#mfaCode").append("<p>绑定成功后，请输入一次性密码用于验证，并点击绑定按钮：</p>");
+                $("#mfaCode").append("<input id=\"mfaVerifyCode\" type=\"text\" />")
+                $("#mfaCode").append("<br><br>");
+                $("#mfaCode").append("<button class=\"fn-right\" onclick=\"Settings.verifyMFA()\">绑定</button>");
+              } else {
+                $("#mfaCode").append("获取2FA信息失败，请联系管理员");
+              }
+            }
+          });
+
+        }
+      },
+    });
+  },
+  /**
+   * 初始化背包
+   */
+  initBag: function (sysBag) {
+    let html = '';
+    let bag = sysBag;
+    if (bag.checkin2days !== undefined && bag.checkin2days > 0) {
+      html += '<button style="margin:0 5px 5px 0" onclick="Settings.use2dayCheckinCard(\'' + Label.csrfToken + '\')">两天免签卡 x' + bag.checkin2days + '</button>';
+    }
+    if (bag.patchCheckinCard !== undefined && bag.patchCheckinCard > 0) {
+      html += '<button style="margin:0 5px 5px 0" onclick="Settings.usePatchCheckinCard(\'' + Label.csrfToken + '\', ' + bag.patchStart + ')">补签卡 x' + bag.patchCheckinCard + '</button>';
+    }
+
+    // 下面内容不要变更顺序
+    if (bag.sysCheckinRemain !== undefined && bag.sysCheckinRemain > 0) {
+      html += '<br><div style="float: left;font-size: 12px;color: rgba(0,0,0,0.38);">免签卡生效中，剩余' + bag.sysCheckinRemain + '天</div>';
+    }
+    if (html === '') {
+      html = '你的背包和钱包一样，是空的。';
+    }
+    document.getElementById("bag").innerHTML = html;
+  },
+  /**
+   * 初始化勋章
+   */
+  initMetal: function (metal) {
+    let html = '';
+    if (metal.list !== undefined) {
+      for (let i = 0; i < metal.list.length; i++) {
+        let m = metal.list[i];
+        let btn = '';
+        if (m.enabled === true) {
+          btn = '<button class="btn red" onclick="Settings.toggleMetal(\'' + m.name + '\', false)">卸下</button>';
+        } else {
+          btn = '<button class="btn green" onclick="Settings.toggleMetal(\'' + m.name + '\', true)">佩戴</button>';
+        }
+        html += '<div class="fn__flex" style="justify-content: space-between; margin-bottom: 10px">' +
+            '<div>' +
+            ' <label style="margin: 0 0 0 0">' +
+            '   <div><img src="' + Util.genMetal(m.name, m.attr) + '"/><br><span style="font-size: 5px">' + m.name + ' (' + m.description + ')</span></div>' +
+            ' </label>' +
+            ' </div>' +
+            ' <div>' + btn + "</div>" +
+            "</div>";
+      }
+    }
+    if (html === '') {
+      html = '鱼战士，你还没有任何勋章！';
+    }
+    document.getElementById("metal").innerHTML = html;
+  },
+  toggleMetal: function (name, enabled) {
+    $.ajax({
+      url: Label.servePath + "/admin/user/toggle-metal",
+      method: "post",
+      data: "name=" + name + "&enabled=" + enabled,
+      async: false,
+      success: function () {
+        location.reload();
+      }
+    });
+  },
+  /**
+   * 使用补签卡
+   * @param csrfToken
+   */
+  usePatchCheckinCard: function (csrfToken, record) {
+    if (record == undefined) {
+      alert("您没有可以补签的记录！");
+    } else {
+      if (confirm('补签卡仅适用于断签一天的情况！\n在使用补签卡后，你的签到记录将提前至日期：' + record + '\n确定继续吗？') === true) {
+        $.ajax({
+          url: Label.servePath + '/bag/patchCheckin',
+          type: 'GET',
+          async: false,
+          headers: {'csrfToken': csrfToken},
+          success: function (result) {
+            alert(result.msg);
+            location.reload();
+          }
+        })
+      }
+    }
+  },
+  /**
+   * 使用两天免签卡
+   * @param csrfToken
+   */
+  use2dayCheckinCard: function (csrfToken) {
+    if (confirm('使用两天免签卡后，明天和后天的签到将由系统自动帮你完成，不需要登录摸鱼派。确定使用吗？') === true) {
+      $.ajax({
+        url: Label.servePath + '/bag/2dayCheckin',
+        type: 'GET',
+        async: false,
+        headers: {'csrfToken': csrfToken},
+        success: function (result) {
+          alert(result.msg);
+          location.reload();
+        }
+      })
+    }
+  },
+  /**
    * 举报
    * @param it
    */
@@ -59,6 +249,74 @@ var Settings = {
     })
   },
   /**
+   * 获取手机验证码
+   * @param csrfToken
+   */
+  getPhoneCaptcha: function (csrfToken) {
+    $('#phoneGetBtn').attr('disabled', 'disabled').css('opacity', '0.3')
+    $.ajax({
+      url: Label.servePath + '/settings/phone/vc',
+      type: 'POST',
+      headers: {'csrfToken': csrfToken},
+      data: JSON.stringify({
+        userPhone: $('#phoneInput').val(),
+        captcha: $('#phoneVerify').val(),
+      }),
+      success: function (result) {
+        if (0 === result.code) {
+          $('#phoneInput').prop('disabled', true)
+          $('#phone_captch').hide()
+          $('#phoneCodePanel').show()
+          $('#phoneCode').show().focus()
+          $('#phoneSubmitBtn').show()
+          $('#phoneGetBtn').hide()
+        }
+        Util.alert(result.msg)
+        $('#phoneGetBtn').removeAttr('disabled').css('opacity', '1')
+      },
+    })
+  },
+  /**
+   * 更新手机
+   */
+  updatePhone: function (csrfToken) {
+    $('#phoneSubmitBtn').attr('disabled', 'disabled').css('opacity', '0.3')
+    $.ajax({
+      url: Label.servePath + '/settings/phone',
+      type: 'POST',
+      headers: {'csrfToken': csrfToken},
+      data: JSON.stringify({
+        userPhone: $('#phoneInput').val(),
+        captcha: $('#phoneCode').val(),
+      }),
+      success: function (result) {
+        if (0 === result.code) {
+          $('#phone_captch').show()
+          $('#phoneVerify').val('')
+          $('#phoneCodePanel').hide()
+          $('#phoneCode').val('')
+          $('#phoneSubmitBtn').hide()
+          $('#phoneGetBtn').show()
+          $('#phoneInput').prop('disabled', false)
+          $('#phone_captch img').click()
+          Util.alert(Label.updateSuccLabel)
+        } else {
+          if (result.code === 1) {
+            $('#phone_captch').show()
+            $('#phoneVerify').val('')
+            $('#phoneCodePanel').hide()
+            $('#phoneSubmitBtn').hide()
+            $('#phoneGetBtn').show()
+            $('#phoneInput').prop('disabled', false)
+            $('#phone_captch img').click()
+          }
+          Util.alert(result.msg)
+        }
+        $('#phoneSubmitBtn').removeAttr('disabled').css('opacity', '1')
+      },
+    })
+  },
+  /**
    * 获取邮箱验证码
    * @param csrfToken
    */
@@ -75,7 +333,7 @@ var Settings = {
       success: function (result) {
         if (0 === result.code) {
           $('#emailInput').prop('disabled', true)
-          $('.home-account__captch').hide()
+          $('#email_captch').hide()
           $('#emailCodePanel').show()
           $('#emailCode').show().focus()
           $('#emailSubmitBtn').show()
@@ -101,25 +359,24 @@ var Settings = {
       }),
       success: function (result) {
         if (0 === result.code) {
-          $('.home-account__captch').show()
+          $('#email_captch').show()
           $('#emailVerify').val('')
           $('#emailCodePanel').hide()
           $('#emailCode').val('')
           $('#emailSubmitBtn').hide()
           $('#emailGetBtn').show()
           $('#emailInput').prop('disabled', false)
-          $('.home-account__captch img').click()
+          $('#email_captch img').click()
           Util.alert(Label.updateSuccLabel)
         } else {
           if (result.code === 1) {
-            $('.home-account__captch').show()
+            $('#email_captch').show()
             $('#emailVerify').val('')
-            $('#emailCodePanel').hide()
             $('#emailCodePanel').hide()
             $('#emailSubmitBtn').hide()
             $('#emailGetBtn').show()
             $('#emailInput').prop('disabled', false)
-            $('.home-account__captch img').click()
+            $('#email_captch img').click()
           }
           Util.alert(result.msg)
         }
@@ -432,6 +689,16 @@ var Settings = {
     })
   },
   /**
+   * 向用户确认是否真的注销账号
+   */
+  requestDeactive: function (csrfToken) {
+    if (confirm("请注意！这不是保存按钮！！！\n点击确定后，您的摸鱼派账号将会被永久停用，无法登录，账户信息将被部分抹除，确定继续吗？")) {
+      if (confirm("亲爱的鱼油，再次向您确认！\n您的账号数据非常宝贵，如果对社区的发展有任何意见或建议，欢迎联系摸鱼派管理组。\n本次确认后，您的账户将被永久停用。")) {
+        Settings.update('deactivate', csrfToken);
+      }
+    }
+  },
+  /**
    * @description 更新 settings 页面数据.
    * @argument {String} csrfToken CSRF token
    */
@@ -482,6 +749,7 @@ var Settings = {
           userReplyWatchArticleStatus: $('#userReplyWatchArticleStatus').
             prop('checked'),
           userForwardPageStatus: $('#userForwardPageStatus').prop('checked'),
+          chatRoomPictureStatus: $('#chatRoomPictureStatus').prop('checked')
         }
 
         break
@@ -501,6 +769,19 @@ var Settings = {
           userName: $('#newUsername').val(),
         }
 
+        break
+      case 'system':
+        let cardBg = "";
+        if ($("#userCardSettings").attr("bgUrl") !== undefined) {
+          cardBg = $("#userCardSettings").attr("bgUrl");
+        }
+        requestJSONObject = {
+          systemTitle: $('#newSystemTitle').val(),
+          cardBg: cardBg,
+          onlineTimeUnit: $('#onlineTimeUnit').val(),
+          showSideAd: $("#showSideAd").prop("checked"),
+          showTopAd: $("#showTopAd").prop("checked"),
+        }
         break
       case 'deactivate':
         break
@@ -717,7 +998,7 @@ var Settings = {
   initFunction: function () {
     $('#emojiGrid img').click(function () {
       var emoji = $(this).attr('alt')
-      if ($('#emotionList').val().indexOf(emoji) !== -1) {
+      if ($('#emotionList').val().split(',').indexOf(emoji) !== -1) {
         return
       }
       if ($('#emotionList').val() !== '') {
@@ -743,6 +1024,21 @@ var Settings = {
       'hideFooter': true,
     })
 
+    $.ajax({
+      url: Label.servePath + "/user/" + Label.userName + "/metal",
+      async: true,
+      method: "get",
+      success: function (result) {
+        let list = result.data.list;
+        if (list !== undefined) {
+          for (let i = 0; i < list.length; i++) {
+            let m = list[i];
+            $("#metal").append("<img title='" + m.description + "' src='" + Util.genMetal(m.name, m.attr) + "'/>");
+          }
+        }
+      }
+    });
+
     if ($.ua.device.type !== 'mobile') {
       Settings.homeScroll()
     } else {
@@ -764,6 +1060,7 @@ var Settings = {
           case 'success':
           case 'cache':
             $('.home-menu a').removeClass('current')
+            Util.listenUserCard()
             switch (location.pathname) {
               case '/member/' + Label.userName:
               case '/member/' + Label.userName + '/comments':

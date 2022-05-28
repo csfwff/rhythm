@@ -1,5 +1,6 @@
 /*
- * Symphony - A modern community (forum/BBS/SNS/blog) platform written in Java.
+ * Rhythm - A modern community (forum/BBS/SNS/blog) platform written in Java.
+ * Modified version from Symphony, Thanks Symphony :)
  * Copyright (C) 2012-present, b3log.org
  *
  * This program is free software: you can redistribute it and/or modify
@@ -121,19 +122,11 @@ public class TagQueryService {
 
         final String[] tagTitles = tagsStr.split(",");
         for (final String tagTitle : tagTitles) {
-            final JSONObject tag = new JSONObject();
-            tag.put(Tag.TAG_TITLE, tagTitle);
-
-            final String uri = tagRepository.getURIByTitle(tagTitle);
-            if (null != uri) {
-                tag.put(Tag.TAG_URI, uri);
-            } else {
-                tag.put(Tag.TAG_URI, tagTitle);
+            try {
+                final JSONObject tag = tagRepository.getByTitle(tagTitle);
+                ret.add(tag);
+            } catch (RepositoryException ignored) {
             }
-
-            Tag.fillDescription(tag);
-
-            ret.add(tag);
         }
 
         return ret;

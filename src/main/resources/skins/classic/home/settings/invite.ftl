@@ -1,6 +1,7 @@
 <#--
 
-    Symphony - A modern community (forum/BBS/SNS/blog) platform written in Java.
+    Rhythm - A modern community (forum/BBS/SNS/blog) platform written in Java.
+    Modified version from Symphony, Thanks Symphony :)
     Copyright (C) 2012-present, b3log.org
 
     This program is free software: you can redistribute it and/or modify
@@ -29,6 +30,16 @@
                 <button class="btn" id="shareClipboard">${copyLabel}</button>
             </div>
         </div>
+        <#else>
+            <div class="module">
+                <div class="module-header">
+                    <h2>${inviteTipLabel}</h2>
+                </div>
+                <div class="module-panel form">
+                    <input readonly="readonly" type="text" value="${serverScheme}://${serverHost}${contextPath}/register?r=${currentUser.userName}" onclick="this.select()"/>
+                    <button class="btn" id="shareClipboard">${copyLabel}</button>
+                </div>
+            </div>
     </#if>
 <#if "2" == allowRegister>
     <#if permissions["commonExchangeIC"].permissionGrant>
@@ -54,7 +65,7 @@
     </#if>
 <div class="module">
     <div class="module-header">
-        <h2>${queryInvitecodeStateLabel}</h2> 
+        <h2>${queryInvitecodeStateLabel}</h2>
     </div>
     <div class="module-panel form fn-clear">
         <input id="invitecode" type="text" placeholder="${inputInvitecodeLabel}"/><br/><br/>

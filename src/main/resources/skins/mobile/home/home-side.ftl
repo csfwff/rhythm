@@ -1,6 +1,7 @@
 <#--
 
-    Symphony - A modern community (forum/BBS/SNS/blog) platform written in Java.
+    Rhythm - A modern community (forum/BBS/SNS/blog) platform written in Java.
+    Modified version from Symphony, Thanks Symphony :)
     Copyright (C) 2012-present, b3log.org
 
     This program is free software: you can redistribute it and/or modify
@@ -24,18 +25,20 @@
             <div id="userNicknameDom"><b>${user.userNickname}</b></div>
             <div class="ft-gray">${user.userName}</div>
 
+            <div id="metal">
+            </div>
+
             <div>
                 <#if isLoggedIn && (currentUser.userName != user.userName)>
-                    <button class="green small" onclick="location.href = '${servePath}/post?type=1&at=${user.userName}&tags=${discussionLabel}'">
+                    <button class="green small" onclick="window.location.href = '${servePath}/idle-talk?toUser=${user.userName}'">
                         ${privateMessageLabel}
                     </button>
                 </#if>
                 <#if (isLoggedIn && ("adminRole" == currentUser.userRole || currentUser.userName == user.userName)) || 0 == user.userOnlineStatus>
                     <span class="tooltipped tooltipped-n" aria-label="<#if user.userOnlineFlag>${onlineLabel}<#else>${offlineLabel}</#if>">
-                        <span class="<#if user.userOnlineFlag>online<#else>offline</#if>"><svg><use xlink:href="#logo"></use></svg></span>
+                        <span class="<#if user.userOnlineFlag>online<#else>offline</#if>"><#if user.userOnlineFlag>在线<#else>离线</#if></span>
                     </span>
                 </#if>
-                <span class="tooltipped tooltipped-n offline" aria-label="${roleLabel}"> ${user.roleName}</span>
                 <#if permissions["userAddPoint"].permissionGrant ||
                         permissions["userAddUser"].permissionGrant ||
                         permissions["userExchangePoint"].permissionGrant ||
@@ -47,6 +50,26 @@
                 <span aria-label="${reportLabel}" class="tooltipped tooltipped-n"
                       onclick="$('#reportDialog').data('id', '${user.oId}').dialog('open')"
                 ><svg><use xlink:href="#icon-report"></use></svg></span>
+            </div>
+
+            <div>
+                <a href="https://fishpi.cn/article/1630575841478" target="_blank">
+                    <img style="height: 26px;margin-top: 5px;" src="
+                    <#if user.roleName == '管理员'>
+                    https://pwl.stackoverflow.wiki/adminRole.png
+                    <#elseif user.roleName == 'OP'>
+                    https://pwl.stackoverflow.wiki/opRole.png
+                    <#elseif user.roleName == '纪律委员'>
+                    https://pwl.stackoverflow.wiki/policeRole.png
+                    <#elseif user.roleName == '超级会员'>
+                    https://pwl.stackoverflow.wiki/svipRole.png
+                    <#elseif user.roleName == '成员'>
+                    https://pwl.stackoverflow.wiki/vipRole.png
+                    <#else>
+                    https://pwl.stackoverflow.wiki/newRole.png
+                    </#if>
+                    "/>
+                </a>
             </div>
 
             <#if isLoggedIn && (currentUser.userName != user.userName)>
@@ -111,22 +134,63 @@
             <span class="ft-gray">${checkinStreakPart2Label}</span>
         </div>
         <div class="fn-hr10"></div>
-        <ul class="status fn-flex">
-            <li>
+        <ul class="status fn-flex" style="padding-bottom: 0">
+            <li id="userTags">
                 <strong>${user.userTagCount?c}</strong>
                 <span class="ft-gray">${tagLabel}</span>
             </li>
-            <li>
+            <li id="userArticles">
                 <strong>${user.userArticleCount?c}</strong>
                 <span class="ft-gray">${articleLabel}</span>
             </li>
-            <li>
+            <li id="userComments">
                 <strong>${user.userCommentCount?c}</strong>
                 <span class="ft-gray">${cmtLabel}</span>
+            </li>
+            <li id="userFollower" style="cursor:pointer;">
+                <strong>${followerCount}</strong>
+                <span class="ft-gray">${followersLabel}</span>
+            </li>
+            <li id="userFollowing" style="cursor:pointer;">
+                <strong>${followingUserCount}</strong>
+                <span class="ft-gray">${followingUsersLabel}</span>
+            </li>
+        </ul>
+        <ul class="status fn-flex" style="padding-top: 0">
+            <li id="onlineMinute" style="cursor:pointer;">
+                <strong>
+                    <#assign x=(user.onlineMinute?c)>
+                    <#if onlineTimeUnit??>
+                        <#if onlineTimeUnit == 'h'>
+                            <#assign t=(x?number/60)>
+                            ${t} 小时
+                        <#elseif onlineTimeUnit == 'd'>
+                            <#assign t=(x?number/60/24)>
+                            ${t} 天
+                        <#else>
+                            ${user.onlineMinute} 分钟
+                        </#if>
+                    <#else>
+                        ${user.onlineMinute} 分钟
+                    </#if>
+                </strong>
+                <span class="ft-gray">在线时间</span>
             </li>
         </ul>
     </div>
 </div>
+
+<script>
+    document.getElementById("userFollower").addEventListener("click", function () {
+        window.location.href = "${servePath}/member/${user.userName}/followers";
+    });
+    document.getElementById("userFollowing").addEventListener("click", function () {
+        window.location.href = "${servePath}/member/${user.userName}/following/users";
+    });
+    document.getElementById("onlineMinute").addEventListener("click", function () {
+        window.location.href = "${servePath}/top/online";
+    });
+</script>
 
 <div id="reportDialog">
     <div class="form fn-clear">

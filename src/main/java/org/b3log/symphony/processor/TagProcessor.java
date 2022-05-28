@@ -1,5 +1,6 @@
 /*
- * Symphony - A modern community (forum/BBS/SNS/blog) platform written in Java.
+ * Rhythm - A modern community (forum/BBS/SNS/blog) platform written in Java.
+ * Modified version from Symphony, Thanks Symphony :)
  * Copyright (C) 2012-present, b3log.org
  *
  * This program is free software: you can redistribute it and/or modify
@@ -42,6 +43,7 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * Tag processor.
@@ -150,6 +152,26 @@ public class TagProcessor {
         dataModel.put(Common.COLD_TAGS, coldTags);
 
         dataModelService.fillHeaderAndFooter(context, dataModel);
+
+        final boolean isLoggedIn = (Boolean) dataModel.get(Common.IS_LOGGED_IN);
+
+        trendTags.forEach(tag -> {
+            final String tagId = tag.optString(Keys.OBJECT_ID);
+            if (isLoggedIn) {
+                final JSONObject currentUser = Sessions.getUser();
+                if (Objects.isNull(currentUser)) {
+                    tag.put(Common.IS_FOLLOWING, Boolean.FALSE);
+                } else {
+                    final String followerId = currentUser.optString(Keys.OBJECT_ID);
+                    final boolean isFollowing = followQueryService.isFollowing(followerId, tagId, Follow.FOLLOWING_TYPE_C_TAG);
+                    tag.put(Common.IS_FOLLOWING, isFollowing);
+                }
+            } else {
+                tag.put(Common.IS_FOLLOWING, Boolean.FALSE);
+            }
+
+        });
+
     }
 
     /**

@@ -868,7 +868,7 @@
         {
           "name": "dataId",
           "type": "String",
-          "length": 19,
+          "length": 128,
           "description": "数据实体 id"
         },
         {
@@ -1311,6 +1311,12 @@
           "description": "用户邮箱"
         },
         {
+          "name": "userPhone",
+          "type": "String",
+          "length": 255,
+          "description": "用户手机号"
+        },
+        {
           "name": "userName",
           "type": "String",
           "length": 64,
@@ -1541,6 +1547,11 @@
           "description": "0：公开清风明月列表，1：不公开清风明月列表"
         },
         {
+          "name": "chatRoomPictureStatus",
+          "type": "int",
+          "description": "0: 聊天室图片自动模糊，2: 聊天室图片不自动模糊"
+        },
+        {
           "name": "userFollowerStatus",
           "type": "int",
           "description": "0：公开关注者列表，1：不公开关注者列表"
@@ -1642,6 +1653,17 @@
           "type": "String",
           "length": 255,
           "description": "自定义首页跳转 https://github.com/b3log/symphony/issues/774"
+        },
+        {
+          "name": "onlineMinute",
+          "type": "int",
+          "description": "在线时间（分钟）"
+        },
+        {
+          "name": "secret2fa",
+          "type": "String",
+          "length": 255,
+          "description": "两步验证 Secret"
         }
       ]
     },
@@ -1880,6 +1902,142 @@
           "name": "emotionType",
           "type": "int",
           "description": "0：emoji"
+        }
+      ]
+    },
+    {
+      "name": "chat_room",
+      "description": "聊天室数据永久存储",
+      "keys": [
+        {
+          "name": "oId",
+          "type": "String",
+          "length": 19,
+          "description": "主键"
+        },
+        {
+          "name": "content",
+          "type": "String",
+          "length": 102400,
+          "description": "聊天内容JSON"
+        }
+      ]
+    },
+    {
+      "name": "system_settings",
+      "description": "用户系统设置",
+      "keys": [
+        {
+          "name": "oId",
+          "type": "String",
+          "length": 19,
+          "description": "主键"
+        },
+        {
+          "name": "userId",
+          "type": "String",
+          "length": 19,
+          "description": "用户id"
+        },
+        {
+          "name": "settings",
+          "type": "String",
+          "length": 4096,
+          "description": "系统设置JSON"
+        }
+      ]
+    },
+    {
+      "name": "cloud",
+      "description": "游戏云存档存储库",
+      "keys": [
+        {
+          "name": "oId",
+          "type": "String",
+          "length": 19,
+          "description": "主键"
+        },
+        {
+          "name": "userId",
+          "type": "String",
+          "length": 19,
+          "description": "用户ID"
+        },
+        {
+          "name": "gameId",
+          "type": "String",
+          "length": 19,
+          "description": "游戏ID"
+        },
+        {
+          "name": "data",
+          "type": "String",
+          "length": 500000,
+          "description": "游戏存档"
+        }
+      ]
+    },
+    {
+      "name": "sponsor",
+      "description": "赞助名单",
+      "keys": [
+        {
+          "name": "oId",
+          "type": "String",
+          "length": 19,
+          "description": "主键"
+        },
+        {
+          "name": "userId",
+          "type": "String",
+          "length": 19,
+          "description": "用户ID"
+        },
+        {
+          "name": "time",
+          "type": "long",
+          "description": "时间"
+        },
+        {
+          "name": "amount",
+          "type": "double",
+          "description": "金额"
+        },
+        {
+          "name": "message",
+          "type": "String",
+          "length": 255,
+          "description": "捐赠人留言"
+        }
+      ]
+    },
+    {
+      "name": "chat",
+      "description": "私聊消息表",
+      "keys": [
+        {
+          "name": "oId",
+          "type": "String",
+          "length": 19,
+          "description": "主键"
+        },
+        {
+          "name": "senderId",
+          "type": "String",
+          "length": 19,
+          "description": "发送者ID"
+        },
+        {
+          "name": "receiverId",
+          "type": "String",
+          "length": 19,
+          "description": "接收者ID"
+        },
+        {
+          "name": "message",
+          "type": "String",
+          "length": 102400,
+          "description": "消息JSON"
         }
       ]
     }

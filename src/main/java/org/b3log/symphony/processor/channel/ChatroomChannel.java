@@ -1,5 +1,6 @@
 /*
- * Symphony - A modern community (forum/BBS/SNS/blog) platform written in Java.
+ * Rhythm - A modern community (forum/BBS/SNS/blog) platform written in Java.
+ * Modified version from Symphony, Thanks Symphony :)
  * Copyright (C) 2012-present, b3log.org
  *
  * This program is free software: you can redistribute it and/or modify
@@ -24,6 +25,7 @@ import org.b3log.latke.ioc.Singleton;
 import org.b3log.latke.model.User;
 import org.b3log.symphony.model.Common;
 import org.b3log.symphony.model.UserExt;
+import org.b3log.symphony.processor.ApiProcessor;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -48,7 +50,12 @@ public class ChatroomChannel implements WebSocketChannel {
     /**
      * Online user information storage.
      */
-    public static final Map<WebSocketSession, JSONObject> onlineUsers = new HashMap<>();
+    public static final Map<WebSocketSession, JSONObject> onlineUsers = Collections.synchronizedMap(new HashMap<>());
+
+    /**
+     * 当前讨论话题
+     */
+    public static String discussing = "暂无";
 
     /**
      * Called when the socket connection with the browser is established.
@@ -57,27 +64,21 @@ public class ChatroomChannel implements WebSocketChannel {
      */
     @Override
     public void onConnect(final WebSocketSession session) {
-        final String userName = session.getParameter("user");
-        final String userStr = session.getHttpSession().getAttribute(User.USER);
-        if (null == userStr) {
-            return;
+        String userStr = session.getHttpSession().getAttribute(User.USER);
+        try {
+            userStr = ApiProcessor.getUserByKey(session.getParameter("apiKey")).toString();
+        } catch (NullPointerException ignored) {
         }
-
-        final JSONObject user = new JSONObject(userStr);
-        user.put(User.USER_NAME, userName);
-        onlineUsers.put(session, user);
+        if (null != userStr) {
+            final JSONObject user = new JSONObject(userStr);
+            onlineUsers.put(session, user);
+        }
 
         SESSIONS.add(session);
 
-        synchronized (SESSIONS) {
-            final Iterator<WebSocketSession> i = SESSIONS.iterator();
-            // i 是每个客户端，遍历给他们发送 SESSIONS.size()，也就是在线人数
-            while (i.hasNext()) {
-                final WebSocketSession s = i.next();
-                final String msgStr = getOnline().toString();
-                s.sendText(msgStr);
-            }
-        }
+        // 单独发送在线信息
+        final String msgStr = getOnline().toString();
+        session.sendText(msgStr);
     }
 
     /**
@@ -119,15 +120,16 @@ public class ChatroomChannel implements WebSocketChannel {
      *                }
      */
     public static void notifyChat(final JSONObject message) {
-        message.put(Common.TYPE, "msg");
+        if (!message.has(Common.TYPE)) {
+            message.put(Common.TYPE, "msg");
+        }
         final String msgStr = message.toString();
 
-        synchronized (SESSIONS) {
-            final Iterator<WebSocketSession> i = SESSIONS.iterator();
-            while (i.hasNext()) {
-                final WebSocketSession session = i.next();
+        try {
+            for (WebSocketSession session : SESSIONS) {
                 session.sendText(msgStr);
             }
+        } catch (Exception ignored) {
         }
     }
 
@@ -136,52 +138,69 @@ public class ChatroomChannel implements WebSocketChannel {
      *
      * @param session the specified session
      */
-    private void removeSession(final WebSocketSession session) {
-        onlineUsers.remove(session);
+    private synchronized void removeSession(final WebSocketSession session) {
+        try {
+            onlineUsers.remove(session);
+        } catch (NullPointerException ignored) {
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
         SESSIONS.remove(session);
-
-        synchronized (SESSIONS) {
-            final Iterator<WebSocketSession> i = SESSIONS.iterator();
-            while (i.hasNext()) {
-                final WebSocketSession s = i.next();
-                final String msgStr = getOnline().toString();
-                s.sendText(msgStr);
-            }
-        }
     }
 
     /**
      * 获得聊天室在线人数和在线成员信息
      * @return
      */
-    private JSONObject getOnline() {
-        // 使用 HashMap 去重
-        Map<String, JSONObject> filteredOnlineUsers = new HashMap<>();
-        for (JSONObject object : onlineUsers.values()) {
-            String name = object.optString(User.USER_NAME);
-            filteredOnlineUsers.put(name, object);
+    public static JSONObject getOnline() {
+        try {
+            // 使用 HashMap 去重
+            Map<String, JSONObject> filteredOnlineUsers = new HashMap<>();
+            for (JSONObject object : onlineUsers.values()) {
+                String name = object.optString(User.USER_NAME);
+                filteredOnlineUsers.put(name, object);
+            }
+
+            JSONArray onlineArray = new JSONArray();
+            for (String user : filteredOnlineUsers.keySet()) {
+                JSONObject object = filteredOnlineUsers.get(user);
+
+                String avatar = object.optString(UserExt.USER_AVATAR_URL);
+                String homePage = Latkes.getStaticServePath() + "/member/" + user;
+
+                JSONObject generated = new JSONObject();
+                generated.put(User.USER_NAME, user);
+                generated.put(UserExt.USER_AVATAR_URL, avatar);
+                generated.put("homePage", homePage);
+                onlineArray.put(generated);
+            }
+
+            JSONObject result = new JSONObject();
+            result.put(Common.ONLINE_CHAT_CNT, filteredOnlineUsers.size());
+            result.put(Common.TYPE, "online");
+            result.put("users", onlineArray);
+            result.put("discussing", discussing);
+
+            return result;
+        } catch (Exception e) {
+            e.printStackTrace();
         }
+        return new JSONObject().put(Common.ONLINE_CHAT_CNT, 99999).put(Common.TYPE, "online").put("users", new JSONArray());
+    }
 
-        JSONArray onlineArray = new JSONArray();
-        for (String user : filteredOnlineUsers.keySet()) {
-            JSONObject object = filteredOnlineUsers.get(user);
-
-            String avatar = object.optString(UserExt.USER_AVATAR_URL);
-            String homePage = Latkes.getStaticServePath() + "/member/" + user;
-
-            JSONObject generated = new JSONObject();
-            generated.put(User.USER_NAME, user);
-            generated.put(UserExt.USER_AVATAR_URL, avatar);
-            generated.put("homePage", homePage);
-            onlineArray.put(generated);
+    // 发送在线信息
+    public synchronized static void sendOnlineMsg() {
+        final String msgStr = getOnline().toString();
+        try {
+            for (WebSocketSession s : SESSIONS) {
+                s.sendText(msgStr);
+                try {
+                    Thread.sleep(500);
+                } catch (Exception ignored) {
+                }
+            }
+        } catch (Exception ignored) {
         }
-
-        JSONObject result = new JSONObject();
-        result.put(Common.ONLINE_CHAT_CNT, filteredOnlineUsers.size());
-        result.put(Common.TYPE, "online");
-        result.put("users", onlineArray);
-
-        return result;
     }
 }

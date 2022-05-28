@@ -1,5 +1,6 @@
 /*
- * Symphony - A modern community (forum/BBS/SNS/blog) platform written in Java.
+ * Rhythm - A modern community (forum/BBS/SNS/blog) platform written in Java.
+ * Modified version from Symphony, Thanks Symphony :)
  * Copyright (C) 2012-present, b3log.org
  *
  * This program is free software: you can redistribute it and/or modify
@@ -44,9 +45,13 @@ import org.b3log.latke.util.Paginator;
 import org.b3log.latke.util.Strings;
 import org.b3log.symphony.event.ArticleBaiduSender;
 import org.b3log.symphony.model.*;
+import org.b3log.symphony.processor.bot.ChatRoomBot;
+import org.b3log.symphony.processor.channel.UserChannel;
+import org.b3log.symphony.processor.middleware.LoginCheckMidware;
 import org.b3log.symphony.processor.middleware.PermissionMidware;
 import org.b3log.symphony.processor.middleware.validate.UserRegister2ValidationMidware;
 import org.b3log.symphony.processor.middleware.validate.UserRegisterValidationMidware;
+import org.b3log.symphony.repository.ReportRepository;
 import org.b3log.symphony.service.*;
 import org.b3log.symphony.util.Escapes;
 import org.b3log.symphony.util.Sessions;
@@ -308,12 +313,28 @@ public class AdminProcessor {
     private OperationQueryService operationQueryService;
 
     /**
+     * Report repository.
+     */
+    @Inject
+    private ReportRepository reportRepository;
+
+    /**
+     * CLoud service.
+     */
+    @Inject
+    private CloudService cloudService;
+
+    @Inject
+    private SponsorService sponsorService;
+
+    /**
      * Register request handlers.
      */
     public static void register() {
         final BeanManager beanManager = BeanManager.getInstance();
         final AdminProcessor adminProcessor = beanManager.getReference(AdminProcessor.class);
         final PermissionMidware permissionMidware = beanManager.getReference(PermissionMidware.class);
+        final LoginCheckMidware loginCheck = beanManager.getReference(LoginCheckMidware.class);
         final Handler[] middlewares = new Handler[]{permissionMidware::check};
 
         Dispatcher.get("/admin/auditlog", adminProcessor::showAuditlog, middlewares);
@@ -357,12 +378,18 @@ public class AdminProcessor {
         Dispatcher.get("/admin/add-user", adminProcessor::showAddUser, middlewares);
         Dispatcher.post("/admin/add-user", adminProcessor::addUser, middlewares);
         Dispatcher.post("/admin/user/{userId}", adminProcessor::updateUser, middlewares);
+        Dispatcher.post("/admin/user/{userId}/phone", adminProcessor::updateUserPhone, middlewares);
         Dispatcher.post("/admin/user/{userId}/email", adminProcessor::updateUserEmail, middlewares);
         Dispatcher.post("/admin/user/{userId}/username", adminProcessor::updateUserName, middlewares);
         Dispatcher.post("/admin/user/{userId}/charge-point", adminProcessor::chargePoint, middlewares);
         Dispatcher.post("/admin/user/{userId}/abuse-point", adminProcessor::abusePoint, middlewares);
         Dispatcher.post("/admin/user/{userId}/init-point", adminProcessor::initPoint, middlewares);
         Dispatcher.post("/admin/user/{userId}/exchange-point", adminProcessor::exchangePoint, middlewares);
+        Dispatcher.post("/admin/user/{userId}/adjust-bag", adminProcessor::adjustBag, middlewares);
+        Dispatcher.post("/admin/user/{userId}/give-metal", adminProcessor::giveMetal, middlewares);
+        Dispatcher.post("/admin/user/{userId}/remove-metal", adminProcessor::removeMetal, middlewares);
+        Dispatcher.post("/admin/user/{userId}/remove-mfa", adminProcessor::removeMFA, middlewares);
+        Dispatcher.post("/admin/user/toggle-metal", adminProcessor::toggleMetal, loginCheck::handle);
         Dispatcher.get("/admin/articles", adminProcessor::showArticles, middlewares);
         Dispatcher.get("/admin/article/{articleId}", adminProcessor::showArticle, middlewares);
         Dispatcher.post("/admin/article/{articleId}", adminProcessor::updateArticle, middlewares);
@@ -384,6 +411,98 @@ public class AdminProcessor {
         Dispatcher.post("/admin/domain/{domainId}/remove-tag", adminProcessor::removeDomainTag, middlewares);
         Dispatcher.post("/admin/search/index", adminProcessor::rebuildArticleSearchIndex, middlewares);
         Dispatcher.post("/admin/search-index-article", adminProcessor::rebuildOneArticleSearchIndex, middlewares);
+        Dispatcher.post("/admin/broadcast/warn", adminProcessor::warnBroadcast, middlewares);
+    }
+
+    /**
+     * Warn broadcast.
+     * @param context
+     */
+    public void warnBroadcast(final RequestContext context) {
+        final Request request = context.getRequest();
+        JSONObject currentUser = Sessions.getUser();
+        try {
+            currentUser = ApiProcessor.getUserByKey(context.param("apiKey"));
+        } catch (NullPointerException ignored) {
+        }
+        String username = currentUser.optString(User.USER_NAME);
+        String warnBroadcastText = context.param("warnBroadcastText");
+
+        // 发布紧急公告
+        // 弹窗警告
+        final JSONObject cmd = new JSONObject();
+        cmd.put(Common.COMMAND, "warnBroadcast");
+        cmd.put("warnBroadcastText", warnBroadcastText);
+        cmd.put("who", username);
+        UserChannel.sendCmdToAll(cmd);
+        // 聊天室消息警告
+        ChatRoomBot.sendBotMsg("## :warning::warning::warning::warning::warning::warning::warning::warning::warning::warning:\n### 摸鱼派社区紧急公告\n\n\n" + warnBroadcastText + "\n\n\n——紧急公告发布人：" + username + "\n## :warning::warning::warning::warning::warning::warning::warning::warning::warning::warning:");
+
+        LOGGER.log(Level.WARN, "{} has sent a warning broadcast [warnBroadcastText={}]", username, warnBroadcastText);
+        operationMgmtService.addOperation(Operation.newOperation(request, Operation.OPERATION_CODE_C_UPDATE_MISC, "Type=Broadcast"));
+        context.sendRedirect(Latkes.getServePath() + "/admin/misc");
+    }
+
+    /**
+     * Adjust bag item.
+     *
+     * @param context
+     */
+    public void adjustBag(final RequestContext context) {
+        final String userId = context.pathVar("userId");
+        final String item = context.param("item");
+        final int sum = Integer.parseInt(context.param("sum"));
+        final BeanManager beanManager = BeanManager.getInstance();
+        final CloudService cloudService = beanManager.getReference(CloudService.class);
+        cloudService.putBag(userId, item, sum, Integer.MAX_VALUE);
+        context.sendRedirect(Latkes.getServePath() + "/admin/user/" + userId);
+    }
+
+    public void giveMetal(final RequestContext context) {
+        final String userId = context.pathVar("userId");
+        final String name = context.param("name");
+        final String description = context.param("description");
+        final String attr = context.param("attr");
+        final String data = context.param("data");
+        final BeanManager beanManager = BeanManager.getInstance();
+        final CloudService cloudService = beanManager.getReference(CloudService.class);
+        cloudService.giveMetal(userId, name, description, attr, data);
+        context.sendRedirect(Latkes.getServePath() + "/admin/user/" + userId);
+    }
+
+    public void removeMFA(final RequestContext context) {
+        final String userId = context.pathVar("userId");
+        try {
+            final JSONObject user = userQueryService.getUser(userId);
+            user.put("secret2fa", "");
+            userMgmtService.updateUser(userId, user);
+        } catch (Exception ignored) {
+        }
+        context.sendRedirect(Latkes.getServePath() + "/admin/user/" + userId);
+    }
+
+    public void removeMetal(final RequestContext context) {
+        final String userId = context.pathVar("userId");
+        final String name = context.param("name");
+        final BeanManager beanManager = BeanManager.getInstance();
+        final CloudService cloudService = beanManager.getReference(CloudService.class);
+        cloudService.removeMetal(userId, name);
+        context.sendRedirect(Latkes.getServePath() + "/admin/user/" + userId);
+    }
+
+    public void toggleMetal(final RequestContext context) {
+        JSONObject currentUser = Sessions.getUser();
+        try {
+            currentUser = ApiProcessor.getUserByKey(context.param("apiKey"));
+        } catch (NullPointerException ignored) {
+        }
+        final String userId = currentUser.optString(Keys.OBJECT_ID);
+        final String name = context.param("name");
+        final boolean enabled = Boolean.parseBoolean(context.param("enabled"));
+        final BeanManager beanManager = BeanManager.getInstance();
+        final CloudService cloudService = beanManager.getReference(CloudService.class);
+        cloudService.toggleMetal(userId, name, enabled);
+        context.renderJSON(StatusCodes.SUCC);
     }
 
     /**
@@ -442,6 +561,19 @@ public class AdminProcessor {
     public void makeReportHandled(final RequestContext context) {
         final String reportId = context.pathVar("reportId");
         final Request request = context.getRequest();
+        final JSONObject currentUser = userQueryService.getCurrentUser(request);
+        final String adminUserId = currentUser.optString(Keys.OBJECT_ID);
+        try {
+            final JSONObject report = reportRepository.get(reportId);
+            final String reporterId = report.optString(Report.REPORT_USER_ID);
+            if (reporterId.equals(adminUserId)) {
+                context.sendRedirect(Latkes.getServePath() + "/admin/reports");
+                return;
+            }
+        } catch (final Exception e) {
+            LOGGER.log(Level.ERROR, "Makes report [id=" + reportId + "] as ignored failed", e);
+        }
+
         reportMgmtService.makeReportHandled(reportId);
         operationMgmtService.addOperation(Operation.newOperation(request, Operation.OPERATION_CODE_C_MAKE_REPORT_HANDLED, reportId));
 
@@ -1319,6 +1451,9 @@ public class AdminProcessor {
         final List<JSONObject> roles = (List<JSONObject>) result.opt(Role.ROLES);
         dataModel.put(Role.ROLES, roles);
 
+        dataModel.put("sysBag", cloudService.getBag(userId));
+        dataModel.put("sysMetal", cloudService.getMetal(userId));
+
         dataModelService.fillHeaderAndFooter(context, dataModel);
     }
 
@@ -1443,6 +1578,7 @@ public class AdminProcessor {
                 case UserExt.USER_UA_STATUS:
                 case UserExt.USER_JOIN_POINT_RANK:
                 case UserExt.USER_JOIN_USED_POINT_RANK:
+                case UserExt.CHAT_ROOM_PICTURE_STATUS:
                 case UserExt.USER_FORWARD_PAGE_STATUS:
                     user.put(name, Integer.valueOf(value));
                     break;
@@ -1460,12 +1596,17 @@ public class AdminProcessor {
 
         final JSONObject currentUser = Sessions.getUser();
         // 仅允许管理员和OP修改用户所属分组
-        if (
-                ! Role.ROLE_ID_C_ADMIN.equals(currentUser.optString(User.USER_ROLE))
-                &&
-                ! "1630552921050".equals(currentUser.optString(User.USER_ROLE))
+        if (!Role.ROLE_ID_C_ADMIN.equals(currentUser.optString(User.USER_ROLE))
+            &&
+            !"1630552921050".equals(currentUser.optString(User.USER_ROLE))
         ) {
             user.put(User.USER_ROLE, oldRole);
+        }
+
+        if (!Role.ROLE_ID_C_ADMIN.equals(currentUser.optString(User.USER_ROLE))) {
+            if (user.optString(User.USER_ROLE).equals(Role.ROLE_ID_C_ADMIN)) {
+                user.put(User.USER_ROLE, oldRole);
+            }
         }
 
         try {
@@ -1476,7 +1617,45 @@ public class AdminProcessor {
             return;
         }
 
+        dataModel.put("sysBag", cloudService.getBag(userId));
+        dataModel.put("sysMetal", cloudService.getMetal(userId));
+
         dataModelService.fillHeaderAndFooter(context, dataModel);
+    }
+
+    /**
+     * Updates a user's phone.
+     *
+     * @param context the specified context
+     */
+    public void updateUserPhone(final RequestContext context) {
+        final String userId = context.pathVar("userId");
+        final Request request = context.getRequest();
+
+        final JSONObject user = userQueryService.getUser(userId);
+        final String oldPhone = user.optString("userPhone");
+        final String newPhone = context.param("userPhone");
+
+        if (oldPhone.equals(newPhone)) {
+            context.sendRedirect(Latkes.getServePath() + "/admin/user/" + userId);
+            return;
+        }
+
+        user.put("userPhone", newPhone);
+
+        try {
+            userMgmtService.updateUserPhone(userId, user);
+            operationMgmtService.addOperation(Operation.newOperation(request, Operation.OPERATION_CODE_C_UPDATE_USER_EMAIL, userId));
+        } catch (final ServiceException e) {
+            final AbstractFreeMarkerRenderer renderer = new SkinRenderer(context, "admin/error.ftl");
+            final Map<String, Object> dataModel = renderer.getDataModel();
+
+            dataModel.put(Keys.MSG, e.getMessage());
+            dataModelService.fillHeaderAndFooter(context, dataModel);
+            return;
+        }
+
+        context.sendRedirect(Latkes.getServePath() + "/admin/user/" + userId);
     }
 
     /**
@@ -1560,7 +1739,6 @@ public class AdminProcessor {
 
         final String pointStr = context.param(Common.POINT);
         final String memo = context.param("memo");
-
         if (StringUtils.isBlank(pointStr) || StringUtils.isBlank(memo) || !Strings.isNumeric(memo.split("-")[0])) {
             LOGGER.warn("Charge point memo format error");
 
@@ -1579,6 +1757,15 @@ public class AdminProcessor {
             notification.put(Notification.NOTIFICATION_USER_ID, userId);
             notification.put(Notification.NOTIFICATION_DATA_ID, transferId);
             notificationMgmtService.addPointChargeNotification(notification);
+            // 保存捐赠记录
+            final JSONObject record = new JSONObject();
+            record.put(UserExt.USER_T_ID, userId);
+            record.put("time", System.currentTimeMillis());
+            final String[] memos = memo.split("-");
+            final String message = memos.length < 2 || StringUtils.isBlank(memos[1]) ? "没有填写捐助信息 :)" : memo.split("-")[1];
+            record.put(Sponsor.SPONSOR_MESSAGE, message);
+            record.put(Sponsor.AMOUNT, Double.parseDouble(memos[0]));
+            sponsorService.add(record);
         } catch (final NumberFormatException | ServiceException e) {
             final AbstractFreeMarkerRenderer renderer = new SkinRenderer(context, "admin/error.ftl");
             final Map<String, Object> dataModel = renderer.getDataModel();

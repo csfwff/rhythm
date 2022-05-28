@@ -1,6 +1,7 @@
 <#--
 
-    Symphony - A modern community (forum/BBS/SNS/blog) platform written in Java.
+    Rhythm - A modern community (forum/BBS/SNS/blog) platform written in Java.
+    Modified version from Symphony, Thanks Symphony :)
     Copyright (C) 2012-present, b3log.org
 
     This program is free software: you can redistribute it and/or modify
@@ -27,19 +28,19 @@
     <div class="module-panel">
         <ul class="module-list">
             <li>
-                <a href="${servePath}/about">${getStartLabel}</a>
+                <a href="${servePath}/article/1630569106133">${getStartLabel}</a>
                 <span class="ft-gray">${getStartTipLabel}</span>
             </li>
             <li>
-                <a href="${servePath}/about">${basicLabel}</a>
+                <a href="${servePath}/article/1630575841478">${basicLabel}</a>
                 <span class="ft-gray">${basicTipLabel}</span>
             </li>
             <li>
-                <a href="${servePath}/about">${hotKeyLabel}</a>
+                <a href="${servePath}/article/1631459254239">${hotKeyLabel}</a>
                 <span class="ft-gray">${hotKeyTipLabel}</span>
             </li>
             <li>
-                <a href="${servePath}/about">Markdown ${tutorialLabel}</a>
+                <a href="${servePath}/article/1631460144004">Markdown ${tutorialLabel}</a>
                 <span class="ft-gray">${markdownTutorialTipLabel}</span>
             </li>
         </ul>

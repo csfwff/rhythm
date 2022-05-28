@@ -1,5 +1,6 @@
 /*
- * Symphony - A modern community (forum/BBS/SNS/blog) platform written in Java.
+ * Rhythm - A modern community (forum/BBS/SNS/blog) platform written in Java.
+ * Modified version from Symphony, Thanks Symphony :)
  * Copyright (C) 2012-present, b3log.org
  *
  * This program is free software: you can redistribute it and/or modify
@@ -17,6 +18,11 @@
  */
 package org.b3log.symphony.service;
 
+import com.tencentcloudapi.common.Credential;
+import com.tencentcloudapi.common.exception.TencentCloudSDKException;
+import com.tencentcloudapi.sms.v20210111.SmsClient;
+import com.tencentcloudapi.sms.v20210111.models.SendSmsRequest;
+import com.tencentcloudapi.sms.v20210111.models.SendSmsResponse;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -34,6 +40,7 @@ import org.b3log.symphony.model.Verifycode;
 import org.b3log.symphony.repository.UserRepository;
 import org.b3log.symphony.repository.VerifycodeRepository;
 import org.b3log.symphony.util.Mails;
+import org.b3log.symphony.util.Symphonys;
 import org.json.JSONObject;
 
 import java.util.*;
@@ -183,6 +190,36 @@ public class VerifycodeMgmtService {
             }
         } catch (final RepositoryException e) {
             LOGGER.log(Level.ERROR, "Sends verifycode failed", e);
+        }
+    }
+
+    public boolean sendVerifyCodeSMS(String phone, String code) {
+        return sendMsg(new String[]{phone}, new String[]{code});
+    }
+
+    public boolean sendMsg(String[] phoneNumber, String[] templateParam) {
+        if (Latkes.getRuntimeMode().equals(Latkes.RuntimeMode.DEVELOPMENT)) {
+            LOGGER.log(Level.INFO, "开发模式不真正发送短信，发送的手机号为：{}，当前短信验证码为：{}", phoneNumber, templateParam);
+            return true;
+        } else {
+            Credential cred = new Credential(Symphonys.TEN_SMS_SECRET_ID, Symphonys.TEN_SMS_SECRET_KEY);
+            SmsClient client = new SmsClient(cred, Symphonys.TEN_SMS_DIYU);
+            SendSmsRequest req = new SendSmsRequest();
+            req.setSmsSdkAppId(Symphonys.TEN_SMS_SDK_APPID);
+            req.setSignName(Symphonys.TEN_SMS_SIGN_NAME);
+            req.setTemplateId(Symphonys.TEN_SMS_TEMPLATE_ID);
+            req.setPhoneNumberSet(phoneNumber);
+            req.setTemplateParamSet(templateParam);
+            SendSmsResponse res = null;
+            try {
+                res = client.SendSms(req);
+            } catch (TencentCloudSDKException e) {
+                LOGGER.log(Level.ERROR, "Unable send SMS [phoneNumber={}, templateParam={}]", phoneNumber, templateParam);
+                return false;
+            }
+            assert res != null;
+            LOGGER.log(Level.INFO, SendSmsResponse.toJsonString(res));
+            return true;
         }
     }
 }

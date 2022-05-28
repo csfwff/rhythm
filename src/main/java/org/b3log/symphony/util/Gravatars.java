@@ -1,5 +1,6 @@
 /*
- * Symphony - A modern community (forum/BBS/SNS/blog) platform written in Java.
+ * Rhythm - A modern community (forum/BBS/SNS/blog) platform written in Java.
+ * Modified version from Symphony, Thanks Symphony :)
  * Copyright (C) 2012-present, b3log.org
  *
  * This program is free software: you can redistribute it and/or modify
@@ -59,7 +60,7 @@ public final class Gravatars {
             }
 
             final HttpResponse response = HttpRequest.get("http://www.gravatar.com/avatar/" + h + "?s=256&d=" + d[RandomUtils.nextInt(d.length)]).
-                    connectionTimeout(5000).timeout(5000).send();
+                    connectionTimeout(2000).timeout(2000).send();
             if (200 != response.statusCode()) {
                 LOGGER.log(Level.WARN, "Gets avatar data failed [sc=" + response.statusCode() + "]");
 

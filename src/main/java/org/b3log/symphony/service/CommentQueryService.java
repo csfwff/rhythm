@@ -1,5 +1,6 @@
 /*
- * Symphony - A modern community (forum/BBS/SNS/blog) platform written in Java.
+ * Rhythm - A modern community (forum/BBS/SNS/blog) platform written in Java.
+ * Modified version from Symphony, Thanks Symphony :)
  * Copyright (C) 2012-present, b3log.org
  *
  * This program is free software: you can redistribute it and/or modify
@@ -108,6 +109,11 @@ public class CommentQueryService {
     @Inject
     private ShortLinkQueryService shortLinkQueryService;
 
+    /**
+     * Cloud service.
+     */
+    @Inject
+    private CloudService cloudService;
 
     /**
      * Gets the URL of a comment.
@@ -626,6 +632,15 @@ public class CommentQueryService {
             try {
                 for (final JSONObject comment : ret) {
                     final String commentId = comment.optString(Keys.OBJECT_ID);
+                    String commentAuthorId = comment.optString(Comment.COMMENT_AUTHOR_ID);
+                    String metal = cloudService.getEnabledMetal(commentAuthorId);
+
+                    if (!metal.equals("{}")) {
+                        List<Object> list = new JSONObject(metal).optJSONArray("list").toList();
+                        comment.put("sysMetal", list);
+                    } else {
+                        comment.put("sysMetal", new ArrayList<>());
+                    }
 
                     // Fill revision count
                     comment.put(Comment.COMMENT_REVISION_COUNT, 0);
@@ -660,6 +675,47 @@ public class CommentQueryService {
             return ret;
         } catch (final RepositoryException e) {
             LOGGER.log(Level.ERROR, "Gets article [" + articleId + "] comments failed", e);
+
+            return Collections.emptyList();
+        } finally {
+            Stopwatchs.end();
+        }
+    }
+
+    /**
+     * Gets the article commentors with the specified article id, page number and page size.
+     *
+     * @param articleId      the specified article id
+     * @return comments, return an empty list if not found
+     */
+    public List<JSONObject> getArticleCommentors(final String articleId) {
+        final Query query = new Query().
+                setFilter(new PropertyFilter(Comment.COMMENT_ON_ARTICLE_ID, FilterOperator.EQUAL, articleId)).
+                addSort(Keys.OBJECT_ID, SortDirection.DESCENDING).
+                select(Comment.COMMENT_AUTHOR_ID);
+
+        try {
+            Stopwatchs.start("Query comments");
+            JSONObject result;
+            try {
+                result = commentRepository.get(query);
+            } finally {
+                Stopwatchs.end();
+            }
+            final List<JSONObject> ret = (List<JSONObject>) result.opt(Keys.RESULTS);
+            final HashSet<String> hashRet = new HashSet<>();
+            for (JSONObject r : ret) {
+                hashRet.add(r.optString(Comment.COMMENT_AUTHOR_ID));
+            }
+
+            final List<JSONObject> fRet = new ArrayList<>();
+            for (String h : hashRet) {
+                fRet.add(userQueryService.getUser(h));
+            }
+
+            return (List<JSONObject>)fRet;
+        } catch (final RepositoryException e) {
+            LOGGER.log(Level.ERROR, "Gets article [" + articleId + "] commentors failed", e);
 
             return Collections.emptyList();
         } finally {
@@ -813,6 +869,16 @@ public class CommentQueryService {
             comment.put(Comment.COMMENT_T_AUTHOR_URL, author.optString(User.USER_URL));
             final String thumbnailURL = avatarQueryService.getAvatarURLByUser(author, "48");
             comment.put(Comment.COMMENT_T_AUTHOR_THUMBNAIL_URL, thumbnailURL);
+
+            final String authorId = comment.optString(Comment.COMMENT_AUTHOR_ID);
+            String metal = cloudService.getEnabledMetal(authorId);
+
+            if (!metal.equals("{}")) {
+                List<Object> list = new JSONObject(metal).optJSONArray("list").toList();
+                comment.put("sysMetal", list);
+            } else {
+                comment.put("sysMetal", new ArrayList<>());
+            }
 
             processCommentContent(comment);
         } finally {

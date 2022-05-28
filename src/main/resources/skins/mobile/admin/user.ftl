@@ -1,6 +1,7 @@
 <#--
 
-    Symphony - A modern community (forum/BBS/SNS/blog) platform written in Java.
+    Rhythm - A modern community (forum/BBS/SNS/blog) platform written in Java.
+    Modified version from Symphony, Thanks Symphony :)
     Copyright (C) 2012-present, b3log.org
 
     This program is free software: you can redistribute it and/or modify
@@ -251,6 +252,15 @@
             <h2>${advancedUpdateLabel}</h2>
         </div>
         <div class="module-panel form fn-clear">
+            <form action="${servePath}/admin/user/${user.oId}/phone" method="POST">
+                <label for="userPhone">手机号码</label>
+                <input type="text" id="userPhone" name="userPhone" value="${user.userPhone}"/>
+
+                <br/><br/>
+                <button type="submit" class="green fn-right">${submitLabel}</button>
+            </form>
+            <br/>
+
             <form action="${servePath}/admin/user/${user.oId}/email" method="POST">
                 <label for="userEmail">${userEmailLabel}</label>
                 <input type="text" id="userEmail" name="userEmail" value="${user.userEmail}" />
@@ -351,5 +361,118 @@
             </form>
         </div>
     </div>
+
+    <#if permissions["userAdjustBag"].permissionGrant>
+    <div class="module">
+        <div class="module-header">
+            <h2>物品发放</h2>
+        </div>
+        <div class="module-panel form fn-clear">
+            <form action="${servePath}/admin/user/${user.oId}/adjust-bag" method="POST">
+                <label>${userNameLabel}</label>
+                <input type="text" name="userName" value="${user.userName}" readonly class="input--admin-readonly"/>
+                <label>物品名称</label>
+                <input type="text" name="item" value=""/>
+                <label>数量</label>
+                <input type="text" name="sum" value=""/>
+
+                <br/><br/>
+                <button type="submit" class="green fn-right">${submitLabel}</button>
+            </form>
+        </div>
+    </div>
+    </#if>
+
+    <#if permissions["userGiveMetal"].permissionGrant>
+    <div class="module">
+        <div class="module-header">
+            <h2>勋章发放</h2>
+        </div>
+        <div class="module-panel form fn-clear form--admin">
+            <form action="${servePath}/admin/user/${user.oId}/give-metal" method="POST">
+                <div class="fn__flex">
+                    <label>
+                        <div>${userNameLabel}</div>
+                        <input type="text" name="userName" value="${user.userName}" readonly class="input--admin-readonly"/>
+                    </label>
+                </div>
+                <div class="fn__flex">
+                    <label class="mid">
+                        <div>勋章名称</div>
+                        <input type="text" name="name" value=""/>
+                    </label>
+                    <label>
+                        <div>描述</div>
+                        <input type="text" name="description" value=""/>
+                    </label>
+                </div>
+                <div class="fn__flex">
+                    <label class="mid">
+                        <div>属性</div>
+                        <input type="text" name="attr" value=""/>
+                    </label>
+                    <label>
+                        <div>数据</div>
+                        <input type="text" name="data" value=""/>
+                    </label>
+                </div>
+                <br/>
+                <button type="submit" class="green fn-right">${submitLabel}</button>
+            </form>
+            <div style="float: left;font-size: 12px;color: rgba(0,0,0,0.38);">
+                当前用户勋章数据：<br>
+                ${sysMetal}<br>
+                属性示例：<br>
+                url=[图标URL]&backcolor=0000ff&fontcolor=ffffff<br>
+                数据示例：<br>
+                暂时无需填写，留空即可
+            </div>
+        </div>
+    </div>
+    </#if>
+
+    <#if permissions["userRemoveMetal"].permissionGrant>
+    <div class="module">
+        <div class="module-header">
+            <h2>勋章移除</h2>
+        </div>
+        <div class="module-panel form fn-clear form--admin">
+            <form action="${servePath}/admin/user/${user.oId}/remove-metal" method="POST">
+                <div class="fn__flex">
+                    <label>
+                        <div>${userNameLabel}</div>
+                        <input type="text" name="userName" value="${user.userName}" readonly class="input--admin-readonly"/>
+                    </label>
+                    <label class="mid">
+                        <div>勋章名称</div>
+                        <input type="text" name="name" value=""/>
+                    </label>
+                </div>
+                <br/>
+                <button type="submit" class="green fn-right">${submitLabel}</button>
+            </form>
+        </div>
+    </div>
+    </#if>
+
+    <#if permissions["userRemoveMFA"].permissionGrant>
+    <div class="module">
+        <div class="module-header">
+            <h2>两步认证令牌移除</h2>
+        </div>
+        <div class="module-panel form fn-clear form--admin">
+            <form action="${servePath}/admin/user/${user.oId}/remove-mfa" method="POST">
+                <div class="fn__flex">
+                    <label>
+                        <div>${userNameLabel}</div>
+                        <input type="text" name="userName" value="${user.userName}" readonly class="input--admin-readonly"/>
+                    </label>
+                </div>
+                <br/>
+                <button type="submit" class="green fn-right">${submitLabel}</button>
+            </form>
+        </div>
+    </div>
+    </#if>
 </div>
 </@admin>

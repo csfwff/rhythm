@@ -1,6 +1,7 @@
 <#--
 
-    Symphony - A modern community (forum/BBS/SNS/blog) platform written in Java.
+    Rhythm - A modern community (forum/BBS/SNS/blog) platform written in Java.
+    Modified version from Symphony, Thanks Symphony :)
     Copyright (C) 2012-present, b3log.org
 
     This program is free software: you can redistribute it and/or modify
@@ -37,7 +38,7 @@
                     <div class="list module">
                         <#if unreadNotificationCnt &gt; 0>
                             <div onclick="Settings.makeAllNotificationsRead()"
-                                  aria-label="${makeAllAsReadLabel}" class="mark-as-read tooltipped tooltipped-w home-side-read">
+                                  aria-label="${makeAllAsReadLabel}" class="mark-as-read tooltipped tooltipped-es home-side-read">
                                 ${makeAllAsReadLabel}
                                 <svg><use xlink:href="#check"></use></svg>
                             </div>

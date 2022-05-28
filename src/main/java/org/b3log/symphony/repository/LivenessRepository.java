@@ -1,5 +1,6 @@
 /*
- * Symphony - A modern community (forum/BBS/SNS/blog) platform written in Java.
+ * Rhythm - A modern community (forum/BBS/SNS/blog) platform written in Java.
+ * Modified version from Symphony, Thanks Symphony :)
  * Copyright (C) 2012-present, b3log.org
  *
  * This program is free software: you can redistribute it and/or modify
@@ -21,6 +22,8 @@ import org.b3log.latke.repository.*;
 import org.b3log.latke.repository.annotation.Repository;
 import org.b3log.symphony.model.Liveness;
 import org.json.JSONObject;
+
+import java.util.List;
 
 /**
  * Liveness repository.
@@ -62,5 +65,12 @@ public class LivenessRepository extends AbstractRepository {
                 new PropertyFilter(Liveness.LIVENESS_USER_ID, FilterOperator.EQUAL, userId),
                 new PropertyFilter(Liveness.LIVENESS_DATE, FilterOperator.EQUAL, date))).setPageCount(1);
         return getFirst(query);
+    }
+
+    public List<JSONObject> getByDate(final String date) throws RepositoryException {
+        final Query query = new Query().setFilter(
+                new PropertyFilter(Liveness.LIVENESS_DATE, FilterOperator.EQUAL, date)
+        );
+        return getList(query);
     }
 }

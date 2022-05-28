@@ -1,6 +1,7 @@
 <#--
 
-    Symphony - A modern community (forum/BBS/SNS/blog) platform written in Java.
+    Rhythm - A modern community (forum/BBS/SNS/blog) platform written in Java.
+    Modified version from Symphony, Thanks Symphony :)
     Copyright (C) 2012-present, b3log.org
 
     This program is free software: you can redistribute it and/or modify
@@ -40,7 +41,6 @@
                             <a href="${servePath}/member/${user.userName}/points">
                                 ${user.userPoint?c}
                             </a>
-                            ~ ${yuanLabel}${user.money?c}
                         </div>
                     </div>
                     <div class="ft-gray">

@@ -1,5 +1,6 @@
 /*
- * Symphony - A modern community (forum/BBS/SNS/blog) platform written in Java.
+ * Rhythm - A modern community (forum/BBS/SNS/blog) platform written in Java.
+ * Modified version from Symphony, Thanks Symphony :)
  * Copyright (C) 2012-present, b3log.org
  *
  * This program is free software: you can redistribute it and/or modify
@@ -29,6 +30,110 @@
  * @static
  */
 var Util = {
+  bling: undefined,
+  isBlinging: false,
+
+  /**
+   * 插入紧急公告模板
+   * @param num
+   */
+  insertWarnBroadcastModel: function (num) {
+    let model = '';
+    switch (num) {
+      case 1:
+        model = '摸鱼派社区即将进行升级维护，预计停服时间：<b>5分钟</b><br>' +
+            '维护完成后摸鱼派将自动刷新（客户端请手动重新登录），感谢你的理解～<br>' +
+            '摸鱼这么久了，去给自己倒杯咖啡吧 ☕️';
+        break;
+      case 2:
+        model = '摸鱼派社区即将进行升级维护，预计停服时间：<b>20秒</b><br>' +
+            '维护完成后摸鱼派将自动刷新（客户端请手动重新登录），感谢你的理解～<br>' +
+            '摸鱼这么久了，去给自己倒杯咖啡吧 ☕️';
+        break;
+    }
+    $("[name='warnBroadcastText']").val(model);
+  },
+
+  genMetal(name, attr) {
+    if (attr !== undefined && attr !== '') {
+      attr = '&' + attr;
+    } else {
+      attr = '';
+    }
+    return 'https://fishpi.cn/gen?scale=0.79&txt=' + name + attr;
+  },
+
+  parseDom(arg) {
+    var objE = document.createElement("div");
+    objE.innerHTML = arg;
+    return objE.childNodes;
+  },
+
+  parseArray(arrStr) {
+    var tempKey = 'arr23' + new Date().getTime();//arr231432350056527
+    var arrayJsonStr = '{"' + tempKey + '":' + arrStr + '}';
+    var arrayJson;
+    if (JSON && JSON.parse) {
+      arrayJson = JSON.parse(arrayJsonStr);
+    } else {
+      arrayJson = eval('(' + arrayJsonStr + ')');
+    }
+    return arrayJson[tempKey];
+  },
+
+  fadeIn(element, callback) {
+    let opacity = 0;
+    for (let i = 0; i < 100; i++) {
+      setTimeout(function () {
+        opacity = +(opacity + 0.01).toFixed(2);
+        element.style.opacity = opacity;
+        if (i === 99) {
+          setTimeout(callback, 200);
+        }
+      }, i * 5);
+    }
+  },
+
+  fadeOut(element, callback) {
+    let opacity = 1;
+    for (let i = 0; i < 100; i++) {
+      setTimeout(function () {
+        opacity = +(opacity - 0.01).toFixed(2);
+        element.style.opacity = opacity;
+        if (i === 99) {
+          setTimeout(callback, 400);
+        }
+      }, i * 5);
+    }
+  },
+
+  getAtUsers: function (key) {
+    var atUsers = [];
+    $.ajax({
+      url: Label.servePath + '/users/names',
+      type: 'POST',
+      async: false,
+      data: JSON.stringify({name: key}),
+      success: function (result) {
+        if (result.code === 0) {
+          for (var i = 0; i < result.data.length; i++) {
+            atUsers.push({
+              value: '@' + result.data[i].userName + " ",
+              html: '<img src="' + result.data[i].userAvatarURL +
+                  '"/>' +
+                  result.data[i].userName,
+              avatar: result.data[i].userAvatarURL,
+              username: result.data[i].userName
+            });
+          }
+        } else {
+          alert(result.msg);
+        }
+      },
+    });
+    return atUsers;
+  },
+
   LazyLoadImage: function () {
     var loadImg = function (it) {
       var testImage = document.createElement('img')
@@ -197,22 +302,30 @@ var Util = {
    * @description 关闭 alert
    */
   closeAlert: function () {
-    var $alert = $('#alertDialogPanel')
-    $alert.prev().remove()
-    $alert.remove()
+    $("#alertDialogPanel,.dialog-background").fadeOut(200);
+    setTimeout(function () {
+      $("#alertDialogPanel,.dialog-background").remove();
+    }, 200);
+  },
+
+  clearAlert() {
+    $("#alertDialogPanel,.dialog-background").remove();
   },
   /**
    * @description alert
    * @param {String} content alert 内容
    */
-  alert: function (content) {
+  alert: function (content, title) {
+    if (title === undefined) {
+      title = "";
+    }
     var alertHTML = '',
       alertBgHTML = '<div onclick="Util.closeAlert(this)" style="height: ' +
         document.documentElement.scrollHeight
         + 'px;display: block;" class="dialog-background"></div>',
       alertContentHTML = '<div class="dialog-panel" id="alertDialogPanel" tabindex="0">'
         +
-        '<div class="fn-clear dialog-header-bg"><a class="icon-close" href="javascript:void(0);" onclick="Util.closeAlert()"><svg><use xlink:href="#close"></use></svg></a></div>'
+        '<div class="fn-clear dialog-header-bg"><span style="font-size: 14px;">' + title + '</span><a class="icon-close" href="javascript:void(0);" onclick="Util.closeAlert()"><svg><use xlink:href="#close"></use></svg></a></div>'
         +
         '<div class="dialog-main" style="text-align:center;padding: 30px 10px 40px">' +
         content + '</div></div>'
@@ -225,7 +338,7 @@ var Util = {
       'top': ($(window).height() - $('#alertDialogPanel').height()) / 2 + 'px',
       'left': ($(window).width() - $('#alertDialogPanel').width()) / 2 + 'px',
       'outline': 'none',
-    }).show().focus()
+    }).fadeIn(200).focus()
   },
   /**
    * @description 标记指定类型的消息通知为已读状态.
@@ -353,7 +466,7 @@ var Util = {
       return false
     }).bind('keyup', 'Shift+/', function (event) {
       // shift/⇧ ? 新窗口打开键盘快捷键说明文档
-      window.open(Label.servePath + '/about')
+      window.open(Label.servePath + '/article/1631459254239')
       return false
     }).bind('keyup', 'j', function (event) {
       // j 移动到下一项
@@ -658,7 +771,6 @@ var Util = {
       upload: {
         max: Label.fileMaxSize,
         url: Label.servePath + '/upload',
-        linkToImgUrl: Label.servePath + '/fetch-upload',
         filename: function (name) {
           return name.replace(/\?|\\|\/|:|\||<|>|\*|\[|\]|\s+/g, '-')
         },
@@ -1213,6 +1325,15 @@ var Util = {
    * @description 初识化前台页面
    */
   init: function (isLoggedIn) {
+    // 初始化用户卡片
+    $.ua.set(navigator.userAgent);
+    if ($.ua.device.type !== 'mobile') {
+      let cardHtml = '' +
+          '<div id="userCard" style="position: absolute; z-index: 130; right: auto; display: none; ">' +
+          '</div>';
+      $("body").append(cardHtml);
+      Util.listenUserCard();
+    }
     //禁止 IE7 以下浏览器访问
     this._kill()
     // 导航
@@ -1277,17 +1398,208 @@ var Util = {
     })
   },
   /**
+   * @description 监听用户名片
+   */
+  userCardCache: new Map(),
+  listenUserCard: function () {
+    var cardLock = false;
+    $(".avatar, .avatar-small, .avatar-middle, .avatar-mid, .avatar-big, .name-at").unbind();
+
+    $(".avatar, .avatar-small, .avatar-middle, .avatar-mid, .avatar-big, .name-at").hover(function () {
+      // 加载用户信息
+      if ($(this).attr("aria-label") !== undefined) {
+        let username = $(this).attr("aria-label");
+        // 请求数据
+        let data;
+        if (Util.userCardCache.has(username)) {
+          data = Util.userCardCache.get(username);
+        } else {
+          $.ajax({
+            url: Label.servePath + "/user/" + username,
+            type: "GET",
+            cache: false,
+            async: false,
+            headers: {'csrfToken': Label.csrfToken},
+            success: function (result) {
+              data = result;
+              Util.userCardCache.set(username, data);
+            }
+          });
+        }
+        let followerCount = data.followerCount;
+        let followingUserCount = data.followingUserCount;
+        let oId = data.oId;
+        let onlineMinute = data.onlineMinute;
+        let userAvatarURL = data.userAvatarURL;
+        let userCity = data.userCity;
+        let userIntro = data.userIntro;
+        let userName = data.userName;
+        let userNickname = data.userNickname;
+        let userOnlineFlag = data.userOnlineFlag;
+        let userPoint = data.userPoint;
+        let userURL = data.userURL;
+        let userRole = data.userRole;
+        let cardBg = data.cardBg;
+        let canFollow = data.canFollow;
+        let userNo = data.userNo;
+        let userAppRole = data.userAppRole;
+        let sysMetal = JSON.parse(data.sysMetal);
+        // 组合内容
+        let html = "" +
+            '<div class="user-card" id="userCardContent">\n' +
+            '    <div>\n' +
+            '        <a href="' + Label.servePath + '/member/' + userName + '">\n' +
+            '            <div class="avatar-mid-card" style="background-image: url(' + userAvatarURL + ');"></div>\n' +
+            '        </a>\n' +
+            '        <div class="user-card__meta">\n' +
+            '            <div class="fn__ellipsis">\n' +
+            '                <a class="user-card__name" href="' + Label.servePath + '/member/' + userName + '"><b>' + userNickname + '</b></a>\n' +
+            '                <a class="ft-gray ft-smaller" href="' + Label.servePath + '/member/' + userName + '"><b>' + userName + '</b></a>\n';
+        html += '            </div>\n';
+        if (userIntro !== "") {
+          html += '' +
+              '            <div class="user-card__info vditor-reset">\n' +
+              '                ' + userIntro + '\n' +
+              '            </div>\n';
+        } else {
+          if (userAppRole === "0") {
+            html += '<div class="user-card__info vditor-reset">' +
+                '摸鱼派 ' + userNo + ' 号成员，<b>黑客</b>' +
+                '</div>\n';
+          } else if (userAppRole === "1") {
+            html += '<div class="user-card__info vditor-reset">' +
+                '摸鱼派 ' + userNo + ' 号成员，<b>画家</b>' +
+                '</div>\n';
+          }
+        }
+        let list = sysMetal.list;
+        if (list !== undefined && list.length !== 0) {
+          html += '<div class="user-card__info vditor-reset">';
+          for (let i = 0; i < list.length; i++) {
+            let m = list[i];
+            html += "<img title='" + m.description + "' src='" + Util.genMetal(m.name, m.attr) + "'/>";
+          }
+          html += '</div>';
+        }
+        html += '            <div class="user-card__icons fn__flex">\n' +
+            '                <div class="fn__flex-1">\n' +
+            '                    <a href="https://fishpi.cn/article/1630575841478" class="tooltipped__n tooltipped-new"\n' +
+            '                       aria-label="用户分组：' + userRole + '">\n';
+        switch (userRole) {
+          case '管理员':
+            html += '<img style="height: 20px;margin: 0px;" src="https://pwl.stackoverflow.wiki/adminRole.png"/>';
+            break;
+          case 'OP':
+            html += '<img style="height: 20px;margin: 0px;" src="https://pwl.stackoverflow.wiki/opRole.png"/>';
+            break;
+          case '纪律委员':
+            html += '<img style="height: 20px;margin: 0px;" src="https://pwl.stackoverflow.wiki/policeRole.png"/>';
+            break;
+          case '超级会员':
+            html += '<img style="height: 20px;margin: 0px;" src="https://pwl.stackoverflow.wiki/svipRole.png"/>';
+            break;
+          case '成员':
+            html += '<img style="height: 20px;margin: 0px;" src="https://pwl.stackoverflow.wiki/vipRole.png"/>';
+            break;
+          default:
+            html += '<img style="height: 20px;margin: 0px;" src="https://pwl.stackoverflow.wiki/newRole.png"/>';
+            break;
+        }
+        html += '                    </a>\n';
+        html += '                    <a href="' + Label.servePath + '/member/' + userName + '/points" class="tooltipped-new tooltipped__n"\n' +
+            '                       aria-label="' + userPoint + ' 积分">\n' +
+            '                        <svg>\n' +
+            '                            <use xlink:href="#iconPoints"></use>\n' +
+            '                        </svg>\n' +
+            '                    </a>\n';
+        if (userCity !== "") {
+          html += '' +
+              '<a href="' + Label.servePath + '/city/' + userCity + '" class="tooltipped-new tooltipped__n" rel="nofollow"\n' +
+              '   aria-label="' + userCity + '">\n' +
+              '    <svg>\n' +
+              '        <use xlink:href="#icon-local"></use>\n' +
+              '    </svg>\n' +
+              '</a>\n';
+        }
+        html += '' +
+            '                </div>\n';
+        if (userOnlineFlag === true) {
+          html += '<span style="background-color:#d23f31;color:#fff;font-size:12px;line-height:20px;border-radius:3px;height:20px;display:inline-block;padding:0 5px;vertical-align:middle;box-sizing:border-box;">在线</span>';
+        } else {
+          html += '<span style="background-color:rgba(0,0,0,0.54);color:#fff;font-size:12px;line-height:20px;border-radius:3px;height:20px;display:inline-block;padding:0 5px;vertical-align:middle;box-sizing:border-box;">离线</span>';
+        }
+        html += '                <div class="fn__shrink">\n' +
+            '                    <a class="green small btn" href="' + Label.servePath + '/idle-talk?toUser=' + userName + '" rel="nofollow">\n' +
+            '                        私信\n' +
+            '                    </a>\n';
+        if (canFollow === "yes") {
+          html += '' +
+              '<button class="follow small" onclick="Util.follow(this, \'' + oId + '\', \'user\')">\n' +
+              ' 关注\n' +
+              '</button>';
+        } else if (canFollow === "no") {
+          html += '' +
+              '<button class="follow small" onclick="Util.unfollow(this, \'' + oId + '\', \'user\')">\n' +
+              ' 取消关注\n' +
+              '</button>';
+        }
+        html += '' +
+            '                </div>\n' +
+            '            </div>\n' +
+            '        </div>\n' +
+            '    </div>\n' +
+            '</div>';
+        $("#userCard").html(html);
+        if (cardBg !== "") {
+          $("#userCardContent").addClass("user-card--bg");
+          $("#userCardContent").css("background-image", "url(" + cardBg + ")");
+          $("#userCardContent > div").attr("style", "background-image: linear-gradient(90deg, rgba(214, 227, 235, 0.36), rgba(255, 255, 255, 0.76), rgba(255, 255, 255, 0.76));");
+          $("#userCardContent > div > a > div").css("width", "105px");
+          $("#userCardContent > div > a > div").css("height", "105px");
+          $("#userCardContent > div > a > div").css("top", "80px");
+        }
+
+        // 设置位置
+        let left = $(this).offset().left;
+        left = left + 30;
+        if (left + 350 > $(document.body).width()) {
+          left = left - 350;
+        }
+        $("#userCard").css("left", left);
+        let top = $(this).offset().top - 110;
+        if (top < 45) {
+          top = $(this).offset().top + 45;
+        }
+        $("#userCard").css("top", top + "px");
+        $("#userCard").show();
+      }
+    }, function (event) {
+      setTimeout(function () {
+        let el = $(event.toElement);
+        if ($(el).parents("#userCard").length === 0) {
+          if (!cardLock) {
+            $("#userCard").hide();
+          }
+        }
+      }, 50);
+    });
+    $("#userCard").unbind();
+    $("#userCard").hover(function () {
+      cardLock = true;
+    }, function () {
+      cardLock = false;
+      $("#userCard").hide();
+    });
+  },
+  /**
    * @description 用户状态 channel.
    * @static
    */
   initUserChannel: function (channelServer) {
-    var userChannel = new ReconnectingWebSocket(channelServer)
-    userChannel.reconnectInterval = 10000
+    var userChannel = new WebSocket(channelServer)
 
     userChannel.onopen = function () {
-      setInterval(function () {
-        userChannel.send('-hb-')
-      }, 1000 * 60 * 5)
+      console.log("Connected to user channel websocket.")
     }
 
     userChannel.onmessage = function (evt) {
@@ -1295,17 +1607,77 @@ var Util = {
 
       switch (data.command) {
         case 'refreshNotification':
-          Util.setUnreadNotificationCount(true)
+          if (window.location.pathname === '/' || window.location.pathname === '/cr') {
+            Util.makeNotificationRead('at');
+            Util.setUnreadNotificationCount(true);
+          } else {
+            Util.setUnreadNotificationCount(true);
+            Util.notice("default", 3000, "你有一条新的通知！<a href='/notifications'>点击查看</a>");
+          }
           break
+        case 'newIdleChatMessage':
+          if (window.location.pathname !== "/idle-talk") {
+            Util.blingChat();
+            Util.notice("warning", 3000, "叮咚！你收到了一条私信。<a href='/idle-talk'>点击查看</a>");
+          }
+          break;
+        case 'warnBroadcast':
+          let text = data.warnBroadcastText;
+          let who = data.who;
+          Util.alert("" +
+              "<style>" +
+              ".dialog-header-bg {" +
+              "border-radius: 4px 4px 0px 0px; background-color: rgb(151,49,210); color: rgb(255, 255, 255);" +
+              "}" +
+              ".dialog-main {" +
+              "height: 170px;" +
+              "overflow: auto;" +
+              "}" +
+              "</style>" +
+              "<div class=\"fn-hr5\"></div>\n" +
+              "<div class=\"ft__center\">\n" +
+              "<div><h1>摸鱼派社区紧急公告</h1><br>" + text + "<br><br>——紧急公告发布人：" + who + "</div>" +
+              "</div>\n" +
+              "", "紧急公告");
+          Util.alert(text);
+          $(".dialog-background").attr("onclick", "")
+          break;
       }
     }
 
     userChannel.onclose = function () {
-      userChannel.close()
+      console.log("Disconnected to user channel websocket.")
     }
 
     userChannel.onerror = function (err) {
       console.log('ERROR', err)
+    }
+  },
+  /**
+   * @description 让聊天图标闪烁
+   */
+  blingChat: function () {
+    if (!Util.isBlinging) {
+      Util.isBlinging = true;
+      $("#idleTalkIconContainer").html("<use xlink:href=\"#redIdleChat\"></use>");
+      setTimeout(function () {
+        $("#idleTalkIconContainer").html("<use xlink:href=\"#idleChat\"></use>");
+      }, 1000);
+      bling = setInterval(function () {
+        $("#idleTalkIconContainer").html("<use xlink:href=\"#redIdleChat\"></use>");
+        setTimeout(function () {
+          $("#idleTalkIconContainer").html("<use xlink:href=\"#idleChat\"></use>");
+        }, 1000);
+      }, 2000);
+    }
+  },
+  /**
+   * @description 终止闪烁聊天图标
+   */
+  pauseBling: function () {
+    if (Util.isBlinging) {
+      Util.isBlinging = false;
+      clearInterval(bling);
     }
   },
   /**
@@ -1426,6 +1798,28 @@ var Util = {
       })
     })
   },
+  /**
+   * @description 通知
+   * options 说明
+   * 参数名	默认值	类型	参数说明
+   * type	success	{String}	提示框的类型，可填写参数 default, success, warning, danger
+   * duration	3000	{Number}	设置提示框消失时间，默认 3000 毫秒
+   * callback	function()	{Function}	提示框关闭时所调用的回调法。
+   */
+  notice: function (type, duration, text, callback) {
+    if (callback !== undefined) {
+      $.tooltips(text, {
+        type: type,
+        duration: duration,
+        callback: callback
+      });
+    } else {
+      $.tooltips(text, {
+        type: type,
+        duration: duration
+      });
+    }
+  },
 }
 /**
  * @description 数据验证
@@ -1514,6 +1908,12 @@ var Validate = {
       case 'imgStyle':
         if (val === '' ||
           (val !== '' && (!/^\w+:\/\//.test(val) || val.length > 100))) {
+          isValidate = false
+        }
+        break
+      case 'phone' :
+        if (!/^[1][0-9]{10}$/.test(
+          data.target.val())) {
           isValidate = false
         }
         break
@@ -1787,3 +2187,52 @@ var Audio = {
     Audio.wavFileBlob = Audio.recorderObj.buildWavFileBlob()
   },
 }
+function Rotate(id) {
+  let pause = false;
+  let running = false;
+
+  this.submit = function () {
+    if (!running) {
+      running = true;
+      let rotate = 0;
+      let styleSave;
+      let pool;
+
+      if (pool === undefined) {
+        styleSave = document.getElementById(id).getAttribute("style");
+        if (styleSave !== null && styleSave !== undefined && styleSave !== "") {
+          if (!styleSave.endsWith(";")) {
+            styleSave = styleSave + ";";
+          }
+        } else {
+          styleSave = "";
+        }
+        pool = setInterval(function () {
+          rotate += 5;
+          if (rotate > 360) {
+            rotate = 0;
+          }
+          document.getElementById(id).setAttribute("style", styleSave + "-webkit-transform: rotate(" + rotate + "deg);");
+          if (rotate === 0) {
+            if (pause) {
+              clearInterval(pool);
+              document.getElementById(id).setAttribute("style", styleSave);
+              running = false;
+            }
+          }
+        }, 15);
+      }
+    }
+  }
+
+  this.stop = function () {
+    pause = true;
+  }
+
+  String.prototype.endWith = function (endStr) {
+    const d = this.length - endStr.length;
+    return (d >= 0 && this.lastIndexOf(endStr) === d);
+  }
+}
+
+

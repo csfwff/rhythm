@@ -1,5 +1,6 @@
 /*
- * Symphony - A modern community (forum/BBS/SNS/blog) platform written in Java.
+ * Rhythm - A modern community (forum/BBS/SNS/blog) platform written in Java.
+ * Modified version from Symphony, Thanks Symphony :)
  * Copyright (C) 2012-present, b3log.org
  *
  * This program is free software: you can redistribute it and/or modify
@@ -113,6 +114,48 @@
   opacity: 0
 }
 
+.tooltipped-new {
+  position: relative;
+  cursor: pointer;
+}
+
+.tooltipped-new::after {
+  position: absolute;
+  z-index: 1000000;
+  display: none;
+  padding: 5px 8px;
+  font-size: 11px;
+  font-weight: normal;
+  -webkit-font-smoothing: subpixel-antialiased;
+  color: #fff;
+  text-align: center;
+  text-decoration: none;
+  text-shadow: none;
+  text-transform: none;
+  letter-spacing: normal;
+  word-wrap: break-word;
+  white-space: pre;
+  pointer-events: none;
+  content: attr(aria-label);
+  background: rgba(0, 0, 0, 0.8);
+  border-radius: 3px;
+  line-height: 16px;
+  opacity: 0
+}
+
+.tooltipped-new::before {
+  position: absolute;
+  z-index: 1000001;
+  display: none;
+  width: 0;
+  height: 0;
+  color: rgba(0, 0, 0, 0.8);
+  pointer-events: none;
+  content: "";
+  border: 5px solid transparent;
+  opacity: 0
+}
+
 @-webkit-keyframes tooltip-appear {
   from {
     opacity: 0
@@ -140,7 +183,13 @@
 .tooltipped:active::before,
 .tooltipped:active::after,
 .tooltipped:focus::before,
-.tooltipped:focus::after {
+.tooltipped:focus::after,
+.tooltipped-new:hover::before,
+.tooltipped-new:hover::after,
+.tooltipped-new:active::before,
+.tooltipped-new:active::after,
+.tooltipped-new:focus::before,
+.tooltipped-new:focus::after {
   display: inline-block;
   text-decoration: none;
   -webkit-animation-name: tooltip-appear;
@@ -730,7 +779,7 @@ a[class*=" icon-"]:hover {
 }
 
 .dialog-main {
-  min-width: 300px;
+  min-width: 480px;
   padding: 10px;
   box-sizing: content-box;
 }
@@ -751,7 +800,7 @@ a[class*=" icon-"]:hover {
 }
 
 .main {
-  padding: 20px 0;
+  padding: 25px 0 0 0;
   background-attachment: fixed;
   min-height: 280px;
 }
@@ -897,7 +946,7 @@ a[class*=" icon-"]:hover {
   .person-list {
     position: absolute;
     top: 48px;
-    right: 10px;
+    right: 47px;
     width: 154px;
     background-color: #fff;
     line-height: 21px;
@@ -976,7 +1025,7 @@ a[class*=" icon-"]:hover {
   }
 
   .slogan {
-    padding: 20px 0px 30px 0;
+    padding: 20px 0px 20px 0;
     margin: 0px 0 10px;
     color: #f0f0f0;
     width: 100%;
@@ -1100,6 +1149,10 @@ a[class*=" icon-"]:hover {
   list-style: none outside none;
   padding: 15px;
   position: relative;
+}
+
+.index .module-panel .module-list li {
+  padding: 11px 15px;
 }
 
 .module-panel .module-list li.last,
@@ -1263,6 +1316,9 @@ a[class*=" icon-"]:hover {
   margin-bottom: .25em;
   background-size: contain;
   vertical-align: text-top;
+  -webkit-filter: none !important;
+  filter: none !important;
+  transition: none !important;
 }
 
 /* end emoji */
@@ -1449,3 +1505,181 @@ a[class*=" icon-"]:hover {
   right: 15px;
   border-radius: 0 3px 3px 0;
 }
+
+
+.blur img {
+  -webkit-filter: blur(20px) saturate(1.4);
+  filter:blur(20px) saturate(1.4);
+  transition:all .15s ease-in-out
+}
+.blur img:hover {
+  filter: none;
+  -webkit-filter: none;
+}
+
+.tag_selection {
+  margin: 20px 0 0 0;
+}
+
+.user-card {
+  -webkit-animation-duration: .15s;
+  animation-duration: .15s;
+  -webkit-animation-name: scale-in;
+  animation-name: scale-in;
+  -webkit-animation-timing-function: cubic-bezier(.2,0,.13,1.5);
+  animation-timing-function: cubic-bezier(.2,0,.13,1.5);
+  width: 360px;
+  box-shadow: 0 3px 12px rgba(27,31,35,.15);
+  background-color: var(--layer-background-color);
+  min-height: 50px;
+  box-sizing: border-box;
+  font-size: 14px;
+  border-radius: 3px;
+  border-top: 1px solid transparent
+}
+
+.user-card>div {
+  padding: 15px;
+  border-radius: 3px
+}
+
+.user-card--bg {
+  width: 460px!important;
+  background-size: cover;
+  background-position: 50%
+}
+
+.user-card--bg .avatar-mid {
+  width: 120px!important;
+  height: 120px!important;
+  top: 65px!important
+}
+
+.user-card--bg>div {
+  margin-top: 120px;
+  border-radius: 0 0 3px 3px
+}
+
+.user-card--bg .user-card__info,.user-card--bg .user-card__name {
+  margin-left: 135px!important
+}
+
+.user-card__name {
+  font-size: 18px;
+  line-height: 22px;
+  margin-left: 92px
+}
+
+.user-card__name,.user-card__name:hover {
+  color: var(--text-color)
+}
+
+.user-card__info {
+  margin: 8px 0;
+  line-height: 18px;
+  font-size: 14px;
+  min-height: 18px;
+  overflow: hidden
+}
+
+.user-card__icons a,.user-card__icons span {
+  margin-right: 10px;
+  float: left;
+  height: 20px
+}
+
+.user-card__icons a svg,.user-card__icons span svg {
+  margin-top: 2px;
+  height: 16px;
+  width: 16px;
+  color: var(--text-gray-color);
+  vertical-align: super
+}
+
+.user-card__icons a:hover {
+  text-decoration: none
+}
+
+.user-card__icons a:hover svg {
+  color: #4285f4
+}
+
+.user-card__icons img {
+  float: left;
+  margin-top: 2px
+}
+
+.user-card__icon--disabled svg {
+  opacity: .3
+}
+
+.user-card .avatar-mid-card {
+  height: 77px;
+  width: 77px;
+  position: absolute;
+  top: -39px;
+  background-color: hsla(0,0%,100%,.8);
+  background-size: 100% 100%;
+}
+
+.index-head-title{
+    border-bottom:
+    1px solid #eee;
+    margin:0px 10px ;
+}
+
+.index-bottom{
+background-color:#f6f8fa
+}
+
+.index-chat{
+  border-bottom:1px solid #eee;
+}
+
+#userCard{
+background-color: white;
+}
+
+
+/*@keyframes swim {
+  0% {
+    transform: translate(0,0) rotateY(0deg);
+  }
+  10% {
+    transform: translate(0,0) rotateY(0deg);
+  }
+  27% {
+    transform: translate(100px,0) rotateY(0deg);
+  }
+  36% {
+    transform: translate(150px,5px) rotate(20deg);
+  }
+  42% {
+    transform: translate(175px,0) rotate(0deg);
+  }
+  45% {
+    transform: translate(200px,0) rotateY(0deg);
+  }
+  47% {
+    transform: translate(200px,-5px) rotate(-20deg);
+  }
+  50% {
+    transform: translate(200px,-5px) rotate(0deg);
+  }
+  65% {
+    transform: translate(200px,0) rotateY(180deg);
+  }
+  85% {
+    transform: translate(0,0) rotateY(180deg);
+  }
+  88% {
+    transform: translate(0,0) rotateY(0deg);
+  }
+  100% {
+    transform: translate(0,0) rotateY(0deg);
+  }
+}
+
+.swimming {
+  animation: swim 15s linear;
+}*/

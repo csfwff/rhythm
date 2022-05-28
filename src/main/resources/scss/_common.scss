@@ -1,5 +1,6 @@
 /*
- * Symphony - A modern community (forum/BBS/SNS/blog) platform written in Java.
+ * Rhythm - A modern community (forum/BBS/SNS/blog) platform written in Java.
+ * Modified version from Symphony, Thanks Symphony :)
  * Copyright (C) 2012-present, b3log.org
  *
  * This program is free software: you can redistribute it and/or modify
@@ -463,6 +464,21 @@ blockquote {
   white-space: nowrap;
 }
 
+.discuss_title {
+  cursor: pointer;
+  text-align: center;
+  text-decoration: none;
+  padding: 6px 2px;
+  margin: 9px 0;
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1;
+  color: $theme-secondary;
+  background-color: #f5f5f5;
+  border-radius: 3px;
+  display: block;
+}
+
 .count {
   text-decoration: none;
   padding: 2px 5px;
@@ -522,8 +538,7 @@ blockquote {
   display: flex;
   flex-direction: row;
   flex-wrap: wrap;
-  padding: 15px;
-
+  padding: 13px 15px;
 }
 
 .tag-item{

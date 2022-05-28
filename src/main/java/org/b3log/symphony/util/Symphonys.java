@@ -1,5 +1,6 @@
 /*
- * Symphony - A modern community (forum/BBS/SNS/blog) platform written in Java.
+ * Rhythm - A modern community (forum/BBS/SNS/blog) platform written in Java.
+ * Modified version from Symphony, Thanks Symphony :)
  * Copyright (C) 2012-present, b3log.org
  *
  * This program is free software: you can redistribute it and/or modify
@@ -134,7 +135,7 @@ public final class Symphonys {
     /**
      * 聊天室最小发言时间间隔，用于防止刷屏，单位毫秒.
      */
-    public static final long MIN_STEP_CHAT_TIME = getLong("minStepChatTime");
+    public static final long MIN_STEP_CHAT_TIME = 0;
 
     /**
      * 用户发布帖子必须注册时间超过该设置，单位毫秒。默认 0 为不限制，刚注册完就可以发帖.
@@ -458,7 +459,7 @@ public final class Symphonys {
     /**
      * 写字活动奖励积分值.
      */
-    public static final int POINT_ACTIVITY_CHAR = getInt("pointActivityCharacter");
+    public static final int POINT_ACTIVITY_CHAR = 10;
 
     /**
      * 数据导出所需积分值.
@@ -852,6 +853,16 @@ public final class Symphonys {
      */
     public static final Map<String, Set<String>> URL_PERMISSION_RULES = new HashMap<>();
 
+    /**
+     * 腾讯云SMS相关
+     */
+    public static final String TEN_SMS_SECRET_ID = get("ten.sms.secretId");
+    public static final String TEN_SMS_SECRET_KEY = get("ten.sms.secretKey");
+    public static final String TEN_SMS_DIYU = get("ten.sms.diyu");
+    public static final String TEN_SMS_SDK_APPID = get("ten.sms.sdkAppId");
+    public static final String TEN_SMS_SIGN_NAME = get("ten.sms.signName");
+    public static final String TEN_SMS_TEMPLATE_ID = get("ten.sms.templateId");
+
     static {
         // Loads permission URL rules
         final String prefix = "permission.rule.url.";
@@ -969,7 +980,7 @@ public final class Symphonys {
      * @param key the specified key
      * @return string property value corresponding to the specified key, returns {@code null} if not found
      */
-    private static String get(final String key) {
+    public static String get(final String key) {
         return CFG.getProperty(key);
     }
 

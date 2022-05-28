@@ -21,11 +21,11 @@
     <inceptionYear>2012</inceptionYear>
 
     <properties>
-        <latke.version>3.4.13</latke.version>
+        <latke.version>3.4.18</latke.version>
 
         <jsoup.version>1.12.1</jsoup.version>
         <flexmark.version>0.50.40</flexmark.version>
-        <qiniu.version>7.7.0</qiniu.version>
+        <qiniu.version>7.8.0</qiniu.version>
         <jodd.version>5.0.13</jodd.version>
         <emoji-java.version>5.1.0</emoji-java.version>
         <user-agent-utils.version>1.21</user-agent-utils.version>
@@ -128,6 +128,8 @@
             <groupId>org.b3log</groupId>
             <artifactId>latke-core</artifactId>
             <version>${latke.version}</version>
+            <scope>system</scope>
+            <systemPath>${project.basedir}/src/main/resources/lib/latke-core.jar</systemPath>
         </dependency>
 
         <dependency>
@@ -242,6 +244,38 @@
             <groupId>com.squareup.okio</groupId>
             <artifactId>okio</artifactId>
             <version>${okio.version}</version>
+        </dependency>
+
+        <!-- https://mvnrepository.com/artifact/org.jodd/jodd-http -->
+        <dependency>
+            <groupId>org.jodd</groupId>
+            <artifactId>jodd-http</artifactId>
+            <version>6.0.6</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.assertj</groupId>
+            <artifactId>assertj-core</artifactId>
+            <version>3.20.2</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.kie.modules</groupId>
+            <artifactId>org-apache-commons-lang3</artifactId>
+            <version>6.5.0.Final</version>
+            <type>pom</type>
+        </dependency>
+
+        <dependency>
+            <groupId>com.tencentcloudapi</groupId>
+            <artifactId>tencentcloud-sdk-java</artifactId>
+            <version>3.1.426</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.alipay.sdk</groupId>
+            <artifactId>alipay-sdk-java</artifactId>
+            <version>4.22.67.ALL</version>
         </dependency>
 
     </dependencies>

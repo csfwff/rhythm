@@ -1,5 +1,6 @@
 /*
- * Symphony - A modern community (forum/BBS/SNS/blog) platform written in Java.
+ * Rhythm - A modern community (forum/BBS/SNS/blog) platform written in Java.
+ * Modified version from Symphony, Thanks Symphony :)
  * Copyright (C) 2012-present, b3log.org
  *
  * This program is free software: you can redistribute it and/or modify
@@ -63,6 +64,11 @@ public class BeforeRequestHandler implements Handler {
     public void handle(final RequestContext context) {
         Stopwatchs.start("Request initialized [" + context.requestURI() + "]");
 
+        if (context.header(Common.USER_AGENT) == null) {
+            context.sendStatus(500);
+            return;
+        }
+
         Locales.setLocale(Latkes.getLocale());
 
         Sessions.setTemplateDir(Symphonys.SKIN_DIR_NAME);
@@ -111,6 +117,7 @@ public class BeforeRequestHandler implements Handler {
             }
 
             httpSession.setAttribute(User.USER, user.toString());
+            httpSession.setAttribute(Common.IP, getIpAddr(request));
 
             final String skin = Sessions.isMobile() ? user.optString(UserExt.USER_MOBILE_SKIN) : user.optString(UserExt.USER_SKIN);
             httpSession.setAttribute(Keys.TEMPLATE_DIR_NAME, skin);
@@ -149,7 +156,10 @@ public class BeforeRequestHandler implements Handler {
                     && !StringUtils.containsIgnoreCase(userAgentStr, "MetaURI")
                     && !StringUtils.containsIgnoreCase(userAgentStr, "Feed")
                     && !StringUtils.containsIgnoreCase(userAgentStr, "okhttp")
-                    && !StringUtils.containsIgnoreCase(userAgentStr, "Sym")) {
+                    && !StringUtils.containsIgnoreCase(userAgentStr, "Sym")
+                    && !StringUtils.containsIgnoreCase(userAgentStr, "axios")
+                    && !StringUtils.containsIgnoreCase(userAgentStr, "node")
+                    && !StringUtils.containsIgnoreCase(userAgentStr, "RSS")) {
                 LOGGER.log(Level.WARN, "Unknown client [UA=" + userAgentStr + ", remoteAddr="
                         + Requests.getRemoteAddr(context.getRequest()) + ", URI=" + context.requestURI() + "]");
             }
@@ -163,5 +173,25 @@ public class BeforeRequestHandler implements Handler {
 
         Sessions.setBot(false);
         Sessions.setMobile(BrowserType.MOBILE_BROWSER == browserType);
+    }
+
+    /**
+     * 获取 IP地址
+     * 使用 Nginx等反向代理软件， 则不能通过 request.getRemoteAddr()获取 IP地址
+     * 如果使用了多级反向代理的话，X-Forwarded-For的值并不止一个，而是一串IP地址，
+     * X-Forwarded-For中第一个非 unknown的有效IP字符串，则为真实IP地址
+     */
+    public static String getIpAddr(Request request) {
+        String ip = request.getHeader("x-forwarded-for");
+        if (ip == null || ip.length() == 0) {
+            ip = request.getHeader("Proxy-Client-IP");
+        }
+        if (ip == null || ip.length() == 0) {
+            ip = request.getHeader("WL-Proxy-Client-IP");
+        }
+        if (ip == null || ip.length() == 0) {
+            ip = request.getRemoteAddr();
+        }
+        return "0:0:0:0:0:0:0:1%0".equals(ip) ? "127.0.0.1" : ip;
     }
 }

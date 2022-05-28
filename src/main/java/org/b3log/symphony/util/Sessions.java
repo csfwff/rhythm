@@ -1,5 +1,6 @@
 /*
- * Symphony - A modern community (forum/BBS/SNS/blog) platform written in Java.
+ * Rhythm - A modern community (forum/BBS/SNS/blog) platform written in Java.
+ * Modified version from Symphony, Thanks Symphony :)
  * Copyright (C) 2012-present, b3log.org
  *
  * This program is free software: you can redistribute it and/or modify
@@ -26,20 +27,19 @@ import org.b3log.latke.Keys;
 import org.b3log.latke.Latkes;
 import org.b3log.latke.cache.Cache;
 import org.b3log.latke.cache.CacheFactory;
-import org.b3log.latke.http.Cookie;
-import org.b3log.latke.http.Request;
-import org.b3log.latke.http.RequestContext;
-import org.b3log.latke.http.Response;
+import org.b3log.latke.http.*;
 import org.b3log.latke.ioc.BeanManager;
 import org.b3log.latke.model.User;
 import org.b3log.latke.util.Crypts;
 import org.b3log.latke.util.Requests;
 import org.b3log.symphony.model.Common;
 import org.b3log.symphony.model.UserExt;
+import org.b3log.symphony.processor.ApiProcessor;
 import org.b3log.symphony.repository.UserRepository;
 import org.b3log.symphony.service.UserMgmtService;
 import org.json.JSONObject;
 
+import java.util.Objects;
 import java.util.Set;
 
 /**
@@ -352,7 +352,7 @@ public final class Sessions {
      * @param userId   the specified user id
      * @param response the specified response
      */
-    public static void logout(final String userId, final Response response) {
+    public static void logout(final String userId, final Request request, final Response response) {
         if (null != response) {
             final Cookie cookie = new Cookie(COOKIE_NAME, "");
             cookie.setMaxAge(0);
@@ -362,9 +362,12 @@ public final class Sessions {
 
         SESSION_CACHE.remove(userId);
 
-        final BeanManager beanManager = BeanManager.getInstance();
-        final UserMgmtService userMgmtService = beanManager.getReference(UserMgmtService.class);
-        userMgmtService.updateOnlineStatus(userId, "", false, true);
+        final Session httpSession = request.getSession();
+        httpSession.setAttribute(User.USER, null);
+
+        //final BeanManager beanManager = BeanManager.getInstance();
+        //final UserMgmtService userMgmtService = beanManager.getReference(UserMgmtService.class);
+        //userMgmtService.updateOnlineStatus(userId, "", false, true);
     }
 
     /**
@@ -374,6 +377,22 @@ public final class Sessions {
      * @return the current user, returns {@code null} if not logged in
      */
     public static JSONObject currentUser(final Request request) {
+
+        //如何保证web端不会传apiKey参数?
+        final String apiKey = request.getParameter("apiKey");
+        if (Objects.nonNull(apiKey)) {
+            //support request for api
+            try {
+                JSONObject user = ApiProcessor.getUserByKey(apiKey);
+                if (Objects.nonNull(user)) {
+                    return user;
+                }
+
+            } catch (NullPointerException ignored) {
+            }
+            return null;
+        }
+
         final Set<Cookie> cookies = request.getCookies();
         if (cookies.isEmpty()) {
             return null;
@@ -464,7 +483,7 @@ public final class Sessions {
             final String token = cookieJSONObject.optString(Keys.TOKEN);
             final String password = StringUtils.substringBeforeLast(token, COOKIE_ITEM_SEPARATOR);
             if (userPassword.equals(password)) {
-                userMgmtService.updateOnlineStatus(userId, ip, true, true);
+                //userMgmtService.updateOnlineStatus(userId, ip, true, true);
 
                 SESSION_CACHE.put(userId, ret);
 

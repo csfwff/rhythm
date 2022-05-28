@@ -1,6 +1,7 @@
 <#--
 
-    Symphony - A modern community (forum/BBS/SNS/blog) platform written in Java.
+    Rhythm - A modern community (forum/BBS/SNS/blog) platform written in Java.
+    Modified version from Symphony, Thanks Symphony :)
     Copyright (C) 2012-present, b3log.org
 
     This program is free software: you can redistribute it and/or modify
@@ -21,6 +22,7 @@
 <#include "macro-list.ftl">
 <#include "macro-pagination.ftl">
 <#include "common/sub-nav.ftl">
+<#include "common/index-nav.ftl">
 <!DOCTYPE html>
 <html>
     <head>
@@ -28,9 +30,14 @@
         </@head>
     </head>
     <body>
+    <div class="mobile-head">
         <#include "header.ftl">
+        <@indexNav "city"/>
+
+    </div>
+    <div style="height: 74px;width: 1px;" ></div>
         <div class="main">
-            <@subNav 'city/my' ''/>
+<#--            <@subNav 'city/my' ''/>-->
             <div class="content fn-clear">
                 <#if articles?size gt 0>
                 <div class="fn-clear">

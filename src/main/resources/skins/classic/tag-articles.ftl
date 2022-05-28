@@ -1,6 +1,7 @@
 <#--
 
-    Symphony - A modern community (forum/BBS/SNS/blog) platform written in Java.
+    Rhythm - A modern community (forum/BBS/SNS/blog) platform written in Java.
+    Modified version from Symphony, Thanks Symphony :)
     Copyright (C) 2012-present, b3log.org
 
     This program is free software: you can redistribute it and/or modify
@@ -79,7 +80,7 @@
                                 <div<#if relatedTag.tagDescription == ''> style="width:auto"</#if>>
                                     <div>${relatedTag.tagDescription}</div>
                                     <span class="fn-right">
-                                        <span class="ft-gray">${referenceLabel}</span> 
+                                        <span class="ft-gray">${referenceLabel}</span>
                                         ${relatedTag.tagReferenceCount?c} &nbsp;
                                         <span class="ft-gray">${cmtLabel}</span>
                                         ${relatedTag.tagCommentCount?c}&nbsp;
@@ -108,7 +109,7 @@
                         <@pagination url="${servePath}/tag/${tag.tagURI}${current}" pjaxTitle="${tag.tagTitle} - ${tagLabel} - ${symphonyLabel}"/>
                     </div>
                     </#if><#if pjax><!---- pjax {#tag-pjax-container} end ----></#if>
-                </div> 
+                </div>
                 <div class="side">
                     <#include "side.ftl">
                 </div>
@@ -159,7 +160,8 @@
                 },
                 callback: function () {
                     Util.parseMarkdown();
-                    Util.parseHljs()
+                    Util.parseHljs();
+                    Util.listenUserCard();
                 }
             });
             NProgress.configure({ showSpinner: false });

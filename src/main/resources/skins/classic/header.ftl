@@ -1,6 +1,7 @@
 <#--
 
-    Symphony - A modern community (forum/BBS/SNS/blog) platform written in Java.
+    Rhythm - A modern community (forum/BBS/SNS/blog) platform written in Java.
+    Modified version from Symphony, Thanks Symphony :)
     Copyright (C) 2012-present, b3log.org
 
     This program is free software: you can redistribute it and/or modify
@@ -20,20 +21,20 @@
 <div class="nav">
     <h1 aria-label="${symphonyLabel}" class="tooltipped tooltipped-s">
         <a href="${servePath}">
-            <svg><use xlink:href="#logo"></use></svg>
+            <svg class="swimming"><use xlink:href="#logo-white"></use></svg>
         </a>
     </h1>
     <div class="nav-tabs">
-        <#list domains as domain>
-        <a pjax-title="${domain.domainTitle} - ${domainLabel} - ${symphonyLabel}"
-           href="${servePath}/domain/${domain.domainURI}"<#if selected?? && selected == domain.domainURI>
-           class="current"</#if>>${domain.domainIconPath} ${domain.domainTitle}</a>
-        </#list>
         <a pjax-title="${latestLabel} - ${symphonyLabel}"
            href="${servePath}/recent"<#if selected?? && 'recent' == selected> class="current"</#if>>
             <svg>
                 <use xlink:href="#refresh"></use>
             </svg> ${latestLabel}</a>
+        <a pjax-title="${breezemoonLabel} - ${symphonyLabel}"
+           href="${servePath}/breezemoons"<#if selected?? && 'breezemoons' == selected> class="current"</#if>>
+            <svg>
+                <use xlink:href="#breezemoons"></use>
+            </svg> ${breezemoonLabel}</a>
         <a pjax-title="${qnaLabel} - ${symphonyLabel}"
            href="${servePath}/qna"<#if selected?? && 'qna' == selected> class="current"</#if>>
             <svg>
@@ -49,6 +50,10 @@
                 <use xlink:href="#local"></use>
             </svg> ${currentUser.userCity}</a>
         </#if>
+        <a href="${servePath}/top"<#if selected?? && 'top' == selected> class="current"</#if>>
+            <svg>
+                <use xlink:href="#rank"></use>
+            </svg> ${totalRankLabel}</a>
         <#if isLoggedIn>
         <a href="${servePath}/watch"<#if selected?? && 'watch' == selected> class="current"</#if>>
             <svg>
@@ -58,7 +63,7 @@
     </div>
     <#if esEnabled || algoliaEnabled>
     <form class="responsive-hide fn-left" target="_blank" action="/search">
-        <input class="search" placeholder="Search Fishing Pi" type="text" name="key" id="search"
+        <input class="search" placeholder="搜索你感兴趣的内容" type="text" name="key" id="search"
                value="<#if key??>${key}</#if>">
         <input type="submit" class="fn-none" value=""/>
     </form>
@@ -79,7 +84,20 @@
             </#if>
             <a id="aNotifications"
                class="tooltipped tooltipped-w <#if unreadNotificationCount == 0>no-msg<#else>msg</#if>"
-               href="${servePath}/notifications" aria-label="${messageLabel}">${unreadNotificationCount}</a>
+               href="${servePath}/notifications" aria-label="${messageLabel}">${unreadNotificationCount}
+            </a>
+            <a href="${servePath}/idle-talk" class="tooltipped tooltipped-w" aria-label="私信">
+                <#if hasUnreadChatMessage?? && hasUnreadChatMessage>
+                    <script>
+                        setTimeout(function () {
+                            Util.blingChat();
+                        }, 2000);
+                    </script>
+                </#if>
+                <svg id="idleTalkIconContainer">
+                    <use xlink:href="#idleChat"></use>
+                </svg>
+            </a>
             <a href="${servePath}/activities" aria-label="${activityLabel}" class="tooltipped tooltipped-w">
                 <svg>
                     <use xlink:href="#flag"></use>
@@ -90,13 +108,19 @@
                data-url="${servePath}/member/${currentUser.userName}">
                 <span class="avatar-small" style="background-image:url('${currentUser.userAvatarURL20}')"></span>
             </a>
-            <div class="module person-list" id="personListPanel">
+            <div class="module person-list" id="personListPanel" style="right: 13px">
                 <ul>
                     <li>
                         <a href="${servePath}/member/${currentUser.userName}">${goHomeLabel}</a>
                     </li>
                     <li>
                         <a href="${servePath}/settings">${settingsLabel}</a>
+                    </li>
+                    <li>
+                        <a href="${servePath}/charge/point"><span class="ft-red">❤</span>️ ${chargePointLabel}</a>
+                    </li>
+                    <li>
+                        <a href="javascript:void(0)" onclick="Count.settings()">⏰ 下班倒计时</a>
                     </li>
                     <li>
                         <a href="${servePath}/settings/help">${helpLabel}</a>

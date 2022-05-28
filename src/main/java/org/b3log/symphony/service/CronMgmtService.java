@@ -1,5 +1,6 @@
 /*
- * Symphony - A modern community (forum/BBS/SNS/blog) platform written in Java.
+ * Rhythm - A modern community (forum/BBS/SNS/blog) platform written in Java.
+ * Modified version from Symphony, Thanks Symphony :)
  * Copyright (C) 2012-present, b3log.org
  *
  * This program is free software: you can redistribute it and/or modify
@@ -23,7 +24,12 @@ import org.apache.logging.log4j.Logger;
 import org.b3log.latke.ioc.Inject;
 import org.b3log.latke.service.annotation.Service;
 import org.b3log.latke.util.Stopwatchs;
+import org.b3log.symphony.processor.AlipayProcessor;
+import org.b3log.symphony.processor.IdleTalkProcessor;
+import org.b3log.symphony.processor.bot.ChatRoomBot;
+import org.b3log.symphony.processor.channel.ChatroomChannel;
 import org.b3log.symphony.util.Symphonys;
+import org.b3log.symphony.util.Vocation;
 
 import java.util.concurrent.TimeUnit;
 
@@ -103,10 +109,63 @@ public class CronMgmtService {
     private CacheMgmtService cacheMgmtService;
 
     /**
+     * Liveness management service.
+     */
+    @Inject
+    private LivenessMgmtService livenessMgmtService;
+
+
+    /**
      * Start all cron tasks.
      */
     public void start() {
         long delay = 10000;
+
+        livenessMgmtService.initCheckLiveness();
+
+        Symphonys.SCHEDULED_EXECUTOR_SERVICE.scheduleAtFixedRate(() -> {
+            try {
+                ChatroomChannel.sendOnlineMsg();
+            } catch (final Exception e) {
+                LOGGER.log(Level.ERROR, "Executes cron failed", e);
+            } finally {
+                Stopwatchs.release();
+            }
+        }, delay, 2 * 60 * 1000, TimeUnit.MILLISECONDS);
+        delay += 2000;
+
+        Symphonys.SCHEDULED_EXECUTOR_SERVICE.scheduleAtFixedRate(() -> {
+            try {
+                livenessMgmtService.checkLiveness();
+            } catch (final Exception e) {
+                LOGGER.log(Level.ERROR, "Executes cron failed", e);
+            } finally {
+                Stopwatchs.release();
+            }
+        }, delay, 60 * 1000, TimeUnit.MILLISECONDS);
+        delay += 2000;
+
+        Symphonys.SCHEDULED_EXECUTOR_SERVICE.scheduleAtFixedRate(() -> {
+            try {
+                livenessMgmtService.autoCheckin();
+            } catch (final Exception e) {
+                LOGGER.log(Level.ERROR, "Executes cron failed", e);
+            } finally {
+                Stopwatchs.release();
+            }
+        }, delay, 60 * 1000, TimeUnit.MILLISECONDS);
+        delay += 2000;
+
+        Symphonys.SCHEDULED_EXECUTOR_SERVICE.scheduleAtFixedRate(() -> {
+            try {
+                Vocation.refresh();
+            } catch (final Exception e) {
+                LOGGER.log(Level.ERROR, "Get vocation data failed");
+            } finally {
+                Stopwatchs.release();
+            }
+        }, delay, 10 * 60 * 1000, TimeUnit.MILLISECONDS);
+        delay += 2000;
 
         Symphonys.SCHEDULED_EXECUTOR_SERVICE.scheduleAtFixedRate(() -> {
             try {
@@ -131,6 +190,18 @@ public class CronMgmtService {
         }, delay, 5 * 1000, TimeUnit.MILLISECONDS);
         delay += 2000;
 
+
+        Symphonys.SCHEDULED_EXECUTOR_SERVICE.scheduleAtFixedRate(() -> {
+            try {
+                cacheMgmtService.refreshIndexCache();
+            } catch (final Exception e) {
+                LOGGER.log(Level.ERROR, "Executes cron failed", e);
+            } finally {
+                Stopwatchs.release();
+            }
+        }, delay, 60 * 1000, TimeUnit.MILLISECONDS);
+        delay += 2000;
+
         Symphonys.SCHEDULED_EXECUTOR_SERVICE.scheduleAtFixedRate(() -> {
             try {
                 cacheMgmtService.refreshCache();
@@ -145,7 +216,7 @@ public class CronMgmtService {
         Symphonys.SCHEDULED_EXECUTOR_SERVICE.scheduleAtFixedRate(() -> {
             try {
                 invitecodeMgmtService.expireInvitecodes();
-                mailMgmtService.sendWeeklyNewsletter();
+                // mailMgmtService.sendWeeklyNewsletter();
             } catch (final Exception e) {
                 LOGGER.log(Level.ERROR, "Executes cron failed", e);
             } finally {
@@ -163,6 +234,28 @@ public class CronMgmtService {
                 Stopwatchs.release();
             }
         }, delay, 2 * 60 * 60 * 1000, TimeUnit.MILLISECONDS);
+        delay += 2000;
+
+        Symphonys.SCHEDULED_EXECUTOR_SERVICE.scheduleAtFixedRate(() -> {
+            try {
+                //ChatRoomBot.notice();
+            } catch (final Exception e) {
+                LOGGER.log(Level.ERROR, "Executes cron failed", e);
+            } finally {
+                Stopwatchs.release();
+            }
+        }, delay, 15 * 60 * 1000, TimeUnit.MILLISECONDS);
+        delay += 2000;
+
+        Symphonys.SCHEDULED_EXECUTOR_SERVICE.scheduleAtFixedRate(() -> {
+            try {
+                AlipayProcessor.checkTrades();
+            } catch (final Exception e) {
+                LOGGER.log(Level.ERROR, "Executes cron failed", e);
+            } finally {
+                Stopwatchs.release();
+            }
+        }, delay, 60 * 1000, TimeUnit.MILLISECONDS);
         delay += 2000;
     }
 

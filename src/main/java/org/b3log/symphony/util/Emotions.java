@@ -1,5 +1,6 @@
 /*
- * Symphony - A modern community (forum/BBS/SNS/blog) platform written in Java.
+ * Rhythm - A modern community (forum/BBS/SNS/blog) platform written in Java.
+ * Modified version from Symphony, Thanks Symphony :)
  * Copyright (C) 2012-present, b3log.org
  *
  * This program is free software: you can redistribute it and/or modify
@@ -112,7 +113,7 @@ public final class Emotions {
 
         ret = toUnicode(ret);
         for (final String emojiCode : EMOJIS) {
-            String repl = "<img alt=\"" + emojiCode + "\" class=\"emoji\" src=\"https://cdn.jsdelivr.net/npm/vditor/dist/images/emoji/" + emojiCode;
+            String repl = "<img alt=\"" + emojiCode + "\" class=\"emoji\" src=\"https://file.fishpi.cn/vditor/dist/images/emoji/" + emojiCode;
             final String suffix = "huaji".equals(emojiCode) ? ".gif" : ".png";
             repl += suffix + "\" title=\"" + emojiCode + "\" />";
             ret = ret.replace(":" + emojiCode + ":", repl);

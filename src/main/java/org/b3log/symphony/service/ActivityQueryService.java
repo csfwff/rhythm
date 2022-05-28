@@ -1,5 +1,6 @@
 /*
- * Symphony - A modern community (forum/BBS/SNS/blog) platform written in Java.
+ * Rhythm - A modern community (forum/BBS/SNS/blog) platform written in Java.
+ * Modified version from Symphony, Thanks Symphony :)
  * Copyright (C) 2012-present, b3log.org
  *
  * This program is free software: you can redistribute it and/or modify
@@ -23,20 +24,20 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.b3log.latke.Keys;
 import org.b3log.latke.ioc.Inject;
-import org.b3log.latke.repository.Query;
-import org.b3log.latke.repository.RepositoryException;
-import org.b3log.latke.repository.SortDirection;
+import org.b3log.latke.repository.*;
 import org.b3log.latke.service.annotation.Service;
 import org.b3log.latke.util.Stopwatchs;
 import org.b3log.symphony.model.Pointtransfer;
 import org.b3log.symphony.model.UserExt;
+import org.b3log.symphony.repository.CloudRepository;
 import org.b3log.symphony.repository.PointtransferRepository;
 import org.b3log.symphony.repository.UserRepository;
+import org.checkerframework.checker.units.qual.C;
+import org.json.JSONArray;
 import org.json.JSONObject;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 /**
  * Activity query service.
@@ -76,6 +77,12 @@ public class ActivityQueryService {
      */
     @Inject
     private AvatarQueryService avatarQueryService;
+
+    /**
+     * Cloud repository.
+     */
+    @Inject
+    private CloudRepository cloudRepository;
 
     /**
      * Gets average point of activity eating snake of a user specified by the given user id.
@@ -167,9 +174,10 @@ public class ActivityQueryService {
      * @return users, returns an empty list if not found
      */
     public List<JSONObject> getTopCheckinUsers(final int fetchSize) {
+        String today = new SimpleDateFormat("yyyyMMdd").format(new Date());
         final List<JSONObject> ret = new ArrayList<>();
-        final Query query = new Query().addSort(UserExt.USER_LONGEST_CHECKIN_STREAK, SortDirection.DESCENDING).
-                addSort(UserExt.USER_CURRENT_CHECKIN_STREAK, SortDirection.DESCENDING).
+        final Query query = new Query().addSort(UserExt.USER_CURRENT_CHECKIN_STREAK, SortDirection.DESCENDING).
+                setFilter(new PropertyFilter(UserExt.USER_CURRENT_CHECKIN_STREAK_END, FilterOperator.EQUAL, today)).
                 setPage(1, fetchSize);
         try {
             final JSONObject result = userRepository.get(query);
@@ -185,6 +193,34 @@ public class ActivityQueryService {
             }
         } catch (final RepositoryException e) {
             LOGGER.log(Level.ERROR, "Gets top checkin users failed", e);
+        }
+        return ret;
+    }
+
+    /**
+     * Gets the top user online time with the specified fetch size.
+     *
+     * @param fetchSize the specified fetch size
+     * @return users, returns an empty list if not found
+     */
+    public List<JSONObject> getTopOnlineTimeUsers(final int fetchSize) {
+        final List<JSONObject> ret = new ArrayList<>();
+        final Query query = new Query().addSort(UserExt.ONLINE_MINUTE, SortDirection.DESCENDING).
+                setPage(1, fetchSize);
+        try {
+            final JSONObject result = userRepository.get(query);
+            final List<JSONObject> users = (List<JSONObject>) result.opt(Keys.RESULTS);
+            for (final JSONObject user : users) {
+                if (UserExt.USER_APP_ROLE_C_HACKER == user.optInt(UserExt.USER_APP_ROLE)) {
+                    user.put(UserExt.USER_T_POINT_HEX, Integer.toHexString(user.optInt(UserExt.USER_POINT)));
+                } else {
+                    user.put(UserExt.USER_T_POINT_CC, UserExt.toCCString(user.optInt(UserExt.USER_POINT)));
+                }
+                avatarQueryService.fillUserAvatarURL(user);
+                ret.add(user);
+            }
+        } catch (final RepositoryException e) {
+            LOGGER.log(Level.ERROR, "Gets top online time users failed", e);
         }
         return ret;
     }
@@ -284,5 +320,207 @@ public class ActivityQueryService {
         final long time = maybeToday.optLong(Pointtransfer.TIME);
 
         return DateUtils.isSameDay(now, new Date(time));
+    }
+
+    /**
+     * Gets the top Evolve top of rank users with the specified fetch size.
+     *
+     * @param fetchSize the specified fetch size
+     * @return users, returns an empty list if not found
+     */
+    public List<JSONObject> getEvolve(final String type, final int fetchSize) {
+        List<JSONObject> ret = new ArrayList<>();
+
+        try {
+            Query query = new Query()
+                    .setFilter(new PropertyFilter("gameId", FilterOperator.EQUAL, 40));
+            List<JSONObject> gameData = cloudRepository.getList(query);
+
+            // 排序并剪切
+            gameData.sort((o1, o2) -> {
+                long x = new JSONObject(o2.optString("data")).getJSONObject("top").optLong(type);
+                long y = new JSONObject(o1.optString("data")).getJSONObject("top").optLong(type);
+                return Long.compare(x, y);
+            });
+            if (gameData.size() > fetchSize) {
+                gameData = gameData.subList(0, fetchSize);
+            }
+
+            // 渲染用户信息
+            for (final JSONObject data : gameData) {
+                String userId = data.optString("userId");
+                data.put("profile", userRepository.get(userId));
+                data.put("data", new JSONObject(data.optString("data")));
+            }
+
+            ret = gameData;
+        } catch (final RepositoryException e) {
+            LOGGER.log(Level.ERROR, "Gets top Mofish users failed", e);
+        }
+
+        return ret;
+    }
+
+    /**
+     * Gets the top Life Restart top of rank users with the specified fetch size.
+     *
+     * @param fetchSize the specified fetch size
+     * @return users, returns an empty list if not found
+     */
+    public List<JSONObject> getTopLifeRestart(final int fetchSize) {
+        List<JSONObject> ret = new ArrayList<>();
+
+        try {
+            Query query = new Query()
+                    .setFilter(new PropertyFilter("gameId", FilterOperator.EQUAL, 39));
+            final List<JSONObject> gameDataFirst = cloudRepository.getList(query);
+
+            // 排序并剪切
+            List<JSONObject> gameData = new ArrayList<>();
+            for (JSONObject data : gameDataFirst) {
+                try {
+                    JSONObject data2 = new JSONObject(data.optString("data"));
+                    String times = data2.optString("times");
+                    if (!times.isEmpty()) {
+                        gameData.add(data);
+                    }
+                } catch (Exception ignored) {
+                }
+            }
+            Collections.sort(gameData, (o1, o2) -> {
+                int i1 = Integer.valueOf(new JSONObject(o1.optString("data")).optString("times"));
+                int i2 = Integer.valueOf(new JSONObject(o2.optString("data")).optString("times"));
+                return i2 - i1;
+            });
+            if (gameData.size() > fetchSize) {
+                gameData = gameData.subList(0, fetchSize);
+            }
+
+            // 渲染用户信息
+            for (final JSONObject data : gameData) {
+                String userId = data.optString("userId");
+                data.put("profile", userRepository.get(userId));
+                data.put("data", new JSONObject(data.optString("data")));
+                try {
+                    data.put("achievement", new JSONArray(data.optJSONObject("data").optString("ACHV")).length());
+                } catch (Exception e) {
+                    data.put("achievement", 0);
+                }
+            }
+
+            ret = gameData;
+        } catch (final RepositoryException e) {
+            LOGGER.log(Level.ERROR, "Gets top Mofish users failed", e);
+        }
+
+        return ret;
+    }
+
+    /**
+     * Gets the top Mofish users (single game max) with the specified fetch size.
+     *
+     * @param fetchSize the specified fetch size
+     * @return users, returns an empty list if not found
+     */
+    public List<JSONObject> getTopMofish(final int fetchSize) {
+        final List<JSONObject> ret = new ArrayList<>();
+
+        try {
+            final List<JSONObject> users = userRepository.select("SELECT\n"
+                    + "	u.*, MAX(sum) AS point, MAX(p.dataId) AS passTime\n"
+                    + "FROM\n"
+                    + "	" + pointtransferRepository.getName() + " AS p,\n"
+                    + "	" + userRepository.getName() + " AS u\n"
+                    + "WHERE\n"
+                    + "	p.toId = u.oId\n"
+                    + "AND type = 39\n"
+                    + "GROUP BY\n"
+                    + "	toId\n"
+                    + "ORDER BY\n"
+                    + "	point DESC, passTime ASC\n"
+                    + "LIMIT ?", fetchSize);
+
+            for (final JSONObject user : users) {
+                avatarQueryService.fillUserAvatarURL(user);
+
+                ret.add(user);
+            }
+        } catch (final RepositoryException e) {
+            LOGGER.log(Level.ERROR, "Gets top Mofish users failed", e);
+        }
+
+        return ret;
+    }
+
+    /**
+     * Gets the top ADR users (single game max) with the specified fetch size.
+     *
+     * @param fetchSize the specified fetch size
+     * @return users, returns an empty list if not found
+     */
+    public List<JSONObject> getTopADR(final int fetchSize) {
+        final List<JSONObject> ret = new ArrayList<>();
+
+        try {
+            final List<JSONObject> users = userRepository.select("SELECT\n"
+                    + "	u.*, MAX(dataId+0) AS point, MAX(p.time) as passTime\n"
+                    + "FROM\n"
+                    + "	" + pointtransferRepository.getName() + " AS p,\n"
+                    + "	" + userRepository.getName() + " AS u\n"
+                    + "WHERE\n"
+                    + "	p.toId = u.oId\n"
+                    + "AND type = 38\n"
+                    + "GROUP BY\n"
+                    + "	toId\n"
+                    + "ORDER BY\n"
+                    + "	point DESC, passTime ASC\n"
+                    + "LIMIT ?", fetchSize);
+
+            for (final JSONObject user : users) {
+                avatarQueryService.fillUserAvatarURL(user);
+
+                ret.add(user);
+            }
+        } catch (final RepositoryException e) {
+            LOGGER.log(Level.ERROR, "Gets top ADR users failed", e);
+        }
+
+        return ret;
+    }
+
+    /**
+     * Gets the top Emoji users (single game max) with the specified fetch size.
+     *
+     * @param fetchSize the specified fetch size
+     * @return users, returns an empty list if not found
+     */
+    public List<JSONObject> getTopEmoji(final int fetchSize) {
+        final List<JSONObject> ret = new ArrayList<>();
+
+        try {
+            final List<JSONObject> users = userRepository.select("SELECT\n"
+                    + "	u.*, MAX(dataId+0) AS point, MAX(p.time) as passTime\n"
+                    + "FROM\n"
+                    + "	" + pointtransferRepository.getName() + " AS p,\n"
+                    + "	" + userRepository.getName() + " AS u\n"
+                    + "WHERE\n"
+                    + "	p.toId = u.oId\n"
+                    + "AND type = 44\n"
+                    + "GROUP BY\n"
+                    + "	toId\n"
+                    + "ORDER BY\n"
+                    + "	point DESC, passTime ASC\n"
+                    + "LIMIT ?", fetchSize);
+
+            for (final JSONObject user : users) {
+                avatarQueryService.fillUserAvatarURL(user);
+
+                ret.add(user);
+            }
+        } catch (final RepositoryException e) {
+            LOGGER.log(Level.ERROR, "Gets top Emoji rank users failed", e);
+        }
+
+        return ret;
     }
 }

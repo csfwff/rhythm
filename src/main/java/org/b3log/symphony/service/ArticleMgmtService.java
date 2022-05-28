@@ -1,5 +1,6 @@
 /*
- * Symphony - A modern community (forum/BBS/SNS/blog) platform written in Java.
+ * Rhythm - A modern community (forum/BBS/SNS/blog) platform written in Java.
+ * Modified version from Symphony, Thanks Symphony :)
  * Copyright (C) 2012-present, b3log.org
  *
  * This program is free software: you can redistribute it and/or modify
@@ -771,6 +772,8 @@ public class ArticleMgmtService {
             final JSONObject eventData = new JSONObject();
             eventData.put(Article.ARTICLE, article);
             eventData.put(Article.ARTICLE_T_NOTIFY_FOLLOWERS, requestJSONObject.optBoolean(Article.ARTICLE_T_NOTIFY_FOLLOWERS));
+            eventData.put(Article.ARTICLE_TAGS, requestJSONObject.optString(Article.ARTICLE_TAGS));
+            eventData.put("author", author);
             eventManager.fireEventAsynchronously(new Event<>(EventTypes.ADD_ARTICLE, eventData));
 
             return ret;
@@ -1272,7 +1275,7 @@ public class ArticleMgmtService {
                 }
 
                 if (!ids.contains(articleId)) {
-                    throw new ServiceException(langPropsService.get("stickExistLabel"));
+                    // throw new ServiceException(langPropsService.get("stickExistLabel"));
                 }
             }
 

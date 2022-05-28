@@ -1,6 +1,7 @@
 <#--
 
-    Symphony - A modern community (forum/BBS/SNS/blog) platform written in Java.
+    Rhythm - A modern community (forum/BBS/SNS/blog) platform written in Java.
+    Modified version from Symphony, Thanks Symphony :)
     Copyright (C) 2012-present, b3log.org
 
     This program is free software: you can redistribute it and/or modify
@@ -26,9 +27,8 @@
         <li>
             <div class="fn-flex">
                 <a rel="nofollow"
-                   class="tooltipped tooltipped-se"
-                   href="${servePath}/member/${user.userName}" 
-                   aria-label="${user.userName}"><div class="avatar" style="background-image:url('${user.userAvatarURL}')"></div></a>
+                   href="${servePath}/member/${user.userName}"
+                   ><div class="avatar" aria-label="${user.userName}" style="background-image:url('${user.userAvatarURL}')"></div></a>
                 <div class="has-view fn-flex-1">
                     <h2>
                         ${user_index + 1}.
@@ -50,7 +50,7 @@
                             <#if 0 == user.userAppRole>${hackerLabel}<#else>${painterLabel}</#if>
                         </div>
                     </div>
-                    <div class="cmts tooltipped tooltipped-w" aria-label="${pointLabel} ${user.userPoint?c}">
+                    <div class="cmts tooltipped tooltipped-w" aria-label="${checkinStreakPart0Label}${user.userLongestCheckinStreak}${checkinStreakPart1Label}${user.userCurrentCheckinStreak}${checkinStreakPart2Label}">
                         ${user.userCurrentCheckinStreak}/<span class="ft-red">${user.userLongestCheckinStreak}</span>
                     </div>
                 </div>

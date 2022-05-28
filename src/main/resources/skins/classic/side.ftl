@@ -1,6 +1,7 @@
 <#--
 
-    Symphony - A modern community (forum/BBS/SNS/blog) platform written in Java.
+    Rhythm - A modern community (forum/BBS/SNS/blog) platform written in Java.
+    Modified version from Symphony, Thanks Symphony :)
     Copyright (C) 2012-present, b3log.org
 
     This program is free software: you can redistribute it and/or modify
@@ -26,18 +27,20 @@
     </div>
 </#if>
 
+<#if showSideAd>
 <#if ADLabel!="" && ((tag?? && tag.tagShowSideAd == 0) || !tag??)>
 <div class="module">
     <div class="module-header">
         <h2>
-            ${sponsorLabel} 
-            <a href="${servePath}/about" class="fn-right ft-13 ft-gray" target="_blank">${wantPutOnLabel}</a>
+            ${sponsorLabel}
+            <a href="${servePath}/settings/system" class="fn-right ft-13 ft-gray" target="_blank">${wantPutOnLabel}</a>
         </h2>
     </div>
     <div class="module-panel ad fn-clear">
         ${ADLabel}
     </div>
 </div>
+</#if>
 </#if>
 
 <div class="module">
@@ -53,7 +56,7 @@
         <#list sideBreezemoons as item>
             <li>
                 <a href="${servePath}/member/${item.breezemoonAuthorName}">
-                    <span class="avatar-small slogan tooltipped tooltipped-se" aria-label="${item.breezemoonAuthorName}"
+                    <span class="avatar-small slogan" aria-label="${item.breezemoonAuthorName}"
                           style="background-image: url(${item.breezemoonAuthorThumbnailURL48})"></span>
                 </a>
                 <a href="${servePath}/member/${item.breezemoonAuthorName}/breezemoons/${item.oId}"
@@ -79,7 +82,7 @@
             <#list sideHotArticles as hotArticle>
             <li<#if !hotArticle_has_next> class="last"</#if>>
                 <a rel="nofollow" href="${servePath}/member/${hotArticle.articleAuthorName}">
-                    <span class="avatar-small tooltipped tooltipped-se slogan" aria-label="${hotArticle.articleAuthorName}" style="background-image:url('${hotArticle.articleAuthorThumbnailURL20}')"></span>
+                    <span class="avatar-small slogan" aria-label="${hotArticle.articleAuthorName}" style="background-image:url('${hotArticle.articleAuthorThumbnailURL20}')"></span>
                   </a>
                 <a rel="nofollow" class="title" href="${servePath}${hotArticle.articlePermalink}">${hotArticle.articleTitleEmoj}</a>
             </li>
@@ -107,7 +110,7 @@
                 <div<#if tag.tagDescription == ''> style="width:auto"</#if>>
                     <div>${tag.tagDescription}</div>
                     <span class="fn-right">
-                        <span class="ft-gray">${referenceLabel}</span> 
+                        <span class="ft-gray">${referenceLabel}</span>
                         ${tag.tagReferenceCount} &nbsp;
                         <span class="ft-gray">${cmtLabel}</span>
                         ${tag.tagCommentCount}&nbsp;
@@ -132,7 +135,7 @@
             <#list sideRandomArticles as randomArticle>
             <li<#if !randomArticle_has_next> class="last"</#if>>
                 <a rel="nofollow" href="${servePath}/member/${randomArticle.articleAuthorName}">
-                    <span aria-label="${randomArticle.articleAuthorName}" style="background-image:url('${randomArticle.articleAuthorThumbnailURL20}')" class="avatar-small tooltipped tooltipped-se slogan"></span>
+                    <span aria-label="${randomArticle.articleAuthorName}" style="background-image:url('${randomArticle.articleAuthorThumbnailURL20}')" class="avatar-small slogan"></span>
                 </a>
                 <a class="title" rel="nofollow" href="${servePath}${randomArticle.articlePermalink}">${randomArticle.articleTitleEmoj}</a>
             </li>

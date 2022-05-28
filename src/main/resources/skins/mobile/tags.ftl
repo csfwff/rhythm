@@ -1,6 +1,7 @@
 <#--
 
-    Symphony - A modern community (forum/BBS/SNS/blog) platform written in Java.
+    Rhythm - A modern community (forum/BBS/SNS/blog) platform written in Java.
+    Modified version from Symphony, Thanks Symphony :)
     Copyright (C) 2012-present, b3log.org
 
     This program is free software: you can redistribute it and/or modify
@@ -32,7 +33,7 @@
                 <div class="fn-hr10"></div>
                 <div class="content">
                     <div class="module">
-                        <div class="module-header">  
+                        <div class="module-header">
                             <h2>
                                 ${trendTagsLabel}
                             </h2>
@@ -40,7 +41,7 @@
                         <div class="module-panel list">
                             <ul class="tags-trend">
                                 <#list trendTags as tag>
-                                <li class="<#if !tag_has_next>last</#if>"> 
+                                <li class="<#if !tag_has_next>last</#if>">
                                     <div class="fn-clear">
                                         <#if tag.tagIconPath!="">
                                         <div class="avatar-small fn-left" style="background-image:url('${tag.tagIconPath}')" alt="${tag.tagTitle}"></div>
@@ -49,7 +50,7 @@
                                         <h2><a class="ft-red" rel="tag" href="${servePath}/tag/${tag.tagURI}">${tag.tagTitle}</a></h2>
                                         <span class="ft-gray fn-right">
                                             ${referenceLabel} ${tag.tagReferenceCount?c} &nbsp;
-                                            ${cmtLabel} ${tag.tagCommentCount?c} 
+                                            ${cmtLabel} ${tag.tagCommentCount?c}
                                         </span>
                                     </div>
                                     <div class="vditor-reset">${tag.tagDescription}</div>
@@ -60,12 +61,13 @@
                     </div>
                 </div>
                 <div class="side">
+                    <#if showSideAd>
                     <#if ADLabel!="">
                     <div class="module">
                         <div class="module-header">
                             <h2>
-                                ${sponsorLabel} 
-                                <a href="${servePath}/about" class="fn-right ft-13 ft-gray" target="_blank">${wantPutOnLabel}</a>
+                                ${sponsorLabel}
+                                <a href="${servePath}/settings/system" class="fn-right ft-13 ft-gray" target="_blank">${wantPutOnLabel}</a>
                             </h2>
                         </div>
                         <div class="module-panel ad fn-clear">
@@ -75,7 +77,7 @@
                     </#if>
                     </#if>
                     <div class="module">
-                        <div class="module-header">  
+                        <div class="module-header">
                             <h2>
                                 ${coldTagsLabel}
                             </h2>
@@ -90,7 +92,7 @@
                                     <h2><a rel="tag" class="ft-green" href="${servePath}/tag/${tag.tagURI}">${tag.tagTitle}</a></h2>
                                     <span class="ft-gray fn-right">
                                         ${referenceLabel} ${tag.tagReferenceCount?c} &nbsp;
-                                        ${cmtLabel} ${tag.tagCommentCount?c} 
+                                        ${cmtLabel} ${tag.tagCommentCount?c}
                                     </span>
                                     <div class="vditor-reset">${tag.tagDescription}</div>
                                 </li>

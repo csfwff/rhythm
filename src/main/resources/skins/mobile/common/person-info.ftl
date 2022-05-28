@@ -1,6 +1,7 @@
 <#--
 
-    Symphony - A modern community (forum/BBS/SNS/blog) platform written in Java.
+    Rhythm - A modern community (forum/BBS/SNS/blog) platform written in Java.
+    Modified version from Symphony, Thanks Symphony :)
     Copyright (C) 2012-present, b3log.org
 
     This program is free software: you can redistribute it and/or modify
@@ -21,13 +22,6 @@
 <div class="module person-info" data-percent="${liveness}">
     <div class="info fn-clear">
         <button class="btn red" title="${addArticleLabel}" onclick="window.location = '/pre-post'">${postArticleLabel}</button>
-        <#if !isDailyCheckin>
-        <a class="fn-right" href="${servePath}/activity/daily-checkin">${dailyCheckinLabel}</a>
-        <#else>
-        <a class="ft-gray fn-right" title="${checkinStreakLabel}" href="${servePath}/top/checkin">
-            ${currentUser.userCurrentCheckinStreak}/<span class="ft-red">${currentUser.userLongestCheckinStreak}</span>
-        </a>
-        </#if>
     </div>
     <div class="module-panel">
         <ul class="status fn-flex">

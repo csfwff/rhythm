@@ -1,5 +1,6 @@
 /*
- * Symphony - A modern community (forum/BBS/SNS/blog) platform written in Java.
+ * Rhythm - A modern community (forum/BBS/SNS/blog) platform written in Java.
+ * Modified version from Symphony, Thanks Symphony :)
  * Copyright (C) 2012-present, b3log.org
  *
  * This program is free software: you can redistribute it and/or modify
@@ -20,11 +21,17 @@ package org.b3log.symphony.service;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.b3log.latke.http.RequestContext;
 import org.b3log.latke.ioc.Inject;
+import org.b3log.latke.model.User;
 import org.b3log.latke.repository.*;
 import org.b3log.latke.service.annotation.Service;
 import org.b3log.symphony.model.Reward;
+import org.b3log.symphony.model.UserExt;
 import org.b3log.symphony.repository.RewardRepository;
+import org.b3log.symphony.util.StatusCodes;
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -49,6 +56,48 @@ public class RewardQueryService {
      */
     @Inject
     private RewardRepository rewardRepository;
+
+    /**
+     * User query service.
+     */
+    @Inject
+    private UserQueryService userQueryService;
+
+    /**
+     * Get rewarded senders by dataId.
+     */
+    public void rewardedSenders(final RequestContext context) {
+        String articleId = context.pathVar("aId");
+
+        final Query query = new Query();
+        final List<Filter> filters = new ArrayList<>();
+        filters.add(new PropertyFilter(Reward.DATA_ID, FilterOperator.EQUAL, articleId));
+        filters.add(new PropertyFilter(Reward.TYPE, FilterOperator.EQUAL, Reward.TYPE_C_THANK_ARTICLE));
+
+        query.select(Reward.SENDER_ID)
+                .setFilter(new CompositeFilter(CompositeFilterOperator.AND, filters));
+
+        try {
+            List<JSONObject> list = rewardRepository.getList(query);
+            JSONArray array = new JSONArray();
+            // 渲染用户信息
+            for (JSONObject object : list) {
+                JSONObject userObject = new JSONObject();
+                try {
+                    JSONObject user = userQueryService.getUser(object.optString(Reward.SENDER_ID));
+                    userObject.put(User.USER_NAME, user.optString(User.USER_NAME));
+                    userObject.put(UserExt.USER_AVATAR_URL, user.optString(UserExt.USER_AVATAR_URL));
+                } catch (Exception ignored) {
+                }
+                array.put(userObject);
+            }
+            context.renderJSON(StatusCodes.SUCC).renderData(array);
+        } catch (final RepositoryException e) {
+            LOGGER.log(Level.ERROR, "get rewarded senders failed", e);
+
+            context.renderJSON(StatusCodes.ERR);
+        }
+    }
 
     /**
      * Gets rewarded count.

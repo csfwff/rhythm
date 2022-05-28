@@ -1,5 +1,6 @@
 /*
- * Symphony - A modern community (forum/BBS/SNS/blog) platform written in Java.
+ * Rhythm - A modern community (forum/BBS/SNS/blog) platform written in Java.
+ * Modified version from Symphony, Thanks Symphony :)
  * Copyright (C) 2012-present, b3log.org
  *
  * This program is free software: you can redistribute it and/or modify
@@ -195,11 +196,13 @@ var GobangChannel = {
      * @description Initializes message channel
      */
     init: function (channelServer) {
-        GobangChannel.ws = new ReconnectingWebSocket(channelServer);
-        GobangChannel.ws.reconnectInterval = 10000;
+        GobangChannel.ws = new WebSocket(channelServer);
 
         GobangChannel.ws.onopen = function () {
-            // GobangChannel.ws.send('zephyr test');
+            console.log("Connected to gobang channel websocket.")
+            setInterval(function () {
+                GobangChannel.ws.send('zephyr test')
+            }, 1000 * 55)
         };
 
         GobangChannel.ws.onmessage = function (evt) {
@@ -214,10 +217,13 @@ var GobangChannel = {
                     Gobang.drawChessMan(resp.posX,resp.posY,5,"red");
                     if(resp.result != null && resp.result != ""){
                         Util.alert(resp.result);
-                        document.getElementById("gobangCanvas").removeEventListener("click",Gobang.moveChess);
-                        $(".side button.green").show();
-                        $(".side button.red").hide();
-                        $(".side ul").prepend('<li>GG</li>');
+                        setTimeout(function () {
+                            window.location.reload();
+                        }, 3000);
+                        // document.getElementById("gobangCanvas").removeEventListener("click",Gobang.moveChess);
+                        // $(".side button.green").show();
+                        // $(".side button.red").hide();
+                        // $(".side ul").prepend('<li>GG</li>');
                     }
                     break;
                 case 3:
@@ -252,7 +258,7 @@ var GobangChannel = {
         };
 
         GobangChannel.ws.onclose = function () {
-            GobangChannel.ws.close();
+            console.log("Disconnected to gobang channel websocket.")
         };
 
         GobangChannel.ws.onerror = function (err) {

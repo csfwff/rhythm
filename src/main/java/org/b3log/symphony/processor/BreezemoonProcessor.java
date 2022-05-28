@@ -1,5 +1,6 @@
 /*
- * Symphony - A modern community (forum/BBS/SNS/blog) platform written in Java.
+ * Rhythm - A modern community (forum/BBS/SNS/blog) platform written in Java.
+ * Modified version from Symphony, Thanks Symphony :)
  * Copyright (C) 2012-present, b3log.org
  *
  * This program is free software: you can redistribute it and/or modify
@@ -34,6 +35,7 @@ import org.b3log.latke.util.Requests;
 import org.b3log.symphony.model.Breezemoon;
 import org.b3log.symphony.model.Common;
 import org.b3log.symphony.model.UserExt;
+import org.b3log.symphony.processor.middleware.AnonymousViewCheckMidware;
 import org.b3log.symphony.processor.middleware.CSRFMidware;
 import org.b3log.symphony.processor.middleware.LoginCheckMidware;
 import org.b3log.symphony.processor.middleware.PermissionMidware;
@@ -42,6 +44,7 @@ import org.b3log.symphony.service.BreezemoonQueryService;
 import org.b3log.symphony.service.DataModelService;
 import org.b3log.symphony.service.OptionQueryService;
 import org.b3log.symphony.util.*;
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.util.List;
@@ -102,12 +105,38 @@ public class BreezemoonProcessor {
         final LoginCheckMidware loginCheck = beanManager.getReference(LoginCheckMidware.class);
         final PermissionMidware permissionMidware = beanManager.getReference(PermissionMidware.class);
         final CSRFMidware csrfMidware = beanManager.getReference(CSRFMidware.class);
+        final AnonymousViewCheckMidware anonymousViewCheckMidware = beanManager.getReference(AnonymousViewCheckMidware.class);
 
         final BreezemoonProcessor breezemoonProcessor = beanManager.getReference(BreezemoonProcessor.class);
         Dispatcher.get("/watch/breezemoons", breezemoonProcessor::showWatchBreezemoon, loginCheck::handle, csrfMidware::fill);
-        Dispatcher.post("/breezemoon", breezemoonProcessor::addBreezemoon, loginCheck::handle, csrfMidware::check, permissionMidware::check);
+        Dispatcher.post("/breezemoon", breezemoonProcessor::addBreezemoon, loginCheck::handle, permissionMidware::check);
         Dispatcher.put("/breezemoon/{id}", breezemoonProcessor::updateBreezemoon, loginCheck::handle, csrfMidware::check, permissionMidware::check);
         Dispatcher.delete("/breezemoon/{id}", breezemoonProcessor::removeBreezemoon, loginCheck::handle, csrfMidware::check, permissionMidware::check);
+        Dispatcher.get("/api/breezemoons", breezemoonProcessor::getBreezemoons, anonymousViewCheckMidware::handle);
+    }
+
+    /**
+     * 清风明月API
+     * @param context
+     */
+    public void getBreezemoons(final RequestContext context) {
+        try {
+            final int pageNum = Integer.parseInt(context.param("p"));
+            final int pageSize = Integer.parseInt(context.param("size"));
+            final int windowSize = 15;
+            final JSONObject result = breezemoonQueryService.getBreezemoons("", "", pageNum, pageSize, windowSize);
+            final List<JSONObject> bms = (List<JSONObject>) result.opt(Breezemoon.BREEZEMOONS);
+            // 结果去敏
+            for (int i = 0; i < bms.size(); i++) {
+                bms.get(i).remove("breezemoonIP");
+                bms.get(i).remove("breezemoonUA");
+                bms.get(i).remove("breezemoonAuthorId");
+                bms.get(i).remove("breezemoonStatus");
+            }
+            context.renderJSON(new JSONObject().put(Breezemoon.BREEZEMOONS, new JSONArray(bms))).renderCode(StatusCodes.SUCC);
+        } catch (Exception e) {
+            context.renderJSON(new JSONObject()).renderCode(StatusCodes.ERR).renderMsg("请求非法");
+        }
     }
 
     /**
@@ -172,10 +201,15 @@ public class BreezemoonProcessor {
             return;
         }
 
+        JSONObject user = Sessions.getUser();
+        try {
+            user = ApiProcessor.getUserByKey(requestJSONObject.optString("apiKey"));
+        } catch (NullPointerException ignored) {
+        }
+
         final JSONObject breezemoon = new JSONObject();
         final String breezemoonContent = requestJSONObject.optString(Breezemoon.BREEZEMOON_CONTENT);
         breezemoon.put(Breezemoon.BREEZEMOON_CONTENT, breezemoonContent);
-        final JSONObject user = Sessions.getUser();
         final String authorId = user.optString(Keys.OBJECT_ID);
         breezemoon.put(Breezemoon.BREEZEMOON_AUTHOR_ID, authorId);
         final String ip = Requests.getRemoteAddr(request);

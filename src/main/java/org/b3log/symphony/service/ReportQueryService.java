@@ -1,5 +1,6 @@
 /*
- * Symphony - A modern community (forum/BBS/SNS/blog) platform written in Java.
+ * Rhythm - A modern community (forum/BBS/SNS/blog) platform written in Java.
+ * Modified version from Symphony, Thanks Symphony :)
  * Copyright (C) 2012-present, b3log.org
  *
  * This program is free software: you can redistribute it and/or modify
@@ -31,6 +32,7 @@ import org.b3log.latke.service.LangPropsService;
 import org.b3log.latke.service.annotation.Service;
 import org.b3log.latke.util.Paginator;
 import org.b3log.symphony.model.Article;
+import org.b3log.symphony.model.Common;
 import org.b3log.symphony.model.Report;
 import org.b3log.symphony.model.UserExt;
 import org.b3log.symphony.repository.ArticleRepository;
@@ -99,6 +101,12 @@ public class ReportQueryService {
     private CommentQueryService commentQueryService;
 
     /**
+     * Chat Room Service.
+     */
+    @Inject
+    private ChatRoomService chatRoomService;
+
+    /**
      * Gets report by the specified request json object.
      *
      * @param requestJSONObject the specified request json object, for example,
@@ -155,6 +163,7 @@ public class ReportQueryService {
 
         final List<JSONObject> records = (List<JSONObject>) result.opt(Keys.RESULTS);
         final List<JSONObject> reports = new ArrayList<>();
+        String chatContent = "";
         for (final JSONObject record : records) {
             final JSONObject report = new JSONObject();
             report.put(Keys.OBJECT_ID, record.optString(Keys.OBJECT_ID));
@@ -191,6 +200,14 @@ public class ReportQueryService {
                         report.put(Report.REPORT_T_DATA_TYPE_STR, langPropsService.get("accountLabel"));
                         final JSONObject reported = userRepository.get(dataId);
                         reportData = UserExt.getUserLink(reported);
+                        break;
+                    case Report.REPORT_DATA_TYPE_C_CHAT:
+                        report.put(Report.REPORT_T_DATA_TYPE_STR, langPropsService.get("chatLabel"));
+                        final JSONObject redPacket = chatRoomService.getChatMsg(dataId);
+                        final JSONObject content = new JSONObject(redPacket.optString(Common.CONTENT));
+                        chatContent = content.optString("content");
+                        reportData = "<a href=\"" + Latkes.getServePath() + "/cr?oId=" + dataId +
+                                "\" target=\"_blank\">跳转至该消息</a>";
                         break;
                     default:
                         LOGGER.log(Level.ERROR, "Unknown report data type [" + dataType + "]");
@@ -241,6 +258,9 @@ public class ReportQueryService {
             memo = Markdowns.toHTML(memo);
             memo = Markdowns.clean(memo, "");
             report.put(Report.REPORT_MEMO, memo);
+            if (!chatContent.isEmpty()) {
+                report.put(Report.REPORT_MEMO, chatContent.replaceAll("\n\n", "<br>"));
+            }
             report.put(Report.REPORT_HANDLED, record.optInt(Report.REPORT_HANDLED));
             reports.add(report);
         }

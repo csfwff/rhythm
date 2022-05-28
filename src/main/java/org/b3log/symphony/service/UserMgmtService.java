@@ -1,5 +1,6 @@
 /*
- * Symphony - A modern community (forum/BBS/SNS/blog) platform written in Java.
+ * Rhythm - A modern community (forum/BBS/SNS/blog) platform written in Java.
+ * Modified version from Symphony, Thanks Symphony :)
  * Copyright (C) 2012-present, b3log.org
  *
  * This program is free software: you can redistribute it and/or modify
@@ -28,6 +29,7 @@ import org.apache.commons.lang.time.DateUtils;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.util.Strings;
 import org.b3log.latke.Keys;
 import org.b3log.latke.Latkes;
 import org.b3log.latke.ioc.Inject;
@@ -180,6 +182,7 @@ public class UserMgmtService {
             user.put(User.USER_ROLE, Role.ROLE_ID_C_DEFAULT);
             user.put(UserExt.USER_ONLINE_FLAG, false);
             user.put(UserExt.USER_STATUS, UserExt.USER_STATUS_C_DEACTIVATED);
+            user.put("userPhone", "");
             userRepository.update(userId, user);
 
             notificationRepository.removeByUserId(userId);
@@ -355,6 +358,7 @@ public class UserMgmtService {
 
         try {
             final String userEmail = requestJSONObject.optString(User.USER_EMAIL).trim().toLowerCase();
+            final String userPhone = requestJSONObject.optString("userPhone");
             final String userName = requestJSONObject.optString(User.USER_NAME);
             JSONObject user = userRepository.getByName(userName);
             if (null != user && (UserExt.USER_STATUS_C_VALID == user.optInt(UserExt.USER_STATUS)
@@ -371,7 +375,7 @@ public class UserMgmtService {
             boolean toUpdate = false;
             String ret = null;
             String avatarURL = null;
-            user = userRepository.getByEmail(userEmail);
+            user = Strings.isBlank(userPhone) ? null : userRepository.getByPhone(userPhone);
             int userNo = 0;
             if (null != user) {
                 if (UserExt.USER_STATUS_C_VALID == user.optInt(UserExt.USER_STATUS)
@@ -381,7 +385,7 @@ public class UserMgmtService {
                         transaction.rollback();
                     }
 
-                    throw new ServiceException(langPropsService.get("duplicatedEmailLabel"));
+                    throw new ServiceException("该手机号已注册");
                 }
 
                 toUpdate = true;
@@ -392,6 +396,7 @@ public class UserMgmtService {
 
             user = new JSONObject();
             user.put(User.USER_NAME, userName);
+            user.put("userPhone", userPhone);
             user.put(User.USER_EMAIL, userEmail);
             user.put(UserExt.USER_APP_ROLE, requestJSONObject.optInt(UserExt.USER_APP_ROLE));
             user.put(User.USER_PASSWORD, requestJSONObject.optString(User.USER_PASSWORD));
@@ -440,6 +445,7 @@ public class UserMgmtService {
             user.put(UserExt.USER_FOLLOWING_USER_STATUS, UserExt.USER_XXX_STATUS_C_ENABLED);
             user.put(UserExt.USER_FOLLOWER_STATUS, UserExt.USER_XXX_STATUS_C_ENABLED);
             user.put(UserExt.USER_BREEZEMOON_STATUS, UserExt.USER_XXX_STATUS_C_ENABLED);
+            user.put(UserExt.CHAT_ROOM_PICTURE_STATUS, UserExt.USER_XXX_STATUS_C_DISABLED);
             user.put(UserExt.USER_POINT_STATUS, UserExt.USER_XXX_STATUS_C_ENABLED);
             user.put(UserExt.USER_UA_STATUS, UserExt.USER_XXX_STATUS_C_ENABLED);
             user.put(UserExt.USER_NOTIFY_STATUS, UserExt.USER_XXX_STATUS_C_ENABLED);
@@ -452,6 +458,8 @@ public class UserMgmtService {
             user.put(UserExt.USER_REPLY_WATCH_ARTICLE_STATUS, UserExt.USER_SUB_MAIL_STATUS_DISABLED);
             user.put(UserExt.USER_FORWARD_PAGE_STATUS, UserExt.USER_XXX_STATUS_C_ENABLED);
             user.put(UserExt.USER_INDEX_REDIRECT_URL, "");
+            user.put(UserExt.ONLINE_MINUTE, 0);
+            user.put("secret2fa", "");
 
             final JSONObject optionLanguage = optionRepository.get(Option.ID_C_MISC_LANGUAGE);
             final String adminSpecifiedLang = optionLanguage.optString(Option.OPTION_VALUE);
@@ -496,15 +504,15 @@ public class UserMgmtService {
                         byte[] avatarData;
 
                         final String hash = DigestUtils.md5Hex(ret);
-                        avatarData = Gravatars.getRandomAvatarData(hash); // https://github.com/b3log/symphony/issues/569
-                        if (null == avatarData) {
+                        /*avatarData = Gravatars.getRandomAvatarData(hash); // https://github.com/b3log/symphony/issues/569
+                        if (null == avatarData) {*/
                             final BufferedImage img = avatarQueryService.createAvatar(hash, 512);
                             final ByteArrayOutputStream baos = new ByteArrayOutputStream();
                             ImageIO.write(img, "jpg", baos);
                             baos.flush();
                             avatarData = baos.toByteArray();
                             baos.close();
-                        }
+                        /*}*/
 
                         if (Symphonys.QN_ENABLED) {
                             final Auth auth = Auth.create(Symphonys.UPLOAD_QINIU_AK, Symphonys.UPLOAD_QINIU_SK);
@@ -631,6 +639,34 @@ public class UserMgmtService {
     }
 
     /**
+     * Set an online minute.
+     *
+     * @param userId user id.
+     * @param minute online minute.
+     * @throws ServiceException an normal exception.
+     */
+    public void setOnlineMinute(final String userId, int minute) {
+        final Transaction transaction = userRepository.beginTransaction();
+
+        try {
+            final JSONObject user = userRepository.get(userId);
+            if (null == user) {
+                return;
+            }
+            user.put(UserExt.ONLINE_MINUTE, minute);
+            userRepository.update(userId, user, UserExt.ONLINE_MINUTE);
+
+            transaction.commit();
+        } catch (final RepositoryException e) {
+            if (transaction.isActive()) {
+                transaction.rollback();
+            }
+
+            LOGGER.log(Level.ERROR, "Set online minute [id=" + userId + ", minute=" + minute + "] failed", e);
+        }
+    }
+
+    /**
      * Updates the specified user by the given user id.
      *
      * @param userId the given user id
@@ -661,6 +697,36 @@ public class UserMgmtService {
             }
 
             LOGGER.log(Level.ERROR, "Updates a user[id=" + userId + "] failed", e);
+            throw new ServiceException(e);
+        }
+    }
+
+    /**
+     * Updates the specified user's phone by the given user id.
+     *
+     * @param userId the given user id
+     * @param user   the specified user, contains the new phone
+     * @throws ServiceException service exception
+     */
+    public void updateUserPhone(final String userId, final JSONObject user) throws ServiceException {
+        final String newPhone = user.optString("userPhone");
+
+        final Transaction transaction = userRepository.beginTransaction();
+
+        try {
+            if (null != userRepository.getByPhone(newPhone)) {
+                throw new ServiceException("手机号重复 [" + newPhone + "]");
+            }
+
+            userRepository.update(userId, user, "userPhone");
+
+            transaction.commit();
+        } catch (final RepositoryException e) {
+            if (transaction.isActive()) {
+                transaction.rollback();
+            }
+
+            LOGGER.log(Level.ERROR, "Updates phone of the user[id=" + userId + "] failed", e);
             throw new ServiceException(e);
         }
     }

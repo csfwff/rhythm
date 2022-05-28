@@ -1,6 +1,7 @@
 <#--
 
-    Symphony - A modern community (forum/BBS/SNS/blog) platform written in Java.
+    Rhythm - A modern community (forum/BBS/SNS/blog) platform written in Java.
+    Modified version from Symphony, Thanks Symphony :)
     Copyright (C) 2012-present, b3log.org
 
     This program is free software: you can redistribute it and/or modify
@@ -52,12 +53,16 @@
                     ${dataLabel}
                     <#elseif type == "help">
                     ${helpLabel}
+                    <#elseif type == "system">
+                    个性化
                     </#if>
+
                     <svg class="fn-right"><use xlink:href="#chevron-down"></use></svg>
                 </div>
                 <div class="fn-hr5"></div>
                 <ul class="tab fn-clear fn-none">
                     <li<#if 'profile' == type> class="fn-none"</#if>><a href="${servePath}/settings">${profilesLabel}</a></li>
+                    <li<#if 'system' == type> class="current"</#if>><a href="${servePath}/settings/system">个性化</a></li>
                     <li<#if 'avatar' == type> class="fn-none"</#if>><a href="${servePath}/settings/avatar">${avatarLabel}</a></li>
                     <li<#if 'account' == type> class="fn-none"</#if>><a href="${servePath}/settings/account">${accountLabel}</a></li>
                     <li<#if 'invite' == type> class="fn-none"</#if>><a href="${servePath}/settings/invite">${inviteLabel}</a></li>
@@ -94,6 +99,9 @@
                     Label.invalidUserNicknameLabel = "${invalidUserNicknameLabel}";
                     Label.previewLabel = "${previewLabel}";
                     Label.unPreviewLabel = "${unPreviewLabel}";
+                    <#if 'account' == type>Settings.initBag(${sysBag});</#if>
+                    <#if 'account' == type>Settings.initMetal(${sysMetal});</#if>
+                    <#if 'account' == type>Settings.initMFA();</#if>
         </script>
     </body>
 </html>

@@ -1,5 +1,6 @@
 /*
- * Symphony - A modern community (forum/BBS/SNS/blog) platform written in Java.
+ * Rhythm - A modern community (forum/BBS/SNS/blog) platform written in Java.
+ * Modified version from Symphony, Thanks Symphony :)
  * Copyright (C) 2012-present, b3log.org
  *
  * This program is free software: you can redistribute it and/or modify
@@ -35,6 +36,7 @@ import org.b3log.latke.model.User;
 import org.b3log.latke.service.LangPropsService;
 import org.b3log.latke.util.Locales;
 import org.b3log.symphony.model.*;
+import org.b3log.symphony.service.CloudService;
 import org.b3log.symphony.service.RoleQueryService;
 import org.b3log.symphony.service.UserQueryService;
 import org.b3log.symphony.util.Sessions;
@@ -42,10 +44,7 @@ import org.b3log.symphony.util.Templates;
 import org.json.JSONObject;
 
 import java.io.StringWriter;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -195,6 +194,17 @@ public class ArticleChannel implements WebSocketChannel {
                     SESSION_CACHE.put(user.optString(Keys.OBJECT_ID) + Common.CSRF_TOKEN, csrfTokenValue);
                 }
                 dataModel.put(Common.CSRF_TOKEN, csrfTokenValue.optString(Common.DATA));
+
+                final CloudService cloudService = beanManager.getReference(CloudService.class);
+                JSONObject comment = (JSONObject) dataModel.get("comment");
+                String metal = cloudService.getEnabledMetal(comment.optString("commentAuthorId"));
+                if (!metal.equals("{}")) {
+                    List<Object> list = new JSONObject(metal).optJSONArray("list").toList();
+                    comment.put("sysMetal", list);
+                } else {
+                    comment.put("sysMetal", new ArrayList<>());
+                }
+                dataModel.put("comment", comment);
 
                 final String templateDirName = httpSession.getAttribute(Keys.TEMPLATE_DIR_NAME);
                 final Template template = Templates.getTemplate(templateDirName + "/common/comment.ftl");

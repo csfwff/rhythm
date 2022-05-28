@@ -1,6 +1,7 @@
 <#--
 
-    Symphony - A modern community (forum/BBS/SNS/blog) platform written in Java.
+    Rhythm - A modern community (forum/BBS/SNS/blog) platform written in Java.
+    Modified version from Symphony, Thanks Symphony :)
     Copyright (C) 2012-present, b3log.org
 
     This program is free software: you can redistribute it and/or modify
@@ -22,7 +23,7 @@
     <div class="fn-flex">
         <div>
             <a rel="nofollow" href="${servePath}/member/${comment.commentAuthorName}">
-            <div class="avatar tooltipped tooltipped-se"
+            <div class="avatar"
                  aria-label="${comment.commentAuthorName}" style="background-image:url('${comment.commentAuthorThumbnailURL}')"></div>
             </a>
         </div>
@@ -31,6 +32,9 @@
             <div class="fn-clear comment-info">
                 <span class="fn-left ft-smaller">
                     <a rel="nofollow" href="${servePath}/member/${comment.commentAuthorName}" class="ft-gray"><span class="ft-gray">${comment.commentAuthorName}</span></a>
+                    <#list comment.sysMetal?eval as metal>
+                        <img title="${metal.description}" src="https://fishpi.cn/gen?scale=0.79&txt=${metal.name}&${metal.attr}"/>
+                    </#list>
                     <span class="ft-fade">• ${comment.timeAgo}</span>
                     <#if 0 == comment.commenter.userUAStatus><span class="cmt-via ft-fade hover-show fn-hidden" data-ua="${comment.commentUA}"></span></#if>
                 </span>
@@ -60,6 +64,7 @@
                         <div class="avatar-small" style="background-image:url('${comment.commentOriginalAuthorThumbnailURL}')"></div>
                     </span>
                     </#if>
+
                 </span>
             </div>
             <div class="vditor-reset comment">

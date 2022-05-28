@@ -1,6 +1,7 @@
 <#--
 
-    Symphony - A modern community (forum/BBS/SNS/blog) platform written in Java.
+    Rhythm - A modern community (forum/BBS/SNS/blog) platform written in Java.
+    Modified version from Symphony, Thanks Symphony :)
     Copyright (C) 2012-present, b3log.org
 
     This program is free software: you can redistribute it and/or modify
@@ -21,46 +22,56 @@
 <#include "macro-list.ftl">
 <#include "macro-pagination.ftl">
 <#include "common/sub-nav.ftl">
+<#include "common/index-nav.ftl">
 <!DOCTYPE html>
 <html>
-    <head>
-        <@head title="${domain.domainSeoTitle} - ${symphonyLabel}">
+<head>
+    <@head title="${domain.domainSeoTitle} - ${symphonyLabel}">
         <meta name="keywords" content="${domain.domainSeoKeywords}" />
         <meta name="description" content="${domain.domainSeoDesc}"/>
-        </@head>
-        ${domain.domainCSS}
-    </head>
-    <body>
-        <#include "header.ftl">
-        <div class="main">
-            <@subNav '' '${domain.domainURI}'/>
-            <div class="content fn-clear">
-                <@list listData=latestArticles/>
-                <@pagination url="${servePath}/domain/${domain.domainURI}"/>
-                <div class="wrapper">
-                    <div class="module">
-                        <div class="module-header">
-                            <h2>${domain.domainTitle}</h2>
-                            <a href="${servePath}/domain/${domain.domainURI}" class="ft-gray fn-right">${domain.domainTags?size} Tags</a>
-                        </div>
-                        <div class="module-panel">
-                            <ul class="module-list domain">
-                                <li>
-                                    <#list domain.domainTags as tag>
-                                    <a class="tag" rel="nofollow" href="${servePath}/tag/${tag.tagURI}">${tag.tagTitle}</a>
-                                    </#list>
-                                </li>
-                            </ul>
-                            <div class="fn-hr5"></div>
-                        </div>
-                    </div>
+    </@head>
+    ${domain.domainCSS}
+</head>
+<body>
+<div class="mobile-head">
+    <#include "header.ftl">
+    <@indexNav "domains"/>
+</div>
+<div style="height: 74px;width: 1px;" ></div>
+<div class="recent__nav">
+    <#list domains as domainItem>
+        <a pjax-title="${domainItem.domainTitle} - ${domainLabel} - ${symphonyLabel}" href="${servePath}/domain/${domainItem.domainURI}" class="recent__nav-item <#if domainItem.domainURI == domain.domainURI>recent__nav-check</#if>">${domainItem.domainTitle}</a>
+    </#list>
+</div>
+<div class="main">
+    <#--            <@subNav '' '${domain.domainURI}'/>-->
+    <div class="content fn-clear">
+        <@list listData=latestArticles/>
+        <@pagination url="${servePath}/domain/${domain.domainURI}"/>
+        <div class="wrapper">
+            <div class="module">
+                <div class="module-header">
+                    <h2>${domain.domainTitle}</h2>
+                    <a href="${servePath}/domain/${domain.domainURI}" class="ft-gray fn-right">${domain.domainTags?size} Tags</a>
+                </div>
+                <div class="module-panel">
+                    <ul class="module-list domain">
+                        <li>
+                            <#list domain.domainTags as tag>
+                                <a class="tag" rel="nofollow" href="${servePath}/tag/${tag.tagURI}">${tag.tagTitle}</a>
+                            </#list>
+                        </li>
+                    </ul>
+                    <div class="fn-hr5"></div>
                 </div>
             </div>
-            <div class="side wrapper">
-                <#include "side.ftl">
-            </div>
         </div>
-        <#include "footer.ftl">
-        <@listScript/>
-    </body>
+    </div>
+    <div class="side wrapper">
+        <#include "side.ftl">
+    </div>
+</div>
+<#include "footer.ftl">
+<@listScript/>
+</body>
 </html>

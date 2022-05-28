@@ -1,5 +1,6 @@
 /*
- * Symphony - A modern community (forum/BBS/SNS/blog) platform written in Java.
+ * Rhythm - A modern community (forum/BBS/SNS/blog) platform written in Java.
+ * Modified version from Symphony, Thanks Symphony :)
  * Copyright (C) 2012-present, b3log.org
  *
  * This program is free software: you can redistribute it and/or modify
@@ -29,119 +30,117 @@
  * @static
  */
 var ArticleChannel = {
-  /**
-   * WebSocket instance.
-   *
-   * @type WebSocket
-   */
-  ws: undefined,
-  /**
-   * @description Initializes message channel
-   */
-  init: function (channelServer) {
-    ArticleChannel.ws = new ReconnectingWebSocket(channelServer)
-    ArticleChannel.ws.reconnectInterval = 10000
+    /**
+     * WebSocket instance.
+     *
+     * @type WebSocket
+     */
+    ws: undefined,
+    /**
+     * @description Initializes message channel
+     */
+    init: function (channelServer) {
+        ArticleChannel.ws = new WebSocket(channelServer)
 
-    ArticleChannel.ws.onopen = function () {
-      setInterval(function () {
-        ArticleChannel.ws.send('-hb-')
-      }, 1000 * 60 * 3)
-    }
+        ArticleChannel.ws.onopen = function () {
+            console.log("Connected to article channel websocket.")
+        }
 
-    ArticleChannel.ws.onmessage = function (evt) {
-      var data = JSON.parse(evt.data)
+        ArticleChannel.ws.onmessage = function (evt) {
+            var data = JSON.parse(evt.data)
 
-      if (Label.articleOId !== data.articleId) { // It's not the current article
-        return
-      }
-
-      switch (data.type) {
-        case 'comment':
-          var cmtCount = parseInt(
-            $('.comments-header .article-cmt-cnt').text()) + 1
-          // 总帖数更新
-          $('.comments-header .article-cmt-cnt').text(cmtCount + ' ' + Label.cmtLabel)
-
-          // 新增第一条评论时到底部的锚点
-          if ($('#comments .list > ul > li').length === 0) {
-            $('.comment-header > .fn-none').show()
-            // 显示预览模式 & 回到底部
-            $('.comments-header > .fn-none').show()
-            // 显示评论
-            $('#articleCommentsPanel').parent().show()
-          }
-
-          if (0 === Label.userCommentViewMode) { // tranditional view mode
-            $('#comments > .list > ul').append(data.cmtTpl)
-          } else {
-            $('#comments > .list > ul').prepend(data.cmtTpl)
-          }
-
-          // ua
-          $('#' + data.commentId + ' .cmt-via').text('via ' + Util.getDeviceByUa(data.commentUA))
-
-          // 回帖高亮，他人回帖不定位，只有自己回帖才定位
-          if (Label.currentUserName === data.commentAuthorName) {
-            Comment._bgFade($('#' + data.commentId))
-          }
-
-          // 更新回复的回帖
-          if (data.commentOriginalCommentId !== '') {
-            var $originalComment = $('#' + data.commentOriginalCommentId),
-              $replyBtn = $originalComment.find(
-                '.comment-action > .ft-fade > .fn-pointer')
-            if ($replyBtn.length === 1) {
-              $replyBtn.html(' ' + (parseInt($.trim($replyBtn.text())) + 1)
-                + ' ' + Label.replyLabel + ' <span class="'
-                + $replyBtn.find('span').attr('class') + '"></span>')
-
-              if ($replyBtn.find('svg').attr('class') === 'icon-chevron-up') {
-                $replyBtn.find('svg').removeClass('icon-chevron-up').addClass('icon-chevron-down').find('use').attr('xlink:href', '#chevron-down')
-                $replyBtn.click()
-              }
-            } else {
-              $originalComment.find('.comment-action > .ft-fade').prepend('<span class="fn-pointer ft-smaller fn-left" onclick="Comment.showReply(\''
-                + data.commentOriginalCommentId +
-                '\', this, \'comment-replies\')" style="opacity: 1;"> 1 '
-                + Label.replyLabel +
-                ' <svg class="icon-chevron-down"><use xlink:href="#chevron-down"></use></svg>')
+            if (Label.articleOId !== data.articleId) { // It's not the current article
+                return
             }
-          }
-          Util.parseHljs()
-          Util.parseMarkdown()
-          break
-        case 'articleHeat':
-          var $heatBar = $('#heatBar'),
-            $heat = $('.heat')
 
-          if (data.operation === '+') {
-            $heatBar.append('<i class="point"></i>')
-            setTimeout(function () {
-              $heat.width($('.heat').width() + 1 * 3)
-              $heatBar.find('.point').remove()
-            }, 2000)
-          } else {
-            $heat.width($('.heat').width() - 1 * 3)
-            $heatBar.append('<i class="point-remove"></i>')
-            setTimeout(function () {
-              $heatBar.find('.point-remove').remove()
-            }, 2000)
-          }
+            switch (data.type) {
+                case 'comment':
+                    var cmtCount = parseInt(
+                        $('.comments-header .article-cmt-cnt').text()) + 1
+                    // 总帖数更新
+                    $('.comments-header .article-cmt-cnt').text(cmtCount + ' ' + Label.cmtLabel)
 
-          break
-        default:
-          console.error('Wrong data [type=' + data.type + ']')
-      }
+                    // 新增第一条评论时到底部的锚点
+                    if ($('#comments .list > ul > li').length === 0) {
+                        $('.comment-header > .fn-none').show()
+                        // 显示预览模式 & 回到底部
+                        $('.comments-header > .fn-none').show()
+                        // 显示评论
+                        $('#articleCommentsPanel').parent().show()
+                    }
 
-    }
+                    if (0 === Label.userCommentViewMode) { // tranditional view mode
+                        $('#comments > .list > ul').append(data.cmtTpl)
+                    } else {
+                        $('#comments > .list > ul').prepend(data.cmtTpl)
+                    }
 
-    ArticleChannel.ws.onclose = function () {
-    }
+                    // ua
+                    $('#' + data.commentId + ' .cmt-via').text('via ' + Util.getDeviceByUa(data.commentUA))
 
-    ArticleChannel.ws.onerror = function (err) {
-      console.log(err)
-    }
-  },
+                    // 回帖高亮，他人回帖不定位，只有自己回帖才定位
+                    if (Label.currentUserName === data.commentAuthorName) {
+                        Comment._bgFade($('#' + data.commentId))
+                    }
+
+                    // 更新回复的回帖
+                    if (data.commentOriginalCommentId !== '') {
+                        var $originalComment = $('#' + data.commentOriginalCommentId),
+                            $replyBtn = $originalComment.find(
+                                '.comment-action > .ft-fade > .fn-pointer')
+                        if ($replyBtn.length === 1) {
+                            $replyBtn.html(' ' + (parseInt($.trim($replyBtn.text())) + 1)
+                                + ' ' + Label.replyLabel + ' <span class="'
+                                + $replyBtn.find('span').attr('class') + '"></span>')
+
+                            if ($replyBtn.find('svg').attr('class') === 'icon-chevron-up') {
+                                $replyBtn.find('svg').removeClass('icon-chevron-up').addClass('icon-chevron-down').find('use').attr('xlink:href', '#chevron-down')
+                                $replyBtn.click()
+                            }
+                        } else {
+                            $originalComment.find('.comment-action > .ft-fade').prepend('<span class="fn-pointer ft-smaller fn-left" onclick="Comment.showReply(\''
+                                + data.commentOriginalCommentId +
+                                '\', this, \'comment-replies\')" style="opacity: 1;"> 1 '
+                                + Label.replyLabel +
+                                ' <svg class="icon-chevron-down"><use xlink:href="#chevron-down"></use></svg>')
+                        }
+                    }
+                    Util.parseHljs()
+                    Util.parseMarkdown()
+                    break
+                case 'articleHeat':
+                    var $heatBar = $('#heatBar'),
+                        $heat = $('.heat')
+
+                    if (data.operation === '+') {
+                        $heatBar.append('<i class="point"></i>')
+                        setTimeout(function () {
+                            $heat.width($('.heat').width() + 1 * 3)
+                            $heatBar.find('.point').remove()
+                        }, 2000)
+                    } else {
+                        $heat.width($('.heat').width() - 1 * 3)
+                        $heatBar.append('<i class="point-remove"></i>')
+                        setTimeout(function () {
+                            $heatBar.find('.point-remove').remove()
+                        }, 2000)
+                    }
+
+                    break
+                default:
+                    console.error('Wrong data [type=' + data.type + ']')
+            }
+
+        }
+
+        ArticleChannel.ws.onclose = function () {
+            console.log("Disconnected to article channel websocket.")
+        }
+
+        ArticleChannel.ws.onerror = function (err) {
+            console.log(err)
+        }
+    },
 }
 
 /**
@@ -149,59 +148,185 @@ var ArticleChannel = {
  * @static
  */
 var ArticleListChannel = {
-  /**
-   * WebSocket instance.
-   *
-   * @type WebSocket
-   */
-  ws: undefined,
-  /**
-   * @description Initializes message channel
-   */
-  init: function (channelServer) {
-    ArticleListChannel.ws = new ReconnectingWebSocket(channelServer)
-    ArticleListChannel.ws.reconnectInterval = 10000
+    /**
+     * WebSocket instance.
+     *
+     * @type WebSocket
+     */
+    ws: undefined,
+    /**
+     * @description Initializes message channel
+     */
+    init: function (channelServer) {
+        ArticleListChannel.ws = new WebSocket(channelServer)
 
-    ArticleListChannel.ws.onopen = function () {
-      setInterval(function () {
-        ArticleListChannel.ws.send('-hb-')
-      }, 1000 * 60 * 3)
-    }
-
-    ArticleListChannel.ws.onmessage = function (evt) {
-      var data = JSON.parse(evt.data)
-      $('.article-list h2 > a[rel=bookmark]').each(function () {
-        var id = $(this).data('id').toString()
-
-        if (data.articleId === id) {
-          var $li = $(this).closest('li'),
-            $heat = $li.find('.heat')
-
-          if (data.operation === '+') {
-            $li.append('<i class="point"></i>')
-            setTimeout(function () {
-              $heat.width($heat.width() + 1 * 3)
-              $li.find('.point').remove()
-            }, 2000)
-          } else {
-            $heat.width($heat.width() - 1 * 3)
-            $li.append('<i class="point-remove"></i>')
-            setTimeout(function () {
-              $li.find('.point-remove').remove()
-            }, 2000)
-          }
+        ArticleListChannel.ws.onopen = function () {
+            console.log("Connected to article list channel websocket.")
         }
-      })
-    }
 
-    ArticleListChannel.ws.onclose = function () {
-      ArticleListChannel.ws.close()
-    }
+        ArticleListChannel.ws.onmessage = function (evt) {
+            var data = JSON.parse(evt.data)
+            $('.article-list h2 > a[rel=bookmark]').each(function () {
+                var id = $(this).data('id').toString()
 
-    ArticleListChannel.ws.onerror = function (err) {
-      console.log('ERROR', err)
-    }
-  },
+                if (data.articleId === id) {
+                    var $li = $(this).closest('li'),
+                        $heat = $li.find('.heat')
+
+                    if (data.operation === '+') {
+                        $li.append('<i class="point"></i>')
+                        setTimeout(function () {
+                            $heat.width($heat.width() + 1 * 3)
+                            $li.find('.point').remove()
+                        }, 2000)
+                    } else {
+                        $heat.width($heat.width() - 1 * 3)
+                        $li.append('<i class="point-remove"></i>')
+                        setTimeout(function () {
+                            $li.find('.point-remove').remove()
+                        }, 2000)
+                    }
+                }
+            })
+        }
+
+        ArticleListChannel.ws.onclose = function () {
+            console.log("Disconnected to article list channel websocket.")
+        }
+
+        ArticleListChannel.ws.onerror = function (err) {
+            console.log('ERROR', err)
+        }
+    },
+}
+
+var IdleTalkChannel = {
+    /**
+     * WebSocket instance.
+     *
+     * @type WebSocket
+     */
+    ws: undefined,
+    /**
+     * @description Initializes message channel
+     */
+    init: function (channelServer) {
+        IdleTalkChannel.ws = new WebSocket(channelServer)
+
+        IdleTalkChannel.ws.onopen = function () {
+            console.log("Connected to idle talk channel websocket.")
+        }
+
+        IdleTalkChannel.ws.onmessage = function (evt) {
+            var data = JSON.parse(evt.data);
+
+            let cmd = data.command;
+            switch (data.youAre) {
+                case 'sender':
+                    let html2 = '' +
+                        '<li id="' + data.mapId + '">\n' +
+                        '    <div class=\'fn-flex\'>\n' +
+                        '<a href="/member/' + cmd.toUserName + '">' +
+                        '        <div class="avatar tooltipped tooltipped-ne"\n' +
+                        '             aria-label="' + cmd.toUserName + '"\n' +
+                        '             style="background-image:url(\'' + cmd.toUserAvatar + '\')"></div>\n' +
+                        '</a>' +
+                        '        <div class="fn-flex-1">\n' +
+                        '            <h2>\n' +
+                        '                <a href="/member/' + cmd.toUserName + '">发送给「' + cmd.toUserName + '」的私信</a>\n' +
+                        '                <button class="btn fn-right" style="margin-left: 10px" onclick="IdleTalk.revoke(\'' + data.mapId + '\')">撤回</button>\n' +
+                        '            </h2>\n' +
+                        '            <span class="ft-fade vditor-reset">\n' +
+                        '                ' + timeTrans(parseFloat(data.mapId)) + ' · 主题：' + cmd.theme + '\n' +
+                        '            </span>\n' +
+                        '        </div>\n' +
+                        '    </div>\n' +
+                        '</li>';
+                    $("#sent").prepend(html2);
+                    if ($("#sent").find(".nope")[0] !== undefined) {
+                        $("#sent").find(".nope")[0].remove();
+                    }
+                    break;
+                case 'receiver':
+                    let html = '' +
+                        '<li id="' + data.mapId + '">\n' +
+                        '    <div class=\'fn-flex\'>\n' +
+                        '<a href="/member/' + cmd.fromUserName + '">' +
+                        '        <div class="avatar tooltipped tooltipped-ne"\n' +
+                        '             aria-label="' + cmd.fromUserName + '"\n' +
+                        '             style="background-image:url(\'' + cmd.fromUserAvatar + '\')"></div>\n' +
+                        '</a>' +
+                        '        <div class="fn-flex-1">\n' +
+                        '            <h2>\n' +
+                        '                <a href="/member/' + cmd.fromUserName + '">来自「' + cmd.fromUserName + '」的私信</a>\n' +
+                        '                <button class="red fn-right" onclick="IdleTalk.seek(\'' + data.mapId + '\', \'' + cmd.fromUserName + '\', \'' + cmd.theme + '\')">查看并销毁</button>\n' +
+                        '            </h2>\n' +
+                        '            <span class="ft-fade vditor-reset">\n' +
+                        '                ' + timeTrans(parseFloat(data.mapId)) + ' · 主题：' + cmd.theme + '\n' +
+                        '            </span>\n' +
+                        '        </div>\n' +
+                        '    </div>\n' +
+                        '</li>';
+                    $("#received").prepend(html);
+                    if ($("#received").find(".nope")[0] !== undefined) {
+                        $("#received").find(".nope")[0].remove();
+                    }
+                    break;
+                case 'destroyIdleChatMessage':
+                    $("#" + cmd).remove();
+                    if ($("#received").find("li")[0] === undefined && $("#received").find(".nope")[0] === undefined) {
+                        $("#received").append('<div class="nope"><svg><use xlink:href="#nope"></use></svg> 没有收到任何来信</div>');
+                    }
+                    if ($("#sent").find("li")[0] === undefined && $("#sent").find(".nope")[0] === undefined) {
+                        $("#sent").append('<div class="nope"><svg><use xlink:href="#nope"></use></svg> 没有未读的发信</div>');
+                    }
+                    break;
+            }
+        }
+
+        IdleTalkChannel.ws.onclose = function () {
+            console.log("Disconnected to idle talk channel websocket.")
+            setInterval(function () {
+                $.ajax({
+                    url: Label.servePath + "/shop",
+                    method: "get",
+                    success: function() {
+                        location.reload();
+                    }
+                })
+            }, 10000);
+        }
+
+        IdleTalkChannel.ws.onerror = function (err) {
+            console.log('ERROR', err)
+            setInterval(function () {
+                $.ajax({
+                    url: Label.servePath + "/shop",
+                    method: "get",
+                    success: function() {
+                        location.reload();
+                    }
+                })
+            }, 10000);
+        }
+    },
+}
+
+/**
+ * 转化时间戳
+ *
+ * @param date
+ * @returns {string}
+ */
+function timeTrans(date) {
+    var date = new Date(date);
+    var Y = date.getFullYear() + '年';
+    var M = (date.getMonth() + 1 < 10 ? '0' + (date.getMonth() + 1) : date.getMonth() + 1) + '月';
+    var D = (date.getDate() < 10 ? '0' + (date.getDate()) : date.getDate()) + '日 ';
+    var h = (date.getHours() < 10 ? '0' + date.getHours() : date.getHours()) + ':';
+    var m = (date.getMinutes() < 10 ? '0' + date.getMinutes() : date.getMinutes()) + ':';
+    var s = (date.getSeconds() < 10 ? '0' + date.getSeconds() : date.getSeconds());
+    return Y + M + D + h + m + s;
 }
 
 /**
@@ -209,89 +334,179 @@ var ArticleListChannel = {
  * @static
  */
 var ChatRoomChannel = {
-  /**
-   * WebSocket instance.
-   *
-   * @type WebSocket
-   */
-  ws: undefined,
-  /**
-   * @description Initializes message channel
-   */
-  init: function (channelServer) {
-    ChatRoomChannel.ws = new ReconnectingWebSocket(channelServer)
-    ChatRoomChannel.ws.reconnectInterval = 10000
+    /**
+     * WebSocket instance.
+     *
+     * @type WebSocket
+     */
+    ws: undefined,
+    /**
+     * @description Initializes message channel
+     */
+    init: function (channelServer) {
+        ChatRoomChannel.ws = new WebSocket(channelServer)
 
-    ChatRoomChannel.ws.onopen = function () {
-      setInterval(function () {
-        ChatRoomChannel.ws.send('-hb-')
-      }, 1000 * 60 * 3)
-    }
+        ChatRoomChannel.ws.onopen = function () {
+            console.log("Connected to chat room channel websocket.")
+        }
 
-    ChatRoomChannel.ws.onmessage = function (evt) {
-      var data = JSON.parse(evt.data)
+        ChatRoomChannel.ws.onmessage = function (evt) {
+            var data = JSON.parse(evt.data)
 
-      switch (data.type) {
-        case 'online':
-          $('#onlineCnt').text(data.onlineChatCnt)
-          $("#chatRoomOnlineCnt").html("");
-          for (var user in data.users) {
-            let userInfo = data.users[user];
-            $("#chatRoomOnlineCnt").append("<a target=\"_blank\" title=\"" + userInfo.userName + "\" data-name=\"" + userInfo.userName + "\"\n" +
-                "href=\"" + userInfo.homePage + "\">\n" +
-                "<img class=\"avatar avatar-small tooltipped__user\" aria-name=\"" + userInfo.userName + "\"\n" +
-                "src=\"" + userInfo.userAvatarURL + "\">\n" +
-                "</a>");
-          }
-          break
-        case 'msg':
-          var avatarPart = '<a rel="nofollow" href="/member/' + data.userName +
-            '">'
-            + '<div class="avatar tooltipped tooltipped-se" aria-label="' +
-            data.userName
-            + '" style="background-image:url(' + data.userAvatarURL +
-            ')"></div>'
-            + '</a>'
+            switch (data.type) {
+                case 'discussChanged':
+                    let whoChanged = data.whoChanged;
+                    let newDiscuss = data.newDiscuss;
+                    // 通知
+                    let discussHtml = "<div class='newDiscussNotice' style='color: rgb(50 50 50);margin-bottom: 8px;text-align: center;display: none;'>" +
+                        "<svg><use xlink:href='#pound'></use></svg>&nbsp;" + '<a href="' + Label.servePath + '/member/' + whoChanged + '" target="_blank">' + whoChanged + "</a> 编辑了话题：<a href='javascript:void(0)' style='text-decoration: none'>" +
+                        newDiscuss +
+                        "</a></div>";
+                    $('#chats').prepend(discussHtml);
+                    $(".newDiscussNotice").slideDown(500);
+                    $("#discuss-title").text(newDiscuss);
+                    break;
+                case 'redPacketStatus':
+                    let whoGive = data.whoGive;
+                    let whoGot = data.whoGot;
+                    let got = data.got;
+                    let count = data.count;
+                    let oId = data.oId;
+                    let dice = data.dice
+                    let spell
+                    if (dice === null || dice === undefined) {
+                        spell = '<a href="' + Label.servePath + '/member/' + whoGot + '" target="_blank">' + whoGot + '</a> 抢到了 <a href="' + Label.servePath + '/member/' + whoGive + '" target="_blank">' + whoGive + '</a> 的 <a style="cursor: pointer" onclick="ChatRoom.unpackRedPacket(\'' + oId + '\')">红包</a>';
+                    }else {
+                        let bet
+                        switch (dice.bet) {
+                            case 'big':
+                                bet = "大"
+                                break
+                            case 'small':
+                                bet = "小"
+                                break
+                            case 'leopard':
+                                bet = "豹子"
+                                break
+                        }
+                        let chips = dice.chips;
+                        spell = '<a href="' + Label.servePath + '/member/' + whoGot + '" target="_blank">' + whoGot + '</a> 在 <a href="' + Label.servePath + '/member/' + whoGive + '" target="_blank">' + whoGive + '</a> 的 <a style="cursor: pointer" onclick="ChatRoom.bet(\'' + oId + '\')">盘口</a> 下注' + chips + '积分买' + bet;
+                    }
+                    // 红包抢光了，修改状态
+                    if (got === count) {
+                        $("#chatroom" + data.oId).find(".hongbao__item").css("opacity", ".36");
+                        $("#chatroom" + data.oId).find(".redPacketDesc").html("已经被抢光啦");
+                        if (dice === null || dice === undefined) {
+                            spell += '，红包已被领完 (' + got + '/' + count + ')';
+                        } else {
+                            spell += '，已封盘 (' + got + '/' + count + ')';
+                        }
+                    } else {
+                        spell += ' (' + got + '/' + count + ')';
+                    }
+                    // 通知
+                    let html = "<div class='redPacketNotice' style='color: rgb(50 50 50);margin-bottom: 8px;text-align: center;display: none;'>" +
+                        "<svg><use xlink:href='#redPacketIcon'></use></svg>&nbsp;" +
+                        spell +
+                        "</div>";
+                    $('#chats').prepend(html);
+                    $(".redPacketNotice").slideDown(500);
+                    break;
+                case 'online':
+                    $("#discuss-title").text(data.discussing);
+                    $('#onlineCnt').text(data.onlineChatCnt);
+                    $('#indexOnlineChatCnt').text(data.onlineChatCnt);
+                    Label.onlineAvatarData = "";
+                    for (var user in data.users) {
+                        let userInfo = data.users[user];
+                        Label.onlineAvatarData += "<a target=\"_blank\" data-name=\"" + userInfo.userName + "\"\n" +
+                            "href=\"" + userInfo.homePage + "\">\n" +
+                            "<img style='margin-bottom: 10px' class=\"avatar avatar-small\" aria-label=\"" + userInfo.userName + "\"\n" +
+                            "src=\"" + userInfo.userAvatarURL + "\">\n" +
+                            "</a>";
+                    }
+                    Util.listenUserCard();
+                    break;
+                case 'revoke':
+                    $("#chatroom" + data.oId).remove();
+                    $("#chatindex" + data.oId).remove();
+                    break;
+                case 'msg':
+                    // Chatroom
+                    if ($("#chatRoomIndex").length === 0 && $("#chatroom" + data.oId).length <= 0) {
+                        ChatRoom.renderMsg(data);
+                        ChatRoom.resetMoreBtnListen();
+                    }
 
-          var namePart = '<a rel="nofollow" href="/member/' + data.userName +
-            '"><span class="ft-gray">' + data.userName +
-            '</span></a> <span class="ft-fade"> • ' + data.time + '</span>'
+                    // index
+                    if ($("#chatRoomIndex").has("#emptyChatRoom").length !== 0) {
+                        $("#emptyChatRoom").remove();
+                    }
+                    let userNickname = data.userNickname;
+                    let userName = data.userName;
+                    if (userNickname !== undefined && userNickname !== "") {
+                        userNickname = userNickname + " ( " + userName + " )"
+                    } else {
+                        userNickname = userName;
+                    }
+                    let newContent = data.content;
+                    if (newContent.indexOf("\"msgType\":\"redPacket\"") !== -1) {
+                        newContent = "[收到红包，请在完整版聊天室查看]";
+                    }
+                    $("#chatRoomIndex").prepend("" +
+                        "<li class=\"fn-flex\" id=\"chatindex" + data.oId + "\" style='display: none; border-bottom: 1px solid #eee;'>\n" +
+                        "    <a rel=\"nofollow\" href=\"/member/" + data.userName + "\">\n" +
+                        "        <div class=\"avatar tooltipped tooltipped-n\"\n" +
+                        "             aria-label=\"" + data.userName + "\"\n" +
+                        "             style=\"background-image:url('" + data.userAvatarURL + "')\"></div>\n" +
+                        "    </a>\n" +
+                        "    <div class=\"fn-flex-1\">\n" +
+                        "        <div class=\"ft-smaller\">\n" +
+                        "            <a rel=\"nofollow\" href=\"/member/" + data.userName + "\">\n" +
+                        "                <span class=\"ft-gray\">" + userNickname + "</span>\n" +
+                        "            </a>\n" +
+                        "        </div>\n" +
+                        "        <div class=\"vditor-reset comment " + Label.chatRoomPictureStatus + "\">\n" +
+                        "            " + newContent + "\n" +
+                        "        </div>\n" +
+                        "    </div>\n" +
+                        "</li>");
+                    if ($("#chatRoomIndex li").length === 11) {
+                        $("#chatRoomIndex li:last").remove();
+                    }
+                    $("#chatRoomIndex li:first").slideDown(200);
+                    Util.listenUserCard();
+                    ChatRoom.imageViewer()
+                    break;
+            }
+        }
 
-          var liHTML = '<li class="fn-none">'
-            + '<div class="fn-flex">'
-            + avatarPart
-            + '<div class="fn-flex-1">'
-            + '<div class="ft-smaller">'
-            + namePart
-            + '</div>'
-            + '<div class="vditor-reset comment">'
-            + data.content
-            + '</div>'
-            + '</div>'
-            + '</div>'
-            + '</li>'
-          if ($('.list ul li').length === 0) {
-            $('.list ul').html(liHTML)
-          } else {
-            $('.list ul li:first').before(liHTML)
-          }
+        ChatRoomChannel.ws.onclose = function () {
+            console.log("Disconnected to chat room channel websocket.")
+            setInterval(function () {
+                $.ajax({
+                    url: Label.servePath + "/shop",
+                    method: "get",
+                    success: function() {
+                        location.reload();
+                    }
+                })
+            }, 10000);
+        }
 
-          if ($('.list').scrollTop() < $('li').outerHeight() * 2) {
-            $('.list').animate({'scrollTop': 0}, 500)
-          }
-          $('.list li:first').fadeIn(2000)
-          break
-      }
-    }
-
-    ChatRoomChannel.ws.onclose = function () {
-      ChatRoomChannel.ws.close()
-    }
-
-    ChatRoomChannel.ws.onerror = function (err) {
-      console.log('ERROR', err)
-    }
-  },
+        ChatRoomChannel.ws.onerror = function (err) {
+            console.log('ERROR', err)
+            setInterval(function () {
+                $.ajax({
+                    url: Label.servePath + "/shop",
+                    method: "get",
+                    success: function() {
+                        location.reload();
+                    }
+                })
+            }, 10000);
+        }
+    },
 }
 
 /**
@@ -299,44 +514,62 @@ var ChatRoomChannel = {
  * @static
  */
 var GobangChannel = {
-  /**
-   * WebSocket instance.
-   *
-   * @type WebSocket
-   */
-  ws: undefined,
-  /**
-   * @description Initializes message channel
-   */
-  init: function (channelServer) {
-    GobangChannel.ws = new ReconnectingWebSocket(channelServer)
-    GobangChannel.ws.reconnectInterval = 10000
+    /**
+     * WebSocket instance.
+     *
+     * @type WebSocket
+     */
+    ws: undefined,
+    /**
+     * @description Initializes message channel
+     */
+    init: function (channelServer) {
+        GobangChannel.ws = new WebSocket(channelServer)
 
-    GobangChannel.ws.onopen = function () {
-      setInterval(function () {
-        GobangChannel.ws.send('zephyr test')
-      }, 1000 * 60 * 3)
-    }
+        GobangChannel.ws.onopen = function () {
+            console.log("Connected to gobang channel websocket.")
+            setInterval(function () {
+                GobangChannel.ws.send('zephyr test')
+            }, 1000 * 55)
+        }
 
-    GobangChannel.ws.onmessage = function (evt) {
-      var data = JSON.parse(evt.data)
+        GobangChannel.ws.onmessage = function (evt) {
+            var data = JSON.parse(evt.data)
 
-      switch (data.type) {
-        case 'gobangPlayer':
-          console.log('data.type:>gobangPlayer')
-          break
-        case 'msg':
-          console.log('data.type:>msg')
-          break
-      }
-    }
+            switch (data.type) {
+                case 'gobangPlayer':
+                    console.log('data.type:>gobangPlayer')
+                    break
+                case 'msg':
+                    console.log('data.type:>msg')
+                    break
+            }
+        }
 
-    GobangChannel.ws.onclose = function () {
-      GobangChannel.ws.close()
-    }
+        GobangChannel.ws.onclose = function () {
+            console.log("Disconnected to gobang channel websocket.")
+            setInterval(function () {
+                $.ajax({
+                    url: Label.servePath + "/shop",
+                    method: "get",
+                    success: function() {
+                        location.reload();
+                    }
+                })
+            }, 10000);
+        }
 
-    GobangChannel.ws.onerror = function (err) {
-      console.log('ERROR', err)
-    }
-  },
+        GobangChannel.ws.onerror = function (err) {
+            console.log('ERROR', err)
+            setInterval(function () {
+                $.ajax({
+                    url: Label.servePath + "/shop",
+                    method: "get",
+                    success: function() {
+                        location.reload();
+                    }
+                })
+            }, 10000);
+        }
+    },
 }

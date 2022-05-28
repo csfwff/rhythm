@@ -1,5 +1,6 @@
 /*
- * Symphony - A modern community (forum/BBS/SNS/blog) platform written in Java.
+ * Rhythm - A modern community (forum/BBS/SNS/blog) platform written in Java.
+ * Modified version from Symphony, Thanks Symphony :)
  * Copyright (C) 2012-present, b3log.org
  *
  * This program is free software: you can redistribute it and/or modify
@@ -17,16 +18,26 @@
  */
 package org.b3log.symphony.cache;
 
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.b3log.latke.Keys;
+import org.b3log.latke.ioc.BeanManager;
 import org.b3log.latke.ioc.Singleton;
 import org.b3log.latke.model.User;
+import org.b3log.latke.repository.FilterOperator;
+import org.b3log.latke.repository.PropertyFilter;
+import org.b3log.latke.repository.Query;
+import org.b3log.latke.repository.SortDirection;
+import org.b3log.latke.util.CollectionUtils;
+import org.b3log.symphony.model.UserExt;
+import org.b3log.symphony.repository.UserRepository;
+import org.b3log.symphony.service.AvatarQueryService;
 import org.b3log.symphony.util.JSONs;
 import org.b3log.symphony.util.Sessions;
 import org.json.JSONObject;
 
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
@@ -40,14 +51,29 @@ import java.util.concurrent.CopyOnWriteArrayList;
 public class UserCache {
 
     /**
+     * Logger.
+     */
+    private static final Logger LOGGER = LogManager.getLogger(UserCache.class);
+
+    /**
      * Id, User.
      */
-    private static final Map<String, JSONObject> ID_CACHE = new ConcurrentHashMap<>();
+    private static final Map<String, JSONObject> ID_CACHE = Collections.synchronizedMap(new LinkedHashMap<String, JSONObject>() {
+        @Override
+        protected boolean removeEldestEntry(Map.Entry eldest) {
+            return size() > 100;
+        }
+    });
 
     /**
      * Name, User.
      */
-    private static final Map<String, JSONObject> NAME_CACHE = new ConcurrentHashMap<>();
+    private static final Map<String, JSONObject> NAME_CACHE = Collections.synchronizedMap(new LinkedHashMap<String, JSONObject>() {
+        @Override
+        protected boolean removeEldestEntry(Map.Entry eldest) {
+            return size() > 100;
+        }
+    });
 
     /**
      * Administrators cache.

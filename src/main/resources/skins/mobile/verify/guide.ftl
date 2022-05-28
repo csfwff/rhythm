@@ -1,6 +1,7 @@
 <#--
 
-    Symphony - A modern community (forum/BBS/SNS/blog) platform written in Java.
+    Rhythm - A modern community (forum/BBS/SNS/blog) platform written in Java.
+    Modified version from Symphony, Thanks Symphony :)
     Copyright (C) 2012-present, b3log.org
 
     This program is free software: you can redistribute it and/or modify
@@ -109,25 +110,25 @@
                         </div>
                         <div class="fn-none ft-center">
                             <br/>
-                            <a href="https://github.com/88250/symphony" target="_blank"><img src="${staticServePath}/images/sym-logo300.png" width="180px"></a> <br/> <br/><br/>
-                            <iframe src="https://ghbtns.com/github-btn.html?user=88250&repo=symphony&type=star&count=true&size=large" frameborder="0" scrolling="0" width="130px" height="30px"></iframe>
+                            <a href="https://github.com/csfwff/rhythm" target="_blank"><img src="${staticServePath}/images/sym-logo300.png" width="180px"></a> <br/> <br/><br/>
+                            <iframe src="https://ghbtns.com/github-btn.html?user=csfwff&repo=rhythm&type=star&count=true&size=large" frameborder="0" scrolling="0" width="130px" height="30px"></iframe>
                         </div>
                         <div class="fn-none list">
                             <ul>
                                 <li>
-                                    <a href="${servePath}/about">${getStartLabel}</a>
+                                    <a href="${servePath}/article/1630569106133">${getStartLabel}</a>
                                     <span class="ft-gray">${getStartTipLabel}</span>
                                 </li>
                                 <li>
-                                    <a href="${servePath}/about">${basicLabel}</a>
+                                    <a href="${servePath}/article/1630575841478">${basicLabel}</a>
                                     <span class="ft-gray">${basicTipLabel}</span>
                                 </li>
                                 <li>
-                                    <a href="${servePath}/about">${hotKeyLabel}</a>
+                                    <a href="${servePath}/article/1631459254239">${hotKeyLabel}</a>
                                     <span class="ft-gray">${hotKeyTipLabel}</span>
                                 </li>
                                 <li>
-                                    <a href="${servePath}/about">Markdown ${tutorialLabel}</a>
+                                    <a href="${servePath}/article/1631460144004">Markdown ${tutorialLabel}</a>
                                     <span class="ft-gray">${markdownTutorialTipLabel}</span>
                                 </li>
                             </ul>

@@ -1,6 +1,7 @@
 <#--
 
-    Symphony - A modern community (forum/BBS/SNS/blog) platform written in Java.
+    Rhythm - A modern community (forum/BBS/SNS/blog) platform written in Java.
+    Modified version from Symphony, Thanks Symphony :)
     Copyright (C) 2012-present, b3log.org
 
     This program is free software: you can redistribute it and/or modify
@@ -28,6 +29,7 @@
         <meta name="description" content="${symDescriptionLabel}"/>
         </@head>
         <link rel="stylesheet" href="${staticServePath}/css/index.css?${staticResourceVersion}" />
+<#--        <link rel="stylesheet" href="${staticServePath}/css/theme/dark-index.css?${staticResourceVersion}" />-->
     </head>
     <body>
         <#include "header.ftl">
@@ -87,7 +89,8 @@
                 },
                 callback: function () {
                     Util.parseMarkdown();
-                    Util.parseHljs()
+                    Util.parseHljs();
+                    Util.listenUserCard();
                 }
             });
             NProgress.configure({ showSpinner: false });

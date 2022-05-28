@@ -1,5 +1,6 @@
 /*
- * Symphony - A modern community (forum/BBS/SNS/blog) platform written in Java.
+ * Rhythm - A modern community (forum/BBS/SNS/blog) platform written in Java.
+ * Modified version from Symphony, Thanks Symphony :)
  * Copyright (C) 2012-present, b3log.org
  *
  * This program is free software: you can redistribute it and/or modify
@@ -67,12 +68,22 @@ public class TagCache {
     /**
      * &lt;title, URI&gt;
      */
-    private static final Map<String, String> TITLE_URIS = new ConcurrentHashMap<>();
+    private static final Map<String, String> TITLE_URIS = Collections.synchronizedMap(new LinkedHashMap<String, String>() {
+        @Override
+        protected boolean removeEldestEntry(Map.Entry eldest) {
+            return size() > 100;
+        }
+    });
 
     /**
      * &lt;id, tag&gt;
      */
-    private static final Map<String, JSONObject> CACHE = new ConcurrentHashMap<>();
+    private static final Map<String, JSONObject> CACHE = Collections.synchronizedMap(new LinkedHashMap<String, JSONObject>() {
+        @Override
+        protected boolean removeEldestEntry(Map.Entry eldest) {
+            return size() > 100;
+        }
+    });
 
     /**
      * Gets a tag by the specified tag id.

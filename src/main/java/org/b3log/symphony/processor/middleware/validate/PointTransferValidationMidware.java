@@ -1,5 +1,6 @@
 /*
- * Symphony - A modern community (forum/BBS/SNS/blog) platform written in Java.
+ * Rhythm - A modern community (forum/BBS/SNS/blog) platform written in Java.
+ * Modified version from Symphony, Thanks Symphony :)
  * Copyright (C) 2012-present, b3log.org
  *
  * This program is free software: you can redistribute it and/or modify
@@ -59,6 +60,7 @@ public class PointTransferValidationMidware {
 
     public void handle(final RequestContext context) {
         final Request request = context.getRequest();
+        final JSONObject currentUser = Sessions.getUser();
 
         final JSONObject requestJSONObject = context.requestJSON();
         final String userName = requestJSONObject.optString(User.USER_NAME);
@@ -70,9 +72,11 @@ public class PointTransferValidationMidware {
 
         final int amount = requestJSONObject.optInt(Common.AMOUNT);
         if (amount < 1 || amount > 5000) {
-            context.renderJSON(new JSONObject().put(Keys.MSG, langPropsService.get("amountInvalidLabel")));
-            context.abort();
-            return;
+            if (!currentUser.optString(User.USER_NAME).equals("admin")) {
+                context.renderJSON(new JSONObject().put(Keys.MSG, langPropsService.get("amountInvalidLabel")));
+                context.abort();
+                return;
+            }
         }
 
         JSONObject toUser = userQueryService.getUserByName(userName);
@@ -90,7 +94,6 @@ public class PointTransferValidationMidware {
 
         request.setAttribute(Common.TO_USER, toUser);
 
-        final JSONObject currentUser = Sessions.getUser();
         if (UserExt.USER_STATUS_C_VALID != currentUser.optInt(UserExt.USER_STATUS)) {
             context.renderJSON(new JSONObject().put(Keys.MSG, langPropsService.get("userStatusInvalidLabel")));
             context.abort();
@@ -98,17 +101,21 @@ public class PointTransferValidationMidware {
         }
 
         if (currentUser.optString(User.USER_NAME).equals(toUser.optString(User.USER_NAME))) {
-            context.renderJSON(new JSONObject().put(Keys.MSG, langPropsService.get("cannotTransferSelfLabel")));
-            context.abort();
-            return;
+            if (!currentUser.optString(User.USER_NAME).equals("admin")) {
+                context.renderJSON(new JSONObject().put(Keys.MSG, langPropsService.get("cannotTransferSelfLabel")));
+                context.abort();
+                return;
+            }
         }
 
         final int balanceMinLimit = Symphonys.POINT_TRANSER_MIN;
         final int balance = currentUser.optInt(UserExt.USER_POINT);
         if (balance - amount < balanceMinLimit) {
-            context.renderJSON(new JSONObject().put(Keys.MSG, langPropsService.get("insufficientBalanceLabel")));
-            context.abort();
-            return;
+            if (!currentUser.optString(User.USER_NAME).equals("admin")) {
+                context.renderJSON(new JSONObject().put(Keys.MSG, langPropsService.get("insufficientBalanceLabel")));
+                context.abort();
+                return;
+            }
         }
 
         String memo = StringUtils.trim(requestJSONObject.optString(Pointtransfer.MEMO));

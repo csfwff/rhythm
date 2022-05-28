@@ -1,5 +1,6 @@
 /*
- * Symphony - A modern community (forum/BBS/SNS/blog) platform written in Java.
+ * Rhythm - A modern community (forum/BBS/SNS/blog) platform written in Java.
+ * Modified version from Symphony, Thanks Symphony :)
  * Copyright (C) 2012-present, b3log.org
  *
  * This program is free software: you can redistribute it and/or modify
@@ -34,6 +35,7 @@ import org.b3log.latke.util.CollectionUtils;
 import org.b3log.latke.util.Paginator;
 import org.b3log.latke.util.Times;
 import org.b3log.latke.util.URLs;
+import org.b3log.symphony.cache.UserCache;
 import org.b3log.symphony.model.*;
 import org.b3log.symphony.repository.FollowRepository;
 import org.b3log.symphony.repository.PointtransferRepository;
@@ -94,6 +96,12 @@ public class UserQueryService {
      */
     @Inject
     private RoleQueryService roleQueryService;
+
+    /**
+     * User cache.
+     */
+    @Inject
+    private UserCache userCache;
 
     /**
      * Get nice users with the specified fetch size.
@@ -427,6 +435,22 @@ public class UserQueryService {
     }
 
     /**
+     * Gets a user by the specified phone.
+     *
+     * @param phone the specified phone
+     * @return user, returns {@code null} if not found
+     * @throws ServiceException service exception
+     */
+    public JSONObject getUserByPhone(final String phone) throws ServiceException {
+        try {
+            return userRepository.getByPhone(phone);
+        } catch (final RepositoryException e) {
+            LOGGER.log(Level.ERROR, "Gets user by phone[" + phone + "] failed", e);
+            throw new ServiceException(e);
+        }
+    }
+
+    /**
      * Gets user names from the specified text.
      * <p>
      * A user name is between &#64; and a punctuation, a blank or a line break (\n). For example, the specified text is
@@ -709,5 +733,48 @@ public class UserQueryService {
         to = URLs.encode(to + redirectURL);
 
         return Latkes.getContextPath() + "/login?goto=" + to;
+    }
+
+    public int getOnlineMinute(final String userId) {
+        try {
+            final Query query = new Query()
+                    .setFilter(new PropertyFilter(Keys.OBJECT_ID, FilterOperator.EQUAL, userId))
+                    .select(UserExt.ONLINE_MINUTE);
+            JSONObject result = userRepository.get(query);
+            final List<JSONObject> results = (List<JSONObject>) result.opt(Keys.RESULTS);
+            return results.get(0).optInt(UserExt.ONLINE_MINUTE);
+        } catch (final RepositoryException e) {
+            LOGGER.log(Level.ERROR, "Gets online minute failed", e);
+
+            return 0;
+        }
+    }
+
+    public String getUserName(final String userId) {
+        try {
+            final Query query = new Query()
+                    .setFilter(new PropertyFilter(Keys.OBJECT_ID, FilterOperator.EQUAL, userId))
+                    .select(User.USER_NAME);
+            JSONObject result = userRepository.get(query);
+            final List<JSONObject> results = (List<JSONObject>) result.opt(Keys.RESULTS);
+            return results.get(0).optString(User.USER_NAME);
+        } catch (final RepositoryException e) {
+            LOGGER.log(Level.WARN, "Gets user name failed", e);
+
+            return "someone101";
+        }
+    }
+
+    public String getSecret2fa(final String userId) {
+        try {
+            final Query query = new Query()
+                    .setFilter(new PropertyFilter(Keys.OBJECT_ID, FilterOperator.EQUAL, userId))
+                    .select("secret2fa");
+            JSONObject result = userRepository.get(query);
+            final List<JSONObject> results = (List<JSONObject>) result.opt(Keys.RESULTS);
+            return results.get(0).optString("secret2fa");
+        } catch (final RepositoryException e) {
+            return "";
+        }
     }
 }

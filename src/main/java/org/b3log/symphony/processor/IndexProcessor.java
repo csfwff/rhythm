@@ -1,5 +1,6 @@
 /*
- * Symphony - A modern community (forum/BBS/SNS/blog) platform written in Java.
+ * Rhythm - A modern community (forum/BBS/SNS/blog) platform written in Java.
+ * Modified version from Symphony, Thanks Symphony :)
  * Copyright (C) 2012-present, b3log.org
  *
  * This program is free software: you can redistribute it and/or modify
@@ -19,6 +20,8 @@ package org.b3log.symphony.processor;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.time.DateFormatUtils;
+import org.apache.commons.lang.time.DateUtils;
 import org.b3log.latke.Keys;
 import org.b3log.latke.Latkes;
 import org.b3log.latke.http.Dispatcher;
@@ -30,22 +33,20 @@ import org.b3log.latke.ioc.BeanManager;
 import org.b3log.latke.ioc.Inject;
 import org.b3log.latke.ioc.Singleton;
 import org.b3log.latke.model.Pagination;
+import org.b3log.latke.model.User;
 import org.b3log.latke.service.LangPropsService;
+import org.b3log.latke.util.CollectionUtils;
 import org.b3log.latke.util.Locales;
 import org.b3log.latke.util.Paginator;
 import org.b3log.latke.util.Stopwatchs;
-import org.b3log.symphony.model.Article;
-import org.b3log.symphony.model.Common;
-import org.b3log.symphony.model.UserExt;
+import org.b3log.symphony.Server;
+import org.b3log.symphony.cache.ArticleCache;
+import org.b3log.symphony.model.*;
 import org.b3log.symphony.processor.middleware.AnonymousViewCheckMidware;
 import org.b3log.symphony.processor.middleware.LoginCheckMidware;
-import org.b3log.symphony.service.ArticleQueryService;
-import org.b3log.symphony.service.DataModelService;
-import org.b3log.symphony.service.UserMgmtService;
-import org.b3log.symphony.service.UserQueryService;
-import org.b3log.symphony.util.Markdowns;
-import org.b3log.symphony.util.Sessions;
-import org.b3log.symphony.util.Symphonys;
+import org.b3log.symphony.service.*;
+import org.b3log.symphony.util.*;
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.io.InputStream;
@@ -104,6 +105,42 @@ public class IndexProcessor {
     private LangPropsService langPropsService;
 
     /**
+     * Activity query service.
+     */
+    @Inject
+    private ActivityQueryService activityQueryService;
+
+    /**
+     * Liveness query service.
+     */
+    @Inject
+    private LivenessQueryService livenessQueryService;
+
+    /**
+     * Pointtransfer management service.
+     */
+    @Inject
+    private PointtransferMgmtService pointtransferMgmtService;
+
+    /**
+     * Pointtransfer query service.
+     */
+    @Inject
+    private PointtransferQueryService pointtransferQueryService;
+
+    /**
+     * Article cache.
+     */
+    @Inject
+    private ArticleCache articleCache;
+
+    /**
+     * Breezemoon query service.
+     */
+    @Inject
+    private BreezemoonQueryService breezemoonQueryService;
+
+    /**
      * Register request handlers.
      */
     public static void register() {
@@ -122,8 +159,117 @@ public class IndexProcessor {
         Dispatcher.get("/hot", indexProcessor::showHotArticles, anonymousViewCheckMidware::handle);
         Dispatcher.get("/perfect", indexProcessor::showPerfectArticles, anonymousViewCheckMidware::handle);
         Dispatcher.get("/charge/point", indexProcessor::showChargePoint, anonymousViewCheckMidware::handle);
+        Dispatcher.get("/games/handle/", indexProcessor::showHandle, loginCheck::handle);
+        Dispatcher.get("/games/adarkroom/", indexProcessor::showADarkRoom, loginCheck::handle);
+        Dispatcher.get("/games/lifeRestart/view/", indexProcessor::showLifeRestart, loginCheck::handle);
+        Dispatcher.get("/games/emojiPair", indexProcessor::showEmojiPair, loginCheck::handle);
+        Dispatcher.get("/games/evolve/", indexProcessor::showEvolve, loginCheck::handle);
+        Dispatcher.get("/user/checkedIn", indexProcessor::isCheckedIn, loginCheck::handle);
+        Dispatcher.get("/oldAlmanac", indexProcessor::showOldAlmanac, anonymousViewCheckMidware::handle);
+        Dispatcher.get("/download", indexProcessor::showDownload, anonymousViewCheckMidware::handle);
+        Dispatcher.get("/breezemoons", indexProcessor::showBreezemoons, anonymousViewCheckMidware::handle);
+        Dispatcher.get("/privacy", indexProcessor::showPrivacy, anonymousViewCheckMidware::handle);
     }
 
+    /**
+     * 隐私政策
+     *
+     * @param context
+     */
+    public void showPrivacy(final RequestContext context) {
+        final AbstractFreeMarkerRenderer renderer = new SkinRenderer(context, "privacy.ftl");
+        final Map<String, Object> dataModel = renderer.getDataModel();
+        dataModelService.fillHeaderAndFooter(context, dataModel);
+    }
+
+    /**
+     * 清风明月大列表
+     */
+    public void showBreezemoons(final RequestContext context) {
+        final Request request = context.getRequest();
+
+        final AbstractFreeMarkerRenderer renderer = new SkinRenderer(context, "breezemoons.ftl");
+        final Map<String, Object> dataModel = renderer.getDataModel();
+        final int pageNum = Paginator.getPage(request);
+        final int pageSize = 32;
+        final int windowSize = 15;
+
+        final JSONObject result = breezemoonQueryService.getBreezemoons("", "", pageNum, pageSize, windowSize);
+        final List<JSONObject> bms = (List<JSONObject>) result.opt(Breezemoon.BREEZEMOONS);
+        dataModel.put(Breezemoon.BREEZEMOONS, bms);
+
+        final JSONObject pagination = result.optJSONObject(Pagination.PAGINATION);
+        final int pageCount = pagination.optInt(Pagination.PAGINATION_PAGE_COUNT);
+        final JSONArray pageNums = pagination.optJSONArray(Pagination.PAGINATION_PAGE_NUMS);
+        dataModel.put(Pagination.PAGINATION_FIRST_PAGE_NUM, pageNums.opt(0));
+        dataModel.put(Pagination.PAGINATION_LAST_PAGE_NUM, pageNums.opt(pageNums.length() - 1));
+        dataModel.put(Pagination.PAGINATION_CURRENT_PAGE_NUM, pageNum);
+        dataModel.put(Pagination.PAGINATION_PAGE_COUNT, pageCount);
+        dataModel.put(Pagination.PAGINATION_PAGE_NUMS, CollectionUtils.jsonArrayToList(pageNums));
+
+        dataModelService.fillHeaderAndFooter(context, dataModel);
+        dataModelService.fillRandomArticles(dataModel);
+        dataModelService.fillSideHotArticles(dataModel);
+        dataModelService.fillSideTags(dataModel);
+        dataModelService.fillLatestCmts(dataModel);
+
+        dataModel.put(Common.CURRENT, StringUtils.substringAfter(context.requestURI(), "/recent"));
+        dataModel.put(Common.SELECTED, Breezemoon.BREEZEMOONS);
+    }
+
+    /**
+     * 检测用户是否签到
+     *
+     * @param context
+     */
+    public void isCheckedIn(final RequestContext context) {
+        JSONObject currentUser = Sessions.getUser();
+        try {
+            currentUser = ApiProcessor.getUserByKey(context.param("apiKey"));
+        } catch (NullPointerException ignored) {
+        }
+        final String userId = currentUser.optString(Keys.OBJECT_ID);
+        context.renderJSON(StatusCodes.SUCC).renderJSON(new JSONObject().put("checkedIn", activityQueryService.isCheckedinToday(userId)));
+    }
+
+    public void showEvolve(final RequestContext context) {
+        final AbstractFreeMarkerRenderer renderer = new SkinRenderer(context, "games/evolve/index.ftl");
+        final Map<String, Object> dataModel = renderer.getDataModel();
+        dataModelService.fillHeaderAndFooter(context, dataModel);
+    }
+
+    public void showEmojiPair(final RequestContext context) {
+        final AbstractFreeMarkerRenderer renderer = new SkinRenderer(context, "games/emojiPair/index.ftl");
+        final Map<String, Object> dataModel = renderer.getDataModel();
+        dataModelService.fillHeaderAndFooter(context, dataModel);
+    }
+
+    public void showLifeRestart(final RequestContext context) {
+        final AbstractFreeMarkerRenderer renderer = new SkinRenderer(context, "games/lifeRestart/view/index.ftl");
+        final Map<String, Object> dataModel = renderer.getDataModel();
+        dataModelService.fillHeaderAndFooter(context, dataModel);
+    }
+
+    public void showADarkRoom(final RequestContext context) {
+        final AbstractFreeMarkerRenderer renderer = new SkinRenderer(context, "games/adarkroom/index.ftl");
+        final Map<String, Object> dataModel = renderer.getDataModel();
+        dataModelService.fillHeaderAndFooter(context, dataModel);
+    }
+
+    public void showHandle(final RequestContext context) {
+        final AbstractFreeMarkerRenderer renderer = new SkinRenderer(context, "games/handle/index.ftl");
+        final Map<String, Object> dataModel = renderer.getDataModel();
+        dataModelService.fillHeaderAndFooter(context, dataModel);
+        // 发放积分
+        JSONObject currentUser = Sessions.getUser();
+        // 校验该用户今日是否已经获得汉兜每日奖励
+        List<JSONObject> list = pointtransferQueryService.getLatestPointtransfers(currentUser.optString(Keys.OBJECT_ID), Pointtransfer.TRANSFER_TYPE_C_ACTIVITY_PLAY_HANDLE, 1);
+        if (list.isEmpty() || !DateUtils.isSameDay(new Date(), new Date(list.get(0).optLong("time")))) {
+            pointtransferMgmtService.transfer(Pointtransfer.ID_C_SYS, currentUser.optString(Keys.OBJECT_ID),
+                    Pointtransfer.TRANSFER_TYPE_C_ACTIVITY_PLAY_HANDLE,
+                    60, "", System.currentTimeMillis(), "");
+        }
+    }
 
     /**
      * Show changelogs.
@@ -258,12 +404,65 @@ public class IndexProcessor {
         dataModel.put(Common.CURRENT, StringUtils.substringAfter(context.requestURI(), "/watch"));
     }
 
+    private static final Map<String, Object> indexModelCache = new HashMap<>();
+
+    public void loadIndexData() {
+        Map<String, Object> dataModel = new HashMap<>();
+
+        // 签到排行
+        final List<JSONObject> users = activityQueryService.getTopCheckinUsers(6);
+        dataModel.put(Common.TOP_CHECKIN_USERS, users);
+
+        // 在线时间排行
+        final List<JSONObject> onlineTopUsers = activityQueryService.getTopOnlineTimeUsers(5);
+        dataModel.put("onlineTopUsers", onlineTopUsers);
+
+        // 随机文章
+        dataModel.put("indexRandomArticles", ArticleProcessor.getRandomArticles(12));
+
+        // 问题文章
+        final JSONObject result = articleQueryService.getQuestionArticles(0, 1, 10);
+        final List<JSONObject> qaArticles = (List<JSONObject>) result.get(Article.ARTICLES);
+        dataModel.put(Common.QNA,qaArticles);
+
+        // 最近文章
+        final List<JSONObject> recentArticles = articleQueryService.getIndexRecentArticles();
+        dataModel.put(Common.RECENT_ARTICLES, recentArticles);
+
+        // 活跃用户
+        final List<JSONObject> niceUsers = userQueryService.getNiceUsers(10);
+        dataModel.put(Common.NICE_USERS, niceUsers);
+
+        // 优选文章
+        final List<JSONObject> perfectArticles = articleQueryService.getIndexPerfectArticles();
+        dataModel.put(Common.PERFECT_ARTICLES, perfectArticles);
+
+        // 摸鱼派版本
+        dataModel.put(Common.FISHING_PI_VERSION, Server.FISHING_PI_VERSION);
+
+        // 假期信息
+        dataModel.put("vocationData", Vocation.vocationData);
+
+        indexModelCache.clear();
+        indexModelCache.putAll(dataModel);
+    }
+
+    public void makeIndexData(Map<String, Object> dataModel) {
+        if (indexModelCache.isEmpty()) {
+            loadIndexData();
+        }
+
+        dataModel.putAll(indexModelCache);
+    }
+
     /**
      * Shows index.
      *
      * @param context the specified context
      */
     public void showIndex(final RequestContext context) {
+        final AbstractFreeMarkerRenderer renderer = new SkinRenderer(context, "index.ftl");
+        final Map<String, Object> dataModel = renderer.getDataModel();
         final JSONObject currentUser = Sessions.getUser();
         if (null != currentUser) {
             // 自定义首页跳转 https://github.com/b3log/symphony/issues/774
@@ -272,27 +471,69 @@ public class IndexProcessor {
                 context.sendRedirect(indexRedirectURL);
                 return;
             }
+            dataModel.put(UserExt.CHAT_ROOM_PICTURE_STATUS, currentUser.optInt(UserExt.CHAT_ROOM_PICTURE_STATUS));
+            // 是否领取过昨日奖励
+            final String userId = currentUser.optString(Keys.OBJECT_ID);
+            dataModel.put("collectedYesterdayLivenessReward",
+                    (
+                            // 没领取过，返回true
+                            (!activityQueryService.isCollectedYesterdayLivenessReward(userId))
+                            // 有奖励，返回true
+                            && livenessQueryService.getYesterdayLiveness(userId) != null
+                    ) ? 0 : 1);
+
+            dataModel.put("checkedIn", activityQueryService.isCheckedinToday(userId) ? 1 : 0);
+
+            // 用户手机号
+            dataModel.put("userPhone", currentUser.optString("userPhone"));
+
+            // 提示绑定2FA
+            boolean isAdmin = DataModelService.hasPermission(currentUser.optString(User.USER_ROLE), 3);
+            if (isAdmin) {
+                String secret = userQueryService.getSecret2fa(userId);
+                if (secret.isEmpty()) {
+                    dataModel.put("need2fa", "yes");
+                } else {
+                    dataModel.put("need2fa", "no");
+                }
+            } else {
+                dataModel.put("need2fa", "no");
+            }
+        } else {
+            dataModel.put(UserExt.CHAT_ROOM_PICTURE_STATUS, UserExt.USER_XXX_STATUS_C_ENABLED);
+            // 是否领取过昨日奖励
+            dataModel.put("collectedYesterdayLivenessReward", 1);
+            dataModel.put("checkedIn", 0);
+            dataModel.put("userPhone", "not-logged");
+            // 提示绑定2FA
+            dataModel.put("need2fa", "no");
         }
 
-        final AbstractFreeMarkerRenderer renderer = new SkinRenderer(context, "index.ftl");
-        final Map<String, Object> dataModel = renderer.getDataModel();
+        dataModel.put(Common.MESSAGES, ChatroomProcessor.getMessages(1));
 
-        final List<JSONObject> recentArticles = articleQueryService.getIndexRecentArticles();
-        dataModel.put(Common.RECENT_ARTICLES, recentArticles);
+        makeIndexData(dataModel);
 
-        final List<JSONObject> perfectArticles = articleQueryService.getIndexPerfectArticles();
-        dataModel.put(Common.PERFECT_ARTICLES, perfectArticles);
-
-        final List<JSONObject> niceUsers = userQueryService.getNiceUsers(56);
-        dataModel.put(Common.NICE_USERS, niceUsers);
-
-        final JSONObject result = articleQueryService.getQuestionArticles(0, 1, 10);
-        final List<JSONObject> qaArticles = (List<JSONObject>) result.get(Article.ARTICLES);
-        dataModel.put(Common.QNA,qaArticles);
+        // TGIF
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(new Date());
+        if (calendar.get(Calendar.DAY_OF_WEEK) == 6) {
+            // 周五
+            String date = DateFormatUtils.format(new Date(), "yyyyMMdd");
+            String articleTitle = "摸鱼周报 " + date;
+            JSONObject article = articleQueryService.getArticleByTitle(articleTitle);
+            if (article == null) {
+                dataModel.put("TGIF", "0");
+                dataModel.put("yyyyMMdd", date);
+            } else {
+                dataModel.put("TGIF", Latkes.getServePath() + article.optString(Article.ARTICLE_PERMALINK));
+            }
+        } else {
+            // 不是周五
+            dataModel.put("TGIF", "-1");
+        }
 
         dataModelService.fillHeaderAndFooter(context, dataModel);
         dataModelService.fillIndexTags(dataModel);
-        //dataModelService.fillSideTags(dataModel);
 
         dataModel.put(Common.SELECTED, Common.INDEX);
     }
@@ -452,6 +693,37 @@ public class IndexProcessor {
         dataModelService.fillLatestCmts(dataModel);
     }
 
+
+    /**
+     * Shows old almanac.
+     *
+     * @param context the specified context
+     */
+    public void showOldAlmanac(final RequestContext context) {
+        //老黄历
+        final AbstractFreeMarkerRenderer renderer = new SkinRenderer(context, "/old-almanac.ftl");
+        final Map<String, Object> dataModel = renderer.getDataModel();
+        dataModelService.fillHeaderAndFooter(context, dataModel);
+        dataModelService.fillRandomArticles(dataModel);
+        dataModelService.fillSideHotArticles(dataModel);
+        dataModelService.fillSideTags(dataModel);
+        dataModelService.fillLatestCmts(dataModel);
+    }
+
+
+    /**
+     * Shows download.
+     *
+     * @param context the specified context
+     */
+    public void showDownload(final RequestContext context) {
+        //下载客户端
+        final AbstractFreeMarkerRenderer renderer = new SkinRenderer(context, "/download.ftl");
+        final Map<String, Object> dataModel = renderer.getDataModel();
+        dataModelService.fillHeaderAndFooter(context, dataModel);
+    }
+
+
     /**
      * Shows about.
      *
@@ -460,7 +732,7 @@ public class IndexProcessor {
     public void showAbout(final RequestContext context) {
         // 关于页主要描述社区愿景、行为准则、内容协议等，并介绍社区的功能
         // 这些内容请搭建后自行编写发布，然后再修改这里进行重定向
-        context.sendRedirect(Latkes.getServePath() + "/member/admin");
+        context.sendRedirect(Latkes.getServePath() + "/article/1630569106133");
     }
 
     /**
@@ -483,10 +755,17 @@ public class IndexProcessor {
      * @param context the specified context
      */
     public void showChargePoint(final RequestContext context) {
+        if (context.param("out_trade_no") != null) {
+            // 触发交易检查
+            AlipayProcessor.checkTrades();
+            context.sendRedirect(Latkes.getServePath() + "/charge/point");
+            return;
+        }
         final AbstractFreeMarkerRenderer renderer = new SkinRenderer(context, "charge-point.ftl");
         final Map<String, Object> dataModel = renderer.getDataModel();
         dataModelService.fillHeaderAndFooter(context, dataModel);
         dataModelService.fillRandomArticles(dataModel);
+        dataModelService.fillSponsors(dataModel);
         dataModelService.fillSideHotArticles(dataModel);
         dataModelService.fillSideTags(dataModel);
         dataModelService.fillLatestCmts(dataModel);

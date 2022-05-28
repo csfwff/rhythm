@@ -1,5 +1,6 @@
 /*
- * Symphony - A modern community (forum/BBS/SNS/blog) platform written in Java.
+ * Rhythm - A modern community (forum/BBS/SNS/blog) platform written in Java.
+ * Modified version from Symphony, Thanks Symphony :)
  * Copyright (C) 2012-present, b3log.org
  *
  * This program is free software: you can redistribute it and/or modify
@@ -334,6 +335,7 @@ var EatingSnake = {
                     return;
                 } else {
                     $("#tip").addClass("error").removeClass('succ').html('<ul><li>' + result.msg + '</li></ul>');
+                    Util.alert(result.msg);
                 }
 
                 $("#tip").show();

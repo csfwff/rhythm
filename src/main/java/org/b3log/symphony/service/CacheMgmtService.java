@@ -1,5 +1,6 @@
 /*
- * Symphony - A modern community (forum/BBS/SNS/blog) platform written in Java.
+ * Rhythm - A modern community (forum/BBS/SNS/blog) platform written in Java.
+ * Modified version from Symphony, Thanks Symphony :)
  * Copyright (C) 2012-present, b3log.org
  *
  * This program is free software: you can redistribute it and/or modify
@@ -30,8 +31,11 @@ import org.b3log.latke.service.annotation.Service;
 import org.b3log.symphony.cache.ArticleCache;
 import org.b3log.symphony.cache.DomainCache;
 import org.b3log.symphony.cache.TagCache;
+import org.b3log.symphony.cache.UserCache;
 import org.b3log.symphony.model.Common;
+import org.b3log.symphony.processor.IndexProcessor;
 import org.b3log.symphony.processor.StatisticProcessor;
+import org.b3log.symphony.processor.UserProcessor;
 import org.b3log.symphony.processor.channel.ArticleChannel;
 import org.b3log.symphony.processor.channel.ArticleListChannel;
 import org.b3log.symphony.processor.channel.ChatroomChannel;
@@ -95,6 +99,18 @@ public class CacheMgmtService {
     private OptionQueryService optionQueryService;
 
     /**
+     * User cache.
+     */
+    @Inject
+    private UserCache userCache;
+
+    /**
+     * Index processor.
+     */
+    @Inject
+    private IndexProcessor indexProcessor;
+
+    /**
      * Refreshes all caches.
      */
     public void refreshCache() {
@@ -112,8 +128,21 @@ public class CacheMgmtService {
             final StatisticProcessor statisticProcessor = BeanManager.getInstance().getReference(StatisticProcessor.class);
             statisticProcessor.loadStatData();
             userQueryService.loadUserNames();
+            UserProcessor.livenessCache.clear();
             statusReport();
             LOGGER.info("Refreshed cache");
+        } finally {
+            unlock(lockName);
+        }
+    }
+
+    public void refreshIndexCache() {
+        final String lockName = "refreshIndexCaches";
+        if (!lock(lockName)) {
+            return;
+        }
+        try {
+            indexProcessor.loadIndexData();
         } finally {
             unlock(lockName);
         }

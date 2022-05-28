@@ -1,6 +1,7 @@
 <#--
 
-    Symphony - A modern community (forum/BBS/SNS/blog) platform written in Java.
+    Rhythm - A modern community (forum/BBS/SNS/blog) platform written in Java.
+    Modified version from Symphony, Thanks Symphony :)
     Copyright (C) 2012-present, b3log.org
 
     This program is free software: you can redistribute it and/or modify
@@ -107,7 +108,7 @@
                         <a href="${servePath}/update?id=${article.oId}"><svg><use xlink:href="#edit"></use></svg></a>
                         </#if>
                         <#if article.isMyArticle && permissions["commonStickArticle"].permissionGrant>
-                        <a class="tooltipped tooltipped-n" aria-label="${stickLabel}" 
+                        <a class="tooltipped tooltipped-n" aria-label="${stickLabel}"
                            href="javascript:Article.stick('${article.oId}')"><svg><use xlink:href="#chevron-up"></use></svg></a>
                         </#if>
                         <#if permissions["articleUpdateArticleBasic"].permissionGrant>
@@ -121,6 +122,13 @@
                         ${article.articleTitleEmoj}
                     </a>
                 </h1>
+                <div style="margin-bottom: 3px">
+                    <#if article.sysMetal != "[]">
+                        <#list article.sysMetal?eval as metal>
+                            <img title="${metal.description}" src="https://fishpi.cn/gen?scale=0.79&txt=${metal.name}&${metal.attr}"/>
+                        </#list>
+                    </#if>
+                </div>
                 <div class="article-info">
                     <a rel="author" href="${servePath}/member/${article.articleAuthorName}"
                        title="${article.articleAuthorName}"><div class="avatar" style="background-image:url('${article.articleAuthorThumbnailURL48}')"></div></a>
@@ -128,6 +136,12 @@
                         <a rel="author" href="${servePath}/member/${article.articleAuthorName}" class="ft-gray"
                            title="${article.articleAuthorName}"><strong>${article.articleAuthorName}</strong></a>
                         <span class="ft-gray">
+                        <#if article.articleCity != "">
+                        &nbsp;•&nbsp;
+                        <a href="${servePath}/city/${article.articleCity}" class="ft-gray">
+                                <span class="article__cnt">${article.articleCity}</span>
+                        </a>
+                        </#if>
                         &nbsp;•&nbsp;
                         <a rel="nofollow" class="ft-gray" href="#comments">
                             <b class="article-level<#if article.articleCommentCount lt 40>${(article.articleCommentCount/10)?int}<#else>4</#if>">${article.articleCommentCount}</b> ${cmtLabel}</a>
@@ -185,7 +199,7 @@
                         <span data-type="google"><svg class="icon-google"><use xlink:href="#google"></use></svg></span>
                     </div>
                 </div>
-                
+
                 <#if 0 < article.articleRewardPoint>
                 <div class="vditor-reset" id="articleRewardContent"<#if !article.rewarded> class="reward"</#if>>
                      <#if !article.rewarded>
@@ -270,6 +284,9 @@
                                                     </#if>
                                                     <#if 0 == comment.commenter.userUAStatus><span class="cmt-via ft-fade" data-ua="${comment.commentUA}"></span></#if>
                                                 </span>
+                                                &nbsp;<#list comment.sysMetal?eval as metal>
+                                                <img title="${metal.description}" src="https://fishpi.cn/gen?scale=0.79&txt=${metal.name}&${metal.attr}"/>
+                                                </#list>
                                                 <a class="ft-a-title fn-right tooltipped tooltipped-nw" aria-label="${goCommentLabel}"
                                                    href="javascript:Comment.goComment('${servePath}/article/${article.oId}?p=${comment.paginationCurrentPageNum}&m=${userCommentViewMode}#${comment.oId}')"><svg><use xlink:href="#down"></use></svg></a>
                                             </div>
@@ -284,7 +301,7 @@
                         </div>
                     </div>
                     </#if>
-                    
+
                 <#if 1 == userCommentViewMode>
                 <#if isLoggedIn>
                 <#if discussionViewable && article.articleCommentable && permissions["commonAddComment"].permissionGrant>
@@ -296,6 +313,25 @@
                     <div class="tip" id="addCommentTip"></div>
 
                     <div class="fn-clear comment-submit">
+                        <svg id="emojiBtn" style="width: 30px; height: 30px; cursor:pointer;">
+                            <use xlink:href="#emojiIcon"></use>
+                        </svg>
+                        <div class="hide-list" id="emojiList">
+                            <div class="hide-list-emojis" id="emojis" style="max-height: 200px">
+                            </div>
+                            <div class="hide-list-emojis__tail">
+                                        <span>
+                                        <a onclick="Comment.fromURL()">从URL导入表情包</a>
+                                        </span>
+                                <span class="hide-list-emojis__tip"></span>
+                                <span>
+                                            <a onclick="$('#uploadEmoji input').click()">上传表情包</a>
+                                        </span>
+                                <form style="display: none" id="uploadEmoji" method="POST" enctype="multipart/form-data">
+                                    <input type="file" name="file">
+                                </form>
+                            </div>
+                        </div>
                         <#if permissions["commonAddCommentAnonymous"].permissionGrant>
                         <label class="anonymous-check">${anonymousLabel}<input type="checkbox" id="commentAnonymous"></label>
                         </#if>
@@ -363,18 +399,20 @@
                 </#if>
             </div>
             <div class="side wrapper">
+                <#if showSideAd>
                 <#if ADLabel!="">
                 <div class="module">
                     <div class="module-header">
                         <h2>
-                            ${sponsorLabel} 
-                            <a href="${servePath}/about" class="fn-right ft-13 ft-gray" target="_blank">${wantPutOnLabel}</a>
+                            ${sponsorLabel}
+                            <a href="${servePath}/settings/system" class="fn-right ft-13 ft-gray" target="_blank">${wantPutOnLabel}</a>
                         </h2>
                     </div>
                     <div class="module-panel ad fn-clear">
                         ${ADLabel}
                     </div>
                 </div>
+                </#if>
                 </#if>
                 <#if sideRelevantArticles?size != 0>
                 <div class="module">
@@ -387,7 +425,7 @@
                         <ul class="module-list">
                             <#list sideRelevantArticles as relevantArticle>
                             <li<#if !relevantArticle_has_next> class="last"</#if>>
-                                <a rel="nofollow" 
+                                <a rel="nofollow"
                                href="${servePath}/member/${relevantArticle.articleAuthorName}">
                                     <span class="avatar-small slogan" style="background-image:url('${relevantArticle.articleAuthorThumbnailURL20}')"></span>
                                 </a>
@@ -441,6 +479,7 @@
         </div>
         <#include "footer.ftl">
         <div id="thoughtProgressPreview"></div>
+        <script src="${staticServePath}/js/lib/jquery/file-upload-9.10.1/jquery.fileupload.min.js"></script>
         <script src="${staticServePath}/js/lib/compress/article-libs.min.js?${staticResourceVersion}"></script>
         <script src="${staticServePath}/js/m-article${miniPostfix}.js?${staticResourceVersion}"></script>
         <script src="${staticServePath}/js/channel${miniPostfix}.js?${staticResourceVersion}"></script>

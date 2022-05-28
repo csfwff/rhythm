@@ -1,5 +1,6 @@
 /*
- * Symphony - A modern community (forum/BBS/SNS/blog) platform written in Java.
+ * Rhythm - A modern community (forum/BBS/SNS/blog) platform written in Java.
+ * Modified version from Symphony, Thanks Symphony :)
  * Copyright (C) 2012-present, b3log.org
  *
  * This program is free software: you can redistribute it and/or modify
@@ -22,20 +23,30 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.b3log.latke.Keys;
 import org.b3log.latke.Latkes;
 import org.b3log.latke.event.EventManager;
 import org.b3log.latke.http.BaseServer;
 import org.b3log.latke.ioc.BeanManager;
+import org.b3log.latke.model.User;
+import org.b3log.latke.repository.Query;
+import org.b3log.latke.repository.Transaction;
 import org.b3log.latke.util.Stopwatchs;
 import org.b3log.latke.util.Strings;
 import org.b3log.symphony.cache.DomainCache;
 import org.b3log.symphony.cache.TagCache;
 import org.b3log.symphony.event.*;
+import org.b3log.symphony.model.UserExt;
 import org.b3log.symphony.processor.Router;
+import org.b3log.symphony.processor.channel.UserChannel;
+import org.b3log.symphony.repository.UserRepository;
 import org.b3log.symphony.service.CronMgmtService;
 import org.b3log.symphony.service.InitMgmtService;
 import org.b3log.symphony.util.Markdowns;
 import org.b3log.symphony.util.Symphonys;
+import org.json.JSONObject;
+
+import java.util.List;
 
 /**
  * Server.
@@ -55,6 +66,11 @@ public final class Server extends BaseServer {
      * Symphony version.
      */
     public static final String VERSION = "3.6.2";
+
+    /**
+     * Fishing Pi version.
+     */
+    public static final String FISHING_PI_VERSION = "0.1.4";
 
     /**
      * Main.
@@ -159,7 +175,7 @@ public final class Server extends BaseServer {
         final String jdbcURL = Latkes.getLocalProperty("jdbc.URL");
         final boolean luteAvailable = Markdowns.LUTE_AVAILABLE;
 
-        LOGGER.log(Level.INFO, "Sym is booting [ver=" + VERSION + ", os=" + Latkes.getOperatingSystemName() +
+        LOGGER.log(Level.INFO, "Rhythm is booting [ver=" + VERSION + ", os=" + Latkes.getOperatingSystemName() +
                 ", isDocker=" + Latkes.isDocker() + ", luteAvailable=" + luteAvailable + ", pid=" + Latkes.currentPID() +
                 ", runtimeDatabase=" + runtimeDatabase + ", runtimeMode=" + Latkes.getRuntimeMode() + ", jdbc.username=" +
                 jdbcUsername + ", jdbc.URL=" + jdbcURL + "]");
@@ -189,6 +205,8 @@ public final class Server extends BaseServer {
         eventManager.registerListener(articleAddAudioHandler);
         final ArticleUpdateAudioHandler articleUpdateAudioHandler = beanManager.getReference(ArticleUpdateAudioHandler.class);
         eventManager.registerListener(articleUpdateAudioHandler);
+        final ChangeRoleHandler roleHandler = beanManager.getReference(ChangeRoleHandler.class);
+        eventManager.registerListener(roleHandler);
 
         final TagCache tagCache = beanManager.getReference(TagCache.class);
         tagCache.loadTags();
@@ -206,11 +224,42 @@ public final class Server extends BaseServer {
 
         final Server server = new Server();
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+            // 用户层
+            UserChannel.settlement();
+            // 框架
             cronMgmtService.stop();
             server.shutdown();
             Symphonys.EXECUTOR_SERVICE.shutdown();
             Latkes.shutdown();
         }));
+
+        // 强制离线所有用户，防止在线 Flag 出现问题
+        LOGGER.log(Level.INFO, "Resetting users online status...");
+        final UserRepository userRepository = beanManager.getReference(UserRepository.class);
+        final Transaction transaction = userRepository.beginTransaction();
+        try {
+            final Query query = new Query();
+            List<JSONObject> userList = userRepository.getList(query);
+            for (JSONObject user : userList) {
+                String oId = user.optString(Keys.OBJECT_ID);
+                Boolean userOnlineFlag = user.optBoolean(UserExt.USER_ONLINE_FLAG);
+                if (userOnlineFlag) {
+                    user.put(UserExt.USER_ONLINE_FLAG, false);
+                    userRepository.update(oId, user);
+                    System.out.println("User [" + user.optString(User.USER_NAME) + "] is still online, changed to offline.");
+                }
+            }
+            transaction.commit();
+            System.out.println("Users online status has been reset successfully.");
+        } catch (Exception e) {
+            if (transaction.isActive()) {
+                transaction.rollback();
+            }
+
+            LOGGER.log(Level.ERROR, "Cannot offline all users forced", e);
+        }
+
+        LOGGER.log(Level.INFO, "Everything is ready, Thank you for using Rhythm!");
 
         final String unixDomainSocketPath = commandLine.getOptionValue("unix_domain_socket_path");
         if (StringUtils.isNotBlank(unixDomainSocketPath)) {

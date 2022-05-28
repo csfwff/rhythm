@@ -1,5 +1,6 @@
 /*
- * Symphony - A modern community (forum/BBS/SNS/blog) platform written in Java.
+ * Rhythm - A modern community (forum/BBS/SNS/blog) platform written in Java.
+ * Modified version from Symphony, Thanks Symphony :)
  * Copyright (C) 2012-present, b3log.org
  *
  * This program is free software: you can redistribute it and/or modify
@@ -144,7 +145,10 @@ public class RoleQueryService {
      */
     public JSONObject getRole(final String roleId) {
         try {
-            final JSONObject ret = roleRepository.get(roleId);
+            JSONObject ret = roleRepository.get(roleId);
+            if (null == ret) {
+                ret = new JSONObject();
+            }
 
             if (!Strings.isNumeric(roleId)) {
                 ret.put(Role.ROLE_NAME, langPropsService.get(roleId + "NameLabel"));

@@ -1,5 +1,6 @@
 /*
- * Symphony - A modern community (forum/BBS/SNS/blog) platform written in Java.
+ * Rhythm - A modern community (forum/BBS/SNS/blog) platform written in Java.
+ * Modified version from Symphony, Thanks Symphony :)
  * Copyright (C) 2012-present, b3log.org
  *
  * This program is free software: you can redistribute it and/or modify
@@ -34,6 +35,7 @@ import org.b3log.symphony.util.Escapes;
 import org.b3log.symphony.util.Symphonys;
 import org.json.JSONObject;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -346,7 +348,6 @@ public class PointtransferQueryService {
                         desTemplate = desTemplate.replace("{article}", articleRewardLink);
                         break;
                     case Pointtransfer.TRANSFER_TYPE_C_COMMENT_REWARD:
-                        final JSONObject reward14 = rewardRepository.get(dataId);
                         JSONObject user14;
                         if ("14In".equals(typeStr)) {
                             user14 = userRepository.get(fromId);
@@ -355,7 +356,13 @@ public class PointtransferQueryService {
                         }
                         final String userLink14 = UserExt.getUserLink(user14);
                         desTemplate = desTemplate.replace("{user}", userLink14);
-                        final String articleId14 = reward14.optString(Reward.DATA_ID);
+                        final String articleId14;
+                        try {
+                            articleId14 = dataId.split("-")[1];
+                        } catch (Exception e) {
+                            desTemplate = langPropsService.get("removedLabel");
+                            break;
+                        }
                         final JSONObject article14 = articleRepository.get(articleId14);
                         if (null == article14) {
                             desTemplate = langPropsService.get("removedLabel");
@@ -455,8 +462,12 @@ public class PointtransferQueryService {
                             user9 = userRepository.get(toId);
                         }
 
-                        final String userLink = UserExt.getUserLink(user9);
-                        desTemplate = desTemplate.replace("{user}", userLink);
+                        if (fromId.equals(Pointtransfer.ID_C_SYS)) {
+                            desTemplate = desTemplate.replace("{user}", "系统");
+                        } else {
+                            final String userLink = UserExt.getUserLink(user9);
+                            desTemplate = desTemplate.replace("{user}", userLink);
+                        }
                         final String memo = record.optString(Pointtransfer.MEMO);
                         if (StringUtils.isNotBlank(memo)) {
                             desTemplate = desTemplate.replace("{memo}", memo);
@@ -528,6 +539,32 @@ public class PointtransferQueryService {
                         final String oldName = dataId.split("-")[0];
                         final String newName = dataId.split("-")[1];
                         desTemplate = desTemplate.replace("{oldName}", oldName).replace("{newName}", newName);
+                        break;
+                    case Pointtransfer.TRANSFER_TYPE_C_BLMZ:
+                        break;
+                    case Pointtransfer.TRANSFER_TYPE_C_ACTIVITY_ADR:
+                        desTemplate = desTemplate.replace("{score}", dataId);
+                        break;
+                    case Pointtransfer.TRANSFER_TYPE_C_ACTIVITY_MOFISH:
+                        desTemplate = desTemplate.replace("{time}", new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date(Long.valueOf(dataId))));
+                        desTemplate = desTemplate.replace("{stage}", String.valueOf(record.optInt(Pointtransfer.SUM)));
+                        break;
+                    case Pointtransfer.TRANSFER_TYPE_C_ACTIVITY_SEND_RED_PACKET:
+                        break;
+                    case Pointtransfer.TRANSFER_TYPE_C_ACTIVITY_RECEIVE_RED_PACKET:
+                        break;
+                    case Pointtransfer.TRANSFER_TYPE_C_ACTIVITY_SEND_TGIF:
+                        break;
+                    case Pointtransfer.TRANSFER_TYPE_C_ACTIVITY_PLAY_HANDLE:
+                        break;
+                    case Pointtransfer.TRANSFER_TYPE_C_ACTIVITY_PLAY_EMOJI_PAIR:
+                        if (dataId.isEmpty()) {
+                            desTemplate = desTemplate.replace("{score}", "?");
+                        } else {
+                            desTemplate = desTemplate.replace("{score}", dataId);
+                        }
+                        break;
+                    case Pointtransfer.TRANSFER_TYPE_C_ACTIVITY_SET_DISCUSS:
                         break;
                     default:
                         LOGGER.warn("Invalid point type [" + type + "]");

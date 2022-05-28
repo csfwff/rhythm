@@ -1,5 +1,6 @@
 /*
- * Symphony - A modern community (forum/BBS/SNS/blog) platform written in Java.
+ * Rhythm - A modern community (forum/BBS/SNS/blog) platform written in Java.
+ * Modified version from Symphony, Thanks Symphony :)
  * Copyright (C) 2012-present, b3log.org
  *
  * This program is free software: you can redistribute it and/or modify
@@ -35,8 +36,10 @@ import org.b3log.latke.ioc.BeanManager;
 import org.b3log.latke.ioc.Inject;
 import org.b3log.latke.ioc.Singleton;
 import org.b3log.latke.model.User;
+import org.b3log.latke.repository.RepositoryException;
 import org.b3log.latke.service.LangPropsService;
 import org.b3log.latke.service.ServiceException;
+import org.b3log.latke.util.Requests;
 import org.b3log.latke.util.Strings;
 import org.b3log.latke.util.TimeZones;
 import org.b3log.symphony.model.*;
@@ -45,6 +48,8 @@ import org.b3log.symphony.processor.middleware.LoginCheckMidware;
 import org.b3log.symphony.processor.middleware.validate.PointTransferValidationMidware;
 import org.b3log.symphony.processor.middleware.validate.UpdatePasswordValidationMidware;
 import org.b3log.symphony.processor.middleware.validate.UpdateProfilesValidationMidware;
+import org.b3log.symphony.processor.middleware.validate.UserRegisterValidationMidware;
+import org.b3log.symphony.repository.UserRepository;
 import org.b3log.symphony.service.*;
 import org.b3log.symphony.util.*;
 import org.json.JSONObject;
@@ -183,6 +188,30 @@ public class SettingsProcessor {
     private PointtransferMgmtService pointtransferMgmtService;
 
     /**
+     * System Settings service.
+     */
+    @Inject
+    private SystemSettingsService settingsService;
+
+    /**
+     * CLoud service.
+     */
+    @Inject
+    private CloudService cloudService;
+
+    /**
+     * Activity management service.
+     */
+    @Inject
+    private ActivityMgmtService activityMgmtService;
+
+    /**
+     * User repository.
+     */
+    @Inject
+    private UserRepository userRepository;
+
+    /**
      * Register request handlers.
      */
     public static void register() {
@@ -197,12 +226,15 @@ public class SettingsProcessor {
         Dispatcher.post("/settings/deactivate", settingsProcessor::deactivateUser, loginCheck::handle);
         Dispatcher.post("/settings/username", settingsProcessor::updateUserName, loginCheck::handle);
         Dispatcher.post("/settings/email/vc", settingsProcessor::sendEmailVC, loginCheck::handle);
+        Dispatcher.post("/settings/phone/vc", settingsProcessor::sendPhoneVC, loginCheck::handle);
         Dispatcher.post("/settings/email", settingsProcessor::updateEmail, loginCheck::handle);
+        Dispatcher.post("/settings/phone", settingsProcessor::updatePhone, loginCheck::handle);
         Dispatcher.post("/settings/i18n", settingsProcessor::updateI18n, loginCheck::handle, csrfMidware::check);
         Dispatcher.group().middlewares(loginCheck::handle, csrfMidware::fill).router().get().uris(new String[]{"/settings", "/settings/{page}"}).handler(settingsProcessor::showSettings);
         Dispatcher.post("/settings/geo/status", settingsProcessor::updateGeoStatus, loginCheck::handle, csrfMidware::check);
         Dispatcher.post("/settings/privacy", settingsProcessor::updatePrivacy, loginCheck::handle, csrfMidware::check);
         Dispatcher.post("/settings/function", settingsProcessor::updateFunction, loginCheck::handle, csrfMidware::check);
+        Dispatcher.post("/settings/system", settingsProcessor::updateSystem, loginCheck::handle, csrfMidware::check);
         Dispatcher.post("/settings/profiles", settingsProcessor::updateProfiles, loginCheck::handle, csrfMidware::check, updateProfilesValidationMidware::handle);
         Dispatcher.post("/settings/avatar", settingsProcessor::updateAvatar, loginCheck::handle, csrfMidware::check, updateProfilesValidationMidware::handle);
         Dispatcher.post("/settings/password", settingsProcessor::updatePassword, loginCheck::handle, csrfMidware::check, updatePasswordValidationMidware::handle);
@@ -211,6 +243,43 @@ public class SettingsProcessor {
         Dispatcher.post("/point/buy-invitecode", settingsProcessor::pointBuy, loginCheck::handle, csrfMidware::check);
         Dispatcher.post("/export/posts", settingsProcessor::exportPosts, loginCheck::handle);
         Dispatcher.post("/point/transfer", settingsProcessor::pointTransfer, loginCheck::handle, csrfMidware::check, pointTransferValidationMidware::handle);
+        Dispatcher.get("/bag/2dayCheckin", settingsProcessor::use2dayCheckinCard, loginCheck::handle, csrfMidware::check);
+        Dispatcher.get("/bag/patchCheckin", settingsProcessor::usePatchCheckinCard, loginCheck::handle, csrfMidware::check);
+
+    }
+
+    /**
+     * 使用补签卡
+     */
+    public void usePatchCheckinCard(final RequestContext context) {
+        JSONObject user = Sessions.getUser();
+        final String userId = user.optString(Keys.OBJECT_ID);
+        if (activityMgmtService.patchCheckin(userId) == 0) {
+            context.renderJSON(StatusCodes.SUCC);
+            context.renderMsg("补签卡使用成功！");
+        } else {
+            context.renderJSON(StatusCodes.ERR);
+            context.renderMsg("补签卡使用失败！可能没有需要补签的记录或背包中没有补签卡。");
+        }
+    }
+
+    /**
+     * 使用两天免签卡
+     */
+    public void use2dayCheckinCard(final RequestContext context) {
+        JSONObject user = Sessions.getUser();
+        final String userId = user.optString(Keys.OBJECT_ID);
+        JSONObject bag = new JSONObject(cloudService.getBag(userId));
+        if (bag.optInt("sysCheckinRemain") > 0) {
+            context.renderJSON(StatusCodes.ERR);
+            context.renderMsg("两天免签卡使用失败！你目前还有生效中的免签卡，省着点用吧～");
+            return;
+        }
+        if (cloudService.putBag(userId, "checkin2days", -1, Integer.MAX_VALUE) == 0) {
+            cloudService.putBag(userId, "sysCheckinRemain", 2, 2);
+            context.renderJSON(StatusCodes.SUCC);
+            context.renderMsg("两天免签卡使用成功！未来两天的签到将由系统自动进行～");
+        }
     }
 
     /**
@@ -225,7 +294,7 @@ public class SettingsProcessor {
         final JSONObject currentUser = Sessions.getUser();
         try {
             userMgmtService.deactivateUser(currentUser.optString(Keys.OBJECT_ID));
-            Sessions.logout(currentUser.optString(Keys.OBJECT_ID), response);
+            Sessions.logout(currentUser.optString(Keys.OBJECT_ID), context.getRequest(), response);
 
             context.renderJSON(StatusCodes.SUCC);
         } catch (final Exception e) {
@@ -260,7 +329,84 @@ public class SettingsProcessor {
                     Pointtransfer.TRANSFER_TYPE_C_CHANGE_USERNAME, Pointtransfer.TRANSFER_SUM_C_CHANGE_USERNAME,
                     oldName + "-" + newName, System.currentTimeMillis(), "");
 
+            // 将该用户 API 无效化
+            ApiProcessor.removeKeyByUsername(oldName);
+
             context.renderJSON(StatusCodes.SUCC);
+        } catch (final ServiceException e) {
+            context.renderMsg(e.getMessage());
+        }
+    }
+
+    /**
+     * Sends phone verify code.
+     *
+     * @param context the specified context
+     */
+    public void sendPhoneVC(final RequestContext context) {
+        context.renderJSON(StatusCodes.ERR);
+
+        final JSONObject requestJSONObject = context.requestJSON();
+        final String userPhone = requestJSONObject.optString("userPhone");
+        if (!UserRegisterValidationMidware.isMobileNO(userPhone)) {
+            final String msg = langPropsService.get("sendFailedLabel") + " - 手机号不合法";
+            context.renderMsg(msg);
+            return;
+        }
+
+        final String captcha = requestJSONObject.optString(CaptchaProcessor.CAPTCHA);
+        if (CaptchaProcessor.invalidCaptcha(captcha)) {
+            final String msg = langPropsService.get("sendFailedLabel") + " - " + langPropsService.get("captchaErrorLabel");
+            context.renderMsg(msg);
+            return;
+        }
+
+        final JSONObject user = Sessions.getUser();
+
+        if (userPhone.equals(user.optString("userPhone"))) {
+            final String msg = langPropsService.get("sendFailedLabel") + " - 该手机号与当前绑定手机号相同";
+            context.renderMsg(msg);
+            return;
+        }
+
+        final String userId = user.optString(Keys.OBJECT_ID);
+        try {
+            JSONObject verifycode = verifycodeQueryService.getVerifycodeByUserId(Verifycode.TYPE_C_PHONE, Verifycode.BIZ_TYPE_C_BIND_PHONE, userId);
+            if (null != verifycode) {
+                context.renderJSON(StatusCodes.SUCC).renderMsg(langPropsService.get("vcSentLabel"));
+                return;
+            }
+
+            if (null != userQueryService.getUserByPhone(userPhone)) {
+                context.renderMsg("该手机号已绑定其他账号");
+                return;
+            }
+
+            final String name = user.optString(User.USER_NAME);
+            final String ip = Requests.getRemoteAddr(context.getRequest());
+
+            if (LoginProcessor.verifySMSCodeLimiterOfIP.access(ip) && LoginProcessor.verifySMSCodeLimiterOfName.access(name) && LoginProcessor.verifySMSCodeLimiterOfPhone.access(userPhone)) {
+                final String code = RandomStringUtils.randomNumeric(6);
+                if (!verifycodeMgmtService.sendVerifyCodeSMS(userPhone, code)) {
+                    context.renderMsg("验证码发送失败，请稍候重试");
+                    return;
+                }
+
+                verifycode = new JSONObject();
+                verifycode.put(Verifycode.USER_ID, userId);
+                verifycode.put(Verifycode.BIZ_TYPE, Verifycode.BIZ_TYPE_C_BIND_PHONE);
+                verifycode.put(Verifycode.TYPE, Verifycode.TYPE_C_PHONE);
+                verifycode.put(Verifycode.CODE, code);
+                verifycode.put(Verifycode.STATUS, Verifycode.STATUS_C_UNSENT);
+                verifycode.put(Verifycode.EXPIRED, DateUtils.addMinutes(new Date(), 10).getTime());
+                verifycode.put(Verifycode.RECEIVER, userPhone);
+                verifycodeMgmtService.addVerifycode(verifycode);
+                LOGGER.log(Level.INFO, "Generated a verify code for binding [userName={}, phone={}, code={}]", name, userPhone, code);
+
+                context.renderJSON(StatusCodes.SUCC).renderMsg(langPropsService.get("verifycodeSentLabel"));
+            } else {
+                context.renderMsg("验证码发送频率过快，请稍候重试");
+            }
         } catch (final ServiceException e) {
             context.renderMsg(e.getMessage());
         }
@@ -325,6 +471,48 @@ public class SettingsProcessor {
             context.renderMsg(e.getMessage());
         }
     }
+
+    /**
+     * Updates phone.
+     *
+     * @param context the specified context
+     */
+    public void updatePhone(final RequestContext context) {
+        context.renderJSON(StatusCodes.ERR);
+
+        final Request request = context.getRequest();
+        final JSONObject requestJSONObject = context.requestJSON();
+        final String captcha = requestJSONObject.optString(CaptchaProcessor.CAPTCHA);
+        final JSONObject currentUser = Sessions.getUser();
+        final String userId = currentUser.optString(Keys.OBJECT_ID);
+        try {
+            final JSONObject verifycode = verifycodeQueryService.getVerifycodeByUserId(Verifycode.TYPE_C_PHONE, Verifycode.BIZ_TYPE_C_BIND_PHONE, userId);
+            if (null == verifycode) {
+                final String msg = langPropsService.get("updateFailLabel") + " - " + langPropsService.get("captchaErrorLabel");
+                context.renderMsg(msg);
+                context.renderJSONValue(Keys.CODE, 2);
+                return;
+            }
+
+            if (!StringUtils.equals(verifycode.optString(Verifycode.CODE), captcha)) {
+                final String msg = langPropsService.get("updateFailLabel") + " - " + langPropsService.get("captchaErrorLabel");
+                context.renderMsg(msg);
+                context.renderJSONValue(Keys.CODE, 2);
+                return;
+            }
+
+            final JSONObject user = userQueryService.getUser(userId);
+            final String userPhone = verifycode.optString(Verifycode.RECEIVER);
+            user.put("userPhone", userPhone);
+            userMgmtService.updateUserPhone(userId, user);
+            verifycodeMgmtService.removeByCode(captcha);
+
+            context.renderJSON(StatusCodes.SUCC);
+        } catch (final ServiceException e) {
+            context.renderMsg(e.getMessage());
+        }
+    }
+
 
     /**
      * Updates email.
@@ -500,6 +688,8 @@ public class SettingsProcessor {
         }
 
         dataModel.put(Common.TYPE, "settings");
+        dataModel.put("sysBag", cloudService.getBag(userId));
+        dataModel.put("sysMetal", cloudService.getMetal(userId));
 
         // “感谢加入”系统通知已读置位 https://github.com/b3log/symphony/issues/907
         notificationMgmtService.makeRead(userId, Notification.DATA_TYPE_C_SYS_ANNOUNCE_NEW_USER);
@@ -604,6 +794,41 @@ public class SettingsProcessor {
     }
 
     /**
+     * Updates user system settings.
+     *
+     * @param context the specified context
+     */
+    public void updateSystem(final RequestContext context) {
+        context.renderJSON(StatusCodes.ERR);
+        final Request request = context.getRequest();
+        JSONObject requestJSONObject;
+        try {
+            requestJSONObject = context.requestJSON();
+            request.setAttribute(Keys.REQUEST, requestJSONObject);
+        } catch (final Exception e) {
+            LOGGER.warn(e.getMessage());
+            requestJSONObject = new JSONObject();
+        }
+        String systemTitle = requestJSONObject.optString(SystemSettings.SYSTEM_TITLE);
+        String cardBg = requestJSONObject.optString("cardBg");
+        String onlineTimeUnit = requestJSONObject.optString(SystemSettings.ONLINE_TIME_UNIT);
+        boolean showSideAd = requestJSONObject.optBoolean("showSideAd");
+        boolean showTopAd = requestJSONObject.optBoolean("showTopAd");
+        final JSONObject settings = new JSONObject();
+        settings.put(SystemSettings.SYSTEM_TITLE, systemTitle);
+        settings.put("cardBg", cardBg);
+        settings.put(SystemSettings.ONLINE_TIME_UNIT, onlineTimeUnit);
+        settings.put("showSideAd", showSideAd);
+        settings.put("showTopAd", showTopAd);
+        try {
+            settingsService.setSystemSettings(settings);
+            context.renderJSON(StatusCodes.SUCC);
+        } catch (Exception e) {
+            context.renderMsg(e.getMessage());
+        }
+    }
+
+    /**
      * Updates user function.
      *
      * @param context the specified context
@@ -631,6 +856,7 @@ public class SettingsProcessor {
         final boolean keyboardShortcutsStatus = requestJSONObject.optBoolean(UserExt.USER_KEYBOARD_SHORTCUTS_STATUS);
         final boolean userReplyWatchArticleStatus = requestJSONObject.optBoolean(UserExt.USER_REPLY_WATCH_ARTICLE_STATUS);
         final boolean forwardStatus = requestJSONObject.optBoolean(UserExt.USER_FORWARD_PAGE_STATUS);
+        final boolean chatRoomPictureStatus = requestJSONObject.optBoolean(UserExt.CHAT_ROOM_PICTURE_STATUS);
         String indexRedirectURL = requestJSONObject.optString(UserExt.USER_INDEX_REDIRECT_URL);
         if (!Strings.isURL(indexRedirectURL)) {
             indexRedirectURL = "";
@@ -675,6 +901,7 @@ public class SettingsProcessor {
         user.put(UserExt.USER_KEYBOARD_SHORTCUTS_STATUS, keyboardShortcutsStatus ? UserExt.USER_XXX_STATUS_C_ENABLED : UserExt.USER_XXX_STATUS_C_DISABLED);
         user.put(UserExt.USER_REPLY_WATCH_ARTICLE_STATUS, userReplyWatchArticleStatus ? UserExt.USER_XXX_STATUS_C_ENABLED : UserExt.USER_XXX_STATUS_C_DISABLED);
         user.put(UserExt.USER_FORWARD_PAGE_STATUS, forwardStatus ? UserExt.USER_XXX_STATUS_C_ENABLED : UserExt.USER_XXX_STATUS_C_DISABLED);
+        user.put(UserExt.CHAT_ROOM_PICTURE_STATUS, chatRoomPictureStatus ? UserExt.USER_XXX_STATUS_C_ENABLED : UserExt.USER_XXX_STATUS_C_DISABLED);
         user.put(UserExt.USER_INDEX_REDIRECT_URL, indexRedirectURL);
 
         try {
@@ -835,7 +1062,11 @@ public class SettingsProcessor {
             memo = "";
         }
 
-        final String fromId = currentUser.optString(Keys.OBJECT_ID);
+        String fromId = currentUser.optString(Keys.OBJECT_ID);
+        String fromUsername = currentUser.optString(User.USER_NAME);
+        if (fromUsername.equals("admin")) {
+            fromId = Pointtransfer.ID_C_SYS;
+        }
         final String toId = toUser.optString(Keys.OBJECT_ID);
 
         final String transferId = pointtransferMgmtService.transfer(fromId, toId,

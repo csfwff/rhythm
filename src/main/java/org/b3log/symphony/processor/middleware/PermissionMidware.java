@@ -1,5 +1,6 @@
 /*
- * Symphony - A modern community (forum/BBS/SNS/blog) platform written in Java.
+ * Rhythm - A modern community (forum/BBS/SNS/blog) platform written in Java.
+ * Modified version from Symphony, Thanks Symphony :)
  * Copyright (C) 2012-present, b3log.org
  *
  * This program is free software: you can redistribute it and/or modify
@@ -33,6 +34,7 @@ import org.b3log.latke.service.LangPropsService;
 import org.b3log.latke.util.Stopwatchs;
 import org.b3log.symphony.model.Permission;
 import org.b3log.symphony.model.Role;
+import org.b3log.symphony.processor.ApiProcessor;
 import org.b3log.symphony.service.RoleQueryService;
 import org.b3log.symphony.util.Sessions;
 import org.b3log.symphony.util.Symphonys;
@@ -97,7 +99,17 @@ public class PermissionMidware {
                 return;
             }
 
-            final JSONObject user = Sessions.getUser();
+            JSONObject user = Sessions.getUser();
+            try {
+                user = ApiProcessor.getUserByKey(context.param("apiKey"));
+            } catch (NullPointerException ignored) {
+            }
+            try {
+                final JSONObject requestJSONObject = context.requestJSON();
+                user = ApiProcessor.getUserByKey(requestJSONObject.optString("apiKey"));
+            } catch (NullPointerException ignored) {
+            }
+
             final String roleId = null != user ? user.optString(User.USER_ROLE) : Role.ROLE_ID_C_VISITOR;
             final String userName = null != user ? " " + user.optString(User.USER_NAME) + " " : "";
             final Set<String> grantPermissions = roleQueryService.getPermissions(roleId);

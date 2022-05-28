@@ -1,5 +1,6 @@
 /*
- * Symphony - A modern community (forum/BBS/SNS/blog) platform written in Java.
+ * Rhythm - A modern community (forum/BBS/SNS/blog) platform written in Java.
+ * Modified version from Symphony, Thanks Symphony :)
  * Copyright (C) 2012-present, b3log.org
  *
  * This program is free software: you can redistribute it and/or modify
@@ -95,9 +96,19 @@ public final class UserExt {
     public static final String USER_LIST_VIEW_MODE = "userListViewMode";
 
     /**
-     * Key of user breezemoons status
+     * Key of user breezemoons status.
      */
     public static final String USER_BREEZEMOON_STATUS = "userBreezemoonStatus";
+
+    /**
+     * Key of chat room picture status.
+     */
+    public static final String CHAT_ROOM_PICTURE_STATUS = "chatRoomPictureStatus";
+
+    /**
+     * Key of user online minute.
+     */
+    public static final String ONLINE_MINUTE = "onlineMinute";
 
     /**
      * Key of user point status.
@@ -333,6 +344,11 @@ public final class UserExt {
      * Key of app role.
      */
     public static final String USER_APP_ROLE = "userAppRole";
+
+    /**
+     * key of user role
+     */
+    public static final String USER_ROLE = "userRole";
 
     //// Transient ////
     /**
@@ -600,13 +616,14 @@ public final class UserExt {
      * @return {@code true} if it is, returns {@code false} otherwise
      */
     public static boolean isValidMailDomain(final String email) {
-        final String whitelistMailDomains = Symphonys.MAIL_DOMAINS;
+        /* final String whitelistMailDomains = Symphonys.MAIL_DOMAINS;
         if (StringUtils.isBlank(whitelistMailDomains)) {
             return true;
         }
 
         final String domain = StringUtils.substringAfter(email, "@");
-        return StringUtils.containsIgnoreCase(whitelistMailDomains, domain);
+        return StringUtils.containsIgnoreCase(whitelistMailDomains, domain); */
+        return true;
     }
 
     /**
@@ -651,6 +668,6 @@ public final class UserExt {
      * @return user link
      */
     public static String getUserLink(final String userName) {
-        return "<a href=\"" + Latkes.getServePath() + "/member/" + userName + "\">" + userName + "</a> ";
+        return "<a href=\"" + Latkes.getServePath() + "/member/" + userName + "\" class=\"name-at\" aria-label=\"" + userName + "\">" + userName + "</a> ";
     }
 }

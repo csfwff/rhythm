@@ -1,5 +1,6 @@
 /*
- * Symphony - A modern community (forum/BBS/SNS/blog) platform written in Java.
+ * Rhythm - A modern community (forum/BBS/SNS/blog) platform written in Java.
+ * Modified version from Symphony, Thanks Symphony :)
  * Copyright (C) 2012-present, b3log.org
  *
  * This program is free software: you can redistribute it and/or modify
@@ -29,6 +30,8 @@ import org.json.JSONObject;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Geography utilities.
@@ -51,6 +54,11 @@ public final class Geos {
     }
 
     /**
+     * The cache of ip locates relationship.
+     */
+    private static final Map<String, JSONObject> ipLocatesCache = new HashMap<>();
+
+    /**
      * Gets country, province and city of the specified IP.
      *
      * @param ip the specified IP
@@ -63,6 +71,10 @@ public final class Geos {
      * </pre>, returns {@code null} if not found
      */
     public static JSONObject getAddress(final String ip) {
+        if (ipLocatesCache.containsKey(ip)) {
+            return ipLocatesCache.get(ip);
+        }
+
         final String ak = Symphonys.BAIDU_LBS_AK;
         if (StringUtils.isBlank(ak) || !Strings.isIPv4(ip)) {
             return null;
@@ -76,7 +88,7 @@ public final class Geos {
             conn.setReadTimeout(1000);
             final JSONObject data = new JSONObject(IOUtils.toString(conn.getInputStream(), StandardCharsets.UTF_8));
             if (0 != data.optInt("status")) {
-                return getAddressTaobao(ip);
+                return null;
             }
 
             final String content = data.optString("address");
@@ -90,7 +102,7 @@ public final class Geos {
             final String province = content.split("\\|")[1];
             String city = content.split("\\|")[2];
             if ("None".equals(province) || "None".equals(city)) {
-                return getAddressTaobao(ip);
+                return null;
             }
 
             city = StringUtils.replace(city, "市", "");
@@ -99,12 +111,13 @@ public final class Geos {
             ret.put(Common.COUNTRY, "中国");
             ret.put(Common.PROVINCE, province);
             ret.put(Common.CITY, city);
+            ipLocatesCache.put(ip, ret);
 
             return ret;
         } catch (final Exception e) {
-            LOGGER.log(Level.ERROR, "Can't get location from Baidu [ip=" + ip + "]", e);
+            LOGGER.log(Level.ERROR, "Can't get location from Baidu [ip=" + ip + "]");
 
-            return getAddressTaobao(ip);
+            return null;
         } finally {
             if (null != conn) {
                 try {
@@ -117,6 +130,8 @@ public final class Geos {
     }
 
     /**
+     * @deprecated 已弃用，接口无效
+     *
      * Gets province, city of the specified IP by Taobao API.
      *
      * @param ip the specified IP

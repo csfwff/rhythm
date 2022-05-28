@@ -1,5 +1,6 @@
 /*
- * Symphony - A modern community (forum/BBS/SNS/blog) platform written in Java.
+ * Rhythm - A modern community (forum/BBS/SNS/blog) platform written in Java.
+ * Modified version from Symphony, Thanks Symphony :)
  * Copyright (C) 2012-present, b3log.org
  *
  * This program is free software: you can redistribute it and/or modify
@@ -1226,7 +1227,7 @@ public class ArticleQueryService {
         try {
             Stopwatchs.start("Query index recent articles");
             try {
-                final int fetchSize = 10;
+                final int fetchSize = 12;
                 Query query = new Query().
                         setFilter(CompositeFilterOperator.and(
                                 new PropertyFilter(Article.ARTICLE_TYPE, FilterOperator.NOT_EQUAL, Article.ARTICLE_TYPE_C_DISCUSSION),
@@ -1468,7 +1469,7 @@ public class ArticleQueryService {
 
         article.put(Article.ARTICLE_T_HEAT, viewingCnt);
 
-        final int viewCnt = article.optInt(Article.ARTICLE_VIEW_CNT);
+        int viewCnt = article.optInt(Article.ARTICLE_VIEW_CNT);
         final double views = (double) viewCnt / 1000;
         if (views >= 1) {
             final DecimalFormat df = new DecimalFormat("#.#");
@@ -1497,6 +1498,12 @@ public class ArticleQueryService {
         final String tagsStr = article.optString(Article.ARTICLE_TAGS);
         final List<JSONObject> tags = tagQueryService.buildTagObjs(tagsStr);
         article.put(Article.ARTICLE_T_TAG_OBJS, (Object) tags);
+
+        // q&a status
+        if (Article.ARTICLE_TYPE_C_QNA == article.optInt(Article.ARTICLE_TYPE)) {
+            final String articleAuthorId = article.optString(Article.ARTICLE_AUTHOR_ID);
+            article.put(Common.OFFERED, rewardQueryService.isRewarded(articleAuthorId, articleId, Reward.TYPE_C_ACCEPT_COMMENT));
+        }
     }
 
     /**
@@ -2116,13 +2123,13 @@ public class ArticleQueryService {
         );
     }
 
-    private List<JSONObject> getStickArticles() {
+    public List<JSONObject> getStickArticles() {
         final Query query = new Query().
                 setFilter(CompositeFilterOperator.and(
                         new PropertyFilter(Article.ARTICLE_STICK, FilterOperator.NOT_EQUAL, 0L),
                         new PropertyFilter(Article.ARTICLE_TYPE, FilterOperator.NOT_EQUAL, Article.ARTICLE_TYPE_C_DISCUSSION),
                         new PropertyFilter(Article.ARTICLE_STATUS, FilterOperator.EQUAL, Article.ARTICLE_STATUS_C_VALID))).
-                setPageCount(1).setPage(1, 2).
+                setPageCount(1).setPage(1, 5).
                 addSort(Article.ARTICLE_STICK, SortDirection.DESCENDING);
         try {
             return articleRepository.getList(query);

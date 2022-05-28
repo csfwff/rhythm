@@ -1,5 +1,6 @@
 /*
- * Symphony - A modern community (forum/BBS/SNS/blog) platform written in Java.
+ * Rhythm - A modern community (forum/BBS/SNS/blog) platform written in Java.
+ * Modified version from Symphony, Thanks Symphony :)
  * Copyright (C) 2012-present, b3log.org
  *
  * This program is free software: you can redistribute it and/or modify
@@ -37,6 +38,7 @@ import org.b3log.symphony.service.UserQueryService;
 import org.json.JSONObject;
 
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * UserRegisterValidation for validate {@link org.b3log.symphony.processor.LoginProcessor} register(Type POST) method.
@@ -161,7 +163,10 @@ public class UserRegisterValidationMidware {
 
     public void handle(final RequestContext context) {
         final JSONObject requestJSONObject = context.requestJSON();
-        final String referral = requestJSONObject.optString(Common.REFERRAL);
+        String referral = context.param("r");
+        if (referral == null) {
+            referral = "";
+        }
 
         // check if admin allow to register
         final JSONObject option = optionQueryService.getOption(Option.ID_C_MISC_ALLOW_REGISTER);
@@ -177,7 +182,6 @@ public class UserRegisterValidationMidware {
             try {
                 final JSONObject referralUser = userQueryService.getUserByName(referral);
                 if (null != referralUser) {
-
                     final Map<String, JSONObject> permissions =
                             roleQueryService.getUserPermissionsGrantMap(referralUser.optString(Keys.OBJECT_ID));
                     final JSONObject useILPermission =
@@ -224,7 +228,7 @@ public class UserRegisterValidationMidware {
         }
 
         final String name = requestJSONObject.optString(User.USER_NAME);
-        final String email = requestJSONObject.optString(User.USER_EMAIL);
+        final String phone = requestJSONObject.optString("userPhone");
         final int appRole = requestJSONObject.optInt(UserExt.USER_APP_ROLE);
 
         if (UserExt.isReservedUserName(name)) {
@@ -239,16 +243,20 @@ public class UserRegisterValidationMidware {
             return;
         }
 
-        if (!Strings.isEmail(email)) {
-            context.renderJSON(new JSONObject().put(Keys.MSG, langPropsService.get("registerFailLabel") + " - " + langPropsService.get("invalidEmailLabel")));
+        if (!isMobileNO(phone)) {
+            context.renderJSON(new JSONObject().put(Keys.MSG, langPropsService.get("registerFailLabel") + " - " + "手机号不合法"));
             context.abort();
             return;
-        }
-
-        if (!UserExt.isValidMailDomain(email)) {
-            context.renderJSON(new JSONObject().put(Keys.MSG, langPropsService.get("registerFailLabel") + " - " + langPropsService.get("invalidEmail1Label")));
-            context.abort();
-            return;
+        } else {
+            try {
+                if (Objects.nonNull(userQueryService.getUserByPhone(phone))) {
+                    context.renderJSON(new JSONObject().put(Keys.MSG, langPropsService.get("registerFailLabel") + " - " + "该手机号已注册"));
+                    context.abort();
+                    return;
+                }
+            } catch (Exception e) {
+                LOGGER.log(Level.WARN, "Query user by phone  [phone=" + phone + "] failed", e);
+            }
         }
 
         if (UserExt.USER_APP_ROLE_C_HACKER != appRole && UserExt.USER_APP_ROLE_C_PAINTER != appRole) {
@@ -258,5 +266,14 @@ public class UserRegisterValidationMidware {
         }
 
         context.handle();
+    }
+
+    public static boolean isMobileNO(String mobiles) {
+        String telRegex = "[1]\\d{10}";
+        if (mobiles.isEmpty()) {
+            return false;
+        } else {
+            return mobiles.matches(telRegex);
+        }
     }
 }

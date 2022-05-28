@@ -1,5 +1,6 @@
 /*
- * Symphony - A modern community (forum/BBS/SNS/blog) platform written in Java.
+ * Rhythm - A modern community (forum/BBS/SNS/blog) platform written in Java.
+ * Modified version from Symphony, Thanks Symphony :)
  * Copyright (C) 2012-present, b3log.org
  *
  * This program is free software: you can redistribute it and/or modify
@@ -21,15 +22,18 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.b3log.latke.Latkes;
 import org.b3log.latke.http.Dispatcher;
 import org.b3log.latke.http.RequestContext;
 import org.b3log.latke.http.Response;
 import org.b3log.latke.http.renderer.PngRenderer;
 import org.b3log.latke.ioc.BeanManager;
 import org.b3log.latke.ioc.Singleton;
+import org.b3log.latke.util.Requests;
 import org.b3log.latke.util.Strings;
 import org.b3log.symphony.model.Common;
 import org.json.JSONObject;
+import org.patchca.background.BackgroundFactory;
 import org.patchca.color.GradientColorFactory;
 import org.patchca.color.RandomColorFactory;
 import org.patchca.filter.predefined.CurvesRippleFilterFactory;
@@ -37,17 +41,16 @@ import org.patchca.font.RandomFontFactory;
 import org.patchca.service.Captcha;
 import org.patchca.service.ConfigurableCaptchaService;
 import org.patchca.word.RandomWordFactory;
+import pers.adlered.simplecurrentlimiter.main.SimpleCurrentLimiter;
 
 import javax.imageio.ImageIO;
-import javax.swing.*;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashSet;
+import java.net.URL;
+import java.util.*;
 import java.util.List;
-import java.util.Set;
 
 /**
  * Captcha processor.
@@ -119,43 +122,70 @@ public class CaptchaProcessor {
      *
      * @param context the specified context
      */
+    SimpleCurrentLimiter captchaCurrentLimiter = new SimpleCurrentLimiter(5, 5);
     public void get(final RequestContext context) {
-        final PngRenderer renderer = new PngRenderer();
-        context.setRenderer(renderer);
+        String address = Requests.getRemoteAddr(context.getRequest());
+        if (captchaCurrentLimiter.access(address)) {
+            final PngRenderer renderer = new PngRenderer();
+            context.setRenderer(renderer);
 
-        try {
-            final ConfigurableCaptchaService cs = new ConfigurableCaptchaService();
-            if (0.5 < Math.random()) {
-                cs.setColorFactory(new GradientColorFactory());
-            } else {
-                cs.setColorFactory(new RandomColorFactory());
+            try {
+                final ConfigurableCaptchaService cs = new ConfigurableCaptchaService();
+                // 随机颜色
+                if (0.5 < Math.random()) {
+                    cs.setColorFactory(new GradientColorFactory());
+                } else {
+                    cs.setColorFactory(new RandomColorFactory());
+                }
+                // 随机字符
+                final RandomWordFactory randomWordFactory = new RandomWordFactory();
+                randomWordFactory.setCharacters(CHARS);
+                randomWordFactory.setMinLength(CAPTCHA_LENGTH);
+                randomWordFactory.setMaxLength(CAPTCHA_LENGTH);
+                cs.setWordFactory(randomWordFactory);
+                // 随机字体
+                List<String> fonts = getAvailableFonts();
+                cs.setFontFactory(new RandomFontFactory(fonts));
+                // 自定义验证码图片背景
+                MyCustomBackgroundFactory backgroundFactory = new MyCustomBackgroundFactory();
+                cs.setBackgroundFactory(backgroundFactory);
+                // 彩条
+                cs.setFilterFactory(new CurvesRippleFilterFactory(cs.getColorFactory()));
+
+                final Captcha captcha = cs.getCaptcha();
+                final String challenge = captcha.getChallenge();
+                final BufferedImage bufferedImage = captcha.getImage();
+
+                if (CAPTCHAS.size() > 64) {
+                    CAPTCHAS.clear();
+                }
+
+                CAPTCHAS.add(challenge);
+
+                final Response response = context.getResponse();
+                response.setHeader("Pragma", "no-cache");
+                response.setHeader("Cache-Control", "no-cache");
+                response.setHeader("Expires", "0");
+
+                renderImg(renderer, bufferedImage);
+            } catch (final Exception e) {
+                LOGGER.log(Level.ERROR, e.getMessage(), e);
             }
-            cs.setFilterFactory(new CurvesRippleFilterFactory(cs.getColorFactory()));
-            final RandomWordFactory randomWordFactory = new RandomWordFactory();
-            randomWordFactory.setCharacters(CHARS);
-            randomWordFactory.setMinLength(CAPTCHA_LENGTH);
-            randomWordFactory.setMaxLength(CAPTCHA_LENGTH);
-            cs.setWordFactory(randomWordFactory);
-            cs.setFontFactory(new RandomFontFactory(getAvaialbeFonts()));
+        } else {
+            try {
+                final PngRenderer renderer = new PngRenderer();
+                context.setRenderer(renderer);
 
-            final Captcha captcha = cs.getCaptcha();
-            final String challenge = captcha.getChallenge();
-            final BufferedImage bufferedImage = captcha.getImage();
+                final Response response = context.getResponse();
+                response.setHeader("Pragma", "no-cache");
+                response.setHeader("Cache-Control", "no-cache");
+                response.setHeader("Expires", "0");
 
-            if (CAPTCHAS.size() > 64) {
-                CAPTCHAS.clear();
+                URL url = new URL(Latkes.getStaticServePath() + "/images/wait.png");
+                renderImg(renderer, ImageIO.read(url));
+            } catch (Exception e) {
+                e.printStackTrace();
             }
-
-            CAPTCHAS.add(challenge);
-
-            final Response response = context.getResponse();
-            response.setHeader("Pragma", "no-cache");
-            response.setHeader("Cache-Control", "no-cache");
-            response.setHeader("Expires", "0");
-
-            renderImg(renderer, bufferedImage);
-        } catch (final Exception e) {
-            LOGGER.log(Level.ERROR, e.getMessage(), e);
         }
     }
 
@@ -182,32 +212,61 @@ public class CaptchaProcessor {
                 return;
             }
 
-            final PngRenderer renderer = new PngRenderer();
-            context.setRenderer(renderer);
+            String address = Requests.getRemoteAddr(context.getRequest());
+            if (captchaCurrentLimiter.access(address)) {
 
-            final ConfigurableCaptchaService cs = new ConfigurableCaptchaService();
-            if (0.5 < Math.random()) {
-                cs.setColorFactory(new GradientColorFactory());
+                final PngRenderer renderer = new PngRenderer();
+                context.setRenderer(renderer);
+
+                final ConfigurableCaptchaService cs = new ConfigurableCaptchaService();
+
+                // 随机颜色
+                if (0.5 < Math.random()) {
+                    cs.setColorFactory(new GradientColorFactory());
+                } else {
+                    cs.setColorFactory(new RandomColorFactory());
+                }
+                // 随机字符
+                final RandomWordFactory randomWordFactory = new RandomWordFactory();
+                randomWordFactory.setCharacters(CHARS);
+                randomWordFactory.setMinLength(CAPTCHA_LENGTH);
+                randomWordFactory.setMaxLength(CAPTCHA_LENGTH);
+                cs.setWordFactory(randomWordFactory);
+                // 随机字体
+                List<String> fonts = getAvailableFonts();
+                cs.setFontFactory(new RandomFontFactory(fonts));
+                // 自定义验证码图片背景
+                MyCustomBackgroundFactory backgroundFactory = new MyCustomBackgroundFactory();
+                cs.setBackgroundFactory(backgroundFactory);
+                // 彩条
+                cs.setFilterFactory(new CurvesRippleFilterFactory(cs.getColorFactory()));
+
+                final Captcha captcha = cs.getCaptcha();
+                final String challenge = captcha.getChallenge();
+                final BufferedImage bufferedImage = captcha.getImage();
+
+                wrong.put(CAPTCHA, challenge);
+
+                response.setHeader("Pragma", "no-cache");
+                response.setHeader("Cache-Control", "no-cache");
+                response.setHeader("Expires", "0");
+
+                renderImg(renderer, bufferedImage);
             } else {
-                cs.setColorFactory(new RandomColorFactory());
+                try {
+                    final PngRenderer renderer = new PngRenderer();
+                    context.setRenderer(renderer);
+
+                    response.setHeader("Pragma", "no-cache");
+                    response.setHeader("Cache-Control", "no-cache");
+                    response.setHeader("Expires", "0");
+
+                    URL url = new URL(Latkes.getStaticServePath() + "/images/wait.png");
+                    renderImg(renderer, ImageIO.read(url));
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
             }
-            cs.setFilterFactory(new CurvesRippleFilterFactory(cs.getColorFactory()));
-            final RandomWordFactory randomWordFactory = new RandomWordFactory();
-            randomWordFactory.setCharacters(CHARS);
-            randomWordFactory.setMinLength(CAPTCHA_LENGTH);
-            randomWordFactory.setMaxLength(CAPTCHA_LENGTH);
-            cs.setWordFactory(randomWordFactory);
-            final Captcha captcha = cs.getCaptcha();
-            final String challenge = captcha.getChallenge();
-            final BufferedImage bufferedImage = captcha.getImage();
-
-            wrong.put(CAPTCHA, challenge);
-
-            response.setHeader("Pragma", "no-cache");
-            response.setHeader("Cache-Control", "no-cache");
-            response.setHeader("Expires", "0");
-
-            renderImg(renderer, bufferedImage);
         } catch (final Exception e) {
             LOGGER.log(Level.ERROR, e.getMessage(), e);
         }
@@ -221,7 +280,7 @@ public class CaptchaProcessor {
         }
     }
 
-    private static List<String> getAvaialbeFonts() {
+    private static List<String> getAvailableFonts() {
         final List<String> ret = new ArrayList<>();
 
         final GraphicsEnvironment e = GraphicsEnvironment.getLocalGraphicsEnvironment();
@@ -236,5 +295,55 @@ public class CaptchaProcessor {
         //ret.add(defaultFontName);
 
         return ret;
+    }
+
+    /**
+     * 自定义验证码图片背景,主要画一些噪点和干扰线
+     */
+    private class MyCustomBackgroundFactory implements BackgroundFactory {
+        private Random random = new Random();
+
+        public void fillBackground(BufferedImage image) {
+            Graphics graphics = image.getGraphics();
+
+            // 验证码图片的宽高
+            int imgWidth = image.getWidth();
+            int imgHeight = image.getHeight();
+
+            // 填充为灰色背景
+            graphics.setColor(Color.GRAY);
+            graphics.fillRect(0, 0, imgWidth, imgHeight);
+
+            // 画100个噪点(颜色及位置随机)
+            for(int i = 0; i < 100; i++) {
+                // 随机颜色
+                int rInt = random.nextInt(255);
+                int gInt = random.nextInt(255);
+                int bInt = random.nextInt(255);
+
+                graphics.setColor(new Color(rInt, gInt, bInt));
+
+                // 随机位置
+                int xInt = random.nextInt(imgWidth - 3);
+                int yInt = random.nextInt(imgHeight - 2);
+
+                // 随机旋转角度
+                int sAngleInt = random.nextInt(360);
+                int eAngleInt = random.nextInt(360);
+
+                // 随机大小
+                int wInt = random.nextInt(6);
+                int hInt = random.nextInt(6);
+
+                graphics.fillArc(xInt, yInt, wInt, hInt, sAngleInt, eAngleInt);
+
+                // 画5条干扰线
+                if (i % 20 == 0) {
+                    int xInt2 = random.nextInt(imgWidth);
+                    int yInt2 = random.nextInt(imgHeight);
+                    graphics.drawLine(xInt, yInt, xInt2, yInt2);
+                }
+            }
+        }
     }
 }

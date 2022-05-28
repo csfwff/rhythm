@@ -1,6 +1,7 @@
 <#--
 
-    Symphony - A modern community (forum/BBS/SNS/blog) platform written in Java.
+    Rhythm - A modern community (forum/BBS/SNS/blog) platform written in Java.
+    Modified version from Symphony, Thanks Symphony :)
     Copyright (C) 2012-present, b3log.org
 
     This program is free software: you can redistribute it and/or modify
@@ -35,6 +36,13 @@
                         <a data-id="${article.oId}" data-type="${article.articleType}" rel="bookmark"
                            href="${servePath}${article.articlePermalink}">${article.articleTitleEmoj}
                         </a>
+                        <#if article.offered>
+                            <a href="${servePath}${article.articlePermalink}#comments">
+                                <svg style="color: green" fill="currentColor;" width="14px" height="14px" display="inline" stroke="currentColor;" stroke-width="0">
+                                    <use xlink:href="#iconAdopt"></use>
+                                </svg>
+                            </a>
+                        </#if>
                         <#if article.articleStick gt 0 && article.articleStick < 9223372036854775807>
                         <span class="ft-smaller ft-red stick-remains fn-none">${stickLabel}${remainsLabel} ${article.articleStickRemains?c} ${minuteLabel}</span>
                         </#if>

@@ -1,5 +1,6 @@
 /*
- * Symphony - A modern community (forum/BBS/SNS/blog) platform written in Java.
+ * Rhythm - A modern community (forum/BBS/SNS/blog) platform written in Java.
+ * Modified version from Symphony, Thanks Symphony :)
  * Copyright (C) 2012-present, b3log.org
  *
  * This program is free software: you can redistribute it and/or modify
@@ -153,11 +154,16 @@ public class InitMgmtService {
         ADMIN_PERMISSIONS.add(Permission.PERMISSION_ID_C_MISC_ALLOW_ANONYMOUS_VIEW);
         ADMIN_PERMISSIONS.add(Permission.PERMISSION_ID_C_MISC_LANGUAGE);
         ADMIN_PERMISSIONS.add(Permission.PERMISSION_ID_C_MISC_REGISTER_METHOD);
+        ADMIN_PERMISSIONS.add(Permission.PERMISSION_ID_C_MISC_BROAD_CAST);
         ADMIN_PERMISSIONS.add(Permission.PERMISSION_ID_C_MENU_ADMIN_DOMAINS);
         ADMIN_PERMISSIONS.add(Permission.PERMISSION_ID_C_MENU_ADMIN_AD);
         ADMIN_PERMISSIONS.add(Permission.PERMISSION_ID_C_MENU_ADMIN_ROLES);
         ADMIN_PERMISSIONS.add(Permission.PERMISSION_ID_C_MENU_ADMIN_MISC);
         ADMIN_PERMISSIONS.add(Permission.PERMISSION_ID_C_MENU_ADMIN_REPORTS);
+        ADMIN_PERMISSIONS.add(Permission.PERMISSION_ID_C_USER_ADJUST_BAG);
+        ADMIN_PERMISSIONS.add(Permission.PERMISSION_ID_C_USER_GIVE_METAL);
+        ADMIN_PERMISSIONS.add(Permission.PERMISSION_ID_C_USER_REMOVE_METAL);
+        ADMIN_PERMISSIONS.add(Permission.PERMISSION_ID_C_USER_REMOVE_MFA);
     }
 
     /**

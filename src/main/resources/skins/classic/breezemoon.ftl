@@ -1,6 +1,7 @@
 <#--
 
-    Symphony - A modern community (forum/BBS/SNS/blog) platform written in Java.
+    Rhythm - A modern community (forum/BBS/SNS/blog) platform written in Java.
+    Modified version from Symphony, Thanks Symphony :)
     Copyright (C) 2012-present, b3log.org
 
     This program is free software: you can redistribute it and/or modify
@@ -51,10 +52,11 @@
                     <ul id="breezemoonList">
                         <#list watchingBreezemoons as item>
                             <li class="fn-flex" id="${item.oId}">
-                                <a class="tooltipped tooltipped-n avatar"
+                                <a class="avatar"
                                    style="background-image:url('${item.breezemoonAuthorThumbnailURL48}')"
                                    rel="nofollow" href="${servePath}/member/${item.breezemoonAuthorName}"
-                                   aria-label="Vanessa">
+                                   aria-label="${item.breezemoonAuthorName}"
+                                >
                                 </a>
                                 <div class="fn-flex-1">
                                     <div class="ft-fade">
@@ -124,7 +126,8 @@
             return 0 > href.indexOf('${servePath}/watch')
         },
         callback: function () {
-            Breezemoon.init()
+            Breezemoon.init();
+            Util.listenUserCard();
         },
     })
     NProgress.configure({showSpinner: false})

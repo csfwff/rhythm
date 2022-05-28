@@ -1,6 +1,7 @@
 <#--
 
-    Symphony - A modern community (forum/BBS/SNS/blog) platform written in Java.
+    Rhythm - A modern community (forum/BBS/SNS/blog) platform written in Java.
+    Modified version from Symphony, Thanks Symphony :)
     Copyright (C) 2012-present, b3log.org
 
     This program is free software: you can redistribute it and/or modify
@@ -23,7 +24,7 @@
     <div class="module-header">${functionTipLabel}</div>
     <div class="module-panel form fn-clear">
         <label>${userListPageSizeLabel}</label>
-        <input id="userListPageSize" type="number" value="${currentUser.userListPageSize}" /> 
+        <input id="userListPageSize" type="number" value="${currentUser.userListPageSize}" />
         <label>${cmtViewModeLabel}</label>
         <select id="userCommentViewMode" name="userCommentViewMode">
             <option value="0"<#if 0 == currentUser.userCommentViewMode> selected</#if>>${traditionLabel}</option>
@@ -74,6 +75,12 @@
                 <label>
                     <input id="userForwardPageStatus" <#if 0 == currentUser.userForwardPageStatus> checked="checked"</#if> type="checkbox" />
                     ${useForwardPageLabel}
+                </label>
+            </div>
+            <div>
+                <label>
+                    <input id="chatRoomPictureStatus" <#if 0 == currentUser.chatRoomPictureStatus> checked="checked"</#if> type="checkbox" />
+                    ${chatRoomPictureStatusLabel}
                 </label>
             </div>
         </div>

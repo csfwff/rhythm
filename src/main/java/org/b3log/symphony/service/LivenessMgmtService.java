@@ -1,5 +1,6 @@
 /*
- * Symphony - A modern community (forum/BBS/SNS/blog) platform written in Java.
+ * Rhythm - A modern community (forum/BBS/SNS/blog) platform written in Java.
+ * Modified version from Symphony, Thanks Symphony :)
  * Copyright (C) 2012-present, b3log.org
  *
  * This program is free software: you can redistribute it and/or modify
@@ -22,14 +23,22 @@ import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.b3log.latke.Keys;
+import org.b3log.latke.ioc.BeanManager;
 import org.b3log.latke.ioc.Inject;
+import org.b3log.latke.model.User;
 import org.b3log.latke.repository.RepositoryException;
 import org.b3log.latke.repository.annotation.Transactional;
 import org.b3log.latke.service.annotation.Service;
 import org.b3log.latke.util.Stopwatchs;
 import org.b3log.symphony.model.Liveness;
+import org.b3log.symphony.processor.UserProcessor;
 import org.b3log.symphony.repository.LivenessRepository;
+import org.b3log.symphony.util.Symphonys;
 import org.json.JSONObject;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Liveness management service.
@@ -51,6 +60,24 @@ public class LivenessMgmtService {
      */
     @Inject
     private LivenessRepository livenessRepository;
+
+    /**
+     * Activity query service.
+     */
+    @Inject
+    private ActivityQueryService activityQueryService;
+
+    /**
+     * User query service.
+     */
+    @Inject
+    private UserQueryService userQueryService;
+
+    /**
+     * Liveness query service.
+     */
+    @Inject
+    private LivenessQueryService livenessQueryService;
 
     /**
      * Increments a field of the specified liveness.
@@ -86,11 +113,94 @@ public class LivenessMgmtService {
 
             liveness.put(field, liveness.optInt(field) + 1);
 
+            final int livenessMax = Symphonys.ACTIVITY_YESTERDAY_REWARD_MAX;
+            final int currentLiveness = Liveness.calcPoint(liveness);
+            float livenessPercent = (float) (Math.round((float) currentLiveness / livenessMax * 100 * 100)) / 100;
+            UserProcessor.livenessCache.put(userId, livenessPercent);
+
             livenessRepository.update(liveness.optString(Keys.OBJECT_ID), liveness);
         } catch (final RepositoryException e) {
             LOGGER.log(Level.ERROR, "Updates a liveness [" + date + "] field [" + field + "] failed", e);
         } finally {
             Stopwatchs.end();
+        }
+    }
+
+    private static Map<String, String> gave2dayCards = new HashMap<>();
+
+    // 系统刚启动时运行，避免重复发放免签卡
+    public void initCheckLiveness() {
+        final String date = DateFormatUtils.format(System.currentTimeMillis(), "yyyyMMdd");
+        try {
+            List<JSONObject> userList = livenessRepository.getByDate(date);
+            for (JSONObject i : userList) {
+                String userId = i.optString(Liveness.LIVENESS_USER_ID);
+                JSONObject user = userQueryService.getUser(userId);
+                final int livenessMax = Symphonys.ACTIVITY_YESTERDAY_REWARD_MAX;
+                final int currentLiveness = livenessQueryService.getCurrentLivenessPoint(userId);
+                float liveness = (float) (Math.round((float) currentLiveness / livenessMax * 100 * 100)) / 100;
+                if (liveness == 100) {
+                    LOGGER.log(Level.INFO, "Ignore checkin card 2 days for " + user.optString(User.USER_NAME));
+                    gave2dayCards.put(userId, date);
+                }
+            }
+        } catch (RepositoryException e) {
+            LOGGER.log(Level.ERROR, "Init check liveness [" + date + "] failed", e);
+        }
+    }
+
+    public void checkLiveness() {
+        final BeanManager beanManager = BeanManager.getInstance();
+        final ActivityMgmtService activityMgmtService = beanManager.getReference(ActivityMgmtService.class);
+        final CloudService cloudService = beanManager.getReference(CloudService.class);
+        final String date = DateFormatUtils.format(System.currentTimeMillis(), "yyyyMMdd");
+        try {
+            List<JSONObject> userList = livenessRepository.getByDate(date);
+            for (JSONObject i : userList) {
+                String userId = i.optString(Liveness.LIVENESS_USER_ID);
+                JSONObject user = userQueryService.getUser(userId);
+                final int livenessMax = Symphonys.ACTIVITY_YESTERDAY_REWARD_MAX;
+                final int currentLiveness = livenessQueryService.getCurrentLivenessPoint(userId);
+                float liveness = (float) (Math.round((float) currentLiveness / livenessMax * 100 * 100)) / 100;
+                if (!activityQueryService.isCheckedinToday(userId)) {
+                    if (liveness >= 10) {
+                        activityMgmtService.dailyCheckin(userId);
+                        LOGGER.log(Level.INFO, "Checkin for " + user.optString(User.USER_NAME) + " liveness is " + liveness + "%");
+                    }
+                }
+                if (liveness == 100) {
+                    if (gave2dayCards.get(userId) == null || !gave2dayCards.get(userId).equals(date)) {
+                        if (cloudService.putBag(userId, "checkin2days", 1, Integer.MAX_VALUE) == 0) {
+                            LOGGER.log(Level.INFO, "Checkin card 2 days for " + user.optString(User.USER_NAME));
+                        }
+                        gave2dayCards.put(userId, date);
+                    }
+                }
+            }
+        } catch (RepositoryException e) {
+            LOGGER.log(Level.ERROR, "Check liveness [" + date + "] failed", e);
+        }
+    }
+
+    public void autoCheckin() {
+        final String date = DateFormatUtils.format(System.currentTimeMillis(), "HHmm");
+        int numDate = Integer.parseInt(date);
+        if (numDate >= 0 && numDate <= 5) {
+            // 自动签到
+            final BeanManager beanManager = BeanManager.getInstance();
+            final ActivityMgmtService activityMgmtService = beanManager.getReference(ActivityMgmtService.class);
+            final CloudService cloudService = beanManager.getReference(CloudService.class);
+            List<JSONObject> bags = cloudService.getBags();
+            for (JSONObject i : bags) {
+                JSONObject bag = new JSONObject(i.optString("data"));
+                if (bag.has("sysCheckinRemain") && bag.optInt("sysCheckinRemain") > 0) {
+                    String userId = i.optString("userId");
+                    if (!activityQueryService.isCheckedinToday(userId)) {
+                        activityMgmtService.dailyCheckin(userId);
+                        cloudService.putBag(userId, "sysCheckinRemain", -1, Integer.MAX_VALUE);
+                    }
+                }
+            }
         }
     }
 }

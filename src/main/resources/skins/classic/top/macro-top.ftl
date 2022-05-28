@@ -1,6 +1,7 @@
 <#--
 
-    Symphony - A modern community (forum/BBS/SNS/blog) platform written in Java.
+    Rhythm - A modern community (forum/BBS/SNS/blog) platform written in Java.
+    Modified version from Symphony, Thanks Symphony :)
     Copyright (C) 2012-present, b3log.org
 
     This program is free software: you can redistribute it and/or modify
@@ -40,6 +41,36 @@
         <#if type == "link">
             <@head title="${linkRankLabel} - ${symphonyLabel}">
         <link rel="canonical" href="${servePath}/top/link">
+            </@head>
+        </#if>
+        <#if type == "online">
+            <@head title="在线时间排行 - ${symphonyLabel}">
+                <link rel="canonical" href="${servePath}/top/online">
+            </@head>
+        </#if>
+        <#if type == "evolve">
+            <@head title="进化排行榜 - ${symphonyLabel}">
+                <link rel="canonical" href="${servePath}/top/evolve">
+            </@head>
+        </#if>
+        <#if type == "adr">
+            <@head title="ADR 游戏总分排行 - ${symphonyLabel}">
+                <link rel="canonical" href="${servePath}/top/adr">
+            </@head>
+        </#if>
+        <#if type == "mofish">
+            <@head title="摸鱼大闯关游戏排行 - ${symphonyLabel}">
+                <link rel="canonical" href="${servePath}/top/mofish">
+            </@head>
+        </#if>
+        <#if type == "lifeRestart">
+            <@head title="人生重开模拟器成就排行 - ${symphonyLabel}">
+                <link rel="canonical" href="${servePath}/top/lifeRestart">
+            </@head>
+        </#if>
+        <#if type == "emoji">
+            <@head title="Emoji 真假小黄脸 游戏总分排行 - ${symphonyLabel}">
+                <link rel="canonical" href="${servePath}/top/emoji">
             </@head>
         </#if>
         <link rel="stylesheet" href="${staticServePath}/css/index.css?${staticResourceVersion}" />
