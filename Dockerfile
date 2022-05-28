@@ -1,4 +1,4 @@
-FROM docker.io/library/3.8.5-openjdk-8-slim as MVN_BUILD
+FROM docker.io/library/maven:3.8.5-openjdk-8-slim as MVN_BUILD
 
 WORKDIR /opt/sym/
 ADD . /tmp
