@@ -1477,9 +1477,10 @@ var ChatRoom = {
   /**
    * xiaoIce Game
    * */
+  iceWs: "",
   loadXiaoIceGame: function(){
     // 连接游戏服务器
-    let iceWs = new WebSocket('wss://game.yuis.cc/wss');
+    iceWs = new WebSocket('wss://game.yuis.cc/wss');
     let iceWsHeart = null;
     iceWs.onopen = function(){
       iceWs.send(JSON.stringify({type:'setUser',user:Label.currentUser}))
@@ -1509,7 +1510,6 @@ var ChatRoom = {
         $('#iceMsgList').prepend(html);
       }
     }
-    // console.log(iceWs);
     // 打开游戏界面
     $('#xiaoIceGameBtn').click(function(){
       $("#xiaoIceGameBox").show(200);
@@ -1532,30 +1532,26 @@ var ChatRoom = {
       $("#xiaoIceGameBox").toggleClass('active');
     })
     // 发送指令
-    $('#iceSendMsg').click(function(){
-      let msg = $('.ice-chat-input').val();
-      $('.ice-chat-input').val("");
-      console.log(Label)
-      let uMsg = `<div class="ice-msg-item me">
+    $('#iceSendMsg').click(ChatRoom.sendIceMsg);
+    $('.ice-chat-input').bind('keypress', function(event) {
+      if (event.keyCode === 13) {
+        event.preventDefault();
+        ChatRoom.sendIceMsg();
+      }
+    });
+  },
+
+  sendIceMsg: function () {
+    let msg = $('.ice-chat-input').val();
+    $('.ice-chat-input').val("");
+    let uMsg = `<div class="ice-msg-item me">
                     <div class="ice-msg-content">${msg}</div>
                   </div>`
-      $('#iceMsgList').prepend(uMsg);
-      iceWs.send(JSON.stringify({
-        type:'gameMsg',
-        msg:msg
-      }));
-      // $.ajax({
-      //   url: `https://pwl.yuis.cc/api?msg=${msg}&user=${Label.currentUser}&key=xiaoIce`,
-      //   method: 'get',
-      //   success: function (result) {
-      //     console.log(result)
-      //     let html = `<div class="ice-msg-item">
-      //               <div class="ice-msg-content">${result.msg}</div>
-      //             </div>`
-      //     $('#iceMsgList').prepend(html)
-      //   }
-      // });
-    })
+    $('#iceMsgList').prepend(uMsg);
+    iceWs.send(JSON.stringify({
+      type:'gameMsg',
+      msg:msg
+    }));
   },
 
  /**
