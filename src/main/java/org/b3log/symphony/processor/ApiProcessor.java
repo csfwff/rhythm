@@ -20,6 +20,7 @@ package org.b3log.symphony.processor;
 
 import org.apache.commons.lang.RandomStringUtils;
 import org.apache.commons.lang.StringUtils;
+import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.b3log.latke.Keys;
@@ -35,15 +36,18 @@ import org.b3log.latke.ioc.Singleton;
 import org.b3log.latke.model.User;
 import org.b3log.latke.service.LangPropsService;
 import org.b3log.latke.service.ServiceException;
+import org.b3log.latke.util.Crypts;
 import org.b3log.latke.util.Requests;
 import org.b3log.symphony.model.*;
 import org.b3log.symphony.processor.middleware.CSRFMidware;
 import org.b3log.symphony.processor.middleware.LoginCheckMidware;
 import org.b3log.symphony.processor.middleware.validate.Activity1A0001CollectValidationMidware;
 import org.b3log.symphony.processor.middleware.validate.Activity1A0001ValidationMidware;
+import org.b3log.symphony.repository.UserRepository;
 import org.b3log.symphony.service.*;
 import org.b3log.symphony.util.Sessions;
 import org.b3log.symphony.util.StatusCodes;
+import org.b3log.symphony.util.Symphonys;
 import org.json.JSONObject;
 import pers.adlered.simplecurrentlimiter.main.SimpleCurrentLimiter;
 
@@ -102,6 +106,11 @@ public class ApiProcessor {
      */
     @Inject
     private CloudService cloudService;
+
+    /**
+     * Cookie value separator.
+     */
+    public static final String COOKIE_ITEM_SEPARATOR = ":";
 
     /**
      * Register request handlers.
@@ -180,7 +189,13 @@ public class ApiProcessor {
                     return;
                 }
 
-                final String key = RandomStringUtils.randomAlphanumeric(32);
+                final JSONObject cookieJSONObject = new JSONObject();
+                cookieJSONObject.put(Keys.OBJECT_ID, userId);
+
+                final String random = RandomStringUtils.randomAlphanumeric(16);
+                cookieJSONObject.put(Keys.TOKEN, userPassword + COOKIE_ITEM_SEPARATOR + random);
+                final String key = Crypts.encryptByAES(cookieJSONObject.toString(), Symphonys.COOKIE_SECRET);
+
                 context.renderCodeMsg(StatusCodes.SUCC, "");
                 context.renderJSONValue("Key", key);
                 String userName = user.optString(User.USER_NAME);
@@ -261,13 +276,59 @@ public class ApiProcessor {
      * @throws NullPointerException if apiKey is null or not found in keymaps
      */
     public static JSONObject getUserByKey(String apiKey) {
-        if (apiKey != null) {
+        if (apiKey != null && !apiKey.isEmpty()) {
             JSONObject user = ApiProcessor.keys.get(apiKey);
+            if (null == user) {
+                user = tryLogInWithApiKey(apiKey);
+            }
             if (null != user) {
                 return user;
             }
         }
         throw new NullPointerException();
+    }
+
+    /**
+     * Tries to login with Api Key.
+     *
+     * @param apiKey the specified apikey
+     * @return returns user if logged in, returns {@code null} otherwise
+     */
+    private static JSONObject tryLogInWithApiKey(String apiKey) {
+        final String value = Crypts.decryptByAES(apiKey, Symphonys.COOKIE_SECRET);
+        final JSONObject cookieJSONObject = new JSONObject(value);
+        final BeanManager beanManager = BeanManager.getInstance();
+        final UserRepository userRepository = beanManager.getReference(UserRepository.class);
+
+        try {
+            final String userId = cookieJSONObject.optString(Keys.OBJECT_ID);
+            if (StringUtils.isBlank(userId)) {
+                return null;
+            }
+
+            final JSONObject ret = userRepository.get(userId);
+            if (null == ret) {
+                return null;
+            }
+
+            final String userPassword = ret.optString(User.USER_PASSWORD);
+            final String token = cookieJSONObject.optString(Keys.TOKEN);
+            final String password = StringUtils.substringBeforeLast(token, COOKIE_ITEM_SEPARATOR);
+            if (userPassword.equals(password)) {
+                String userName = ret.optString(User.USER_NAME);
+                if (null != keys.get(userName)) {
+                    removeKeyByUsername(userName);
+                }
+                keys.put(apiKey, ret);
+                keys.put(userName, new JSONObject().put("key", apiKey));
+
+                return ret;
+            }
+        } catch (final Exception e) {
+            LOGGER.log(Level.WARN, "Parses apikey failed, clears apikey");
+        }
+
+        return null;
     }
 
     public void userExists(final RequestContext context) {
