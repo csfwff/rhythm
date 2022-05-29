@@ -25,8 +25,8 @@
         </div>
         <div class="fn-flex-1">
             <div class="fn-clear ft-smaller">
-                <div onclick="window.open('https://www.tsyvps.com/aff/HEHTPGYL')" style="padding: 8px 0px; color: #0A6AB5; background-color: #ffffff; line-height: 20px; border-radius: 12px; width: 175px; margin-bottom: 15px; cursor: pointer;">
-                    <div style="padding-left: 20px;">
+                <div onclick="window.open('https://www.tsyvps.com/aff/HEHTPGYL')" style="text-align: center;padding: 8px 0px; color: #0A6AB5; background-color: #ffffff; line-height: 20px; border-radius: 12px; width: 175px; margin-bottom: 15px; cursor: pointer;">
+                    <div>
                         <img style="vertical-align: -3px; max-height: 15px;" src="https://file.fishpi.cn/2022/05/165184311051006-afb572fb.png">&nbsp;&nbsp;SCDN 由蓝易云支持<br>
                         <span style="color: #616161">性价比主机，高防 CDN</span>
                     </div>

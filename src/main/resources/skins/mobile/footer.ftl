@@ -67,7 +67,7 @@
         <div class="fn-hr5"></div>
         <div class="ft-smaller" style="display: inline-block">
             <div onclick="window.open('https://www.tsyvps.com/aff/HEHTPGYL')" style="padding: 8px 0px; color: #0A6AB5; background-color: #ffffff; line-height: 20px; border-radius: 12px; width: 175px; margin-top: 15px;">
-                <div style="padding-left: 3px;">
+                <div>
                     <img style="vertical-align: -3px; max-height: 15px;" src="https://file.fishpi.cn/2022/05/165184311051006-afb572fb.png">&nbsp;&nbsp;SCDN 由蓝易云支持<br>
                     <span style="color: #616161">性价比主机，高防 CDN</span>
                 </div>
