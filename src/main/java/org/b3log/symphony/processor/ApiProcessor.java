@@ -23,6 +23,8 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.b3log.latke.Keys;
+import org.b3log.latke.cache.Cache;
+import org.b3log.latke.cache.CacheFactory;
 import org.b3log.latke.http.Dispatcher;
 import org.b3log.latke.http.Request;
 import org.b3log.latke.http.RequestContext;
@@ -72,12 +74,10 @@ public class ApiProcessor {
     /**
      * 存储用户的Key
      */
-    public static Map<String, JSONObject> keys = Collections.synchronizedMap(new LinkedHashMap<String, JSONObject>() {
-        @Override
-        protected boolean removeEldestEntry(Map.Entry eldest) {
-            return size() > 1000;
-        }
-    });
+    /**
+     * Session cache.
+     */
+    private static final Cache keys = CacheFactory.getCache("keys");
 
     /**
      * Follow query service.
@@ -183,7 +183,12 @@ public class ApiProcessor {
                 final String key = RandomStringUtils.randomAlphanumeric(32);
                 context.renderCodeMsg(StatusCodes.SUCC, "");
                 context.renderJSONValue("Key", key);
+                String userName = user.optString(User.USER_NAME);
+                if (null != keys.get(userName)) {
+                    removeKeyByUsername(userName);
+                }
                 keys.put(key, user);
+                keys.put(userName, new JSONObject().put("key", key));
 
                 return;
             }
@@ -257,8 +262,9 @@ public class ApiProcessor {
      */
     public static JSONObject getUserByKey(String apiKey) {
         if (apiKey != null) {
-            if (ApiProcessor.keys.containsKey(apiKey)) {
-                return ApiProcessor.keys.get(apiKey);
+            JSONObject user = ApiProcessor.keys.get(apiKey);
+            if (null != user) {
+                return user;
             }
         }
         throw new NullPointerException();
@@ -275,13 +281,9 @@ public class ApiProcessor {
     }
 
     public static void removeKeyByUsername(String userName) {
-        for (Map.Entry<String, JSONObject> jsonObject : keys.entrySet()) {
-            String currentUserName = jsonObject.getValue().optString(User.USER_NAME);
-            if (userName.equals(currentUserName)) {
-                keys.remove(jsonObject.getKey());
-                System.out.println(userName);
-            }
-        }
+        String key = keys.get(userName).optString("key");
+        keys.remove(key);
+        keys.remove(userName);
     }
 
 }
