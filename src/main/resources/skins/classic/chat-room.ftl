@@ -117,6 +117,28 @@
     </div>
 </div>
 <div id="goToTop" style="position:fixed;bottom:20px;right:10%;display:none;"><a href="#"><svg style="width:30px;height:30px;color:#626262;"><use xlink:href="#toTopIcon"></use></svg></a></div>
+<div id="xiaoIceGameBtn" class="ice-game-btn">
+    <img src="${staticServePath}/images/xiaoIce/xiaoIce.gif" class="ice-game-icon" alt="">
+</div>
+<div id="xiaoIceGameBox" class="ice-game-box" style="display: none">
+    <div class="ice-tool-bar">
+        <div>
+            <img src="${staticServePath}/images/xiaoIce/xiaoIce-icon.png" class="ice-logo" alt="">
+            xiaoIce Game
+        </div>
+        <div class="ice-tools">
+            <div id="iceMinimize" class="ice-tool-btn" title="最小化">
+                <div class="ice-minimize-btn"></div>
+            </div>
+            <div id="iceClose" class="ice-close-btn" title="关闭">×</div>
+        </div>
+    </div>
+    <div class="ice-chat-box">
+        <input class="ice-chat-input" type="text" placeholder="开始游戏"/>
+        <div id="iceSendMsg" class="ice-send-btn">发送</div>
+    </div>
+    <div id="iceMsgList" class="ice-msg-list"></div>
+</div>
 <#include "footer.ftl">
 <script>
     Label.uploadLabel = "${uploadLabel}";

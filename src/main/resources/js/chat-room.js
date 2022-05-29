@@ -414,6 +414,8 @@ var ChatRoom = {
 
     //  加载挂件
     ChatRoom.loadAvatarPendant();
+    //  加载小冰游戏
+    ChatRoom.loadXiaoIceGame();
   },
   /**
    * 设置话题
@@ -1472,6 +1474,89 @@ var ChatRoom = {
     this.imgWaitting = this.imgWaitting || delayshow()
     // console.log("后", this.imgWaitting)
  },
+  /**
+   * xiaoIce Game
+   * */
+  loadXiaoIceGame: function(){
+    // 连接游戏服务器
+    let iceWs = new WebSocket('wss://game.yuis.cc/wss');
+    let iceWsHeart = null;
+    iceWs.onopen = function(){
+      iceWs.send(JSON.stringify({type:'setUser',user:Label.currentUser}))
+      iceWsHeart = setInterval(()=>{
+        iceWs.send(JSON.stringify({type:'hb'}))
+      },15000)
+    }
+    iceWs.onclose = function(){
+      let html = `<div class="ice-msg-item">
+                    <div class="ice-msg-content">小冰网络失去连接</div>
+                  </div>`
+      $('#iceMsgList').prepend(html);
+    }
+    iceWs.onerror = function(err){
+      let html = `<div class="ice-msg-item">
+                    <div class="ice-msg-content">小冰网络维护中...</div>
+                  </div>`
+      $('#iceMsgList').prepend(html);
+    }
+    // 收到消息
+    iceWs.onmessage = function (e){
+      let data = JSON.parse(e.data);
+      if(data.type == "all" || data.type == Label.currentUser){
+        let html = `<div class="ice-msg-item">
+                    <div class="ice-msg-content">${data.msg}</div>
+                  </div>`
+        $('#iceMsgList').prepend(html);
+      }
+    }
+    // console.log(iceWs);
+    // 打开游戏界面
+    $('#xiaoIceGameBtn').click(function(){
+      $("#xiaoIceGameBox").show(200);
+      $('#xiaoIceGameBtn').hide(200);
+      setTimeout(()=>{
+          $("#xiaoIceGameBox").addClass('active');
+      },220)
+    })
+    // 关闭游戏界面
+    $('#iceClose').click(function(){
+      $("#xiaoIceGameBox").removeClass('active');
+      setTimeout(()=>{
+        $('.ice-chat-input').val("");
+        $("#xiaoIceGameBox").hide(200);
+        $('#xiaoIceGameBtn').show(200);
+      },420)
+    })
+    // 最小化切换
+    $('#iceMinimize').click(function(){
+      $("#xiaoIceGameBox").toggleClass('active');
+    })
+    // 发送指令
+    $('#iceSendMsg').click(function(){
+      let msg = $('.ice-chat-input').val();
+      $('.ice-chat-input').val("");
+      console.log(Label)
+      let uMsg = `<div class="ice-msg-item me">
+                    <div class="ice-msg-content">${msg}</div>
+                  </div>`
+      $('#iceMsgList').prepend(uMsg);
+      iceWs.send(JSON.stringify({
+        type:'gameMsg',
+        msg:msg
+      }));
+      // $.ajax({
+      //   url: `https://pwl.yuis.cc/api?msg=${msg}&user=${Label.currentUser}&key=xiaoIce`,
+      //   method: 'get',
+      //   success: function (result) {
+      //     console.log(result)
+      //     let html = `<div class="ice-msg-item">
+      //               <div class="ice-msg-content">${result.msg}</div>
+      //             </div>`
+      //     $('#iceMsgList').prepend(html)
+      //   }
+      // });
+    })
+  },
 
  /**
   * 按时间加载头像挂件
