@@ -224,6 +224,10 @@ public class UserProcessor {
         Dispatcher.post("/user/query/latest-login-ip", userProcessor::getLatestLoginIp);
     }
 
+    /**
+     * 金手指：查询用户最近登录的IP
+     * @param context
+     */
     public void getLatestLoginIp(final RequestContext context) {
         JSONObject requestJSONObject = context.requestJSON();
         final String goldFingerKey = requestJSONObject.optString("goldFingerKey");
