@@ -37,6 +37,7 @@ import org.b3log.symphony.model.UserExt;
 import org.b3log.symphony.processor.ApiProcessor;
 import org.b3log.symphony.repository.UserRepository;
 import org.b3log.symphony.service.UserMgmtService;
+import org.b3log.symphony.service.UserQueryService;
 import org.json.JSONObject;
 
 import java.util.Objects;
@@ -364,6 +365,11 @@ public final class Sessions {
 
         final Session httpSession = request.getSession();
         httpSession.setAttribute(User.USER, null);
+
+        final BeanManager beanManager = BeanManager.getInstance();
+        final UserQueryService userQueryService = beanManager.getReference(UserQueryService.class);
+        final String userName = userQueryService.getUserName(userId);
+        ApiProcessor.removeKeyByUsername(userName);
 
         //final BeanManager beanManager = BeanManager.getInstance();
         //final UserMgmtService userMgmtService = beanManager.getReference(UserMgmtService.class);

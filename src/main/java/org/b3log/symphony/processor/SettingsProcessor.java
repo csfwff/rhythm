@@ -287,18 +287,37 @@ public class SettingsProcessor {
      *
      * @param context the specified context
      */
-    public void deactivateUser(final RequestContext context) {
+    List<String> users = new ArrayList<>();
+    synchronized public void deactivateUser(final RequestContext context) {
         context.renderJSON(StatusCodes.ERR);
 
         final Response response = context.getResponse();
-        final JSONObject currentUser = Sessions.getUser();
+        JSONObject currentUser = Sessions.getUser();
         try {
-            userMgmtService.deactivateUser(currentUser.optString(Keys.OBJECT_ID));
-            Sessions.logout(currentUser.optString(Keys.OBJECT_ID), context.getRequest(), response);
+            final JSONObject requestJSONObject = context.requestJSON();
+            currentUser = ApiProcessor.getUserByKey(requestJSONObject.optString("apiKey"));
+        } catch (NullPointerException ignored) {
+        }
 
-            context.renderJSON(StatusCodes.SUCC);
-        } catch (final Exception e) {
-            context.renderMsg(e.getMessage());
+        final String userId = currentUser.optString(Keys.OBJECT_ID);
+        if (users.contains(userId)) {
+            for (int i = 0; i < users.size(); i++) {
+                if (users.get(i).equals(userId)) {
+                    users.remove(i);
+                }
+            }
+            try {
+                userMgmtService.deactivateUser(userId);
+                Sessions.logout(currentUser.optString(Keys.OBJECT_ID), context.getRequest(), response);
+
+                context.renderJSON(StatusCodes.SUCC);
+                context.renderMsg("操作已完成。");
+            } catch (final Exception e) {
+                context.renderMsg(e.getMessage());
+            }
+        } else {
+            users.add(userId);
+            context.renderMsg("用户注销申请已记录，如确认要注销该用户，请再请求一次本接口，如果是测试用途，请不要再次请求本接口。");
         }
     }
 
