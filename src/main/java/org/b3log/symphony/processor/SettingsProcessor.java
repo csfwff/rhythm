@@ -307,8 +307,8 @@ public class SettingsProcessor {
                 }
             }
             try {
-                userMgmtService.deactivateUser(userId);
                 Sessions.logout(currentUser.optString(Keys.OBJECT_ID), context.getRequest(), response);
+                userMgmtService.deactivateUser(userId);
 
                 context.renderJSON(StatusCodes.SUCC);
                 context.renderMsg("操作已完成。");
