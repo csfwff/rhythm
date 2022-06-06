@@ -224,6 +224,32 @@ public class UserProcessor {
         Dispatcher.post("/user/query/latest-login-ip", userProcessor::getLatestLoginIp);
         Dispatcher.post("/user/edit/give-metal", userProcessor::giveMetal);
         Dispatcher.post("/user/edit/remove-metal", userProcessor::removeMetal);
+        Dispatcher.post("/user/query/items", userProcessor::getItem);
+    }
+
+    /**
+     * 金手指：获取用户背包内容
+     * @param context
+     */
+    public void getItem(final RequestContext context) {
+        JSONObject requestJSONObject = context.requestJSON();
+        final String goldFingerKey = requestJSONObject.optString("goldFingerKey");
+        final String itemKey = Symphonys.get("gold.finger.item");
+        if (goldFingerKey.equals(itemKey)) {
+            try {
+                final String userName = requestJSONObject.optString("userName");
+                JSONObject user = userQueryService.getUserByName(userName);
+                final String userId = user.optString(Keys.OBJECT_ID);
+                context.renderJSON(StatusCodes.SUCC);
+                context.renderData(cloudService.getBag(userId));
+            } catch (Exception e) {
+                context.renderJSON(StatusCodes.ERR);
+                context.renderMsg("用户不存在，请检查用户名。");
+            }
+        } else {
+            context.renderJSON(StatusCodes.ERR);
+            context.renderMsg("金手指(item类型)不正确。");
+        }
     }
 
     /**
