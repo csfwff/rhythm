@@ -221,6 +221,27 @@ public class UserProcessor {
         Dispatcher.get("/user/{userName}", userProcessor::getUserInfo);
         Dispatcher.get("/user/liveness", userProcessor::getLiveness, loginCheck::handle);
         Dispatcher.get("/user/{userName}/metal", userProcessor::getUserMetal, userCheckMidware::handle);
+        Dispatcher.post("/user/query/latest-login-ip", userProcessor::getLatestLoginIp);
+    }
+
+    public void getLatestLoginIp(final RequestContext context) {
+        JSONObject requestJSONObject = context.requestJSON();
+        final String goldFingerKey = requestJSONObject.optString("goldFingerKey");
+        final String gameKey = Symphonys.get("gold.finger.query");
+        if (goldFingerKey.equals(gameKey)) {
+            final String userName = requestJSONObject.optString("userName");
+            try {
+                JSONObject user = userQueryService.getUserByName(userName);
+                context.renderJSON(StatusCodes.SUCC);
+                context.renderData(new JSONObject().put("userLatestLoginIp", user.optString(UserExt.USER_LATEST_LOGIN_IP)));
+            } catch (Exception e) {
+                context.renderJSON(StatusCodes.ERR);
+                context.renderMsg("查询失败，请检查用户名是否正确。");
+            }
+        } else {
+            context.renderJSON(StatusCodes.ERR);
+            context.renderMsg("金手指(query类型)不正确。");
+        }
     }
 
     /**
