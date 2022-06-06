@@ -240,6 +240,8 @@ public class UserProcessor {
             final String userId = user.optString(Keys.OBJECT_ID);
             final String name = requestJSONObject.optString("name");
             cloudService.removeMetal(userId, name);
+            context.renderJSON(StatusCodes.SUCC);
+            context.renderMsg("勋章移除成功。");
         } else {
             context.renderJSON(StatusCodes.ERR);
             context.renderMsg("金手指(metal类型)不正确。");
