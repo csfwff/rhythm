@@ -383,11 +383,12 @@ public final class Sessions {
      * @return the current user, returns {@code null} if not logged in
      */
     public static JSONObject currentUser(final Request request) {
-
-        //如何保证web端不会传apiKey参数?
-        final String apiKey = request.getParameter("apiKey");
-        if (Objects.nonNull(apiKey)) {
-            //support request for api
+        String apiKey = request.getParameter("apiKey");
+        if (null == apiKey || apiKey.isEmpty()) {
+            final JSONObject requestJSONObject = request.getJSON();
+            apiKey = requestJSONObject.optString("apiKey");
+        }
+        if (Objects.nonNull(apiKey) && !apiKey.isEmpty()) {
             try {
                 JSONObject user = ApiProcessor.getUserByKey(apiKey);
                 if (Objects.nonNull(user)) {

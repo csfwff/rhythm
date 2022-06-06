@@ -295,39 +295,40 @@ public class ApiProcessor {
      * @return returns user if logged in, returns {@code null} otherwise
      */
     private static JSONObject tryLogInWithApiKey(String apiKey) {
-        final String value = Crypts.decryptByAES(apiKey, Symphonys.COOKIE_SECRET);
-        final JSONObject cookieJSONObject = new JSONObject(value);
-        final BeanManager beanManager = BeanManager.getInstance();
-        final UserRepository userRepository = beanManager.getReference(UserRepository.class);
+        if (null != apiKey && apiKey.length() > 100) {
+            final String value = Crypts.decryptByAES(apiKey, Symphonys.COOKIE_SECRET);
+            final JSONObject cookieJSONObject = new JSONObject(value);
+            final BeanManager beanManager = BeanManager.getInstance();
+            final UserRepository userRepository = beanManager.getReference(UserRepository.class);
 
-        try {
-            final String userId = cookieJSONObject.optString(Keys.OBJECT_ID);
-            if (StringUtils.isBlank(userId)) {
-                return null;
-            }
-
-            final JSONObject ret = userRepository.get(userId);
-            if (null == ret) {
-                return null;
-            }
-
-            final String userPassword = ret.optString(User.USER_PASSWORD);
-            final String token = cookieJSONObject.optString(Keys.TOKEN);
-            final String password = StringUtils.substringBeforeLast(token, COOKIE_ITEM_SEPARATOR);
-            if (userPassword.equals(password)) {
-                String userName = ret.optString(User.USER_NAME);
-                if (null != keys.get(userName)) {
-                    removeKeyByUsername(userName);
+            try {
+                final String userId = cookieJSONObject.optString(Keys.OBJECT_ID);
+                if (StringUtils.isBlank(userId)) {
+                    return null;
                 }
-                keys.put(apiKey, ret);
-                keys.put(userName, new JSONObject().put("key", apiKey));
 
-                return ret;
+                final JSONObject ret = userRepository.get(userId);
+                if (null == ret) {
+                    return null;
+                }
+
+                final String userPassword = ret.optString(User.USER_PASSWORD);
+                final String token = cookieJSONObject.optString(Keys.TOKEN);
+                final String password = StringUtils.substringBeforeLast(token, COOKIE_ITEM_SEPARATOR);
+                if (userPassword.equals(password)) {
+                    String userName = ret.optString(User.USER_NAME);
+                    if (null != keys.get(userName)) {
+                        removeKeyByUsername(userName);
+                    }
+                    keys.put(apiKey, ret);
+                    keys.put(userName, new JSONObject().put("key", apiKey));
+
+                    return ret;
+                }
+            } catch (final Exception e) {
+                LOGGER.log(Level.WARN, "Parses apikey failed, clears apikey");
             }
-        } catch (final Exception e) {
-            LOGGER.log(Level.WARN, "Parses apikey failed, clears apikey");
         }
-
         return null;
     }
 
