@@ -1478,12 +1478,13 @@ var ChatRoom = {
    * xiaoIce Game
    * */
   iceWs: "",
+  IceGameCK : localStorage.getItem("IceGameCK") || null,
   loadXiaoIceGame: function(){
     // 连接游戏服务器
     iceWs = new WebSocket('wss://game.yuis.cc/wss');
     let iceWsHeart = null;
     iceWs.onopen = function(){
-      iceWs.send(JSON.stringify({type:'setUser',user:Label.currentUser}))
+      iceWs.send(JSON.stringify({type:'setUser',user:Label.currentUser,ck:ChatRoom.IceGameCK}))
       iceWsHeart = setInterval(()=>{
         iceWs.send(JSON.stringify({type:'hb'}))
       },15000)
@@ -1503,11 +1504,15 @@ var ChatRoom = {
     // 收到消息
     iceWs.onmessage = function (e){
       let data = JSON.parse(e.data);
-      if(data.type == "all" || data.type == Label.currentUser){
+      if(data.user == "all" || data.user == Label.currentUser){
         let html = `<div class="ice-msg-item">
                     <div class="ice-msg-content">${data.msg}</div>
                   </div>`
         $('#iceMsgList').prepend(html);
+      }
+      if(data.type == "setCK"){
+        ChatRoom.IceGameCK = data.ck;
+        localStorage.setItem("IceGameCK",data.ck);
       }
     }
     // 打开游戏界面
@@ -1548,9 +1553,15 @@ var ChatRoom = {
                     <div class="ice-msg-content">${msg}</div>
                   </div>`
     $('#iceMsgList').prepend(uMsg);
+    let type = "gameMsg";
+    console.log(/(登录)/.test(msg))
+    if(/(登录)/.test(msg)){
+      type = "login"
+    }
     iceWs.send(JSON.stringify({
-      type:'gameMsg',
-      msg:msg
+      type: type,
+      ck: ChatRoom.IceGameCK,
+      msg: msg
     }));
   },
 
