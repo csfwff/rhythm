@@ -222,6 +222,32 @@ public class UserProcessor {
         Dispatcher.get("/user/liveness", userProcessor::getLiveness, loginCheck::handle);
         Dispatcher.get("/user/{userName}/metal", userProcessor::getUserMetal, userCheckMidware::handle);
         Dispatcher.post("/user/query/latest-login-ip", userProcessor::getLatestLoginIp);
+        Dispatcher.post("/user/edit/give-metal", userProcessor::giveMetal);
+    }
+
+    /**
+     * 金手指：添加勋章
+     * @param context
+     */
+    public void giveMetal(final RequestContext context) {
+        JSONObject requestJSONObject = context.requestJSON();
+        final String goldFingerKey = requestJSONObject.optString("goldFingerKey");
+        final String metalKey = Symphonys.get("gold.finger.metal");
+        if (goldFingerKey.equals(metalKey)) {
+            final String userName = requestJSONObject.optString("userName");
+            JSONObject user = userQueryService.getUserByName(userName);
+            final String userId = user.optString(Keys.OBJECT_ID);
+            final String name = requestJSONObject.optString("name");
+            final String description = requestJSONObject.optString("description");
+            final String attr = requestJSONObject.optString("attr");
+            final String data = requestJSONObject.optString("data");
+            cloudService.giveMetal(userId, name, description, attr, data);
+            context.renderJSON(StatusCodes.SUCC);
+            context.renderMsg("勋章安装成功。");
+        } else {
+            context.renderJSON(StatusCodes.ERR);
+            context.renderMsg("金手指(metal类型)不正确。");
+        }
     }
 
     /**
@@ -231,8 +257,8 @@ public class UserProcessor {
     public void getLatestLoginIp(final RequestContext context) {
         JSONObject requestJSONObject = context.requestJSON();
         final String goldFingerKey = requestJSONObject.optString("goldFingerKey");
-        final String gameKey = Symphonys.get("gold.finger.query");
-        if (goldFingerKey.equals(gameKey)) {
+        final String queryKey = Symphonys.get("gold.finger.query");
+        if (goldFingerKey.equals(queryKey)) {
             final String userName = requestJSONObject.optString("userName");
             try {
                 JSONObject user = userQueryService.getUserByName(userName);
