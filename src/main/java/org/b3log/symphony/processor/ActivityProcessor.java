@@ -239,18 +239,25 @@ public class ActivityProcessor {
     public void shareMofishScore(final RequestContext context) {
         try {
             JSONObject requestJSONObject = context.requestJSON();
-            final String userName = requestJSONObject.optString("userName");
-            final int stage = requestJSONObject.optInt("stage");
-            final long time = requestJSONObject.optLong("time");
-            final JSONObject user = userQueryService.getUserByName(userName);
-            final boolean succ = null != pointtransferMgmtService.transfer(Pointtransfer.ID_C_SYS, user.optString(Keys.OBJECT_ID),
-                    Pointtransfer.TRANSFER_TYPE_C_ACTIVITY_MOFISH, stage,
-                    time + "", System.currentTimeMillis(), "");
-            if (!succ) {
-                throw new ServiceException(langPropsService.get("transferFailLabel"));
+            final String goldFingerKey = requestJSONObject.optString("goldFingerKey");
+            final String gameKey = Symphonys.get("gold.finger.game");
+            if (goldFingerKey.equals(gameKey)) {
+                final String userName = requestJSONObject.optString("userName");
+                final int stage = requestJSONObject.optInt("stage");
+                final long time = requestJSONObject.optLong("time");
+                final JSONObject user = userQueryService.getUserByName(userName);
+                final boolean succ = null != pointtransferMgmtService.transfer(Pointtransfer.ID_C_SYS, user.optString(Keys.OBJECT_ID),
+                        Pointtransfer.TRANSFER_TYPE_C_ACTIVITY_MOFISH, stage,
+                        time + "", System.currentTimeMillis(), "");
+                if (!succ) {
+                    throw new ServiceException(langPropsService.get("transferFailLabel"));
+                }
+                context.renderJSON(StatusCodes.SUCC);
+                context.renderMsg("数据上传成功！");
+            } else {
+                context.renderJSON(StatusCodes.ERR);
+                context.renderMsg("金手指(game类型)不正确。");
             }
-            context.renderJSON(StatusCodes.SUCC);
-            context.renderMsg("数据上传成功！");
         } catch (Exception e) {
             context.renderJSON(StatusCodes.ERR);
             context.renderMsg("存储数据失败！原因：未知原因");
