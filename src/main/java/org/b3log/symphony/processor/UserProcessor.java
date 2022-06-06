@@ -223,6 +223,27 @@ public class UserProcessor {
         Dispatcher.get("/user/{userName}/metal", userProcessor::getUserMetal, userCheckMidware::handle);
         Dispatcher.post("/user/query/latest-login-ip", userProcessor::getLatestLoginIp);
         Dispatcher.post("/user/edit/give-metal", userProcessor::giveMetal);
+        Dispatcher.post("/user/edit/remove-metal", userProcessor::removeMetal);
+    }
+
+    /**
+     * 金手指：移除勋章
+     * @param context
+     */
+    public void removeMetal(final RequestContext context) {
+        JSONObject requestJSONObject = context.requestJSON();
+        final String goldFingerKey = requestJSONObject.optString("goldFingerKey");
+        final String metalKey = Symphonys.get("gold.finger.metal");
+        if (goldFingerKey.equals(metalKey)) {
+            final String userName = requestJSONObject.optString("userName");
+            JSONObject user = userQueryService.getUserByName(userName);
+            final String userId = user.optString(Keys.OBJECT_ID);
+            final String name = requestJSONObject.optString("name");
+            cloudService.removeMetal(userId, name);
+        } else {
+            context.renderJSON(StatusCodes.ERR);
+            context.renderMsg("金手指(metal类型)不正确。");
+        }
     }
 
     /**
