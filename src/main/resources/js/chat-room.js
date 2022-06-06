@@ -1481,7 +1481,7 @@ var ChatRoom = {
   IceGameCK : localStorage.getItem("IceGameCK") || null,
   loadXiaoIceGame: function(){
     // 连接游戏服务器
-    iceWs = new WebSocket('ws://127.0.0.1:3005');
+    iceWs = new WebSocket('wss://game.yuis.cc/wss');
     let iceWsHeart = null;
     iceWs.onopen = function(){
       iceWs.send(JSON.stringify({type:'setUser',user:Label.currentUser,ck:ChatRoom.IceGameCK}))
