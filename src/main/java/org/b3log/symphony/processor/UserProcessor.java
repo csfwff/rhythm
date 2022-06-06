@@ -225,6 +225,36 @@ public class UserProcessor {
         Dispatcher.post("/user/edit/give-metal", userProcessor::giveMetal);
         Dispatcher.post("/user/edit/remove-metal", userProcessor::removeMetal);
         Dispatcher.post("/user/query/items", userProcessor::getItem);
+        Dispatcher.post("/user/edit/items", userProcessor::adjustItem);
+    }
+
+    /**
+     * 金手指：调整用户背包
+     * @param context
+     */
+    public void adjustItem(final RequestContext context) {
+        JSONObject requestJSONObject = context.requestJSON();
+        final String goldFingerKey = requestJSONObject.optString("goldFingerKey");
+        final String itemKey = Symphonys.get("gold.finger.item");
+        if (goldFingerKey.equals(itemKey)) {
+            try {
+                final String userName = requestJSONObject.optString("userName");
+                JSONObject user = userQueryService.getUserByName(userName);
+                final String userId = user.optString(Keys.OBJECT_ID);
+                final String item = requestJSONObject.optString("item");
+                final int sum = requestJSONObject.optInt("sum");
+                cloudService.putBag(userId, item, sum, Integer.MAX_VALUE);
+                context.renderJSON(StatusCodes.SUCC);
+                context.renderMsg("背包调整成功，附当前用户背包内容，请检查数据。");
+                context.renderData(new JSONObject(cloudService.getBag(userId)));
+            } catch (Exception e) {
+                context.renderJSON(StatusCodes.ERR);
+                context.renderMsg("用户不存在，请检查用户名。");
+            }
+        } else {
+            context.renderJSON(StatusCodes.ERR);
+            context.renderMsg("金手指(item类型)不正确。");
+        }
     }
 
     /**
@@ -241,7 +271,7 @@ public class UserProcessor {
                 JSONObject user = userQueryService.getUserByName(userName);
                 final String userId = user.optString(Keys.OBJECT_ID);
                 context.renderJSON(StatusCodes.SUCC);
-                context.renderData(cloudService.getBag(userId));
+                context.renderData(new JSONObject(cloudService.getBag(userId)));
             } catch (Exception e) {
                 context.renderJSON(StatusCodes.ERR);
                 context.renderMsg("用户不存在，请检查用户名。");
