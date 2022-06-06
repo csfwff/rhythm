@@ -295,7 +295,7 @@ public class ApiProcessor {
      * @return returns user if logged in, returns {@code null} otherwise
      */
     private static JSONObject tryLogInWithApiKey(String apiKey) {
-        if (null != apiKey && apiKey.length() > 100) {
+        if (null != apiKey && apiKey.length() == 192) {
             final String value = Crypts.decryptByAES(apiKey, Symphonys.COOKIE_SECRET);
             final JSONObject cookieJSONObject = new JSONObject(value);
             final BeanManager beanManager = BeanManager.getInstance();
