@@ -243,6 +243,7 @@ public class SettingsProcessor {
         Dispatcher.post("/point/buy-invitecode", settingsProcessor::pointBuy, loginCheck::handle, csrfMidware::check);
         Dispatcher.post("/export/posts", settingsProcessor::exportPosts, loginCheck::handle);
         Dispatcher.post("/point/transfer", settingsProcessor::pointTransfer, loginCheck::handle, csrfMidware::check, pointTransferValidationMidware::handle);
+        Dispatcher.get("/bag/1dayCheckin", settingsProcessor::use1dayCheckinCard, loginCheck::handle, csrfMidware::check);
         Dispatcher.get("/bag/2dayCheckin", settingsProcessor::use2dayCheckinCard, loginCheck::handle, csrfMidware::check);
         Dispatcher.get("/bag/patchCheckin", settingsProcessor::usePatchCheckinCard, loginCheck::handle, csrfMidware::check);
 
@@ -260,6 +261,25 @@ public class SettingsProcessor {
         } else {
             context.renderJSON(StatusCodes.ERR);
             context.renderMsg("补签卡使用失败！可能没有需要补签的记录或背包中没有补签卡。");
+        }
+    }
+
+    /**
+     * 使用单日免签卡
+     */
+    public void use1dayCheckinCard(final RequestContext context) {
+        JSONObject user = Sessions.getUser();
+        final String userId = user.optString(Keys.OBJECT_ID);
+        JSONObject bag = new JSONObject(cloudService.getBag(userId));
+        if (bag.optInt("sysCheckinRemain") > 0) {
+            context.renderJSON(StatusCodes.ERR);
+            context.renderMsg("单日免签卡使用失败！你目前还有生效中的免签卡，省着点用吧～");
+            return;
+        }
+        if (cloudService.putBag(userId, "checkin1day", -1, Integer.MAX_VALUE) == 0) {
+            cloudService.putBag(userId, "sysCheckinRemain", 1, 1);
+            context.renderJSON(StatusCodes.SUCC);
+            context.renderMsg("单日免签卡使用成功！明天的签到将由系统自动进行～");
         }
     }
 

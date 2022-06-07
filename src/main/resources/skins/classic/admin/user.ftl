@@ -521,6 +521,7 @@
                 当前用户背包数据：<br>
                 ${sysBag}<br>
                 可用物品名称：<br>
+                checkin1day (1日免签卡)<br>
                 checkin2days (2日免签卡)<br>
                 patchCheckinCard (补签卡)<br>
                 数量为正数时，增加；数量为负数时，减少。

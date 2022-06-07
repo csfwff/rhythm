@@ -123,6 +123,9 @@ var Settings = {
   initBag: function (sysBag) {
     let html = '';
     let bag = sysBag;
+    if (bag.checkin1day !== undefined && bag.checkin1day > 0) {
+      html += '<button style="margin:0 5px 5px 0" onclick="Settings.use1dayCheckinCard(\'' + Label.csrfToken + '\')">单日免签卡 x' + bag.checkin1day + '</button>';
+    }
     if (bag.checkin2days !== undefined && bag.checkin2days > 0) {
       html += '<button style="margin:0 5px 5px 0" onclick="Settings.use2dayCheckinCard(\'' + Label.csrfToken + '\')">两天免签卡 x' + bag.checkin2days + '</button>';
     }
@@ -199,6 +202,24 @@ var Settings = {
           }
         })
       }
+    }
+  },
+  /**
+   * 使用单日免签卡
+   * @param csrfToken
+   */
+  use1dayCheckinCard: function (csrfToken) {
+    if (confirm('使用单日免签卡后，明天的签到将由系统自动帮你完成，不需要登录摸鱼派。确定使用吗？') === true) {
+      $.ajax({
+        url: Label.servePath + '/bag/1dayCheckin',
+        type: 'GET',
+        async: false,
+        headers: {'csrfToken': csrfToken},
+        success: function (result) {
+          alert(result.msg);
+          location.reload();
+        }
+      })
     }
   },
   /**
