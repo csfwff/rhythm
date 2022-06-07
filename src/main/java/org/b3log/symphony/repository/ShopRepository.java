@@ -18,10 +18,11 @@
  */
 package org.b3log.symphony.repository;
 
-import org.b3log.latke.repository.AbstractRepository;
-import org.b3log.latke.repository.RepositoryException;
+import org.b3log.latke.repository.*;
 import org.b3log.latke.repository.annotation.Repository;
 import org.json.JSONObject;
+
+import java.util.List;
 
 @Repository
 public class ShopRepository extends AbstractRepository {
@@ -34,5 +35,11 @@ public class ShopRepository extends AbstractRepository {
     @Override
     public String add(JSONObject jsonObject) throws RepositoryException {
         return super.add(jsonObject);
+    }
+
+    public List<JSONObject> getByType(String type) throws RepositoryException {
+        final Query query = new Query().setFilter(
+                new PropertyFilter("type", FilterOperator.EQUAL, type));
+        return getList(query);
     }
 }
