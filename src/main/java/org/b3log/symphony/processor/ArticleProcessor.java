@@ -1678,7 +1678,13 @@ public class ArticleProcessor {
      * @param context the specified http request context
      */
     public void thankArticle(final RequestContext context) {
-        final JSONObject currentUser = Sessions.getUser();
+        JSONObject currentUser = Sessions.getUser();
+        try {
+            final JSONObject requestJSONObject = context.requestJSON();
+            currentUser = ApiProcessor.getUserByKey(requestJSONObject.optString("apiKey"));
+        } catch (NullPointerException ignored) {
+        }
+
         if (null == currentUser) {
             context.sendError(403);
             return;
