@@ -332,6 +332,7 @@
                             <img style="border-radius: 0"
                                  src="https://pwl.stackoverflow.wiki/2022/03/ss-61cf1b96.png">
                             <b>系统商店</b>
+                            <p style="color: #de9900; font-weight: bold">系统商店公测中，福利价收购商品，快来体验吧！</p>
                         </a>
                     </div>
                 </div>
