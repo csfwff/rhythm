@@ -145,7 +145,7 @@ public class CommentProcessor {
         Dispatcher.post("/comment/original", commentProcessor::getOriginalComment);
         Dispatcher.post("/comment/replies", commentProcessor::getReplies);
         Dispatcher.post("/comment", commentProcessor::addComment, loginCheck::handle, permissionMidware::check, commentAddValidationMidware::handle);
-        Dispatcher.post("/comment/thank", commentProcessor::thankComment, loginCheck::handle, csrfMidware::check, permissionMidware::check);
+        Dispatcher.post("/comment/thank", commentProcessor::thankComment, loginCheck::handle, permissionMidware::check);
     }
 
     /**
@@ -519,7 +519,11 @@ public class CommentProcessor {
         context.renderJSON(StatusCodes.ERR);
 
         final JSONObject requestJSONObject = context.requestJSON();
-        final JSONObject currentUser = Sessions.getUser();
+        JSONObject currentUser = Sessions.getUser();
+        try {
+            currentUser = ApiProcessor.getUserByKey(requestJSONObject.optString("apiKey"));
+        } catch (NullPointerException ignored) {
+        }
         final String commentId = requestJSONObject.optString(Comment.COMMENT_T_ID);
 
         try {
