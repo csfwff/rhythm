@@ -557,7 +557,7 @@
             </svg>
         </a>
     </h1>
-    <h2 class="fn-ellipsis fn-pointer" onclick="Util.goTop()">
+    <h2 class="fn-ellipsis fn-pointer" id="bigTitle" onclick="Util.goTop()">
         ${article.articleTitleEmojUnicode}
     </h2>
     <div class="user-nav">
@@ -777,6 +777,18 @@
     setInterval(function () {
         Util.listenUserCard();
     }, 1000);
+</script>
+<script>
+    $(document).ready(function () {
+        $(window).scroll(function () {
+            let title = "${article.articleTitleEmojUnicode}";
+            if ($(document).scrollTop() > 500) {
+                $("#bigTitle").html("");
+            } else {
+                $("#bigTitle").html(title);
+            }
+        });
+    })
 </script>
 </body>
 </html>
