@@ -309,7 +309,7 @@
         } else if (liveness >= 10 && !checkedIn) {
             $("#checkIn").html("已提交自动签到至系统<br>请稍候查看签到状态");
         } else if (liveness < 100) {
-            $("#checkIn").html("今日活跃度到达 100% 后<br>可获得一张免签卡 (2天)");
+            $("#checkIn").html("今日活跃度到达 100% 后<br>可获得一张免签卡 (1天)");
         } else {
             $("#checkIn").html("膜拜肝帝！活跃爆满！<br>免签卡已放入你的背包！");
         }

@@ -126,7 +126,7 @@ public class LivenessMgmtService {
         }
     }
 
-    private static Map<String, String> gave2dayCards = new HashMap<>();
+    private static Map<String, String> gifts = new HashMap<>();
 
     // 系统刚启动时运行，避免重复发放免签卡
     public void initCheckLiveness() {
@@ -140,8 +140,8 @@ public class LivenessMgmtService {
                 final int currentLiveness = livenessQueryService.getCurrentLivenessPoint(userId);
                 float liveness = (float) (Math.round((float) currentLiveness / livenessMax * 100 * 100)) / 100;
                 if (liveness == 100) {
-                    LOGGER.log(Level.INFO, "Ignore checkin card 2 days for " + user.optString(User.USER_NAME));
-                    gave2dayCards.put(userId, date);
+                    LOGGER.log(Level.INFO, "Ignore gifts for " + user.optString(User.USER_NAME));
+                    gifts.put(userId, date);
                 }
             }
         } catch (RepositoryException e) {
@@ -162,18 +162,18 @@ public class LivenessMgmtService {
                 final int livenessMax = Symphonys.ACTIVITY_YESTERDAY_REWARD_MAX;
                 final int currentLiveness = livenessQueryService.getCurrentLivenessPoint(userId);
                 float liveness = (float) (Math.round((float) currentLiveness / livenessMax * 100 * 100)) / 100;
-                if (!activityQueryService.isCheckedinToday(userId)) {
-                    if (liveness >= 10) {
+                if (liveness >= 10) {
+                    if (!activityQueryService.isCheckedinToday(userId)) {
                         activityMgmtService.dailyCheckin(userId);
                         LOGGER.log(Level.INFO, "Checkin for " + user.optString(User.USER_NAME) + " liveness is " + liveness + "%");
                     }
                 }
                 if (liveness == 100) {
-                    if (gave2dayCards.get(userId) == null || !gave2dayCards.get(userId).equals(date)) {
-                        if (cloudService.putBag(userId, "checkin2days", 1, Integer.MAX_VALUE) == 0) {
-                            LOGGER.log(Level.INFO, "Checkin card 2 days for " + user.optString(User.USER_NAME));
+                    if (gifts.get(userId) == null || !gifts.get(userId).equals(date)) {
+                        if (cloudService.putBag(userId, "checkin1day", 1, Integer.MAX_VALUE) == 0) {
+                            LOGGER.log(Level.INFO, "Checkin card 1 day for " + user.optString(User.USER_NAME));
                         }
-                        gave2dayCards.put(userId, date);
+                        gifts.put(userId, date);
                     }
                 }
             }
