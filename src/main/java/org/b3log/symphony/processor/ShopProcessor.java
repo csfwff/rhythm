@@ -187,7 +187,12 @@ public class ShopProcessor {
                             JSONArray tradersObject = new JSONArray(sellObject.optString("traders"));
                             // 检查每日总限购
                             int maxPerDay = limitObject.optInt("maxPerDay");
-                            int tradersToday = tradersObject.length();
+                            int tradersToday = 0;
+                            for (int i = 0; i < tradersObject.length(); i++) {
+                                JSONObject traderObject = tradersObject.optJSONObject(i);
+                                int trades = traderObject.optInt("trades");
+                                tradersToday += trades;
+                            }
                             if (tradersToday >= maxPerDay) {
                                 ShopChannel.sendMsg(userId, "" +
                                         "今日总限购已到封顶，无法交易，明天再来吧！");

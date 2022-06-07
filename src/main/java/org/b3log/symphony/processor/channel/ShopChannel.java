@@ -75,7 +75,7 @@ public class ShopChannel implements WebSocketChannel {
                 "欢迎来到系统商店！<span style=\"color: #00bff3\">" + user.optString(User.USER_NAME) + "</span><br>" +
                 "<span style=\"color: #EABF04\">输入\"help\"获取帮助信息。</span>"
         );
-        //sendMsg(userId, "<b style=\"color: red\">请注意：当前系统商店为预览版本，交易功能暂不可用，欢迎你对系统商店提出意见与建议（请联系 @adlered）！</b>");
+        sendMsg(userId, "<br><b style=\"color: green\">系统商店测试版 v1.0.0，如遇漏洞请勿继续交易，请反馈至微信 1101635162，必有重谢！<br>故意通过漏洞交易并隐瞒不报，将没收全部所得并处以封禁 :)</b>");
     }
 
     private String getMOTD() {
