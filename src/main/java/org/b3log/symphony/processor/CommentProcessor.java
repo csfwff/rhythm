@@ -200,7 +200,13 @@ public class CommentProcessor {
             return;
         }
 
-        final JSONObject currentUser = Sessions.getUser();
+        JSONObject currentUser = Sessions.getUser();
+        try {
+            final JSONObject requestJSONObject = context.requestJSON();
+            currentUser = ApiProcessor.getUserByKey(requestJSONObject.optString("apiKey"));
+        } catch (NullPointerException ignored) {
+        }
+
         final String currentUserId = currentUser.optString(Keys.OBJECT_ID);
         final JSONObject comment = commentQueryService.getComment(id);
         if (null == comment) {
