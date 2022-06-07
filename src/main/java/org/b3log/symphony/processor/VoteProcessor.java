@@ -236,7 +236,11 @@ public class VoteProcessor {
         final JSONObject requestJSONObject = context.requestJSON();
         final String dataId = requestJSONObject.optString(Common.DATA_ID);
 
-        final JSONObject currentUser = Sessions.getUser();
+        JSONObject currentUser = Sessions.getUser();
+        try {
+            currentUser = ApiProcessor.getUserByKey(requestJSONObject.optString("apiKey"));
+        } catch (NullPointerException ignored) {
+        }
         final String userId = currentUser.optString(Keys.OBJECT_ID);
 
         if (!Role.ROLE_ID_C_ADMIN.equals(currentUser.optString(User.USER_ROLE))
