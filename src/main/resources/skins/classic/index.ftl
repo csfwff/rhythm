@@ -852,9 +852,9 @@
         } else if (liveness >= 10 && !checkedIn) {
             $("#activityDesc").html("已提交自动签到至系统<br>请稍候查看签到状态");
         } else if (liveness < 100) {
-            $("#activityDesc").html("今日活跃度到达 100% 后<br>可获得一张免签卡 (1天)");
+            $("#activityDesc").html("今日活跃度到达 100% 后<br>可获得一份神秘礼物");
         } else {
-            $("#activityDesc").html("膜拜肝帝！活跃爆满！<br>免签卡已放入你的背包！");
+            $("#activityDesc").html("膜拜肝帝！活跃爆满！<br>神秘礼物已放入你的背包！");
         }
     }
     refreshActivities();
