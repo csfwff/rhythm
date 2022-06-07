@@ -144,7 +144,7 @@ public class CommentProcessor {
         Dispatcher.put("/comment/{id}", commentProcessor::updateComment, loginCheck::handle, csrfMidware::check, permissionMidware::check, commentUpdateValidationMidware::handle);
         Dispatcher.post("/comment/original", commentProcessor::getOriginalComment);
         Dispatcher.post("/comment/replies", commentProcessor::getReplies);
-        Dispatcher.post("/comment", commentProcessor::addComment, loginCheck::handle, csrfMidware::check, permissionMidware::check, commentAddValidationMidware::handle);
+        Dispatcher.post("/comment", commentProcessor::addComment, loginCheck::handle, permissionMidware::check, commentAddValidationMidware::handle);
         Dispatcher.post("/comment/thank", commentProcessor::thankComment, loginCheck::handle, csrfMidware::check, permissionMidware::check);
     }
 
@@ -456,7 +456,11 @@ public class CommentProcessor {
         comment.put(Comment.COMMENT_ORIGINAL_COMMENT_ID, commentOriginalCommentId);
 
         try {
-            final JSONObject currentUser = Sessions.getUser();
+            JSONObject currentUser = Sessions.getUser();
+            try {
+                currentUser = ApiProcessor.getUserByKey(requestJSONObject.optString("apiKey"));
+            } catch (NullPointerException ignored) {
+            }
             final String currentUserName = currentUser.optString(User.USER_NAME);
             final JSONObject article = articleQueryService.getArticle(articleId);
             final String articleContent = article.optString(Article.ARTICLE_CONTENT);
