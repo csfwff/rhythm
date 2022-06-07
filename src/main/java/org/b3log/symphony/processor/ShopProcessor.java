@@ -27,6 +27,7 @@ import org.b3log.latke.ioc.Inject;
 import org.b3log.latke.ioc.Singleton;
 import org.b3log.symphony.processor.channel.ShopChannel;
 import org.b3log.symphony.processor.middleware.LoginCheckMidware;
+import org.b3log.symphony.repository.ShopRepository;
 import org.b3log.symphony.service.DataModelService;
 import org.b3log.symphony.util.Sessions;
 import org.b3log.symphony.util.StatusCodes;
@@ -42,6 +43,12 @@ public class ShopProcessor {
      */
     @Inject
     private DataModelService dataModelService;
+
+    /**
+     * Shop repository.
+     */
+    @Inject
+    private ShopRepository shopRepository;
 
     /**
      * Register request handlers.
@@ -77,9 +84,31 @@ public class ShopProcessor {
                 ShopChannel.sendMsg(userId, "<br>" +
                         "===== 系统商店帮助菜单 =====<br>" +
                         "help 打印帮助菜单<br>" +
-                        "history 查看输入的历史命令 (支持通过上下按键快捷切换)" +
-                        "list buy 查看可供购买的商品列表" +
+                        "history 查看输入的历史命令 (支持通过上下按键快捷切换)<br>" +
+                        "list buy 查看可供购买的商品列表<br>" +
                         "list sell 查看商店收购中的商品列表");
+                break;
+            case "list":
+                String type = "";
+                try {
+                    type = command.split(" ")[1];
+                } catch (Exception e) {
+                    ShopChannel.sendMsg(userId, "" +
+                            "命令有误，输入\"help\"获取帮助信息。");
+                    break;
+                }
+                switch (type) {
+                    case "buy":
+
+                        break;
+                    case "sell":
+
+                        break;
+                    default:
+                        ShopChannel.sendMsg(userId, "" +
+                                "命令有误，输入\"help\"获取帮助信息。");
+                        break;
+                }
                 break;
             default:
                 ShopChannel.sendMsg(userId, "" +
