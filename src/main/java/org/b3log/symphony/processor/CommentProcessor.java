@@ -141,7 +141,7 @@ public class CommentProcessor {
         Dispatcher.post("/comment/{id}/remove", commentProcessor::removeComment, loginCheck::handle, permissionMidware::check);
         Dispatcher.get("/comment/{id}/revisions", commentProcessor::getCommentRevisions, loginCheck::handle, permissionMidware::check);
         Dispatcher.get("/comment/{id}/content", commentProcessor::getCommentContent, loginCheck::handle);
-        Dispatcher.put("/comment/{id}", commentProcessor::updateComment, loginCheck::handle, csrfMidware::check, permissionMidware::check, commentUpdateValidationMidware::handle);
+        Dispatcher.put("/comment/{id}", commentProcessor::updateComment, loginCheck::handle, permissionMidware::check, commentUpdateValidationMidware::handle);
         Dispatcher.post("/comment/original", commentProcessor::getOriginalComment);
         Dispatcher.post("/comment/replies", commentProcessor::getReplies);
         Dispatcher.post("/comment", commentProcessor::addComment, loginCheck::handle, permissionMidware::check, commentAddValidationMidware::handle);
@@ -296,13 +296,17 @@ public class CommentProcessor {
                 return;
             }
 
-            final JSONObject currentUser = Sessions.getUser();
+            final JSONObject requestJSONObject = (JSONObject) context.attr(Keys.REQUEST);
+            JSONObject currentUser = Sessions.getUser();
+            try {
+                currentUser = ApiProcessor.getUserByKey(requestJSONObject.optString("apiKey"));
+            } catch (NullPointerException ignored) {
+            }
             if (!currentUser.optString(Keys.OBJECT_ID).equals(comment.optString(Comment.COMMENT_AUTHOR_ID))) {
                 context.sendError(403);
                 return;
             }
 
-            final JSONObject requestJSONObject = (JSONObject) context.attr(Keys.REQUEST);
 
             String commentContent = requestJSONObject.optString(Comment.COMMENT_CONTENT);
             final boolean isOnlyAuthorVisible = requestJSONObject.optBoolean(Comment.COMMENT_VISIBLE);
