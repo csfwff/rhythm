@@ -2040,6 +2040,36 @@
           "description": "消息JSON"
         }
       ]
+    },
+    {
+      "name": "shop",
+      "description": "系统商店数据",
+      "keys": [
+        {
+          "name": "oId",
+          "type": "String",
+          "length": 19,
+          "description": "主键"
+        },
+        {
+          "name": "type",
+          "type": "String",
+          "length": 19,
+          "description": "交易类型"
+        },
+        {
+          "name": "trader",
+          "type": "String",
+          "length": 19,
+          "description": "交易者ID"
+        },
+        {
+          "name": "data",
+          "type": "String",
+          "length": 102400,
+          "description": "商品数据"
+        }
+      ]
     }
   ]
 }

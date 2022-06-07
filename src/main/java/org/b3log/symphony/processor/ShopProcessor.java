@@ -77,7 +77,9 @@ public class ShopProcessor {
                 ShopChannel.sendMsg(userId, "<br>" +
                         "===== 系统商店帮助菜单 =====<br>" +
                         "help 打印帮助菜单<br>" +
-                        "history 查看输入的历史命令 (支持通过上下按键快捷切换)");
+                        "history 查看输入的历史命令 (支持通过上下按键快捷切换)" +
+                        "list buy 查看可供购买的商品列表" +
+                        "list sell 查看商店收购中的商品列表");
                 break;
             default:
                 ShopChannel.sendMsg(userId, "" +
