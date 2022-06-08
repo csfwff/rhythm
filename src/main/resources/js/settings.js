@@ -120,6 +120,7 @@ var Settings = {
   /**
    * 初始化背包
    */
+  remainCheckin: 0,
   initBag: function (sysBag) {
     let html = '';
     let bag = sysBag;
@@ -136,6 +137,7 @@ var Settings = {
     // 下面内容不要变更顺序
     if (bag.sysCheckinRemain !== undefined && bag.sysCheckinRemain > 0) {
       html += '<br><div style="float: left;font-size: 12px;color: rgba(0,0,0,0.38);">免签卡生效中，剩余' + bag.sysCheckinRemain + '天</div>';
+      Settings.remainCheckin = bag.sysCheckinRemain;
     }
     if (html === '') {
       html = '你的背包和钱包一样，是空的。';
@@ -209,7 +211,11 @@ var Settings = {
    * @param csrfToken
    */
   use1dayCheckinCard: function (csrfToken) {
-    if (confirm('使用单日免签卡后，明天的签到将由系统自动帮你完成，不需要登录摸鱼派。确定使用吗？') === true) {
+    let confirmText = '使用单日免签卡后，明天的签到将由系统自动帮你完成，不需要登录摸鱼派。确定使用吗？';
+    if (Settings.remainCheckin > 0) {
+      confirmText = '您已经有生效中的免签卡，如继续使用时间将继续叠加，确认继续吗？';
+    }
+    if (confirm(confirmText) === true) {
       $.ajax({
         url: Label.servePath + '/bag/1dayCheckin',
         type: 'GET',
@@ -227,7 +233,11 @@ var Settings = {
    * @param csrfToken
    */
   use2dayCheckinCard: function (csrfToken) {
-    if (confirm('使用两天免签卡后，明天和后天的签到将由系统自动帮你完成，不需要登录摸鱼派。确定使用吗？') === true) {
+    let confirmText = '使用两天免签卡后，明天和后天的签到将由系统自动帮你完成，不需要登录摸鱼派。确定使用吗？';
+    if (Settings.remainCheckin > 0) {
+      confirmText = '您已经有生效中的免签卡，如继续使用时间将继续叠加，确认继续吗？';
+    }
+    if (confirm(confirmText) === true) {
       $.ajax({
         url: Label.servePath + '/bag/2dayCheckin',
         type: 'GET',

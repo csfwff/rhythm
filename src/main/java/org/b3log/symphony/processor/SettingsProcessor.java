@@ -272,8 +272,11 @@ public class SettingsProcessor {
         final String userId = user.optString(Keys.OBJECT_ID);
         JSONObject bag = new JSONObject(cloudService.getBag(userId));
         if (bag.optInt("sysCheckinRemain") > 0) {
-            context.renderJSON(StatusCodes.ERR);
-            context.renderMsg("单日免签卡使用失败！你目前还有生效中的免签卡，省着点用吧～");
+            if (cloudService.putBag(userId, "checkin1day", -1, Integer.MAX_VALUE) == 0) {
+                cloudService.putBag(userId, "sysCheckinRemain", bag.optInt("sysCheckinRemain") + 1, bag.optInt("sysCheckinRemain") + 1);
+                context.renderJSON(StatusCodes.SUCC);
+                context.renderMsg("单日免签卡使用成功！您的免签天数已累积。");
+            }
             return;
         }
         if (cloudService.putBag(userId, "checkin1day", -1, Integer.MAX_VALUE) == 0) {
@@ -291,8 +294,11 @@ public class SettingsProcessor {
         final String userId = user.optString(Keys.OBJECT_ID);
         JSONObject bag = new JSONObject(cloudService.getBag(userId));
         if (bag.optInt("sysCheckinRemain") > 0) {
-            context.renderJSON(StatusCodes.ERR);
-            context.renderMsg("两天免签卡使用失败！你目前还有生效中的免签卡，省着点用吧～");
+            if (cloudService.putBag(userId, "checkin2days", -1, Integer.MAX_VALUE) == 0) {
+                cloudService.putBag(userId, "sysCheckinRemain", bag.optInt("sysCheckinRemain") + 2, bag.optInt("sysCheckinRemain") + 2);
+                context.renderJSON(StatusCodes.SUCC);
+                context.renderMsg("两日免签卡使用成功！您的免签天数已累积。");
+            }
             return;
         }
         if (cloudService.putBag(userId, "checkin2days", -1, Integer.MAX_VALUE) == 0) {
