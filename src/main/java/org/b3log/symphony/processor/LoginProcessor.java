@@ -393,7 +393,7 @@ public class LoginProcessor {
         }
 
         String name = null;
-        String email = null;
+        String phone = null;
         try {
             final JSONObject user = userQueryService.getUser(userId);
             if (null == user || UserExt.USER_STATUS_C_VALID != user.optInt(UserExt.USER_STATUS)) {
@@ -401,15 +401,18 @@ public class LoginProcessor {
                 return;
             }
 
+            name = user.optString(User.USER_NAME);
+            phone = user.optString("userPhone");
+
             user.put(User.USER_PASSWORD, password);
             userMgmtService.updatePassword(user);
             verifycodeMgmtService.removeByCode(code);
             context.renderJSON(StatusCodes.SUCC);
-            LOGGER.info("User [email=" + user.optString(User.USER_EMAIL) + "] reseted password");
+            LOGGER.info("User [phone=" + phone + "] reseted password");
             Sessions.login(response, userId, true);
         } catch (final ServiceException e) {
             final String msg = langPropsService.get("resetPwdLabel") + " - " + e.getMessage();
-            LOGGER.log(Level.ERROR, msg + "[name={}, email={}]", name, email);
+            LOGGER.log(Level.ERROR, msg + "[name={}, phone={}]", name, phone);
             context.renderMsg(msg);
         }
     }
