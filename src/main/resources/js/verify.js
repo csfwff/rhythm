@@ -201,6 +201,14 @@ var Verify = {
                 success: function (result, textStatus) {
                     if (0 === result.code) {
                         $("#fpwdTip").addClass('succ').removeClass('error').html('<ul><li>' + result.msg + '</li></ul>');
+                        $("#fpwdPhone, #fpwdCaptcha, #fpwdSecurityCode").hide();
+                        $("#fpwdTip").before('' +
+                            '<div class="input-wrap">\n' +
+                            '    <svg><use xlink:href="#email"></use></svg>\n' +
+                            '    <input id="resetPwdVerifyCode" type="text" placeholder="短信验证码" autocomplete="off" />\n' +
+                            '</div>');
+                        $("#forgetBtn").text('验证');
+                        $("#forgetBtn").attr('onclick', 'location.href = Label.servePath + "/reset-pwd?code=" + $("#resetPwdVerifyCode").val()');
                     } else {
                         $("#fpwdTip").removeClass("tip-succ");
                         $("#fpwdTip").addClass('error').removeClass('succ').html('<ul><li>' + result.msg + '</li></ul>');
