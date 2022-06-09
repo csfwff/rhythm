@@ -319,7 +319,7 @@ public class LoginProcessor {
             final String ip = Requests.getRemoteAddr(context.getRequest());
             final String name = user.optString(User.USER_NAME);
             if (verifySMSCodeLimiterOfIP.access(ip) && verifySMSCodeLimiterOfName.access(name) && verifySMSCodeLimiterOfPhone.access(phone)) {
-                final String code = RandomStringUtils.randomAlphanumeric(6);
+                final String code = RandomStringUtils.randomNumeric(6);
                 if (!verifycodeMgmtService.sendVerifyCodeSMS(phone, code)) {
                     context.renderMsg("验证码发送失败，请稍候重试");
                     return;
