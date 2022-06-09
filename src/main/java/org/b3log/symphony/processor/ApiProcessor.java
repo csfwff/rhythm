@@ -184,9 +184,12 @@ public class ApiProcessor {
     }
 
     public static void removeKeyByUsername(String userName) {
-        String key = keys.get(userName).optString("key");
-        keys.remove(key);
-        keys.remove(userName);
+        try {
+            String key = keys.get(userName).optString("key");
+            keys.remove(key);
+            keys.remove(userName);
+        } catch (Exception ignored) {
+        }
     }
 
     public void getKey(final RequestContext context) {

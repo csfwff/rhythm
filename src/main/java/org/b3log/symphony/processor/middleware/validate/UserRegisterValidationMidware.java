@@ -249,10 +249,13 @@ public class UserRegisterValidationMidware {
             return;
         } else {
             try {
-                if (Objects.nonNull(userQueryService.getUserByPhone(phone))) {
-                    context.renderJSON(new JSONObject().put(Keys.MSG, langPropsService.get("registerFailLabel") + " - " + "该手机号已注册"));
-                    context.abort();
-                    return;
+                JSONObject user = userQueryService.getUserByPhone(phone);
+                if (Objects.nonNull(user)) {
+                    if (user.optInt(UserExt.USER_STATUS) != UserExt.USER_STATUS_C_NOT_VERIFIED) {
+                        context.renderJSON(new JSONObject().put(Keys.MSG, langPropsService.get("registerFailLabel") + " - " + "该手机号已注册"));
+                        context.abort();
+                        return;
+                    }
                 }
             } catch (Exception e) {
                 LOGGER.log(Level.WARN, "Query user by phone  [phone=" + phone + "] failed", e);

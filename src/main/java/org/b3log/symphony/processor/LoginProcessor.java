@@ -511,9 +511,9 @@ public class LoginProcessor {
      *
      * @param context the specified context
      */
-    public static SimpleCurrentLimiter verifySMSCodeLimiterOfIP = new SimpleCurrentLimiter(120, 1);
-    public static SimpleCurrentLimiter verifySMSCodeLimiterOfName = new SimpleCurrentLimiter(120, 1);
-    public static SimpleCurrentLimiter verifySMSCodeLimiterOfPhone = new SimpleCurrentLimiter(120, 1);
+    public static SimpleCurrentLimiter verifySMSCodeLimiterOfIP = new SimpleCurrentLimiter(600, 2);
+    public static SimpleCurrentLimiter verifySMSCodeLimiterOfName = new SimpleCurrentLimiter(600, 2);
+    public static SimpleCurrentLimiter verifySMSCodeLimiterOfPhone = new SimpleCurrentLimiter(600, 2);
     public void register(final RequestContext context) {
         context.renderJSON(StatusCodes.ERR);
         final String ip = Requests.getRemoteAddr(context.getRequest());
