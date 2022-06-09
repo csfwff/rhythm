@@ -179,9 +179,9 @@ var Verify = {
     forgetPwd: function () {
         if (Validate.goValidate({target: $("#fpwdTip"),
             data: [{
-                    "target": $("#fpwdEmail"),
-                    "msg": Label.invalidEmailLabel,
-                    "type": "email"
+                    "target": $("#fpwdPhone"),
+                    "msg": "手机号码不合法",
+                    "type": "phone"
                 }, {
                     "target": $("#fpwdSecurityCode"),
                     "msg": Label.captchaErrorLabel,
@@ -189,7 +189,7 @@ var Verify = {
                     'max': 4
                 }]})) {
             var requestJSONObject = {
-                userEmail: $("#fpwdEmail").val().replace(/(^\s*)|(\s*$)/g, ""),
+                userPhone: $("#fpwdPhone").val(),
                 captcha: $("#fpwdSecurityCode").val()
             };
 

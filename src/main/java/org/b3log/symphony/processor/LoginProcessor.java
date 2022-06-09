@@ -306,32 +306,42 @@ public class LoginProcessor {
         context.renderJSON(StatusCodes.ERR);
 
         final JSONObject requestJSONObject = context.requestJSON();
-        final String email = requestJSONObject.optString(User.USER_EMAIL);
+        final String phone = requestJSONObject.optString("userPhone");
 
         try {
-            final JSONObject user = userQueryService.getUserByEmail(email);
+            final JSONObject user = userQueryService.getUserByPhone(phone);
             if (null == user || UserExt.USER_STATUS_C_VALID != user.optInt(UserExt.USER_STATUS)) {
                 context.renderMsg(langPropsService.get("notFoundUserLabel"));
                 return;
             }
 
             final String userId = user.optString(Keys.OBJECT_ID);
+            final String ip = Requests.getRemoteAddr(context.getRequest());
+            final String name = user.optString(User.USER_NAME);
+            if (verifySMSCodeLimiterOfIP.access(ip) && verifySMSCodeLimiterOfName.access(name) && verifySMSCodeLimiterOfPhone.access(phone)) {
+                final String code = RandomStringUtils.randomAlphanumeric(6);
+                if (!verifycodeMgmtService.sendVerifyCodeSMS(phone, code)) {
+                    context.renderMsg("验证码发送失败，请稍候重试");
+                    return;
+                }
 
-            final JSONObject verifycode = new JSONObject();
-            verifycode.put(Verifycode.BIZ_TYPE, Verifycode.BIZ_TYPE_C_RESET_PWD);
-            final String code = RandomStringUtils.randomAlphanumeric(6);
-            verifycode.put(Verifycode.CODE, code);
-            verifycode.put(Verifycode.EXPIRED, DateUtils.addDays(new Date(), 1).getTime());
-            verifycode.put(Verifycode.RECEIVER, email);
-            verifycode.put(Verifycode.STATUS, Verifycode.STATUS_C_UNSENT);
-            verifycode.put(Verifycode.TYPE, Verifycode.TYPE_C_EMAIL);
-            verifycode.put(Verifycode.USER_ID, userId);
-            verifycodeMgmtService.addVerifycode(verifycode);
+                final JSONObject verifycode = new JSONObject();
+                verifycode.put(Verifycode.BIZ_TYPE, Verifycode.BIZ_TYPE_C_RESET_PWD);
+                verifycode.put(Verifycode.CODE, code);
+                verifycode.put(Verifycode.EXPIRED, DateUtils.addDays(new Date(), 1).getTime());
+                verifycode.put(Verifycode.RECEIVER, phone);
+                verifycode.put(Verifycode.STATUS, Verifycode.STATUS_C_UNSENT);
+                verifycode.put(Verifycode.TYPE, Verifycode.TYPE_C_PHONE);
+                verifycode.put(Verifycode.USER_ID, userId);
+                verifycodeMgmtService.addVerifycode(verifycode);
 
-            context.renderJSON(StatusCodes.SUCC).renderMsg(langPropsService.get("verifycodeSentLabel"));
+                context.renderJSON(StatusCodes.SUCC).renderMsg("重置密码链接已通过短信的形式发送至您的手机，请查收。");
+            } else {
+                context.renderMsg("验证码发送频率过快，请稍候重试");
+            }
         } catch (final ServiceException e) {
             final String msg = langPropsService.get("resetPwdLabel") + " - " + e.getMessage();
-            LOGGER.log(Level.ERROR, msg + "[email=" + email + "]");
+            LOGGER.log(Level.ERROR, msg + "[phone=" + phone + "]");
             context.renderMsg(msg);
         }
     }

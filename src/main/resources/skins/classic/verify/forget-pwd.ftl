@@ -37,8 +37,8 @@
                         <svg><use xlink:href="#logo"></use></svg>
 
                         <div class="input-wrap">
-                            <svg><use xlink:href="#email"></use></svg>
-                            <input id="fpwdEmail" type="text" placeholder="${emailLabel}" autocomplete="off" autofocus="autofocus" />
+                            <svg><use xlink:href="#phone"></use></svg>
+                            <input id="fpwdPhone" type="text" placeholder="手机号码" autocomplete="off" autofocus="autofocus" />
                         </div>
                         <div class="input-wrap">
                             <img id="fpwdCaptcha" class="fn-pointer captcha-img" src="${servePath}/captcha" onclick="this.src = '${servePath}/captcha?' + (new Date()).getTime()" />

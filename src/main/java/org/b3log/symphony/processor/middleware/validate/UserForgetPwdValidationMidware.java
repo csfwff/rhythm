@@ -46,7 +46,7 @@ public class UserForgetPwdValidationMidware {
 
     public void handle(final RequestContext context) {
         final JSONObject requestJSONObject = context.requestJSON();
-        final String email = requestJSONObject.optString(User.USER_EMAIL);
+        final String phone = requestJSONObject.optString("userPhone");
         final String captcha = requestJSONObject.optString(CaptchaProcessor.CAPTCHA);
 
         if (CaptchaProcessor.invalidCaptcha(captcha)) {
@@ -55,12 +55,21 @@ public class UserForgetPwdValidationMidware {
             return;
         }
 
-        if (!Strings.isEmail(email)) {
-            context.renderJSON(new JSONObject().put(Keys.MSG, langPropsService.get("submitFailedLabel") + " - " + langPropsService.get("invalidEmailLabel")));
+        if (!isMobileNO(phone)) {
+            context.renderJSON(new JSONObject().put(Keys.MSG, langPropsService.get("submitFailedLabel") + " - " + "手机号不合法"));
             context.abort();
             return;
         }
 
         context.handle();
+    }
+
+    public static boolean isMobileNO(String mobiles) {
+        String telRegex = "[1]\\d{10}";
+        if (mobiles.isEmpty()) {
+            return false;
+        } else {
+            return mobiles.matches(telRegex);
+        }
     }
 }
