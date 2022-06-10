@@ -86,14 +86,7 @@
                class="tooltipped tooltipped-w <#if unreadNotificationCount == 0>no-msg<#else>msg</#if>"
                href="${servePath}/notifications" aria-label="${messageLabel}">${unreadNotificationCount}
             </a>
-            <a href="${servePath}/idle-talk" class="tooltipped tooltipped-w" aria-label="私信">
-                <#if hasUnreadChatMessage?? && hasUnreadChatMessage>
-                    <script>
-                        setTimeout(function () {
-                            Util.blingChat();
-                        }, 2000);
-                    </script>
-                </#if>
+            <a href="${servePath}/chat" class="tooltipped tooltipped-w" aria-label="私信">
                 <svg id="idleTalkIconContainer">
                     <use xlink:href="#idleChat"></use>
                 </svg>
