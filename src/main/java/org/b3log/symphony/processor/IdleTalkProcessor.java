@@ -30,10 +30,12 @@ import org.b3log.latke.http.renderer.AbstractFreeMarkerRenderer;
 import org.b3log.latke.ioc.BeanManager;
 import org.b3log.latke.ioc.Inject;
 import org.b3log.latke.ioc.Singleton;
+import org.b3log.latke.model.Pagination;
 import org.b3log.latke.model.User;
 import org.b3log.latke.repository.RepositoryException;
 import org.b3log.latke.repository.Transaction;
 import org.b3log.latke.util.Ids;
+import org.b3log.latke.util.Paginator;
 import org.b3log.symphony.model.Common;
 import org.b3log.symphony.model.Notification;
 import org.b3log.symphony.model.Pointtransfer;
@@ -95,7 +97,7 @@ public class IdleTalkProcessor {
         final LoginCheckMidware loginCheck = beanManager.getReference(LoginCheckMidware.class);
 
         final IdleTalkProcessor idleTalkProcessor = beanManager.getReference(IdleTalkProcessor.class);
-        Dispatcher.get("/idle-talk", idleTalkProcessor::showIdleTalk, loginCheck::handle);
+        Dispatcher.get("/chat", idleTalkProcessor::showChat, loginCheck::handle);
         Dispatcher.get("/api/idle-talk", idleTalkProcessor::showIdleTalkApi, loginCheck::handle);
         Dispatcher.post("/idle-talk/send", idleTalkProcessor::sendIdleTalk, loginCheck::handle);
         Dispatcher.get("/idle-talk/revoke", idleTalkProcessor::revoke, loginCheck::handle);
@@ -278,25 +280,29 @@ public class IdleTalkProcessor {
     }
 
     /**
-     * Shows Idle Talk index.
+     * Shows Chat index.
      *
      * @param context
      */
-    public void showIdleTalk(final RequestContext context) {
-        final AbstractFreeMarkerRenderer renderer = new SkinRenderer(context, "home/idle-talk.ftl");
+    public void showChat(final RequestContext context) {
+        final AbstractFreeMarkerRenderer renderer = new SkinRenderer(context, "chat.ftl");
         final Map<String, Object> dataModel = renderer.getDataModel();
         final JSONObject currentUser = Sessions.getUser();
         final String userId = currentUser.optString(Keys.OBJECT_ID);
-        try {
-            List<JSONObject> meSent = chatRepository.getMessagesBySenderId(userId);
-            List<JSONObject> meReceived = chatRepository.getMessagesByReceiverId(userId);
-            dataModel.put("meSent", meSent);
-            dataModel.put("meReceived", meReceived);
-        } catch (RepositoryException e) {
-            dataModel.put("meSent", "");
-            dataModel.put("meReceived", "");
-            LOGGER.log(Level.ERROR, "Get chats failed", e);
+
+        int pageNum = 15;
+        int pageSize = -1;
+        int pageCount = 30;
+        int windowSize = 8;
+        final List<Integer> pageNums = Paginator.paginate(pageNum, pageSize, pageCount, windowSize);
+        if (!pageNums.isEmpty()) {
+            dataModel.put(Pagination.PAGINATION_FIRST_PAGE_NUM, pageNums.get(0));
+            dataModel.put(Pagination.PAGINATION_LAST_PAGE_NUM, pageNums.get(pageNums.size() - 1));
         }
+
+        dataModel.put(Pagination.PAGINATION_CURRENT_PAGE_NUM, pageNum);
+        dataModel.put(Pagination.PAGINATION_PAGE_COUNT, pageCount);
+        dataModel.put(Pagination.PAGINATION_PAGE_NUMS, pageNums);
 
         dataModelService.fillHeaderAndFooter(context, dataModel);
     }
