@@ -51,11 +51,6 @@ public class ChatChannel implements WebSocketChannel {
     public static final Map<String, Set<WebSocketSession>> SESSIONS = new ConcurrentHashMap();
 
     /**
-     * Session set.
-     */
-    public static final List<String> KEYS = new ArrayList<>();
-
-    /**
      * Called when the socket connection with the browser is established.
      *
      * @param session session
@@ -86,15 +81,13 @@ public class ChatChannel implements WebSocketChannel {
         String chatHex = userId + toUserId;
 
         final Set<WebSocketSession> userSessions = SESSIONS.getOrDefault(chatHex, Collections.newSetFromMap(new ConcurrentHashMap()));
-        userSessions.add(session);
 
         final Session httpSession = session.getHttpSession();
         httpSession.setAttribute(User.USER, user.toString());
+        httpSession.setAttribute("chatHex", chatHex);
 
+        userSessions.add(session);
         SESSIONS.put(chatHex, userSessions);
-        if (!KEYS.contains(chatHex)) {
-            KEYS.add(chatHex);
-        }
     }
 
     /**
@@ -114,7 +107,7 @@ public class ChatChannel implements WebSocketChannel {
      */
     @Override
     public void onMessage(final Message message) {
-
+        System.out.println(message.text);
     }
 
     /**
@@ -134,36 +127,11 @@ public class ChatChannel implements WebSocketChannel {
      */
     private void removeSession(final WebSocketSession session) {
         final Session httpSession = session.getHttpSession();
-        final String userStr = httpSession.getAttribute(User.USER);
-        if (null == userStr) {
+        final String chatHex = httpSession.getAttribute("chatHex");
+        if (null == chatHex) {
             return;
         }
-        final JSONObject user = new JSONObject(userStr);
-        final String userId = user.optString(Keys.OBJECT_ID);
-        // 查询列表
-        final List<String> pairKeys = getKeysByFromUserId(userId, false);
-        // 删除SESSIONS
-        for (String key : pairKeys) {
-            Set<WebSocketSession> userSessions = SESSIONS.get(key);
-            userSessions.remove(session);
-        }
-    }
-
-    public static List<String> getKeysByFromUserId(String userId, boolean getAll) {
-        final List<String> pairKeys = new ArrayList<>();
-        if (getAll) {
-            for (String key : KEYS) {
-                if (key.contains(userId)) {
-                    pairKeys.add(key);
-                }
-            }
-        } else {
-            for (String key : KEYS) {
-                if (key.startsWith(userId)) {
-                    pairKeys.add(key);
-                }
-            }
-        }
-        return pairKeys;
+        Set<WebSocketSession> userSessions = SESSIONS.get(chatHex);
+        userSessions.remove(session);
     }
 }
