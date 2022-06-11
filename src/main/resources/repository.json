@@ -2093,6 +2093,18 @@
           "description": "主键"
         },
         {
+          "name": "fromId",
+          "type": "String",
+          "length": 19,
+          "description": "发送者"
+        },
+        {
+          "name": "toId",
+          "type": "String",
+          "length": 19,
+          "description": "接收者"
+        },
+        {
           "name": "user_session",
           "type": "String",
           "length": 64,
