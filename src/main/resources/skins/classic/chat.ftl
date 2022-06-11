@@ -154,3 +154,6 @@
 </html>
 <script src="${staticServePath}/js/chat${miniPostfix}.js?${staticResourceVersion}"></script>
 <script src="${staticServePath}/js/channel${miniPostfix}.js?${staticResourceVersion}"></script>
+<script>
+    var apiKey = '${apiKey}';
+</script>
