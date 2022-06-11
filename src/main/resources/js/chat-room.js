@@ -1484,7 +1484,12 @@ var ChatRoom = {
     iceWs = new WebSocket('wss://game.yuis.cc/wss');
     let iceWsHeart = null;
     iceWs.onopen = function(){
-      iceWs.send(JSON.stringify({type:'setUser',user:Label.currentUser,ck:ChatRoom.IceGameCK}))
+      iceWs.send(JSON.stringify({
+        type:'setUser',
+        user:Label.currentUser,
+        ck:ChatRoom.IceGameCK,
+        uid:Label.currentUserId
+      }))
       iceWsHeart = setInterval(()=>{
         iceWs.send(JSON.stringify({type:'hb'}))
       },15000)
