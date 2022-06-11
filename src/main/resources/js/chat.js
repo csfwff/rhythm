@@ -44,7 +44,23 @@ var Chat = {
             $("#buttons").show();
             // 显示翻页
             $(".pagination__chat").show();
+            $("#chatMessageList")
         }
+    },
+
+    loadMessageList() {
+        $("#chatMessageList").append('' +
+            '<div class="module-panel" style="padding: 10px 15px">\n' +
+            '    <nav class="home-menu">\n' +
+            '        <div class="avatar"\n' +
+            '             style="display: inline-block; background-image:url(https://pwl.stackoverflow.wiki/2021/09/1552202503861_1562141298909-67b099fd.jpeg)">\n' +
+            '        </div>\n' +
+            '        <div style="display: inline-block; vertical-align: -12px;">\n' +
+            '            adlered<br>\n' +
+            '            <span style="color: #868888">最近一条消息</span>\n' +
+            '        </div>\n' +
+            '    </nav>\n' +
+            '</div>');
     },
 
     addSelfMsg(oId, userName, avatarURL, content, time) {
@@ -67,9 +83,24 @@ var Chat = {
         Util.listenUserCard();
     },
 
-    addTargetMsg() {
+    addTargetMsg(oId, userName, avatarURL, content, time) {
         $("#chats").prepend('' +
-            '');
+            '<div id="chat' + oId + '" class="fn__flex chats__item">\n' +
+            '    <a href="' + Label.servePath + '/member/' + userName + '" style="height: 38px">\n' +
+            '        <div class="avatar tooltipped__user" aria-label="' + userName + '"\n' +
+            '             style="background-image: url(' + avatarURL + ');"></div>\n' +
+            '    </a>\n' +
+            '    <div class="chats__content">\n' +
+            '        <div class="chats__arrow"></div>\n' +
+            '        <div style="margin-top: 4px" class="vditor-reset ft__smaller ">\n' +
+            '            <p>' + content + '</p>\n' +
+            '        </div>\n' +
+            '        <div class="ft__smaller ft__fade fn__right date-bar">\n' +
+            '            ' + time + '\n' +
+            '        </div>\n' +
+            '    </div>\n' +
+            '</div>');
+        Util.listenUserCard();
     }
 }
 

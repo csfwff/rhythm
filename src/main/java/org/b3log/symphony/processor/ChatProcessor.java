@@ -82,20 +82,6 @@ public class ChatProcessor {
         ApiProcessor.keys.put(userName, new JSONObject().put("key", key));
         dataModel.put("apiKey", key);
 
-        int pageNum = 15;
-        int pageSize = -1;
-        int pageCount = 30;
-        int windowSize = 8;
-        final List<Integer> pageNums = Paginator.paginate(pageNum, pageSize, pageCount, windowSize);
-        if (!pageNums.isEmpty()) {
-            dataModel.put(Pagination.PAGINATION_FIRST_PAGE_NUM, pageNums.get(0));
-            dataModel.put(Pagination.PAGINATION_LAST_PAGE_NUM, pageNums.get(pageNums.size() - 1));
-        }
-
-        dataModel.put(Pagination.PAGINATION_CURRENT_PAGE_NUM, pageNum);
-        dataModel.put(Pagination.PAGINATION_PAGE_COUNT, pageCount);
-        dataModel.put(Pagination.PAGINATION_PAGE_NUMS, pageNums);
-
         dataModelService.fillHeaderAndFooter(context, dataModel);
     }
 
