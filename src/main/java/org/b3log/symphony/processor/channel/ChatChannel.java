@@ -18,6 +18,7 @@
  */
 package org.b3log.symphony.processor.channel;
 
+import org.apache.commons.lang.StringUtils;
 import org.b3log.latke.Keys;
 import org.b3log.latke.http.Session;
 import org.b3log.latke.http.WebSocketChannel;
@@ -25,10 +26,17 @@ import org.b3log.latke.http.WebSocketSession;
 import org.b3log.latke.ioc.Inject;
 import org.b3log.latke.ioc.Singleton;
 import org.b3log.latke.model.User;
+import org.b3log.latke.repository.RepositoryException;
+import org.b3log.latke.repository.Transaction;
+import org.b3log.symphony.model.Common;
 import org.b3log.symphony.processor.ApiProcessor;
+import org.b3log.symphony.repository.ChatInfoRepository;
+import org.b3log.symphony.repository.ChatUnreadRepository;
+import org.b3log.symphony.service.OptionQueryService;
 import org.b3log.symphony.service.UserQueryService;
 import org.json.JSONObject;
 
+import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -44,6 +52,15 @@ public class ChatChannel implements WebSocketChannel {
 
     @Inject
     private UserQueryService userQueryService;
+
+    @Inject
+    private OptionQueryService optionQueryService;
+
+    @Inject
+    private ChatInfoRepository chatInfoRepository;
+
+    @Inject
+    private ChatUnreadRepository chatUnreadRepository;
 
     /**
      * Session set.
@@ -85,6 +102,8 @@ public class ChatChannel implements WebSocketChannel {
         final Session httpSession = session.getHttpSession();
         httpSession.setAttribute(User.USER, user.toString());
         httpSession.setAttribute("chatHex", chatHex);
+        httpSession.setAttribute("fromId", userId);
+        httpSession.setAttribute("toId", toUserId);
 
         userSessions.add(session);
         SESSIONS.put(chatHex, userSessions);
@@ -107,7 +126,84 @@ public class ChatChannel implements WebSocketChannel {
      */
     @Override
     public void onMessage(final Message message) {
-        System.out.println(message.text);
+        JSONObject result = new JSONObject();
+        result.put("code", 0);
+        result.put("msg", "");
+        result.put("data", "");
+
+        final Session httpSession = message.session.getHttpSession();
+        String fromId = httpSession.getAttribute("fromId");
+        String toId = httpSession.getAttribute("toId");
+        if (fromId == null || toId == null) {
+            message.session.close();
+            return;
+        }
+        String chatHex = fromId + toId;
+        String time = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date());
+        String content = message.text;
+        content = StringUtils.trim(content);
+        if (StringUtils.isBlank(content) || content.length() > 512) {
+            result.put("code", -1);
+            result.put("msg", "内容为空或大于512个字，发送失败");
+            message.session.sendText(result.toString());
+            return;
+        }
+
+        if (optionQueryService.containReservedWord(content)) {
+            result.put("code", -1);
+            result.put("msg", "内容包含敏感词，发送失败");
+            message.session.sendText(result.toString());
+            return;
+        }
+
+        // 存入数据库
+        JSONObject chatInfo = new JSONObject();
+        chatInfo.put("fromId", fromId);
+        chatInfo.put("toId", toId);
+        chatInfo.put("user_session", chatHex);
+        chatInfo.put("time", time);
+        chatInfo.put("content", content);
+        String chatInfoOId;
+        try {
+            Transaction transaction = chatInfoRepository.beginTransaction();
+            chatInfoOId = chatInfoRepository.add(chatInfo);
+            transaction.commit();
+        } catch (RepositoryException e) {
+            result.put("code", -1);
+            result.put("msg", "发送出错，" + e.getMessage());
+            message.session.sendText(result.toString());
+            return;
+        }
+        JSONObject chatUnread = new JSONObject();
+        chatUnread.put("fromId", fromId);
+        chatUnread.put("toId", toId);
+        chatUnread.put("user_session", chatHex);
+        try {
+            Transaction transaction = chatUnreadRepository.beginTransaction();
+            chatUnreadRepository.add(chatUnread);
+            transaction.commit();
+        } catch (RepositoryException e) {
+            result.put("code", -1);
+            result.put("msg", "发送出错，" + e.getMessage());
+            message.session.sendText(result.toString());
+            return;
+        }
+
+        // 格式化并发送给WS用户
+        try {
+            JSONObject info = chatInfoRepository.get(chatInfoOId);
+            // 组合反向user_session
+            String targetUserSession = toId + fromId;
+            final Set<WebSocketSession> sessions = SESSIONS.get(targetUserSession);
+            for (final WebSocketSession session : sessions) {
+                session.sendText(info.toString());
+            }
+        } catch (RepositoryException e) {
+            result.put("code", -1);
+            result.put("msg", "发送出错，" + e.getMessage());
+            message.session.sendText(result.toString());
+            return;
+        }
     }
 
     /**
