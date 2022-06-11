@@ -18,18 +18,15 @@
  */
 package org.b3log.symphony.processor.channel;
 
-import org.apache.commons.lang.StringUtils;
 import org.b3log.latke.Keys;
 import org.b3log.latke.http.Session;
 import org.b3log.latke.http.WebSocketChannel;
 import org.b3log.latke.http.WebSocketSession;
-import org.b3log.latke.ioc.BeanManager;
+import org.b3log.latke.ioc.Inject;
 import org.b3log.latke.ioc.Singleton;
 import org.b3log.latke.model.User;
-import org.b3log.symphony.model.Common;
-import org.b3log.symphony.model.UserExt;
 import org.b3log.symphony.processor.ApiProcessor;
-import org.b3log.symphony.service.UserMgmtService;
+import org.b3log.symphony.service.UserQueryService;
 import org.json.JSONObject;
 
 import java.util.Collections;
@@ -46,6 +43,19 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 @Singleton
 public class ChatChannel implements WebSocketChannel {
+
+    @Inject
+    private UserQueryService userQueryService;
+
+    /**
+     * Session set.
+     */
+    public static final Map<String, Set<WebSocketSession>> SESSIONS = new ConcurrentHashMap();
+
+    /**
+     * Session set.
+     */
+    public static final Set<String> KEYS = Collections.newSetFromMap(new ConcurrentHashMap());
 
     /**
      * Called when the socket connection with the browser is established.
@@ -64,7 +74,27 @@ public class ChatChannel implements WebSocketChannel {
             return;
         }
         String toUser = session.getParameter("toUser");
+        JSONObject toUserJSON = userQueryService.getUserByName(toUser);
+        if (toUserJSON == null) {
+            session.close();
+            return;
+        }
+        String toUserId = toUserJSON.optString(Keys.OBJECT_ID);
+        String userId = user.optString(Keys.OBJECT_ID);
+        if (userId.equals(toUserId)) {
+            session.close();
+            return;
+        }
+        String chatHex = userId + toUserId;
 
+        final Set<WebSocketSession> userSessions = SESSIONS.getOrDefault(chatHex, Collections.newSetFromMap(new ConcurrentHashMap()));
+        userSessions.add(session);
+
+        final Session httpSession = session.getHttpSession();
+        httpSession.setAttribute(User.USER, user.toString());
+
+        SESSIONS.put(chatHex, userSessions);
+        KEYS.add(chatHex);
     }
 
     /**
@@ -74,6 +104,7 @@ public class ChatChannel implements WebSocketChannel {
      */
     @Override
     public void onClose(final WebSocketSession session) {
+        removeSession(session);
     }
 
     /**
@@ -83,6 +114,7 @@ public class ChatChannel implements WebSocketChannel {
      */
     @Override
     public void onMessage(final Message message) {
+
     }
 
     /**
@@ -92,5 +124,37 @@ public class ChatChannel implements WebSocketChannel {
      */
     @Override
     public void onError(final Error error) {
+        removeSession(error.session);
+    }
+
+    /**
+     * Removes the specified session.
+     *
+     * @param session the specified session
+     */
+    private void removeSession(final WebSocketSession session) {
+        final Session httpSession = session.getHttpSession();
+        final String userStr = httpSession.getAttribute(User.USER);
+        if (null == userStr) {
+            return;
+        }
+        final JSONObject user = new JSONObject(userStr);
+        final String userId = user.optString(Keys.OBJECT_ID);
+        // 1. 查询列表
+        final Set<String> pairKeys = Collections.newSetFromMap(new ConcurrentHashMap());
+        for (String key : KEYS) {
+            if (key.startsWith(userId)) {
+                pairKeys.add(userId);
+            }
+        }
+        // 2. 删除KEYS
+        for (String key : pairKeys) {
+            KEYS.remove(key);
+        }
+        // 3. 删除SESSIONS
+        for (String key : pairKeys) {
+            Set<WebSocketSession> userSessions = SESSIONS.get(key);
+            userSessions.remove(session);
+        }
     }
 }
