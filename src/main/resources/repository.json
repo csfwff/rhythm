@@ -2070,6 +2070,65 @@
           "description": "商品数据"
         }
       ]
+    },
+    {
+      "name": "chat_info",
+      "description": "私聊数据表",
+      "keys": [
+        {
+          "name": "oId",
+          "type": "String",
+          "length": 19,
+          "description": "主键"
+        },
+        {
+          "name": "fromId",
+          "type": "String",
+          "length": 19,
+          "description": "发送者"
+        },
+        {
+          "name": "toId",
+          "type": "String",
+          "length": 19,
+          "description": "接收者"
+        },
+        {
+          "name": "user_session",
+          "type": "String",
+          "length": 64,
+          "description": "两个用户的Hash"
+        },
+        {
+          "name": "time",
+          "type": "long",
+          "description": "发送消息时间"
+        },
+        {
+          "name": "content",
+          "type": "String",
+          "length": 512,
+          "description": "私聊消息内容"
+        }
+      ]
+    },
+    {
+      "name": "chat_unread",
+      "description": "私聊未读记录表",
+      "keys": [
+        {
+          "name": "oId",
+          "type": "String",
+          "length": 19,
+          "description": "主键"
+        },
+        {
+          "name": "user_session",
+          "type": "String",
+          "length": 64,
+          "description": "两个用户的Hash"
+        }
+      ]
     }
   ]
 }
