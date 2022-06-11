@@ -54,8 +54,8 @@ public final class Router {
         Dispatcher.webSocket("/gobang-game-channel", gobangChannel);
         final UserChannel userChannel = beanManager.getReference(UserChannel.class);
         Dispatcher.webSocket("/user-channel", userChannel);
-        final IdleTalkChannel idleTalkChannel = beanManager.getReference(IdleTalkChannel.class);
-        Dispatcher.webSocket("/idle-talk-channel", idleTalkChannel);
+        final ChatChannel chatChannel = beanManager.getReference(ChatChannel.class);
+        Dispatcher.webSocket("/chat-channel", chatChannel);
         final ShopChannel shopChannel = beanManager.getReference(ShopChannel.class);
         Dispatcher.webSocket("/shop-channel", shopChannel);
 

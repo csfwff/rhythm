@@ -45,12 +45,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * @since 1.4.0
  */
 @Singleton
-public class IdleTalkChannel implements WebSocketChannel {
-
-    /**
-     * Session set.
-     */
-    public static final Map<String, Set<WebSocketSession>> SESSIONS = new ConcurrentHashMap();
+public class ChatChannel implements WebSocketChannel {
 
     /**
      * Called when the socket connection with the browser is established.
@@ -59,21 +54,17 @@ public class IdleTalkChannel implements WebSocketChannel {
      */
     @Override
     public void onConnect(final WebSocketSession session) {
-        JSONObject user = new JSONObject(session.getHttpSession().getAttribute(User.USER));
+        JSONObject user = null;
         try {
             user = ApiProcessor.getUserByKey(session.getParameter("apiKey"));
         } catch (NullPointerException ignored) {
         }
-
         if (null == user) {
+            session.close();
             return;
         }
+        String toUser = session.getParameter("toUser");
 
-        final String userId = user.optString(Keys.OBJECT_ID);
-        final Set<WebSocketSession> userSessions = SESSIONS.getOrDefault(userId, Collections.newSetFromMap(new ConcurrentHashMap()));
-        userSessions.add(session);
-
-        SESSIONS.put(userId, userSessions);
     }
 
     /**
@@ -83,7 +74,6 @@ public class IdleTalkChannel implements WebSocketChannel {
      */
     @Override
     public void onClose(final WebSocketSession session) {
-        removeSession(session);
     }
 
     /**
@@ -102,48 +92,5 @@ public class IdleTalkChannel implements WebSocketChannel {
      */
     @Override
     public void onError(final Error error) {
-        removeSession(error.session);
-    }
-
-    /**
-     * Sends command to browsers.
-     *
-     * @param message the specified message, for example,
-     *                "userId": "",
-     *                "cmd": ""
-     */
-    public static void sendCmd(final JSONObject message) {
-        final String recvUserId = message.optString(UserExt.USER_T_ID);
-        if (StringUtils.isBlank(recvUserId)) {
-            return;
-        }
-
-        final String msgStr = message.toString();
-
-        for (final String userId : SESSIONS.keySet()) {
-            if (userId.equals(recvUserId)) {
-                final Set<WebSocketSession> sessions = SESSIONS.get(userId);
-                for (final WebSocketSession session : sessions) {
-                    session.sendText(msgStr);
-                }
-            }
-        }
-    }
-
-    /**
-     * Removes the specified session.
-     *
-     * @param session the specified session
-     */
-    private void removeSession(final WebSocketSession session) {
-        final Session httpSession = session.getHttpSession();
-        final String userStr = httpSession.getAttribute(User.USER);
-        if (null == userStr) {
-            return;
-        }
-        final JSONObject user = new JSONObject(userStr);
-        final String userId = user.optString(Keys.OBJECT_ID);
-        Set<WebSocketSession> userSessions = SESSIONS.get(userId);
-        userSessions.remove(session);
     }
 }

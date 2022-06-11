@@ -4,47 +4,51 @@ import org.b3log.latke.Keys;
 import org.b3log.latke.http.Dispatcher;
 import org.b3log.latke.http.RequestContext;
 import org.b3log.latke.ioc.BeanManager;
+import org.b3log.latke.ioc.Inject;
 import org.b3log.latke.ioc.Singleton;
 import org.b3log.latke.repository.FilterOperator;
 import org.b3log.latke.repository.PropertyFilter;
 import org.b3log.latke.repository.Query;
 import org.b3log.latke.repository.RepositoryException;
-import org.b3log.symphony.processor.middleware.LoginCheckMidware;
+import org.b3log.symphony.processor.middleware.ApiCheckMidware;
+import org.b3log.symphony.repository.ChatInfoRepository;
 import org.b3log.symphony.repository.ChatUnreadRepository;
-import org.b3log.symphony.util.Sessions;
 import org.json.JSONObject;
+
+import java.util.List;
 
 @Singleton
 public class ChatProcessor {
+
+    @Inject
+    private ChatUnreadRepository chatUnreadRepository;
+
+    @Inject
+    private ChatInfoRepository chatInfoRepository;
 
     /**
      * Register request handlers.
      */
     public static void register() {
         final BeanManager beanManager = BeanManager.getInstance();
-        final LoginCheckMidware loginCheck = beanManager.getReference(LoginCheckMidware.class);
+        final ApiCheckMidware apiCheck = beanManager.getReference(ApiCheckMidware.class);
 
         final ChatProcessor chatProcessor = beanManager.getReference(ChatProcessor.class);
-        Dispatcher.get("/chat/hasUnread", chatProcessor::hasUnreadChatMessage);
+        Dispatcher.get("/chat/has-unread", chatProcessor::hasUnreadChatMessage, apiCheck::handle);
     }
 
-    public boolean hasUnreadChatMessage(RequestContext context) {
+    public void hasUnreadChatMessage(RequestContext context) {
+        context.renderJSON(new JSONObject().put("result", 0));
         JSONObject currentUser = ApiProcessor.getUserByKey(context.param("apiKey"));
-
         String userId = currentUser.optString(Keys.OBJECT_ID);
-
-        final BeanManager beanManager = BeanManager.getInstance();
-        final ChatUnreadRepository chatUnreadRepository = beanManager.getReference(ChatUnreadRepository.class);
 
         Query query = new Query().setFilter(new PropertyFilter("fromId", FilterOperator.EQUAL, userId));
         try {
-            JSONObject result = chatUnreadRepository.getFirst(query);
+            List<JSONObject> result = chatUnreadRepository.getList(query);
             if (result != null) {
-                return true;
+                context.renderJSON(new JSONObject().put("result", result.size()));
             }
-        } catch (RepositoryException e) {
-            return false;
+        } catch (RepositoryException ignored) {
         }
-        return false;
     }
 }
