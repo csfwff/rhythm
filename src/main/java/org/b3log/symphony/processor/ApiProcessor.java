@@ -66,7 +66,7 @@ public class ApiProcessor {
     /**
      * Session cache.
      */
-    private static final Cache keys = CacheFactory.getCache("keys");
+    public static final Cache keys = CacheFactory.getCache("keys");
 
     /**
      * 存储用户的Key
