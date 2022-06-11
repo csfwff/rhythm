@@ -377,14 +377,6 @@ public class DataModelService {
             Stopwatchs.end();
         }
 
-        try {
-            JSONObject user = Sessions.getUser();
-            if (null != user) {
-                dataModel.put("hasUnreadChatMessage", ChatProcessor.hasUnreadChatMessage(user.optString(Keys.OBJECT_ID)));
-            }
-        } catch (Exception ignored) {
-        }
-
         final String serverScheme = Latkes.getServerScheme();
         dataModel.put(Common.WEBSOCKET_SCHEME, StringUtils.containsIgnoreCase(serverScheme, "https") ? "wss" : "ws");
         dataModel.put(Common.LUTE_AVAILABLE, Markdowns.LUTE_AVAILABLE);

@@ -91,13 +91,6 @@
                     <use xlink:href="#idleChat"></use>
                 </svg>
             </a>
-        <#if hasUnreadChatMessage?? && hasUnreadChatMessage>
-            <script>
-                setTimeout(function () {
-                    Util.blingChat();
-                }, 2000);
-            </script>
-        </#if>
             <a href="${servePath}/activities" aria-label="${activityLabel}" class="tooltipped tooltipped-w">
                 <svg>
                     <use xlink:href="#flag"></use>
