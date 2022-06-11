@@ -141,16 +141,29 @@ public class ChatChannel implements WebSocketChannel {
         final JSONObject user = new JSONObject(userStr);
         final String userId = user.optString(Keys.OBJECT_ID);
         // 查询列表
-        final List<String> pairKeys = new ArrayList<>();
-        for (String key : KEYS) {
-            if (key.startsWith(userId)) {
-                pairKeys.add(key);
-            }
-        }
+        final List<String> pairKeys = getKeysByFromUserId(userId, false);
         // 删除SESSIONS
         for (String key : pairKeys) {
             Set<WebSocketSession> userSessions = SESSIONS.get(key);
             userSessions.remove(session);
         }
+    }
+
+    public static List<String> getKeysByFromUserId(String userId, boolean getAll) {
+        final List<String> pairKeys = new ArrayList<>();
+        if (getAll) {
+            for (String key : KEYS) {
+                if (key.contains(userId)) {
+                    pairKeys.add(key);
+                }
+            }
+        } else {
+            for (String key : KEYS) {
+                if (key.startsWith(userId)) {
+                    pairKeys.add(key);
+                }
+            }
+        }
+        return pairKeys;
     }
 }
