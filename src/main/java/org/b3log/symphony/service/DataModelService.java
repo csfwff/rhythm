@@ -35,7 +35,7 @@ import org.b3log.latke.util.Stopwatchs;
 import org.b3log.symphony.Server;
 import org.b3log.symphony.cache.DomainCache;
 import org.b3log.symphony.model.*;
-import org.b3log.symphony.processor.IdleTalkProcessor;
+import org.b3log.symphony.processor.ChatProcessor;
 import org.b3log.symphony.util.Markdowns;
 import org.b3log.symphony.util.Sessions;
 import org.b3log.symphony.util.Symphonys;
@@ -380,7 +380,7 @@ public class DataModelService {
         try {
             JSONObject user = Sessions.getUser();
             if (null != user) {
-                dataModel.put("hasUnreadChatMessage", IdleTalkProcessor.hasUnreadChatMessage(user.optString(Keys.OBJECT_ID)));
+                dataModel.put("hasUnreadChatMessage", ChatProcessor.hasUnreadChatMessage(user.optString(Keys.OBJECT_ID)));
             }
         } catch (Exception ignored) {
         }

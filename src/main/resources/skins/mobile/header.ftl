@@ -37,6 +37,13 @@
                 <span class="avatar-small" style="background-image:url('${currentUser.userAvatarURL20}')"></span>
             </a>
             <a href="${servePath}/chat" title="私信"><svg id="idleTalkIconContainer"><use xlink:href="#idleChat"></use></svg></a>
+            <#if hasUnreadChatMessage?? && hasUnreadChatMessage>
+                <script>
+                    setTimeout(function () {
+                        Util.blingChat();
+                    }, 2000);
+                </script>
+            </#if>
             <a href="${servePath}/activities" title="${activityLabel}"><svg><use xlink:href="#flag"></use></svg></a>
             <#if permissions["commonAddArticle"].permissionGrant>
                 <a href="${servePath}/pre-post" title="${addArticleLabel}"><svg><use xlink:href="#addfile"></use></svg></a>

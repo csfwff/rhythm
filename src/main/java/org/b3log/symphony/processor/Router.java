@@ -105,8 +105,6 @@ public final class Router {
         UserProcessor.register();
         // 投票
         VoteProcessor.register();
-        // 龙门阵
-        IdleTalkProcessor.register();
         // API
         ApiProcessor.register();
         // 商店
@@ -115,6 +113,8 @@ public final class Router {
         AlipayProcessor.register();
         // MFA
         MFAProcessor.register();
+        // Chat
+        ChatProcessor.register();
 
         final BeanManager beanManager = BeanManager.getInstance();
         final LoginCheckMidware loginCheck = beanManager.getReference(LoginCheckMidware.class);

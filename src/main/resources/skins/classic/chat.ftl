@@ -46,14 +46,12 @@
             <div class="module person-info">
                 <div class="module-panel" style="padding: 0">
                     <nav class="home-menu">
-                        <a href="http://localhost:8080/notifications/reply">
-                            <div class="avatar"
-                                 style="display: inline-block; background-image:url('https://pwl.stackoverflow.wiki/2021/09/1552202503861_1562141298909-67b099fd.jpeg')"></div>
-                            <div style="display: inline-block; vertical-align: -12px;">
-                                adlered<br>
-                                <span style="color: #868888">最近一条消息</span>
-                            </div>
-                        </a>
+                        <div class="avatar"
+                             style="display: inline-block; background-image:url('https://pwl.stackoverflow.wiki/2021/09/1552202503861_1562141298909-67b099fd.jpeg')"></div>
+                        <div style="display: inline-block; vertical-align: -12px;">
+                            adlered<br>
+                            <span style="color: #868888">最近一条消息</span>
+                        </div>
                     </nav>
                 </div>
             </div>

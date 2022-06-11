@@ -25,8 +25,6 @@ import org.b3log.latke.ioc.Inject;
 import org.b3log.latke.service.annotation.Service;
 import org.b3log.latke.util.Stopwatchs;
 import org.b3log.symphony.processor.AlipayProcessor;
-import org.b3log.symphony.processor.IdleTalkProcessor;
-import org.b3log.symphony.processor.bot.ChatRoomBot;
 import org.b3log.symphony.processor.channel.ChatroomChannel;
 import org.b3log.symphony.util.Symphonys;
 import org.b3log.symphony.util.Vocation;
