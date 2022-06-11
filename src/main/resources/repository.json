@@ -2012,36 +2012,6 @@
       ]
     },
     {
-      "name": "chat",
-      "description": "私聊消息表",
-      "keys": [
-        {
-          "name": "oId",
-          "type": "String",
-          "length": 19,
-          "description": "主键"
-        },
-        {
-          "name": "senderId",
-          "type": "String",
-          "length": 19,
-          "description": "发送者ID"
-        },
-        {
-          "name": "receiverId",
-          "type": "String",
-          "length": 19,
-          "description": "接收者ID"
-        },
-        {
-          "name": "message",
-          "type": "String",
-          "length": 102400,
-          "description": "消息JSON"
-        }
-      ]
-    },
-    {
       "name": "shop",
       "description": "系统商店数据",
       "keys": [
