@@ -29,9 +29,7 @@ import org.b3log.symphony.processor.ApiProcessor;
 import org.b3log.symphony.service.UserQueryService;
 import org.json.JSONObject;
 
-import java.util.Collections;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -55,7 +53,7 @@ public class ChatChannel implements WebSocketChannel {
     /**
      * Session set.
      */
-    public static final Set<String> KEYS = Collections.newSetFromMap(new ConcurrentHashMap());
+    public static final List<String> KEYS = new ArrayList<>();
 
     /**
      * Called when the socket connection with the browser is established.
@@ -94,7 +92,9 @@ public class ChatChannel implements WebSocketChannel {
         httpSession.setAttribute(User.USER, user.toString());
 
         SESSIONS.put(chatHex, userSessions);
-        KEYS.add(chatHex);
+        if (!KEYS.contains(chatHex)) {
+            KEYS.add(chatHex);
+        }
     }
 
     /**
@@ -140,18 +140,14 @@ public class ChatChannel implements WebSocketChannel {
         }
         final JSONObject user = new JSONObject(userStr);
         final String userId = user.optString(Keys.OBJECT_ID);
-        // 1. 查询列表
-        final Set<String> pairKeys = Collections.newSetFromMap(new ConcurrentHashMap());
+        // 查询列表
+        final List<String> pairKeys = new ArrayList<>();
         for (String key : KEYS) {
             if (key.startsWith(userId)) {
-                pairKeys.add(userId);
+                pairKeys.add(key);
             }
         }
-        // 2. 删除KEYS
-        for (String key : pairKeys) {
-            KEYS.remove(key);
-        }
-        // 3. 删除SESSIONS
+        // 删除SESSIONS
         for (String key : pairKeys) {
             Set<WebSocketSession> userSessions = SESSIONS.get(key);
             userSessions.remove(session);
