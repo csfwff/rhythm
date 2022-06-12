@@ -197,11 +197,18 @@ public class ChatChannel implements WebSocketChannel {
         // 格式化并发送给WS用户
         try {
             JSONObject info = chatInfoRepository.get(chatInfoOId);
+            // 返回给发送者同样的拷贝
+            final Set<WebSocketSession> senderSessions = SESSIONS.get(chatHex);
+            if (senderSessions != null) {
+                for (final WebSocketSession session : senderSessions) {
+                    session.sendText(info.toString());
+                }
+            }
             // 组合反向user_session
             String targetUserSession = toId + fromId;
-            final Set<WebSocketSession> sessions = SESSIONS.get(targetUserSession);
-            if (sessions != null) {
-                for (final WebSocketSession session : sessions) {
+            final Set<WebSocketSession> recieverSessions = SESSIONS.get(targetUserSession);
+            if (recieverSessions != null) {
+                for (final WebSocketSession session : recieverSessions) {
                     session.sendText(info.toString());
                 }
             }

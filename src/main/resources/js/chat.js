@@ -54,7 +54,18 @@ var Chat = {
             }
             Chat.ws.onmessage = function (evt) {
                 var data = JSON.parse(evt.data)
-                console.log(data);
+                let oId = data.oId;
+                let toId = data.toId;
+                let fromId = data.fromId;
+                let time = data.time;
+                let user_session = data.user_session;
+                if (fromId === Label.currentUserId) {
+                    // 我发送的
+
+                } else {
+                    // 他发给我的
+
+                }
             }
             Chat.ws.onclose = function () {
                 console.log("Disconnected to chat channel websocket.")
