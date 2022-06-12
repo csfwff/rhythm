@@ -54,17 +54,23 @@ var Chat = {
             }
             Chat.ws.onmessage = function (evt) {
                 var data = JSON.parse(evt.data)
+                console.log(data);
                 let oId = data.oId;
                 let toId = data.toId;
                 let fromId = data.fromId;
                 let time = data.time;
+                let content = data.content;
                 let user_session = data.user_session;
-                if (fromId === Label.currentUserId) {
+                let senderUserName = data.senderUserName;
+                let senderAvatar = data.senderAvatar;
+                let receiverUserName = data.receiverUserName;
+                let receiverAvatar = data.receiverAvatar;
+                if (senderUserName === Label.currentUserName) {
                     // 我发送的
-                    Chat.addSelfMsg()
+                    Chat.addSelfMsg(oId, senderUserName, senderAvatar, content, time);
                 } else {
                     // 他发给我的
-
+                    Chat.addTargetMsg(oId, senderUserName, senderAvatar, content, time);
                 }
             }
             Chat.ws.onclose = function () {

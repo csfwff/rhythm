@@ -202,8 +202,13 @@ public class ChatChannel implements WebSocketChannel {
             info.put("senderUserName", senderJSON.optString(User.USER_NAME));
             info.put("senderAvatar", senderJSON.optString(UserExt.USER_AVATAR_URL));
             JSONObject receiverJSON = userQueryService.getUser(toId);
-            info.put("receiverUserName", receiverJSON.optString(User.USER_NAME));
-            info.put("receiverAvatar", receiverJSON.optString(UserExt.USER_AVATAR_URL));
+            if (!toId.equals("1000000000086")) {
+                info.put("receiverUserName", receiverJSON.optString(User.USER_NAME));
+                info.put("receiverAvatar", receiverJSON.optString(UserExt.USER_AVATAR_URL));
+            } else {
+                info.put("receiverUserName", "文件传输助手");
+                info.put("receiverAvatar", "https://file.fishpi.cn/2022/06/e1541bfe4138c144285f11ea858b6bf6-ba777366.jpeg");
+            }
             // 返回给发送者同样的拷贝
             final Set<WebSocketSession> senderSessions = SESSIONS.get(chatHex);
             if (senderSessions != null) {
