@@ -4,20 +4,22 @@ var Chat = {
     init: function () {
         let toUser = getQueryVariable("toUser");
         Chat.toUser = toUser;
-        // 用户已读
-        $.ajax({
-            url: Label.servePath + "/chat/mark-as-read?apiKey=" + apiKey + "&fromUser=" + Chat.toUser,
-            type: "GET"
-        });
-        // 加载用户
-        if (toUser !== 'FileTransfer') {
+        if (toUser !== '') {
+            // 用户已读
             $.ajax({
-                url: Label.servePath + "/user/" + toUser,
-                type: "GET",
-                success: function (result) {
-                    Chat.addToMessageList(result.userName, result.userAvatarURL, "&nbsp;");
-                }
+                url: Label.servePath + "/chat/mark-as-read?apiKey=" + apiKey + "&fromUser=" + Chat.toUser,
+                type: "GET"
             });
+            // 加载用户
+            if (toUser !== 'FileTransfer') {
+                $.ajax({
+                    url: Label.servePath + "/user/" + toUser,
+                    type: "GET",
+                    success: function (result) {
+                        Chat.addToMessageList(result.userName, result.userAvatarURL, "&nbsp;");
+                    }
+                });
+            }
         }
         // 加载最近聊天列表
         setTimeout(function () {
@@ -46,6 +48,24 @@ var Chat = {
                 }
             });
         }, 100);
+
+        $(function () {
+            // 加载未读
+            setTimeout(function () {
+                $.ajax({
+                    url: Label.servePath + '/chat/has-unread?apiKey=' + apiKey,
+                    type: 'GET',
+                    success: function (result) {
+                        let count = result.result;
+                        let list = result.data;
+                        list.forEach((data) => {
+                            console.log(data.senderUserName);
+                            $("#chatTo" + data.senderUserName).css("background-color", "#fff4eb");
+                        });
+                    }
+                });
+            }, 200);
+        });
 
         if (toUser === "") {
             // 未选定用户
@@ -158,28 +178,11 @@ var Chat = {
                     })
                 }, 10000);
             }
-            // 加载未读
             $(function () {
-                setTimeout(function () {
-                    $.ajax({
-                        url: Label.servePath + '/chat/has-unread?apiKey=' + apiKey,
-                        type: 'GET',
-                        success: function (result) {
-                            let count = result.result;
-                            let list = result.data;
-                            list.forEach((data) => {
-                                console.log(data.senderUserName);
-                                $("#chatTo" + data.senderUserName).css("background-color", "#fff4eb");
-                            });
-                        }
-                    });
-                }, 150);
-            });
-            // 对话中的用户深色
-            $(function () {
+                // 对话中的用户深色
                 setTimeout(function () {
                     $("#chatTo" + toUser).css("background-color", "#f1f1f1");
-                }, 155);
+                }, 220);
             });
             // 监听滑动
             Chat.loadMore();
