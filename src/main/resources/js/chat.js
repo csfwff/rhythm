@@ -13,6 +13,16 @@ var Chat = {
             $("#chatStatus").html('和 ' +
                 '<a href="' + Label.servePath + '/member/' + toUser + '">' + toUser + '</a> ' +
                 '聊天中');
+            // 显示按钮
+            $("#buttons").show();
+            // 显示翻页
+            $(".pagination__chat").show();
+            // 监听按钮
+            $("#sendChatBtn").on('click', function () {
+                Chat.send();
+            });
+            // 加载最近聊天列表
+
             // 加载编辑器
             Chat.editor = Util.newVditor({
                 id: 'messageContent',
@@ -41,12 +51,11 @@ var Chat = {
                             'help',
                         ],
                     },
-                ]
-            })
-            // 显示按钮
-            $("#buttons").show();
-            // 显示翻页
-            $(".pagination__chat").show();
+                ],
+                ctrlEnter: function () {
+                    Chat.send();
+                }
+            });
             // 连接WS
             Chat.ws = new WebSocket(chatChannelURL + toUser);
             Chat.ws.onopen = function () {
@@ -54,23 +63,29 @@ var Chat = {
             }
             Chat.ws.onmessage = function (evt) {
                 var data = JSON.parse(evt.data)
-                console.log(data);
-                let oId = data.oId;
-                let toId = data.toId;
-                let fromId = data.fromId;
-                let time = data.time;
-                let content = data.content;
-                let user_session = data.user_session;
-                let senderUserName = data.senderUserName;
-                let senderAvatar = data.senderAvatar;
-                let receiverUserName = data.receiverUserName;
-                let receiverAvatar = data.receiverAvatar;
-                if (senderUserName === Label.currentUserName) {
-                    // 我发送的
-                    Chat.addSelfMsg(oId, senderUserName, senderAvatar, content, time);
+                if (data.code === -1) {
+                    $('#chatContentTip').
+                    addClass('error').
+                    html('<ul><li>' + data.msg + '</li></ul>');
                 } else {
-                    // 他发给我的
-                    Chat.addTargetMsg(oId, senderUserName, senderAvatar, content, time);
+                    $('#chatContentTip').removeClass('error succ').html('')
+                    let oId = data.oId;
+                    let toId = data.toId;
+                    let fromId = data.fromId;
+                    let time = data.time;
+                    let content = data.content;
+                    let user_session = data.user_session;
+                    let senderUserName = data.senderUserName;
+                    let senderAvatar = data.senderAvatar;
+                    let receiverUserName = data.receiverUserName;
+                    let receiverAvatar = data.receiverAvatar;
+                    if (senderUserName === Label.currentUserName) {
+                        // 我发送的
+                        Chat.addSelfMsg(oId, senderUserName, senderAvatar, content, time);
+                    } else {
+                        // 他发给我的
+                        Chat.addTargetMsg(oId, senderUserName, senderAvatar, content, time);
+                    }
                 }
             }
             Chat.ws.onclose = function () {
@@ -97,11 +112,18 @@ var Chat = {
                     })
                 }, 10000);
             }
-            // 监听按钮
-            $("#sendChatBtn").on('click', function () {
-                Chat.ws.send(Chat.editor.getValue());
-                Chat.editor.setValue('');
-            });
+        }
+    },
+
+    send() {
+        let content = Chat.editor.getValue();
+        if (content.length > 1024) {
+            $('#chatContentTip').
+            addClass('error').
+            html('<ul><li>发送失败：超过 1024 字符，请修改后重试。</li></ul>');
+        } else {
+            Chat.ws.send(content);
+            Chat.editor.setValue('');
         }
     },
 

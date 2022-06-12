@@ -154,8 +154,13 @@ public class ChatProcessor {
                     info.put("receiverUserName", "文件传输助手");
                     info.put("receiverAvatar", "https://file.fishpi.cn/2022/06/e1541bfe4138c144285f11ea858b6bf6-ba777366.jpeg");
                 }
+                // 将content过滤为纯文本
+                String content = info.optString("content");
+                String preview = content.replaceAll("[^a-zA-Z0-9\\u4E00-\\u9FA5]", "");
+                info.put("preview", preview.length() > 20 ? preview.substring(0, 20) : preview);
             }
-            context.renderJSON(new JSONObject().put("result", 0).put("data", infoList));
+            context.renderJSON(new JSONObject().put("result", 0)
+                    .put("data", infoList.size() > 10 ? infoList.subList(0, 10) : infoList));
         } catch (Exception e) {
             context.renderJSON(new JSONObject()
                     .put("result", -1)

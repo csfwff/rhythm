@@ -53,6 +53,7 @@
             <br>
             <div id="messageContent"></div>
             <br>
+            <div class="tip fn-left" id="chatContentTip"></div>
             <div class="fn-clear" id="buttons" style="display: none">
                 <div class="fn-right">
                     <button class="green" id="sendChatBtn">发送</button>
