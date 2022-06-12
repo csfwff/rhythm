@@ -1,11 +1,14 @@
 var Chat = {
     init: function () {
+        // 获取消息列表
+
+
         let toUser = getQueryVariable("toUser");
         if (toUser === "") {
-            // 未选定用户，获取消息列表
+            // 未选定用户
             $("#chatStatus").html('请在左侧列表选择最近聊天的成员，或直接发起聊天。');
         } else {
-            // 已选定用户，获取消息列表并获取第一页聊天信息
+            // 已选定用户，获取第一页聊天信息
             // 状态
             $("#chatStatus").html('和 ' +
                 '<a href="' + Label.servePath + '/member/' + toUser + '">' + toUser + '</a> ' +
@@ -44,7 +47,40 @@ var Chat = {
             $("#buttons").show();
             // 显示翻页
             $(".pagination__chat").show();
-            $("#chatMessageList")
+            // 连接WS
+            Chat.ws = new WebSocket(chatChannelURL + toUser);
+
+            Chat.ws.onopen = function () {
+                console.log("Connected to chat channel websocket.")
+            }
+            Chat.ws.onmessage = function (evt) {
+                var data = JSON.parse(evt.data)
+                console.log(data);
+            }
+            Chat.ws.onclose = function () {
+                console.log("Disconnected to chat channel websocket.")
+                setInterval(function () {
+                    $.ajax({
+                        url: Label.servePath + "/shop",
+                        method: "get",
+                        success: function() {
+                            location.reload();
+                        }
+                    })
+                }, 10000);
+            }
+            Chat.ws.onerror = function (err) {
+                console.log('ERROR', err)
+                setInterval(function () {
+                    $.ajax({
+                        url: Label.servePath + "/shop",
+                        method: "get",
+                        success: function() {
+                            location.reload();
+                        }
+                    })
+                }, 10000);
+            }
         }
     },
 
