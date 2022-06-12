@@ -8,7 +8,6 @@ import org.b3log.latke.http.renderer.AbstractFreeMarkerRenderer;
 import org.b3log.latke.ioc.BeanManager;
 import org.b3log.latke.ioc.Inject;
 import org.b3log.latke.ioc.Singleton;
-import org.b3log.latke.model.Pagination;
 import org.b3log.latke.model.User;
 import org.b3log.latke.repository.*;
 import org.b3log.latke.util.Crypts;
@@ -54,7 +53,30 @@ public class ChatProcessor {
         Dispatcher.get("/chat/has-unread", chatProcessor::hasUnreadChatMessage, apiCheck::handle);
         Dispatcher.get("/chat/get-list", chatProcessor::getList, apiCheck::handle);
         Dispatcher.get("/chat/get-message", chatProcessor::getMessage, apiCheck::handle);
+        Dispatcher.get("/chat/mark-as-read", chatProcessor::markAsRead, apiCheck::handle);
+    }
 
+    public void markAsRead(final RequestContext context) {
+        context.renderJSON(new JSONObject().put("result", 0));
+        JSONObject currentUser = ApiProcessor.getUserByKey(context.param("apiKey"));
+        String userId = currentUser.optString(Keys.OBJECT_ID);
+        try {
+            String fromUser = context.param("fromUser");
+            JSONObject fromUserJSON = userQueryService.getUserByName(fromUser);
+            String fromUserId = fromUserJSON.optString(Keys.OBJECT_ID);
+            final Transaction transaction = chatUnreadRepository.beginTransaction();
+            Query query = new Query()
+                    .setFilter(CompositeFilterOperator.and(
+                            new PropertyFilter("fromId", FilterOperator.EQUAL, fromUserId),
+                            new PropertyFilter("toId", FilterOperator.EQUAL, userId)
+                    ));
+            chatUnreadRepository.remove(query);
+            transaction.commit();
+        } catch (Exception e) {
+            context.renderJSON(new JSONObject()
+                    .put("result", -1)
+                    .put("msg", "标记为已读失败 " + e.getMessage()));
+        }
     }
 
     public void getMessage(final RequestContext context) {
@@ -293,11 +315,12 @@ public class ChatProcessor {
         JSONObject currentUser = ApiProcessor.getUserByKey(context.param("apiKey"));
         String userId = currentUser.optString(Keys.OBJECT_ID);
 
-        Query query = new Query().setFilter(new PropertyFilter("fromId", FilterOperator.EQUAL, userId));
+        Query query = new Query().setFilter(new PropertyFilter("toId", FilterOperator.EQUAL, userId));
         try {
             List<JSONObject> result = chatUnreadRepository.getList(query);
             if (result != null) {
-                context.renderJSON(new JSONObject().put("result", result.size()));
+                context.renderJSON(new JSONObject().put("result", result.size())
+                        .put("data", result));
             }
         } catch (RepositoryException ignored) {
         }

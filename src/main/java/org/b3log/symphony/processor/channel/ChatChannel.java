@@ -28,6 +28,8 @@ import org.b3log.latke.ioc.Singleton;
 import org.b3log.latke.model.User;
 import org.b3log.latke.repository.RepositoryException;
 import org.b3log.latke.repository.Transaction;
+import org.b3log.symphony.model.Common;
+import org.b3log.symphony.model.Notification;
 import org.b3log.symphony.model.UserExt;
 import org.b3log.symphony.processor.ApiProcessor;
 import org.b3log.symphony.processor.ChatProcessor;
@@ -232,6 +234,12 @@ public class ChatChannel implements WebSocketChannel {
                     session.sendText(info.toString());
                 }
             }
+            // 给接收者发送通知
+            final JSONObject cmd = new JSONObject();
+            cmd.put(UserExt.USER_T_ID, toId);
+            cmd.put(Common.COMMAND, "newIdleChatMessage");
+
+            UserChannel.sendCmd(cmd);
         } catch (RepositoryException e) {
             result.put("code", -1);
             result.put("msg", "发送出错，" + e.getMessage());

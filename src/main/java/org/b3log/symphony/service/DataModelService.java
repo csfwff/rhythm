@@ -386,16 +386,18 @@ public class DataModelService {
         try {
             JSONObject user = Sessions.getUser();
             String userId = user.optString(Keys.OBJECT_ID);
+            List<JSONObject> result = new ArrayList<>();
             int unread = 0;
-            Query query = new Query().setFilter(new PropertyFilter("fromId", FilterOperator.EQUAL, userId));
+            Query query = new Query().setFilter(new PropertyFilter("toId", FilterOperator.EQUAL, userId));
             try {
-                List<JSONObject> result = chatUnreadRepository.getList(query);
+                result = chatUnreadRepository.getList(query);
                 if (result != null) {
                     unread = result.size();
                 }
             } catch (RepositoryException ignored) {
             }
             dataModel.put("unreadChat", unread);
+            dataModel.put("unreadChatList", result);
         } catch (Exception ignored) {
         }
 
