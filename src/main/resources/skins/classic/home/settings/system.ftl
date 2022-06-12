@@ -103,7 +103,7 @@
                                     </a>
                                 </div>
                                 <div class="fn__shrink">
-                                    <a class="green small btn" href="${servePath}/idle-talk?toUser=${currentUser.userName}" rel="nofollow">
+                                    <a class="green small btn" href="${servePath}/chat?toUser=${currentUser.userName}" rel="nofollow">
                                         私信
                                     </a>
                                 </div>

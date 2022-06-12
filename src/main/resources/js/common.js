@@ -1529,7 +1529,7 @@ var Util = {
           html += '<span style="background-color:rgba(0,0,0,0.54);color:#fff;font-size:12px;line-height:20px;border-radius:3px;height:20px;display:inline-block;padding:0 5px;vertical-align:middle;box-sizing:border-box;">离线</span>';
         }
         html += '                <div class="fn__shrink">\n' +
-            '                    <a class="green small btn" href="' + Label.servePath + '/idle-talk?toUser=' + userName + '" rel="nofollow">\n' +
+            '                    <a class="green small btn" href="' + Label.servePath + '/chat?toUser=' + userName + '" rel="nofollow">\n' +
             '                        私信\n' +
             '                    </a>\n';
         if (canFollow === "yes") {

@@ -34,21 +34,21 @@
     <div class="wrapper">
         <div class="side">
             <div class="module person-info" id="chatMessageList">
-                <div class="module-panel" style="padding: 10px 15px;cursor: pointer" onclick="location.href = Label.servePath + '/chat?toUser=FileTransfer'">
+                <div class="module-panel" id="chatToFileTransfer" style="padding: 10px 15px;cursor: pointer" onclick="location.href = Label.servePath + '/chat?toUser=FileTransfer'">
                     <nav class="home-menu">
                         <div class="avatar"
                              style="display: inline-block; background-image:url('https://file.fishpi.cn/2022/06/e1541bfe4138c144285f11ea858b6bf6-ba777366.jpeg')">
                         </div>
                         <div style="display: inline-block; vertical-align: -12px;">
                             文件传输助手<br>
-                            <span style="color: #868888">跨端传输文本/文件</span>
+                            <span id="fileTransferMsg" style="color: #868888">跨端传输文本/文件</span>
                         </div>
                     </nav>
                 </div>
             </div>
         </div>
-        <div class="content chat-room" style="margin-left: 15px; padding: 10px">
-            <div class="ft__gray ft__center" id="chatStatus">
+        <div class="content chat-room" style="padding: 10px">
+            <div class="ft__gray" style="text-align: center" id="chatStatus">
             </div>
             <br>
             <div id="messageContent"></div>

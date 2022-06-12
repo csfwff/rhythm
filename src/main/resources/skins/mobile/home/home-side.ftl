@@ -30,7 +30,7 @@
 
             <div>
                 <#if isLoggedIn && (currentUser.userName != user.userName)>
-                    <button class="green small" onclick="window.location.href = '${servePath}/idle-talk?toUser=${user.userName}'">
+                    <button class="green small" onclick="window.location.href = '${servePath}/chat?toUser=${user.userName}'">
                         ${privateMessageLabel}
                     </button>
                 </#if>

@@ -203,6 +203,8 @@ public class ChatChannel implements WebSocketChannel {
             String html = ChatProcessor.processMarkdown(markdown);
             info.put("content", html);
             info.put("markdown", markdown);
+            String preview = markdown.replaceAll("[^a-zA-Z0-9\\u4E00-\\u9FA5]", "");
+            info.put("preview", preview.length() > 20 ? preview.substring(0, 20) : preview);
             // 嵌入用户信息
             JSONObject senderJSON = userQueryService.getUser(fromId);
             info.put("senderUserName", senderJSON.optString(User.USER_NAME));

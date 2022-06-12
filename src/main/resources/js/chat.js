@@ -1,9 +1,45 @@
 var Chat = {
     init: function () {
-        // 获取消息列表
-
-
         let toUser = getQueryVariable("toUser");
+
+        // 加载用户
+        if (toUser !== 'FileTransfer') {
+            $.ajax({
+                url: Label.servePath + "/user/" + toUser,
+                type: "GET",
+                success: function (result) {
+                    Chat.addToMessageList(result.userName, result.userAvatarURL, "&nbsp;");
+                }
+            });
+        }
+        // 加载最近聊天列表
+        setTimeout(function () {
+            $.ajax({
+                url: Label.servePath + '/chat/get-list?apiKey=' + apiKey,
+                type: 'GET',
+                success: function (result) {
+                    if (0 === result.result) {
+                        let data = result.data;
+                        data.forEach((userData) => {
+                            if (userData.receiverUserName === '文件传输助手') {
+                                $("#fileTransferMsg").html(userData.preview);
+                            } else {
+                                if (userData.senderUserName != Label.currentUserName) {
+                                    if ($("#chatTo" + userData.senderUserName).length <= 0) {
+                                        Chat.addToMessageList(userData.senderUserName, userData.senderAvatar, userData.preview);
+                                    }
+                                } else {
+                                    if ($("#chatTo" + userData.receiverUserName).length <= 0) {
+                                        Chat.addToMessageList(userData.receiverUserName, userData.receiverAvatar, userData.preview);
+                                    }
+                                }
+                            }
+                        });
+                    }
+                }
+            });
+        }, 100);
+
         if (toUser === "") {
             // 未选定用户
             $("#chatStatus").html('请在左侧列表选择最近聊天的成员，或直接发起聊天。');
@@ -21,8 +57,6 @@ var Chat = {
             $("#sendChatBtn").on('click', function () {
                 Chat.send();
             });
-            // 加载最近聊天列表
-
             // 加载编辑器
             Chat.editor = Util.newVditor({
                 id: 'messageContent',
@@ -74,17 +108,22 @@ var Chat = {
                     let fromId = data.fromId;
                     let time = data.time;
                     let content = data.content;
+                    let preview = data.preview.substring(0, 10);
+                    let dot = data.preview.length > 10 ? "..." : "";
                     let user_session = data.user_session;
                     let senderUserName = data.senderUserName;
                     let senderAvatar = data.senderAvatar;
                     let receiverUserName = data.receiverUserName;
                     let receiverAvatar = data.receiverAvatar;
+                    // 添加消息
                     if (senderUserName === Label.currentUserName) {
                         // 我发送的
                         Chat.addSelfMsg(oId, senderUserName, senderAvatar, content, time);
+                        $("#chatTo" + receiverUserName).find("span").html(preview + dot);
                     } else {
                         // 他发给我的
                         Chat.addTargetMsg(oId, senderUserName, senderAvatar, content, time);
+                        $("#chatTo" + senderUserName).find("span").html(preview + dot);
                     }
                 }
             }
@@ -112,6 +151,12 @@ var Chat = {
                     })
                 }, 10000);
             }
+            // 对话中的用户深色
+            $(function () {
+                setTimeout(function () {
+                    $("#chatTo" + toUser).css("background-color", "#f1f1f1");
+                }, 100);
+            });
         }
     },
 
@@ -127,16 +172,17 @@ var Chat = {
         }
     },
 
-    loadMessageList() {
+    addToMessageList(userName, avatarURL, preview) {
+        let dot = preview.length > 10 ? "..." : "";
         $("#chatMessageList").append('' +
-            '<div class="module-panel" style="padding: 10px 15px">\n' +
+            '<div class="module-panel" id="chatTo' + userName + '" style="padding: 10px 15px;cursor: pointer" onclick="location.href = Label.servePath + \'/chat?toUser=' + userName + '\'"\n' +
             '    <nav class="home-menu">\n' +
             '        <div class="avatar"\n' +
-            '             style="display: inline-block; background-image:url(https://pwl.stackoverflow.wiki/2021/09/1552202503861_1562141298909-67b099fd.jpeg)">\n' +
+            '             style="display: inline-block; background-image:url(' + avatarURL + ')">\n' +
             '        </div>\n' +
             '        <div style="display: inline-block; vertical-align: -12px;">\n' +
-            '            adlered<br>\n' +
-            '            <span style="color: #868888">最近一条消息</span>\n' +
+            '            ' + userName + '<br>\n' +
+            '            <span style="color: #868888">' + preview.substring(0, 10) + dot + '</span>\n' +
             '        </div>\n' +
             '    </nav>\n' +
             '</div>');

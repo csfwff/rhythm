@@ -43,7 +43,7 @@
     <div class="wrapper">
         <div class="side" style="margin-bottom: 25px">
             <div class="module person-info" id="chatMessageList">
-                <div class="module-panel" style="padding: 10px 15px;cursor: pointer"
+                <div class="module-panel" id="chatToFileTransfer" style="padding: 10px 15px;cursor: pointer"
                      onclick="location.href = Label.servePath + '/chat?toUser=FileTransfer'">
                     <nav class="home-menu">
                         <div class="avatar"
@@ -51,7 +51,7 @@
                         </div>
                         <div style="display: inline-block; vertical-align: -12px;">
                             文件传输助手<br>
-                            <span style="color: #868888">跨端传输文本/文件</span>
+                            <span id="fileTransferMsg" style="color: #868888">跨端传输文本/文件</span>
                         </div>
                     </nav>
                 </div>

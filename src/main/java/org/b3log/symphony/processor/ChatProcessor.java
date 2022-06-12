@@ -110,6 +110,7 @@ public class ChatProcessor {
                     if (chatInfo.size() > 0) {
                         JSONObject result = chatInfo.get(0);
                         Iterator<JSONObject> iterator = infoList.iterator();
+                        boolean add = true;
                         while (iterator.hasNext()) {
                             JSONObject info = iterator.next();
                             String iFromId = info.optString("fromId");
@@ -121,12 +122,16 @@ public class ChatProcessor {
                                 long iOId = Long.parseLong(info.optString(Keys.OBJECT_ID));
                                 long rOId = Long.parseLong(result.optString(Keys.OBJECT_ID));
                                 if (rOId > iOId) {
+                                    // 替换
                                     iterator.remove();
-                                    forMeList.add(result);
+                                } else {
+                                    // 不加入这个
+                                    add = false;
                                 }
-                            } else {
-                                forMeList.add(result);
                             }
+                        }
+                        if (add) {
+                            forMeList.add(result);
                         }
                     }
                 } catch (Exception ignored) {
@@ -158,9 +163,21 @@ public class ChatProcessor {
                 String content = info.optString("content");
                 String preview = content.replaceAll("[^a-zA-Z0-9\\u4E00-\\u9FA5]", "");
                 info.put("preview", preview.length() > 20 ? preview.substring(0, 20) : preview);
+                String markdown = info.optString("content");
+                String html = ChatProcessor.processMarkdown(markdown);
+                info.put("content", html);
+                info.put("markdown", markdown);
             }
+            int listLength = 10;
+            List<JSONObject> resultList = infoList.size() > listLength ? infoList.subList(0, listLength) : infoList;
+            Collections.sort(resultList, new Comparator<JSONObject>() {
+                @Override
+                public int compare(JSONObject o1, JSONObject o2) {
+                    return o2.optLong(Keys.OBJECT_ID) > o1.optLong(Keys.OBJECT_ID) ? 1 : -1;
+                }
+            });
             context.renderJSON(new JSONObject().put("result", 0)
-                    .put("data", infoList.size() > 10 ? infoList.subList(0, 10) : infoList));
+                    .put("data", resultList));
         } catch (Exception e) {
             context.renderJSON(new JSONObject()
                     .put("result", -1)
