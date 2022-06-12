@@ -21,9 +21,9 @@ import org.b3log.symphony.processor.middleware.LoginCheckMidware;
 import org.b3log.symphony.repository.ChatInfoRepository;
 import org.b3log.symphony.repository.ChatUnreadRepository;
 import org.b3log.symphony.service.DataModelService;
+import org.b3log.symphony.service.ShortLinkQueryService;
 import org.b3log.symphony.service.UserQueryService;
-import org.b3log.symphony.util.Sessions;
-import org.b3log.symphony.util.Symphonys;
+import org.b3log.symphony.util.*;
 import org.json.JSONObject;
 
 import java.util.*;
@@ -208,5 +208,19 @@ public class ChatProcessor {
             }
         } catch (RepositoryException ignored) {
         }
+    }
+
+    public static String processMarkdown(String content) {
+        final BeanManager beanManager = BeanManager.getInstance();
+        final ShortLinkQueryService shortLinkQueryService = beanManager.getReference(ShortLinkQueryService.class);
+        content = shortLinkQueryService.linkArticle(content);
+        content = Emotions.toAliases(content);
+        content = Emotions.convert(content);
+        content = Markdowns.toHTML(content);
+        content = Markdowns.clean(content, "");
+        content = MediaPlayers.renderAudio(content);
+        content = MediaPlayers.renderVideo(content);
+
+        return content;
     }
 }

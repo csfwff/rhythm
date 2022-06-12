@@ -152,7 +152,7 @@ var Chat = {
             '    <div class="chats__content">\n' +
             '        <div class="chats__arrow"></div>\n' +
             '        <div style="margin-top: 4px" class="vditor-reset ft__smaller ">\n' +
-            '            <p>' + content + '</p>\n' +
+            '            ' + content + '\n' +
             '        </div>\n' +
             '        <div class="ft__smaller ft__fade fn__right date-bar">\n' +
             '            ' + time + '\n' +
@@ -172,7 +172,7 @@ var Chat = {
             '    <div class="chats__content">\n' +
             '        <div class="chats__arrow"></div>\n' +
             '        <div style="margin-top: 4px" class="vditor-reset ft__smaller ">\n' +
-            '            <p>' + content + '</p>\n' +
+            '            ' + content + '\n' +
             '        </div>\n' +
             '        <div class="ft__smaller ft__fade fn__right date-bar">\n' +
             '            ' + time + '\n' +

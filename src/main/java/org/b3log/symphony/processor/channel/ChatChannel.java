@@ -30,6 +30,7 @@ import org.b3log.latke.repository.RepositoryException;
 import org.b3log.latke.repository.Transaction;
 import org.b3log.symphony.model.UserExt;
 import org.b3log.symphony.processor.ApiProcessor;
+import org.b3log.symphony.processor.ChatProcessor;
 import org.b3log.symphony.repository.ChatInfoRepository;
 import org.b3log.symphony.repository.ChatUnreadRepository;
 import org.b3log.symphony.service.OptionQueryService;
@@ -197,6 +198,11 @@ public class ChatChannel implements WebSocketChannel {
         // 格式化并发送给WS用户
         try {
             JSONObject info = chatInfoRepository.get(chatInfoOId);
+            // 渲染 Markdown
+            String markdown = info.optString("content");
+            String html = ChatProcessor.processMarkdown(markdown);
+            info.put("content", html);
+            info.put("markdown", markdown);
             // 嵌入用户信息
             JSONObject senderJSON = userQueryService.getUser(fromId);
             info.put("senderUserName", senderJSON.optString(User.USER_NAME));
