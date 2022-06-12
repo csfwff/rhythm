@@ -1,3 +1,21 @@
+/*
+ * Rhythm - A modern community (forum/BBS/SNS/blog) platform written in Java.
+ * Modified version from Symphony, Thanks Symphony :)
+ * Copyright (C) 2012-present, b3log.org
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
 package org.b3log.symphony.processor;
 
 import org.apache.commons.lang.RandomStringUtils;
@@ -85,7 +103,14 @@ public class ChatProcessor {
         String userId = currentUser.optString(Keys.OBJECT_ID);
         try {
             String toUser = context.param("toUser");
-            JSONObject toUserJSON = userQueryService.getUserByName(toUser);
+            JSONObject toUserJSON = new JSONObject();
+            if (toUser.equals("FileTransfer")) {
+                toUserJSON.put(Keys.OBJECT_ID, "1000000000086");
+                toUserJSON.put(User.USER_NAME, "文件传输助手");
+                toUserJSON.put(UserExt.USER_AVATAR_URL, "https://file.fishpi.cn/2022/06/e1541bfe4138c144285f11ea858b6bf6-ba777366.jpeg");
+            } else {
+                toUserJSON = userQueryService.getUserByName(toUser);
+            }
             String toUserOId = toUserJSON.optString(Keys.OBJECT_ID);
             Query queryFrom = new Query()
                     .setFilter(CompositeFilterOperator.and(
