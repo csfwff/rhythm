@@ -91,6 +91,8 @@ public class ChatChannel implements WebSocketChannel {
                 session.close();
                 return;
             }
+            toUserJSON = new JSONObject();
+            toUserJSON.put(Keys.OBJECT_ID, "1000000000086");
         }
         String toUserId = toUserJSON.optString(Keys.OBJECT_ID);
         String userId = user.optString(Keys.OBJECT_ID);
@@ -198,8 +200,10 @@ public class ChatChannel implements WebSocketChannel {
             // 组合反向user_session
             String targetUserSession = toId + fromId;
             final Set<WebSocketSession> sessions = SESSIONS.get(targetUserSession);
-            for (final WebSocketSession session : sessions) {
-                session.sendText(info.toString());
+            if (sessions != null) {
+                for (final WebSocketSession session : sessions) {
+                    session.sendText(info.toString());
+                }
             }
         } catch (RepositoryException e) {
             result.put("code", -1);
