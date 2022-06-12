@@ -15,18 +15,19 @@ import org.b3log.latke.repository.PropertyFilter;
 import org.b3log.latke.repository.Query;
 import org.b3log.latke.repository.RepositoryException;
 import org.b3log.latke.util.Crypts;
-import org.b3log.latke.util.Paginator;
+import org.b3log.symphony.model.UserExt;
 import org.b3log.symphony.processor.middleware.ApiCheckMidware;
 import org.b3log.symphony.processor.middleware.LoginCheckMidware;
 import org.b3log.symphony.repository.ChatInfoRepository;
 import org.b3log.symphony.repository.ChatUnreadRepository;
 import org.b3log.symphony.service.DataModelService;
+import org.b3log.symphony.service.UserQueryService;
 import org.b3log.symphony.util.Sessions;
 import org.b3log.symphony.util.Symphonys;
 import org.json.JSONObject;
 
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Singleton
 public class ChatProcessor {
@@ -39,6 +40,9 @@ public class ChatProcessor {
 
     @Inject
     private DataModelService dataModelService;
+
+    @Inject
+    private UserQueryService userQueryService;
 
     /**
      * Register request handlers.
@@ -67,14 +71,91 @@ public class ChatProcessor {
         JSONObject currentUser = ApiProcessor.getUserByKey(context.param("apiKey"));
         String userId = currentUser.optString(Keys.OBJECT_ID);
         try {
-            List<JSONObject> chatUsers = chatInfoRepository.select(
+            List<JSONObject> chatUsersFrom = chatInfoRepository.select(
                     "SELECT DISTINCT toId " +
                             "FROM " + chatInfoRepository.getName() + " " +
-                            "WHERE fromId = '" + userId + "' LIMIT ?", 1);
-            for (JSONObject chatUser : chatUsers) {
-                String toId = chatUser.optString("toId");
+                            "WHERE fromId = ?", userId);
+            List<JSONObject> chatUsersTo = chatInfoRepository.select(
+                    "SELECT DISTINCT fromId " +
+                            "FROM " + chatInfoRepository.getName() + " " +
+                            "WHERE toId = ?", userId);
 
+            List<JSONObject> infoList = new LinkedList<>();
+            // 加载我发送的
+            for (JSONObject chatUser : chatUsersFrom) {
+                String toId = chatUser.optString("toId");
+                try {
+                    List<JSONObject> chatInfo = chatInfoRepository.select(
+                            "SELECT * FROM " + chatInfoRepository.getName() +
+                                    " WHERE fromId = ? AND toId = ? ORDER BY oId DESC LIMIT 1",
+                            userId, toId
+                    );
+                    if (chatInfo.size() > 0) {
+                        JSONObject result = chatInfo.get(0);
+                        infoList.add(result);
+                    }
+                } catch (Exception ignored) {
+                }
             }
+            // 加载发给我的（要比对时间去重）
+            List<JSONObject> forMeList = new LinkedList<>();
+            for (JSONObject chatUser : chatUsersTo) {
+                String fromId = chatUser.optString("fromId");
+                try {
+                    List<JSONObject> chatInfo = chatInfoRepository.select(
+                            "SELECT * FROM " + chatInfoRepository.getName() +
+                                    " WHERE fromId = ? AND toId = ? ORDER BY oId DESC LIMIT 1",
+                            fromId, userId
+                    );
+                    if (chatInfo.size() > 0) {
+                        JSONObject result = chatInfo.get(0);
+                        Iterator<JSONObject> iterator = infoList.iterator();
+                        while (iterator.hasNext()) {
+                            JSONObject info = iterator.next();
+                            String iFromId = info.optString("fromId");
+                            String iToId = info.optString("toId");
+                            String rFromId = result.optString("fromId");
+                            String rToId = result.optString("toId");
+                            if (iFromId.equals(rToId) && iToId.equals(rFromId)) {
+                                // 相同
+                                long iOId = Long.parseLong(info.optString(Keys.OBJECT_ID));
+                                long rOId = Long.parseLong(result.optString(Keys.OBJECT_ID));
+                                if (rOId > iOId) {
+                                    iterator.remove();
+                                    forMeList.add(result);
+                                }
+                            } else {
+                                forMeList.add(result);
+                            }
+                        }
+                    }
+                } catch (Exception ignored) {
+                }
+            }
+            List<JSONObject> forMeListDistinct = forMeList.stream().distinct().collect(Collectors.toList());
+            infoList.addAll(forMeListDistinct);
+            // 渲染用户信息
+            for (JSONObject info : infoList) {
+                String fromId = info.optString("fromId");
+                String toId = info.optString("toId");
+                JSONObject senderJSON = userQueryService.getUser(fromId);
+                if (!fromId.equals("1000000000086")) {
+                    info.put("senderUserName", senderJSON.optString(User.USER_NAME));
+                    info.put("senderAvatar", senderJSON.optString(UserExt.USER_AVATAR_URL));
+                } else {
+                    info.put("receiverUserName", "文件传输助手");
+                    info.put("receiverAvatar", "https://file.fishpi.cn/2022/06/e1541bfe4138c144285f11ea858b6bf6-ba777366.jpeg");
+                }
+                JSONObject receiverJSON = userQueryService.getUser(toId);
+                if (!toId.equals("1000000000086")) {
+                    info.put("receiverUserName", receiverJSON.optString(User.USER_NAME));
+                    info.put("receiverAvatar", receiverJSON.optString(UserExt.USER_AVATAR_URL));
+                } else {
+                    info.put("receiverUserName", "文件传输助手");
+                    info.put("receiverAvatar", "https://file.fishpi.cn/2022/06/e1541bfe4138c144285f11ea858b6bf6-ba777366.jpeg");
+                }
+            }
+            context.renderJSON(new JSONObject().put("result", 0).put("data", infoList));
         } catch (Exception e) {
             context.renderJSON(new JSONObject()
                     .put("result", -1)
