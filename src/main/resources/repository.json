@@ -2071,7 +2071,8 @@
         },
         {
           "name": "time",
-          "type": "long",
+          "type": "String",
+          "length": 19,
           "description": "发送消息时间"
         },
         {
