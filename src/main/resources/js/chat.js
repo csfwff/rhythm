@@ -158,11 +158,28 @@ var Chat = {
                     })
                 }, 10000);
             }
+            // 加载未读
+            $(function () {
+                setTimeout(function () {
+                    $.ajax({
+                        url: Label.servePath + '/chat/has-unread?apiKey=' + apiKey,
+                        type: 'GET',
+                        success: function (result) {
+                            let count = result.result;
+                            let list = result.data;
+                            list.forEach((data) => {
+                                console.log(data.senderUserName);
+                                $("#chatTo" + data.senderUserName).css("background-color", "#fff4eb");
+                            });
+                        }
+                    });
+                }, 150);
+            });
             // 对话中的用户深色
             $(function () {
                 setTimeout(function () {
                     $("#chatTo" + toUser).css("background-color", "#f1f1f1");
-                }, 100);
+                }, 155);
             });
             // 监听滑动
             Chat.loadMore();

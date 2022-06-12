@@ -397,7 +397,6 @@ public class DataModelService {
             } catch (RepositoryException ignored) {
             }
             dataModel.put("unreadChat", unread);
-            dataModel.put("unreadChatList", result);
         } catch (Exception ignored) {
         }
 

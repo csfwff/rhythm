@@ -318,6 +318,22 @@ public class ChatProcessor {
         Query query = new Query().setFilter(new PropertyFilter("toId", FilterOperator.EQUAL, userId));
         try {
             List<JSONObject> result = chatUnreadRepository.getList(query);
+            for (JSONObject info : result) {
+                String fromId = info.optString("fromId");
+                String toId = info.optString("toId");
+                JSONObject senderJSON = userQueryService.getUser(fromId);
+                if (!fromId.equals("1000000000086")) {
+                    info.put("senderUserName", senderJSON.optString(User.USER_NAME));
+                } else {
+                    info.put("receiverUserName", "文件传输助手");
+                }
+                JSONObject receiverJSON = userQueryService.getUser(toId);
+                if (!toId.equals("1000000000086")) {
+                    info.put("receiverUserName", receiverJSON.optString(User.USER_NAME));
+                } else {
+                    info.put("receiverUserName", "文件传输助手");
+                }
+            }
             if (result != null) {
                 context.renderJSON(new JSONObject().put("result", result.size())
                         .put("data", result));
