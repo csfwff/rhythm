@@ -4,6 +4,11 @@ var Chat = {
     init: function () {
         let toUser = getQueryVariable("toUser");
         Chat.toUser = toUser;
+        // 用户已读
+        $.ajax({
+            url: Label.servePath + "/chat/mark-as-read?apiKey=" + apiKey + "&fromUser=" + Chat.toUser,
+            type: "GET"
+        });
         // 加载用户
         if (toUser !== 'FileTransfer') {
             $.ajax({

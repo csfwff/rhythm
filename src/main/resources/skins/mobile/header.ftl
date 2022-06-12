@@ -39,9 +39,11 @@
             <a href="${servePath}/chat" title="私信"><svg id="idleTalkIconContainer"><use xlink:href="#idleChat"></use></svg></a>
             <#if unreadChat?? && unreadChat gt 0>
                 <script>
-                    setTimeout(function () {
-                        Util.blingChat();
-                    }, 2000);
+                    if (window.location.pathname !== "/chat") {
+                        setTimeout(function () {
+                            Util.blingChat();
+                        }, 2000);
+                    }
                 </script>
             </#if>
             <a href="${servePath}/activities" title="${activityLabel}"><svg><use xlink:href="#flag"></use></svg></a>
