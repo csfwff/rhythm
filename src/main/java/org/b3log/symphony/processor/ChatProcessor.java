@@ -64,6 +64,7 @@ public class ChatProcessor {
         context.renderJSON(new JSONObject().put("result", 0));
         JSONObject currentUser = ApiProcessor.getUserByKey(context.param("apiKey"));
         String userId = currentUser.optString(Keys.OBJECT_ID);
+
     }
 
     public void getList(final RequestContext context) {
