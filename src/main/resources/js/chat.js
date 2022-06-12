@@ -49,7 +49,6 @@ var Chat = {
             $(".pagination__chat").show();
             // 连接WS
             Chat.ws = new WebSocket(chatChannelURL + toUser);
-
             Chat.ws.onopen = function () {
                 console.log("Connected to chat channel websocket.")
             }
@@ -81,6 +80,11 @@ var Chat = {
                     })
                 }, 10000);
             }
+            // 监听按钮
+            $("#sendChatBtn").on('click', function () {
+                Chat.ws.send(Chat.editor.getValue());
+                Chat.editor.setValue('');
+            });
         }
     },
 

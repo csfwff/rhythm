@@ -65,8 +65,6 @@
             <br>
             <div class="fn-clear" id="buttons" style="display: none">
                 <div class="fn-right">
-                    <button class="red" id="rmChatBtn">全部删除</button>
-                    <span class="fn__space5"></span>
                     <button class="green" id="sendChatBtn">发送</button>
                 </div>
             </div>
