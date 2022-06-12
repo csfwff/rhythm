@@ -1182,22 +1182,22 @@ public class ChatroomProcessor {
             switch (mode) {
                 case 0:
                     msgs = chatRoomRepository.select(
-                            "(select * from " + chatRoomRepository.getName() + " where oId > '?' order by oId asc limit ?) union" +
-                                    "(select * from " + chatRoomRepository.getName() + " where oId = '?') union" +
-                                    "(select * from " + chatRoomRepository.getName() + " where oId < '?' order by oId desc limit ?) order by oId desc;",
+                            "(select * from " + chatRoomRepository.getName() + " where oId > ? order by oId asc limit ?) union" +
+                                    "(select * from " + chatRoomRepository.getName() + " where oId = ?) union" +
+                                    "(select * from " + chatRoomRepository.getName() + " where oId < ? order by oId desc limit ?) order by oId desc;",
                             oId, size, oId, oId, size
                     );
                     break;
                 case 1:
                     msgs = chatRoomRepository.select(
-                            "select * from " + chatRoomRepository.getName() + " where oId <= '?' order by oId desc limit ?",
-                            oId, size + 1
+                            "select * from " + chatRoomRepository.getName() + " where oId <= ? order by oId desc limit ?",
+                            oId, (size + 1)
                     );
                     break;
                 case 2:
                     msgs = chatRoomRepository.select(
-                            "(select * from " + chatRoomRepository.getName() + " where oId >= '?' order by oId asc limit ?) order by oId desc",
-                            oId, size + 1
+                            "(select * from " + chatRoomRepository.getName() + " where oId >= ? order by oId asc limit ?) order by oId desc",
+                            oId, (size + 1)
                     );
                     break;
                 default:
