@@ -125,11 +125,11 @@ public class UserRegisterValidationMidware {
      * @return {@code true} if it is invalid, returns {@code false} otherwise
      */
     public static boolean invalidUserName(final String name) {
-        if (name.equals("FileTransfer")) {
+        if (StringUtils.isBlank(name)) {
             return true;
         }
 
-        if (StringUtils.isBlank(name)) {
+        if (name.equals("FileTransfer")) {
             return true;
         }
 

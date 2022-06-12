@@ -16,6 +16,10 @@ var Chat = {
                     url: Label.servePath + "/user/" + toUser,
                     type: "GET",
                     success: function (result) {
+                        if (result.code === -1) {
+                            alert('指定的用户名不存在，请检查后重试！');
+                            location.href = Label.servePath + '/chat';
+                        }
                         Chat.addToMessageList(result.userName, result.userAvatarURL, "&nbsp;");
                     }
                 });
@@ -69,7 +73,14 @@ var Chat = {
 
         if (toUser === "") {
             // 未选定用户
-            $("#chatStatus").html('请在左侧列表选择最近聊天的成员，或直接发起聊天。');
+            $("#chatStatus").html('请在左侧列表选择最近聊天的成员，或直接发起聊天。<br><br>' +
+                '<input class="form" id="chatWithInput" placeholder="输入用户名">&nbsp;<button onclick="Chat.startAChat()">发起聊天</button>');
+            // 监听回车
+            $("#chatWithInput").keypress(function (e) {
+                if (e.which == 13) {
+                    Chat.startAChat();
+                }
+            });
         } else {
             // 已选定用户，获取第一页聊天信息
             // 状态
@@ -196,6 +207,13 @@ var Chat = {
                     }
                 }
             );
+        }
+    },
+
+    startAChat() {
+        let input = $("#chatWithInput").val();
+        if (input !== '') {
+            location.href = Label.servePath + '/chat?toUser=' + input;
         }
     },
 

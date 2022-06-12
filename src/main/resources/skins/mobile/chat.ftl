@@ -27,6 +27,34 @@
     </@head>
     <link rel="stylesheet" href="${staticServePath}/css/mobile-base.css?${staticResourceVersion}" />
     <link rel="stylesheet" href="${staticServePath}/css/home.css?${staticResourceVersion}"/>
+    <style>
+        .ft__center {
+            text-align: center;
+        }
+
+        .ft__gray {
+            color: var(--text-gray-color);
+        }
+
+        .form {
+            border: 1px solid rgba(0,0,0,.38);
+            background-color: #fafafa;
+            border-radius: 3px;
+            box-shadow: 0 1px 2px rgb(0 0 0 / 8%) inset;
+            padding: 7px 8px;
+            width: 130px;
+            line-height: 17px;
+            box-sizing: border-box;
+            -moz-box-sizing: border-box;
+            -webkit-box-sizing: border-box;
+        }
+
+        .form:focus {
+            background-color: #fff;
+            box-shadow: 0 1px 2px rgb(0 0 0 / 8%) inset, 0 0 5px rgb(81 167 232 / 50%);
+            border: 1px solid #51a7e8;
+        }
+    </style>
 </head>
 <body>
 <#include "header.ftl">
