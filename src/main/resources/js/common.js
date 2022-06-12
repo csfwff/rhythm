@@ -1616,9 +1616,9 @@ var Util = {
           }
           break
         case 'newIdleChatMessage':
-          if (window.location.pathname !== "/idle-talk") {
+          if (window.location.pathname !== "/chat") {
             Util.blingChat();
-            Util.notice("warning", 3000, "叮咚！你收到了一条私信。<a href='/idle-talk'>点击查看</a>");
+            Util.notice("warning", 3000, "叮咚！你收到了一条私信。<a href='/chat'>点击查看</a>");
           }
           break;
         case 'warnBroadcast':

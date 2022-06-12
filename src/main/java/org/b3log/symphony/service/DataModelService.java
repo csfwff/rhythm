@@ -28,6 +28,10 @@ import org.b3log.latke.Latkes;
 import org.b3log.latke.http.RequestContext;
 import org.b3log.latke.ioc.Inject;
 import org.b3log.latke.model.User;
+import org.b3log.latke.repository.FilterOperator;
+import org.b3log.latke.repository.PropertyFilter;
+import org.b3log.latke.repository.Query;
+import org.b3log.latke.repository.RepositoryException;
 import org.b3log.latke.service.LangPropsService;
 import org.b3log.latke.service.annotation.Service;
 import org.b3log.latke.util.Locales;
@@ -36,6 +40,7 @@ import org.b3log.symphony.Server;
 import org.b3log.symphony.cache.DomainCache;
 import org.b3log.symphony.model.*;
 import org.b3log.symphony.processor.ChatProcessor;
+import org.b3log.symphony.repository.ChatUnreadRepository;
 import org.b3log.symphony.util.Markdowns;
 import org.b3log.symphony.util.Sessions;
 import org.b3log.symphony.util.Symphonys;
@@ -140,10 +145,11 @@ public class DataModelService {
     @Inject
     private BreezemoonQueryService breezemoonQueryService;
 
-
-
     @Inject
     private SystemSettingsService settingsService;
+
+    @Inject
+    private ChatUnreadRepository chatUnreadRepository;
 
     /**
      * Fills relevant articles.
@@ -375,6 +381,22 @@ public class DataModelService {
             fillFooter(dataModel);
         } finally {
             Stopwatchs.end();
+        }
+
+        try {
+            JSONObject user = Sessions.getUser();
+            String userId = user.optString(Keys.OBJECT_ID);
+            int unread = 0;
+            Query query = new Query().setFilter(new PropertyFilter("fromId", FilterOperator.EQUAL, userId));
+            try {
+                List<JSONObject> result = chatUnreadRepository.getList(query);
+                if (result != null) {
+                    unread = result.size();
+                }
+            } catch (RepositoryException ignored) {
+            }
+            dataModel.put("unreadChat", unread);
+        } catch (Exception ignored) {
         }
 
         final String serverScheme = Latkes.getServerScheme();
