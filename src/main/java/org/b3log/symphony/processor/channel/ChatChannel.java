@@ -76,7 +76,8 @@ public class ChatChannel implements WebSocketChannel {
     public void onConnect(final WebSocketSession session) {
         JSONObject user = null;
         try {
-            user = ApiProcessor.getUserByKey(session.getParameter("apiKey"));
+            String apiKey = session.getParameter("apiKey");
+            user = ApiProcessor.getUserByKey(apiKey);
         } catch (NullPointerException ignored) {
         }
         if (null == user) {
@@ -86,8 +87,10 @@ public class ChatChannel implements WebSocketChannel {
         String toUser = session.getParameter("toUser");
         JSONObject toUserJSON = userQueryService.getUserByName(toUser);
         if (toUserJSON == null) {
-            session.close();
-            return;
+            if (!toUser.equals("FileTransfer")) {
+                session.close();
+                return;
+            }
         }
         String toUserId = toUserJSON.optString(Keys.OBJECT_ID);
         String userId = user.optString(Keys.OBJECT_ID);

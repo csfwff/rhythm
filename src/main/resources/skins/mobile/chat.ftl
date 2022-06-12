@@ -115,6 +115,6 @@
         </#if>
     }
     var apiKey = '${apiKey}';
-    var chatChannelURL = "${wsScheme}://${serverHost}:${serverPort}${contextPath}/chat-channel?apikey=" + apiKey + "&toUser=";
+    var chatChannelURL = "${wsScheme}://${serverHost}:${serverPort}${contextPath}/chat-channel?apiKey=" + apiKey + "&toUser=";
 </script>
 
