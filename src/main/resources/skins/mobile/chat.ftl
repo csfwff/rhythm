@@ -61,7 +61,7 @@
                 </div>
             </div>
             <br>
-            <div class="module" style="min-height: 200px; margin-top: 20px;">
+            <div class="module" style="min-height: 50px; margin-top: 20px;">
                 <div id="chats">
                 </div>
             </div>
