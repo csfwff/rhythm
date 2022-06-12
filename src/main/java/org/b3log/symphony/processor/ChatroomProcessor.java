@@ -1182,19 +1182,22 @@ public class ChatroomProcessor {
             switch (mode) {
                 case 0:
                     msgs = chatRoomRepository.select(
-                            "(select * from symphony_chat_room where oId > '" + oId + "' order by oId asc limit " + size + ") union" +
-                                    "(select * from symphony_chat_room where oId = '" + oId + "') union" +
-                                    "(select * from symphony_chat_room where oId < '" + oId + "' order by oId desc limit " + size + ") order by oId desc;"
+                            "(select * from " + chatRoomRepository.getName() + " where oId > '?' order by oId asc limit ?) union" +
+                                    "(select * from " + chatRoomRepository.getName() + " where oId = '?') union" +
+                                    "(select * from " + chatRoomRepository.getName() + " where oId < '?' order by oId desc limit ?) order by oId desc;",
+                            oId, size, oId, oId, size
                     );
                     break;
                 case 1:
                     msgs = chatRoomRepository.select(
-                            "select * from symphony_chat_room where oId <= '" + oId + "' order by oId desc limit " + (size + 1)
+                            "select * from " + chatRoomRepository.getName() + " where oId <= '?' order by oId desc limit ?",
+                            oId, size + 1
                     );
                     break;
                 case 2:
                     msgs = chatRoomRepository.select(
-                            "(select * from symphony_chat_room where oId >= '" + oId + "' order by oId asc limit " + (size + 1) + ") order by oId desc"
+                            "(select * from " + chatRoomRepository.getName() + " where oId >= '?' order by oId asc limit ?) order by oId desc",
+                            oId, size + 1
                     );
                     break;
                 default:

@@ -57,18 +57,31 @@ public class ChatProcessor {
     }
 
     public void getMessage(final RequestContext context) {
-
+        context.renderJSON(new JSONObject().put("result", 0));
+        JSONObject currentUser = ApiProcessor.getUserByKey(context.param("apiKey"));
+        String userId = currentUser.optString(Keys.OBJECT_ID);
     }
 
     public void getList(final RequestContext context) {
+        context.renderJSON(new JSONObject().put("result", 0));
+        JSONObject currentUser = ApiProcessor.getUserByKey(context.param("apiKey"));
+        String userId = currentUser.optString(Keys.OBJECT_ID);
+        try {
+            List<JSONObject> chatUsers = chatInfoRepository.select(
+                    "SELECT DISTINCT toId " +
+                            "FROM " + chatInfoRepository.getName() + " " +
+                            "WHERE fromId = '" + userId + "' LIMIT ?", 1);
+            for (JSONObject chatUser : chatUsers) {
+                String toId = chatUser.optString("toId");
 
+            }
+        } catch (Exception e) {
+            context.renderJSON(new JSONObject()
+                    .put("result", -1)
+                    .put("msg", "获取对象列表失败 " + e.getMessage()));
+        }
     }
 
-    /**
-     * Shows Chat index.
-     *
-     * @param context
-     */
     public void showChat(final RequestContext context) {
         final AbstractFreeMarkerRenderer renderer = new SkinRenderer(context, "chat.ftl");
         final Map<String, Object> dataModel = renderer.getDataModel();
