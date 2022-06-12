@@ -51,6 +51,17 @@ public class ChatProcessor {
         final ChatProcessor chatProcessor = beanManager.getReference(ChatProcessor.class);
         Dispatcher.get("/chat", chatProcessor::showChat, loginCheck::handle);
         Dispatcher.get("/chat/has-unread", chatProcessor::hasUnreadChatMessage, apiCheck::handle);
+        Dispatcher.get("/chat/get-list", chatProcessor::getList, apiCheck::handle);
+        Dispatcher.get("/chat/get-message", chatProcessor::getMessage, apiCheck::handle);
+
+    }
+
+    public void getMessage(final RequestContext context) {
+
+    }
+
+    public void getList(final RequestContext context) {
+
     }
 
     /**
