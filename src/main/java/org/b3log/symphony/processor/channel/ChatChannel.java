@@ -28,7 +28,7 @@ import org.b3log.latke.ioc.Singleton;
 import org.b3log.latke.model.User;
 import org.b3log.latke.repository.RepositoryException;
 import org.b3log.latke.repository.Transaction;
-import org.b3log.symphony.model.Common;
+import org.b3log.symphony.model.UserExt;
 import org.b3log.symphony.processor.ApiProcessor;
 import org.b3log.symphony.repository.ChatInfoRepository;
 import org.b3log.symphony.repository.ChatUnreadRepository;
@@ -197,6 +197,13 @@ public class ChatChannel implements WebSocketChannel {
         // 格式化并发送给WS用户
         try {
             JSONObject info = chatInfoRepository.get(chatInfoOId);
+            // 嵌入用户信息
+            JSONObject senderJSON = userQueryService.getUser(fromId);
+            info.put("senderUserName", senderJSON.optString(User.USER_NAME));
+            info.put("senderAvatar", senderJSON.optString(UserExt.USER_AVATAR_URL));
+            JSONObject receiverJSON = userQueryService.getUser(toId);
+            info.put("receiverUserName", receiverJSON.optString(User.USER_NAME));
+            info.put("receiverAvatar", receiverJSON.optString(UserExt.USER_AVATAR_URL));
             // 返回给发送者同样的拷贝
             final Set<WebSocketSession> senderSessions = SESSIONS.get(chatHex);
             if (senderSessions != null) {
@@ -206,9 +213,9 @@ public class ChatChannel implements WebSocketChannel {
             }
             // 组合反向user_session
             String targetUserSession = toId + fromId;
-            final Set<WebSocketSession> recieverSessions = SESSIONS.get(targetUserSession);
-            if (recieverSessions != null) {
-                for (final WebSocketSession session : recieverSessions) {
+            final Set<WebSocketSession> receiverSessions = SESSIONS.get(targetUserSession);
+            if (receiverSessions != null) {
+                for (final WebSocketSession session : receiverSessions) {
                     session.sendText(info.toString());
                 }
             }

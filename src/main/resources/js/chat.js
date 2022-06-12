@@ -61,7 +61,7 @@ var Chat = {
                 let user_session = data.user_session;
                 if (fromId === Label.currentUserId) {
                     // 我发送的
-
+                    Chat.addSelfMsg()
                 } else {
                     // 他发给我的
 
