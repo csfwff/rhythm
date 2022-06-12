@@ -10,10 +10,7 @@ import org.b3log.latke.ioc.Inject;
 import org.b3log.latke.ioc.Singleton;
 import org.b3log.latke.model.Pagination;
 import org.b3log.latke.model.User;
-import org.b3log.latke.repository.FilterOperator;
-import org.b3log.latke.repository.PropertyFilter;
-import org.b3log.latke.repository.Query;
-import org.b3log.latke.repository.RepositoryException;
+import org.b3log.latke.repository.*;
 import org.b3log.latke.util.Crypts;
 import org.b3log.symphony.model.UserExt;
 import org.b3log.symphony.processor.middleware.ApiCheckMidware;
@@ -64,7 +61,85 @@ public class ChatProcessor {
         context.renderJSON(new JSONObject().put("result", 0));
         JSONObject currentUser = ApiProcessor.getUserByKey(context.param("apiKey"));
         String userId = currentUser.optString(Keys.OBJECT_ID);
-
+        try {
+            String toUser = context.param("toUser");
+            JSONObject toUserJSON = userQueryService.getUserByName(toUser);
+            String toUserOId = toUserJSON.optString(Keys.OBJECT_ID);
+            Query queryFrom = new Query()
+                    .setFilter(CompositeFilterOperator.and(
+                            new PropertyFilter("fromId", FilterOperator.EQUAL, userId),
+                            new PropertyFilter("toId", FilterOperator.EQUAL, toUserOId)
+                    ))
+                    .addSort(Keys.OBJECT_ID, SortDirection.DESCENDING);
+            List<JSONObject> listFrom = chatInfoRepository.getList(queryFrom);
+            Query queryTo = new Query()
+                    .setFilter(CompositeFilterOperator.and(
+                            new PropertyFilter("fromId", FilterOperator.EQUAL, toUserOId),
+                            new PropertyFilter("toId", FilterOperator.EQUAL, userId)
+                    ))
+                    .addSort(Keys.OBJECT_ID, SortDirection.DESCENDING);
+            List<JSONObject> listTo = chatInfoRepository.getList(queryTo);
+            List<JSONObject> list = new ArrayList<>();
+            list.addAll(listFrom);
+            list.addAll(listTo);
+            listFrom = null;
+            listTo = null;
+            Collections.sort(list, new Comparator<JSONObject>() {
+                @Override
+                public int compare(JSONObject o1, JSONObject o2) {
+                    return o2.optLong(Keys.OBJECT_ID) > o1.optLong(Keys.OBJECT_ID) ? 1 : -1;
+                }
+            });
+            int page = Integer.parseInt(context.param("page"));
+            int pageSize = Integer.parseInt(context.param("pageSize"));
+            int start = (page * pageSize) - pageSize;
+            int end = (page * pageSize) - 1;
+            if (end >= list.size()) {
+                end = list.size() - 1;
+            }
+            list = list.subList(start, end + 1);
+            for (JSONObject info : list) {
+                String fromId = info.optString("fromId");
+                String toId = info.optString("toId");
+                JSONObject senderJSON = userQueryService.getUser(fromId);
+                if (!fromId.equals("1000000000086")) {
+                    info.put("senderUserName", senderJSON.optString(User.USER_NAME));
+                    info.put("senderAvatar", senderJSON.optString(UserExt.USER_AVATAR_URL));
+                } else {
+                    info.put("receiverUserName", "文件传输助手");
+                    info.put("receiverAvatar", "https://file.fishpi.cn/2022/06/e1541bfe4138c144285f11ea858b6bf6-ba777366.jpeg");
+                }
+                JSONObject receiverJSON = userQueryService.getUser(toId);
+                if (!toId.equals("1000000000086")) {
+                    info.put("receiverUserName", receiverJSON.optString(User.USER_NAME));
+                    info.put("receiverAvatar", receiverJSON.optString(UserExt.USER_AVATAR_URL));
+                } else {
+                    info.put("receiverUserName", "文件传输助手");
+                    info.put("receiverAvatar", "https://file.fishpi.cn/2022/06/e1541bfe4138c144285f11ea858b6bf6-ba777366.jpeg");
+                }
+                // 将content过滤为纯文本
+                String content = info.optString("content");
+                String preview = content.replaceAll("[^a-zA-Z0-9\\u4E00-\\u9FA5]", "");
+                info.put("preview", preview.length() > 20 ? preview.substring(0, 20) : preview);
+                String markdown = info.optString("content");
+                String html = ChatProcessor.processMarkdown(markdown);
+                info.put("content", html);
+                info.put("markdown", markdown);
+            }
+            if (start <= list.size()) {
+                context.renderJSON(new JSONObject()
+                        .put("result", 0)
+                        .put("data", list));
+            } else {
+                context.renderJSON(new JSONObject()
+                        .put("result", -1)
+                        .put("msg", "没有更多消息了"));
+            }
+        } catch (Exception e) {
+           context.renderJSON(new JSONObject()
+                   .put("result", -1)
+                   .put("msg", "获取历史记录失败 " + e.getMessage()));
+        }
     }
 
     public void getList(final RequestContext context) {

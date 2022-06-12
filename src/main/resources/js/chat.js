@@ -1,7 +1,9 @@
 var Chat = {
+    page: 1,
+    toUser: '',
     init: function () {
         let toUser = getQueryVariable("toUser");
-
+        Chat.toUser = toUser;
         // 加载用户
         if (toUser !== 'FileTransfer') {
             $.ajax({
@@ -158,6 +160,16 @@ var Chat = {
                 }, 100);
             });
         }
+    },
+
+    loadMore() {
+        $.ajax({
+            url: Label.servePath + "/chat/get-message?apiKey=" + apiKey + "&toUser=" + Chat.toUser + "&page=" + Chat.page + "&pageSize=20",
+            type: "GET",
+            success: function (result) {
+                console.log(result)
+            }
+        });
     },
 
     send() {
