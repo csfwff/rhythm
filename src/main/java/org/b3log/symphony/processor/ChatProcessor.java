@@ -266,14 +266,14 @@ public class ChatProcessor {
                 info.put("content", html);
                 info.put("markdown", markdown);
             }
-            int listLength = 10;
-            List<JSONObject> resultList = infoList.size() > listLength ? infoList.subList(0, listLength) : infoList;
-            Collections.sort(resultList, new Comparator<JSONObject>() {
+            int listLength = 50;
+            Collections.sort(infoList, new Comparator<JSONObject>() {
                 @Override
                 public int compare(JSONObject o1, JSONObject o2) {
                     return o2.optLong(Keys.OBJECT_ID) > o1.optLong(Keys.OBJECT_ID) ? 1 : -1;
                 }
             });
+            List<JSONObject> resultList = infoList.size() > listLength ? infoList.subList(0, listLength) : infoList;
             context.renderJSON(new JSONObject().put("result", 0)
                     .put("data", resultList));
         } catch (Exception e) {
