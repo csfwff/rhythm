@@ -57,7 +57,7 @@
                 </div>
             </div>
         </div>
-        <div class="content chat-room" style="margin-left: 15px; padding: 10px">
+        <div class="content chat-room" style="margin-left: 15px; padding: 20px 10px">
             <div class="ft__gray ft__center" id="chatStatus">
             </div>
             <br>

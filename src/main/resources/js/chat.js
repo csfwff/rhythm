@@ -120,11 +120,11 @@ var Chat = {
                     // 添加消息
                     if (senderUserName === Label.currentUserName) {
                         // 我发送的
-                        Chat.addSelfMsg(oId, senderUserName, senderAvatar, content, time);
+                        Chat.addSelfMsg(oId, senderUserName, senderAvatar, content, time, false);
                         $("#chatTo" + receiverUserName).find("span").html(preview + dot);
                     } else {
                         // 他发给我的
-                        Chat.addTargetMsg(oId, senderUserName, senderAvatar, content, time);
+                        Chat.addTargetMsg(oId, senderUserName, senderAvatar, content, time, false);
                         $("#chatTo" + senderUserName).find("span").html(preview + dot);
                     }
                 }
@@ -159,17 +159,61 @@ var Chat = {
                     $("#chatTo" + toUser).css("background-color", "#f1f1f1");
                 }, 100);
             });
+            // 监听滑动
+            Chat.loadMore();
+            $(window).scroll(
+                function() {
+                    var scrollTop = $(this).scrollTop();
+                    var scrollHeight = $(document).height();
+                    var windowHeight = $(this).height();
+                    if (scrollTop + windowHeight + 500 >= scrollHeight) {
+                        Chat.loadMore();
+                    }
+                }
+            );
         }
     },
 
+    noMore: false,
     loadMore() {
-        $.ajax({
-            url: Label.servePath + "/chat/get-message?apiKey=" + apiKey + "&toUser=" + Chat.toUser + "&page=" + Chat.page + "&pageSize=20",
-            type: "GET",
-            success: function (result) {
-                console.log(result)
-            }
-        });
+        if (!Chat.noMore) {
+            $.ajax({
+                url: Label.servePath + "/chat/get-message?apiKey=" + apiKey + "&toUser=" + Chat.toUser + "&page=" + Chat.page + "&pageSize=20",
+                type: "GET",
+                success: function (result) {
+                    try {
+                        result.data.length;
+                    } catch (e) {
+                        Chat.noMore = true;
+                    }
+                    if (!Chat.noMore) {
+                        Chat.page++;
+                        result.data.forEach((data) => {
+                            let oId = data.oId;
+                            let toId = data.toId;
+                            let fromId = data.fromId;
+                            let time = data.time;
+                            let content = data.content;
+                            let preview = data.preview.substring(0, 10);
+                            let dot = data.preview.length > 10 ? "..." : "";
+                            let user_session = data.user_session;
+                            let senderUserName = data.senderUserName;
+                            let senderAvatar = data.senderAvatar;
+                            let receiverUserName = data.receiverUserName;
+                            let receiverAvatar = data.receiverAvatar;
+                            // 添加消息
+                            if (senderUserName === Label.currentUserName) {
+                                // 我发送的
+                                Chat.addSelfMsg(oId, senderUserName, senderAvatar, content, time, true);
+                            } else {
+                                // 他发给我的
+                                Chat.addTargetMsg(oId, senderUserName, senderAvatar, content, time, true);
+                            }
+                        });
+                    }
+                }
+            });
+        }
     },
 
     send() {
@@ -200,43 +244,81 @@ var Chat = {
             '</div>');
     },
 
-    addSelfMsg(oId, userName, avatarURL, content, time) {
-        $("#chats").prepend('' +
-            '<div id="chat' + oId + '" class="fn__flex chats__item chats__item--me">\n' +
-            '    <a href="' + Label.servePath + '/member/' + userName + '" style="height: 38px">\n' +
-            '        <div class="avatar tooltipped__user" aria-label="' + userName + '"\n' +
-            '             style="background-image: url(' + avatarURL + ');"></div>\n' +
-            '    </a>\n' +
-            '    <div class="chats__content">\n' +
-            '        <div class="chats__arrow"></div>\n' +
-            '        <div style="margin-top: 4px" class="vditor-reset ft__smaller ">\n' +
-            '            ' + content + '\n' +
-            '        </div>\n' +
-            '        <div class="ft__smaller ft__fade fn__right date-bar">\n' +
-            '            ' + time + '\n' +
-            '        </div>\n' +
-            '    </div>\n' +
-            '</div>');
+    addSelfMsg(oId, userName, avatarURL, content, time, reverse) {
+        if (reverse === true) {
+            $("#chats").append('' +
+                '<div id="chat' + oId + '" class="fn__flex chats__item chats__item--me">\n' +
+                '    <a href="' + Label.servePath + '/member/' + userName + '" style="height: 38px">\n' +
+                '        <div class="avatar tooltipped__user" aria-label="' + userName + '"\n' +
+                '             style="background-image: url(' + avatarURL + ');"></div>\n' +
+                '    </a>\n' +
+                '    <div class="chats__content">\n' +
+                '        <div class="chats__arrow"></div>\n' +
+                '        <div style="margin-top: 4px" class="vditor-reset ft__smaller ">\n' +
+                '            ' + content + '\n' +
+                '        </div>\n' +
+                '        <div class="ft__smaller ft__fade fn__right date-bar">\n' +
+                '            ' + time + '\n' +
+                '        </div>\n' +
+                '    </div>\n' +
+                '</div>');
+        } else {
+            $("#chats").prepend('' +
+                '<div id="chat' + oId + '" class="fn__flex chats__item chats__item--me">\n' +
+                '    <a href="' + Label.servePath + '/member/' + userName + '" style="height: 38px">\n' +
+                '        <div class="avatar tooltipped__user" aria-label="' + userName + '"\n' +
+                '             style="background-image: url(' + avatarURL + ');"></div>\n' +
+                '    </a>\n' +
+                '    <div class="chats__content">\n' +
+                '        <div class="chats__arrow"></div>\n' +
+                '        <div style="margin-top: 4px" class="vditor-reset ft__smaller ">\n' +
+                '            ' + content + '\n' +
+                '        </div>\n' +
+                '        <div class="ft__smaller ft__fade fn__right date-bar">\n' +
+                '            ' + time + '\n' +
+                '        </div>\n' +
+                '    </div>\n' +
+                '</div>');
+        }
         Util.listenUserCard();
     },
 
-    addTargetMsg(oId, userName, avatarURL, content, time) {
-        $("#chats").prepend('' +
-            '<div id="chat' + oId + '" class="fn__flex chats__item">\n' +
-            '    <a href="' + Label.servePath + '/member/' + userName + '" style="height: 38px">\n' +
-            '        <div class="avatar tooltipped__user" aria-label="' + userName + '"\n' +
-            '             style="background-image: url(' + avatarURL + ');"></div>\n' +
-            '    </a>\n' +
-            '    <div class="chats__content">\n' +
-            '        <div class="chats__arrow"></div>\n' +
-            '        <div style="margin-top: 4px" class="vditor-reset ft__smaller ">\n' +
-            '            ' + content + '\n' +
-            '        </div>\n' +
-            '        <div class="ft__smaller ft__fade fn__right date-bar">\n' +
-            '            ' + time + '\n' +
-            '        </div>\n' +
-            '    </div>\n' +
-            '</div>');
+    addTargetMsg(oId, userName, avatarURL, content, time, reverse) {
+        if (reverse === true) {
+            $("#chats").append('' +
+                '<div id="chat' + oId + '" class="fn__flex chats__item">\n' +
+                '    <a href="' + Label.servePath + '/member/' + userName + '" style="height: 38px">\n' +
+                '        <div class="avatar tooltipped__user" aria-label="' + userName + '"\n' +
+                '             style="background-image: url(' + avatarURL + ');"></div>\n' +
+                '    </a>\n' +
+                '    <div class="chats__content">\n' +
+                '        <div class="chats__arrow"></div>\n' +
+                '        <div style="margin-top: 4px" class="vditor-reset ft__smaller ">\n' +
+                '            ' + content + '\n' +
+                '        </div>\n' +
+                '        <div class="ft__smaller ft__fade fn__right date-bar">\n' +
+                '            ' + time + '\n' +
+                '        </div>\n' +
+                '    </div>\n' +
+                '</div>');
+        } else {
+            $("#chats").prepend('' +
+                '<div id="chat' + oId + '" class="fn__flex chats__item">\n' +
+                '    <a href="' + Label.servePath + '/member/' + userName + '" style="height: 38px">\n' +
+                '        <div class="avatar tooltipped__user" aria-label="' + userName + '"\n' +
+                '             style="background-image: url(' + avatarURL + ');"></div>\n' +
+                '    </a>\n' +
+                '    <div class="chats__content">\n' +
+                '        <div class="chats__arrow"></div>\n' +
+                '        <div style="margin-top: 4px" class="vditor-reset ft__smaller ">\n' +
+                '            ' + content + '\n' +
+                '        </div>\n' +
+                '        <div class="ft__smaller ft__fade fn__right date-bar">\n' +
+                '            ' + time + '\n' +
+                '        </div>\n' +
+                '    </div>\n' +
+                '</div>');
+        }
         Util.listenUserCard();
     }
 }
