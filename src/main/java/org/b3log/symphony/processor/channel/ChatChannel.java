@@ -20,6 +20,8 @@ package org.b3log.symphony.processor.channel;
 
 import org.apache.commons.lang.StringUtils;
 import org.b3log.latke.Keys;
+import org.b3log.latke.event.Event;
+import org.b3log.latke.event.EventManager;
 import org.b3log.latke.http.Session;
 import org.b3log.latke.http.WebSocketChannel;
 import org.b3log.latke.http.WebSocketSession;
@@ -28,8 +30,8 @@ import org.b3log.latke.ioc.Singleton;
 import org.b3log.latke.model.User;
 import org.b3log.latke.repository.RepositoryException;
 import org.b3log.latke.repository.Transaction;
+import org.b3log.symphony.event.EventTypes;
 import org.b3log.symphony.model.Common;
-import org.b3log.symphony.model.Notification;
 import org.b3log.symphony.model.UserExt;
 import org.b3log.symphony.processor.ApiProcessor;
 import org.b3log.symphony.processor.ChatProcessor;
@@ -37,6 +39,7 @@ import org.b3log.symphony.repository.ChatInfoRepository;
 import org.b3log.symphony.repository.ChatUnreadRepository;
 import org.b3log.symphony.service.OptionQueryService;
 import org.b3log.symphony.service.UserQueryService;
+import org.b3log.symphony.util.Strings;
 import org.json.JSONObject;
 
 import java.text.SimpleDateFormat;
@@ -64,6 +67,9 @@ public class ChatChannel implements WebSocketChannel {
 
     @Inject
     private ChatUnreadRepository chatUnreadRepository;
+
+    @Inject
+    private EventManager eventManager;
 
     /**
      * Session set.
@@ -103,7 +109,7 @@ public class ChatChannel implements WebSocketChannel {
             session.close();
             return;
         }
-        String chatHex = userId + toUserId;
+        String chatHex = Strings.uniqueId(new String[]{toUserId, userId});
 
         final Set<WebSocketSession> userSessions = SESSIONS.getOrDefault(chatHex, Collections.newSetFromMap(new ConcurrentHashMap()));
 
@@ -146,7 +152,7 @@ public class ChatChannel implements WebSocketChannel {
             message.session.close();
             return;
         }
-        String chatHex = fromId + toId;
+        String chatHex = Strings.uniqueId(new String[]{fromId, toId});
         String time = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date());
         String content = message.text;
         content = StringUtils.trim(content);
@@ -226,14 +232,6 @@ public class ChatChannel implements WebSocketChannel {
                     session.sendText(info.toString());
                 }
             }
-            // 组合反向user_session
-            String targetUserSession = toId + fromId;
-            final Set<WebSocketSession> receiverSessions = SESSIONS.get(targetUserSession);
-            if (receiverSessions != null) {
-                for (final WebSocketSession session : receiverSessions) {
-                    session.sendText(info.toString());
-                }
-            }
             // 给接收者发送通知
             final JSONObject cmd = new JSONObject();
             cmd.put(UserExt.USER_T_ID, toId);
@@ -246,6 +244,8 @@ public class ChatChannel implements WebSocketChannel {
             message.session.sendText(result.toString());
             return;
         }
+
+        eventManager.fireEventAsynchronously(new Event<>(EventTypes.PRIVATE_CHAT, chatInfo));
     }
 
     /**
@@ -272,4 +272,6 @@ public class ChatChannel implements WebSocketChannel {
         Set<WebSocketSession> userSessions = SESSIONS.get(chatHex);
         userSessions.remove(session);
     }
+
+
 }

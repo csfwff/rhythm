@@ -19,6 +19,8 @@
 package org.b3log.symphony.processor;
 
 import org.apache.commons.lang.RandomStringUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.b3log.latke.Keys;
 import org.b3log.latke.http.Dispatcher;
 import org.b3log.latke.http.RequestContext;
@@ -34,6 +36,7 @@ import org.b3log.symphony.processor.middleware.ApiCheckMidware;
 import org.b3log.symphony.processor.middleware.LoginCheckMidware;
 import org.b3log.symphony.repository.ChatInfoRepository;
 import org.b3log.symphony.repository.ChatUnreadRepository;
+import org.b3log.symphony.service.ChatListService;
 import org.b3log.symphony.service.DataModelService;
 import org.b3log.symphony.service.ShortLinkQueryService;
 import org.b3log.symphony.service.UserQueryService;
@@ -46,11 +49,19 @@ import java.util.stream.Collectors;
 @Singleton
 public class ChatProcessor {
 
+    /**
+     * Logger.
+     */
+    private static final Logger LOGGER = LogManager.getLogger(ChatProcessor.class);
+
     @Inject
     private ChatUnreadRepository chatUnreadRepository;
 
     @Inject
     private ChatInfoRepository chatInfoRepository;
+
+    @Inject
+    private ChatListService chatListService;
 
     @Inject
     private DataModelService dataModelService;
@@ -186,6 +197,49 @@ public class ChatProcessor {
            context.renderJSON(new JSONObject()
                    .put("result", -1)
                    .put("msg", "获取历史记录失败 " + e.getMessage()));
+        }
+    }
+
+    public void getList2(final RequestContext context) {
+        context.renderJSON(new JSONObject().put("result", 0));
+        JSONObject currentUser = ApiProcessor.getUserByKey(context.param("apiKey"));
+        String userId = currentUser.optString(Keys.OBJECT_ID);
+        List<JSONObject> infoList = new LinkedList<>();
+        try {
+            infoList = chatListService.getChatList(userId);
+        } catch (Exception e) {
+        }
+        // 渲染用户信息
+        for (JSONObject listItem : infoList) {
+            String sessionId = listItem.optString("sessionId");
+            String[] ids = sessionId.split("_");
+            final String otherId = Arrays.stream(ids).filter(id -> !id.equals(userId)).findAny().get();
+            JSONObject senderJSON = userQueryService.getUser(otherId);
+            JSONObject info = null;
+            final String lastMessageId = listItem.optString("lastMessageId");
+            try {
+                info = chatInfoRepository.get(lastMessageId);
+                if (Objects.isNull(info)) continue;
+            } catch (Exception e) {
+                LOGGER.error("get chat info error by id: [{}]", lastMessageId);
+                continue;
+            }
+
+            if (!otherId.equals("1000000000086")) {
+                info.put("receiverUserName", senderJSON.optString(User.USER_NAME));
+                info.put("receiverAvatar", senderJSON.optString(UserExt.USER_AVATAR_URL));
+            } else {
+                info.put("receiverUserName", "文件传输助手");
+                info.put("receiverAvatar", "https://file.fishpi.cn/2022/06/e1541bfe4138c144285f11ea858b6bf6-ba777366.jpeg");
+            }
+            // 将content过滤为纯文本
+            String content = info.optString("content");
+            String preview = content.replaceAll("[^a-zA-Z0-9\\u4E00-\\u9FA5]", "");
+            info.put("preview", preview.length() > 20 ? preview.substring(0, 20) : preview);
+            String markdown = info.optString("content");
+            String html = ChatProcessor.processMarkdown(markdown);
+            info.put("content", html);
+            info.put("markdown", markdown);
         }
     }
 
