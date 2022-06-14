@@ -191,10 +191,18 @@ var Chat = {
                         // 我发送的
                         Chat.addSelfMsg(oId, senderUserName, senderAvatar, content, time, false);
                         $("#chatTo" + receiverUserName).find("span").html(preview + dot);
+                        // 新消息置顶
+                        let html = $("#chatTo" + receiverUserName).prop('outerHTML');
+                        $("#chatTo" + receiverUserName).remove();
+                        $("#chatMessageList").prepend(html);
                     } else {
                         // 他发给我的
                         Chat.addTargetMsg(oId, senderUserName, senderAvatar, content, time, false);
                         $("#chatTo" + senderUserName).find("span").html(preview + dot);
+                        // 新消息置顶
+                        let html = $("#chatTo" + senderUserName).prop('outerHTML');
+                        $("#chatTo" + senderUserName).remove();
+                        $("#chatMessageList").prepend(html);
                     }
                 }
             }
