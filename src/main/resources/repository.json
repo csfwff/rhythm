@@ -2084,6 +2084,36 @@
       ]
     },
     {
+      "name": "chat_list",
+      "description": "私聊列表",
+      "keys": [
+        {
+          "name": "oId",
+          "type": "String",
+          "length": 19,
+          "description": "主键"
+        },
+        {
+          "name": "sessionId",
+          "type": "String",
+          "length": 64,
+          "description": "两个用户的Hash"
+        },
+        {
+          "name": "time",
+          "type": "String",
+          "length": 19,
+          "description": "最新发送时间"
+        },
+        {
+          "name": "lastMessageId",
+          "type": "String",
+          "length": 19,
+          "description": "最后一条私聊消息Id"
+        }
+      ]
+    },
+    {
       "name": "chat_unread",
       "description": "私聊未读记录表",
       "keys": [
