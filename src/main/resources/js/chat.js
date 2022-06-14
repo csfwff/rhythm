@@ -195,6 +195,10 @@ var Chat = {
                         let html = $("#chatTo" + receiverUserName).prop('outerHTML');
                         $("#chatTo" + receiverUserName).remove();
                         $("#chatMessageList").prepend(html);
+                        // 文件传输助手特殊管理
+                        if (toId === '1000000000086') {
+                            $("#chatToFileTransfer").find("span").html(preview + dot);
+                        }
                     } else {
                         // 他发给我的
                         Chat.addTargetMsg(oId, senderUserName, senderAvatar, content, time, false);
