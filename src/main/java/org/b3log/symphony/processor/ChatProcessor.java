@@ -227,9 +227,8 @@ public class ChatProcessor {
             info.put("markdown", markdown);
             res.add(info);
         }
-        List<JSONObject> resultList = res.size() > 15 ? res.subList(0, 15) : res;
         context.renderJSON(new JSONObject().put("result", 0)
-                .put("data", resultList));
+                .put("data", res));
     }
 
     public void showChat(final RequestContext context) {
