@@ -39,6 +39,8 @@
                 <a style="margin-right: 0px; padding-right: 0px" target="_blank" href="https://www.lundao.pub/">论道社区</a>
                 &nbsp;｜&nbsp;
                 <a style="margin-right: 0px; padding-right: 0px" target="_blank" href="https://xyears.cn/">十年之约论坛</a>
+                &nbsp;｜&nbsp;
+                <a style="margin-right: 0px; padding-right: 0px" target="_blank" href="https://www.tsyvps.com/aff/HEHTPGYL">蓝易云</a>
             </div>
             <div class="fn-clear ft-smaller">
                 <div style="margin-top: 5px">探索</div>
