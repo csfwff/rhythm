@@ -62,7 +62,7 @@
     <div class="wrapper">
         <div class="side">
             <div class="module person-info" id="chatMessageList">
-                <div class="module-panel" id="chatToFileTransfer" style="padding: 10px 15px;cursor: pointer" onclick="location.href = Label.servePath + '/chat?toUser=FileTransfer'">
+                <div class="module-panel" id="chatToFileTransfer" style="padding: 10px 15px;cursor: pointer" onclick="Chat.init('FileTransfer')">
                     <nav class="home-menu">
                         <div class="avatar"
                              style="display: inline-block; background-image:url('https://file.fishpi.cn/2022/06/e1541bfe4138c144285f11ea858b6bf6-ba777366.jpeg')">
@@ -88,7 +88,7 @@
                 </div>
             </div>
             <br>
-            <div class="module" style="min-height: 50px; margin-top: 20px;">
+            <div class="module" style="min-height: 200px; margin-top: 20px;">
                 <div id="chats">
                 </div>
             </div>

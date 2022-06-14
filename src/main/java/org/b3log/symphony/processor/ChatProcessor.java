@@ -122,10 +122,17 @@ public class ChatProcessor {
                 receiverInfo.put(User.USER_NAME, "文件传输助手");
                 receiverInfo.put(UserExt.USER_AVATAR_URL, "https://file.fishpi.cn/2022/06/e1541bfe4138c144285f11ea858b6bf6-ba777366.jpeg");
             } else {
-                final JSONObject reciver = userQueryService.getUserByName(toUser);
-                toUserOId = reciver.optString(Keys.OBJECT_ID);
-                receiverInfo.put("receiverUserName", reciver.optString(User.USER_NAME));
-                receiverInfo.put("receiverAvatar", reciver.optString(UserExt.USER_AVATAR_URL));
+                try {
+                    final JSONObject reciver = userQueryService.getUserByName(toUser);
+                    toUserOId = reciver.optString(Keys.OBJECT_ID);
+                    receiverInfo.put("receiverUserName", reciver.optString(User.USER_NAME));
+                    receiverInfo.put("receiverAvatar", reciver.optString(UserExt.USER_AVATAR_URL));
+                } catch (NullPointerException e) {
+                    context.renderJSON(new JSONObject()
+                            .put("result", -1)
+                            .put("msg", "对象用户不存在 " + e.getMessage()));
+                    return;
+                }
             }
             sessionId = Strings.uniqueId(new String[]{userId, toUserOId});
             int page = Integer.parseInt(context.param("page"));
@@ -172,7 +179,7 @@ public class ChatProcessor {
             LOGGER.error("get chat message error in session [{}]", sessionId, e);
             context.renderJSON(new JSONObject()
                     .put("result", -1)
-                    .put("msg", "获取历史记录失败 " + e.getMessage()));
+                    .put("msg", "获取列表失败 " + e.getMessage()));
         }
     }
 

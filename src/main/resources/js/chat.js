@@ -19,35 +19,31 @@
 var Chat = {
     page: 1,
     toUser: '',
-    init: function () {
-        let toUser = getQueryVariable("toUser");
-        Chat.toUser = toUser;
-        if (toUser !== '') {
-            // 用户已读
-            $.ajax({
-                url: Label.servePath + "/chat/mark-as-read?apiKey=" + apiKey + "&fromUser=" + Chat.toUser,
-                type: "GET"
-            });
-            // 加载用户
-            if (toUser !== 'FileTransfer') {
-                $.ajax({
-                    url: Label.servePath + "/user/" + toUser,
-                    type: "GET",
-                    success: function (result) {
-                        if (result.code === -1) {
-                            alert('指定的用户名不存在，请检查后重试！');
-                            location.href = Label.servePath + '/chat';
-                        }
-                        Chat.addToMessageList(result.userName, result.userAvatarURL, "&nbsp;");
-                    }
-                });
+    init: function (to) {
+        let toUser;
+        if (to !== undefined) {
+            // 打扫战场
+            Chat.page = 1;
+            try {
+                Chat.ws.close();
+            } catch (e) {
             }
+            $("#chats").html("");
+            $("#chatTo" + Chat.toUser).css("background-color", "");
+            Chat.toUser = '';
+            Chat.noMore = false;
+            $("#chatTo" + to).css("background-color", "#f1f1f1");
+            toUser = to;
+        } else {
+            toUser = getQueryVariable("toUser");
         }
+        Chat.toUser = toUser;
         // 加载最近聊天列表
         setTimeout(function () {
             $.ajax({
                 url: Label.servePath + '/chat/get-list?apiKey=' + apiKey,
                 type: 'GET',
+                async: 'false',
                 success: function (result) {
                     if (0 === result.result) {
                         let data = result.data;
@@ -69,6 +65,30 @@ var Chat = {
                     }
                 }
             });
+
+            if (toUser !== '') {
+                // 用户已读
+                $.ajax({
+                    url: Label.servePath + "/chat/mark-as-read?apiKey=" + apiKey + "&fromUser=" + Chat.toUser,
+                    type: "GET"
+                });
+                // 加载用户
+                if (toUser !== 'FileTransfer') {
+                    $.ajax({
+                        url: Label.servePath + "/user/" + toUser,
+                        type: "GET",
+                        success: function (result) {
+                            if (result.code === -1) {
+                                alert('指定的用户名不存在，请检查后重试！');
+                                location.href = Label.servePath + '/chat';
+                            }
+                            if ($("#chatTo" + result.userName).length <= 0) {
+                                Chat.addToMessageList(result.userName, result.userAvatarURL, "&nbsp;");
+                            }
+                        }
+                    });
+                }
+            }
         }, 100);
 
         $(function () {
@@ -81,12 +101,11 @@ var Chat = {
                         let count = result.result;
                         let list = result.data;
                         list.forEach((data) => {
-                            console.log(data.senderUserName);
                             $("#chatTo" + data.senderUserName).css("background-color", "#fff4eb");
                         });
                     }
                 });
-            }, 200);
+            }, 2000);
         });
 
         if (toUser === "") {
@@ -109,10 +128,6 @@ var Chat = {
             $("#buttons").show();
             // 显示翻页
             $(".pagination__chat").show();
-            // 监听按钮
-            $("#sendChatBtn").on('click', function () {
-                Chat.send();
-            });
             // 加载编辑器
             Chat.editor = Util.newVditor({
                 id: 'messageContent',
@@ -185,27 +200,9 @@ var Chat = {
             }
             Chat.ws.onclose = function () {
                 console.log("Disconnected to chat channel websocket.")
-                setInterval(function () {
-                    $.ajax({
-                        url: Label.servePath + "/shop",
-                        method: "get",
-                        success: function() {
-                            location.reload();
-                        }
-                    })
-                }, 10000);
             }
             Chat.ws.onerror = function (err) {
                 console.log('ERROR', err)
-                setInterval(function () {
-                    $.ajax({
-                        url: Label.servePath + "/shop",
-                        method: "get",
-                        success: function() {
-                            location.reload();
-                        }
-                    })
-                }, 10000);
             }
             $(function () {
                 // 对话中的用户深色
@@ -213,8 +210,8 @@ var Chat = {
                     $("#chatTo" + toUser).css("background-color", "#f1f1f1");
                 }, 220);
             });
-            // 监听滑动
             Chat.loadMore();
+            // 监听滑动
             $(window).scroll(
                 function() {
                     var scrollTop = $(this).scrollTop();
@@ -231,49 +228,55 @@ var Chat = {
     startAChat() {
         let input = $("#chatWithInput").val();
         if (input !== '') {
-            location.href = Label.servePath + '/chat?toUser=' + input;
+            Chat.init(input);
         }
     },
 
     noMore: false,
+    moreLock: false,
     loadMore() {
-        if (!Chat.noMore) {
-            $.ajax({
-                url: Label.servePath + "/chat/get-message?apiKey=" + apiKey + "&toUser=" + Chat.toUser + "&page=" + Chat.page + "&pageSize=20",
-                type: "GET",
-                success: function (result) {
-                    try {
-                        result.data.length;
-                    } catch (e) {
-                        Chat.noMore = true;
+        if (!Chat.moreLock) {
+            Chat.moreLock = true;
+            if (!Chat.noMore) {
+                $.ajax({
+                    url: Label.servePath + "/chat/get-message?apiKey=" + apiKey + "&toUser=" + Chat.toUser + "&page=" + Chat.page + "&pageSize=20",
+                    type: "GET",
+                    async: "false",
+                    success: function (result) {
+                        try {
+                            result.data.length;
+                        } catch (e) {
+                            Chat.noMore = true;
+                        }
+                        if (!Chat.noMore) {
+                            Chat.page++;
+                            result.data.forEach((data) => {
+                                let oId = data.oId;
+                                let toId = data.toId;
+                                let fromId = data.fromId;
+                                let time = data.time;
+                                let content = data.content;
+                                let preview = data.preview.substring(0, 10);
+                                let dot = data.preview.length > 10 ? "..." : "";
+                                let user_session = data.user_session;
+                                let senderUserName = data.senderUserName;
+                                let senderAvatar = data.senderAvatar;
+                                let receiverUserName = data.receiverUserName;
+                                let receiverAvatar = data.receiverAvatar;
+                                // 添加消息
+                                if (senderUserName === Label.currentUserName) {
+                                    // 我发送的
+                                    Chat.addSelfMsg(oId, senderUserName, senderAvatar, content, time, true);
+                                } else {
+                                    // 他发给我的
+                                    Chat.addTargetMsg(oId, senderUserName, senderAvatar, content, time, true);
+                                }
+                            });
+                        }
                     }
-                    if (!Chat.noMore) {
-                        Chat.page++;
-                        result.data.forEach((data) => {
-                            let oId = data.oId;
-                            let toId = data.toId;
-                            let fromId = data.fromId;
-                            let time = data.time;
-                            let content = data.content;
-                            let preview = data.preview.substring(0, 10);
-                            let dot = data.preview.length > 10 ? "..." : "";
-                            let user_session = data.user_session;
-                            let senderUserName = data.senderUserName;
-                            let senderAvatar = data.senderAvatar;
-                            let receiverUserName = data.receiverUserName;
-                            let receiverAvatar = data.receiverAvatar;
-                            // 添加消息
-                            if (senderUserName === Label.currentUserName) {
-                                // 我发送的
-                                Chat.addSelfMsg(oId, senderUserName, senderAvatar, content, time, true);
-                            } else {
-                                // 他发给我的
-                                Chat.addTargetMsg(oId, senderUserName, senderAvatar, content, time, true);
-                            }
-                        });
-                    }
-                }
-            });
+                });
+            }
+            Chat.moreLock = false;
         }
     },
 
@@ -292,7 +295,7 @@ var Chat = {
     addToMessageList(userName, avatarURL, preview) {
         let dot = preview.length > 10 ? "..." : "";
         $("#chatMessageList").append('' +
-            '<div class="module-panel" id="chatTo' + userName + '" style="padding: 10px 15px;cursor: pointer" onclick="location.href = Label.servePath + \'/chat?toUser=' + userName + '\'"\n' +
+            '<div class="module-panel" id="chatTo' + userName + '" style="padding: 10px 15px;cursor: pointer" onclick="Chat.init(\'' + userName + '\')"\n' +
             '    <nav class="home-menu">\n' +
             '        <div class="avatar"\n' +
             '             style="display: inline-block; background-image:url(' + avatarURL + ')">\n' +
@@ -398,4 +401,8 @@ function getQueryVariable(variable) {
 
 $(document).ready(function () {
     Chat.init();
+    // 监听按钮
+    $("#sendChatBtn").on('click', function () {
+        Chat.send();
+    });
 });
