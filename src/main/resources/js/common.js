@@ -1618,7 +1618,24 @@ var Util = {
         case 'newIdleChatMessage':
           if (window.location.pathname !== "/chat") {
             Util.blingChat();
-            Util.notice("warning", 3000, "叮咚！你收到了一条私信。<a href='/chat'>点击查看</a>");
+            Util.notice("warning", 3000, "叮咚！" + data.senderUserName + " 向你发送了一条私信。<a href='/chat?toUser=" + data.senderUserName + "'>点击查看</a>");
+          } else {
+            let preview = data.preview.substring(0, 10);
+            let dot = data.preview.length > 10 ? "..." : "";
+            let senderUserName = data.senderUserName;
+            let senderAvatar = data.senderAvatar;
+            if ($("#chatTo" + senderUserName).length <= 0) {
+              Chat.addToMessageList(senderUserName, senderAvatar, preview);
+            } else {
+              $("#chatTo" + senderUserName).find("span").html(preview + dot);
+            }
+            if ($("#chatTo" + senderUserName).css("background-color") !== 'rgb(241, 241, 241)') {
+              $("#chatTo" + senderUserName).css("background-color", "#fff4eb");
+            }
+            // 新消息置顶
+            let html = $("#chatTo" + senderUserName).prop('outerHTML');
+            $("#chatTo" + senderUserName).remove();
+            $("#chatMessageList").prepend(html);
           }
           break;
         case 'warnBroadcast':

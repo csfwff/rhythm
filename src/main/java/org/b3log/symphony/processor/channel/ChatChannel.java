@@ -236,7 +236,9 @@ public class ChatChannel implements WebSocketChannel {
             final JSONObject cmd = new JSONObject();
             cmd.put(UserExt.USER_T_ID, toId);
             cmd.put(Common.COMMAND, "newIdleChatMessage");
-
+            cmd.put("senderUserName", info.optString("senderUserName"));
+            cmd.put("senderAvatar", info.optString("senderAvatar"));
+            cmd.put("preview", info.optString("preview"));
             UserChannel.sendCmd(cmd);
         } catch (RepositoryException e) {
             result.put("code", -1);
