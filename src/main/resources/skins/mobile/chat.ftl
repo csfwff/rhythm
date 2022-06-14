@@ -61,7 +61,7 @@
 <div class="main">
     <div class="wrapper">
         <div class="side">
-            <div class="module person-info">
+            <div class="module person-info" style="border: 1px solid #eee;">
                 <div class="module-panel" id="chatToFileTransfer" style="padding: 10px 15px;cursor: pointer" onclick="Chat.init('FileTransfer')">
                     <nav class="home-menu">
                         <div class="avatar"
@@ -74,7 +74,17 @@
                     </nav>
                 </div>
             </div>
-            <div class="module person-info" id="chatMessageList">
+            <div>
+                <details class="details action__item fn__flex-center" style="margin-left: 95%">
+                    <summary>
+                        ···
+                    </summary>
+                    <details-menu class="fn__layer">
+                        <a onclick="Chat.markAllAsRead()" class="item"><svg><use xlink:href="#check"></use></svg> 全部标为已读</a>
+                    </details-menu>
+                </details>
+            </div>
+            <div class="module person-info" style="border: 1px solid #eee;" id="chatMessageList">
             </div>
         </div>
         <div class="content chat-room" style="padding: 20px 10px">

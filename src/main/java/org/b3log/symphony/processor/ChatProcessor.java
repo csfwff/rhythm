@@ -41,6 +41,7 @@ import org.b3log.symphony.service.DataModelService;
 import org.b3log.symphony.service.ShortLinkQueryService;
 import org.b3log.symphony.service.UserQueryService;
 import org.b3log.symphony.util.*;
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.util.*;
@@ -83,6 +84,40 @@ public class ChatProcessor {
         Dispatcher.get("/chat/get-list", chatProcessor::getList, apiCheck::handle);
         Dispatcher.get("/chat/get-message", chatProcessor::getMessage, apiCheck::handle);
         Dispatcher.get("/chat/mark-as-read", chatProcessor::markAsRead, apiCheck::handle);
+        Dispatcher.get("/chat/mark-all-as-read", chatProcessor::markAllAsRead, apiCheck::handle);
+    }
+
+    public void markAllAsRead(final RequestContext context) {
+        context.renderJSON(new JSONObject().put("result", 0));
+        JSONObject currentUser = ApiProcessor.getUserByKey(context.param("apiKey"));
+        String userId = currentUser.optString(Keys.OBJECT_ID);
+        try {
+            Query query = new Query()
+                    .setFilter(
+                            new PropertyFilter("toId", FilterOperator.EQUAL, userId)
+                    );
+            List<JSONObject> unreadList = chatUnreadRepository.getList(query);
+            List<String> unreadUserNameList = new ArrayList<>();
+            for (JSONObject unread : unreadList) {
+                String targetUserId = unread.optString("user_session").replaceAll(userId, "").replaceAll("_", "");
+                try {
+                    JSONObject targetUser = userQueryService.getUser(targetUserId);
+                    String userName = targetUser.optString(User.USER_NAME);
+                    if (!unreadUserNameList.contains(userName)) {
+                        unreadUserNameList.add(userName);
+                    }
+                } catch (Exception ignored) {
+                }
+            }
+            final Transaction transaction = chatUnreadRepository.beginTransaction();
+            chatUnreadRepository.remove(query);
+            transaction.commit();
+            context.renderJSON(new JSONObject().put("result", 0).put("users", unreadUserNameList));
+        } catch (Exception e) {
+            context.renderJSON(new JSONObject()
+                    .put("result", -1)
+                    .put("msg", "全部标记为已读失败 " + e.getMessage()));
+        }
     }
 
     public void markAsRead(final RequestContext context) {

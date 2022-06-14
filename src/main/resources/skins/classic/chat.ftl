@@ -75,6 +75,16 @@
                     </nav>
                 </div>
             </div>
+            <div>
+                <details class="details action__item fn__flex-center" style="margin-left: 95%">
+                    <summary>
+                        ···
+                    </summary>
+                    <details-menu class="fn__layer">
+                        <a onclick="Chat.markAllAsRead()" class="item"><svg><use xlink:href="#check"></use></svg> 全部标为已读</a>
+                    </details-menu>
+                </details>
+            </div>
             <div class="module person-info" id="chatMessageList">
             </div>
         </div>

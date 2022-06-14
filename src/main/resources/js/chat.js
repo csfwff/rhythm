@@ -396,6 +396,19 @@ var Chat = {
                 '</div>');
         }
         Util.listenUserCard();
+    },
+
+    markAllAsRead() {
+        $.ajax({
+            url: Label.servePath + "/chat/mark-all-as-read?apiKey=" + apiKey,
+            type: "GET",
+            success: function (result) {
+                console.log(result);
+                result.users.forEach((user) => {
+                    $("#chatTo" + user).css("background-color", "");
+                });
+            }
+        });
     }
 }
 
@@ -416,5 +429,8 @@ $(document).ready(function () {
     // 监听按钮
     $("#sendChatBtn").on('click', function () {
         Chat.send();
+    });
+    $("body").click(function() {
+        $("details[open]").removeAttr("open");
     });
 });
