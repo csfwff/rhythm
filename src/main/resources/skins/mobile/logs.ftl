@@ -29,7 +29,16 @@
         <#include "header.ftl">
         <div class="main">
             <div class="wrapper">
-
+                <div class="content vditor-reset">
+                    <h1>管理日志公开</h1>
+                    <i class="ft-gray">摸鱼派管理组公平、公正、公开，感谢大家的监督。</i>
+                    <br><br>
+                    <div id="logsContent">
+                    </div>
+                </div>
+                <div class="side">
+                    <#include "side.ftl">
+                </div>
             </div>
         </div>
         <#include "footer.ftl">
