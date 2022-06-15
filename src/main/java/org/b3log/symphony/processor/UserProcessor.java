@@ -489,6 +489,7 @@ public class UserProcessor {
         filteredUserProfile.put(UserExt.USER_NO, user.optString(UserExt.USER_NO));
         filteredUserProfile.put(UserExt.USER_APP_ROLE, user.optString(UserExt.USER_APP_ROLE));
         filteredUserProfile.put("sysMetal", cloudService.getEnabledMetal(user.optString(Keys.OBJECT_ID)));
+        filteredUserProfile.put("allMetalOwned", cloudService.getMetal(user.optString(Keys.OBJECT_ID)));
         final String userId = user.optString(Keys.OBJECT_ID);
         final long followerCnt = followQueryService.getFollowerCount(userId, Follow.FOLLOWING_TYPE_C_USER);
         filteredUserProfile.put("followerCount", followerCnt);
