@@ -81,6 +81,9 @@
         <#if type == "auditlog">
             <@head title="${auditlogLabel} - ${symphonyLabel}"></@head>
         </#if>
+        <#if type == "open">
+            <@head title="${openAdminLabel} - ${symphonyLabel}"></@head>
+        </#if>
         <link rel="stylesheet" href="${staticServePath}/css/home.css?${staticResourceVersion}" />
     </head>
     <body>
@@ -134,6 +137,9 @@
                                 <#if permissions["menuAdmin"].permissionGrant>
                                 <a href="${servePath}/admin/auditlog"<#if type == "auditlog"> class="current"</#if>>${auditlogLabel}</a>
                                 </#if>
+                                 <#if permissions["menuAdminOpenApi"].permissionGrant>
+                                <a href="${servePath}/admin/open"<#if type == "open"> class="current"</#if>>${openAdminLabel}</a>
+                                </#if>
                             </nav>
                         </div>
                     </div>
@@ -146,6 +152,37 @@
         <script>
             Util.parseHljs()
             Util.parseMarkdown()
+        </script>
+        <#elseif type == 'open'>
+        <script>
+        AdminOpenApiApproved = function (it, id) {
+                var $btn = $(it);
+                $btn.attr('disabled', 'disabled').css('opacity', '0.3');
+                $.ajax({
+                    url: '/admin/open/' + id,
+                    cache: false,
+                    success: function() {
+                        window.location.reload();
+                    },
+                    complete: function() {
+                        $btn.removeAttr('disabled').css('opacity', '1');
+                    },
+                });
+            }
+            AdminOpenApiCancel = function (it, id) {
+                var $btn = $(it);
+                $btn.attr('disabled', 'disabled').css('opacity', '0.3');
+                $.ajax({
+                    url: '/admin/open/reject/' + id,
+                    cache: false,
+                    success: function() {
+                        window.location.reload();
+                    },
+                    complete: function() {
+                        $btn.removeAttr('disabled').css('opacity', '1');
+                    },
+                });
+            }
         </script>
         <#elseif type == 'reports'>
         <script>

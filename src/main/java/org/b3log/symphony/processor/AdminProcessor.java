@@ -51,6 +51,7 @@ import org.b3log.symphony.processor.middleware.LoginCheckMidware;
 import org.b3log.symphony.processor.middleware.PermissionMidware;
 import org.b3log.symphony.processor.middleware.validate.UserRegister2ValidationMidware;
 import org.b3log.symphony.processor.middleware.validate.UserRegisterValidationMidware;
+import org.b3log.symphony.repository.OpenApiRepository;
 import org.b3log.symphony.repository.ReportRepository;
 import org.b3log.symphony.service.*;
 import org.b3log.symphony.util.Escapes;
@@ -289,6 +290,13 @@ public class AdminProcessor {
     private BreezemoonMgmtService breezemoonMgmtService;
 
     /**
+     * OpenApi management service.
+     */
+    @Inject
+    private OpenApiMgmtService openApiMgmtService;
+
+
+    /**
      * Report management service.
      */
     @Inject
@@ -299,6 +307,12 @@ public class AdminProcessor {
      */
     @Inject
     private ReportQueryService reportQueryService;
+
+    /**
+     * Report query service.
+     */
+    @Inject
+    private OpenApiQueryService openApiQueryService;
 
     /**
      * Operation management service.
@@ -317,6 +331,12 @@ public class AdminProcessor {
      */
     @Inject
     private ReportRepository reportRepository;
+
+    /**
+     * OpenApi repository.
+     */
+    @Inject
+    private OpenApiRepository openApiRepository;
 
     /**
      * CLoud service.
@@ -341,6 +361,10 @@ public class AdminProcessor {
         Dispatcher.get("/admin/report/ignore/{reportId}", adminProcessor::makeReportIgnored, middlewares);
         Dispatcher.get("/admin/report/{reportId}", adminProcessor::makeReportHandled, middlewares);
         Dispatcher.get("/admin/reports", adminProcessor::showReports, middlewares);
+        Dispatcher.get("/admin/open", adminProcessor::showOpen, middlewares);
+        Dispatcher.get("/admin/open/{openApiId}", adminProcessor::makeOpenApiApproved, middlewares);
+        Dispatcher.get("/admin/open/reject/{openApiId}", adminProcessor::makeOpenApiRejected, middlewares);
+
         Dispatcher.post("/admin/role/{roleId}/remove", adminProcessor::removeRole, middlewares);
         Dispatcher.get("/admin/breezemoons", adminProcessor::showBreezemoons, middlewares);
         Dispatcher.get("/admin/breezemoon/{breezemoonId}", adminProcessor::showBreezemoon, middlewares);
@@ -614,6 +638,81 @@ public class AdminProcessor {
 
         dataModelService.fillHeaderAndFooter(context, dataModel);
     }
+
+
+    /**
+     * Makes a openapi as handled .
+     *
+     * @param context the specified context
+     */
+    private void makeOpenApiHandled(final RequestContext context,boolean isApproved) {
+      final String openApiId = context.pathVar("openApiId");
+      final Request request = context.getRequest();
+//      final JSONObject currentUser = userQueryService.getCurrentUser(request);
+//      final String adminUserId = currentUser.optString(Keys.OBJECT_ID);
+//      try {
+//          final JSONObject openapi = openApiRepository.get(openApiId);
+//          final String applierId = openapi.optString(OpenApi.OPEN_API_USER_ID);
+          //iwpz: 这里你确定管理员能不能审核自己吧
+//          if (applierId.equals(adminUserId)) {
+//              context.sendRedirect(Latkes.getServePath() + "/admin/open");
+//              return;
+//          }
+//      } catch (final Exception e) {
+//          LOGGER.log(Level.ERROR, "Makes openapi [id=" + openApiId + "] as "+ (isApproved?"approved":"rejected") +" failed", e);
+//      }
+
+
+      openApiMgmtService.makeOpenApiHandled(openApiId, isApproved);
+      operationMgmtService.addOperation(Operation.newOperation(request, Operation.OPERATION_CODE_C_HANDLED_OPEN_API_APPLY, openApiId));
+
+      context.sendRedirect(Latkes.getServePath() + "/admin/reports");
+  }
+
+  public void makeOpenApiApproved(final RequestContext context) {
+    makeOpenApiHandled(context,true);
+  }
+
+  public void makeOpenApiRejected(final RequestContext context) {
+    makeOpenApiHandled(context,false);
+  }
+
+    /**
+     * Shows OpenApis.
+     *
+     * @param context the specified context
+     */
+    public void showOpen(final RequestContext context) {
+      final Request request = context.getRequest();
+
+      final AbstractFreeMarkerRenderer renderer = new SkinRenderer(context, "admin/open.ftl");
+      final Map<String, Object> dataModel = renderer.getDataModel();
+
+      final int pageNum = Paginator.getPage(request);
+      final int pageSize = PAGE_SIZE;
+      final int windowSize = WINDOW_SIZE;
+
+      final JSONObject requestJSONObject = new JSONObject();
+      requestJSONObject.put(Pagination.PAGINATION_CURRENT_PAGE_NUM, pageNum);
+      requestJSONObject.put(Pagination.PAGINATION_PAGE_SIZE, pageSize);
+      requestJSONObject.put(Pagination.PAGINATION_WINDOW_SIZE, windowSize);
+
+      final JSONObject result = openApiQueryService.getOpenApis(requestJSONObject);
+      dataModel.put(OpenApi.OPEN_API, result.opt(OpenApi.OPEN_API));
+
+      final JSONObject pagination = result.optJSONObject(Pagination.PAGINATION);
+      final int pageCount = pagination.optInt(Pagination.PAGINATION_PAGE_COUNT);
+      final JSONArray pageNums = pagination.optJSONArray(Pagination.PAGINATION_PAGE_NUMS);
+      dataModel.put(Pagination.PAGINATION_FIRST_PAGE_NUM, pageNums.opt(0));
+      dataModel.put(Pagination.PAGINATION_LAST_PAGE_NUM, pageNums.opt(pageNums.length() - 1));
+      dataModel.put(Pagination.PAGINATION_CURRENT_PAGE_NUM, pageNum);
+      dataModel.put(Pagination.PAGINATION_PAGE_COUNT, pageCount);
+      dataModel.put(Pagination.PAGINATION_PAGE_NUMS, CollectionUtils.jsonArrayToList(pageNums));
+
+      dataModelService.fillHeaderAndFooter(context, dataModel);
+  }
+
+
 
     /**
      * Removes an role.

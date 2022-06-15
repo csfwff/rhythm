@@ -526,6 +526,12 @@ public final class Permission {
     public static final int PERMISSION_CATEGORY_C_BREEZEMOON = 11;
 
     /**
+     * Category - open api management
+     */
+    public static final int PERMISSION_CATEGORY_C_OPEN_API = 12;
+
+
+    /**
      * Private constructor.
      */
     private Permission() {

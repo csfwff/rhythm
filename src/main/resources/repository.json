@@ -120,6 +120,70 @@
       ]
     },
     {
+      "name":"open_api",
+      "description":"OpenApi表",
+      "keys":[
+        {
+          "name": "oId",
+          "type": "String",
+          "length": 19,
+          "description": "主键"
+        },
+        {
+          "name": "openApiUserId",
+          "type": "String",
+          "length": 19,
+          "description": "用户id"
+        },
+        {
+          "name": "openApiKey",
+          "type": "String",
+          "length": 255,
+          "description": "ApiKey"
+        },
+        {
+          "name":"openApiName",
+          "type":"String",
+          "length":255,
+          "description":"应用名称"
+        },
+        {
+          "name": "openApiAvailable",
+          "type": "int",
+          "length": 1,
+          "description": "0：不可用，1：可用"
+        },
+        {
+          "name": "openApiUpdateTime",
+          "type": "datetime",
+          "description": "更新时间"
+        },
+        {
+          "name": "openApiLevel",
+          "type": "int",
+          "length": 2,
+          "description": "Api等级"
+        },{
+          "name": "openApiDescription",
+          "type": "String",
+          "length": 255,
+          "description": "描述"
+        },
+        {
+          "name":"openApiWebhookAddress",
+          "type":"String",
+          "length":255,
+          "description":"Webhook地址"
+        },
+        {
+          "name":"openApiIcon",
+          "type":"String",
+          "length":255,
+          "description":"应用icon地址"
+        }
+      ]
+    },
+    {
       "name": "report",
       "description": "举报表",
       "keys": [
