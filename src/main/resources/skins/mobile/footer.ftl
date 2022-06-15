@@ -45,7 +45,8 @@
         <div class="fn-hr5"></div>
         <div style="margin-top: 5px">
             <div>探索</div>
-            <a href="https://github.com/csfwff/rhythm" target="_blank">Rhythm 社区引擎</a>
+            <a href="https://github.com/csfwff/rhythm" target="_blank">Rhythm 社区引擎</a><br>
+            <a href="${servePath}/logs" target="_blank">日志公开</a>
         </div>
         <div class="fn-hr5"></div>
         <div style="margin-top: 5px">

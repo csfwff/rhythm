@@ -79,6 +79,7 @@
                 <a href="${servePath}/statistic">${dataStatLabel}</a>
                 <a href="${servePath}/article/1636516552191">开放 API</a>
                 <a href="${servePath}/privacy" target="_blank">隐私政策</a>
+                <a href="${servePath}/logs" target="_blank">日志公开</a>
             </div>
         </div>
     </div>
