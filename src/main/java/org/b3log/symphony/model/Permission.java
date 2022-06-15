@@ -464,6 +464,8 @@ public final class Permission {
      */
     public static final String PERMISSION_ID_C_USER_REMOVE_MFA = "userRemoveMFA";
 
+    public static final String PERMISSION_ID_CATEGORY_C_OPEN_API = "menuAdminOpenApi";
+
     // Category constants
     /**
      * Category - common function.
