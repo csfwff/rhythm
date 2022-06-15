@@ -1615,6 +1615,11 @@ var Util = {
             Util.notice("default", 3000, "你有一条新的通知！<a href='/notifications'>点击查看</a>");
           }
           break
+        case 'chatUnreadCountRefresh':
+          if (data.count === 0) {
+            Util.pauseBling();
+          }
+          break;
         case 'newIdleChatMessage':
           if (window.location.pathname !== "/chat") {
             Util.blingChat();

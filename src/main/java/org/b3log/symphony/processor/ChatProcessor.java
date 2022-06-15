@@ -31,7 +31,9 @@ import org.b3log.latke.ioc.Singleton;
 import org.b3log.latke.model.User;
 import org.b3log.latke.repository.*;
 import org.b3log.latke.util.Crypts;
+import org.b3log.symphony.model.Common;
 import org.b3log.symphony.model.UserExt;
+import org.b3log.symphony.processor.channel.UserChannel;
 import org.b3log.symphony.processor.middleware.ApiCheckMidware;
 import org.b3log.symphony.processor.middleware.LoginCheckMidware;
 import org.b3log.symphony.repository.ChatInfoRepository;
@@ -112,6 +114,12 @@ public class ChatProcessor {
             final Transaction transaction = chatUnreadRepository.beginTransaction();
             chatUnreadRepository.remove(query);
             transaction.commit();
+            // 通知用户
+            final JSONObject cmd = new JSONObject();
+            cmd.put(UserExt.USER_T_ID, userId);
+            cmd.put(Common.COMMAND, "chatUnreadCountRefresh");
+            cmd.put("count", 0);
+            UserChannel.sendCmd(cmd);
             context.renderJSON(new JSONObject().put("result", 0).put("users", unreadUserNameList));
         } catch (Exception e) {
             context.renderJSON(new JSONObject()
@@ -136,6 +144,17 @@ public class ChatProcessor {
                     ));
             chatUnreadRepository.remove(query);
             transaction.commit();
+            // 通知用户
+            Query queryUnread = new Query().setFilter(new PropertyFilter("toId", FilterOperator.EQUAL, userId));
+            try {
+                List<JSONObject> result = chatUnreadRepository.getList(queryUnread);
+                final JSONObject cmd = new JSONObject();
+                cmd.put(UserExt.USER_T_ID, userId);
+                cmd.put(Common.COMMAND, "chatUnreadCountRefresh");
+                cmd.put("count", result.size());
+                UserChannel.sendCmd(cmd);
+            } catch (Exception ignored) {
+            }
         } catch (Exception e) {
             context.renderJSON(new JSONObject()
                     .put("result", -1)
