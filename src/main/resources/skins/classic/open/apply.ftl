@@ -65,7 +65,7 @@
                         <div class="apply-row-area">
                              <div class="apply-radio"><label><input type="radio" value="0" name="apiKeyType" checked>鱼游 </label></div>
                             <div class="apply-radio"><label><input type="radio" value="1" name="apiKeyType"> 应用 </label></div>
-                            <div class="apply-radio"><label><input type="radio" value="2" name="apiKeyType"> 占位 </label></div>
+                            <div class="apply-radio"><label><input type="radio" value="2" name="apiKeyType"> 其他 </label></div>
                         </div>
                         <div id="applyTip" class="tip"></div>
                         <div class="apply-input-area">
