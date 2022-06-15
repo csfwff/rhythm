@@ -170,7 +170,7 @@ public class OpenApiQueryService {
                   openapi.put(OpenApi.OPEN_API_T_USERNAME, UserExt.getUserLink(OpenApiApplier));
                   openapi.put(OpenApi.OPEN_API_AVAILABLE,record.optInt(OpenApi.OPEN_API_AVAILABLE));
                   openapi.put(OpenApi.OPEN_API_UPDATE_TIME, OpenApi.OPEN_API_UPDATE_TIME);
-                  openapi.put(OpenApi.OPEN_API_ID,record.optString(OpenApi.OPEN_API_ID));
+                  openapi.put("oId",record.optString("oId"));
                   openapi.put(OpenApi.OPEN_API_LEVEL,record.optInt(OpenApi.OPEN_API_LEVEL));
                   openapi.put(OpenApi.OPEN_API_TYPE,record.optInt(OpenApi.OPEN_API_TYPE));
                   openapi.put(OpenApi.OPEN_API_NAME, record.optString(OpenApi.OPEN_API_NAME));

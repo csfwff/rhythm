@@ -37,12 +37,6 @@ public final class OpenApi {
      */
     public static final String OPEN_API_T_USERNAME = "openApiApplyUserName";
 
-
-    /**
-     * OpenApi User Id
-     */
-    public static final String OPEN_API_ID = "oId";
-
     /**
      * OpenApi User Id
      */

@@ -155,7 +155,7 @@
         },
         {
           "name": "openApiUpdateTime",
-          "type": "datetime",
+          "type": "int",
           "description": "更新时间"
         },
         {

@@ -384,7 +384,7 @@ public class InitMgmtService {
             permissionRepository.add(permission);
 
             // openapi management permission
-            permission.put(Keys.OBJECT_ID,Permission.PERMISSION_CATEGORY_C_OPEN_API);
+            permission.put(Keys.OBJECT_ID,Permission.PERMISSION_ID_CATEGORY_C_OPEN_API);
             permissionRepository.add(permission);
 
             // common permissions
