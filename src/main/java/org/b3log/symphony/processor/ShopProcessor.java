@@ -209,7 +209,7 @@ public class ShopProcessor {
                                         int trades = traderObject.optInt("trades");
                                         if (trades >= maxPer) {
                                             ShopChannel.sendMsg(userId, "" +
-                                                    "你今天已经买得够多啦，无法继续交易，明天再来吧！");
+                                                    "你今天已经卖得够多啦，无法继续交易，明天再来吧！");
                                             return;
                                         }
                                         if (sum > (maxPer - trades)) {
