@@ -33,6 +33,9 @@ import org.b3log.symphony.repository.ArticleRepository;
 import org.b3log.symphony.repository.LogsRepository;
 import org.json.JSONObject;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
 /**
  * @author fangcong
  * @version 0.0.1
@@ -67,13 +70,14 @@ public class LogsService {
         }
     }
 
-    public static void simpleLog(RequestContext context, String time, String module, String message) {
+    public static void simpleLog(RequestContext context, String module, String message) {
         String address = Requests.getRemoteAddr(context.getRequest());
         try {
             address = address.substring(0, (address.length() - 3));
             address = address + "*";
         } catch (Exception ignored) {
         }
+        String time = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss:SS").format(new Date());
         log("simple", time, address, module, message, true);
     }
 }

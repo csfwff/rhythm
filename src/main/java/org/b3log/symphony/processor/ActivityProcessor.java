@@ -252,6 +252,9 @@ public class ActivityProcessor {
                 if (!succ) {
                     throw new ServiceException(langPropsService.get("transferFailLabel"));
                 }
+                // === 记录日志 ===
+                LogsService.simpleLog(context, "上传摸鱼大闯关数据", "用户: " + userName + ", 通过关卡: " + stage + ", 通关时间: " + time);
+                // === 记录日志 ===
                 context.renderJSON(StatusCodes.SUCC);
                 context.renderMsg("数据上传成功！");
             } else {
