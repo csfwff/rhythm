@@ -213,8 +213,7 @@ public class ChatProcessor {
                 }
                 // 将content过滤为纯文本
                 String content = info.optString("content");
-                String preview = content.replaceAll("[^a-zA-Z0-9\\u4E00-\\u9FA5]", "");
-                info.put("preview", preview.length() > 20 ? preview.substring(0, 20) : preview);
+                info.put("preview", makePreview(content));
                 String markdown = info.optString("content");
                 String html = ChatProcessor.processMarkdown(markdown);
                 info.put("content", html);
@@ -235,6 +234,14 @@ public class ChatProcessor {
                     .put("result", -1)
                     .put("msg", "获取列表失败 " + e.getMessage()));
         }
+    }
+
+    public static String makePreview(String str) {
+        String preview = str.replaceAll("[^a-zA-Z0-9\\u4E00-\\u9FA5]", "");
+        if (preview.isEmpty()) {
+            preview = "[聊天消息]";
+        }
+        return preview.length() > 20 ? preview.substring(0, 20) : preview;
     }
 
     public void getList(final RequestContext context) {
@@ -273,8 +280,7 @@ public class ChatProcessor {
             }
             // 将content过滤为纯文本
             String content = info.optString("content");
-            String preview = content.replaceAll("[^a-zA-Z0-9\\u4E00-\\u9FA5]", "");
-            info.put("preview", preview.length() > 20 ? preview.substring(0, 20) : preview);
+            info.put("preview", makePreview(content));
             String markdown = info.optString("content");
             String html = ChatProcessor.processMarkdown(markdown);
             info.put("content", html);
