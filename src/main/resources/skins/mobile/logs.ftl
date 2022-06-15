@@ -35,6 +35,8 @@
                     <br><br>
                     <div id="logsContent">
                     </div>
+                    <br>
+                    <div style="color: #888f91; cursor: pointer" onclick="Logs.more()" id="loadMoreBtn">加载更多</div>
                 </div>
                 <div class="side">
                     <#include "side.ftl">

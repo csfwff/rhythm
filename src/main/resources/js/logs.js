@@ -2,6 +2,7 @@ var Logs = {
 
     init: function () {
         Logs.connectWS();
+        Logs.more();
     },
 
     connectWS: function () {
@@ -27,13 +28,35 @@ var Logs = {
     },
 
     appendLog: function (key1, key2, key3, data) {
-        let result = '<div>';
-        result += '<span style=\'color: #696969\'>' + key1 + '</span> ';
-        result += '<span style=\'color: #708090\'>' + key2 + '</span> ';
-        result += '<span style=\'color: #6A5ACD\'>' + key3 + '</span> ';
-        result += '<span style=\'color: #1E90FF\'>' + data + '</span> ';
+        let result = '<div style="padding: 5px 0;font-size: 15px;">';
+        result += '<span style="color: #696969">' + key1 + '</span> ';
+        result += '<span style="color: #708090">' + key2 + '</span> ';
+        result += '<span style="color: #6A5ACD">' + key3 + '</span> ';
+        result += '<span style="color: #1E90FF">' + data + '</span> ';
         result += '</div>';
         $("#logsContent").prepend(result);
+    },
+
+    page: 1,
+    more: function () {
+        $.ajax({
+            url: Label.servePath + '/logs/more?page=' + Logs.page,
+            type: 'GET',
+            async: false,
+            success: function (result) {
+                if (0 === result.code) {
+                    let data = result.data;
+                    if (data.length === 0) {
+                        $("#loadMoreBtn").html("没有更多内容了");
+                    } else {
+                        data.forEach((log) => {
+                            Logs.appendLog(log.key1, log.key2, log.key3, log.data);
+                        });
+                    }
+                }
+            }
+        });
+        Logs.page++;
     }
 
 }

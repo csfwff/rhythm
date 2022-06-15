@@ -46,7 +46,7 @@ var Chat = {
         reqRecentList = $.ajax({
             url: Label.servePath + '/chat/get-list?apiKey=' + apiKey,
             type: 'GET',
-            async: 'false',
+            async: false,
             success: function (result) {
                 if (0 === result.result) {
                     let data = result.data;

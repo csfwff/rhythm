@@ -81,7 +81,7 @@ public class LogsService {
             address += "*";
         } catch (Exception ignored) {
         }
-        String time = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss:SS").format(new Date());
+        String time = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date());
         log("simple", time, address, module, message, true);
     }
 }
