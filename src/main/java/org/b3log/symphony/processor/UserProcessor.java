@@ -262,6 +262,9 @@ public class UserProcessor {
                         notification.put(Notification.NOTIFICATION_USER_ID, userId);
                         notification.put(Notification.NOTIFICATION_DATA_ID, transferId);
                         notificationMgmtService.addPointTransferNotification(notification);
+                        // === 记录日志 ===
+                        LogsService.simpleLog(context, "增加积分", "用户: " + userName + ", 积分: " + point + ", 备注: " + memo);
+                        // === 记录日志 ===
                         context.renderJSON(StatusCodes.SUCC);
                         context.renderMsg("转账成功，交易oId为：" + transferId);
                         return;
@@ -274,6 +277,9 @@ public class UserProcessor {
                         notification.put(Notification.NOTIFICATION_USER_ID, userId);
                         notification.put(Notification.NOTIFICATION_DATA_ID, transferId);
                         notificationMgmtService.addAbusePointDeductNotification(notification);
+                        // === 记录日志 ===
+                        LogsService.simpleLog(context, "扣除积分", "用户: " + userName + ", 积分: " + point + ", 备注: " + memo);
+                        // === 记录日志 ===
                         context.renderJSON(StatusCodes.SUCC);
                         context.renderMsg("扣款成功，交易oId为：" + transferId);
                         return;
@@ -310,6 +316,9 @@ public class UserProcessor {
                 final String item = requestJSONObject.optString("item");
                 final int sum = requestJSONObject.optInt("sum");
                 cloudService.putBag(userId, item, sum, Integer.MAX_VALUE);
+                // === 记录日志 ===
+                LogsService.simpleLog(context, "调整用户背包", "用户: " + userName + ", 物品: " + item + ", 数量: " + sum);
+                // === 记录日志 ===
                 context.renderJSON(StatusCodes.SUCC);
                 context.renderMsg("背包调整成功，附当前用户背包内容，请检查数据。");
                 context.renderData(new JSONObject(cloudService.getBag(userId)));
@@ -362,6 +371,9 @@ public class UserProcessor {
             final String userId = user.optString(Keys.OBJECT_ID);
             final String name = requestJSONObject.optString("name");
             cloudService.removeMetal(userId, name);
+            // === 记录日志 ===
+            LogsService.simpleLog(context, "移除勋章", "用户: " + userName + ", 勋章名称: " + name);
+            // === 记录日志 ===
             context.renderJSON(StatusCodes.SUCC);
             context.renderMsg("勋章移除成功。");
         } else {
@@ -387,6 +399,9 @@ public class UserProcessor {
             final String attr = requestJSONObject.optString("attr");
             final String data = requestJSONObject.optString("data");
             cloudService.giveMetal(userId, name, description, attr, data);
+            // === 记录日志 ===
+            LogsService.simpleLog(context, "添加勋章", "用户: " + userName + ", 勋章名称: " + name + ", 勋章描述: " + description + ", 勋章属性: " + attr);
+            // === 记录日志 ===
             context.renderJSON(StatusCodes.SUCC);
             context.renderMsg("勋章安装成功。");
         } else {
