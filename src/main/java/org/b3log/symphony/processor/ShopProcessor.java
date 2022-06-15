@@ -27,12 +27,14 @@ import org.b3log.latke.ioc.BeanManager;
 import org.b3log.latke.ioc.Inject;
 import org.b3log.latke.ioc.Singleton;
 import org.b3log.latke.repository.Transaction;
+import org.b3log.symphony.model.Notification;
 import org.b3log.symphony.model.Pointtransfer;
 import org.b3log.symphony.processor.channel.ShopChannel;
 import org.b3log.symphony.processor.middleware.LoginCheckMidware;
 import org.b3log.symphony.repository.ShopRepository;
 import org.b3log.symphony.service.CloudService;
 import org.b3log.symphony.service.DataModelService;
+import org.b3log.symphony.service.NotificationMgmtService;
 import org.b3log.symphony.service.PointtransferMgmtService;
 import org.b3log.symphony.util.Sessions;
 import org.b3log.symphony.util.StatusCodes;
@@ -64,6 +66,9 @@ public class ShopProcessor {
      */
     @Inject
     private CloudService cloudService;
+
+    @Inject
+    private NotificationMgmtService notificationMgmtService;
 
     /**
      * Pointtransfer management service.
@@ -242,6 +247,10 @@ public class ShopProcessor {
                                 // 加积分
                                 final String transferId = pointtransferMgmtService.transfer(Pointtransfer.ID_C_SYS, userId,
                                         Pointtransfer.TRANSFER_TYPE_C_ACCOUNT2ACCOUNT, total, userId, System.currentTimeMillis(), "系统商店收购：" + sum + "件 " + name);
+                                final JSONObject notification = new JSONObject();
+                                notification.put(Notification.NOTIFICATION_USER_ID, userId);
+                                notification.put(Notification.NOTIFICATION_DATA_ID, transferId);
+                                notificationMgmtService.addPointTransferNotification(notification);
                                 // 写JSON
                                 boolean changed = false;
                                 for (int i = 0; i < tradersObject.length(); i++) {
