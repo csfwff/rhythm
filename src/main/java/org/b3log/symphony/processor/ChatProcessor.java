@@ -260,6 +260,9 @@ public class ChatProcessor {
             String[] ids = sessionId.split("_");
             final String otherId = Arrays.stream(ids).filter(id -> !id.equals(userId)).findAny().get();
             JSONObject otherUser = userQueryService.getUser(otherId);
+            if (otherUser == null) {
+                continue;
+            }
             JSONObject info = null;
             final String lastMessageId = listItem.optString("lastMessageId");
             try {

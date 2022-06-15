@@ -633,9 +633,6 @@ $(document).ready(function () {
     $("#sendChatBtn").on('click', function () {
         Chat.send();
     });
-    $("body").click(function () {
-        $("details[open]").removeAttr("open");
-    });
     // img preview
     $('#chats').on('click', '.vditor-reset img', function (event) {
         if ($(this).hasClass('emoji') ||
@@ -665,6 +662,9 @@ $(document).ready(function () {
         $("html,body").animate({scrollTop: 0}, 800);
         return false;
     });
+    $("body").click(function () {
+        $("details[open]").removeAttr("open");
+    });
     // 表情包初始化
     // 加载表情
     Chat.listenUploadEmojis();
@@ -677,16 +677,11 @@ $(document).ready(function () {
             $("#emojiList").addClass("showList");
             setTimeout(function () {
                 $("body").unbind();
-                $('body').click(function (event) {
-                    if ($(event.target).closest('a').attr('id') !== 'aPersonListPanel' &&
-                        $(event.target).closest('.module').attr('id') !== 'personListPanel') {
-                        $('#personListPanel').hide()
-                    }
-                })
                 $("body").click(function() {
                     $("#emojiList").removeClass("showList");
                     $("body").unbind();
                     $('body').click(function (event) {
+                        $("details[open]").removeAttr("open");
                         if ($(event.target).closest('a').attr('id') !== 'aPersonListPanel' &&
                             $(event.target).closest('.module').attr('id') !== 'personListPanel') {
                             $('#personListPanel').hide()
