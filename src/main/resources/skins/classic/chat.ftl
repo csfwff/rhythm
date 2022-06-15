@@ -75,6 +75,7 @@
                     </nav>
                 </div>
             </div>
+            <span id="messageListPanel" style="display: none">
             <div>
                 <details class="details action__item fn__flex-center" style="margin-left: 95%">
                     <summary>
@@ -87,6 +88,7 @@
             </div>
             <div class="module person-info" id="chatMessageList">
             </div>
+            </span>
         </div>
         <div class="content chat-room" style="margin-left: 15px; padding: 20px 10px">
             <div class="ft__gray ft__center" id="chatStatus">

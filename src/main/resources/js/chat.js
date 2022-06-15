@@ -20,6 +20,7 @@ var Chat = {
     page: 1,
     toUser: '',
     init: function (to) {
+        let reqRecentList;
         let toUser;
         if (to !== undefined) {
             // 打扫战场
@@ -42,195 +43,202 @@ var Chat = {
         let newUrl = (currenturl.split("?"))[0];
         history.pushState('', '', newUrl);
         // 加载最近聊天列表
-        var reqRecentList = $.ajax({
+        reqRecentList = $.ajax({
             url: Label.servePath + '/chat/get-list?apiKey=' + apiKey,
             type: 'GET',
             async: 'false',
             success: function (result) {
                 if (0 === result.result) {
                     let data = result.data;
-                    data.forEach((userData) => {
-                        if (userData.receiverUserName === '文件传输助手') {
-                            $("#fileTransferMsg").html(userData.preview);
-                        } else {
-                            if (userData.senderUserName != Label.currentUserName) {
-                                if ($("#chatTo" + userData.senderUserName).length <= 0) {
-                                    Chat.addToMessageList(userData.senderUserName, userData.senderAvatar, userData.preview);
-                                }
+                    if (data.length !== 0) {
+                        data.forEach((userData) => {
+                            if (userData.receiverUserName === '文件传输助手') {
+                                $("#fileTransferMsg").html(userData.preview);
                             } else {
-                                if ($("#chatTo" + userData.receiverUserName).length <= 0) {
-                                    Chat.addToMessageList(userData.receiverUserName, userData.receiverAvatar, userData.preview);
+                                if (userData.senderUserName != Label.currentUserName) {
+                                    if ($("#chatTo" + userData.senderUserName).length <= 0) {
+                                        Chat.addToMessageList(userData.senderUserName, userData.senderAvatar, userData.preview);
+                                    }
+                                } else {
+                                    if ($("#chatTo" + userData.receiverUserName).length <= 0) {
+                                        Chat.addToMessageList(userData.receiverUserName, userData.receiverAvatar, userData.preview);
+                                    }
                                 }
                             }
-                        }
-                    });
+                        });
+                    }
                 }
             }
         });
-
-        if (toUser !== '') {
-            // 加载用户
-            if (toUser !== 'FileTransfer') {
-                var reqLoadUser = $.ajax({
-                    url: Label.servePath + "/user/" + toUser,
-                    type: "GET",
-                    success: function (result) {
-                        if (result.code === -1) {
-                            alert('指定的用户名不存在，请检查后重试！');
-                            location.href = Label.servePath + '/chat';
-                        }
-                        if ($("#chatTo" + result.userName).length <= 0) {
-                            Chat.addToMessageList(result.userName, result.userAvatarURL, "&nbsp;");
-                        }
-                        toUser = result.userName;
-                        Chat.toUser = toUser;
-                    }
-                });
-            }
-            $.when(reqLoadUser).done(function () {
-                // 用户已读
-                $.ajax({
-                    url: Label.servePath + "/chat/mark-as-read?apiKey=" + apiKey + "&fromUser=" + Chat.toUser,
-                    type: "GET"
-                });
-            });
-        }
 
         $.when(reqRecentList).done(function () {
-            $.ajax({
-                url: Label.servePath + '/chat/has-unread?apiKey=' + apiKey,
-                type: 'GET',
-                success: function (result) {
-                    let count = result.result;
-                    let list = result.data;
-                    list.forEach((data) => {
-                        $("#chatTo" + data.senderUserName).css("background-color", "#fff4eb");
+            if (toUser !== "") {
+                // 加载用户
+                if (toUser !== 'FileTransfer') {
+                    var reqLoadUser = $.ajax({
+                        url: Label.servePath + "/user/" + toUser,
+                        type: "GET",
+                        success: function (result) {
+                            if (result.code === -1) {
+                                alert('指定的用户名不存在，请检查后重试！');
+                                location.href = Label.servePath + '/chat';
+                            }
+                            if ($("#chatTo" + result.userName).length <= 0) {
+                                Chat.addToMessageList(result.userName, result.userAvatarURL, "&nbsp;");
+                            }
+                            toUser = result.userName;
+                            Chat.toUser = toUser;
+                        }
+                    });
+                }
+            }
+
+            $.when(reqLoadUser).done(function () {
+                if (toUser === "") {
+                    // 未选定用户
+                    $("#chatStatus").html('请在左侧列表选择最近聊天的成员，或直接发起聊天。<br><br>' +
+                        '<input class="form" id="chatWithInput" placeholder="输入用户名">&nbsp;<button onclick="Chat.startAChat()">发起聊天</button>');
+                    // 监听回车
+                    $("#chatWithInput").keypress(function (e) {
+                        if (e.which == 13) {
+                            Chat.startAChat();
+                        }
+                    });
+                } else {
+                    // 已选定用户，获取第一页聊天信息
+                    // 状态
+                    $("#chatStatus").html('和 ' +
+                        '<a href="' + Label.servePath + '/member/' + toUser + '">' + toUser + '</a> ' +
+                        '聊天中');
+                    // 显示按钮
+                    $("#buttons").show();
+                    // 显示翻页
+                    $(".pagination__chat").show();
+                    // 加载编辑器
+                    Chat.editor = Util.newVditor({
+                        id: 'messageContent',
+                        cache: true,
+                        preview: {
+                            mode: 'editor',
+                        },
+                        resize: {
+                            enable: true,
+                            position: 'bottom',
+                        },
+                        height: 150,
+                        placeholder: '说点什么吧，友善第一哦。',
+                        toolbar: [
+                            'emoji',
+                            'link',
+                            'upload',
+                            'edit-mode',
+                            {
+                                name: 'more',
+                                toolbar: [
+                                    'insert-after',
+                                    'fullscreen',
+                                    'preview',
+                                    'info',
+                                    'help',
+                                ],
+                            },
+                        ],
+                        ctrlEnter: function () {
+                            Chat.send();
+                        }
+                    });
+                    // 连接WS
+                    Chat.ws = new WebSocket(chatChannelURL + toUser);
+                    Chat.ws.onopen = function () {
+                        console.log("Connected to chat channel websocket.")
+                    }
+                    Chat.ws.onmessage = function (evt) {
+                        var data = JSON.parse(evt.data)
+                        if (data.code === -1) {
+                            $('#chatContentTip').addClass('error').html('<ul><li>' + data.msg + '</li></ul>');
+                        } else {
+                            $('#chatContentTip').removeClass('error succ').html('')
+                            let oId = data.oId;
+                            let toId = data.toId;
+                            let fromId = data.fromId;
+                            let time = data.time;
+                            let content = data.content;
+                            let preview = data.preview.substring(0, 10);
+                            let dot = data.preview.length > 10 ? "..." : "";
+                            let user_session = data.user_session;
+                            let senderUserName = data.senderUserName;
+                            let senderAvatar = data.senderAvatar;
+                            let receiverUserName = data.receiverUserName;
+                            let receiverAvatar = data.receiverAvatar;
+                            // 添加消息
+                            if (senderUserName === Label.currentUserName) {
+                                // 我发送的
+                                Chat.addSelfMsg(oId, senderUserName, senderAvatar, content, time, false);
+                                $("#chatTo" + receiverUserName).find("span").html(preview + dot);
+                                // 新消息置顶
+                                let html = $("#chatTo" + receiverUserName).prop('outerHTML');
+                                $("#chatTo" + receiverUserName).remove();
+                                $("#chatMessageList").prepend(html);
+                                // 文件传输助手特殊管理
+                                if (toId === '1000000000086') {
+                                    $("#chatToFileTransfer").find("span").html(preview + dot);
+                                }
+                            } else {
+                                // 他发给我的
+                                Chat.addTargetMsg(oId, senderUserName, senderAvatar, content, time, false);
+                                $("#chatTo" + senderUserName).find("span").html(preview + dot);
+                                // 新消息置顶
+                                let html = $("#chatTo" + senderUserName).prop('outerHTML');
+                                $("#chatTo" + senderUserName).remove();
+                                $("#chatMessageList").prepend(html);
+                                // 用户已读
+                                $.ajax({
+                                    url: Label.servePath + "/chat/mark-as-read?apiKey=" + apiKey + "&fromUser=" + Chat.toUser,
+                                    type: "GET"
+                                });
+                            }
+                        }
+                    }
+                    Chat.ws.onclose = function () {
+                        console.log("Disconnected to chat channel websocket.")
+                    }
+                    Chat.ws.onerror = function (err) {
+                        console.log('ERROR', err)
+                    }
+                    // 选中用户
+                    $("#chatTo" + toUser).css("background-color", "#f1f1f1");
+                    // 加载消息
+                    Chat.loadMore();
+                    // 监听滑动
+                    $(window).scroll(
+                        function () {
+                            var scrollTop = $(this).scrollTop();
+                            var scrollHeight = $(document).height();
+                            var windowHeight = $(this).height();
+                            if (scrollTop + windowHeight + 500 >= scrollHeight) {
+                                Chat.loadMore();
+                            }
+                        }
+                    );
+                    // 用户已读
+                    $.ajax({
+                        url: Label.servePath + "/chat/mark-as-read?apiKey=" + apiKey + "&fromUser=" + Chat.toUser,
+                        type: "GET"
+                    });
+                    // 加载未读消息
+                    $.ajax({
+                        url: Label.servePath + '/chat/has-unread?apiKey=' + apiKey,
+                        type: 'GET',
+                        success: function (result) {
+                            let count = result.result;
+                            let list = result.data;
+                            list.forEach((data) => {
+                                $("#chatTo" + data.senderUserName).css("background-color", "#fff4eb");
+                            });
+                        }
                     });
                 }
             });
-        });
-
-        $.when(reqRecentList, reqLoadUser).done(function () {
-            if (toUser === "") {
-                // 未选定用户
-                $("#chatStatus").html('请在左侧列表选择最近聊天的成员，或直接发起聊天。<br><br>' +
-                    '<input class="form" id="chatWithInput" placeholder="输入用户名">&nbsp;<button onclick="Chat.startAChat()">发起聊天</button>');
-                // 监听回车
-                $("#chatWithInput").keypress(function (e) {
-                    if (e.which == 13) {
-                        Chat.startAChat();
-                    }
-                });
-            } else {
-                // 已选定用户，获取第一页聊天信息
-                // 状态
-                $("#chatStatus").html('和 ' +
-                    '<a href="' + Label.servePath + '/member/' + toUser + '">' + toUser + '</a> ' +
-                    '聊天中');
-                // 显示按钮
-                $("#buttons").show();
-                // 显示翻页
-                $(".pagination__chat").show();
-                // 加载编辑器
-                Chat.editor = Util.newVditor({
-                    id: 'messageContent',
-                    cache: true,
-                    preview: {
-                        mode: 'editor',
-                    },
-                    resize: {
-                        enable: true,
-                        position: 'bottom',
-                    },
-                    height: 150,
-                    placeholder: '说点什么吧，友善第一哦。',
-                    toolbar: [
-                        'emoji',
-                        'link',
-                        'upload',
-                        'edit-mode',
-                        {
-                            name: 'more',
-                            toolbar: [
-                                'insert-after',
-                                'fullscreen',
-                                'preview',
-                                'info',
-                                'help',
-                            ],
-                        },
-                    ],
-                    ctrlEnter: function () {
-                        Chat.send();
-                    }
-                });
-                // 连接WS
-                Chat.ws = new WebSocket(chatChannelURL + toUser);
-                Chat.ws.onopen = function () {
-                    console.log("Connected to chat channel websocket.")
-                }
-                Chat.ws.onmessage = function (evt) {
-                    var data = JSON.parse(evt.data)
-                    if (data.code === -1) {
-                        $('#chatContentTip').addClass('error').html('<ul><li>' + data.msg + '</li></ul>');
-                    } else {
-                        $('#chatContentTip').removeClass('error succ').html('')
-                        let oId = data.oId;
-                        let toId = data.toId;
-                        let fromId = data.fromId;
-                        let time = data.time;
-                        let content = data.content;
-                        let preview = data.preview.substring(0, 10);
-                        let dot = data.preview.length > 10 ? "..." : "";
-                        let user_session = data.user_session;
-                        let senderUserName = data.senderUserName;
-                        let senderAvatar = data.senderAvatar;
-                        let receiverUserName = data.receiverUserName;
-                        let receiverAvatar = data.receiverAvatar;
-                        // 添加消息
-                        if (senderUserName === Label.currentUserName) {
-                            // 我发送的
-                            Chat.addSelfMsg(oId, senderUserName, senderAvatar, content, time, false);
-                            $("#chatTo" + receiverUserName).find("span").html(preview + dot);
-                            // 新消息置顶
-                            let html = $("#chatTo" + receiverUserName).prop('outerHTML');
-                            $("#chatTo" + receiverUserName).remove();
-                            $("#chatMessageList").prepend(html);
-                            // 文件传输助手特殊管理
-                            if (toId === '1000000000086') {
-                                $("#chatToFileTransfer").find("span").html(preview + dot);
-                            }
-                        } else {
-                            // 他发给我的
-                            Chat.addTargetMsg(oId, senderUserName, senderAvatar, content, time, false);
-                            $("#chatTo" + senderUserName).find("span").html(preview + dot);
-                            // 新消息置顶
-                            let html = $("#chatTo" + senderUserName).prop('outerHTML');
-                            $("#chatTo" + senderUserName).remove();
-                            $("#chatMessageList").prepend(html);
-                        }
-                    }
-                }
-                Chat.ws.onclose = function () {
-                    console.log("Disconnected to chat channel websocket.")
-                }
-                Chat.ws.onerror = function (err) {
-                    console.log('ERROR', err)
-                }
-                $("#chatTo" + toUser).css("background-color", "#f1f1f1");
-                Chat.loadMore();
-                // 监听滑动
-                $(window).scroll(
-                    function () {
-                        var scrollTop = $(this).scrollTop();
-                        var scrollHeight = $(document).height();
-                        var windowHeight = $(this).height();
-                        if (scrollTop + windowHeight + 500 >= scrollHeight) {
-                            Chat.loadMore();
-                        }
-                    }
-                );
-            }
         });
     },
 
@@ -313,6 +321,9 @@ var Chat = {
             '        </div>\n' +
             '    </nav>\n' +
             '</div>');
+        if ($("#messageListPanel").css("display") === "none") {
+            $("#messageListPanel").show();
+        }
     },
 
     addSelfMsg(oId, userName, avatarURL, content, time, reverse) {
