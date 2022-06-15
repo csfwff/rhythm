@@ -98,6 +98,25 @@
             <br>
             <div class="tip fn-left" id="chatContentTip"></div>
             <div class="fn-clear" id="buttons" style="display: none">
+                <svg id="emojiBtn" style="width: 30px; height: 30px; cursor:pointer;">
+                    <use xlink:href="#emojiIcon"></use>
+                </svg>
+                <div class="hide-list" id="emojiList">
+                    <div class="hide-list-emojis" id="emojis" style="max-height: 200px">
+                    </div>
+                    <div class="hide-list-emojis__tail">
+                        <span>
+                            <a onclick="Chat.fromURL()">从URL导入表情包</a>
+                        </span>
+                        <span class="hide-list-emojis__tip"></span>
+                        <span>
+                            <a onclick="$('#uploadEmoji input').click()">上传表情包</a>
+                        </span>
+                        <form style="display: none" id="uploadEmoji" method="POST" enctype="multipart/form-data">
+                            <input type="file" name="file">
+                        </form>
+                    </div>
+                </div>
                 <div class="fn-right">
                     <button class="green" id="sendChatBtn">发送</button>
                 </div>
@@ -116,6 +135,7 @@
 </html>
 <script src="${staticServePath}/js/chat${miniPostfix}.js?${staticResourceVersion}"></script>
 <script src="${staticServePath}/js/channel${miniPostfix}.js?${staticResourceVersion}"></script>
+<script src="${staticServePath}/js/lib/jquery/file-upload-9.10.1/jquery.fileupload.min.js"></script>
 <script>
     var Label = {
         commentEditorPlaceholderLabel: '${commentEditorPlaceholderLabel}',

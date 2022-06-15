@@ -418,6 +418,200 @@ var Chat = {
                 });
             }
         });
+    },
+
+    /**
+     * 加载表情
+     */
+    loadEmojis: function () {
+        $("#emojis").html("");
+        let emojis = Chat.getEmojis();
+        for (let i = 0; i < emojis.length; i++) {
+            $("#emojis").append("" +
+                "<button>\n" +
+                "    <div class=\"divX\" onclick='Chat.delEmoji(\"" + emojis[i] + "\")'>\n" +
+                "        <svg style=\"width: 15px; height: 15px;\"><use xlink:href=\"#delIcon\"></use></svg>\n" +
+                "    </div>" +
+                "    <img style='max-height: 50px' onclick=\"Chat.editor.setValue(Chat.editor.getValue() + '![图片表情](" + emojis[i] + ")')\" class=\"vditor-emojis__icon\" src=\"" + emojis[i] + "\">\n" +
+                "</button>");
+        }
+    },
+    /**
+     * 删除表情包
+     * @param url
+     */
+    confirmed: false,
+    delEmoji: function (url) {
+        if (Chat.confirmed === true || confirm("确定要删除该表情包吗？")) {
+            Chat.confirmed = true;
+            let emojis = Chat.getEmojis();
+            for (let i = 0; i < emojis.length; i++) {
+                if (emojis[i] === url) {
+                    emojis.splice(i, 1);
+                }
+            }
+            emojis.reverse();
+            $.ajax({
+                url: Label.servePath + "/api/cloud/sync",
+                method: "POST",
+                data: JSON.stringify({
+                    gameId: "emojis",
+                    data: emojis
+                }),
+                headers: {'csrfToken': Label.csrfToken},
+                async: false,
+                success: function (result) {
+                    if (result.code === 0) {
+                        Util.notice("success", 1500, "表情包删除成功。");
+                        Chat.loadEmojis();
+                        setTimeout(function () {
+                            $("#emojiBtn").click();
+                        }, 50)
+                    } else {
+                        Util.notice("warning", 1500, "表情包删除失败：" + result.msg);
+                    }
+                }
+            });
+        }
+    },
+    /**
+     * 上传表情
+     */
+    listenUploadEmojis: function () {
+        $('#uploadEmoji').fileupload({
+            acceptFileTypes: /(\.|\/)(gif|jpe?g|png)$/i,
+            maxFileSize: 5242880,
+            multipart: true,
+            pasteZone: null,
+            dropZone: null,
+            url: Label.servePath + '/upload',
+            paramName: 'file[]',
+            add: function (e, data) {
+                ext = data.files[0].type.split('/')[1]
+
+                if (window.File && window.FileReader && window.FileList &&
+                    window.Blob) {
+                    var reader = new FileReader()
+                    reader.readAsArrayBuffer(data.files[0])
+                    reader.onload = function (evt) {
+                        var fileBuf = new Uint8Array(evt.target.result.slice(0, 11))
+                        var isImg = isImage(fileBuf)
+
+                        if (!isImg) {
+                            Util.alert('只允许上传图片!')
+
+                            return
+                        }
+
+                        if (evt.target.result.byteLength > 1024 * 1024 * 5) {
+                            Util.alert('图片过大 (最大限制 5M)')
+
+                            return
+                        }
+
+                        data.submit()
+                    }
+                } else {
+                    data.submit()
+                }
+            },
+            formData: function (form) {
+                var data = form.serializeArray()
+                return data
+            },
+            submit: function (e, data) {
+            },
+            done: function (e, data) {
+                var result = {
+                    result: {
+                        key: data.result.data.succMap[Object.keys(data.result.data.succMap)[0]]
+                    }
+                }
+                Chat.addEmoji(result.result.key);
+            },
+            fail: function (e, data) {
+                Util.alert('Upload error: ' + data.errorThrown)
+            },
+        })
+    },
+    // 从URL导入表情包
+    fromURL: function () {
+        Util.alert("" +
+            "<div class=\"form fn__flex-column\" style=\"border: none;width: 100%;box-shadow: none;background-color: #ffffff;padding: 0;\">\n" +
+            "<label>\n" +
+            "  <div class=\"ft__smaller ft__fade\" style=\"float: left\">请输入图片的URL</div>\n" +
+            "  <div class=\"fn-hr5 fn__5\"></div>\n" +
+            "  <input type=\"text\" id=\"fromURL\">\n" +
+            "</label>\n" +
+            "<div class=\"fn-hr5\"></div>\n" +
+            "<div class=\"fn__flex\" style=\"margin-top: 15px; justify-content: flex-end;\">\n" +
+            "  <button class=\"btn btn--confirm\" onclick='Chat.addEmoji($(\"#fromURL\").val());Util.closeAlert();'>导入</button>\n" +
+            "</div>\n" +
+            "</div>" +
+            "", "从URL导入表情包");
+        $("#fromURL").focus();
+        $("#fromURL").unbind();
+        $("#fromURL").bind('keypress',function(event){
+            if (event.keyCode == "13") {
+                Chat.addEmoji($("#fromURL").val());
+                Util.closeAlert();
+            }
+        });
+    },
+    addEmoji: function () {
+        for (let i = 0; i < arguments.length; i++) {
+            let url = arguments[i];
+            let emojis = Chat.getEmojis();
+            emojis.reverse();
+            for (let i = 0; i < emojis.length; i++) {
+                if (emojis[i] === url) {
+                    emojis.splice(i, 1);
+                }
+            }
+            emojis.push(url);
+            $.ajax({
+                url: Label.servePath + "/api/cloud/sync",
+                method: "POST",
+                data: JSON.stringify({
+                    gameId: "emojis",
+                    data: emojis
+                }),
+                headers: {'csrfToken': Label.csrfToken},
+                async: false,
+                success: function (result) {
+                    if (result.code !== 0) {
+                        Util.notice("warning", 1500, "表情包上传失败：" + result.msg);
+                    }
+                }
+            });
+        }
+        Util.notice("success", 1500, "表情包上传成功。");
+        $("details[open]").removeAttr("open");
+        Chat.loadEmojis();
+    },
+    /**
+     * 获取表情包
+     */
+    getEmojis: function () {
+        let ret;
+        $.ajax({
+            url: Label.servePath + "/api/cloud/get",
+            method: "POST",
+            data: JSON.stringify({
+                gameId: "emojis",
+            }),
+            headers: {'csrfToken': Label.csrfToken},
+            async: false,
+            success: function (result) {
+                if (result.code === 0 && result.data !== "") {
+                    ret = Util.parseArray(result.data);
+                } else {
+                    ret = [];
+                }
+            },
+        });
+        ret.reverse();
+        return ret;
     }
 }
 
@@ -470,5 +664,36 @@ $(document).ready(function () {
     $("#goToTop a").click(function () {
         $("html,body").animate({scrollTop: 0}, 800);
         return false;
+    });
+    // 表情包初始化
+    // 加载表情
+    Chat.listenUploadEmojis();
+    Chat.loadEmojis();
+    // 监听表情包按钮
+    $("#emojiBtn").on('click', function () {
+        if ($("#emojiList").hasClass("showList")) {
+            $("#emojiList").removeClass("showList");
+        } else {
+            $("#emojiList").addClass("showList");
+            setTimeout(function () {
+                $("body").unbind();
+                $('body').click(function (event) {
+                    if ($(event.target).closest('a').attr('id') !== 'aPersonListPanel' &&
+                        $(event.target).closest('.module').attr('id') !== 'personListPanel') {
+                        $('#personListPanel').hide()
+                    }
+                })
+                $("body").click(function() {
+                    $("#emojiList").removeClass("showList");
+                    $("body").unbind();
+                    $('body').click(function (event) {
+                        if ($(event.target).closest('a').attr('id') !== 'aPersonListPanel' &&
+                            $(event.target).closest('.module').attr('id') !== 'personListPanel') {
+                            $('#personListPanel').hide()
+                        }
+                    })
+                });
+            }, 100);
+        }
     });
 });
