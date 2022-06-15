@@ -205,8 +205,6 @@ var Chat = {
                     Chat.ws.onerror = function (err) {
                         console.log('ERROR', err)
                     }
-                    // 选中用户
-                    $("#chatTo" + toUser).css("background-color", "#f1f1f1");
                     // 加载消息
                     Chat.loadMore();
                     // 监听滑动
@@ -226,7 +224,7 @@ var Chat = {
                         type: "GET"
                     });
                     // 加载未读消息
-                    $.ajax({
+                    var loadUnread = $.ajax({
                         url: Label.servePath + '/chat/has-unread?apiKey=' + apiKey,
                         type: 'GET',
                         success: function (result) {
@@ -236,6 +234,10 @@ var Chat = {
                                 $("#chatTo" + data.senderUserName).css("background-color", "#fff4eb");
                             });
                         }
+                    });
+                    $.when(loadUnread).done(function () {
+                        // 选中用户
+                        $("#chatTo" + toUser).css("background-color", "#f1f1f1");
                     });
                 }
             });
