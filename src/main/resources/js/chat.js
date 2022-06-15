@@ -403,7 +403,6 @@ var Chat = {
             url: Label.servePath + "/chat/mark-all-as-read?apiKey=" + apiKey,
             type: "GET",
             success: function (result) {
-                console.log(result);
                 result.users.forEach((user) => {
                     $("#chatTo" + user).css("background-color", "");
                 });
