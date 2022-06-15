@@ -21,10 +21,12 @@ package org.b3log.symphony.service;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.b3log.latke.http.RequestContext;
 import org.b3log.latke.ioc.BeanManager;
 import org.b3log.latke.ioc.Inject;
 import org.b3log.latke.repository.Transaction;
 import org.b3log.latke.service.annotation.Service;
+import org.b3log.latke.util.Requests;
 import org.b3log.symphony.processor.LogsProcessor;
 import org.b3log.symphony.processor.channel.LogsChannel;
 import org.b3log.symphony.repository.ArticleRepository;
@@ -65,7 +67,13 @@ public class LogsService {
         }
     }
 
-    public static void simpleLog(String time, String address, String module, String message) {
+    public static void simpleLog(RequestContext context, String time, String module, String message) {
+        String address = Requests.getRemoteAddr(context.getRequest());
+        try {
+            address = address.substring(0, (address.length() - 3));
+            address = address + "*";
+        } catch (Exception ignored) {
+        }
         log("simple", time, address, module, message, true);
     }
 }
