@@ -291,7 +291,7 @@ public class UserProcessor {
             context.renderMsg("金手指(point类型)不正确。");
         }
         context.renderJSON(StatusCodes.ERR);
-        context.renderMsg("转账失败");
+        context.renderMsg("转账失败。");
     }
 
     /**
