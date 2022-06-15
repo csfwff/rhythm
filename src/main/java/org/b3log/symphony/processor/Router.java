@@ -115,6 +115,8 @@ public final class Router {
         MFAProcessor.register();
         // Chat
         ChatProcessor.register();
+        // 日志
+        LogsProcessor.register();
 
         final BeanManager beanManager = BeanManager.getInstance();
         final LoginCheckMidware loginCheck = beanManager.getReference(LoginCheckMidware.class);
