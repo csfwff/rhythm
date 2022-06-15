@@ -221,12 +221,14 @@ var Chat = {
                     // 用户已读
                     $.ajax({
                         url: Label.servePath + "/chat/mark-as-read?apiKey=" + apiKey + "&fromUser=" + Chat.toUser,
-                        type: "GET"
+                        type: "GET",
+                        async: false
                     });
                     // 加载未读消息
                     var loadUnread = $.ajax({
                         url: Label.servePath + '/chat/has-unread?apiKey=' + apiKey,
                         type: 'GET',
+                        async: false,
                         success: function (result) {
                             let count = result.result;
                             let list = result.data;
@@ -260,7 +262,7 @@ var Chat = {
                 $.ajax({
                     url: Label.servePath + "/chat/get-message?apiKey=" + apiKey + "&toUser=" + Chat.toUser + "&page=" + Chat.page + "&pageSize=20",
                     type: "GET",
-                    async: "false",
+                    async: false,
                     success: function (result) {
                         try {
                             result.data.length;
@@ -440,4 +442,22 @@ $(document).ready(function () {
     $("body").click(function () {
         $("details[open]").removeAttr("open");
     });
+    // img preview
+    $('#chats').on('click', '.vditor-reset img', function (event) {
+        if ($(this).hasClass('emoji') ||
+            $(this).closest('.editor-panel').length === 1 ||
+            $(this).closest('.ad').length === 1) {
+            return
+        }
+        var $it = $(this);
+        $('body').
+        append('<div class="img-preview" onclick="$(this).remove()"><img src="' +
+            ($it.attr('src').split('?imageView2')[0]) +
+            '" onload="Article.previewImgAfterLoading()"></div>')
+
+        $('.img-preview').css({
+            'background-color': '#fff',
+            'position': 'fixed',
+        })
+    })
 });
