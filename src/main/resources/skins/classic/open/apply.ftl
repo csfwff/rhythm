@@ -40,6 +40,12 @@
           margin-top:10px;
           margin-left:6px;
         }
+
+        .apply-text-area {
+          width:300px;
+          height:100px;
+        }
+
         .apply-title-area {
           margin-top:16px;
           margin-left:6px;
@@ -65,7 +71,10 @@
                     <p class="tips">提示：申请需审核，审核很严格，木事莫申请，申请也不过。</p>
                     <div class="apply-form">
                         <div class="apply-input-area">
-                            <input id="apiKeyDescription" type="text" placeholder="ApiKey描述" autocomplete="off" />
+                            <input id="apiKeyName" placeholder="ApiKey别名" autocomplete="off" ></textarea>
+                        </div>
+                        <div class="apply-input-area">
+                            <textarea id="apiKeyDescription" class="apply-text-area" placeholder="ApiKey描述" autocomplete="off" ></textarea>
                         </div>
                         <div class="apply-row-area">用途：
                              <div class="apply-radio"><label><input type="radio" value="0" name="apiKeyType" checked>鱼游 </label></div>

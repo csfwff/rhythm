@@ -37,6 +37,21 @@ public final class OpenApi {
      */
      public static final String OPEN_API_USER_ID = "openApiUserId";
 
+    /**
+     * OpenApi Name
+     */
+    public static final String OPEN_API_NAME = "openApiName";
+
+    /**
+     * OpenApi Webhook address
+     */
+    public static final String OPEN_API_WEBHOOK_ADDRESS = "openApiWebhookAddress";
+
+    /**
+     * OpenApi Icon address
+     */
+    public static final String OPEN_API_ICON_ADDRESS = "openApiIcon";
+
      /**
      * OpenApi Key
      */

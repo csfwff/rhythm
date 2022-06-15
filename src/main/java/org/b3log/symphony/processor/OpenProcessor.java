@@ -145,6 +145,7 @@ public class OpenProcessor {
         } catch (NullPointerException ignored) {
         }
         final String userId = currentUser.optString(Keys.OBJECT_ID);
+        final String openApiName = StringUtils.trim(requestJSONObject.optString(OpenApi.OPEN_API_NAME));
         final int type = requestJSONObject.optInt(OpenApi.OPEN_API_TYPE);
         final long currentTimeMillis = System.currentTimeMillis();
         final String description = StringUtils.trim(requestJSONObject.optString(OpenApi.OPEN_API_DESCRIPTION));
@@ -152,6 +153,7 @@ public class OpenProcessor {
 
         final JSONObject openApiModel = new JSONObject();
         openApiModel.put(OpenApi.OPEN_API_USER_ID, userId);
+        openApiModel.put(OpenApi.OPEN_API_NAME,openApiName);
         openApiModel.put(OpenApi.OPEN_API_TYPE, type);
         openApiModel.put(OpenApi.OPEN_API_DESCRIPTION, description);
         openApiModel.put(OpenApi.OPEN_API_KEY, openApi);

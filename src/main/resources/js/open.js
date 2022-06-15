@@ -35,9 +35,11 @@ var Open = {
       openApiDescription: $("#apiKeyDescription")
         .val()
         .replace(/(^\s*)|(\s*$)/g, ""),
+      openApiName: $("#apiKeyName")
+        .val()
+        .replace(/(^\s*)|(\s*$)/g, ""),
       openApiType: $("input[name=apiKeyType]:checked").val(),
     };
-    console.log(requestJSONObject);
     $.ajax({
       url: Label.servePath + "/open/apply",
       type: "POST",
