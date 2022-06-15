@@ -383,6 +383,10 @@ public class InitMgmtService {
             permission.put(Keys.OBJECT_ID, Permission.PERMISSION_ID_C_BREEZEMOON_UPDATE_BREEZEMOON);
             permissionRepository.add(permission);
 
+            // openapi management permission
+            permission.put(Keys.OBJECT_ID,Permission.PERMISSION_CATEGORY_C_OPEN_API);
+            permissionRepository.add(permission);
+
             // common permissions
             permission.put(Permission.PERMISSION_CATEGORY, Permission.PERMISSION_CATEGORY_C_COMMON);
 

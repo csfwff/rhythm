@@ -34,7 +34,7 @@ import org.b3log.symphony.repository.OpenApiRepository;
 import org.json.JSONObject;
 
 /**
- * Report management service.
+ * OpenApi management service.
  *
  * @author <a href="http://88250.b3log.org">Liang Ding</a>
  * @version 1.2.0.0, Jul 15, 2018
@@ -49,7 +49,7 @@ public class OpenApiMgmtService {
     private static final Logger LOGGER = LogManager.getLogger(OpenApiMgmtService.class);
 
     /**
-     * Report repository.
+     * OpenApi repository.
      */
     @Inject
     private OpenApiRepository openApiRepository;
@@ -75,7 +75,7 @@ public class OpenApiMgmtService {
     /**
      * Adds a OpenApi.
      *
-     * @param report the specified openApi model, for example,
+     * @param openapi the specified openApi model, for example,
      *               {
      *               "openApiUserId": "",
      *               "openApiKey": "",
@@ -98,4 +98,33 @@ public class OpenApiMgmtService {
             throw new ServiceException(langPropsService.get("systemErrLabel"));
         }
     }
+
+    /**
+     * Makes the specified openapi as handled.
+     *
+     * @param reportId the specified report id
+     */
+    public void makeOpenApiHandled(final String openApiId,final boolean isApprove) {
+      final Transaction transaction = openApiRepository.beginTransaction();
+      try {
+          final JSONObject openapi = openApiRepository.get(openApiId);
+          openapi.put(OpenApi.OPEN_API_AVAILABLE, isApprove?OpenApi.OPEN_API_AVAILABLE_YES:OpenApi.OPEN_API_AVAILABLE_REJECTED);
+
+          openApiRepository.update(openApiId, openapi);
+          transaction.commit();
+
+          //iwpz 先不发了，要加的东西太™多了
+          // final String applierId = openapi.optString(OpenApi.OPEN_API_USER_ID);
+          // final JSONObject notification = new JSONObject();
+          // notification.put(Notification.NOTIFICATION_USER_ID, applierId);
+          // notification.put(Notification.NOTIFICATION_DATA_ID, openApiId);
+          // notificationMgmtService.addOpenApiHandledNotification(notification);
+      } catch (final Exception e) {
+          if (transaction.isActive()) {
+              transaction.rollback();
+          }
+
+          LOGGER.log(Level.ERROR, "Makes openApi [id=" + openApiId + "] as handled failed", e);
+      }
+  }
 }

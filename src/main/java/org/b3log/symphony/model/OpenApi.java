@@ -33,6 +33,17 @@ public final class OpenApi {
     public static final String OPEN_API = "open_api";
 
     /**
+     * Key of apply user name.
+     */
+    public static final String OPEN_API_T_USERNAME = "openApiApplyUserName";
+
+
+    /**
+     * OpenApi User Id
+     */
+    public static final String OPEN_API_ID = "oId";
+
+    /**
      * OpenApi User Id
      */
      public static final String OPEN_API_USER_ID = "openApiUserId";
@@ -61,6 +72,11 @@ public final class OpenApi {
      * OpenApi Available
      */
      public static final String OPEN_API_AVAILABLE = "openApiAvailable";
+
+     /**
+     * OpenApi Rejected
+     */
+    public static final int OPEN_API_AVAILABLE_REJECTED = -1;
 
      /**
      * OpenApi Not Available

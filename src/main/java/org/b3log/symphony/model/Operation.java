@@ -305,6 +305,12 @@ public final class Operation {
      */
     public static final int OPERATION_CODE_C_REBUILD_ARTICLE_SEARCH = 45;
 
+    /**
+     * Operation code - handled open api apply
+     */
+    public static final int OPERATION_CODE_C_HANDLED_OPEN_API_APPLY = 46;
+
+
     //// Transient ////
 
     /**
