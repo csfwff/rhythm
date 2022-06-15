@@ -19,7 +19,9 @@
 package org.b3log.symphony.repository;
 
 import org.b3log.latke.repository.AbstractRepository;
+import org.b3log.latke.repository.RepositoryException;
 import org.b3log.latke.repository.annotation.Repository;
+import org.json.JSONObject;
 
 @Repository
 public class LogsRepository extends AbstractRepository {
@@ -28,6 +30,17 @@ public class LogsRepository extends AbstractRepository {
      */
     public LogsRepository() {
         super("logs");
+    }
+
+    public void add(String type, String key1, String key2, String key3, String data, boolean isPublic) throws RepositoryException {
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("type", type);
+        jsonObject.put("key1", key1);
+        jsonObject.put("key2", key2);
+        jsonObject.put("key3", key3);
+        jsonObject.put("data", data);
+        jsonObject.put("public", isPublic);
+        add(jsonObject);
     }
 
 }
