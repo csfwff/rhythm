@@ -18,11 +18,18 @@
  */
 package org.b3log.symphony.service;
 
+import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.b3log.latke.ioc.BeanManager;
 import org.b3log.latke.ioc.Inject;
+import org.b3log.latke.repository.Transaction;
 import org.b3log.latke.service.annotation.Service;
 import org.b3log.symphony.processor.LogsProcessor;
+import org.b3log.symphony.processor.channel.LogsChannel;
+import org.b3log.symphony.repository.ArticleRepository;
+import org.b3log.symphony.repository.LogsRepository;
+import org.json.JSONObject;
 
 /**
  * @author fangcong
@@ -34,8 +41,25 @@ public class LogsService {
 
     private static final Logger LOGGER = LogManager.getLogger(LogsService.class);
 
-    @Inject
-    private LogsProcessor logsProcessor;
+    public synchronized static void log(String type, String key1, String key2, String key3, String data, boolean isPublic) {
+        try {
+            // 写表
+            final BeanManager beanManager = BeanManager.getInstance();
+            final LogsRepository logsRepository = beanManager.getReference(LogsRepository.class);
+            final Transaction transaction = logsRepository.beginTransaction();
+            logsRepository.add(type, key1, key2, key3, data, isPublic);
+            transaction.commit();
 
-
+            // 向WS发送消息
+            JSONObject messageJSON = new JSONObject();
+            messageJSON.put("type", type);
+            messageJSON.put("key1", key1);
+            messageJSON.put("key2", key2);
+            messageJSON.put("key3", key3);
+            messageJSON.put("data", data);
+            LogsChannel.sendMsg(messageJSON.toString());
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, "Unable to log", e);
+        }
+    }
 }

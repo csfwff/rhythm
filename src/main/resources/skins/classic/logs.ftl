@@ -43,5 +43,6 @@
             </div>
         </div>
         <#include "footer.ftl">
+        <script src="${staticServePath}/js/logs${miniPostfix}.js?${staticResourceVersion}"></script>
     </body>
 </html>
