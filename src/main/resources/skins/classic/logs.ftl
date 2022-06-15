@@ -44,5 +44,8 @@
         </div>
         <#include "footer.ftl">
         <script src="${staticServePath}/js/logs${miniPostfix}.js?${staticResourceVersion}"></script>
+        <script>
+            var logsChannelURL = "${wsScheme}://${serverHost}:${serverPort}${contextPath}/logs-channel";
+        </script>
     </body>
 </html>

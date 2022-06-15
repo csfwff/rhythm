@@ -41,7 +41,7 @@ public class LogsService {
 
     private static final Logger LOGGER = LogManager.getLogger(LogsService.class);
 
-    public synchronized static void log(String type, String key1, String key2, String key3, String data, boolean isPublic) {
+    public static void log(String type, String key1, String key2, String key3, String data, boolean isPublic) {
         try {
             // 写表
             final BeanManager beanManager = BeanManager.getInstance();
@@ -51,15 +51,21 @@ public class LogsService {
             transaction.commit();
 
             // 向WS发送消息
-            JSONObject messageJSON = new JSONObject();
-            messageJSON.put("type", type);
-            messageJSON.put("key1", key1);
-            messageJSON.put("key2", key2);
-            messageJSON.put("key3", key3);
-            messageJSON.put("data", data);
-            LogsChannel.sendMsg(messageJSON.toString());
+            if (isPublic) {
+                JSONObject messageJSON = new JSONObject();
+                messageJSON.put("type", type);
+                messageJSON.put("key1", key1);
+                messageJSON.put("key2", key2);
+                messageJSON.put("key3", key3);
+                messageJSON.put("data", data);
+                LogsChannel.sendMsg(messageJSON.toString());
+            }
         } catch (Exception e) {
             LOGGER.log(Level.ERROR, "Unable to log", e);
         }
+    }
+
+    public static void simpleLog(String time, String address, String module, String message) {
+        log("simple", time, address, module, message, true);
     }
 }
