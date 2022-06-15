@@ -226,6 +226,72 @@ public class UserProcessor {
         Dispatcher.post("/user/edit/remove-metal", userProcessor::removeMetal);
         Dispatcher.post("/user/query/items", userProcessor::getItem);
         Dispatcher.post("/user/edit/items", userProcessor::adjustItem);
+        Dispatcher.post("/user/edit/points", userProcessor::adjustPoint);
+    }
+
+    /**
+     * 金手指：调整积分
+     */
+    public void adjustPoint(final RequestContext context) {
+        JSONObject requestJSONObject = context.requestJSON();
+        final String goldFingerKey = requestJSONObject.optString("goldFingerKey");
+        final String itemKey = Symphonys.get("gold.finger.point");
+        if (goldFingerKey.equals(itemKey)) {
+            try {
+                final String userName = requestJSONObject.optString("userName");
+                JSONObject user = userQueryService.getUserByName(userName);
+                try {
+                    int point = requestJSONObject.optInt("point");
+                    String memo = requestJSONObject.optString("memo");
+                    if (point > 100000 || point < -100000) {
+                        context.renderJSON(StatusCodes.ERR);
+                        context.renderMsg("转账失败：交易数额不得大于 100000 积分。");
+                        return;
+                    }
+                    if (memo.isEmpty()) {
+                        context.renderJSON(StatusCodes.ERR);
+                        context.renderMsg("转账失败：交易备注不得为空。");
+                        return;
+                    }
+                    final String userId = user.optString(Keys.OBJECT_ID);
+                    if (point > 0) {
+                        // 增加积分
+                        final String transferId = pointtransferMgmtService.transfer(Pointtransfer.ID_C_SYS, userId,
+                                Pointtransfer.TRANSFER_TYPE_C_ACCOUNT2ACCOUNT, point, userId, System.currentTimeMillis(), memo);
+                        final JSONObject notification = new JSONObject();
+                        notification.put(Notification.NOTIFICATION_USER_ID, userId);
+                        notification.put(Notification.NOTIFICATION_DATA_ID, transferId);
+                        notificationMgmtService.addPointTransferNotification(notification);
+                        context.renderJSON(StatusCodes.SUCC);
+                        context.renderMsg("转账成功，交易oId为：" + transferId);
+                        return;
+                    } else if (point < 0) {
+                        // 减少积分
+                        point = -point;
+                        final String transferId = pointtransferMgmtService.transfer(userId, Pointtransfer.ID_C_SYS,
+                                Pointtransfer.TRANSFER_TYPE_C_ABUSE_DEDUCT, point, memo, System.currentTimeMillis(), "");
+                        final JSONObject notification = new JSONObject();
+                        notification.put(Notification.NOTIFICATION_USER_ID, userId);
+                        notification.put(Notification.NOTIFICATION_DATA_ID, transferId);
+                        notificationMgmtService.addAbusePointDeductNotification(notification);
+                        context.renderJSON(StatusCodes.SUCC);
+                        context.renderMsg("扣款成功，交易oId为：" + transferId);
+                        return;
+                    }
+                } catch (Exception e) {
+                    context.renderJSON(StatusCodes.ERR);
+                    context.renderMsg("转账失败：" + e.getMessage());
+                }
+            } catch (Exception e) {
+                context.renderJSON(StatusCodes.ERR);
+                context.renderMsg("用户不存在，请检查用户名。");
+            }
+        } else {
+            context.renderJSON(StatusCodes.ERR);
+            context.renderMsg("金手指(point类型)不正确。");
+        }
+        context.renderJSON(StatusCodes.ERR);
+        context.renderMsg("转账失败。");
     }
 
     /**

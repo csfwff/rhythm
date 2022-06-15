@@ -457,7 +457,7 @@ public class LoginProcessor {
      *
      * @param context the specified context
      */
-    public static SimpleCurrentLimiter verifyCodeLimiter = new SimpleCurrentLimiter(60, 2);
+    public static SimpleCurrentLimiter verifyCodeLimiter = new SimpleCurrentLimiter(60, 4);
     public void showRegister(final RequestContext context) {
         if (Sessions.isLoggedIn()) {
             context.sendRedirect(Latkes.getServePath());

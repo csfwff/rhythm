@@ -31,7 +31,9 @@ import org.b3log.latke.ioc.Singleton;
 import org.b3log.latke.model.User;
 import org.b3log.latke.repository.*;
 import org.b3log.latke.util.Crypts;
+import org.b3log.symphony.model.Common;
 import org.b3log.symphony.model.UserExt;
+import org.b3log.symphony.processor.channel.UserChannel;
 import org.b3log.symphony.processor.middleware.ApiCheckMidware;
 import org.b3log.symphony.processor.middleware.LoginCheckMidware;
 import org.b3log.symphony.repository.ChatInfoRepository;
@@ -112,6 +114,12 @@ public class ChatProcessor {
             final Transaction transaction = chatUnreadRepository.beginTransaction();
             chatUnreadRepository.remove(query);
             transaction.commit();
+            // 通知用户
+            final JSONObject cmd = new JSONObject();
+            cmd.put(UserExt.USER_T_ID, userId);
+            cmd.put(Common.COMMAND, "chatUnreadCountRefresh");
+            cmd.put("count", 0);
+            UserChannel.sendCmd(cmd);
             context.renderJSON(new JSONObject().put("result", 0).put("users", unreadUserNameList));
         } catch (Exception e) {
             context.renderJSON(new JSONObject()
@@ -136,6 +144,17 @@ public class ChatProcessor {
                     ));
             chatUnreadRepository.remove(query);
             transaction.commit();
+            // 通知用户
+            Query queryUnread = new Query().setFilter(new PropertyFilter("toId", FilterOperator.EQUAL, userId));
+            try {
+                List<JSONObject> result = chatUnreadRepository.getList(queryUnread);
+                final JSONObject cmd = new JSONObject();
+                cmd.put(UserExt.USER_T_ID, userId);
+                cmd.put(Common.COMMAND, "chatUnreadCountRefresh");
+                cmd.put("count", result.size());
+                UserChannel.sendCmd(cmd);
+            } catch (Exception ignored) {
+            }
         } catch (Exception e) {
             context.renderJSON(new JSONObject()
                     .put("result", -1)
@@ -194,8 +213,7 @@ public class ChatProcessor {
                 }
                 // 将content过滤为纯文本
                 String content = info.optString("content");
-                String preview = content.replaceAll("[^a-zA-Z0-9\\u4E00-\\u9FA5]", "");
-                info.put("preview", preview.length() > 20 ? preview.substring(0, 20) : preview);
+                info.put("preview", makePreview(content));
                 String markdown = info.optString("content");
                 String html = ChatProcessor.processMarkdown(markdown);
                 info.put("content", html);
@@ -218,6 +236,14 @@ public class ChatProcessor {
         }
     }
 
+    public static String makePreview(String str) {
+        String preview = str.replaceAll("[^a-zA-Z0-9\\u4E00-\\u9FA5]", "");
+        if (preview.isEmpty()) {
+            preview = "[聊天消息]";
+        }
+        return preview.length() > 20 ? preview.substring(0, 20) : preview;
+    }
+
     public void getList(final RequestContext context) {
         context.renderJSON(new JSONObject().put("result", 0));
         JSONObject currentUser = ApiProcessor.getUserByKey(context.param("apiKey"));
@@ -234,6 +260,9 @@ public class ChatProcessor {
             String[] ids = sessionId.split("_");
             final String otherId = Arrays.stream(ids).filter(id -> !id.equals(userId)).findAny().get();
             JSONObject otherUser = userQueryService.getUser(otherId);
+            if (otherUser == null) {
+                continue;
+            }
             JSONObject info = null;
             final String lastMessageId = listItem.optString("lastMessageId");
             try {
@@ -254,8 +283,7 @@ public class ChatProcessor {
             }
             // 将content过滤为纯文本
             String content = info.optString("content");
-            String preview = content.replaceAll("[^a-zA-Z0-9\\u4E00-\\u9FA5]", "");
-            info.put("preview", preview.length() > 20 ? preview.substring(0, 20) : preview);
+            info.put("preview", makePreview(content));
             String markdown = info.optString("content");
             String html = ChatProcessor.processMarkdown(markdown);
             info.put("content", html);
