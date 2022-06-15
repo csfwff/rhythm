@@ -28,10 +28,10 @@ var Logs = {
 
     appendLog: function (key1, key2, key3, data) {
         let result = '<div>';
-        result += '<span style=\'color="#696969"\'>' + key1 + '</span> ';
-        result += '<span style=\'color="#708090"\'>' + key2 + '</span> ';
-        result += '<span style=\'color="#6A5ACD"\'>' + key3 + '</span> ';
-        result += '<span style=\'color="#1E90FF"\'>' + data + '</span> ';
+        result += '<span style=\'color: #696969\'>' + key1 + '</span> ';
+        result += '<span style=\'color: #708090\'>' + key2 + '</span> ';
+        result += '<span style=\'color: #6A5ACD\'>' + key3 + '</span> ';
+        result += '<span style=\'color: #1E90FF\'>' + data + '</span> ';
         result += '</div>';
         $("#logsContent").prepend(result);
     }
