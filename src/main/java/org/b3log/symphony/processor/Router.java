@@ -101,6 +101,8 @@ public final class Router {
         TagProcessor.register();
         // 榜单
         TopProcessor.register();
+        //开放平台
+        OpenProcessor.register();
         // 用户
         UserProcessor.register();
         // 投票
