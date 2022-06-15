@@ -40,10 +40,15 @@
           margin-top:10px;
           margin-left:6px;
         }
+        .apply-title-area {
+          margin-top:16px;
+          margin-left:6px;
+        }
         .apply-row-area {
-            margin-top:10px;
+          margin-top:10px;
           margin-left:6px;
           display:flex;
+          align-items:center;
           flex-direction: row;
         }
         .apply-radio {
@@ -62,7 +67,7 @@
                         <div class="apply-input-area">
                             <input id="apiKeyDescription" type="text" placeholder="ApiKey描述" autocomplete="off" />
                         </div>
-                        <div class="apply-row-area">
+                        <div class="apply-row-area">用途：
                              <div class="apply-radio"><label><input type="radio" value="0" name="apiKeyType" checked>鱼游 </label></div>
                             <div class="apply-radio"><label><input type="radio" value="1" name="apiKeyType"> 应用 </label></div>
                             <div class="apply-radio"><label><input type="radio" value="2" name="apiKeyType"> 其他 </label></div>
