@@ -450,8 +450,7 @@ $(document).ready(function () {
             return
         }
         var $it = $(this);
-        $('body').
-        append('<div class="img-preview" onclick="$(this).remove()"><img src="' +
+        $('body').append('<div class="img-preview" onclick="$(this).remove()"><img src="' +
             ($it.attr('src').split('?imageView2')[0]) +
             '" onload="Article.previewImgAfterLoading()"></div>')
 
@@ -460,4 +459,16 @@ $(document).ready(function () {
             'position': 'fixed',
         })
     })
+    // 返回顶部 置顶按钮监听
+    $(window).scroll(function () {
+        if ($(this).scrollTop() > 1) {
+            $("#goToTop").fadeIn();
+        } else {
+            $("#goToTop").fadeOut();
+        }
+    });
+    $("#goToTop a").click(function () {
+        $("html,body").animate({scrollTop: 0}, 800);
+        return false;
+    });
 });
