@@ -19,6 +19,7 @@
 package org.b3log.symphony.processor;
 
 import org.apache.commons.lang.RandomStringUtils;
+import org.apache.commons.lang.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.b3log.latke.Keys;
@@ -45,6 +46,8 @@ import org.b3log.symphony.service.UserQueryService;
 import org.b3log.symphony.util.*;
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.jsoup.Jsoup;
+import org.jsoup.safety.Whitelist;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -236,12 +239,13 @@ public class ChatProcessor {
         }
     }
 
-    public static String makePreview(String str) {
-        String preview = str.replaceAll("[^a-zA-Z0-9\\u4E00-\\u9FA5]", "");
-        if (preview.isEmpty()) {
-            preview = "[聊天消息]";
+    public static String makePreview(String content) {
+        content = Jsoup.clean(content, Whitelist.none());
+        content = StringUtils.trim(content);
+        if (StringUtils.isBlank(content)) {
+            content = "[聊天消息]";
         }
-        return preview.length() > 20 ? preview.substring(0, 20) : preview;
+        return content.length() > 20 ? content.substring(0, 20) : content;
     }
 
     public void getList(final RequestContext context) {
