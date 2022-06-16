@@ -995,11 +995,15 @@ var Util = {
         }
 
         // browser
+        let icon = '<svg style="height: 15px;padding-top: 2px;">' +
+                   '  <use xlink:href="#notification"></use>' +
+                   '</svg>' +
+                   '&nbsp;';
         if (0 < count) {
           $('#aNotifications').
             removeClass('no-msg tooltipped tooltipped-w').
             addClass('msg').
-            text(count).
+            html(icon + count).
             attr('href', 'javascript:void(0)')
           if (0 === result.userNotifyStatus &&
             window.localStorage.hadNotificate !== count.toString() &&
@@ -1037,7 +1041,7 @@ var Util = {
           $('#aNotifications').
             removeClass('msg').
             addClass('no-msg tooltipped tooltipped-w').
-            text(count).
+            html(icon + count).
             attr('href', Label.servePath + '/notifications')
         }
       },
@@ -1619,8 +1623,10 @@ var Util = {
           if (data.count === 0) {
             Util.pauseBling();
           }
+          $("#aChatCount").text(data.count);
           break;
         case 'newIdleChatMessage':
+          $("#aChatCount").text(parseInt($("#aChatCount").text()) + 1);
           if (window.location.pathname !== "/chat") {
             Util.blingChat();
             Util.notice("warning", 3000, "叮咚！" + data.senderUserName + " 向你发送了一条私信。<a href='/chat?toUser=" + data.senderUserName + "'>点击查看</a>");
@@ -1679,6 +1685,9 @@ var Util = {
    * @description 让聊天图标闪烁
    */
   blingChat: function () {
+    $('#aChat').
+    removeClass('no-msg').
+    addClass('msg');
     if (!Util.isBlinging) {
       Util.isBlinging = true;
       $("#idleTalkIconContainer").html("<use xlink:href=\"#redIdleChat\"></use>");
@@ -1697,6 +1706,9 @@ var Util = {
    * @description 终止闪烁聊天图标
    */
   pauseBling: function () {
+    $('#aChat').
+    removeClass('msg').
+    addClass('no-msg');
     if (Util.isBlinging) {
       Util.isBlinging = false;
       clearInterval(bling);

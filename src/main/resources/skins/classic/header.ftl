@@ -82,29 +82,34 @@
                 </svg>
             </a>
             </#if>
+            <a href="${servePath}/activities" aria-label="${activityLabel}" class="tooltipped tooltipped-w">
+                <svg>
+                    <use xlink:href="#flag"></use>
+                </svg>
+            </a>
             <a id="aNotifications"
                class="tooltipped tooltipped-w <#if unreadNotificationCount == 0>no-msg<#else>msg</#if>"
-               href="${servePath}/notifications" aria-label="${messageLabel}">${unreadNotificationCount}
+               href="${servePath}/notifications" aria-label="${messageLabel}">
+                <svg style="height: 15px;padding-top: 2px;">
+                    <use xlink:href="#notification"></use>
+                </svg>
+                &nbsp;${unreadNotificationCount}
             </a>
-            <a href="${servePath}/chat" class="tooltipped tooltipped-w" aria-label="私信">
-                <svg id="idleTalkIconContainer">
+            <a id="aChat" href="${servePath}/chat" class="tooltipped tooltipped-w no-msg" aria-label="私信">
+                <svg style="height: 15px;padding-top: 2px;">
                     <use xlink:href="#idleChat"></use>
                 </svg>
+                &nbsp;<span id="aChatCount"><#if unreadChat?? && unreadChat gt 0>${unreadChat}<#else>0</#if></span>
             </a>
             <#if unreadChat?? && unreadChat gt 0>
                 <script>
                     if (window.location.pathname !== "/chat") {
                         setTimeout(function () {
                             Util.blingChat();
-                        }, 2000);
+                        }, 1000);
                     }
                 </script>
             </#if>
-            <a href="${servePath}/activities" aria-label="${activityLabel}" class="tooltipped tooltipped-w">
-                <svg>
-                    <use xlink:href="#flag"></use>
-                </svg>
-            </a>
             <a href="javascript:void(0)" id="aPersonListPanel" class="tooltipped tooltipped-w"
                aria-label="${viewHomeAndProfileLabel}"
                data-url="${servePath}/member/${currentUser.userName}">
