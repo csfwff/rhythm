@@ -154,11 +154,17 @@ public class OpenProcessor {
 
         final JSONObject openApiModel = new JSONObject();
         openApiModel.put(OpenApi.OPEN_API_USER_ID, userId);
+        openApiModel.put(OpenApi.OPEN_API_KEY, "");
         openApiModel.put(OpenApi.OPEN_API_NAME,openApiName);
         openApiModel.put(OpenApi.OPEN_API_TYPE, type);
-        openApiModel.put(OpenApi.OPEN_API_DESCRIPTION, description);
-        // openApiModel.put(OpenApi.OPEN_API_KEY, openApi);
+        openApiModel.put(OpenApi.OPEN_API_AVAILABLE, OpenApi.OPEN_API_AVAILABLE_NOT);
         openApiModel.put(OpenApi.OPEN_API_UPDATE_TIME, currentTimeMillis);
+        openApiModel.put(OpenApi.OPEN_API_LEVEL, 1);
+        openApiModel.put(OpenApi.OPEN_API_DESCRIPTION, description);
+        openApiModel.put(OpenApi.OPEN_API_WEBHOOK_ADDRESS, "");
+        openApiModel.put(OpenApi.OPEN_API_ICON_ADDRESS, "");
+        openApiModel.put(OpenApi.OPEN_API_ENABLE_RANK, OpenApi.OPEN_API_ENABLE_RANK_DISABLE);
+
       
 
         try {

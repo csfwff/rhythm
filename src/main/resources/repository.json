@@ -148,14 +148,20 @@
           "description":"应用名称"
         },
         {
+          "name": "openApiType",
+          "type": "int",
+          "length": 2,
+          "description": "0:鱼游,1:应用,2:其他"
+        },
+        {
           "name": "openApiAvailable",
           "type": "int",
           "length": 1,
-          "description": "0：不可用，1：可用"
+          "description": "0:未处理,1:可用,-1:已拒绝,2:开发者禁用,3:已封禁"
         },
         {
           "name": "openApiUpdateTime",
-          "type": "int",
+          "type": "long",
           "description": "更新时间"
         },
         {
@@ -180,6 +186,12 @@
           "type":"String",
           "length":255,
           "description":"应用icon地址"
+        },
+        {
+          "name": "openApiEnableRank",
+          "type": "int",
+          "length": 1,
+          "description": "是否启用排行榜,0:否，1:是"
         }
       ]
     },

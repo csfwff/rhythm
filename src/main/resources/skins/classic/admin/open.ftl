@@ -47,6 +47,7 @@
                                 </#if>
                             </div>  -->
                         </div>
+                <#--  "0:未处理,1:可用,-1:已拒绝,2:开发者禁用,3:已封禁"  -->
                 <#if item.openApiAvailable == 0>
                 <div>
                     <button class="mid green" onclick="AdminOpenApiApproved(this, '${item.oId}')">通过</button>
