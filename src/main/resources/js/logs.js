@@ -33,7 +33,7 @@ var Logs = {
             var data = JSON.parse(evt.data);
             switch (data.type) {
                 case 'simple':
-                    Logs.appendLog(data.key1, data.key2, data.key3, data.data);
+                    Logs.prependLog(data.key1, data.key2, data.key3, data.data);
                     break;
             }
         }
@@ -46,19 +46,29 @@ var Logs = {
     },
 
     appendLog: function (key1, key2, key3, data) {
+        let result = Logs.sumResult(key1, key2, key3, data);
+        $("#logsContent").append(result);
+    },
+
+    prependLog: function (key1, key2, key3, data) {
+        let result = Logs.sumResult(key1, key2, key3, data);
+        $("#logsContent").prepend(result);
+    },
+
+    sumResult: function (key1, key2, key3, data) {
         let result = '<div style="padding: 5px 0;font-size: 15px;">';
-        result += '<span style="color: #696969">' + key1 + '</span> ';
-        result += '<span style="color: #708090">' + key2 + '</span> ';
-        result += '<span style="color: #6A5ACD">' + key3 + '</span> ';
+        result += '【 <span style="color: #696969">' + key1 + '</span> ';
+        result += '<span style="color: #708090">' + key2 + '</span> 】<br>';
+        result += '「<span style="color: #6A5ACD">' + key3 + '</span>」 ';
         result += '<span style="color: #1E90FF">' + data + '</span> ';
         result += '</div>';
-        $("#logsContent").prepend(result);
+        return result;
     },
 
     page: 1,
     more: function () {
         $.ajax({
-            url: Label.servePath + '/logs/more?page=' + Logs.page,
+            url: Label.servePath + '/logs/more?page=' + Logs.page + '&pageSize=30',
             type: 'GET',
             async: false,
             success: function (result) {
