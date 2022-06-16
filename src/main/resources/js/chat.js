@@ -104,6 +104,19 @@ var Chat = {
                             Chat.startAChat();
                         }
                     });
+                    // 加载未读消息
+                    $.ajax({
+                        url: Label.servePath + '/chat/has-unread?apiKey=' + apiKey,
+                        type: 'GET',
+                        async: false,
+                        success: function (result) {
+                            let count = result.result;
+                            let list = result.data;
+                            list.forEach((data) => {
+                                $("#chatTo" + data.senderUserName).css("background-color", "#fff4eb");
+                            });
+                        }
+                    });
                 } else {
                     // 已选定用户，获取第一页聊天信息
                     // 状态
