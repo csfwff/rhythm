@@ -159,6 +159,7 @@ public class InitMgmtService {
         ADMIN_PERMISSIONS.add(Permission.PERMISSION_ID_C_MENU_ADMIN_AD);
         ADMIN_PERMISSIONS.add(Permission.PERMISSION_ID_C_MENU_ADMIN_ROLES);
         ADMIN_PERMISSIONS.add(Permission.PERMISSION_ID_C_MENU_ADMIN_MISC);
+        ADMIN_PERMISSIONS.add(Permission.PERMISSION_ID_C_MENU_ADMIN_OPEN_API);
         ADMIN_PERMISSIONS.add(Permission.PERMISSION_ID_C_MENU_ADMIN_REPORTS);
         ADMIN_PERMISSIONS.add(Permission.PERMISSION_ID_C_USER_ADJUST_BAG);
         ADMIN_PERMISSIONS.add(Permission.PERMISSION_ID_C_USER_GIVE_METAL);
@@ -383,10 +384,6 @@ public class InitMgmtService {
             permission.put(Keys.OBJECT_ID, Permission.PERMISSION_ID_C_BREEZEMOON_UPDATE_BREEZEMOON);
             permissionRepository.add(permission);
 
-            // openapi management permission
-            permission.put(Keys.OBJECT_ID,Permission.PERMISSION_ID_CATEGORY_C_OPEN_API);
-            permissionRepository.add(permission);
-
             // common permissions
             permission.put(Permission.PERMISSION_CATEGORY, Permission.PERMISSION_CATEGORY_C_COMMON);
 
@@ -513,7 +510,6 @@ public class InitMgmtService {
 
             // menu permissions
             permission.put(Permission.PERMISSION_CATEGORY, Permission.PERMISSION_CATEGORY_C_MENU);
-
             permission.put(Keys.OBJECT_ID, Permission.PERMISSION_ID_C_MENU_ADMIN_AD);
             permissionRepository.add(permission);
             permission.put(Keys.OBJECT_ID, Permission.PERMISSION_ID_C_MENU_ADMIN);
@@ -540,6 +536,9 @@ public class InitMgmtService {
             permissionRepository.add(permission);
             permission.put(Keys.OBJECT_ID, Permission.PERMISSION_ID_C_MENU_ADMIN_REPORTS);
             permissionRepository.add(permission);
+            permission.put(Keys.OBJECT_ID,Permission.PERMISSION_ID_C_MENU_ADMIN_OPEN_API);
+            permissionRepository.add(permission);
+            
 
             LOGGER.info("Initialized permission data");
 

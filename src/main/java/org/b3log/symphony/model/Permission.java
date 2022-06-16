@@ -439,6 +439,13 @@ public final class Permission {
      */
     public static final String PERMISSION_ID_C_MENU_ADMIN_MISC = "menuAdminMisc";
 
+
+    /**
+     * Id - menu - admin - open api
+     */
+    public static final String PERMISSION_ID_C_MENU_ADMIN_OPEN_API = "menuAdminOpenApi";
+
+
     /**
      * Id - menu - admin - broad cast.
      */
@@ -463,8 +470,6 @@ public final class Permission {
      * Id - user - remove MFA
      */
     public static final String PERMISSION_ID_C_USER_REMOVE_MFA = "userRemoveMFA";
-
-    public static final String PERMISSION_ID_CATEGORY_C_OPEN_API = "menuAdminOpenApi";
 
     // Category constants
     /**

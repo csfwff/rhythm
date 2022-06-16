@@ -57,6 +57,23 @@ public final class OpenApi {
      */
     public static final String OPEN_API_ICON_ADDRESS = "openApiIcon";
 
+
+    /**
+     * OpenApi enable rank
+     */
+    public static final String OPEN_API_ENABLE_RANK = "openApiEnableRank";
+
+    /**
+     * OpenApi enable rank
+     */
+    public static final int OPEN_API_ENABLE_RANK_ENABLE = 1;
+
+    /**
+     * OpenApi disable rank
+     */
+    public static final int OPEN_API_ENABLE_RANK_DISABLE = 0;
+
+
      /**
      * OpenApi Key
      */
@@ -81,6 +98,16 @@ public final class OpenApi {
      * OpenApi Available
      */
      public static final int OPEN_API_AVAILABLE_YES = 1;
+
+     /**
+     * OpenApi Disable by owner
+     */
+    public static final int OPEN_API_AVAILABLE_DISABLE = 2;
+
+     /**
+     * OpenApi Banned by admin
+     */
+    public static final int OPEN_API_AVAILABLE_BANNED = 3;
 
      /**
      * OpenApi Update Time
