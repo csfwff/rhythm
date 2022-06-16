@@ -39,9 +39,9 @@ var Chat = {
         }
         Chat.toUser = toUser;
         // URL删除toUser参数
-        let currenturl = window.location.href;
-        let newUrl = (currenturl.split("?"))[0];
-        history.pushState('', '', newUrl);
+        // let currenturl = window.location.href;
+        // let newUrl = (currenturl.split("?"))[0];
+        // history.pushState('', '', newUrl);
         // 加载最近聊天列表
         reqRecentList = $.ajax({
             url: Label.servePath + '/chat/get-list?apiKey=' + apiKey,
