@@ -29,7 +29,7 @@ import org.b3log.latke.service.annotation.Service;
 import org.b3log.latke.util.Requests;
 import org.b3log.symphony.processor.LogsProcessor;
 import org.b3log.symphony.processor.channel.LogsChannel;
-import org.b3log.symphony.repository.ArticleRepository;
+import org.b3log.symphony.repository.ChatRoomRepository;
 import org.b3log.symphony.repository.LogsRepository;
 import org.json.JSONObject;
 
@@ -71,6 +71,24 @@ public class LogsService {
     }
 
     public static void simpleLog(RequestContext context, String module, String message) {
+        log("simple", getTime(), getAddress(context), module, message, true);
+    }
+
+    public static void chatroomLog(RequestContext context, String oId, String userName) {
+        final BeanManager beanManager = BeanManager.getInstance();
+        final ChatRoomRepository chatRoomRepository = beanManager.getReference(ChatRoomRepository.class);
+        try {
+            JSONObject messageInfo = chatRoomRepository.get(oId);
+            log("cr-revoke", getTime(), getAddress(context), userName, messageInfo.toString(), false);
+        } catch (Exception ignored) {
+        }
+    }
+
+    private static String getTime() {
+        return new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date());
+    }
+
+    private static String getAddress(RequestContext context) {
         String address = Requests.getRemoteAddr(context.getRequest());
         try {
             String[] splitAddress = address.split("\\.");
@@ -81,7 +99,6 @@ public class LogsService {
             address += "*";
         } catch (Exception ignored) {
         }
-        String time = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date());
-        log("simple", time, address, module, message, true);
+        return address;
     }
 }

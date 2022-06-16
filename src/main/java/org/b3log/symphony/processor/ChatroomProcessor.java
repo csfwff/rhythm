@@ -1115,6 +1115,7 @@ public class ChatroomProcessor {
             String msgUser = new JSONObject(message.optString("content")).optString(User.USER_NAME);
             String curUser = currentUser.optString(User.USER_NAME);
             boolean isAdmin = DataModelService.hasPermission(currentUser.optString(User.USER_ROLE), 3);
+            LogsService.chatroomLog(context, removeMessageId, curUser);
 
             if (isAdmin) {
                 final Transaction transaction = chatRoomRepository.beginTransaction();
