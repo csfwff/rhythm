@@ -85,6 +85,16 @@
                                 </div>
                             </li>
                             <li class="fn__flex">
+                                <svg class="avatar"><use xlink:href="#invite"></use></svg>
+                                <div class="fn-flex-1">
+                                    <h2>
+                                        <a class="title"
+                                           href="${servePath}/top/invite">邀请成员排行</a>
+                                    </h2>
+                                    <div class="ft-fade ft-smaller">感谢你们对摸鱼派的杰出贡献</div>
+                                </div>
+                            </li>
+                            <li class="fn__flex">
                                 <img class="avatar" src="https://file.fishpi.cn/2022/06/83501655456862pic-9bdc4e42.jpg" />
                                 <div class="fn-flex-1">
                                     <h2>

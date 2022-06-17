@@ -31,6 +31,7 @@ import org.b3log.latke.model.User;
 import org.b3log.symphony.model.Common;
 import org.b3log.symphony.model.UserExt;
 import org.b3log.symphony.processor.middleware.AnonymousViewCheckMidware;
+import org.b3log.symphony.repository.PointtransferRepository;
 import org.b3log.symphony.service.*;
 import org.b3log.symphony.util.Symphonys;
 import org.b3log.symphony.util.Vocation;
@@ -91,6 +92,12 @@ public class TopProcessor {
     private LinkQueryService linkQueryService;
 
     /**
+     * Point transfer repository.
+     */
+    @Inject
+    private PointtransferRepository pointtransferRepository;
+
+    /**
      * Register request handlers.
      */
     public static void register() {
@@ -110,6 +117,7 @@ public class TopProcessor {
         Dispatcher.get("/top/evolve", topProcessor::showEvolve, anonymousViewCheckMidware::handle);
         Dispatcher.get("/top/emoji", topProcessor::showEmoji, anonymousViewCheckMidware::handle);
         Dispatcher.get("/top/xiaoice", topProcessor::showXiaoice, anonymousViewCheckMidware::handle);
+        Dispatcher.get("/top/invite", topProcessor::showInvite, anonymousViewCheckMidware::handle);
     }
 
     /**
@@ -354,6 +362,42 @@ public class TopProcessor {
                 resultList.add(data);
             }
             dataModel.put("data", resultList);
+        }
+
+        dataModelService.fillHeaderAndFooter(context, dataModel);
+        dataModelService.fillRandomArticles(dataModel);
+        dataModelService.fillSideHotArticles(dataModel);
+        dataModelService.fillSideTags(dataModel);
+        dataModelService.fillLatestCmts(dataModel);
+    }
+
+    /**
+     * Shows Invite ranking list.
+     *
+     * @param context
+     */
+    public void showInvite(final RequestContext context) {
+        final AbstractFreeMarkerRenderer renderer = new SkinRenderer(context, "top/invite.ftl");
+        final Map<String, Object> dataModel = renderer.getDataModel();
+        try {
+            List<JSONObject> list = pointtransferRepository.select("select toId,count(toId) as c " +
+                    "from " + pointtransferRepository.getName() + " " +
+                    "where type = 6 " +
+                    "group by toId " +
+                    "order by c desc " +
+                    "limit 64;");
+            List<JSONObject> result = new ArrayList<>();
+            for (JSONObject user : list) {
+                try {
+                    JSONObject userData = userQueryService.getUser(user.optString("toId"));
+                    user.put("profile", userData);
+                    result.add(user);
+                } catch (Exception e) {
+                    continue;
+                }
+            }
+            dataModel.put("data", result);
+        } catch (Exception ignored) {
         }
 
         dataModelService.fillHeaderAndFooter(context, dataModel);

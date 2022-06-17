@@ -78,6 +78,11 @@
                 <link rel="canonical" href="${servePath}/top/xiaoice">
             </@head>
         </#if>
+        <#if type == "invite">
+            <@head title="邀请成员排行 - ${symphonyLabel}">
+                <link rel="canonical" href="${servePath}/top/invite">
+            </@head>
+        </#if>
         <link rel="stylesheet" href="${staticServePath}/css/index.css?${staticResourceVersion}" />
         <link rel="stylesheet" href="${staticServePath}/css/responsive.css?${staticResourceVersion}" />
     </head>

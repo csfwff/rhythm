@@ -67,6 +67,10 @@
             <@head title="小冰游戏排行 - ${symphonyLabel}">
             </@head>
         </#if>
+        <#if type == "invite">
+            <@head title="邀请成员排行 - ${symphonyLabel}">
+            </@head>
+        </#if>
     </head>
     <body>
         <#include "../header.ftl">
