@@ -18,6 +18,8 @@
  */
 package org.b3log.symphony.processor;
 
+import jodd.http.HttpRequest;
+import jodd.http.HttpResponse;
 import org.b3log.latke.http.Dispatcher;
 import org.b3log.latke.http.Request;
 import org.b3log.latke.http.RequestContext;
@@ -25,14 +27,21 @@ import org.b3log.latke.http.renderer.AbstractFreeMarkerRenderer;
 import org.b3log.latke.ioc.BeanManager;
 import org.b3log.latke.ioc.Inject;
 import org.b3log.latke.ioc.Singleton;
+import org.b3log.latke.model.User;
 import org.b3log.symphony.model.Common;
+import org.b3log.symphony.model.UserExt;
 import org.b3log.symphony.processor.middleware.AnonymousViewCheckMidware;
 import org.b3log.symphony.service.*;
 import org.b3log.symphony.util.Symphonys;
+import org.b3log.symphony.util.Vocation;
+import org.json.JSONArray;
 import org.json.JSONObject;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+
+import static org.b3log.symphony.model.Common.UA;
 
 /**
  * Top ranking list processor.
@@ -100,6 +109,7 @@ public class TopProcessor {
         Dispatcher.get("/top/lifeRestart", topProcessor::showLifeRestart, anonymousViewCheckMidware::handle);
         Dispatcher.get("/top/evolve", topProcessor::showEvolve, anonymousViewCheckMidware::handle);
         Dispatcher.get("/top/emoji", topProcessor::showEmoji, anonymousViewCheckMidware::handle);
+        Dispatcher.get("/top/xiaoice", topProcessor::showXiaoice, anonymousViewCheckMidware::handle);
     }
 
     /**
@@ -295,6 +305,56 @@ public class TopProcessor {
         final List<JSONObject> users = activityQueryService.getEvolve(type, Symphonys.TOP_CNT);
         dataModel.put("topUsers", users);
         dataModel.put("type", type);
+
+        dataModelService.fillHeaderAndFooter(context, dataModel);
+        dataModelService.fillRandomArticles(dataModel);
+        dataModelService.fillSideHotArticles(dataModel);
+        dataModelService.fillSideTags(dataModel);
+        dataModelService.fillLatestCmts(dataModel);
+    }
+
+    /**
+     * Shows Xiaoice ranking list.
+     *
+     * @param context
+     */
+    public void showXiaoice(final RequestContext context) {
+        final AbstractFreeMarkerRenderer renderer = new SkinRenderer(context, "top/xiaoice.ftl");
+        final Map<String, Object> dataModel = renderer.getDataModel();
+        final Request request = context.getRequest();
+        final String type = request.getParameter("type") != null ?
+                request.getParameter("type") : "0";
+        dataModel.put("type", type);
+        final HttpResponse response = HttpRequest.get("https://pwl.yuis.cc/GetXiaoIceGameRank?key=xiaoIceGame&type=" + type)
+                .connectionTimeout(3000).timeout(7000).header("User-Agent", Vocation.UA)
+                .send();
+        if (200 == response.statusCode()) {
+            response.charset("UTF-8");
+            final JSONObject result = new JSONObject(response.bodyText());
+            JSONArray dataList = result.optJSONArray("data");
+            List<JSONObject> resultList = new ArrayList<>();
+            for (int i = 0; i < dataList.length(); i++) {
+                JSONObject data = dataList.optJSONObject(i);
+                String uname = data.optString("uname");
+                JSONObject family = new JSONObject(data.optString("family"));
+                data.remove("family");
+                data.put("family", family);
+
+                try {
+                    JSONObject user = userQueryService.getUserByName(uname);
+                    data.put("userAvatarURL", user.optString(UserExt.USER_AVATAR_URL));
+                    data.put("userIntro", user.optString(UserExt.USER_INTRO));
+                    data.put("userURL", user.optString(User.USER_URL));
+                    data.put("userNo", user.optInt(UserExt.USER_NO));
+                    data.put("userAppRole", user.optInt(UserExt.USER_APP_ROLE));
+                } catch (Exception e) {
+                    continue;
+                }
+
+                resultList.add(data);
+            }
+            dataModel.put("data", resultList);
+        }
 
         dataModelService.fillHeaderAndFooter(context, dataModel);
         dataModelService.fillRandomArticles(dataModel);

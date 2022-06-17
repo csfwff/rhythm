@@ -84,6 +84,16 @@
                                 </div>
                             </li>
                             <li class="fn__flex">
+                                <img class="avatar" src="https://file.fishpi.cn/2022/06/83501655456862pic-9bdc4e42.jpg" />
+                                <div class="fn-flex-1">
+                                    <h2>
+                                        <a class="title"
+                                           href="${servePath}/top/xiaoice">小冰游戏排行</a>
+                                    </h2>
+                                    <div class="ft-fade ft-smaller">看看是谁最肝？</div>
+                                </div>
+                            </li>
+                            <li class="fn__flex">
                                 <img class="avatar" src="https://pwl.stackoverflow.wiki/evolve/evolved.ico" />
                                 <div class="fn-flex-1">
                                     <h2>
