@@ -380,7 +380,7 @@
                                             <a rel="nofollow" href="${servePath}/member/${msg.userName}">
                                                 <div class="avatar"
                                                      aria-label="${msg.userName}"
-                                                     style="background-image:url('${msg.userAvatarURL}')"></div>
+                                                     style="background-image:url('${msg.userAvatarURL48}')"></div>
                                             </a>
                                             <div class="fn-flex-1">
                                                 <div class="ft-smaller">

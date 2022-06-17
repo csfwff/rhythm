@@ -1158,12 +1158,16 @@ public class ChatroomProcessor {
         try {
             final BeanManager beanManager = BeanManager.getInstance();
             final ChatRoomRepository chatRoomRepository = beanManager.getReference(ChatRoomRepository.class);
+            final AvatarQueryService avatarQueryService = beanManager.getReference(AvatarQueryService.class);
             List<JSONObject> messageList = chatRoomRepository.getList(new Query()
                     .setPage(page, 25)
                     .addSort(Keys.OBJECT_ID, SortDirection.DESCENDING));
             List<JSONObject> msgs = messageList.stream().map(msg -> new JSONObject(msg.optString("content")).put("oId", msg.optString(Keys.OBJECT_ID))).collect(Collectors.toList());
             msgs = msgs.stream().map(msg -> JSONs.clone(msg).put(Common.TIME, new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(msg.optLong(Common.TIME)))).collect(Collectors.toList());
             msgs = msgs.stream().map(msg -> JSONs.clone(msg.put("content", processMarkdown(msg.optString("content"))))).collect(Collectors.toList());
+            for (JSONObject msg : msgs) {
+                avatarQueryService.fillUserAvatarURL(msg);
+            }
             return msgs;
         } catch (RepositoryException e) {
             return new LinkedList<>();

@@ -97,6 +97,9 @@ public class TopProcessor {
     @Inject
     private PointtransferRepository pointtransferRepository;
 
+    @Inject
+    private AvatarQueryService avatarQueryService;
+
     /**
      * Register request handlers.
      */
@@ -291,6 +294,11 @@ public class TopProcessor {
         final Map<String, Object> dataModel = renderer.getDataModel();
         final List<JSONObject> users = activityQueryService.getTopLifeRestart(Symphonys.TOP_CNT);
         dataModel.put("topUsers", users);
+        for (JSONObject user : users) {
+            JSONObject profile = user.optJSONObject("profile");
+            avatarQueryService.fillUserAvatarURL(profile);
+            user.put("profile", profile);
+        }
 
         dataModelService.fillHeaderAndFooter(context, dataModel);
         dataModelService.fillRandomArticles(dataModel);
@@ -390,6 +398,7 @@ public class TopProcessor {
             for (JSONObject user : list) {
                 try {
                     JSONObject userData = userQueryService.getUser(user.optString("toId"));
+                    avatarQueryService.fillUserAvatarURL(userData);
                     user.put("profile", userData);
                     result.add(user);
                 } catch (Exception e) {

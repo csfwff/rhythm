@@ -31,10 +31,7 @@ import org.b3log.latke.model.Pagination;
 import org.b3log.latke.util.Paginator;
 import org.b3log.symphony.model.*;
 import org.b3log.symphony.processor.middleware.LoginCheckMidware;
-import org.b3log.symphony.service.DataModelService;
-import org.b3log.symphony.service.NotificationMgmtService;
-import org.b3log.symphony.service.NotificationQueryService;
-import org.b3log.symphony.service.UserQueryService;
+import org.b3log.symphony.service.*;
 import org.b3log.symphony.util.Results;
 import org.b3log.symphony.util.Sessions;
 import org.b3log.symphony.util.StatusCodes;
@@ -92,6 +89,9 @@ public class NotificationProcessor {
      */
     @Inject
     private DataModelService dataModelService;
+
+    @Inject
+    private AvatarQueryService avatarQueryService;
 
     /**
      * Register request handlers.
@@ -673,7 +673,9 @@ public class NotificationProcessor {
 
         final JSONObject result = notificationQueryService.getAtNotifications(userId, pageNum, pageSize);
         final List<JSONObject> atNotifications = (List<JSONObject>) result.get(Keys.RESULTS);
-
+        for (JSONObject user : atNotifications) {
+            avatarQueryService.fillUserAvatarURL(user);
+        }
         dataModel.put(Common.AT_NOTIFICATIONS, atNotifications);
 
         final List<JSONObject> articleFollowAndWatchNotifications = new ArrayList<>();
