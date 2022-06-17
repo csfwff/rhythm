@@ -319,6 +319,11 @@ public class TopProcessor {
                 request.getParameter("type") : "achievement";
         final Map<String, Object> dataModel = renderer.getDataModel();
         final List<JSONObject> users = activityQueryService.getEvolve(type, Symphonys.TOP_CNT);
+        for (JSONObject user : users) {
+            JSONObject profile = user.optJSONObject("profile");
+            avatarQueryService.fillUserAvatarURL(profile);
+            user.put("profile", profile);
+        }
         dataModel.put("topUsers", users);
         dataModel.put("type", type);
 
@@ -363,6 +368,7 @@ public class TopProcessor {
                     data.put("userURL", user.optString(User.USER_URL));
                     data.put("userNo", user.optInt(UserExt.USER_NO));
                     data.put("userAppRole", user.optInt(UserExt.USER_APP_ROLE));
+                    avatarQueryService.fillUserAvatarURL(data);
                 } catch (Exception e) {
                     continue;
                 }

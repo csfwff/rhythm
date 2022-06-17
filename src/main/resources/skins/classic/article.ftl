@@ -245,7 +245,7 @@
                             <#list article.commentors as user>
                                 <a target="_blank" href="${servePath}/member/${user.userName}">
                                     <div class="article__participant">
-                                        <div class="avatar-small" aria-label="${user.userName}" style="background-image: url('${user.userAvatarURL}');"></div>
+                                        <div class="avatar-small" aria-label="${user.userName}" style="background-image: url('${user.userAvatarURL48}');"></div>
                                     </div>
                                 </a>
                             </#list>

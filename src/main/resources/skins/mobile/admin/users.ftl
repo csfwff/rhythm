@@ -35,7 +35,7 @@
             <li>
                 <div class="fn-clear">
                     <div class="avatar-small tooltipped tooltipped-se" aria-label="${item.userName}"
-                         style="background-image:url('${item.userAvatarURL}')"></div> &nbsp;
+                         style="background-image:url('${item.userAvatarURL48}')"></div> &nbsp;
                     <a href="${servePath}/member/${item.userName}">${item.userName}</a>
                     <a href="${servePath}/admin/user/${item.oId}" class="fn-right tooltipped tooltipped-w ft-a-title" aria-label="${editLabel}"><svg><use xlink:href="#edit"></use></svg></a> &nbsp;
                     <#if item.userStatus == 0>
