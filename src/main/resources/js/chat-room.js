@@ -1163,7 +1163,7 @@ var ChatRoom = {
               "<div class=\"fn-hr5\"></div>\n" +
               "<div class=\"ft__center\">\n" +
               "    <div class=\"fn__flex-inline\">\n" +
-              "        <img class=\"avatar avatar--small\" src=\"" + result.info.userAvatarURL + "\" style=\"background-image: none; background-color: transparent; width: 20px; height: 20px; margin-right: 0px;\">\n" +
+              "        <img class=\"avatar avatar--small\" src=\"" + result.info.userAvatarURL48 + "\" style=\"background-image: none; background-color: transparent; width: 20px; height: 20px; margin-right: 0px;\">\n" +
               "        <div class=\"fn__space5\"></div>\n" +
               "        <a href=\"" + Label.servePath + "/member/" + result.info.userName + "\">" + result.info.userName + "</a>'s 红包\n" +
               "    </div>\n" +

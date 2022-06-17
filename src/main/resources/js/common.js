@@ -119,10 +119,10 @@ var Util = {
           for (var i = 0; i < result.data.length; i++) {
             atUsers.push({
               value: '@' + result.data[i].userName + " ",
-              html: '<img src="' + result.data[i].userAvatarURL +
+              html: '<img src="' + result.data[i].userAvatarURL48 +
                   '"/>' +
                   result.data[i].userName,
-              avatar: result.data[i].userAvatarURL,
+              avatar: result.data[i].userAvatarURL48,
               username: result.data[i].userName
             });
           }
@@ -807,7 +807,7 @@ var Util = {
                     for (var i = 0; i < result.data.length; i++) {
                       atUsers.push({
                         value: '@' + result.data[i].userName + " ",
-                        html: '<img src="' + result.data[i].userAvatarURL +
+                        html: '<img src="' + result.data[i].userAvatarURL48 +
                           '"/>' +
                           result.data[i].userName,
                       })
@@ -1434,7 +1434,7 @@ var Util = {
         let followingUserCount = data.followingUserCount;
         let oId = data.oId;
         let onlineMinute = data.onlineMinute;
-        let userAvatarURL = data.userAvatarURL;
+        let userAvatarURL = data.userAvatarURL210;
         let userCity = data.userCity;
         let userIntro = data.userIntro;
         let userName = data.userName;

@@ -498,6 +498,7 @@ public class UserProcessor {
         filteredUserProfile.put(UserExt.USER_NICKNAME, user.optString(UserExt.USER_NICKNAME));
         filteredUserProfile.put(UserExt.USER_CITY, user.optString(UserExt.USER_CITY));
         filteredUserProfile.put(UserExt.USER_AVATAR_URL, user.optString(UserExt.USER_AVATAR_URL));
+        avatarQueryService.fillUserAvatarURL(filteredUserProfile);
         filteredUserProfile.put(UserExt.USER_POINT, user.optInt(UserExt.USER_POINT));
         filteredUserProfile.put(UserExt.USER_INTRO, user.optString(UserExt.USER_INTRO));
         filteredUserProfile.put(Keys.OBJECT_ID, user.optString(Keys.OBJECT_ID));
@@ -1275,6 +1276,7 @@ public class UserProcessor {
                 userName.put(User.USER_NAME, admin.optString(User.USER_NAME));
                 final String avatar = avatarQueryService.getAvatarURLByUser(admin, "20");
                 userName.put(UserExt.USER_AVATAR_URL, avatar);
+                avatarQueryService.fillUserAvatarURL(userName);
 
                 userNames.add(userName);
             }
@@ -1284,6 +1286,9 @@ public class UserProcessor {
         }
 
         final List<JSONObject> userNames = userQueryService.getUserNamesByPrefix(namePrefix);
+        for (JSONObject user : userNames) {
+            avatarQueryService.fillUserAvatarURL(user);
+        }
         result.put(Common.DATA, userNames);
     }
 

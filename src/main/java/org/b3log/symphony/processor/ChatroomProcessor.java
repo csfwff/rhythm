@@ -179,6 +179,9 @@ public class ChatroomProcessor {
     @Inject
     private UserRepository userRepository;
 
+    @Inject
+    private AvatarQueryService avatarQueryService;
+
     /**
      * Register request handlers.
      */
@@ -260,6 +263,7 @@ public class ChatroomProcessor {
             JSONObject info = new JSONObject();
             JSONObject sender = userQueryService.getUser(redPacket.optString("senderId"));
             info.put(UserExt.USER_AVATAR_URL, sender.optString(UserExt.USER_AVATAR_URL));
+            avatarQueryService.fillUserAvatarURL(info);
             info.put(User.USER_NAME, sender.optString(User.USER_NAME));
             info.put("count", redPacket.optInt("count"));
             info.put("got", redPacket.optInt("got"));
