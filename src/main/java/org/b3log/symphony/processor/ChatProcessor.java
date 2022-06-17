@@ -295,7 +295,12 @@ public class ChatProcessor {
             final String lastMessageId = listItem.optString("lastMessageId");
             try {
                 info = chatInfoRepository.get(lastMessageId);
-                if (Objects.isNull(info)) continue;
+                if (Objects.isNull(info)) {
+                    Query query = new Query()
+                            .setFilter(new PropertyFilter("user_session", FilterOperator.EQUAL, listItem.optString("sessionId")))
+                            .addSort(Keys.OBJECT_ID, SortDirection.DESCENDING);
+                    info = chatInfoRepository.getFirst(query);
+                }
             } catch (Exception e) {
                 LOGGER.error("get chat info error by id: [{}]", lastMessageId);
                 continue;
