@@ -34,15 +34,13 @@ import org.b3log.latke.repository.*;
 import org.b3log.latke.util.Crypts;
 import org.b3log.symphony.model.Common;
 import org.b3log.symphony.model.UserExt;
+import org.b3log.symphony.processor.channel.ChatChannel;
 import org.b3log.symphony.processor.channel.UserChannel;
 import org.b3log.symphony.processor.middleware.ApiCheckMidware;
 import org.b3log.symphony.processor.middleware.LoginCheckMidware;
 import org.b3log.symphony.repository.ChatInfoRepository;
 import org.b3log.symphony.repository.ChatUnreadRepository;
-import org.b3log.symphony.service.ChatListService;
-import org.b3log.symphony.service.DataModelService;
-import org.b3log.symphony.service.ShortLinkQueryService;
-import org.b3log.symphony.service.UserQueryService;
+import org.b3log.symphony.service.*;
 import org.b3log.symphony.util.*;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -90,6 +88,32 @@ public class ChatProcessor {
         Dispatcher.get("/chat/get-message", chatProcessor::getMessage, apiCheck::handle);
         Dispatcher.get("/chat/mark-as-read", chatProcessor::markAsRead, apiCheck::handle);
         Dispatcher.get("/chat/mark-all-as-read", chatProcessor::markAllAsRead, apiCheck::handle);
+        Dispatcher.get("/chat/revoke", chatProcessor::revoke, apiCheck::handle);
+    }
+
+    public void revoke(final RequestContext context) {
+        context.renderJSON(new JSONObject().put("result", 0));
+        JSONObject currentUser = ApiProcessor.getUserByKey(context.param("apiKey"));
+        String userId = currentUser.optString(Keys.OBJECT_ID);
+        try {
+            String oId = context.param("oId");
+            JSONObject msg = chatInfoRepository.get(oId);
+            if (userId.equals(msg.optString("fromId"))) {
+                LogsService.chatLog(context, oId, currentUser.optString(User.USER_NAME));
+                final Transaction transaction = chatInfoRepository.beginTransaction();
+                chatInfoRepository.remove(oId);
+                transaction.commit();
+                ChatChannel.sendMsg(msg.optString("fromId"), msg.optString("toId"), oId);
+            } else {
+                context.renderJSON(new JSONObject()
+                        .put("result", -1)
+                        .put("msg", "撤回失败，这不是你发的消息。"));
+            }
+        } catch (Exception e) {
+            context.renderJSON(new JSONObject()
+                    .put("result", -1)
+                    .put("msg", "撤回失败 " + e.getMessage()));
+        }
     }
 
     public void markAllAsRead(final RequestContext context) {

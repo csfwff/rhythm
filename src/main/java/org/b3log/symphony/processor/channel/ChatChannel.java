@@ -76,6 +76,18 @@ public class ChatChannel implements WebSocketChannel {
      */
     public static final Map<String, Set<WebSocketSession>> SESSIONS = new ConcurrentHashMap();
 
+    public static void sendMsg(String userId, String toUserId, String oId) {
+        String chatHex = Strings.uniqueId(new String[]{toUserId, userId});
+        JSONObject message = new JSONObject();
+        message.put("type", "revoke");
+        message.put("data", oId);
+
+        final Set<WebSocketSession> sessions = SESSIONS.get(chatHex);
+        for (final WebSocketSession session : sessions) {
+            session.sendText(message.toString());
+        }
+    }
+
     /**
      * Called when the socket connection with the browser is established.
      *
