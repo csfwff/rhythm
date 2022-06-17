@@ -75,15 +75,14 @@
 <#if  niceUsers?size!=0>
     <div class="module_new">
         <h2 class="module__title ft__fade fn__clear">
-            用户
+            最新注册
         </h2>
     </div>
     <div class="module__body">
-        <#list niceUsers as user>
+        <#list recentRegUsers as user>
             <a  rel="nofollow"
                href="${servePath}/member/${user.userName}">
                 <img class="avatar avatar--index" src="${user.userAvatarURL48}" style="background-image: none; background-color: transparent;" >
-
             </a>
         </#list>
     </div>

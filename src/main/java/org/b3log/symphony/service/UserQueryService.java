@@ -777,4 +777,22 @@ public class UserQueryService {
             return "";
         }
     }
+
+    public List<JSONObject> getRecentRegisteredUsers(int size) {
+        try {
+            Query query = new Query()
+                    .setFilter(new PropertyFilter(UserExt.USER_STATUS, FilterOperator.EQUAL, UserExt.USER_STATUS_C_VALID))
+                    .addSort(Keys.OBJECT_ID, SortDirection.DESCENDING)
+                    .setPage(1, size);
+            List<JSONObject> userList = userRepository.getList(query);
+            for (JSONObject user : userList) {
+                avatarQueryService.fillUserAvatarURL(user);
+            }
+            return userList;
+        } catch (final RepositoryException e) {
+            LOGGER.log(Level.ERROR, "Gets recent registered users failed", e);
+
+            return new ArrayList<>();
+        }
+    }
 }

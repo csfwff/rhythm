@@ -332,7 +332,6 @@
                             <img style="border-radius: 0"
                                  src="https://pwl.stackoverflow.wiki/2022/03/ss-61cf1b96.png">
                             <b>系统商店</b>
-                            <p style="color: #de9900; font-weight: bold">系统商店公测中，福利价收购商品，快来体验吧！</p>
                         </a>
                     </div>
                 </div>
@@ -473,8 +472,31 @@
                     </ul>
                 </div>
             </div>
-
             <div class="index-recent fn-flex-1">
+                <div class="index-head-title">
+                    <div style="float:left;font-size:13px;margin:5px 0 10px 0; font-weight:bold;cursor: pointer">最新注册</div>
+                    <#list recentRegUsers as user>
+                        <#if user_index = 0>
+                            <a target="_blank" href="${servePath}/member/${user.userName}"
+                               style="float: right; margin: 5px 0 10px 0; color: #646464; text-decoration: none">
+                                🎉 欢迎新人 <b>${user.userName}</b>
+                            </a>                    <div style="clear:both;"></div>
+                        </#if>
+                    </#list>
+                </div>
+                <div class="module-panel">
+                    <div class="index-user">
+                        <#list recentRegUsers as user>
+                            <a rel="nofollow"
+                               href="${servePath}/member/${user.userName}">
+                                    <span class="avatar-middle slogan"
+                                          aria-label="${user.userName}"
+                                          style="background-image:url('${user.userAvatarURL48}');height:30px;width:30px;margin: 0px 10px 10px 0px"></span>
+                            </a>
+                        </#list>
+                    </div>
+                </div>
+
                 <div class="index-head-title">
                     <div style="float:left;font-size:13px;margin:5px 0 10px 0; font-weight:bold;cursor: pointer" onclick="location.href='${servePath}/breezemoons'">清风明月</div>
                     <a href="${servePath}/article/1630938317106" title="清风明月是什么？"
@@ -497,7 +519,7 @@
                     <div class="module-panel">
                         <ul class="module-list">
                             <#list sideBreezemoons as item>
-                                <#if item_index <= 13>
+                                <#if item_index <= 10>
                                     <li>
                                         <a href="${servePath}/member/${item.breezemoonAuthorName}">
                     <span class="avatar-small slogan" aria-label="${item.breezemoonAuthorName}"
