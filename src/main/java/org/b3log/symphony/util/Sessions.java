@@ -454,8 +454,7 @@ public final class Sessions {
 
                 return JSONs.clone(ret);
             }
-        } catch (final Exception e) {
-            LOGGER.log(Level.WARN, "Parses cookie failed, clears cookie");
+        } catch (final Exception ignored) {
         }
 
         return null;
@@ -500,8 +499,7 @@ public final class Sessions {
 
                 return ret;
             }
-        } catch (final Exception e) {
-            LOGGER.log(Level.WARN, "Parses cookie failed, clears cookie");
+        } catch (final Exception ignored) {
         }
 
         return null;
