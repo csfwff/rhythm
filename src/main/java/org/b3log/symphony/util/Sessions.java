@@ -411,6 +411,10 @@ public final class Sessions {
                     continue;
                 }
 
+                if (cookie.getValue().length() != 224) {
+                    return null;
+                }
+
                 final String value = Crypts.decryptByAES(cookie.getValue(), Symphonys.COOKIE_SECRET);
                 final JSONObject cookieJSONObject = new JSONObject(value);
 
