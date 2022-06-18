@@ -36,6 +36,7 @@
 </#if>
 <#include "header.ftl">
 <div class="main">
+    <div class="wrapper index-full-size" style="display: none"></div>
     <div class="wrapper" style="padding-bottom: 20px">
         <div class="index-recent fn-flex-1">
             <div class="index-head-title">
@@ -907,6 +908,27 @@
     <#if need2fa == "yes">
     Util.alert("摸鱼派管理组成员，您好！<br>作为管理组的成员，您的账号需要更高的安全性，以确保社区的稳定运行。<br>请您收到此通知后，立即在个人设置-账户中启用两步验证，感谢你对社区的贡献！<br><br><button onclick='location.href=\"${servePath}/settings/account#mfaCode\"'>点击这里前往设置</button>", "致管理组成员的重要通知️")
     </#if>
+</script>
+<script>
+    let now = new Date().getHours();
+    if ((now >= 19 && now <= 23) || (now >= 0 && now <= 7)) {
+        goodNight();
+    }
+    function goodNight() {
+        $("head").append('<link rel="stylesheet" href="https://fonts.font.im/css2?family=Ma+Shan+Zheng&display=swap">');
+        $(".index-full-size").html('' +
+            '<div style="float: left; margin-left: 40px">' +
+            '    <svg style="width: 95px; height: 95px;"><use xlink:href="#moon"></use></svg>' +
+            '</div>' +
+            '<div style="margin: 20px 0 20px 30px;">' +
+            '   <div style="font-size: 25px;">工作辛苦啦，请早点回家休息 :)</div>' +
+            '   <div style="font-size: 17px; margin-top: 10px">下班时间，我们认为专注于做自己喜欢的事会更有意义。</div>' +
+            '   <div style="font-size: 17px; margin-top: 9px">现在是摸鱼派的休息时间，但小派还在默默地陪伴你，请尽快完成工作回家吧~ <span class="ft-red">♥️</span></div>' +
+            '</div>');
+        setTimeout(function () {
+            $(".index-full-size").slideDown(1500);
+        }, 500);
+    }
 </script>
 </body>
 </html>
