@@ -934,7 +934,7 @@
             '</div>');
         setTimeout(function () {
             $("#goodNight").slideDown(1500);
-        }, 2000)
+        }, 4000)
     }
 
     function loadTips() {
