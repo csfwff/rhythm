@@ -36,7 +36,6 @@
 </#if>
 <#include "header.ftl">
 <div class="main">
-    <div class="wrapper index-full-size" id="goodNight" style="display: none"></div>
     <div class="wrapper index-full-size-white" id="nightTips" style="display: none"></div>
     <div class="wrapper" style="padding-bottom: 20px">
         <div class="index-recent fn-flex-1">
@@ -274,9 +273,10 @@
                     </#list>
                 </ul>
             </div>
-
         </div>
     </div>
+
+    <div class="wrapper index-full-size" id="goodNight" style="display: none"></div>
 
     <div class="index-bottom">
         <div class="wrapper">
@@ -936,10 +936,10 @@
             '</div>' +
             '');
         setTimeout(function () {
-            $("#goodNight").slideDown(1500);
+            $("#nightTips").slideDown(1500);
             setTimeout(function () {
-                $("#nightTips").slideDown(1500);
-            }, 1000)
+                $("#goodNight").slideDown(1500);
+            }, 2000)
         }, 500);
     }
 </script>
