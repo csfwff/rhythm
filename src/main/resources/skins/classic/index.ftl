@@ -912,11 +912,17 @@
 </script>
 <script>
     let now = new Date().getHours();
+    let day = new Date().getDay();
     if ((now >= 19 && now <= 23) || (now >= 0 && now <= 7)) {
-        goodNight();
-    }
-    function goodNight() {
         $("head").append('<link rel="stylesheet" href="https://fonts.font.im/css2?family=Ma+Shan+Zheng&display=swap">');
+        loadTips();
+        goodNight();
+    } else if (day === 0 || day === 6) {
+        $("head").append('<link rel="stylesheet" href="https://fonts.font.im/css2?family=Ma+Shan+Zheng&display=swap">');
+        loadTips();
+    }
+
+    function goodNight() {
         $("#goodNight").html('' +
             '<div style="float: left; margin-left: 40px">' +
             '    <svg style="width: 95px; height: 95px;"><use xlink:href="#moon"></use></svg>' +
@@ -926,6 +932,12 @@
             '   <div style="font-size: 17px; margin-top: 10px">下班时间，我们认为专注于做自己喜欢的事会更有意义。</div>' +
             '   <div style="font-size: 17px; margin-top: 9px">现在是摸鱼派的休息时间，但小派还在默默地陪伴你，请尽快完成工作回家吧~ <span class="ft-red">♥️</span></div>' +
             '</div>');
+        setTimeout(function () {
+            $("#goodNight").slideDown(1500);
+        }, 2000)
+    }
+
+    function loadTips() {
         $("#nightTips").html('' +
             '<div style="float: left;margin: 16px 15px 0 55px;">' +
             '    <svg style="width: 30px; height: 30px;"><use xlink:href="#coffee"></use></svg>' +
@@ -937,9 +949,6 @@
             '');
         setTimeout(function () {
             $("#nightTips").slideDown(1500);
-            setTimeout(function () {
-                $("#goodNight").slideDown(1500);
-            }, 2000)
         }, 500);
     }
 </script>
