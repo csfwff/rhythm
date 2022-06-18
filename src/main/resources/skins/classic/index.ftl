@@ -36,7 +36,8 @@
 </#if>
 <#include "header.ftl">
 <div class="main">
-    <div class="wrapper index-full-size" style="display: none"></div>
+    <div class="wrapper index-full-size" id="goodNight" style="display: none"></div>
+    <div class="wrapper index-full-size-white" id="nightTips" style="display: none"></div>
     <div class="wrapper" style="padding-bottom: 20px">
         <div class="index-recent fn-flex-1">
             <div class="index-head-title">
@@ -916,17 +917,29 @@
     }
     function goodNight() {
         $("head").append('<link rel="stylesheet" href="https://fonts.font.im/css2?family=Ma+Shan+Zheng&display=swap">');
-        $(".index-full-size").html('' +
+        $("#goodNight").html('' +
             '<div style="float: left; margin-left: 40px">' +
             '    <svg style="width: 95px; height: 95px;"><use xlink:href="#moon"></use></svg>' +
             '</div>' +
             '<div style="margin: 20px 0 20px 30px;">' +
-            '   <div style="font-size: 25px;">工作辛苦啦，请早点回家休息 :)</div>' +
+            '   <div style="font-size: 25px;"><#if currentUser??>To ${currentUser.userName}: </#if>工作辛苦啦，请早点回家休息 :)</div>' +
             '   <div style="font-size: 17px; margin-top: 10px">下班时间，我们认为专注于做自己喜欢的事会更有意义。</div>' +
             '   <div style="font-size: 17px; margin-top: 9px">现在是摸鱼派的休息时间，但小派还在默默地陪伴你，请尽快完成工作回家吧~ <span class="ft-red">♥️</span></div>' +
             '</div>');
+        $("#nightTips").html('' +
+            '<div style="float: left;margin: 16px 15px 0 55px;">' +
+            '    <svg style="width: 30px; height: 30px;"><use xlink:href="#coffee"></use></svg>' +
+            '</div>' +
+            '<div>' +
+            '   <div style="font-size: 17px; margin-top: 10px">送你一份「加班补助」</div>' +
+            '   <div style="font-size: 17px; margin-top: 9px">使用「加班小记」作为文章标签和标题(如提示标题重复可在后面加上日期)，经人工审核内容真实，发放500积分加班补助。</div>' +
+            '</div>' +
+            '');
         setTimeout(function () {
-            $(".index-full-size").slideDown(1500);
+            $("#goodNight").slideDown(1500);
+            setTimeout(function () {
+                $("#nightTips").slideDown(1500);
+            }, 1000)
         }, 500);
     }
 </script>
