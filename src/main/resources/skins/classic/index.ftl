@@ -933,8 +933,8 @@
             '   <div style="font-size: 17px; margin-top: 9px">现在是摸鱼派的休息时间，但小派还在默默地陪伴你，请尽快完成工作回家吧~ <span class="ft-red">♥️</span></div>' +
             '</div>');
         setTimeout(function () {
-            $("#goodNight").slideDown(1500);
-        }, 4000)
+            $("#goodNight").show(1500);
+        }, 2000)
     }
 
     function loadTips() {
