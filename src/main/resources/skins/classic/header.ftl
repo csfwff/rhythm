@@ -90,7 +90,7 @@
             <a id="aNotifications"
                class="tooltipped tooltipped-w <#if unreadNotificationCount == 0>no-msg<#else>msg</#if>"
                href="${servePath}/notifications" aria-label="${messageLabel}">
-                <svg style="height: 15px;padding-top: 2px;">
+                <svg style="height: 15px;padding-top: 2px;pointer-events: none;">
                     <use xlink:href="#notification"></use>
                 </svg>
                 &nbsp;${unreadNotificationCount}
