@@ -877,9 +877,9 @@
         } else if (liveness >= 10 && !checkedIn) {
             $("#activityDesc").html("已提交自动签到至系统<br>请稍候查看签到状态");
         } else if (liveness < 100) {
-            $("#activityDesc").html("今日活跃度到达 100% 后<br>可获得一份神秘礼物");
+            $("#activityDesc").html("今日活跃度到达 100% 后<br>可获得神秘礼物及明日天降红包资格");
         } else {
-            $("#activityDesc").html("膜拜肝帝！活跃爆满！<br>神秘礼物已放入你的背包！");
+            $("#activityDesc").html("礼物已放入背包，并获得明日天降红包资格！明天在线时如有新人注册，将获得天降红包");
         }
     }
     refreshActivities();

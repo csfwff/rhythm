@@ -1621,12 +1621,14 @@ var Util = {
 
       switch (data.command) {
         case 'refreshNotification':
-          if (window.location.pathname === '/' || window.location.pathname === '/cr') {
+          if (window.location.pathname === '/cr') {
             Util.makeNotificationRead('at');
             Util.setUnreadNotificationCount(true);
           } else {
             Util.setUnreadNotificationCount(true);
-            Util.notice("default", 3000, "你有一条新的通知！<a href='/notifications'>点击查看</a>");
+            if (data.count !== 0) {
+              Util.notice("default", 3000, "你有新的通知！<a href='/notifications'>点击查看</a>");
+            }
           }
           break
         case 'chatUnreadCountRefresh':

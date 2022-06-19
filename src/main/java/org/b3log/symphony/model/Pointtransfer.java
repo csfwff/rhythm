@@ -426,14 +426,21 @@ public final class Pointtransfer {
      * Transfer type - Activity - Play the game Handle.
      */
     public static final int TRANSFER_TYPE_C_ACTIVITY_PLAY_HANDLE = 43;
+
     /**
-     * Transfer type - Activity - Play the game Handle.
+     * Transfer type - Activity - Play the emoji pair.
      */
     public static final int TRANSFER_TYPE_C_ACTIVITY_PLAY_EMOJI_PAIR = 44;
+
     /**
      * Transfer type - Activity - Set discuss title.
      */
     public static final int TRANSFER_TYPE_C_ACTIVITY_SET_DISCUSS = 45;
+
+    /**
+     * Transfer type - Activity - RedPacket from sky.
+     */
+    public static final int TRANSFER_TYPE_C_ACTIVITY_REDPACKET_FROM_SKY = 46;
 
     /**
      * Transfer sum - 摆龙门阵.

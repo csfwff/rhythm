@@ -317,6 +317,7 @@ public class NotificationProcessor {
                 notificationMgmtService.makeRead(userId, Notification.DATA_TYPE_C_INVITECODE_USED);
                 notificationMgmtService.makeRead(userId, Notification.DATA_TYPE_C_INVITATION_LINK_USED);
                 notificationMgmtService.makeRead(userId, Notification.DATA_TYPE_C_POINT_REPORT_HANDLED);
+                notificationMgmtService.makeRead(userId, Notification.DATA_TYPE_C_RED_PACKET_FROM_SKY);
                 break;
             case "sys-announce":
                 notificationMgmtService.makeRead(userId, Notification.DATA_TYPE_C_SYS_ANNOUNCE_ARTICLE);
@@ -523,7 +524,7 @@ public class NotificationProcessor {
      * @param userId    the specified user id
      * @param dataModel the specified data model
      */
-    private void fillNotificationCount(final String userId, final Map<String, Object> dataModel) {
+    public void fillNotificationCount(final String userId, final Map<String, Object> dataModel) {
         final int unreadCommentedNotificationCnt = notificationQueryService.getUnreadNotificationCountByType(userId, Notification.DATA_TYPE_C_COMMENTED);
         dataModel.put(Common.UNREAD_COMMENTED_NOTIFICATION_CNT, unreadCommentedNotificationCnt);
 
