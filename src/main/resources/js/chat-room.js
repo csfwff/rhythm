@@ -1331,13 +1331,13 @@ var ChatRoom = {
 
     let display = Label.currentUser === data.userName && !isPlusOne ? 'display: none;' : ''
     newHTML += '<div id="userName" class="ft__fade ft__smaller" style="' + display + 'padding-bottom: 3px;border-bottom: 1px solid #eee">\n' +
-        '    <span class="ft-gray">' + data.userNickname + '</span>\n';
+        '    <span class="ft-gray">' + data.userNickname + '</span>&nbsp;\n';
     if (data.sysMetal !== undefined && data.sysMetal !== "") {
       let list = JSON.parse(data.sysMetal).list;
       if (list !== undefined) {
         for (let i = 0; i < list.length; i++) {
           let m = list[i];
-          newHTML += "<img title='" + m.description + "' src='" + Util.genMetal(m.name, m.attr) + "'/>";
+          newHTML += "<img title='" + m.name + " - " + m.description + "' src='" + Util.genMiniMetal(m.attr) + "'/>";
         }
       }
     }

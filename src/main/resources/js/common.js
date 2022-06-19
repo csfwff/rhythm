@@ -63,6 +63,16 @@ var Util = {
     return 'https://fishpi.cn/gen?scale=0.79&txt=' + name + attr;
   },
 
+  genMiniMetal(attr) {
+    if (attr !== undefined && attr !== '') {
+      attr = '&' + attr;
+    } else {
+      attr = '';
+    }
+    console.log(attr)
+    return 'https://fishpi.cn/gen?scale=0.79&txt=' + attr;
+  },
+
   parseDom(arg) {
     var objE = document.createElement("div");
     objE.innerHTML = arg;
