@@ -55,7 +55,7 @@
                             border-color: #999 transparent transparent #999;
                             border-style: solid;
                             margin-left: 5px;
-                            z-index: 100;
+                            z-index: 10;
                         }
 
                         .icon-pin {
