@@ -539,11 +539,6 @@ public class LoginProcessor {
         final String name = requestJSONObject.optString(User.USER_NAME);
         final String userPhone = requestJSONObject.optString("userPhone");
         if (verifySMSCodeLimiterOfIP.access(ip) && verifySMSCodeLimiterOfName.access(name) && verifySMSCodeLimiterOfPhone.access(userPhone)) {
-            final String code = RandomStringUtils.randomNumeric(6);
-            if (!verifycodeMgmtService.sendVerifyCodeSMS(userPhone, code)) {
-                context.renderMsg("验证码发送失败，请稍候重试");
-                return;
-            }
 
             final String invitecode = requestJSONObject.optString(Invitecode.INVITECODE);
 
@@ -556,6 +551,12 @@ public class LoginProcessor {
 
             try {
                 final String newUserId = userMgmtService.addUser(user);
+
+                final String code = RandomStringUtils.randomNumeric(6);
+                if (!verifycodeMgmtService.sendVerifyCodeSMS(userPhone, code)) {
+                    context.renderMsg("验证码发送失败，请稍候重试");
+                    return;
+                }
 
                 final JSONObject verifycode = new JSONObject();
                 verifycode.put(Verifycode.BIZ_TYPE, Verifycode.BIZ_TYPE_C_REGISTER);
