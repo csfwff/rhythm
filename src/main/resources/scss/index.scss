@@ -1028,6 +1028,16 @@ code .dec {
   margin: 20px auto;
 }
 
+#paintCanvas {
+  border: 1px solid #eee;
+  border-radius: 5px;
+  background-color: #fff;
+  display: block;
+  background-image: url(../images/paint.png);
+  background-size: cover;
+  margin: 20px auto;
+}
+
 #snakeCanvas,
 #gobangCanvas {
   margin: 20px auto;

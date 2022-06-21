@@ -412,10 +412,97 @@ var ChatRoom = {
       })
     });
 
-    //  加载挂件
+    // 加载挂件
     ChatRoom.loadAvatarPendant();
-    //  加载小冰游戏
+    // 加载小冰游戏
     ChatRoom.loadXiaoIceGame();
+    // 加载画图
+    ChatRoom.charInit('paintCanvas');
+    // 监听画图按钮
+    $("#paintBtn").on('click', function () {
+      if ($("#paintContent").css("display") === 'none') {
+        $("#paintContent").slideDown(1000);
+      } else {
+        $("#paintContent").slideUp(1000);
+      }
+    });
+  },
+  /**
+   * 提交写好字的图片.
+   *
+   * @param {string} id canvas id.
+   */
+  submitCharacter: function (id) {
+    var canvas = document.getElementById(id);
+    let dataURL = canvas.toDataURL();
+    ChatRoom.editor.setValue("![](" + dataURL + ")");
+    //ChatRoom.send();
+    //$(window).scrollTop(0);
+  },
+  /**
+   * clear canvas
+   *
+   * @param {string} id canvas id.
+   */
+  clearCharacter: function (id) {
+    var canvas = document.getElementById(id),
+        ctx = canvas.getContext('2d');
+    ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+  },
+  /**
+   * paint brush
+   * @param {string} id canvas id.
+   * @returns {undefined}
+   */
+  charInit: function (id) {
+    var el = document.getElementById(id),
+        ctx = el.getContext('2d');
+    ctx.strokeStyle = '#000';
+    ctx.lineWidth = 5;
+    ctx.lineJoin = ctx.lineCap = 'round';
+    ctx.shadowBlur = 5;
+    ctx.shadowColor = 'rgb(0, 0, 0)';
+
+    var isDrawing = false, x = 0, y = 0;
+
+    el.onmousedown = function (e) {
+      isDrawing = true;
+      ctx.beginPath();
+      x = e.clientX - e.target.offsetLeft + $(window).scrollLeft();
+      y = e.clientY - e.target.offsetTop + $(window).scrollTop();
+      ctx.moveTo(x, y);
+    };
+
+    el.onmousemove = function (e) {
+      if (!isDrawing) {
+        return;
+      }
+
+      x = e.clientX - e.target.offsetLeft + $(window).scrollLeft();
+      y = e.clientY - e.target.offsetTop + $(window).scrollTop();
+      ctx.lineTo(x, y);
+      ctx.stroke();
+    };
+
+    el.onmouseup = function () {
+      isDrawing = false;
+    };
+
+    el.addEventListener("touchstart", function (e) {
+      ctx.beginPath();
+      x = e.changedTouches[0].pageX - e.target.offsetLeft;
+      y = e.changedTouches[0].pageY - e.target.offsetTop;
+      ctx.moveTo(x, y);
+
+    }, false);
+
+    el.addEventListener("touchmove", function (e) {
+      e.preventDefault();
+      x = e.changedTouches[0].pageX - e.target.offsetLeft;
+      y = e.changedTouches[0].pageY - e.target.offsetTop;
+      ctx.lineTo(x, y);
+      ctx.stroke();
+    }, false);
   },
   /**
    * 设置话题
