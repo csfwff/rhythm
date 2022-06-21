@@ -83,7 +83,7 @@ public class ChatMsgAddValidationMidware {
         String content = requestJSONObject.optString(Common.CONTENT);
         content = StringUtils.trim(content);
         if (StringUtils.isBlank(content) || content.length() > 4096) {
-            context.renderJSON(new JSONObject().put(Keys.MSG, "聊天消息内容过多（大于4096字符）"));
+            context.renderJSON(new JSONObject().put(Keys.MSG, "聊天消息内容为空或过多（大于4096字符）"));
             context.abort();
             return;
         }

@@ -69,7 +69,6 @@ var Util = {
     } else {
       attr = '';
     }
-    console.log(attr)
     return 'https://fishpi.cn/gen?scale=0.79&txt=' + attr;
   },
 

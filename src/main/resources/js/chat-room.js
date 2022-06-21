@@ -435,7 +435,39 @@ var ChatRoom = {
   submitCharacter: function (id) {
     var canvas = document.getElementById(id);
     let dataURL = canvas.toDataURL();
-    ChatRoom.editor.setValue("![](" + dataURL + ")");
+    let blob = dataURLToBlob(dataURL);
+    var formData = new FormData();
+    formData.append("file[]", blob);
+    $.ajax({
+      url: Label.servePath + '/upload',
+      type: 'POST',
+      cache: false,
+      data: formData,
+      processData: false,
+      contentType: false,
+      success: function (data) {
+        let url = data.data.succMap.blob;
+        ChatRoom.editor.setValue(ChatRoom.editor.getValue() + '![涂鸦](' + url + ')');
+        ChatRoom.editor.focus();
+        ChatRoom.clearCharacter("paintCanvas");
+        $("#paintContent").slideUp(500);
+      },
+      error: function (err) {
+      }
+    });
+
+    function dataURLToBlob(dataurl){
+      var arr = dataurl.split(',');
+      var mime = arr[0].match(/:(.*?);/)[1];
+      var bstr = atob(arr[1]);
+      var n = bstr.length;
+      var u8arr = new Uint8Array(n);
+      while(n--){
+        u8arr[n] = bstr.charCodeAt(n);
+      }
+      return new Blob([u8arr], {type:mime});
+    }
+    //
     //ChatRoom.send();
     //$(window).scrollTop(0);
   },
