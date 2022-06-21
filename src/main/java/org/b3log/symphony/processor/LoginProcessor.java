@@ -340,7 +340,7 @@ public class LoginProcessor {
                 verifycode.put(Verifycode.USER_ID, userId);
                 verifycodeMgmtService.addVerifycode(verifycode);
 
-                context.renderJSON(StatusCodes.SUCC).renderMsg("重置密码链接已通过短信的形式发送至您的手机，请查收。");
+                context.renderJSON(StatusCodes.SUCC).renderMsg("验证码已通过短信的形式发送至您的手机，请查收。");
             } else {
                 context.renderMsg("验证码发送频率过快，请稍候重试");
             }
@@ -356,23 +356,30 @@ public class LoginProcessor {
      *
      * @param context the specified context
      */
+    public static SimpleCurrentLimiter resetCodeLimiter = new SimpleCurrentLimiter(60, 4);
     public void showResetPwd(final RequestContext context) {
         final AbstractFreeMarkerRenderer renderer = new SkinRenderer(context, null);
         context.setRenderer(renderer);
         final Map<String, Object> dataModel = renderer.getDataModel();
 
-        final String code = context.param("code");
-        final JSONObject verifycode = verifycodeQueryService.getVerifycode(code);
-        if (null == verifycode) {
-            dataModel.put(Keys.MSG, langPropsService.get("verifycodeExpiredLabel"));
-            renderer.setTemplateName("error/custom.ftl");
-        } else {
-            renderer.setTemplateName("verify/reset-pwd.ftl");
+        final String ip = Requests.getRemoteAddr(context.getRequest());
+        if (resetCodeLimiter.access(ip)) {
+            final String code = context.param("code");
+            final JSONObject verifycode = verifycodeQueryService.getVerifycode(code);
+            if (null == verifycode) {
+                dataModel.put(Keys.MSG, langPropsService.get("verifycodeExpiredLabel"));
+                renderer.setTemplateName("error/custom.ftl");
+            } else {
+                renderer.setTemplateName("verify/reset-pwd.ftl");
 
-            final String userId = verifycode.optString(Verifycode.USER_ID);
-            final JSONObject user = userQueryService.getUser(userId);
-            dataModel.put(User.USER, user);
-            dataModel.put(Keys.CODE, code);
+                final String userId = verifycode.optString(Verifycode.USER_ID);
+                final JSONObject user = userQueryService.getUser(userId);
+                dataModel.put(User.USER, user);
+                dataModel.put(Keys.CODE, code);
+            }
+        } else {
+            dataModel.put(Keys.MSG, "验证码尝试次数过快，请稍候重试！");
+            renderer.setTemplateName("error/custom.ftl");
         }
 
         dataModelService.fillHeaderAndFooter(context, dataModel);
