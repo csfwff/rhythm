@@ -392,40 +392,44 @@ public class LoginProcessor {
      */
     public void resetPwd(final RequestContext context) {
         context.renderJSON(StatusCodes.ERR);
-
-        final Response response = context.getResponse();
-        final JSONObject requestJSONObject = context.requestJSON();
-        final String password = requestJSONObject.optString(User.USER_PASSWORD); // Hashed
-        final String userId = requestJSONObject.optString(UserExt.USER_T_ID);
-        final String code = requestJSONObject.optString(Keys.CODE);
-        final JSONObject verifycode = verifycodeQueryService.getVerifycode(code);
-        if (null == verifycode || !verifycode.optString(Verifycode.USER_ID).equals(userId)) {
-            context.renderMsg(langPropsService.get("verifycodeExpiredLabel"));
-            return;
-        }
-
-        String name = null;
-        String phone = null;
-        try {
-            final JSONObject user = userQueryService.getUser(userId);
-            if (null == user || UserExt.USER_STATUS_C_VALID != user.optInt(UserExt.USER_STATUS)) {
-                context.renderMsg(langPropsService.get("resetPwdLabel") + " - " + "User Not Found");
+        final String ip = Requests.getRemoteAddr(context.getRequest());
+        if (resetCodeLimiter.access(ip)) {
+            final Response response = context.getResponse();
+            final JSONObject requestJSONObject = context.requestJSON();
+            final String password = requestJSONObject.optString(User.USER_PASSWORD); // Hashed
+            final String userId = requestJSONObject.optString(UserExt.USER_T_ID);
+            final String code = requestJSONObject.optString(Keys.CODE);
+            final JSONObject verifycode = verifycodeQueryService.getVerifycode(code);
+            if (null == verifycode || !verifycode.optString(Verifycode.USER_ID).equals(userId)) {
+                context.renderMsg(langPropsService.get("verifycodeExpiredLabel"));
                 return;
             }
 
-            name = user.optString(User.USER_NAME);
-            phone = user.optString("userPhone");
+            String name = null;
+            String phone = null;
+            try {
+                final JSONObject user = userQueryService.getUser(userId);
+                if (null == user || UserExt.USER_STATUS_C_VALID != user.optInt(UserExt.USER_STATUS)) {
+                    context.renderMsg(langPropsService.get("resetPwdLabel") + " - " + "User Not Found");
+                    return;
+                }
 
-            user.put(User.USER_PASSWORD, password);
-            userMgmtService.updatePassword(user);
-            verifycodeMgmtService.removeByCode(code);
-            context.renderJSON(StatusCodes.SUCC);
-            LOGGER.info("User [phone=" + phone + "] reseted password");
-            Sessions.login(response, userId, true);
-        } catch (final ServiceException e) {
-            final String msg = langPropsService.get("resetPwdLabel") + " - " + e.getMessage();
-            LOGGER.log(Level.ERROR, msg + "[name={}, phone={}]", name, phone);
-            context.renderMsg(msg);
+                name = user.optString(User.USER_NAME);
+                phone = user.optString("userPhone");
+
+                user.put(User.USER_PASSWORD, password);
+                userMgmtService.updatePassword(user);
+                verifycodeMgmtService.removeByCode(code);
+                context.renderJSON(StatusCodes.SUCC);
+                LOGGER.info("User [phone=" + phone + "] reseted password");
+                Sessions.login(response, userId, true);
+            } catch (final ServiceException e) {
+                final String msg = langPropsService.get("resetPwdLabel") + " - " + e.getMessage();
+                LOGGER.log(Level.ERROR, msg + "[name={}, phone={}]", name, phone);
+                context.renderMsg(msg);
+            }
+        } else {
+            context.renderMsg("验证码尝试次数过快，请稍候重试！");
         }
     }
 
