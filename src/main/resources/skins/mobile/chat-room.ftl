@@ -106,8 +106,13 @@
                         </div>
                     </div>
                     <div id="paintContent" style="display: none">
+                        <div style="margin: 20px 0 0 0;">
+                            <input id="selectColor" name="mycolor" type="text" class="input_cxcolor" readonly="" style="background-color: rgb(0, 0, 0);">
+                            <input id="selectWidth" type="number" inputmode="decimal" pattern="[0-9]*" min="1" value="3" style="width: 50px">
+                        </div>
                         <canvas id="paintCanvas" width="306" height="300"></canvas>
                         <div class="fn-right">
+                            <button onclick="ChatRoom.revokeChatacter('paintCanvas')">撤销</button>
                             <button class="red" onclick="ChatRoom.clearCharacter('paintCanvas')">${clearLabel}</button>
                             <button class="green"
                                     onclick="ChatRoom.submitCharacter('paintCanvas')">${submitLabel}</button>
@@ -180,6 +185,8 @@
     // Init [ChatRoom] channel
     ChatRoomChannel.init("${wsScheme}://${serverHost}:${serverPort}${contextPath}/chat-room-channel");
     var page = 0;
+    var pointsArray = [];
+    var linesArray = [];
     if ('${contextMode}' === 'no') {
         ChatRoom.more();
     } else {

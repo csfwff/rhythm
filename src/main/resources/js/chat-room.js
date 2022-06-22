@@ -482,9 +482,8 @@ var ChatRoom = {
       }
       return new Blob([u8arr], {type:mime});
     }
-    //
-    //ChatRoom.send();
-    //$(window).scrollTop(0);
+    linesArray = [];
+    $(window).scrollTop(0);
   },
   /**
    * clear canvas
@@ -495,6 +494,27 @@ var ChatRoom = {
     var canvas = document.getElementById(id),
         ctx = canvas.getContext('2d');
     ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+    linesArray = [];
+  },
+  revokeChatacter: function (id) {
+    // 存储点集的数组
+    if (linesArray.length > 0) {
+      ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+      // 删掉上一次操作
+      linesArray.pop();
+
+      // 遍历历史记录重新绘制
+      linesArray.forEach(arr=>{
+        ChatRoom.changeColor(arr.color);
+        ChatRoom.changeWidth(arr.width);
+        ctx.beginPath();
+        ctx.moveTo(arr.point[0].x,arr.point[0].y);
+        for(let i = 1; i < arr.point.length; i++){
+          ctx.lineTo(arr.point[i].x,arr.point[i].y);
+        }
+        ctx.stroke();
+      })
+    }
   },
   /**
    * paint brush
@@ -517,11 +537,13 @@ var ChatRoom = {
     ctx.shadowBlur = 2;
 
     el.onmousedown = function (e) {
+      pointsArray = [];
       isDrawing = true;
       isClick = true;
       ctx.beginPath();
       x = e.clientX - e.target.offsetLeft + $(window).scrollLeft();
       y = e.clientY - e.target.offsetTop + $(window).scrollTop();
+      pointsArray.push({x:x,y:y});
       ctx.moveTo(x, y);
     };
 
@@ -533,11 +555,17 @@ var ChatRoom = {
 
       x = e.clientX - e.target.offsetLeft + $(window).scrollLeft();
       y = e.clientY - e.target.offsetTop + $(window).scrollTop();
+      pointsArray.push({x:x,y:y});
       ctx.lineTo(x, y);
       ctx.stroke();
     };
 
     el.onmouseup = function () {
+      linesArray.push({
+        point: pointsArray,
+        color: ctx.fillStyle,
+        width: ctx.lineWidth
+      });
       if (isClick) {
         ctx.lineTo(x, y);
         ctx.stroke();
@@ -546,20 +574,37 @@ var ChatRoom = {
     };
 
     el.addEventListener("touchstart", function (e) {
+      isClick = true;
+      pointsArray = [];
       ctx.beginPath();
       x = e.changedTouches[0].pageX - e.target.offsetLeft;
       y = e.changedTouches[0].pageY - e.target.offsetTop;
+      pointsArray.push({x:x,y:y});
       ctx.moveTo(x, y);
 
     }, false);
 
     el.addEventListener("touchmove", function (e) {
+      isClick = false;
       e.preventDefault();
       x = e.changedTouches[0].pageX - e.target.offsetLeft;
       y = e.changedTouches[0].pageY - e.target.offsetTop;
+      pointsArray.push({x:x,y:y});
       ctx.lineTo(x, y);
       ctx.stroke();
     }, false);
+
+    el.addEventListener("touchend", function (e) {
+      if (isClick) {
+        ctx.lineTo(x, y);
+        ctx.stroke();
+      }
+      linesArray.push({
+        point: pointsArray,
+        color: ctx.fillStyle,
+        width: ctx.lineWidth
+      });
+      }, false);
   },
   /**
    * 设置话题
