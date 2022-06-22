@@ -92,6 +92,8 @@
                                     <canvas id="paintCanvas" width="500" height="490"></canvas>
                                     <div class="fn-right">
                                         <button class="red" onclick="ChatRoom.clearCharacter('paintCanvas')">${clearLabel}</button>
+                                        <button class="revoke" onclick="ChatRoom.revokeChatacter('paintCanvas')">撤销</button>
+                                        <#--  iwpz: 加label,revoke class并没有建，如需样式自己加  -->
                                         <button class="green" onclick="ChatRoom.submitCharacter('paintCanvas')">${submitLabel}</button>
                                     </div>
                                 </div>
@@ -182,6 +184,8 @@
     // Init [ChatRoom] channel
     ChatRoomChannel.init("${wsScheme}://${serverHost}:${serverPort}${contextPath}/chat-room-channel");
     var page = 0;
+    var pointsArray = [];
+    var linesArray = [];
     if ('${contextMode}' === 'no') {
         ChatRoom.more();
     } else {
