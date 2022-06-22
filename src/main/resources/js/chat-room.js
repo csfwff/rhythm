@@ -27,6 +27,12 @@
  * @description Add comment function.
  * @static
  */
+var el;
+var ctx;
+var isDrawing = false;
+var x = 0;
+var y = 0;
+var isClick = true;
 var ChatRoom = {
   init: function () {
     // 聊天窗口高度设置
@@ -486,19 +492,24 @@ var ChatRoom = {
    * @param {string} id canvas id.
    * @returns {undefined}
    */
+  changeColor: function(color) {
+    ctx.fillStyle = ctx.strokeStyle = ctx.shadowColor = color;
+  },
+  changeWidth: function (width) {
+    ctx.lineWidth = width;
+  },
   charInit: function (id) {
-    var el = document.getElementById(id),
-        ctx = el.getContext('2d');
-    ctx.strokeStyle = '#000';
+    el = document.getElementById(id);
+    ctx = el.getContext('2d');
+    ctx.fillStyle = ctx.strokeStyle = ctx.shadowColor = '#000';
     ctx.lineWidth = 5;
-    ctx.lineJoin = ctx.lineCap = 'round';
-    ctx.shadowBlur = 5;
-    ctx.shadowColor = 'rgb(0, 0, 0)';
-
-    var isDrawing = false, x = 0, y = 0;
+    ctx.lineJoin = 'miter';
+    ctx.lineCap = 'round';
+    ctx.shadowBlur = 2;
 
     el.onmousedown = function (e) {
       isDrawing = true;
+      isClick = true;
       ctx.beginPath();
       x = e.clientX - e.target.offsetLeft + $(window).scrollLeft();
       y = e.clientY - e.target.offsetTop + $(window).scrollTop();
@@ -509,6 +520,7 @@ var ChatRoom = {
       if (!isDrawing) {
         return;
       }
+      isClick = false;
 
       x = e.clientX - e.target.offsetLeft + $(window).scrollLeft();
       y = e.clientY - e.target.offsetTop + $(window).scrollTop();
@@ -517,6 +529,10 @@ var ChatRoom = {
     };
 
     el.onmouseup = function () {
+      if (isClick) {
+        ctx.lineTo(x, y);
+        ctx.stroke();
+      }
       isDrawing = false;
     };
 
