@@ -481,6 +481,34 @@ var ChatRoom = {
         ctx = canvas.getContext('2d');
     ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
   },
+
+  revokeChatacter: function (id) {
+    var canvas = document.getElementById(id),
+      ctx = canvas.getContext('2d');
+      //存储点集的数组
+    if (linesArray.length > 0) {
+      this.clearCharacter(id);
+      //删掉上一次操作
+      linesArray.pop();
+
+      ctx.strokeStyle = '#000';
+      ctx.lineWidth = 5;
+      ctx.lineJoin = ctx.lineCap = 'round';
+      ctx.shadowBlur = 5;
+      ctx.shadowColor = 'rgb(0, 0, 0)';
+
+      //遍历历史记录重新绘制
+      linesArray.forEach(path=>{
+        ctx.beginPath();
+        ctx.moveTo(path[0].x,path[0].y);  
+        for(let i = 1; i < path.length; i++){
+          ctx.lineTo(path[i].x,path[i].y); 
+        }
+        ctx.stroke();
+      })
+    }
+  },
+
   /**
    * paint brush
    * @param {string} id canvas id.
@@ -498,10 +526,12 @@ var ChatRoom = {
     var isDrawing = false, x = 0, y = 0;
 
     el.onmousedown = function (e) {
+      pointsArray = [];
       isDrawing = true;
       ctx.beginPath();
       x = e.clientX - e.target.offsetLeft + $(window).scrollLeft();
       y = e.clientY - e.target.offsetTop + $(window).scrollTop();
+      pointsArray.push({x:x,y:y});
       ctx.moveTo(x, y);
     };
 
@@ -512,18 +542,23 @@ var ChatRoom = {
 
       x = e.clientX - e.target.offsetLeft + $(window).scrollLeft();
       y = e.clientY - e.target.offsetTop + $(window).scrollTop();
+      pointsArray.push({x:x,y:y});
       ctx.lineTo(x, y);
       ctx.stroke();
     };
 
     el.onmouseup = function () {
+      linesArray.push(pointsArray);
+      console.log(linesArray);
       isDrawing = false;
     };
 
     el.addEventListener("touchstart", function (e) {
+      pointsArray = [];
       ctx.beginPath();
       x = e.changedTouches[0].pageX - e.target.offsetLeft;
       y = e.changedTouches[0].pageY - e.target.offsetTop;
+      pointsArray.push({x:x,y:y});
       ctx.moveTo(x, y);
 
     }, false);
@@ -532,8 +567,14 @@ var ChatRoom = {
       e.preventDefault();
       x = e.changedTouches[0].pageX - e.target.offsetLeft;
       y = e.changedTouches[0].pageY - e.target.offsetTop;
+      pointsArray.push({x:x,y:y});
       ctx.lineTo(x, y);
       ctx.stroke();
+    }, false);
+
+    el.addEventListener("touchend", function (e) {
+      linesArray.push(pointsArray);
+      console.log(linesArray);
     }, false);
   },
   /**
