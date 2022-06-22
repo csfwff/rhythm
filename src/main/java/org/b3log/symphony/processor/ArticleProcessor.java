@@ -215,6 +215,9 @@ public class ArticleProcessor {
     @Inject
     private TagQueryService tagQueryService;
 
+    @Inject
+    private AvatarQueryService avatarQueryService;
+
     /**
      * Register request handlers.
      */

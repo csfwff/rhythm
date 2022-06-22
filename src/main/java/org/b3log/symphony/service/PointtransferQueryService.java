@@ -566,6 +566,9 @@ public class PointtransferQueryService {
                         break;
                     case Pointtransfer.TRANSFER_TYPE_C_ACTIVITY_SET_DISCUSS:
                         break;
+                    case Pointtransfer.TRANSFER_TYPE_C_ACTIVITY_REDPACKET_FROM_SKY:
+                        desTemplate = desTemplate.replace("{user}", dataId);
+                        break;
                     default:
                         LOGGER.warn("Invalid point type [" + type + "]");
                 }

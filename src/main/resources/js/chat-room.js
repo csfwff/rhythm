@@ -412,10 +412,129 @@ var ChatRoom = {
       })
     });
 
-    //  加载挂件
+    // 加载挂件
     ChatRoom.loadAvatarPendant();
-    //  加载小冰游戏
+    // 加载小冰游戏
     ChatRoom.loadXiaoIceGame();
+    // 加载画图
+    ChatRoom.charInit('paintCanvas');
+    // 监听画图按钮
+    $("#paintBtn").on('click', function () {
+      if ($("#paintContent").css("display") === 'none') {
+        $("#paintContent").slideDown(1000);
+      } else {
+        $("#paintContent").slideUp(1000);
+      }
+    });
+  },
+  /**
+   * 提交写好字的图片.
+   *
+   * @param {string} id canvas id.
+   */
+  submitCharacter: function (id) {
+    var canvas = document.getElementById(id);
+    let dataURL = canvas.toDataURL();
+    let blob = dataURLToBlob(dataURL);
+    var formData = new FormData();
+    formData.append("file[]", blob);
+    $.ajax({
+      url: Label.servePath + '/upload',
+      type: 'POST',
+      cache: false,
+      data: formData,
+      processData: false,
+      contentType: false,
+      success: function (data) {
+        let url = data.data.succMap.blob;
+        ChatRoom.editor.setValue(ChatRoom.editor.getValue() + '![涂鸦](' + url + ')');
+        ChatRoom.editor.focus();
+        ChatRoom.clearCharacter("paintCanvas");
+        $("#paintContent").slideUp(500);
+      },
+      error: function (err) {
+      }
+    });
+
+    function dataURLToBlob(dataurl){
+      var arr = dataurl.split(',');
+      var mime = arr[0].match(/:(.*?);/)[1];
+      var bstr = atob(arr[1]);
+      var n = bstr.length;
+      var u8arr = new Uint8Array(n);
+      while(n--){
+        u8arr[n] = bstr.charCodeAt(n);
+      }
+      return new Blob([u8arr], {type:mime});
+    }
+    //
+    //ChatRoom.send();
+    //$(window).scrollTop(0);
+  },
+  /**
+   * clear canvas
+   *
+   * @param {string} id canvas id.
+   */
+  clearCharacter: function (id) {
+    var canvas = document.getElementById(id),
+        ctx = canvas.getContext('2d');
+    ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+  },
+  /**
+   * paint brush
+   * @param {string} id canvas id.
+   * @returns {undefined}
+   */
+  charInit: function (id) {
+    var el = document.getElementById(id),
+        ctx = el.getContext('2d');
+    ctx.strokeStyle = '#000';
+    ctx.lineWidth = 5;
+    ctx.lineJoin = ctx.lineCap = 'round';
+    ctx.shadowBlur = 5;
+    ctx.shadowColor = 'rgb(0, 0, 0)';
+
+    var isDrawing = false, x = 0, y = 0;
+
+    el.onmousedown = function (e) {
+      isDrawing = true;
+      ctx.beginPath();
+      x = e.clientX - e.target.offsetLeft + $(window).scrollLeft();
+      y = e.clientY - e.target.offsetTop + $(window).scrollTop();
+      ctx.moveTo(x, y);
+    };
+
+    el.onmousemove = function (e) {
+      if (!isDrawing) {
+        return;
+      }
+
+      x = e.clientX - e.target.offsetLeft + $(window).scrollLeft();
+      y = e.clientY - e.target.offsetTop + $(window).scrollTop();
+      ctx.lineTo(x, y);
+      ctx.stroke();
+    };
+
+    el.onmouseup = function () {
+      isDrawing = false;
+    };
+
+    el.addEventListener("touchstart", function (e) {
+      ctx.beginPath();
+      x = e.changedTouches[0].pageX - e.target.offsetLeft;
+      y = e.changedTouches[0].pageY - e.target.offsetTop;
+      ctx.moveTo(x, y);
+
+    }, false);
+
+    el.addEventListener("touchmove", function (e) {
+      e.preventDefault();
+      x = e.changedTouches[0].pageX - e.target.offsetLeft;
+      y = e.changedTouches[0].pageY - e.target.offsetTop;
+      ctx.lineTo(x, y);
+      ctx.stroke();
+    }, false);
   },
   /**
    * 设置话题
@@ -1163,7 +1282,7 @@ var ChatRoom = {
               "<div class=\"fn-hr5\"></div>\n" +
               "<div class=\"ft__center\">\n" +
               "    <div class=\"fn__flex-inline\">\n" +
-              "        <img class=\"avatar avatar--small\" src=\"" + result.info.userAvatarURL + "\" style=\"background-image: none; background-color: transparent; width: 20px; height: 20px; margin-right: 0px;\">\n" +
+              "        <img class=\"avatar avatar--small\" src=\"" + result.info.userAvatarURL48 + "\" style=\"background-image: none; background-color: transparent; width: 20px; height: 20px; margin-right: 0px;\">\n" +
               "        <div class=\"fn__space5\"></div>\n" +
               "        <a href=\"" + Label.servePath + "/member/" + result.info.userName + "\">" + result.info.userName + "</a>'s 红包\n" +
               "    </div>\n" +
@@ -1331,13 +1450,13 @@ var ChatRoom = {
 
     let display = Label.currentUser === data.userName && !isPlusOne ? 'display: none;' : ''
     newHTML += '<div id="userName" class="ft__fade ft__smaller" style="' + display + 'padding-bottom: 3px;border-bottom: 1px solid #eee">\n' +
-        '    <span class="ft-gray">' + data.userNickname + '</span>\n';
+        '    <span class="ft-gray">' + data.userNickname + '</span>&nbsp;\n';
     if (data.sysMetal !== undefined && data.sysMetal !== "") {
       let list = JSON.parse(data.sysMetal).list;
       if (list !== undefined) {
         for (let i = 0; i < list.length; i++) {
           let m = list[i];
-          newHTML += "<img title='" + m.description + "' src='" + Util.genMetal(m.name, m.attr) + "'/>";
+          newHTML += "<img title='" + m.name + " - " + m.description + "' src='" + Util.genMiniMetal(m.attr) + "'/>";
         }
       }
     }

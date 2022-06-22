@@ -59,6 +59,9 @@
                                 <svg id="emojiBtn" style="width: 30px; height: 30px; cursor:pointer;">
                                     <use xlink:href="#emojiIcon"></use>
                                 </svg>
+                                <svg id="paintBtn" style="width: 30px; height: 30px; cursor:pointer;">
+                                    <use xlink:href="#icon-paint"></use>
+                                </svg>
                                 <div class="hide-list" id="emojiList">
                                     <div class="hide-list-emojis" id="emojis" style="max-height: 200px">
                                     </div>
@@ -84,6 +87,13 @@
                                     </#if>
                                     <button class="red" onclick="$('#chats').empty();page=0;ChatRoom.more();">${cleanScreenLabel}</button>
                                     <button class="green" onclick="ChatRoom.send()">${postLabel}</button>
+                                </div>
+                                <div id="paintContent" style="display: none">
+                                    <canvas id="paintCanvas" width="500" height="490"></canvas>
+                                    <div class="fn-right">
+                                        <button class="red" onclick="ChatRoom.clearCharacter('paintCanvas')">${clearLabel}</button>
+                                        <button class="green" onclick="ChatRoom.submitCharacter('paintCanvas')">${submitLabel}</button>
+                                    </div>
                                 </div>
                             </div>
                             <div class="fn-clear comment-submit">

@@ -1028,6 +1028,15 @@ code .dec {
   margin: 20px auto;
 }
 
+#paintCanvas {
+  border: 1px solid #eee;
+  border-radius: 5px;
+  background-color: #fff;
+  display: block;
+  background-size: cover;
+  margin: 20px auto;
+}
+
 #snakeCanvas,
 #gobangCanvas {
   margin: 20px auto;
@@ -2473,4 +2482,26 @@ code .dec {
   border-radius: 3px;
   box-shadow: 0 1px 2px rgba(0,0,0,.2);
   margin: 0px 5px 10px 5px;
+}
+
+.index-full-size {
+  background-color: rgba(12, 0, 103, 0.7);
+  height: 120px;
+  border-radius: 10px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+  margin-bottom: 30px;
+  color: #ffffff;
+  font-family: 'Ma Shan Zheng', cursive;
+  cursor: default;
+}
+
+.index-full-size-white {
+  background-color: rgba(229, 228, 228, 0.7);
+  height: 65px;
+  border-radius: 10px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+  margin-bottom: 18px;
+  color: #303049;
+  font-family: 'Ma Shan Zheng', cursive;
+  cursor: default;
 }

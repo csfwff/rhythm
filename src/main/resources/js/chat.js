@@ -39,14 +39,14 @@ var Chat = {
         }
         Chat.toUser = toUser;
         // URL删除toUser参数
-        let currenturl = window.location.href;
-        let newUrl = (currenturl.split("?"))[0];
-        history.pushState('', '', newUrl);
+        // let currenturl = window.location.href;
+        // let newUrl = (currenturl.split("?"))[0];
+        // history.pushState('', '', newUrl);
         // 加载最近聊天列表
         reqRecentList = $.ajax({
             url: Label.servePath + '/chat/get-list?apiKey=' + apiKey,
             type: 'GET',
-            async: 'false',
+            async: false,
             success: function (result) {
                 if (0 === result.result) {
                     let data = result.data;
@@ -104,6 +104,19 @@ var Chat = {
                             Chat.startAChat();
                         }
                     });
+                    // 加载未读消息
+                    $.ajax({
+                        url: Label.servePath + '/chat/has-unread?apiKey=' + apiKey,
+                        type: 'GET',
+                        async: false,
+                        success: function (result) {
+                            let count = result.result;
+                            let list = result.data;
+                            list.forEach((data) => {
+                                $("#chatTo" + data.senderUserName).css("background-color", "#fff4eb");
+                            });
+                        }
+                    });
                 } else {
                     // 已选定用户，获取第一页聊天信息
                     // 状态
@@ -154,48 +167,52 @@ var Chat = {
                     }
                     Chat.ws.onmessage = function (evt) {
                         var data = JSON.parse(evt.data)
-                        if (data.code === -1) {
-                            $('#chatContentTip').addClass('error').html('<ul><li>' + data.msg + '</li></ul>');
+                        if (data.type === 'revoke') {
+                            $("#chat" + data.data).remove();
                         } else {
-                            $('#chatContentTip').removeClass('error succ').html('')
-                            let oId = data.oId;
-                            let toId = data.toId;
-                            let fromId = data.fromId;
-                            let time = data.time;
-                            let content = data.content;
-                            let preview = data.preview.substring(0, 10);
-                            let dot = data.preview.length > 10 ? "..." : "";
-                            let user_session = data.user_session;
-                            let senderUserName = data.senderUserName;
-                            let senderAvatar = data.senderAvatar;
-                            let receiverUserName = data.receiverUserName;
-                            let receiverAvatar = data.receiverAvatar;
-                            // 添加消息
-                            if (senderUserName === Label.currentUserName) {
-                                // 我发送的
-                                Chat.addSelfMsg(oId, senderUserName, senderAvatar, content, time, false);
-                                $("#chatTo" + receiverUserName).find("span").html(preview + dot);
-                                // 新消息置顶
-                                let html = $("#chatTo" + receiverUserName).prop('outerHTML');
-                                $("#chatTo" + receiverUserName).remove();
-                                $("#chatMessageList").prepend(html);
-                                // 文件传输助手特殊管理
-                                if (toId === '1000000000086') {
-                                    $("#chatToFileTransfer").find("span").html(preview + dot);
-                                }
+                            if (data.code === -1) {
+                                $('#chatContentTip').addClass('error').html('<ul><li>' + data.msg + '</li></ul>');
                             } else {
-                                // 他发给我的
-                                Chat.addTargetMsg(oId, senderUserName, senderAvatar, content, time, false);
-                                $("#chatTo" + senderUserName).find("span").html(preview + dot);
-                                // 新消息置顶
-                                let html = $("#chatTo" + senderUserName).prop('outerHTML');
-                                $("#chatTo" + senderUserName).remove();
-                                $("#chatMessageList").prepend(html);
-                                // 用户已读
-                                $.ajax({
-                                    url: Label.servePath + "/chat/mark-as-read?apiKey=" + apiKey + "&fromUser=" + Chat.toUser,
-                                    type: "GET"
-                                });
+                                $('#chatContentTip').removeClass('error succ').html('')
+                                let oId = data.oId;
+                                let toId = data.toId;
+                                let fromId = data.fromId;
+                                let time = data.time;
+                                let content = data.content;
+                                let preview = data.preview.substring(0, 10);
+                                let dot = data.preview.length > 10 ? "..." : "";
+                                let user_session = data.user_session;
+                                let senderUserName = data.senderUserName;
+                                let senderAvatar = data.senderAvatar;
+                                let receiverUserName = data.receiverUserName;
+                                let receiverAvatar = data.receiverAvatar;
+                                // 添加消息
+                                if (senderUserName === Label.currentUserName) {
+                                    // 我发送的
+                                    Chat.addSelfMsg(oId, senderUserName, senderAvatar, content, time, false);
+                                    $("#chatTo" + receiverUserName).find("span").html(preview + dot);
+                                    // 新消息置顶
+                                    let html = $("#chatTo" + receiverUserName).prop('outerHTML');
+                                    $("#chatTo" + receiverUserName).remove();
+                                    $("#chatMessageList").prepend(html);
+                                    // 文件传输助手特殊管理
+                                    if (toId === '1000000000086') {
+                                        $("#chatToFileTransfer").find("span").html(preview + dot);
+                                    }
+                                } else {
+                                    // 他发给我的
+                                    Chat.addTargetMsg(oId, senderUserName, senderAvatar, content, time, false);
+                                    $("#chatTo" + senderUserName).find("span").html(preview + dot);
+                                    // 新消息置顶
+                                    let html = $("#chatTo" + senderUserName).prop('outerHTML');
+                                    $("#chatTo" + senderUserName).remove();
+                                    $("#chatMessageList").prepend(html);
+                                    // 用户已读
+                                    $.ajax({
+                                        url: Label.servePath + "/chat/mark-as-read?apiKey=" + apiKey + "&fromUser=" + Chat.toUser,
+                                        type: "GET"
+                                    });
+                                }
                             }
                         }
                     }
@@ -345,7 +362,16 @@ var Chat = {
                 '        </div>\n' +
                 '        <div class="ft__smaller ft__fade fn__right date-bar">\n' +
                 '            ' + time + '\n' +
-                '        </div>\n' +
+                '        <span class="fn__space5"></span>' +
+                '            <details class="details action__item fn__flex-center">\n' +
+                '                <summary>\n' +
+                '                    ···\n' +
+                '                </summary>\n' +
+                '                <details-menu class="fn__layer">\n' +
+                '                    <a onclick="Chat.revoke(\'' + oId + '\')" class="item">撤回</a>\n' +
+                '                </details-menu>\n' +
+                '            </details>' +
+                '        </div>' +
                 '    </div>\n' +
                 '</div>');
         } else {
@@ -362,7 +388,16 @@ var Chat = {
                 '        </div>\n' +
                 '        <div class="ft__smaller ft__fade fn__right date-bar">\n' +
                 '            ' + time + '\n' +
-                '        </div>\n' +
+                '        <span class="fn__space5"></span>' +
+                '            <details class="details action__item fn__flex-center">\n' +
+                '                <summary>\n' +
+                '                    ···\n' +
+                '                </summary>\n' +
+                '                <details-menu class="fn__layer">\n' +
+                '                    <a onclick="Chat.revoke(\'' + oId + '\')" class="item">撤回</a>\n' +
+                '                </details-menu>\n' +
+                '            </details>' +
+                '        </div>' +
                 '    </div>\n' +
                 '</div>');
         }
@@ -406,6 +441,13 @@ var Chat = {
                 '</div>');
         }
         Util.listenUserCard();
+    },
+
+    revoke(oId) {
+        $.ajax({
+            url: Label.servePath + "/chat/revoke?apiKey=" + apiKey + "&oId=" + oId,
+            type: "GET"
+        });
     },
 
     markAllAsRead() {

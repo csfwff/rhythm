@@ -422,7 +422,7 @@ var ChatRoomChannel = {
                         Label.onlineAvatarData += "<a target=\"_blank\" data-name=\"" + userInfo.userName + "\"\n" +
                             "href=\"" + userInfo.homePage + "\">\n" +
                             "<img style='margin-bottom: 10px' class=\"avatar avatar-small\" aria-label=\"" + userInfo.userName + "\"\n" +
-                            "src=\"" + userInfo.userAvatarURL + "\">\n" +
+                            "src=\"" + userInfo.userAvatarURL48 + "\">\n" +
                             "</a>";
                     }
                     Util.listenUserCard();
@@ -458,7 +458,7 @@ var ChatRoomChannel = {
                         "    <a rel=\"nofollow\" href=\"/member/" + data.userName + "\">\n" +
                         "        <div class=\"avatar tooltipped tooltipped-n\"\n" +
                         "             aria-label=\"" + data.userName + "\"\n" +
-                        "             style=\"background-image:url('" + data.userAvatarURL + "')\"></div>\n" +
+                        "             style=\"background-image:url('" + data.userAvatarURL48 + "')\"></div>\n" +
                         "    </a>\n" +
                         "    <div class=\"fn-flex-1\">\n" +
                         "        <div class=\"ft-smaller\">\n" +

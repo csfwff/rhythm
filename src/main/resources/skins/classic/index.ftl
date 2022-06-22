@@ -36,6 +36,7 @@
 </#if>
 <#include "header.ftl">
 <div class="main">
+    <div class="wrapper index-full-size-white" id="nightTips" style="display: none"></div>
     <div class="wrapper" style="padding-bottom: 20px">
         <div class="index-recent fn-flex-1">
             <div class="index-head-title">
@@ -54,7 +55,7 @@
                             border-color: #999 transparent transparent #999;
                             border-style: solid;
                             margin-left: 5px;
-                            z-index: 100;
+                            z-index: 10;
                         }
 
                         .icon-pin {
@@ -272,9 +273,10 @@
                     </#list>
                 </ul>
             </div>
-
         </div>
     </div>
+
+    <div class="wrapper index-full-size" id="goodNight" style="display: none"></div>
 
     <div class="index-bottom">
         <div class="wrapper">
@@ -332,7 +334,6 @@
                             <img style="border-radius: 0"
                                  src="https://pwl.stackoverflow.wiki/2022/03/ss-61cf1b96.png">
                             <b>系统商店</b>
-                            <p style="color: #de9900; font-weight: bold">系统商店公测中，福利价收购商品，快来体验吧！</p>
                         </a>
                     </div>
                 </div>
@@ -381,7 +382,7 @@
                                             <a rel="nofollow" href="${servePath}/member/${msg.userName}">
                                                 <div class="avatar"
                                                      aria-label="${msg.userName}"
-                                                     style="background-image:url('${msg.userAvatarURL}')"></div>
+                                                     style="background-image:url('${msg.userAvatarURL48}')"></div>
                                             </a>
                                             <div class="fn-flex-1">
                                                 <div class="ft-smaller">
@@ -473,8 +474,31 @@
                     </ul>
                 </div>
             </div>
-
             <div class="index-recent fn-flex-1">
+                <div class="index-head-title">
+                    <div style="float:left;font-size:13px;margin:5px 0 10px 0; font-weight:bold;cursor: pointer">最新注册</div>
+                    <#list recentRegUsers as user>
+                        <#if user_index = 0>
+                            <a target="_blank" href="${servePath}/member/${user.userName}"
+                               style="float: right; margin: 5px 0 10px 0; color: #646464; text-decoration: none">
+                                🎉 欢迎新人 <b>${user.userName}</b>
+                            </a>                    <div style="clear:both;"></div>
+                        </#if>
+                    </#list>
+                </div>
+                <div class="module-panel">
+                    <div class="index-user">
+                        <#list recentRegUsers as user>
+                            <a rel="nofollow"
+                               href="${servePath}/member/${user.userName}">
+                                    <span class="avatar-middle slogan"
+                                          aria-label="${user.userName}"
+                                          style="background-image:url('${user.userAvatarURL48}');height:30px;width:30px;margin: 0px 10px 10px 0px"></span>
+                            </a>
+                        </#list>
+                    </div>
+                </div>
+
                 <div class="index-head-title">
                     <div style="float:left;font-size:13px;margin:5px 0 10px 0; font-weight:bold;cursor: pointer" onclick="location.href='${servePath}/breezemoons'">清风明月</div>
                     <a href="${servePath}/article/1630938317106" title="清风明月是什么？"
@@ -497,7 +521,7 @@
                     <div class="module-panel">
                         <ul class="module-list">
                             <#list sideBreezemoons as item>
-                                <#if item_index <= 13>
+                                <#if item_index <= 10>
                                     <li>
                                         <a href="${servePath}/member/${item.breezemoonAuthorName}">
                     <span class="avatar-small slogan" aria-label="${item.breezemoonAuthorName}"
@@ -853,9 +877,9 @@
         } else if (liveness >= 10 && !checkedIn) {
             $("#activityDesc").html("已提交自动签到至系统<br>请稍候查看签到状态");
         } else if (liveness < 100) {
-            $("#activityDesc").html("今日活跃度到达 100% 后<br>可获得一份神秘礼物");
+            $("#activityDesc").html("今日活跃度到达 100% 后<br>可获得神秘礼物及明日天降红包资格");
         } else {
-            $("#activityDesc").html("膜拜肝帝！活跃爆满！<br>神秘礼物已放入你的背包！");
+            $("#activityDesc").html("礼物已放入背包，并获得明日天降红包资格！明天在线时如有新人注册，将获得天降红包");
         }
     }
     refreshActivities();
@@ -885,6 +909,48 @@
     <#if need2fa == "yes">
     Util.alert("摸鱼派管理组成员，您好！<br>作为管理组的成员，您的账号需要更高的安全性，以确保社区的稳定运行。<br>请您收到此通知后，立即在个人设置-账户中启用两步验证，感谢你对社区的贡献！<br><br><button onclick='location.href=\"${servePath}/settings/account#mfaCode\"'>点击这里前往设置</button>", "致管理组成员的重要通知️")
     </#if>
+</script>
+<script>
+    let now = new Date().getHours();
+    let day = new Date().getDay();
+    if ((now >= 19 && now <= 23) || (now >= 0 && now <= 7)) {
+        $("head").append('<link rel="stylesheet" href="https://fonts.font.im/css2?family=Ma+Shan+Zheng&display=swap">');
+        loadTips();
+        goodNight();
+    } else if (day === 0 || day === 6) {
+        $("head").append('<link rel="stylesheet" href="https://fonts.font.im/css2?family=Ma+Shan+Zheng&display=swap">');
+        loadTips();
+    }
+
+    function goodNight() {
+        $("#goodNight").html('' +
+            '<div style="float: left; margin-left: 40px">' +
+            '    <svg style="width: 95px; height: 95px;"><use xlink:href="#moon"></use></svg>' +
+            '</div>' +
+            '<div style="margin: 20px 0 20px 30px;">' +
+            '   <div style="font-size: 25px;"><#if currentUser??>To ${currentUser.userName}: </#if>工作辛苦啦，请早点回家休息 :)</div>' +
+            '   <div style="font-size: 17px; margin-top: 10px">下班时间，我们认为专注于做自己喜欢的事会更有意义。</div>' +
+            '   <div style="font-size: 17px; margin-top: 9px">现在是摸鱼派的休息时间，但小派还在默默地陪伴你，请尽快完成工作回家吧~ <span class="ft-red">♥️</span></div>' +
+            '</div>');
+        setTimeout(function () {
+            $("#goodNight").show(1500);
+        }, 2000)
+    }
+
+    function loadTips() {
+        $("#nightTips").html('' +
+            '<div style="float: left;margin: 16px 15px 0 55px;">' +
+            '    <svg style="width: 30px; height: 30px;"><use xlink:href="#coffee"></use></svg>' +
+            '</div>' +
+            '<div>' +
+            '   <div style="font-size: 17px; margin-top: 10px">送你一份「加班补助」</div>' +
+            '   <div style="font-size: 17px; margin-top: 9px">使用「加班小记」作为文章标签和标题(如提示标题重复可在后面加上日期)，经人工审核内容真实，发放500积分加班补助。</div>' +
+            '</div>' +
+            '');
+        setTimeout(function () {
+            $("#nightTips").slideDown(1500);
+        }, 500);
+    }
 </script>
 </body>
 </html>

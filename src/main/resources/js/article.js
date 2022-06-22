@@ -1344,7 +1344,7 @@ var Article = {
               $("#articleThanksCnt").after("" +
                   "<a target=\"_blank\" href=\"" + Label.servePath + "/member/" + innerData.userName + "\">\n" +
                   "    <div class=\"article__participant\">\n" +
-                  "        <div class=\"avatar-small\" aria-label=\"" + innerData.userName + "\" style=\"background-image: url('" + innerData.userAvatarURL + "');\"></div>\n" +
+                  "        <div class=\"avatar-small\" aria-label=\"" + innerData.userName + "\" style=\"background-image: url('" + innerData.userAvatarURL48 + "');\"></div>\n" +
                   "    </div>\n" +
                   "</a>")
             };

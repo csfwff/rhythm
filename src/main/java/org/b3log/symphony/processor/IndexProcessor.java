@@ -532,6 +532,9 @@ public class IndexProcessor {
             dataModel.put("TGIF", "-1");
         }
 
+        // 最近注册的新人
+        dataModel.put("recentRegUsers", userQueryService.getRecentRegisteredUsers(20));
+
         dataModelService.fillHeaderAndFooter(context, dataModel);
         dataModelService.fillIndexTags(dataModel);
 

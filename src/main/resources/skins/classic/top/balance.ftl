@@ -30,7 +30,7 @@
             <div class="fn-flex">
                 <a rel="nofollow"
                    href="${servePath}/member/${user.userName}"
-                   ><div class="avatar" aria-label="${user.userName}" style="background-image:url('${user.userAvatarURL}')"></div></a>
+                   ><div class="avatar" aria-label="${user.userName}" style="background-image:url('${user.userAvatarURL48}')"></div></a>
                 <div class="has-view fn-flex-1">
                     <h2>
                         ${user_index + 1}.

@@ -40,12 +40,14 @@
             <a target="_blank" href="https://www.cxy521.com/">程序员导航</a><br>
             <a target="_blank" href="https://www.lundao.pub/">论道社区</a><br>
             <a target="_blank" href="https://xyears.cn/">十年之约论坛</a><br>
-            <a target="_blank" href="https://www.tsyvps.com/aff/HEHTPGYL">蓝易云</a>
+            <a target="_blank" href="https://www.tsyvps.com/aff/HEHTPGYL">蓝易云</a><br>
+            <a target="_blank" href="https://my.fishpi.cn/">摸鱼导航网</a>
         </div>
         <div class="fn-hr5"></div>
         <div style="margin-top: 5px">
             <div>探索</div>
-            <a href="https://github.com/csfwff/rhythm" target="_blank">Rhythm 社区引擎</a>
+            <a href="https://github.com/csfwff/rhythm" target="_blank">Rhythm 社区引擎</a><br>
+            <a href="${servePath}/logs" target="_blank">日志公开</a>
         </div>
         <div class="fn-hr5"></div>
         <div style="margin-top: 5px">
@@ -63,7 +65,7 @@
         </div>
         <div class="fn-hr5"></div>
         <div style="margin-top: 5px">
-            <a href="https://qm.qq.com/cgi-bin/qm/qr?k=dpq3N-bezENSsshZERxvTw2dV85WtTdV&jump_from=webapi" target="_blank"><svg style="vertical-align: -2px;"><use xlink:href="#ic-qgroup"></use></svg> 公告/反馈QQ群</a>
+            <a href="https://fishpi.cn/article/1655691776330" target="_blank"><svg style="vertical-align: -2px;"><use xlink:href="#ic-wechat"></use></svg> 官方微信群</a>
         </div>
         <div class="fn-hr5"></div>
         <div class="ft-smaller" style="display: inline-block">

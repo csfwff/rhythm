@@ -2218,6 +2218,53 @@
           "description": "两个用户的Hash"
         }
       ]
+    },
+    {
+      "name": "logs",
+      "description": "系统日志存储",
+      "keys": [
+        {
+          "name": "oId",
+          "type": "String",
+          "length": 19,
+          "description": "主键"
+        },
+        {
+          "name": "type",
+          "type": "String",
+          "length": 20,
+          "description": "类型"
+        },
+        {
+          "name": "key1",
+          "type": "String",
+          "length": 50,
+          "description": "自定义键1"
+        },
+        {
+          "name": "key2",
+          "type": "String",
+          "length": 50,
+          "description": "自定义键2"
+        },
+        {
+          "name": "key3",
+          "type": "String",
+          "length": 50,
+          "description": "自定义键3"
+        },
+        {
+          "name": "data",
+          "type": "String",
+          "length": 2000,
+          "description": "数据"
+        },
+        {
+          "name": "public",
+          "type": "boolean",
+          "description": "是否公开"
+        }
+      ]
     }
   ]
 }
