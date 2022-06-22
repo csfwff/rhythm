@@ -432,6 +432,15 @@ var ChatRoom = {
         $("#paintContent").slideUp(1000);
       }
     });
+    // 监听修改颜色
+    $('#selectColor').cxColor();
+    $("#selectColor").bind("change", function () {
+      ChatRoom.changeColor(this.value);
+    });
+    $("#selectWidth").bind("change", function () {
+      let width = $("#selectWidth").val();
+      ChatRoom.changeWidth(width);
+    });
   },
   /**
    * 提交写好字的图片.
@@ -502,7 +511,7 @@ var ChatRoom = {
     el = document.getElementById(id);
     ctx = el.getContext('2d');
     ctx.fillStyle = ctx.strokeStyle = ctx.shadowColor = '#000';
-    ctx.lineWidth = 5;
+    ctx.lineWidth = 3;
     ctx.lineJoin = 'miter';
     ctx.lineCap = 'round';
     ctx.shadowBlur = 2;
