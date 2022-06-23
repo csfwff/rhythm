@@ -268,7 +268,7 @@ public class AlipayProcessor {
         try {
             final BeanManager beanManager = BeanManager.getInstance();
             final SponsorRepository sponsorRepository = beanManager.getReference(SponsorRepository.class);
-            List<JSONObject> data = sponsorRepository.list();
+            List<JSONObject> data = sponsorRepository.listAsc();
             HashMap<String, Double> map = new HashMap<>();
             List<String> rank = new ArrayList<>();
             List<String> ignores = new ArrayList<>();
