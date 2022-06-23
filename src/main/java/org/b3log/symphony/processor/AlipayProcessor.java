@@ -48,6 +48,7 @@ import org.b3log.symphony.service.NotificationMgmtService;
 import org.b3log.symphony.service.PointtransferMgmtService;
 import org.b3log.symphony.service.SponsorService;
 import org.b3log.symphony.util.Sessions;
+import org.b3log.symphony.util.StatusCodes;
 import org.b3log.symphony.util.Symphonys;
 import org.json.JSONObject;
 
@@ -72,6 +73,15 @@ public class AlipayProcessor {
 
         final AlipayProcessor alipayProcessor = beanManager.getReference(AlipayProcessor.class);
         Dispatcher.get("/pay/alipay", alipayProcessor::pay, loginCheck::handle);
+        Dispatcher.get("/get-rank", alipayProcessor::getRank);
+
+    }
+
+    public void getRank(final RequestContext context) {
+        String userId = context.param("u");
+        int level = Integer.parseInt(context.param("l"));
+        context.renderJSON(StatusCodes.SUCC);
+        context.renderMsg(String.valueOf(getNo(userId, level)));
     }
 
     final String CHARSET = "UTF-8";
