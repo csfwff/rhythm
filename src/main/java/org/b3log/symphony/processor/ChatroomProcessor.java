@@ -1039,6 +1039,7 @@ public class ChatroomProcessor {
             String oId = context.param("oId");
             int size = Integer.parseInt(context.param("size"));
             int mode = Integer.parseInt(context.param("mode"));
+            String type = context.param("type");
             JSONObject currentUser = Sessions.getUser();
             try {
                 currentUser = ApiProcessor.getUserByKey(context.param("apiKey"));
@@ -1052,7 +1053,7 @@ public class ChatroomProcessor {
             JSONObject ret = new JSONObject();
             ret.put(Keys.CODE, StatusCodes.SUCC);
             ret.put(Keys.MSG, "");
-            ret.put(Keys.DATA, getContext(oId, size, mode));
+            ret.put(Keys.DATA, getContext(oId, size, mode, type));
             context.renderJSON(ret);
         } catch (Exception e) {
             context.sendStatus(500);
@@ -1181,7 +1182,7 @@ public class ChatroomProcessor {
         }
     }
 
-    public static List<JSONObject> getContext(String oId, int size, int mode) {
+    public static List<JSONObject> getContext(String oId, int size, int mode, String type) {
         try {
             final BeanManager beanManager = BeanManager.getInstance();
             final ChatRoomRepository chatRoomRepository = beanManager.getReference(ChatRoomRepository.class);
@@ -1217,7 +1218,9 @@ public class ChatroomProcessor {
             }
             msgs = msgs.stream().map(msg -> new JSONObject(msg.optString("content")).put("oId", msg.optString(Keys.OBJECT_ID))).collect(Collectors.toList());
             msgs = msgs.stream().map(msg -> JSONs.clone(msg).put(Common.TIME, new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(msg.optLong(Common.TIME)))).collect(Collectors.toList());
-            msgs = msgs.stream().map(msg -> JSONs.clone(msg.put("content", processMarkdown(msg.optString("content"))))).collect(Collectors.toList());
+            if(!"md".equals(type)){
+                msgs = msgs.stream().map(msg -> JSONs.clone(msg.put("content", processMarkdown(msg.optString("content"))))).collect(Collectors.toList());
+            }
             return msgs;
         } catch (RepositoryException e) {
             return new LinkedList<>();
