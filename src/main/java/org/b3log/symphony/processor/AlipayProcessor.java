@@ -36,6 +36,8 @@ import org.b3log.latke.http.Response;
 import org.b3log.latke.ioc.BeanManager;
 import org.b3log.latke.ioc.Inject;
 import org.b3log.latke.ioc.Singleton;
+import org.b3log.latke.model.User;
+import org.b3log.latke.repository.Query;
 import org.b3log.symphony.model.Notification;
 import org.b3log.symphony.model.Pointtransfer;
 import org.b3log.symphony.model.Sponsor;
@@ -43,10 +45,8 @@ import org.b3log.symphony.model.UserExt;
 import org.b3log.symphony.processor.middleware.CSRFMidware;
 import org.b3log.symphony.processor.middleware.LoginCheckMidware;
 import org.b3log.symphony.repository.SponsorRepository;
-import org.b3log.symphony.service.CloudService;
-import org.b3log.symphony.service.NotificationMgmtService;
-import org.b3log.symphony.service.PointtransferMgmtService;
-import org.b3log.symphony.service.SponsorService;
+import org.b3log.symphony.repository.UserRepository;
+import org.b3log.symphony.service.*;
 import org.b3log.symphony.util.Sessions;
 import org.b3log.symphony.util.StatusCodes;
 import org.b3log.symphony.util.Symphonys;
@@ -63,6 +63,15 @@ public class AlipayProcessor {
      */
     private static final Logger LOGGER = LogManager.getLogger(AlipayProcessor.class);
 
+    @Inject
+    private UserRepository userRepository;
+
+    @Inject
+    private SponsorService sponsorService;
+
+    @Inject
+    private CloudService cloudService;
+
     /**
      * Register request handlers.
      */
@@ -78,10 +87,42 @@ public class AlipayProcessor {
     }
 
     public void getRank(final RequestContext context) {
-        String userId = context.param("u");
+        String id = context.param("u");
         int level = Integer.parseInt(context.param("l"));
         context.renderJSON(StatusCodes.SUCC);
-        context.renderMsg(String.valueOf(getNo(userId, level)));
+        context.renderMsg(String.valueOf(getNo(id, level)));
+        try {
+            List<JSONObject> users = userRepository.getList(new Query());
+            for (JSONObject i : users) {
+                String username = i.optString(User.USER_NAME);
+                String userId = i.optString(Keys.OBJECT_ID);
+                // 统计用户总积分
+                double sum = sponsorService.getSum(userId);
+                if (sum > 0) {
+                    // 三清
+                    cloudService.removeMetal(userId, L1_NAME);
+                    cloudService.removeMetal(userId, L2_NAME);
+                    cloudService.removeMetal(userId, L3_NAME);
+                    // 赋予勋章
+                    if (sum >= 1024) {
+                        System.out.println(username + "捐助大于1024");
+                        cloudService.giveMetal(userId, L3_NAME, L3_DESC + getNo(userId, 3), L3_ATTR, "");
+                        cloudService.giveMetal(userId, L2_NAME, L2_DESC + getNo(userId, 2), L2_ATTR, "");
+                        cloudService.giveMetal(userId, L1_NAME, L1_DESC + getNo(userId, 1), L1_ATTR, "");
+                    } else if (sum >= 256) {
+                        System.out.println(username + "捐助大于256");
+                        cloudService.giveMetal(userId, L2_NAME, L2_DESC + getNo(userId, 2), L2_ATTR, "");
+                        cloudService.giveMetal(userId, L1_NAME, L1_DESC + getNo(userId, 1), L1_ATTR, "");
+                    } else if (sum >= 16) {
+                        System.out.println(username + "捐助大于16");
+                        cloudService.giveMetal(userId, L1_NAME, L1_DESC + getNo(userId, 1), L1_ATTR, "");
+                    }
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
     }
 
     final String CHARSET = "UTF-8";
