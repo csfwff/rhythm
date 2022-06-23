@@ -509,7 +509,7 @@ public class IndexProcessor {
             dataModel.put("need2fa", "no");
         }
 
-        dataModel.put(Common.MESSAGES, ChatroomProcessor.getMessages(1));
+        dataModel.put(Common.MESSAGES, ChatroomProcessor.getMessages(1,"html"));
 
         makeIndexData(dataModel);
 
