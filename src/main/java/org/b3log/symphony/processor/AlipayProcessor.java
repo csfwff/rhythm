@@ -42,6 +42,7 @@ import org.b3log.symphony.model.Sponsor;
 import org.b3log.symphony.model.UserExt;
 import org.b3log.symphony.processor.middleware.CSRFMidware;
 import org.b3log.symphony.processor.middleware.LoginCheckMidware;
+import org.b3log.symphony.repository.SponsorRepository;
 import org.b3log.symphony.service.CloudService;
 import org.b3log.symphony.service.NotificationMgmtService;
 import org.b3log.symphony.service.PointtransferMgmtService;
@@ -51,9 +52,7 @@ import org.b3log.symphony.util.Symphonys;
 import org.json.JSONObject;
 
 import java.nio.charset.StandardCharsets;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
+import java.util.*;
 
 @Singleton
 public class AlipayProcessor {
@@ -235,14 +234,14 @@ public class AlipayProcessor {
                     cloudService.removeMetal(userId, L3_NAME);
                     // 赋予勋章
                     if (sum >= 1024) {
-                        cloudService.giveMetal(userId, L3_NAME, L3_DESC, L3_ATTR, "");
-                        cloudService.giveMetal(userId, L2_NAME, L2_DESC, L2_ATTR, "");
-                        cloudService.giveMetal(userId, L1_NAME, L1_DESC, L1_ATTR, "");
+                        cloudService.giveMetal(userId, L3_NAME, L3_DESC + getNo(userId, 3), L3_ATTR, "");
+                        cloudService.giveMetal(userId, L2_NAME, L2_DESC, L2_ATTR + getNo(userId, 2), "");
+                        cloudService.giveMetal(userId, L1_NAME, L1_DESC, L1_ATTR + getNo(userId, 1), "");
                     } else if (sum >= 256) {
-                        cloudService.giveMetal(userId, L2_NAME, L2_DESC, L2_ATTR, "");
-                        cloudService.giveMetal(userId, L1_NAME, L1_DESC, L1_ATTR, "");
+                        cloudService.giveMetal(userId, L2_NAME, L2_DESC, L2_ATTR + getNo(userId, 2), "");
+                        cloudService.giveMetal(userId, L1_NAME, L1_DESC, L1_ATTR + getNo(userId, 1), "");
                     } else if (sum >= 16) {
-                        cloudService.giveMetal(userId, L1_NAME, L1_DESC, L1_ATTR, "");
+                        cloudService.giveMetal(userId, L1_NAME, L1_DESC, L1_ATTR + getNo(userId, 1), "");
                     }
                     // 删除键
                     iterator.remove();
@@ -254,14 +253,96 @@ public class AlipayProcessor {
 
     // 勋章信息
     final static String L1_NAME = "摸鱼派粉丝";
-    final static String L1_DESC = "捐助摸鱼派达16RMB";
+    final static String L1_DESC = "捐助摸鱼派达16RMB; 编号No.";
     final static String L1_ATTR = "url=https://pwl.stackoverflow.wiki/2021/12/ht1-d8149de4.jpg&backcolor=ffffff&fontcolor=ff3030";
 
     final static String L2_NAME = "摸鱼派忠粉";
-    final static String L2_DESC = "捐助摸鱼派达256RMB";
+    final static String L2_DESC = "捐助摸鱼派达256RMB; 编号No.";
     final static String L2_ATTR = "url=https://pwl.stackoverflow.wiki/2021/12/ht2-bea67b29.jpg&backcolor=87cefa&fontcolor=efffff";
 
     final static String L3_NAME = "摸鱼派铁粉";
-    final static String L3_DESC = "捐助摸鱼派达1024RMB";
+    final static String L3_DESC = "捐助摸鱼派达1024RMB; 编号No.";
     final static String L3_ATTR = "url=https://pwl.stackoverflow.wiki/2021/12/ht3-b97ea102.jpg&backcolor=ee3a8c&fontcolor=ffffff";
+
+    public static int getNo(String userId, int level) {
+        try {
+            final BeanManager beanManager = BeanManager.getInstance();
+            final SponsorRepository sponsorRepository = beanManager.getReference(SponsorRepository.class);
+            List<JSONObject> data = sponsorRepository.listAsc();
+            HashMap<String, Double> map = new HashMap<>();
+            List<String> rank = new ArrayList<>();
+            List<String> ignores = new ArrayList<>();
+            for (JSONObject i : data) {
+                String id = i.optString("userId");
+                double amount = i.optDouble("amount");
+                if (!ignores.contains(id)) {
+                    if (map.containsKey(id)) {
+                        switch (level) {
+                            case 1:
+                                if (map.get(id) + amount >= 16) {
+                                    rank.add(id);
+                                    ignores.add(id);
+                                } else {
+                                    map.put(id, map.get(id) + amount);
+                                }
+                                break;
+                            case 2:
+                                if (map.get(id) + amount >= 256) {
+                                    rank.add(id);
+                                    ignores.add(id);
+                                } else {
+                                    map.put(id, map.get(id) + amount);
+                                }
+                                break;
+                            case 3:
+                                if (map.get(id) + amount >= 1024) {
+                                    rank.add(id);
+                                    ignores.add(id);
+                                } else {
+                                    map.put(id, map.get(id) + amount);
+                                }
+                                break;
+                        }
+                    } else {
+                        switch (level) {
+                            case 1:
+                                if (amount >= 16) {
+                                    rank.add(id);
+                                    ignores.add(id);
+                                } else {
+                                    map.put(id, amount);
+                                }
+                                break;
+                            case 2:
+                                if (amount >= 256) {
+                                    rank.add(id);
+                                    ignores.add(id);
+                                } else {
+                                    map.put(id, amount);
+                                }
+                                break;
+                            case 3:
+                                if (amount >= 1024) {
+                                    rank.add(id);
+                                    ignores.add(id);
+                                } else {
+                                    map.put(id, amount);
+                                }
+                                break;
+                        }
+                    }
+                }
+            }
+            for (int i = 0; i < rank.size(); i++) {
+                String id = rank.get(i);
+                if (id.equals(userId)) {
+                    return i + 1;
+                }
+            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, "Cannot get user No", e);
+        }
+
+        return -1;
+    }
 }
