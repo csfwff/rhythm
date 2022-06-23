@@ -82,45 +82,51 @@ public class AlipayProcessor {
 
         final AlipayProcessor alipayProcessor = beanManager.getReference(AlipayProcessor.class);
         Dispatcher.get("/pay/alipay", alipayProcessor::pay, loginCheck::handle);
+        Dispatcher.get("/get-rank", alipayProcessor::getRank);
     }
 
     public void getRank(final RequestContext context) {
-        String id = context.param("u");
-        int level = Integer.parseInt(context.param("l"));
-        context.renderJSON(StatusCodes.SUCC);
-        context.renderMsg(String.valueOf(getNo(id, level)));
-        try {
-            List<JSONObject> users = userRepository.getList(new Query());
-            for (JSONObject i : users) {
-                String username = i.optString(User.USER_NAME);
-                String userId = i.optString(Keys.OBJECT_ID);
-                // 统计用户总积分
-                double sum = sponsorService.getSum(userId);
-                if (sum > 0) {
-                    // 三清
-                    cloudService.removeMetal(userId, L1_NAME);
-                    cloudService.removeMetal(userId, L2_NAME);
-                    cloudService.removeMetal(userId, L3_NAME);
-                    // 赋予勋章
-                    if (sum >= 1024) {
-                        System.out.println(username + "捐助大于1024");
-                        cloudService.giveMetal(userId, L3_NAME, L3_DESC + getNo(userId, 3), L3_ATTR, "");
-                        cloudService.giveMetal(userId, L2_NAME, L2_DESC + getNo(userId, 2), L2_ATTR, "");
-                        cloudService.giveMetal(userId, L1_NAME, L1_DESC + getNo(userId, 1), L1_ATTR, "");
-                    } else if (sum >= 256) {
-                        System.out.println(username + "捐助大于256");
-                        cloudService.giveMetal(userId, L2_NAME, L2_DESC + getNo(userId, 2), L2_ATTR, "");
-                        cloudService.giveMetal(userId, L1_NAME, L1_DESC + getNo(userId, 1), L1_ATTR, "");
-                    } else if (sum >= 16) {
-                        System.out.println(username + "捐助大于16");
-                        cloudService.giveMetal(userId, L1_NAME, L1_DESC + getNo(userId, 1), L1_ATTR, "");
+        JSONObject user = Sessions.getUser();
+        if (user.optString(User.USER_NAME).equals("adlered")) {
+            String id = context.param("u");
+            int level = Integer.parseInt(context.param("l"));
+            context.renderJSON(StatusCodes.SUCC);
+            context.renderMsg(String.valueOf(getNo(id, level)));
+            try {
+                List<JSONObject> users = userRepository.getList(new Query());
+                for (JSONObject i : users) {
+                    String username = i.optString(User.USER_NAME);
+                    String userId = i.optString(Keys.OBJECT_ID);
+                    // 统计用户总积分
+                    double sum = sponsorService.getSum(userId);
+                    if (sum > 0) {
+                        // 三清
+                        cloudService.removeMetal(userId, L1_NAME);
+                        cloudService.removeMetal(userId, L2_NAME);
+                        cloudService.removeMetal(userId, L3_NAME);
+                        // 赋予勋章
+                        if (sum >= 1024) {
+                            System.out.println(username + "捐助大于1024");
+                            cloudService.giveMetal(userId, L3_NAME, L3_DESC + getNo(userId, 3), L3_ATTR, "");
+                            cloudService.giveMetal(userId, L2_NAME, L2_DESC + getNo(userId, 2), L2_ATTR, "");
+                            cloudService.giveMetal(userId, L1_NAME, L1_DESC + getNo(userId, 1), L1_ATTR, "");
+                        } else if (sum >= 256) {
+                            System.out.println(username + "捐助大于256");
+                            cloudService.giveMetal(userId, L2_NAME, L2_DESC + getNo(userId, 2), L2_ATTR, "");
+                            cloudService.giveMetal(userId, L1_NAME, L1_DESC + getNo(userId, 1), L1_ATTR, "");
+                        } else if (sum >= 16) {
+                            System.out.println(username + "捐助大于16");
+                            cloudService.giveMetal(userId, L1_NAME, L1_DESC + getNo(userId, 1), L1_ATTR, "");
+                        }
                     }
                 }
+            } catch (Exception e) {
+                e.printStackTrace();
             }
-        } catch (Exception e) {
-            e.printStackTrace();
+        } else {
+            context.renderJSON(StatusCodes.ERR);
+            context.renderMsg("no");
         }
-
     }
 
     final String CHARSET = "UTF-8";
