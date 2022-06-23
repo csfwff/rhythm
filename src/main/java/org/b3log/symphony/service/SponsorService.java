@@ -95,7 +95,7 @@ public class SponsorService {
         }
     }
 
-    public void getNo(final RequestContext context) {
+    public int getNo(final RequestContext context) {
         String userId = context.param("userId");
         int level = Integer.parseInt(context.param("level"));
         try {
@@ -110,21 +110,24 @@ public class SponsorService {
                     if (map.containsKey(id)) {
                         switch (level) {
                             case 1:
-                                if (map.get(id) >= 16) {
+                                if (map.get(id) + amount >= 16) {
+                                    rank.add(id);
                                     ignores.add(id);
                                 } else {
                                     map.put(id, map.get(id) + amount);
                                 }
                                 break;
                             case 2:
-                                if (map.get(id) >= 256) {
+                                if (map.get(id) + amount >= 256) {
+                                    rank.add(id);
                                     ignores.add(id);
                                 } else {
                                     map.put(id, map.get(id) + amount);
                                 }
                                 break;
                             case 3:
-                                if (map.get(id) >= 1024) {
+                                if (map.get(id) + amount >= 1024) {
+                                    rank.add(id);
                                     ignores.add(id);
                                 } else {
                                     map.put(id, map.get(id) + amount);
@@ -132,35 +135,45 @@ public class SponsorService {
                                 break;
                         }
                     } else {
-                        map.put(id, amount);
+                        switch (level) {
+                            case 1:
+                                if (amount >= 16) {
+                                    rank.add(id);
+                                    ignores.add(id);
+                                } else {
+                                    map.put(id, amount);
+                                }
+                                break;
+                            case 2:
+                                if (amount >= 256) {
+                                    rank.add(id);
+                                    ignores.add(id);
+                                } else {
+                                    map.put(id, amount);
+                                }
+                                break;
+                            case 3:
+                                if (amount >= 1024) {
+                                    rank.add(id);
+                                    ignores.add(id);
+                                } else {
+                                    map.put(id, amount);
+                                }
+                                break;
+                        }
                     }
                 }
             }
-            Iterator<Map.Entry<String, Double>> iterator = map.entrySet().iterator();
-            while (iterator.hasNext()) {
-                Map.Entry<String, Double> entry = iterator.next();
-                String key = entry.getKey();
-                double value = entry.getValue();
-                switch (level) {
-                    case 1:
-                        if (value < 16) {
-                            iterator.remove();
-                        }
-                        break;
-                    case 2:
-                        if (value < 256) {
-                            iterator.remove();
-                        }
-                        break;
-                    case 3:
-                        if (value < 1024) {
-                            iterator.remove();
-                        }
-                        break;
+            for (int i = 0; i < rank.size(); i++) {
+                String id = rank.get(i);
+                if (id.equals(userId)) {
+                    return i + 1;
                 }
             }
         } catch (Exception e) {
             LOGGER.log(Level.ERROR, "Cannot get user No", e);
         }
+
+        return -1;
     }
 }

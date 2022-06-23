@@ -73,8 +73,6 @@ public class AlipayProcessor {
 
         final AlipayProcessor alipayProcessor = beanManager.getReference(AlipayProcessor.class);
         Dispatcher.get("/pay/alipay", alipayProcessor::pay, loginCheck::handle);
-        final SponsorService sponsorService = beanManager.getReference(SponsorService.class);
-        Dispatcher.get("/test", sponsorService::getNo);
     }
 
     final String CHARSET = "UTF-8";
