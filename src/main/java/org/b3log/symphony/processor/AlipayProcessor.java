@@ -82,8 +82,6 @@ public class AlipayProcessor {
 
         final AlipayProcessor alipayProcessor = beanManager.getReference(AlipayProcessor.class);
         Dispatcher.get("/pay/alipay", alipayProcessor::pay, loginCheck::handle);
-        Dispatcher.get("/get-rank", alipayProcessor::getRank);
-
     }
 
     public void getRank(final RequestContext context) {
