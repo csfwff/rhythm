@@ -73,6 +73,8 @@ public class AlipayProcessor {
 
         final AlipayProcessor alipayProcessor = beanManager.getReference(AlipayProcessor.class);
         Dispatcher.get("/pay/alipay", alipayProcessor::pay, loginCheck::handle);
+        final SponsorService sponsorService = beanManager.getReference(SponsorService.class);
+        Dispatcher.get("/test", sponsorService::getNo);
     }
 
     final String CHARSET = "UTF-8";
@@ -236,8 +238,11 @@ public class AlipayProcessor {
                     // 赋予勋章
                     if (sum >= 1024) {
                         cloudService.giveMetal(userId, L3_NAME, L3_DESC, L3_ATTR, "");
+                        cloudService.giveMetal(userId, L2_NAME, L2_DESC, L2_ATTR, "");
+                        cloudService.giveMetal(userId, L1_NAME, L1_DESC, L1_ATTR, "");
                     } else if (sum >= 256) {
                         cloudService.giveMetal(userId, L2_NAME, L2_DESC, L2_ATTR, "");
+                        cloudService.giveMetal(userId, L1_NAME, L1_DESC, L1_ATTR, "");
                     } else if (sum >= 16) {
                         cloudService.giveMetal(userId, L1_NAME, L1_DESC, L1_ATTR, "");
                     }

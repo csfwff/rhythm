@@ -46,6 +46,12 @@ public class SponsorRepository extends AbstractRepository {
         return getList(query);
     }
 
+    public List<JSONObject> listAsc() throws RepositoryException {
+        final Query query = new Query();
+        query.addSort("time", SortDirection.ASCENDING);
+        return getList(query);
+    }
+
     public List<JSONObject> listByUserId(String userId) throws RepositoryException {
         final Query query = new Query()
                 .setFilter(new PropertyFilter("userId", FilterOperator.EQUAL, userId))

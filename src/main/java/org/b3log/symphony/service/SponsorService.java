@@ -22,6 +22,7 @@ import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.b3log.latke.Keys;
+import org.b3log.latke.http.RequestContext;
 import org.b3log.latke.ioc.Inject;
 import org.b3log.latke.model.User;
 import org.b3log.latke.repository.RepositoryException;
@@ -33,8 +34,7 @@ import org.b3log.symphony.repository.SponsorRepository;
 import org.json.JSONObject;
 
 import java.text.SimpleDateFormat;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -92,6 +92,75 @@ public class SponsorService {
         } catch (Exception e) {
             LOGGER.log(Level.ERROR, "Cannot get user sum", e);
             return 0;
+        }
+    }
+
+    public void getNo(final RequestContext context) {
+        String userId = context.param("userId");
+        int level = Integer.parseInt(context.param("level"));
+        try {
+            List<JSONObject> data = repository.listAsc();
+            HashMap<String, Double> map = new HashMap<>();
+            List<String> rank = new ArrayList<>();
+            List<String> ignores = new ArrayList<>();
+            for (JSONObject i : data) {
+                String id = i.optString("userId");
+                double amount = i.optDouble("amount");
+                if (!ignores.contains(id)) {
+                    if (map.containsKey(id)) {
+                        switch (level) {
+                            case 1:
+                                if (map.get(id) >= 16) {
+                                    ignores.add(id);
+                                } else {
+                                    map.put(id, map.get(id) + amount);
+                                }
+                                break;
+                            case 2:
+                                if (map.get(id) >= 256) {
+                                    ignores.add(id);
+                                } else {
+                                    map.put(id, map.get(id) + amount);
+                                }
+                                break;
+                            case 3:
+                                if (map.get(id) >= 1024) {
+                                    ignores.add(id);
+                                } else {
+                                    map.put(id, map.get(id) + amount);
+                                }
+                                break;
+                        }
+                    } else {
+                        map.put(id, amount);
+                    }
+                }
+            }
+            Iterator<Map.Entry<String, Double>> iterator = map.entrySet().iterator();
+            while (iterator.hasNext()) {
+                Map.Entry<String, Double> entry = iterator.next();
+                String key = entry.getKey();
+                double value = entry.getValue();
+                switch (level) {
+                    case 1:
+                        if (value < 16) {
+                            iterator.remove();
+                        }
+                        break;
+                    case 2:
+                        if (value < 256) {
+                            iterator.remove();
+                        }
+                        break;
+                    case 3:
+                        if (value < 1024) {
+                            iterator.remove();
+                        }
+                        break;
+                }
+            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, "Cannot get user No", e);
         }
     }
 }
