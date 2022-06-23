@@ -235,13 +235,13 @@ public class AlipayProcessor {
                     // 赋予勋章
                     if (sum >= 1024) {
                         cloudService.giveMetal(userId, L3_NAME, L3_DESC + getNo(userId, 3), L3_ATTR, "");
-                        cloudService.giveMetal(userId, L2_NAME, L2_DESC, L2_ATTR + getNo(userId, 2), "");
-                        cloudService.giveMetal(userId, L1_NAME, L1_DESC, L1_ATTR + getNo(userId, 1), "");
+                        cloudService.giveMetal(userId, L2_NAME, L2_DESC + getNo(userId, 2), L2_ATTR, "");
+                        cloudService.giveMetal(userId, L1_NAME, L1_DESC + getNo(userId, 1), L1_ATTR, "");
                     } else if (sum >= 256) {
-                        cloudService.giveMetal(userId, L2_NAME, L2_DESC, L2_ATTR + getNo(userId, 2), "");
-                        cloudService.giveMetal(userId, L1_NAME, L1_DESC, L1_ATTR + getNo(userId, 1), "");
+                        cloudService.giveMetal(userId, L2_NAME, L2_DESC + getNo(userId, 2), L2_ATTR, "");
+                        cloudService.giveMetal(userId, L1_NAME, L1_DESC + getNo(userId, 1), L1_ATTR, "");
                     } else if (sum >= 16) {
-                        cloudService.giveMetal(userId, L1_NAME, L1_DESC, L1_ATTR + getNo(userId, 1), "");
+                        cloudService.giveMetal(userId, L1_NAME, L1_DESC + getNo(userId, 1), L1_ATTR, "");
                     }
                     // 删除键
                     iterator.remove();
