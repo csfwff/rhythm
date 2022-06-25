@@ -495,7 +495,7 @@ public class ChatroomProcessor {
             JSONArray source3 = source2.optJSONArray("who");
             source3.put(new JSONObject().put("userMoney", meGot).put("userId", userId).put("userName", userName).put("time", new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(System.currentTimeMillis())).put("avatar", userQueryService.getUser(userId).optString(UserExt.USER_AVATAR_URL)));
             source2.put("who", source3);
-            source.put("content", source2);
+            source.put("content", source2.toString());
             final Transaction transaction = chatRoomRepository.beginTransaction();
             chatRoomRepository.update(oId, new JSONObject().put("content", source.toString()));
             transaction.commit();
