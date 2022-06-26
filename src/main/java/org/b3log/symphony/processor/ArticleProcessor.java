@@ -644,12 +644,12 @@ public class ArticleProcessor {
             articleAuthor.remove("userCity");
             articleAuthor.remove("userCountry");
             articleAuthor.remove("userEmail");
+            articleAuthor.remove("secret2fa");
         }).collect(Collectors.toList());
     }
 
     private JSONObject articleDesensitize(final JSONObject article) {
         article.remove("articleUA");
-        article.remove("articleOriginalContent");
         JSONObject articleAuthor = article.optJSONObject("articleAuthor");
         articleAuthor.remove("userLatestLoginIP");
         articleAuthor.remove("userPassword");
@@ -658,6 +658,7 @@ public class ArticleProcessor {
         articleAuthor.remove("userCity");
         articleAuthor.remove("userCountry");
         articleAuthor.remove("userEmail");
+        articleAuthor.remove("secret2fa");
         article.put("articleAuthor", articleAuthor);
         return article;
     }
