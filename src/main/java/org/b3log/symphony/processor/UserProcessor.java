@@ -1319,7 +1319,7 @@ public class UserProcessor {
             String emojiChar = Emotions.toUnicode(":" + emoji + ":");
             if (StringUtils.contains(emojiChar, ":")) {
                 final String suffix = "huaji".equals(emoji) ? ".gif" : ".png";
-                emojiChar = Latkes.getStaticServePath() + "/emoji/graphics/" + emoji + suffix;
+                emojiChar = "https://file.fishpi.cn/emoji/graphics/" + emoji + suffix;
             }
 
             data.add(new JSONObject().put(emoji, emojiChar));
