@@ -1535,7 +1535,16 @@ var Util = {
               '</a>\n';
         }
         html += '' +
+            '<a class="tooltipped-new tooltipped__n" rel="nofollow" onclick="javascript:void(0)" style="background-color:#eeeeeecc;border-radius:5px;padding:0 7px 0 4px;cursor:default;color:#6d6c6c;font-size:5px;"\n' +
+            '   aria-label="' + userNo + ' 号成员">\n' +
+            '    <svg style="height: 12px; vertical-align: -4.5px">\n' +
+            '        <use xlink:href="#no"></use>\n' +
+            '    </svg>' +
+            '    <span style="margin: 0;float: none;vertical-align: -3px;">' + userNo + '</span> \n' +
+            '</a>\n';
+        html += '' +
             '                </div>\n';
+
         if (userOnlineFlag === true) {
           html += '<span style="background-color:#d23f31;color:#fff;font-size:12px;line-height:20px;border-radius:3px;height:20px;display:inline-block;padding:0 5px;vertical-align:middle;box-sizing:border-box;">在线</span>';
         } else {
