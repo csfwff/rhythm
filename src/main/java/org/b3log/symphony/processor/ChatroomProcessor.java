@@ -533,9 +533,7 @@ public class ChatroomProcessor {
             } else if ("rockPaperScissors".equalsIgnoreCase(redPacket.getString("type"))) {
                 RED_PACKET_BUCKET.remove(oId);
             }
-            if (count == got + 1) {
-                ChatroomChannel.notifyChat(redPacketStatus);
-            }
+            ChatroomChannel.notifyChat(redPacketStatus);
         } catch (Exception e) {
             context.renderJSON(StatusCodes.ERR).renderMsg("红包非法");
             LOGGER.log(Level.ERROR, "Open Red Packet failed on ChatRoomProcessor.");
