@@ -1007,6 +1007,15 @@ public class ChatroomProcessor {
             dataModel.put(UserExt.CHAT_ROOM_PICTURE_STATUS, UserExt.USER_XXX_STATUS_C_ENABLED);
             dataModel.put("level3Permitted", false);
         }
+        // 是否宵禁
+        int start = 1930;
+        int end = 800;
+        int now = Integer.parseInt(new SimpleDateFormat("HHmm").format(new Date()));
+        if (now > end && now < start) {
+            dataModel.put("nightDisableMode", false);
+        } else {
+            dataModel.put("nightDisableMode", true);
+        }
         dataModelService.fillHeaderAndFooter(context, dataModel);
         dataModelService.fillRandomArticles(dataModel);
         dataModelService.fillSideHotArticles(dataModel);
