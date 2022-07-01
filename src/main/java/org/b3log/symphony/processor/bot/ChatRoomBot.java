@@ -96,16 +96,6 @@ public class ChatRoomBot {
         String userId = currentUser.optString(Keys.OBJECT_ID);
         // ==! 前置参数 !==
 
-        // ==? 宵禁 ?==
-        int start = 1930;
-        int end = 800;
-        int now = Integer.parseInt(new SimpleDateFormat("HHmm").format(new Date()));
-        if (!(now > end && now < start)) {
-            context.renderJSON(StatusCodes.ERR).renderMsg("当前为宵禁时间 (19:30-08:00)，聊天室也在休息，暂时停止聊天服务哦～<br>休息时间和鱼油们聊天，请到摸鱼派官方微信群：<a href='https://fishpi.cn/article/1655691776330' target='_blank'>点我加群</a>");
-            return false;
-        }
-        // ==! 宵禁 !==
-
         // ==? 指令 ?==
         if (DataModelService.hasPermission(currentUser.optString(User.USER_ROLE), 3)) {
             if (content.startsWith("执法")) {
@@ -529,7 +519,7 @@ public class ChatRoomBot {
                         "新的一天开始啦～ 开始愉快的聊天吧 :D");
                 break;
             case 1930:
-                sendBotMsg("现在时间是 19:30 分，摸鱼派已进入宵禁模式，期间聊天室服务将暂停...\n" +
+                sendBotMsg("现在时间是 19:30 分，摸鱼派已进入宵禁模式，期间聊天消息将不会计为活跃度...\n" +
                         "感谢你的陪伴，我们明天再见，早点休息，晚安 \uD83D\uDCA4");
                 break;
         }

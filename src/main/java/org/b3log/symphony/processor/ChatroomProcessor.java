@@ -833,23 +833,29 @@ public class ChatroomProcessor {
 
                 context.renderJSON(StatusCodes.SUCC);
             } else {
-                // 加活跃
-                int risksControlled = ChatRoomBot.risksControlled(userId);
-                if (risksControlled != -1) {
-                    if (risksControlMessageLimiter.access(userId)) {
+                // 宵禁
+                int start = 1930;
+                int end = 800;
+                int now = Integer.parseInt(new SimpleDateFormat("HHmm").format(new Date()));
+                if (now > end && now < start) {
+                    // 加活跃
+                    int risksControlled = ChatRoomBot.risksControlled(userId);
+                    if (risksControlled != -1) {
+                        if (risksControlMessageLimiter.access(userId)) {
+                            try {
+                                if (chatRoomLivenessLimiter.access(userId)) {
+                                    livenessMgmtService.incLiveness(userId, Liveness.LIVENESS_COMMENT);
+                                }
+                            } catch (Exception ignored) {
+                            }
+                        }
+                    } else {
                         try {
                             if (chatRoomLivenessLimiter.access(userId)) {
                                 livenessMgmtService.incLiveness(userId, Liveness.LIVENESS_COMMENT);
                             }
                         } catch (Exception ignored) {
                         }
-                    }
-                } else {
-                    try {
-                        if (chatRoomLivenessLimiter.access(userId)) {
-                            livenessMgmtService.incLiveness(userId, Liveness.LIVENESS_COMMENT);
-                        }
-                    } catch (Exception ignored) {
                     }
                 }
 
