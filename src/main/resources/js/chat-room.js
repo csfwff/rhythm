@@ -27,6 +27,12 @@
  * @description Add comment function.
  * @static
  */
+var el;
+var ctx;
+var isDrawing = false;
+var x = 0;
+var y = 0;
+var isClick = true;
 var ChatRoom = {
   init: function () {
     // 聊天窗口高度设置
@@ -426,6 +432,15 @@ var ChatRoom = {
         $("#paintContent").slideUp(1000);
       }
     });
+    // 监听修改颜色
+    $('#selectColor').cxColor();
+    $("#selectColor").bind("change", function () {
+      ChatRoom.changeColor(this.value);
+    });
+    $("#selectWidth").bind("change", function () {
+      let width = $("#selectWidth").val();
+      ChatRoom.changeWidth(width);
+    });
   },
   /**
    * 提交写好字的图片.
@@ -433,43 +448,47 @@ var ChatRoom = {
    * @param {string} id canvas id.
    */
   submitCharacter: function (id) {
-    var canvas = document.getElementById(id);
-    let dataURL = canvas.toDataURL();
-    let blob = dataURLToBlob(dataURL);
-    var formData = new FormData();
-    formData.append("file[]", blob);
-    $.ajax({
-      url: Label.servePath + '/upload',
-      type: 'POST',
-      cache: false,
-      data: formData,
-      processData: false,
-      contentType: false,
-      success: function (data) {
-        let url = data.data.succMap.blob;
-        ChatRoom.editor.setValue(ChatRoom.editor.getValue() + '![涂鸦](' + url + ')');
-        ChatRoom.editor.focus();
-        ChatRoom.clearCharacter("paintCanvas");
-        $("#paintContent").slideUp(500);
-      },
-      error: function (err) {
-      }
-    });
+    if (linesArray.length !== 0) {
+      var canvas = document.getElementById(id);
+      let dataURL = canvas.toDataURL();
+      let blob = dataURLToBlob(dataURL);
+      var formData = new FormData();
+      formData.append("file[]", blob);
+      $.ajax({
+        url: Label.servePath + '/upload',
+        type: 'POST',
+        cache: false,
+        data: formData,
+        processData: false,
+        contentType: false,
+        success: function (data) {
+          let url = data.data.succMap.blob;
+          ChatRoom.editor.setValue(ChatRoom.editor.getValue() + '![涂鸦](' + url + ')');
+          ChatRoom.editor.focus();
+          ChatRoom.clearCharacter("paintCanvas");
+          $("#paintContent").slideUp(500);
+        },
+        error: function (err) {
+        }
+      });
 
-    function dataURLToBlob(dataurl){
-      var arr = dataurl.split(',');
-      var mime = arr[0].match(/:(.*?);/)[1];
-      var bstr = atob(arr[1]);
-      var n = bstr.length;
-      var u8arr = new Uint8Array(n);
-      while(n--){
-        u8arr[n] = bstr.charCodeAt(n);
+      function dataURLToBlob(dataurl) {
+        var arr = dataurl.split(',');
+        var mime = arr[0].match(/:(.*?);/)[1];
+        var bstr = atob(arr[1]);
+        var n = bstr.length;
+        var u8arr = new Uint8Array(n);
+        while (n--) {
+          u8arr[n] = bstr.charCodeAt(n);
+        }
+        return new Blob([u8arr], {type: mime});
       }
-      return new Blob([u8arr], {type:mime});
+
+      linesArray = [];
+      $(window).scrollTop(0);
+    } else {
+      alert("画布为空，无法提交！")
     }
-    //
-    //ChatRoom.send();
-    //$(window).scrollTop(0);
   },
   /**
    * clear canvas
@@ -480,54 +499,52 @@ var ChatRoom = {
     var canvas = document.getElementById(id),
         ctx = canvas.getContext('2d');
     ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+    linesArray = [];
   },
-
   revokeChatacter: function (id) {
-    var canvas = document.getElementById(id),
-      ctx = canvas.getContext('2d');
-      //存储点集的数组
+    // 存储点集的数组
     if (linesArray.length > 0) {
-      this.clearCharacter(id);
-      //删掉上一次操作
+      ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+      // 删掉上一次操作
       linesArray.pop();
 
-      ctx.strokeStyle = '#000';
-      ctx.lineWidth = 5;
-      ctx.lineJoin = ctx.lineCap = 'round';
-      ctx.shadowBlur = 5;
-      ctx.shadowColor = 'rgb(0, 0, 0)';
-
-      //遍历历史记录重新绘制
-      linesArray.forEach(path=>{
+      // 遍历历史记录重新绘制
+      linesArray.forEach(arr=>{
+        ChatRoom.changeColor(arr.color);
+        ChatRoom.changeWidth(arr.width);
         ctx.beginPath();
-        ctx.moveTo(path[0].x,path[0].y);  
-        for(let i = 1; i < path.length; i++){
-          ctx.lineTo(path[i].x,path[i].y); 
+        ctx.moveTo(arr.point[0].x,arr.point[0].y);
+        for(let i = 1; i < arr.point.length; i++){
+          ctx.lineTo(arr.point[i].x,arr.point[i].y);
         }
         ctx.stroke();
       })
     }
   },
-
   /**
    * paint brush
    * @param {string} id canvas id.
    * @returns {undefined}
    */
+  changeColor: function(color) {
+    ctx.fillStyle = ctx.strokeStyle = ctx.shadowColor = color;
+  },
+  changeWidth: function (width) {
+    ctx.lineWidth = width;
+  },
   charInit: function (id) {
-    var el = document.getElementById(id),
-        ctx = el.getContext('2d');
-    ctx.strokeStyle = '#000';
-    ctx.lineWidth = 5;
-    ctx.lineJoin = ctx.lineCap = 'round';
-    ctx.shadowBlur = 5;
-    ctx.shadowColor = 'rgb(0, 0, 0)';
-
-    var isDrawing = false, x = 0, y = 0;
+    el = document.getElementById(id);
+    ctx = el.getContext('2d');
+    ctx.fillStyle = ctx.strokeStyle = ctx.shadowColor = '#000';
+    ctx.lineWidth = 3;
+    ctx.lineJoin = 'miter';
+    ctx.lineCap = 'round';
+    ctx.shadowBlur = 2;
 
     el.onmousedown = function (e) {
       pointsArray = [];
       isDrawing = true;
+      isClick = true;
       ctx.beginPath();
       x = e.clientX - e.target.offsetLeft + $(window).scrollLeft();
       y = e.clientY - e.target.offsetTop + $(window).scrollTop();
@@ -539,6 +556,7 @@ var ChatRoom = {
       if (!isDrawing) {
         return;
       }
+      isClick = false;
 
       x = e.clientX - e.target.offsetLeft + $(window).scrollLeft();
       y = e.clientY - e.target.offsetTop + $(window).scrollTop();
@@ -548,12 +566,20 @@ var ChatRoom = {
     };
 
     el.onmouseup = function () {
-      linesArray.push(pointsArray);
-      console.log(linesArray);
+      linesArray.push({
+        point: pointsArray,
+        color: ctx.fillStyle,
+        width: ctx.lineWidth
+      });
+      if (isClick) {
+        ctx.lineTo(x, y);
+        ctx.stroke();
+      }
       isDrawing = false;
     };
 
     el.addEventListener("touchstart", function (e) {
+      isClick = true;
       pointsArray = [];
       ctx.beginPath();
       x = e.changedTouches[0].pageX - e.target.offsetLeft;
@@ -564,6 +590,7 @@ var ChatRoom = {
     }, false);
 
     el.addEventListener("touchmove", function (e) {
+      isClick = false;
       e.preventDefault();
       x = e.changedTouches[0].pageX - e.target.offsetLeft;
       y = e.changedTouches[0].pageY - e.target.offsetTop;
@@ -573,9 +600,16 @@ var ChatRoom = {
     }, false);
 
     el.addEventListener("touchend", function (e) {
-      linesArray.push(pointsArray);
-      console.log(linesArray);
-    }, false);
+      if (isClick) {
+        ctx.lineTo(x, y);
+        ctx.stroke();
+      }
+      linesArray.push({
+        point: pointsArray,
+        color: ctx.fillStyle,
+        width: ctx.lineWidth
+      });
+      }, false);
   },
   /**
    * 设置话题

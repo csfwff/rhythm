@@ -495,7 +495,7 @@ public class ChatroomProcessor {
             JSONArray source3 = source2.optJSONArray("who");
             source3.put(new JSONObject().put("userMoney", meGot).put("userId", userId).put("userName", userName).put("time", new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(System.currentTimeMillis())).put("avatar", userQueryService.getUser(userId).optString(UserExt.USER_AVATAR_URL)));
             source2.put("who", source3);
-            source.put("content", source2);
+            source.put("content", source2.toString());
             final Transaction transaction = chatRoomRepository.beginTransaction();
             chatRoomRepository.update(oId, new JSONObject().put("content", source.toString()));
             transaction.commit();
@@ -533,9 +533,7 @@ public class ChatroomProcessor {
             } else if ("rockPaperScissors".equalsIgnoreCase(redPacket.getString("type"))) {
                 RED_PACKET_BUCKET.remove(oId);
             }
-            if (count == got + 1) {
-                ChatroomChannel.notifyChat(redPacketStatus);
-            }
+            ChatroomChannel.notifyChat(redPacketStatus);
         } catch (Exception e) {
             context.renderJSON(StatusCodes.ERR).renderMsg("红包非法");
             LOGGER.log(Level.ERROR, "Open Red Packet failed on ChatRoomProcessor.");
@@ -835,23 +833,29 @@ public class ChatroomProcessor {
 
                 context.renderJSON(StatusCodes.SUCC);
             } else {
-                // 加活跃
-                int risksControlled = ChatRoomBot.risksControlled(userId);
-                if (risksControlled != -1) {
-                    if (risksControlMessageLimiter.access(userId)) {
+                // 宵禁
+                int start = 1930;
+                int end = 800;
+                int now = Integer.parseInt(new SimpleDateFormat("HHmm").format(new Date()));
+                if (now > end && now < start) {
+                    // 加活跃
+                    int risksControlled = ChatRoomBot.risksControlled(userId);
+                    if (risksControlled != -1) {
+                        if (risksControlMessageLimiter.access(userId)) {
+                            try {
+                                if (chatRoomLivenessLimiter.access(userId)) {
+                                    livenessMgmtService.incLiveness(userId, Liveness.LIVENESS_COMMENT);
+                                }
+                            } catch (Exception ignored) {
+                            }
+                        }
+                    } else {
                         try {
                             if (chatRoomLivenessLimiter.access(userId)) {
                                 livenessMgmtService.incLiveness(userId, Liveness.LIVENESS_COMMENT);
                             }
                         } catch (Exception ignored) {
                         }
-                    }
-                } else {
-                    try {
-                        if (chatRoomLivenessLimiter.access(userId)) {
-                            livenessMgmtService.incLiveness(userId, Liveness.LIVENESS_COMMENT);
-                        }
-                    } catch (Exception ignored) {
                     }
                 }
 
@@ -1003,6 +1007,15 @@ public class ChatroomProcessor {
             dataModel.put(UserExt.CHAT_ROOM_PICTURE_STATUS, UserExt.USER_XXX_STATUS_C_ENABLED);
             dataModel.put("level3Permitted", false);
         }
+        // 是否宵禁
+        int start = 1930;
+        int end = 800;
+        int now = Integer.parseInt(new SimpleDateFormat("HHmm").format(new Date()));
+        if (now > end && now < start) {
+            dataModel.put("nightDisableMode", false);
+        } else {
+            dataModel.put("nightDisableMode", true);
+        }
         dataModelService.fillHeaderAndFooter(context, dataModel);
         dataModelService.fillRandomArticles(dataModel);
         dataModelService.fillSideHotArticles(dataModel);
@@ -1039,6 +1052,7 @@ public class ChatroomProcessor {
             String oId = context.param("oId");
             int size = Integer.parseInt(context.param("size"));
             int mode = Integer.parseInt(context.param("mode"));
+            String type = context.param("type");
             JSONObject currentUser = Sessions.getUser();
             try {
                 currentUser = ApiProcessor.getUserByKey(context.param("apiKey"));
@@ -1052,7 +1066,7 @@ public class ChatroomProcessor {
             JSONObject ret = new JSONObject();
             ret.put(Keys.CODE, StatusCodes.SUCC);
             ret.put(Keys.MSG, "");
-            ret.put(Keys.DATA, getContext(oId, size, mode));
+            ret.put(Keys.DATA, getContext(oId, size, mode, type));
             context.renderJSON(ret);
         } catch (Exception e) {
             context.sendStatus(500);
@@ -1079,7 +1093,8 @@ public class ChatroomProcessor {
                     return;
                 }
             }
-            List<JSONObject> jsonObject = getMessages(page);
+            String type = context.param("type");
+            List<JSONObject> jsonObject = getMessages(page,type);
             JSONObject ret = new JSONObject();
             ret.put(Keys.CODE, StatusCodes.SUCC);
             ret.put(Keys.MSG, "");
@@ -1158,7 +1173,7 @@ public class ChatroomProcessor {
      *
      * @return
      */
-    public static List<JSONObject> getMessages(int page) {
+    public static List<JSONObject> getMessages(int page, String type) {
         try {
             final BeanManager beanManager = BeanManager.getInstance();
             final ChatRoomRepository chatRoomRepository = beanManager.getReference(ChatRoomRepository.class);
@@ -1168,7 +1183,9 @@ public class ChatroomProcessor {
                     .addSort(Keys.OBJECT_ID, SortDirection.DESCENDING));
             List<JSONObject> msgs = messageList.stream().map(msg -> new JSONObject(msg.optString("content")).put("oId", msg.optString(Keys.OBJECT_ID))).collect(Collectors.toList());
             msgs = msgs.stream().map(msg -> JSONs.clone(msg).put(Common.TIME, new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(msg.optLong(Common.TIME)))).collect(Collectors.toList());
-            msgs = msgs.stream().map(msg -> JSONs.clone(msg.put("content", processMarkdown(msg.optString("content"))))).collect(Collectors.toList());
+            if(!"md".equals(type)){
+                msgs = msgs.stream().map(msg -> JSONs.clone(msg.put("content", processMarkdown(msg.optString("content"))))).collect(Collectors.toList());
+            }
             for (JSONObject msg : msgs) {
                 avatarQueryService.fillUserAvatarURL(msg);
             }
@@ -1178,7 +1195,7 @@ public class ChatroomProcessor {
         }
     }
 
-    public static List<JSONObject> getContext(String oId, int size, int mode) {
+    public static List<JSONObject> getContext(String oId, int size, int mode, String type) {
         try {
             final BeanManager beanManager = BeanManager.getInstance();
             final ChatRoomRepository chatRoomRepository = beanManager.getReference(ChatRoomRepository.class);
@@ -1214,7 +1231,9 @@ public class ChatroomProcessor {
             }
             msgs = msgs.stream().map(msg -> new JSONObject(msg.optString("content")).put("oId", msg.optString(Keys.OBJECT_ID))).collect(Collectors.toList());
             msgs = msgs.stream().map(msg -> JSONs.clone(msg).put(Common.TIME, new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(msg.optLong(Common.TIME)))).collect(Collectors.toList());
-            msgs = msgs.stream().map(msg -> JSONs.clone(msg.put("content", processMarkdown(msg.optString("content"))))).collect(Collectors.toList());
+            if(!"md".equals(type)){
+                msgs = msgs.stream().map(msg -> JSONs.clone(msg.put("content", processMarkdown(msg.optString("content"))))).collect(Collectors.toList());
+            }
             return msgs;
         } catch (RepositoryException e) {
             return new LinkedList<>();

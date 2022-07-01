@@ -103,7 +103,6 @@
     <include path="/plugins/**.htm" />
     <include path="/plugins/**/*.htm" />
 
-    <include path="/emoji/**/*.*" />
     <include path="/halt.html" />
     <include path="/opensearch.xml" />
 

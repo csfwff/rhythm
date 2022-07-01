@@ -507,4 +507,21 @@ public class ChatRoomBot {
             }
         }
     }
+
+    /**
+     * 宵禁检测
+     */
+    public static void nightDisableCheck() {
+        int now = Integer.parseInt(new SimpleDateFormat("HHmm").format(new Date()));
+        switch (now) {
+            case 800:
+                sendBotMsg("早上好 ☀️\n" +
+                        "新的一天开始啦～ 开始愉快的聊天吧 :D");
+                break;
+            case 1930:
+                sendBotMsg("现在时间是 19:30 分，摸鱼派已进入宵禁模式，期间聊天消息将不会计为活跃度...\n" +
+                        "感谢你的陪伴，我们明天再见，早点休息，晚安 \uD83D\uDCA4");
+                break;
+        }
+    }
 }

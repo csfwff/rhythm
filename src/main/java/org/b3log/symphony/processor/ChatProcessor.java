@@ -300,6 +300,9 @@ public class ChatProcessor {
                             .setFilter(new PropertyFilter("user_session", FilterOperator.EQUAL, listItem.optString("sessionId")))
                             .addSort(Keys.OBJECT_ID, SortDirection.DESCENDING);
                     info = chatInfoRepository.getFirst(query);
+                    if (Objects.isNull(info)) {
+                        continue;
+                    }
                 }
             } catch (Exception e) {
                 LOGGER.error("get chat info error by id: [{}]", lastMessageId);

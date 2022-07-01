@@ -25,6 +25,7 @@ import org.b3log.latke.ioc.Inject;
 import org.b3log.latke.service.annotation.Service;
 import org.b3log.latke.util.Stopwatchs;
 import org.b3log.symphony.processor.AlipayProcessor;
+import org.b3log.symphony.processor.bot.ChatRoomBot;
 import org.b3log.symphony.processor.channel.ChatroomChannel;
 import org.b3log.symphony.util.Symphonys;
 import org.b3log.symphony.util.Vocation;
@@ -120,6 +121,17 @@ public class CronMgmtService {
         long delay = 10000;
 
         livenessMgmtService.initCheckLiveness();
+
+        Symphonys.SCHEDULED_EXECUTOR_SERVICE.scheduleAtFixedRate(() -> {
+            try {
+                ChatRoomBot.nightDisableCheck();
+            } catch (final Exception e) {
+                LOGGER.log(Level.ERROR, "Executes cron failed", e);
+            } finally {
+                Stopwatchs.release();
+            }
+        }, delay, 60 * 1000, TimeUnit.MILLISECONDS);
+        delay += 2000;
 
         Symphonys.SCHEDULED_EXECUTOR_SERVICE.scheduleAtFixedRate(() -> {
             try {
