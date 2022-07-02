@@ -64,6 +64,8 @@
                             <#if type == "0">
                                 <div class="cmts tooltipped tooltipped-w" aria-label="经验值 ${user.exp} 点">
                                     ${user.exp} 经验值<br>
+                                    血脉：${user.ancestry}<br>
+                                    功法：${user.gongfa}<br>
                                 </div>
                             </#if>
                             <#if type == "1">
