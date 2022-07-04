@@ -43,6 +43,7 @@ import org.b3log.symphony.service.UserQueryService;
 import org.b3log.symphony.util.Sessions;
 import org.b3log.symphony.util.Symphonys;
 import org.json.JSONObject;
+import pers.adlered.simplecurrentlimiter.main.SimpleCurrentLimiter;
 
 import java.util.Locale;
 
@@ -60,6 +61,8 @@ public class BeforeRequestHandler implements Handler {
      */
     private static final Logger LOGGER = LogManager.getLogger(BeforeRequestHandler.class);
 
+    SimpleCurrentLimiter antiCCLimiter = new SimpleCurrentLimiter(30, 5);
+
     @Override
     public void handle(final RequestContext context) {
         Stopwatchs.start("Request initialized [" + context.requestURI() + "]");
@@ -67,6 +70,19 @@ public class BeforeRequestHandler implements Handler {
         if (context.header(Common.USER_AGENT) == null) {
             context.sendStatus(500);
             return;
+        }
+
+        try {
+            String method = context.getRequest().getMethod();
+            String uri = context.getRequest().getRequestURI();
+            String ip = Requests.getRemoteAddr(context.getRequest());
+            String union = ip + " " + method + " " + uri;
+            if (!antiCCLimiter.access(union)) {
+                context.sendStatus(503);
+                return;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
 
         Locales.setLocale(Latkes.getLocale());
