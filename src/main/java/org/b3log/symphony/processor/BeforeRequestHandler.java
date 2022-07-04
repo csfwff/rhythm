@@ -61,7 +61,7 @@ public class BeforeRequestHandler implements Handler {
      */
     private static final Logger LOGGER = LogManager.getLogger(BeforeRequestHandler.class);
 
-    SimpleCurrentLimiter antiCCLimiter = new SimpleCurrentLimiter(30, 5);
+    SimpleCurrentLimiter antiCCLimiter = new SimpleCurrentLimiter(10, 3);
 
     @Override
     public void handle(final RequestContext context) {
@@ -83,6 +83,8 @@ public class BeforeRequestHandler implements Handler {
             }
         } catch (Exception e) {
             e.printStackTrace();
+            context.sendStatus(503);
+            return;
         }
 
         Locales.setLocale(Latkes.getLocale());
