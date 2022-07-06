@@ -358,9 +358,13 @@ public class TopProcessor {
                 JSONObject data = dataList.optJSONObject(i);
                 String uname = data.optString("uname");
                 JSONObject family = new JSONObject(data.optString("family"));
-                data.remove("family");
-                data.put("family", family);
 
+                String[] lvFilter = new String[]{"黄阶低级", "黄阶中级", "黄阶高级", "玄阶低级", "玄阶中级", "玄阶高级", "地阶低级", "地阶中级", "地阶高级", "天阶低级", "天阶中级", "天阶高级"};
+                int ancestry = family.optInt("ancestry");
+                int gongfa = family.optInt("gongfa");
+                data.put("ancestry", lvFilter[ancestry]);
+                data.put("gongfa", lvFilter[gongfa]);
+                data.remove("family");
                 try {
                     JSONObject user = userQueryService.getUserByName(uname);
                     data.put("userAvatarURL", user.optString(UserExt.USER_AVATAR_URL));

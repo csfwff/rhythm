@@ -1094,7 +1094,7 @@ a[class*=" icon-"]:hover {
 }
 
 .has-view {
-  margin-right: 40px;
+  margin-right: 150px;
 }
 
 /* end list */
@@ -1103,7 +1103,8 @@ a[class*=" icon-"]:hover {
 .cmts {
   position: absolute;
   right: 15px;
-  top: 40%;
+  top: 50%;
+  transform: translateY(-50%);
 }
 /* end article */
 
