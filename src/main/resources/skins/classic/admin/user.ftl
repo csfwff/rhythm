@@ -600,9 +600,9 @@
                     $('#metal-attr').val('url=https://file.fishpi.cn/2022/06/013happy-6e078931.png&backcolor=f0e68c&fontcolor=ff0000');
                 ">礼仪委员</button>
                 <button class="btn" onclick="
-                    $('#metal-name').val('小姐姐认证');
+                    $('#metal-name').val('小姐姐认证 ');
                     $('#metal-desc').val('摸鱼派官方认证，她是小姐姐哟');
-                    $('#metal-attr').val('');
+                    $('#metal-attr').val('url=https://file.fishpi.cn/2022/07/girl-73f46e57.jpg&backcolor=ffb6c1&fontcolor=ff1493');
                 ">小姐姐认证</button>
                 <button class="btn" onclick="
                     $('#metal-name').val('LGBT ');
