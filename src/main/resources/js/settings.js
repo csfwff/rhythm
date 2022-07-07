@@ -33,21 +33,34 @@ var Settings = {
   submitIdentity: function () {
     let info = {};
     info.type = $("#id-type").children('option:selected').val();
+    let pause = false;
     switch (info.type) {
       case 'LGBT 群体认证':
         if (idCert === '' || idId === '') {
           alert('上传资料不完整，请重新上传');
+          pause = true;
         }
         break;
       default:
         if (idCert === '') {
           alert('上传资料不完整，请重新上传');
+          pause = true;
         }
         break;
     }
-    info.idCert = idCert;
-    info.idId = idId;
-    console.log(info);
+    if (!pause) {
+      info.idCert = idCert;
+      info.idId = idId;
+      $.ajax({
+        url: Label.servePath + '/user/identify',
+        type: 'POST',
+        data: JSON.stringify(info),
+        success: function (result) {
+          alert(result.msg);
+          location.reload();
+        },
+      });
+    }
   },
   initIdentity: function () {
     $("#id-type").change(function () {
@@ -63,6 +76,7 @@ var Settings = {
     switch (selected) {
       case '企业入驻认证':
         html += '' +
+            '<div class="fn-clear">申请企业认证，我们会通过私信联系您补交企业信息、官网、Logo等内容，以用来定制专属勋章，请耐心等待。</div><br>\n' +
             '<div class="fn-clear" style="margin: 0 30px 20px 0; display: inline-block">\n' +
             '    <div class="avatar-big" id="id-cert"\n' +
             '         onclick="$(\'#id-cert-upload input\').click()"' +
