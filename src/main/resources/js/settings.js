@@ -30,6 +30,104 @@
  * @static
  */
 var Settings = {
+  submitIdentity: function () {
+    let info = {};
+    info.type = $("#id-type").children('option:selected').val();
+    switch (info.type) {
+      case 'LGBT 群体认证':
+        if (idCert === '' || idId === '') {
+          alert('上传资料不完整，请重新上传');
+        }
+        break;
+      default:
+        if (idCert === '') {
+          alert('上传资料不完整，请重新上传');
+        }
+        break;
+    }
+    info.idCert = idCert;
+    info.idId = idId;
+    console.log(info);
+  },
+  initIdentity: function () {
+    $("#id-type").change(function () {
+      let selected = $(this).children('option:selected').val();
+      Settings.changeIdentityType(selected);
+    });
+    Settings.changeIdentityType('企业入驻认证');
+  },
+  changeIdentityType: function (selected) {
+    idCert = '';
+    idId = '';
+    let html = '';
+    switch (selected) {
+      case '企业入驻认证':
+        html += '' +
+            '<div class="fn-clear" style="margin: 0 30px 20px 0; display: inline-block">\n' +
+            '    <div class="avatar-big" id="id-cert"\n' +
+            '         onclick="$(\'#id-cert-upload input\').click()"' +
+            '         style="background-image:url(https://file.fishpi.cn/id/%E8%90%A5%E4%B8%9A%E6%89%A7%E7%85%A7%E5%89%AF%E6%9C%AC%E5%A4%8D%E5%8D%B0%E4%BB%B6.png)"></div>\n' +
+            '</div>\n' +
+            '<form id="id-cert-upload" style="display: none" method="POST" enctype="multipart/form-data">\n' +
+            '        <input type="file" name="file">\n' +
+            '</form>' +
+            '';
+        break;
+      case '小姐姐认证':
+        html += '' +
+            '<div class="fn-clear" style="margin: 0 30px 20px 0; display: inline-block">\n' +
+            '    <div class="avatar-big" id="id-cert"\n' +
+            '         onclick="$(\'#id-cert-upload input\').click()"\n' +
+            '         style="background-image:url(https://file.fishpi.cn/id/%E6%89%8B%E5%86%99%E7%A4%BE%E5%8C%BAID%E8%87%AA%E6%8B%8D%E7%85%A7.png)"></div>\n' +
+            '</div>\n' +
+            '<form id="id-cert-upload" style="display: none" method="POST" enctype="multipart/form-data">\n' +
+            '        <input type="file" name="file">\n' +
+            '</form>' +
+            '';
+        break;
+      case 'LGBT 群体认证':
+        html += '' +
+            '<div class="fn-clear" style="margin: 0 30px 20px 0; display: inline-block">\n' +
+            '    <div class="avatar-big" id="id-id"\n' +
+            '         onclick="$(\'#id-id-upload input\').click()"\n' +
+            '         style="background-image:url(https://file.fishpi.cn/id/%E6%89%8B%E6%8C%81%E8%BA%AB%E4%BB%BD%E8%AF%81%E8%87%AA%E6%8B%8D%E7%85%A7.png)"></div>\n' +
+            '</div>\n' +
+            '<form id="id-id-upload" style="display: none" method="POST" enctype="multipart/form-data">\n' +
+            '        <input type="file" name="file">\n' +
+            '</form>' +
+            '';
+        html += '' +
+            '<div class="fn-clear" style="margin: 0 30px 20px 0; display: inline-block">\n' +
+            '    <div class="avatar-big" id="id-cert"\n' +
+            '         onclick="$(\'#id-cert-upload input\').click()"\n' +
+            '         style="background-image:url(https://file.fishpi.cn/id/%E8%BA%AB%E4%BB%BD%E8%AF%81%E6%98%8E.png)"></div>\n' +
+            '</div>\n' +
+            '<form id="id-cert-upload" style="display: none" method="POST" enctype="multipart/form-data">\n' +
+            '        <input type="file" name="file">\n' +
+            '</form>' +
+            '';
+        break;
+    }
+    $('#id-content').html(html);
+    Settings.initUploadAvatar({
+      id: 'id-cert-upload',
+      userId: '${currentUser.oId}',
+      maxSize: '${imgMaxSize?c}'
+    }, function (data) {
+      var uploadKey = data.result.key;
+      $('#id-cert').css("background-image", 'url(' + uploadKey + ')').data('imageurl', uploadKey);
+      idCert = uploadKey;
+    });
+    Settings.initUploadAvatar({
+      id: 'id-id-upload',
+      userId: '${currentUser.oId}',
+      maxSize: '${imgMaxSize?c}'
+    }, function (data) {
+      var uploadKey = data.result.key;
+      $('#id-id').css("background-image", 'url(' + uploadKey + ')').data('imageurl', uploadKey);
+      idId = uploadKey;
+    });
+  },
   /**
    * 解绑两步验证
    */
