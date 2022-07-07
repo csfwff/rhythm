@@ -133,6 +133,9 @@ var Settings = {
     if (bag.patchCheckinCard !== undefined && bag.patchCheckinCard > 0) {
       html += '<button style="margin:0 5px 5px 0" onclick="Settings.usePatchCheckinCard(\'' + Label.csrfToken + '\', ' + bag.patchStart + ')">补签卡 x' + bag.patchCheckinCard + '</button>';
     }
+    if (bag.metalTicket !== undefined && bag.metalTicket > 0) {
+      html += '<button style="margin:0 5px 5px 0" onclick="alert(\'您已取得摸鱼派一周年纪念勋章领取权限，请静待系统公告\')">摸鱼派一周年纪念勋章领取券 x' + bag.metalTicket + '</button>';
+    }
 
     // 下面内容不要变更顺序
     if (bag.sysCheckinRemain !== undefined && bag.sysCheckinRemain > 0) {
