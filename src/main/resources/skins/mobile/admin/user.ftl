@@ -481,12 +481,30 @@
                     </label>
                     <label class="mid">
                         <div>勋章名称</div>
-                        <input type="text" name="name" value=""/>
+                        <input id="remove-metal-name" type="text" name="name" value=""/>
                     </label>
                 </div>
                 <br/>
                 <button type="submit" class="green fn-right">${submitLabel}</button>
             </form>
+            <div style="float: left;font-size: 12px;color: rgba(0,0,0,0.38);">
+                快速移除勋章：<br>
+                <div id="remove-metal-panel">
+                </div>
+                <script>
+                    let html = '';
+                    let sysMetal = ${sysMetal};
+                    let list = sysMetal.list;
+                    if (list !== undefined && list.length !== 0) {
+                        for (let i = 0; i < list.length; i++) {
+                            let m = list[i];
+                            html += '' +
+                                '<button class="btn" onclick="$(\'#remove-metal-name\').val(\'' + m.name + '\')">' + m.name + '</button>';
+                        }
+                    }
+                    document.getElementById('remove-metal-panel').innerHTML = html;
+                </script>
+            </div>
         </div>
     </div>
     </#if>
