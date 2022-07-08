@@ -36,6 +36,7 @@ var Count = {
             Count.initHtml();
             // 初始化时间，930代表早上9点半，1800代表下午6点
             Count.time = data.time === undefined ? "1800" : data.time;
+            Count.lunch = data.lunch === undefined ? "1130" : data.lunch;
             // 开始倒计时
             Count.start();
         }
@@ -159,10 +160,24 @@ var Count = {
             hh = Count.time.substr(0, 2);
             mm = Count.time.substr(2, 2);
         }
-        dateString = dateString + " " + hh + ":" + mm + ":00";
-        let setDate = new Date(dateString.replace(/-/g, '/'));
+        let timeDateString = dateString + " " + hh + ":" + mm + ":00";
+        let setDate = new Date(timeDateString.replace(/-/g, '/'));
         // 计算倒计时
         let nowDate = new Date();
+        let lunch_hh = "11";
+        let lunch_mm = "30";
+        if (Count.lunch.length === 3) {
+            lunch_hh = "0" + Count.lunch.substr(0, 1);
+            lunch_mm = Count.lunch.substr(1, 2);
+        } else if (Count.lunch.length === 4) {
+            lunch_hh = Count.lunch.substr(0, 2);
+            lunch_mm = Count.lunch.substr(2, 2);
+        }
+        let lunchString = dateString + " " + lunch_hh + ":" + lunch_mm + ":00";
+        let lunchDate = new Date(lunchString.replace(/-/g, '/'));
+        if (nowDate.toString() === lunchDate.toString()) {
+            Util.notice("success", 15000, "中午咯，该订饭啦～");
+        }
         let leftTime = setDate.getTime() - nowDate.getTime();
         let leftHour = Math.floor(leftTime / (1000 * 60 * 60) % 24);
         let leftMinute = Math.floor(leftTime / (1000 * 60) % 60);
@@ -218,6 +233,11 @@ var Count = {
             "  <div class=\"fn-hr5 fn__5\"></div>\n" +
             "  <input id=\"countSettingsTime\" type=\"time\"/>\n" +
             "</label>\n" +
+            "<label>\n" +
+            "  <div class=\"ft__smaller ft__fade\" style=\"float: left\">订饭时间</div>\n" +
+            "  <div class=\"fn-hr5 fn__5\"></div>\n" +
+            "  <input id=\"lunchSettingsTime\" type=\"time\"/>\n" +
+            "</label>\n" +
             "<div class=\"fn-hr5\"></div>\n" +
             "<div class=\"fn__flex\" style=\"margin-top: 15px\">\n" +
             "<div class=\"fn__flex-1 fn__flex-center\" style=\"text-align: left;\"></div>\n" +
@@ -236,6 +256,17 @@ var Count = {
                 mm = Count.time.substr(2, 2);
             }
             document.getElementById("countSettingsTime").value = hh + ":" + mm;
+
+            let lunch_hh = "11";
+            let lunch_mm = "30";
+            if (Count.lunch.length === 3) {
+                lunch_hh = "0" + Count.lunch.substr(0, 1);
+                lunch_mm = Count.lunch.substr(1, 2);
+            } else if (Count.lunch.length === 4) {
+                lunch_hh = Count.lunch.substr(0, 2);
+                lunch_mm = Count.lunch.substr(2, 2);
+            }
+            document.getElementById("lunchSettingsTime").value = lunch_hh + ":" + lunch_mm;
             switch (data.status) {
                 case 'enabled':
                     document.getElementById("countSettingStatus").value = "enabled";
@@ -252,6 +283,10 @@ var Count = {
         if (setTime !== "") {
             // 保存时间
             data.time = "" + setTime;
+        }
+        let lunchTime = document.getElementById("lunchSettingsTime").value.replace(":", "");
+        if (lunchTime !== "") {
+            data.lunch = "" + lunchTime;
         }
         // 保存状态
         data.status = document.getElementById("countSettingStatus").value;
