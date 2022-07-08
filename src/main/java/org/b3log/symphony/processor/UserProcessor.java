@@ -21,6 +21,8 @@ package org.b3log.symphony.processor;
 import org.apache.commons.lang.StringUtils;
 import org.b3log.latke.Keys;
 import org.b3log.latke.Latkes;
+import org.b3log.latke.event.Event;
+import org.b3log.latke.event.EventManager;
 import org.b3log.latke.http.Dispatcher;
 import org.b3log.latke.http.Request;
 import org.b3log.latke.http.RequestContext;
@@ -35,6 +37,7 @@ import org.b3log.latke.repository.RepositoryException;
 import org.b3log.latke.repository.Transaction;
 import org.b3log.latke.service.LangPropsService;
 import org.b3log.latke.util.Paginator;
+import org.b3log.symphony.event.EventTypes;
 import org.b3log.symphony.model.*;
 import org.b3log.symphony.processor.channel.ChatChannel;
 import org.b3log.symphony.processor.channel.UserChannel;
@@ -198,6 +201,9 @@ public class UserProcessor {
     @Inject
     private ChatUnreadRepository chatUnreadRepository;
 
+    @Inject
+    private EventManager eventManager;
+
     /**
      * Cache for liveness.
      */
@@ -340,6 +346,8 @@ public class UserProcessor {
                 context.renderMsg("提交失败 " + e.getMessage());
                 return;
             }
+
+            eventManager.fireEventAsynchronously(new Event<>(EventTypes.PRIVATE_CHAT, chatInfo));
 
             context.renderJSON(StatusCodes.SUCC);
             context.renderMsg("提交成功，如审核通过，我们会通过私信的方式通知您 :)");
