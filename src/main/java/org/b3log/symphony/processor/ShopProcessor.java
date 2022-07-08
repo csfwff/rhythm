@@ -216,8 +216,10 @@ public class ShopProcessor {
                             int tradersToday = 0;
                             for (int i = 0; i < tradersObject.length(); i++) {
                                 JSONObject traderObject = tradersObject.optJSONObject(i);
-                                int trades = traderObject.optInt("trades");
-                                tradersToday += trades;
+                                if (traderObject.optString("latestTradeDate").equals(date)) {
+                                    int trades = traderObject.optInt("trades");
+                                    tradersToday += trades;
+                                }
                             }
                             if (tradersToday >= maxPerDay) {
                                 ShopChannel.sendMsg(userId, "" +
@@ -341,8 +343,10 @@ public class ShopProcessor {
                             int tradersToday = 0;
                             for (int i = 0; i < tradersObject.length(); i++) {
                                 JSONObject traderObject = tradersObject.optJSONObject(i);
-                                int trades = traderObject.optInt("trades");
-                                tradersToday += trades;
+                                if (traderObject.optString("latestTradeDate").equals(date)) {
+                                    int trades = traderObject.optInt("trades");
+                                    tradersToday += trades;
+                                }
                             }
                             if (tradersToday >= maxPerDay) {
                                 ShopChannel.sendMsg(userId, "" +
