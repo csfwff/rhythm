@@ -40,6 +40,7 @@
                     <option selected="selected">企业入驻认证</option>
                     <option>小姐姐认证</option>
                     <option>LGBT 群体认证</option>
+                    <option>00 后认证</option>
                 </select>
             </div>
             <div id="id-content"></div>

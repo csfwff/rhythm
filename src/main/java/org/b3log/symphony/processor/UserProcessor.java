@@ -350,7 +350,7 @@ public class UserProcessor {
             eventManager.fireEventAsynchronously(new Event<>(EventTypes.PRIVATE_CHAT, chatInfo));
 
             context.renderJSON(StatusCodes.SUCC);
-            context.renderMsg("提交成功，如审核通过，我们会通过私信的方式通知您 :)");
+            context.renderMsg("提交成功，我们会在5个工作日内将认证结果通过私信的方式通知您 :)");
         } catch (Exception e) {
             context.renderJSON(StatusCodes.ERR);
             context.renderMsg("提交失败，输入不合法 " + e.getMessage());

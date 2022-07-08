@@ -121,6 +121,18 @@ var Settings = {
             '</form>' +
             '';
         break;
+      case '00 后认证':
+        html += '' +
+            '<div class="fn-clear" style="margin: 0 30px 20px 0; display: inline-block">\n' +
+            '    <div class="avatar-big" id="id-cert"\n' +
+            '         onclick="$(\'#id-cert-upload input\').click()"\n' +
+            '         style="background-image:url(https://file.fishpi.cn/id/%E6%89%8B%E6%8C%81%E8%BA%AB%E4%BB%BD%E8%AF%81%E8%87%AA%E6%8B%8D%E7%85%A7.png)"></div>\n' +
+            '</div>\n' +
+            '<form id="id-cert-upload" style="display: none" method="POST" enctype="multipart/form-data">\n' +
+            '        <input type="file" name="file">\n' +
+            '</form>' +
+            '';
+        break;
     }
     $('#id-content').html(html);
     Settings.initUploadAvatar({
