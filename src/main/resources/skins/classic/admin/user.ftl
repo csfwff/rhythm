@@ -609,6 +609,11 @@
                     $('#metal-desc').val('摸鱼派最可爱的群体 🏳️‍🌈');
                     $('#metal-attr').val('url=https://file.fishpi.cn/2022/07/截屏20220707234552-4c0711d1.png&backcolor=b0c4de&fontcolor=f0f8ff');
                 ">LGBT</button>
+                <button class="btn" onclick="
+                    $('#metal-name').val('00后');
+                    $('#metal-desc').val('这片江山已经是00后的天下了');
+                    $('#metal-attr').val('url=https://file.fishpi.cn/2022/07/啤酒-8227499a.jpg&backcolor=ffffff&fontcolor=ffa500');
+                ">00后</button>
             </div>
         </div>
     </div>
