@@ -1724,12 +1724,12 @@ var ChatRoom = {
     })
     // 关闭游戏界面
     $('#iceClose').click(function(){
-      $("#xiaoIceGameBox").removeClass('active');
       setTimeout(()=>{
         $('.ice-chat-input').val("");
         $("#xiaoIceGameBox").hide(200);
         $('#xiaoIceGameBtn').show(200);
-      },420)
+      },$("#xiaoIceGameBox").hasClass('active')?420:1)
+      $("#xiaoIceGameBox").removeClass('active');
     })
     // 最小化切换
     $('#iceMinimize').click(function(){
@@ -1748,13 +1748,11 @@ var ChatRoom = {
   sendIceMsg: function () {
     let msg = $('.ice-chat-input').val();
     $('.ice-chat-input').val("");
-    let uMsg = `<div class="ice-msg-item me">
-                    <div class="ice-msg-content">${msg}</div>
-                  </div>`
+    let uMsg = `<div class="ice-msg-item me"><div class="ice-msg-content">${msg}</div></div>`
     $('#iceMsgList').prepend(uMsg);
     let type = "gameMsg";
-    console.log(/(登录)/.test(msg))
-    if(/(登录)/.test(msg)){
+    // console.log(/登录/.test(msg))
+    if(/登录/.test(msg)){
       type = "login"
     }
     iceWs.send(JSON.stringify({
@@ -1807,7 +1805,6 @@ var ChatRoom = {
   //  春节头像挂件
    if(new Date(SpringFestivalDateList[year][0]) <= new Date(formatDate) && new Date(SpringFestivalDateList[year][1]) >= new Date(formatDate)){
      chatRoom.classList.add('SpringFestival')
-     return;
    }
  }
 }
