@@ -132,7 +132,9 @@ public class ChatroomChannel implements WebSocketChannel {
         final String msgStr = message.toString();
         try {
             for (WebSocketSession session : SESSIONS) {
-                session.sendText(msgStr);
+                if (onlineUsers.containsKey(session)) {
+                    session.sendText(msgStr);
+                }
             }
         } catch (Exception ignored) {
         }

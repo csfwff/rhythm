@@ -36,7 +36,7 @@ public class MainCache {
     public Map<String, CachePair> cachePairMap = Collections.synchronizedMap(new LinkedHashMap<String, CachePair>() {
         @Override
         protected boolean removeEldestEntry(Map.Entry eldest) {
-            return size() > 1000;
+            return size() > 2000;
         }
     });
     // 过期时间（毫秒）
