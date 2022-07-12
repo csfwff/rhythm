@@ -492,7 +492,7 @@ public class ArticleProcessor {
         } finally {
             Stopwatchs.end();
         }
-        dataModel.put(Article.ARTICLE, articleDesensitize(article));
+        dataModel.put(Article.ARTICLE, DesensitizeUtil.articleDesensitize(article));
         context.renderJSON(new JSONObject().put("data", dataModel)).renderCode(StatusCodes.SUCC).renderMsg("");
     }
 
@@ -529,7 +529,7 @@ public class ArticleProcessor {
 
         final JSONObject pagination = result.getJSONObject(Pagination.PAGINATION);
         dataModel.put("pagination", pagination);
-        dataModel.put(Article.ARTICLES, articlesDesensitize(allArticles));
+        dataModel.put(Article.ARTICLES, DesensitizeUtil.articlesDesensitize(allArticles));
 
         context.renderJSON(new JSONObject().put("data", dataModel)).renderCode(StatusCodes.SUCC).renderMsg("");
     }
@@ -586,7 +586,7 @@ public class ArticleProcessor {
         }
 
         final List<JSONObject> articles = articleQueryService.getArticlesByTag(sortMode, tag, pageNum, pageSize);
-        dataModel.put(Article.ARTICLES, articlesDesensitize(articles));
+        dataModel.put(Article.ARTICLES, DesensitizeUtil.articlesDesensitize(articles));
 
         final int tagRefCnt = tag.getInt(Tag.TAG_REFERENCE_CNT);
         final int pageCount = (int) Math.ceil(tagRefCnt / (double) pageSize);
@@ -638,42 +638,13 @@ public class ArticleProcessor {
 
         final JSONObject pagination = result.getJSONObject(Pagination.PAGINATION);
         dataModel.put("pagination", pagination);
-        dataModel.put(Article.ARTICLES, articlesDesensitize(allArticles));
+        dataModel.put(Article.ARTICLES, DesensitizeUtil.articlesDesensitize(allArticles));
 
         context.renderJSON(new JSONObject().put("data", dataModel)).renderCode(StatusCodes.SUCC).renderMsg("");
     }
 
-    private List<JSONObject> articlesDesensitize(List<JSONObject> articles) {
-        return articles.stream().peek(article -> {
-            article.remove("articleUA");
-            article.remove("articleOriginalContent");
-            article.remove("articleContent");
-            JSONObject articleAuthor = article.optJSONObject("articleAuthor");
-            articleAuthor.remove("userLatestLoginIP");
-            articleAuthor.remove("userPassword");
-            articleAuthor.remove("userPhone");
-            articleAuthor.remove("userQQ");
-            articleAuthor.remove("userCity");
-            articleAuthor.remove("userCountry");
-            articleAuthor.remove("userEmail");
-            articleAuthor.remove("secret2fa");
-        }).collect(Collectors.toList());
-    }
 
-    private JSONObject articleDesensitize(final JSONObject article) {
-        article.remove("articleUA");
-        JSONObject articleAuthor = article.optJSONObject("articleAuthor");
-        articleAuthor.remove("userLatestLoginIP");
-        articleAuthor.remove("userPassword");
-        articleAuthor.remove("userPhone");
-        articleAuthor.remove("userQQ");
-        articleAuthor.remove("userCity");
-        articleAuthor.remove("userCountry");
-        articleAuthor.remove("userEmail");
-        articleAuthor.remove("secret2fa");
-        article.put("articleAuthor", articleAuthor);
-        return article;
-    }
+
 
     /**
      * Removes an article.
