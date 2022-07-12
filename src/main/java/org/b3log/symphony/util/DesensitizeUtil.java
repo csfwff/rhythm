@@ -44,7 +44,6 @@ public class DesensitizeUtil {
 
     public static JSONObject articleDesensitize(final JSONObject article) {
         article.remove("articleUA");
-        article.remove("articleOriginalContent");
         JSONObject articleAuthor = article.optJSONObject("articleAuthor");
         articleAuthor.remove("userLatestLoginIP");
         articleAuthor.remove("userPassword");
