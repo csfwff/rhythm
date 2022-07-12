@@ -39,6 +39,7 @@ import org.b3log.symphony.processor.middleware.LoginCheckMidware;
 import org.b3log.symphony.processor.middleware.UserCheckMidware;
 import org.b3log.symphony.service.*;
 import org.b3log.symphony.util.*;
+import org.json.JSONArray;
 import org.json.JSONObject;
 import pers.adlered.simplecurrentlimiter.main.SimpleCurrentLimiter;
 
@@ -226,6 +227,80 @@ public class UserProcessor {
         Dispatcher.post("/user/edit/remove-metal", userProcessor::removeMetal);
         Dispatcher.post("/user/query/items", userProcessor::getItem);
         Dispatcher.post("/user/edit/items", userProcessor::adjustItem);
+        Dispatcher.get("/api/user/{userName}/articles", userProcessor::userArticles,loginCheck::handle);
+        Dispatcher.get("/api/user/{userName}/breezemoons", userProcessor::userBreezemoons, loginCheck::handle);
+    }
+    /**
+     * 获取用户清风明月列表
+     *
+     * @param context
+     */
+    public void userBreezemoons(final RequestContext context) {
+        try {
+            final int pageNum = Integer.parseInt(context.param("p"));
+            final int pageSize = Integer.parseInt(context.param("size"));
+            final String userName = StringUtils.isNotBlank(context.pathVar("userName")) ? context.pathVar("userName") : "";
+            final int windowSize = 15;
+            JSONObject user = userQueryService.getUserByName(userName);
+            if (Objects.isNull(user)) {
+                context.renderJSON(new JSONObject()).renderCode(StatusCodes.ERR).renderMsg("用户不存在");
+                return;
+            }
+            final JSONObject result = breezemoonQueryService.getBreezemoons("", user.optString(Keys.OBJECT_ID), pageNum, pageSize, windowSize);
+            final List<JSONObject> bms = (List<JSONObject>) result.opt(Breezemoon.BREEZEMOONS);
+            // 结果去敏
+            for (int i = 0; i < bms.size(); i++) {
+                bms.get(i).remove("breezemoonIP");
+                bms.get(i).remove("breezemoonUA");
+                bms.get(i).remove("breezemoonAuthorId");
+                bms.get(i).remove("breezemoonStatus");
+            }
+            context.renderJSON(new JSONObject().put("data",result)).renderCode(StatusCodes.SUCC);
+        } catch (Exception e) {
+            context.renderJSON(new JSONObject()).renderCode(StatusCodes.ERR).renderMsg("请求非法");
+        }
+    }
+
+    /**
+     * 获取用户帖子列表
+     *
+     * @param context
+     */
+    public void userArticles(final RequestContext context) {
+        final Request request = context.getRequest();
+        final Map<String, Object> dataModel = new HashMap<>();
+        final int pageNum = Paginator.getPage(request);
+        final String size = context.param("size");
+        int pageSize = StringUtils.isBlank(size) ? 0 : Integer.parseInt(size);
+        pageSize = pageSize <= 0 ? Symphonys.ARTICLE_LIST_CNT : pageSize;
+        final String userName = StringUtils.isNotBlank(context.pathVar("userName")) ? context.pathVar("userName") : "";
+        try {
+            JSONObject user = userQueryService.getUserByName(userName);
+            if (Objects.isNull(user)) {
+                context.renderJSON(new JSONObject()).renderCode(StatusCodes.ERR).renderMsg("用户不存在");
+                return;
+            }
+            final List<JSONObject> userArticles = articleQueryService.getUserArticles(user.optString(Keys.OBJECT_ID), Article.ARTICLE_ANONYMOUS_C_PUBLIC, pageNum, pageSize);
+            int recordCount = 0;
+            int pageCount = 0;
+            if (!userArticles.isEmpty()) {
+                final JSONObject first = userArticles.get(0);
+                pageCount = first.optInt(Pagination.PAGINATION_PAGE_COUNT);
+                recordCount = first.optInt(Pagination.PAGINATION_RECORD_COUNT);
+            }
+            final int windowSize = Symphonys.USER_HOME_LIST_WIN_SIZE;
+            final List<Integer> pageNums = Paginator.paginate(pageNum, pageSize, pageCount, windowSize);
+            JSONObject pageInfo = new JSONObject();
+            dataModel.put("pagination", pageInfo);
+            pageInfo.put(Pagination.PAGINATION_PAGE_COUNT, pageCount);
+            pageInfo.put(Pagination.PAGINATION_PAGE_NUMS, pageNums);
+            pageInfo.put(Pagination.PAGINATION_RECORD_COUNT, recordCount);
+            dataModel.put("articles", DesensitizeUtil.articlesDesensitize(userArticles));
+            context.renderJSON(new JSONObject().put("data",dataModel)).renderCode(StatusCodes.SUCC);
+        } catch (Exception e) {
+            context.renderJSON(new JSONObject()).renderCode(StatusCodes.ERR).renderMsg("请求非法");
+        }
+
     }
 
     /**
