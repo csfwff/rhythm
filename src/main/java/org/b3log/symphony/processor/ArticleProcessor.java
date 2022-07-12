@@ -215,6 +215,9 @@ public class ArticleProcessor {
     @Inject
     private TagQueryService tagQueryService;
 
+    @Inject
+    private AvatarQueryService avatarQueryService;
+
     /**
      * Register request handlers.
      */
@@ -414,6 +417,18 @@ public class ArticleProcessor {
             niceCmtScore = niceComments.get(niceComments.size() - 1).optDouble(Comment.COMMENT_SCORE, 0D);
 
             for (final JSONObject comment : niceComments) {
+                comment.remove("commentUA");
+                comment.remove("commentIP");
+                final JSONObject commenter = comment.optJSONObject("commenter");
+                commenter.remove("userPassword");
+                commenter.remove("userLatestLoginIP");
+                commenter.remove("userPhone");
+                commenter.remove("userQQ");
+                commenter.remove("userCity");
+                commenter.remove("userCountry");
+                commenter.remove("userEmail");
+                commenter.remove("secret2fa");
+
                 String thankTemplate = langPropsService.get("thankConfirmLabel");
                 thankTemplate = thankTemplate.replace("{point}", String.valueOf(Symphonys.POINT_THANK_COMMENT))
                         .replace("{user}", comment.optJSONObject(Comment.COMMENT_T_COMMENTER).optString(User.USER_NAME));

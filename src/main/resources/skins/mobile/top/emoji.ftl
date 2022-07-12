@@ -29,7 +29,7 @@
                 <a rel="nofollow"
                    class="tooltipped tooltipped-se"
                    href="${servePath}/member/${user.userName}"
-                   aria-label="${user.userName}"><div class="avatar" style="background-image:url('${user.userAvatarURL}')"></div></a>
+                   aria-label="${user.userName}"><div class="avatar" style="background-image:url('${user.userAvatarURL48}')"></div></a>
                 <div class="has-view fn-flex-1">
                     <h2>
                         ${user_index + 1}.

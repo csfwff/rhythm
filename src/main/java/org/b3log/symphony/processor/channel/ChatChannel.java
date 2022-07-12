@@ -76,6 +76,18 @@ public class ChatChannel implements WebSocketChannel {
      */
     public static final Map<String, Set<WebSocketSession>> SESSIONS = new ConcurrentHashMap();
 
+    public static void sendMsg(String userId, String toUserId, String oId) {
+        String chatHex = Strings.uniqueId(new String[]{toUserId, userId});
+        JSONObject message = new JSONObject();
+        message.put("type", "revoke");
+        message.put("data", oId);
+
+        final Set<WebSocketSession> sessions = SESSIONS.get(chatHex);
+        for (final WebSocketSession session : sessions) {
+            session.sendText(message.toString());
+        }
+    }
+
     /**
      * Called when the socket connection with the browser is established.
      *
@@ -211,8 +223,7 @@ public class ChatChannel implements WebSocketChannel {
             String html = ChatProcessor.processMarkdown(markdown);
             info.put("content", html);
             info.put("markdown", markdown);
-            String preview = markdown.replaceAll("[^a-zA-Z0-9\\u4E00-\\u9FA5]", "");
-            info.put("preview", preview.length() > 20 ? preview.substring(0, 20) : preview);
+            info.put("preview", ChatProcessor.makePreview(markdown));
             // 嵌入用户信息
             JSONObject senderJSON = userQueryService.getUser(fromId);
             info.put("senderUserName", senderJSON.optString(User.USER_NAME));
@@ -236,7 +247,9 @@ public class ChatChannel implements WebSocketChannel {
             final JSONObject cmd = new JSONObject();
             cmd.put(UserExt.USER_T_ID, toId);
             cmd.put(Common.COMMAND, "newIdleChatMessage");
-
+            cmd.put("senderUserName", info.optString("senderUserName"));
+            cmd.put("senderAvatar", info.optString("senderAvatar"));
+            cmd.put("preview", info.optString("preview"));
             UserChannel.sendCmd(cmd);
         } catch (RepositoryException e) {
             result.put("code", -1);

@@ -103,12 +103,12 @@
                 <#list shortlist as emoji>
                     <#if emoji != "endOfEmoji">
                         <#if emoji == "+1">
-                            <td><img alt="${emoji}" src="${staticServePath}/emoji/graphics/%2B1.png"></td>
+                            <td><img alt="${emoji}" src="https://file.fishpi.cn/emoji/graphics/%2B1.png"></td>
                         <#else>
-                            <td><img alt="${emoji}" src="${staticServePath}/emoji/graphics/${emoji}.png"></td>
+                            <td><img alt="${emoji}" src="https://file.fishpi.cn/emoji/graphics/${emoji}.png"></td>
                         </#if>
                     <#else>
-                        <td colspan="2"><a href="${servePath}/emoji/index.html">${moreLabel}</a></td>
+                        <td colspan="2"><a href="https://file.fishpi.cn/emoji/index.html">${moreLabel}</a></td>
                     </#if>
                 </#list>
             </tr>

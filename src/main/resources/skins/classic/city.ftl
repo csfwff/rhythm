@@ -65,11 +65,11 @@
                                 <#list users as user>
                                 <li>
                                     <div class="fn-flex">
-                                        <a rel="nofollow ft-gray"  
+                                        <a rel="nofollow ft-gray"
                                            href="${servePath}/member/${user.userName}">
-                                            <div class="avatar fn-left tooltipped tooltipped-se" 
-                                                 aria-label="${user.userName} <#if user.userOnlineFlag>${onlineLabel}<#else>${offlineLabel}</#if>" 
-                                                 style="background-image:url('${user.userAvatarURL}')"></div>
+                                            <div class="avatar fn-left tooltipped tooltipped-se"
+                                                 aria-label="${user.userName} <#if user.userOnlineFlag>${onlineLabel}<#else>${offlineLabel}</#if>"
+                                                 style="background-image:url('${user.userAvatarURL48}')"></div>
                                         </a>
                                         <div class="fn-flex-1">
                                             <h2 class="fn-inline">
@@ -78,13 +78,13 @@
                                             <#if user.userNickname != ''>
                                             <a class='ft-fade' rel="nofollow" href="${servePath}/member/${user.userName}" >${user.userName}</a>
                                             </#if>
-                                            <#if isLoggedIn && (currentUser.userName != user.userName)> 
+                                            <#if isLoggedIn && (currentUser.userName != user.userName)>
                                             <#if user.isFollowing>
-                                            <button class="fn-right mid" onclick="Util.unfollow(this, '${user.oId}', 'user')"> 
+                                            <button class="fn-right mid" onclick="Util.unfollow(this, '${user.oId}', 'user')">
                                                 ${unfollowLabel}
                                             </button>
                                             <#else>
-                                            <button class="fn-right mid" onclick="Util.follow(this, '${user.oId}', 'user')"> 
+                                            <button class="fn-right mid" onclick="Util.follow(this, '${user.oId}', 'user')">
                                                 ${followLabel}
                                             </button>
                                             </#if>

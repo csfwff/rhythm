@@ -63,6 +63,9 @@ public class RewardQueryService {
     @Inject
     private UserQueryService userQueryService;
 
+    @Inject
+    private AvatarQueryService avatarQueryService;
+
     /**
      * Get rewarded senders by dataId.
      */
@@ -87,6 +90,7 @@ public class RewardQueryService {
                     JSONObject user = userQueryService.getUser(object.optString(Reward.SENDER_ID));
                     userObject.put(User.USER_NAME, user.optString(User.USER_NAME));
                     userObject.put(UserExt.USER_AVATAR_URL, user.optString(UserExt.USER_AVATAR_URL));
+                    avatarQueryService.fillUserAvatarURL(userObject);
                 } catch (Exception ignored) {
                 }
                 array.put(userObject);

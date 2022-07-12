@@ -44,7 +44,7 @@ public class ChatListService {
     private ChatListRepository chatListRepository;
 
     public List<JSONObject> getChatList(final String userId) throws RepositoryException {
-        final String sql = String.format("SELECT * FROM symphony_chat_info AS info WHERE substring_index(info.user_session,'_',1) = '%s' OR substring_index(substring_index(info.user_session,'_',2),'_',-1) = '%s';", userId, userId);
+        final String sql = String.format("SELECT * FROM symphony_chat_list AS info WHERE substring_index(info.sessionId,'_',1) = '%s' OR substring_index(substring_index(info.sessionId,'_',2),'_',-1) = '%s' order by lastMessageId desc limit 25;", userId, userId);
         List<JSONObject> lists = chatListRepository.select(sql);
         if (Objects.isNull(lists) || lists.size() == 0) {
             return new ArrayList<>();

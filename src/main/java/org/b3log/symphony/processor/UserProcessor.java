@@ -21,28 +21,39 @@ package org.b3log.symphony.processor;
 import org.apache.commons.lang.StringUtils;
 import org.b3log.latke.Keys;
 import org.b3log.latke.Latkes;
+import org.b3log.latke.event.Event;
+import org.b3log.latke.event.EventManager;
 import org.b3log.latke.http.Dispatcher;
 import org.b3log.latke.http.Request;
 import org.b3log.latke.http.RequestContext;
+import org.b3log.latke.http.WebSocketSession;
 import org.b3log.latke.http.renderer.AbstractFreeMarkerRenderer;
 import org.b3log.latke.ioc.BeanManager;
 import org.b3log.latke.ioc.Inject;
 import org.b3log.latke.ioc.Singleton;
 import org.b3log.latke.model.Pagination;
 import org.b3log.latke.model.User;
+import org.b3log.latke.repository.RepositoryException;
+import org.b3log.latke.repository.Transaction;
 import org.b3log.latke.service.LangPropsService;
 import org.b3log.latke.util.Paginator;
+import org.b3log.symphony.event.EventTypes;
 import org.b3log.symphony.model.*;
+import org.b3log.symphony.processor.channel.ChatChannel;
+import org.b3log.symphony.processor.channel.UserChannel;
 import org.b3log.symphony.processor.middleware.AnonymousViewCheckMidware;
 import org.b3log.symphony.processor.middleware.CSRFMidware;
 import org.b3log.symphony.processor.middleware.LoginCheckMidware;
 import org.b3log.symphony.processor.middleware.UserCheckMidware;
+import org.b3log.symphony.repository.ChatInfoRepository;
+import org.b3log.symphony.repository.ChatUnreadRepository;
 import org.b3log.symphony.service.*;
 import org.b3log.symphony.util.*;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import pers.adlered.simplecurrentlimiter.main.SimpleCurrentLimiter;
 
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 /**
@@ -185,6 +196,15 @@ public class UserProcessor {
     @Inject
     private CloudService cloudService;
 
+    @Inject
+    private ChatInfoRepository chatInfoRepository;
+
+    @Inject
+    private ChatUnreadRepository chatUnreadRepository;
+
+    @Inject
+    private EventManager eventManager;
+
     /**
      * Cache for liveness.
      */
@@ -227,6 +247,8 @@ public class UserProcessor {
         Dispatcher.post("/user/edit/remove-metal", userProcessor::removeMetal);
         Dispatcher.post("/user/query/items", userProcessor::getItem);
         Dispatcher.post("/user/edit/items", userProcessor::adjustItem);
+        Dispatcher.post("/user/edit/points", userProcessor::adjustPoint);
+        Dispatcher.post("/user/identify", userProcessor::submitIdentify, loginCheck::handle);
         Dispatcher.get("/api/user/{userName}/articles", userProcessor::userArticles,loginCheck::handle);
         Dispatcher.get("/api/user/{userName}/breezemoons", userProcessor::userBreezemoons, loginCheck::handle);
     }
@@ -303,6 +325,184 @@ public class UserProcessor {
 
     }
 
+    public void submitIdentify(final RequestContext context) {
+        final JSONObject requestJSONObject = context.requestJSON();
+        JSONObject user = Sessions.getUser();
+        try {
+            user = ApiProcessor.getUserByKey(requestJSONObject.optString("apiKey"));
+        } catch (NullPointerException ignored) {
+        }
+        requestJSONObject.put("userName", user.optString(User.USER_NAME));
+        try {
+            String content = "" +
+                    "\uD83C\uDF1F 官方认证申请\n\n" +
+                    "* 社区ID：" + requestJSONObject.optString("userName") + "\n" +
+                    "* 申请类型：" + requestJSONObject.optString("type") + "\n" +
+                    "* 证件照：![](" + requestJSONObject.optString("idCert") + ")\n" +
+                    "* 证明：![](" + requestJSONObject.optString("idId") + ")";
+            String fromId = userQueryService.getUserByName("admin").optString(Keys.OBJECT_ID);
+            String toId = userQueryService.getUserByName("adlered").optString(Keys.OBJECT_ID);
+            String chatHex = Strings.uniqueId(new String[]{fromId, toId});
+            String time = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date());
+            content = StringUtils.trim(content);
+            if (StringUtils.isBlank(content) || content.length() > 1024) {
+                context.renderJSON(StatusCodes.ERR);
+                context.renderMsg("提交失败，输入不合法");
+                return;
+            }
+            // 存入数据库
+            JSONObject chatInfo = new JSONObject();
+            chatInfo.put("fromId", fromId);
+            chatInfo.put("toId", toId);
+            chatInfo.put("user_session", chatHex);
+            chatInfo.put("time", time);
+            chatInfo.put("content", content);
+            String chatInfoOId;
+            try {
+                Transaction transaction = chatInfoRepository.beginTransaction();
+                chatInfoOId = chatInfoRepository.add(chatInfo);
+                transaction.commit();
+            } catch (RepositoryException e) {
+                context.renderJSON(StatusCodes.ERR);
+                context.renderMsg("提交失败 " + e.getMessage());
+                return;
+            }
+            JSONObject chatUnread = new JSONObject();
+            chatUnread.put("fromId", fromId);
+            chatUnread.put("toId", toId);
+            chatUnread.put("user_session", chatHex);
+            try {
+                Transaction transaction = chatUnreadRepository.beginTransaction();
+                chatUnreadRepository.add(chatUnread);
+                transaction.commit();
+            } catch (RepositoryException e) {
+                context.renderJSON(StatusCodes.ERR);
+                context.renderMsg("提交失败 " + e.getMessage());
+                return;
+            }
+            // 格式化并发送给WS用户
+            try {
+                JSONObject info = chatInfoRepository.get(chatInfoOId);
+                // 渲染 Markdown
+                String markdown = info.optString("content");
+                String html = ChatProcessor.processMarkdown(markdown);
+                info.put("content", html);
+                info.put("markdown", markdown);
+                info.put("preview", ChatProcessor.makePreview(markdown));
+                // 嵌入用户信息
+                JSONObject senderJSON = userQueryService.getUser(fromId);
+                info.put("senderUserName", senderJSON.optString(User.USER_NAME));
+                info.put("senderAvatar", senderJSON.optString(UserExt.USER_AVATAR_URL));
+                JSONObject receiverJSON = userQueryService.getUser(toId);
+                if (!toId.equals("1000000000086")) {
+                    info.put("receiverUserName", receiverJSON.optString(User.USER_NAME));
+                    info.put("receiverAvatar", receiverJSON.optString(UserExt.USER_AVATAR_URL));
+                } else {
+                    info.put("receiverUserName", "文件传输助手");
+                    info.put("receiverAvatar", "https://file.fishpi.cn/2022/06/e1541bfe4138c144285f11ea858b6bf6-ba777366.jpeg");
+                }
+                // 返回给发送者同样的拷贝
+                final Set<WebSocketSession> senderSessions = ChatChannel.SESSIONS.get(chatHex);
+                if (senderSessions != null) {
+                    for (final WebSocketSession session : senderSessions) {
+                        session.sendText(info.toString());
+                    }
+                }
+                // 给接收者发送通知
+                final JSONObject cmd = new JSONObject();
+                cmd.put(UserExt.USER_T_ID, toId);
+                cmd.put(Common.COMMAND, "newIdleChatMessage");
+                cmd.put("senderUserName", info.optString("senderUserName"));
+                cmd.put("senderAvatar", info.optString("senderAvatar"));
+                cmd.put("preview", info.optString("preview"));
+                UserChannel.sendCmd(cmd);
+            } catch (RepositoryException e) {
+                context.renderJSON(StatusCodes.ERR);
+                context.renderMsg("提交失败 " + e.getMessage());
+                return;
+            }
+
+            eventManager.fireEventAsynchronously(new Event<>(EventTypes.PRIVATE_CHAT, chatInfo));
+
+            context.renderJSON(StatusCodes.SUCC);
+            context.renderMsg("提交成功，我们会在5个工作日内将认证结果通过私信的方式通知您 :)");
+        } catch (Exception e) {
+            context.renderJSON(StatusCodes.ERR);
+            context.renderMsg("提交失败，输入不合法 " + e.getMessage());
+        }
+    }
+
+    /**
+     * 金手指：调整积分
+     */
+    public void adjustPoint(final RequestContext context) {
+        JSONObject requestJSONObject = context.requestJSON();
+        final String goldFingerKey = requestJSONObject.optString("goldFingerKey");
+        final String itemKey = Symphonys.get("gold.finger.point");
+        if (goldFingerKey.equals(itemKey)) {
+            try {
+                final String userName = requestJSONObject.optString("userName");
+                JSONObject user = userQueryService.getUserByName(userName);
+                try {
+                    int point = requestJSONObject.optInt("point");
+                    String memo = requestJSONObject.optString("memo");
+                    if (point > 100000 || point < -100000) {
+                        context.renderJSON(StatusCodes.ERR);
+                        context.renderMsg("转账失败：交易数额不得大于 100000 积分。");
+                        return;
+                    }
+                    if (memo.isEmpty()) {
+                        context.renderJSON(StatusCodes.ERR);
+                        context.renderMsg("转账失败：交易备注不得为空。");
+                        return;
+                    }
+                    final String userId = user.optString(Keys.OBJECT_ID);
+                    if (point > 0) {
+                        // 增加积分
+                        final String transferId = pointtransferMgmtService.transfer(Pointtransfer.ID_C_SYS, userId,
+                                Pointtransfer.TRANSFER_TYPE_C_ACCOUNT2ACCOUNT, point, userId, System.currentTimeMillis(), memo);
+                        final JSONObject notification = new JSONObject();
+                        notification.put(Notification.NOTIFICATION_USER_ID, userId);
+                        notification.put(Notification.NOTIFICATION_DATA_ID, transferId);
+                        notificationMgmtService.addPointTransferNotification(notification);
+                        // === 记录日志 ===
+                        LogsService.simpleLog(context, "增加积分", "用户: " + userName + ", 积分: " + point + ", 备注: " + memo);
+                        // === 记录日志 ===
+                        context.renderJSON(StatusCodes.SUCC);
+                        context.renderMsg("转账成功，交易oId为：" + transferId);
+                        return;
+                    } else if (point < 0) {
+                        // 减少积分
+                        point = -point;
+                        final String transferId = pointtransferMgmtService.transfer(userId, Pointtransfer.ID_C_SYS,
+                                Pointtransfer.TRANSFER_TYPE_C_ABUSE_DEDUCT, point, memo, System.currentTimeMillis(), "");
+                        final JSONObject notification = new JSONObject();
+                        notification.put(Notification.NOTIFICATION_USER_ID, userId);
+                        notification.put(Notification.NOTIFICATION_DATA_ID, transferId);
+                        notificationMgmtService.addAbusePointDeductNotification(notification);
+                        // === 记录日志 ===
+                        LogsService.simpleLog(context, "扣除积分", "用户: " + userName + ", 积分: " + point + ", 备注: " + memo);
+                        // === 记录日志 ===
+                        context.renderJSON(StatusCodes.SUCC);
+                        context.renderMsg("扣款成功，交易oId为：" + transferId);
+                        return;
+                    }
+                } catch (Exception e) {
+                    context.renderJSON(StatusCodes.ERR);
+                    context.renderMsg("转账失败：" + e.getMessage());
+                }
+            } catch (Exception e) {
+                context.renderJSON(StatusCodes.ERR);
+                context.renderMsg("用户不存在，请检查用户名。");
+            }
+        } else {
+            context.renderJSON(StatusCodes.ERR);
+            context.renderMsg("金手指(point类型)不正确。");
+        }
+        context.renderJSON(StatusCodes.ERR);
+        context.renderMsg("转账失败。");
+    }
+
     /**
      * 金手指：调整用户背包
      * @param context
@@ -319,6 +519,9 @@ public class UserProcessor {
                 final String item = requestJSONObject.optString("item");
                 final int sum = requestJSONObject.optInt("sum");
                 cloudService.putBag(userId, item, sum, Integer.MAX_VALUE);
+                // === 记录日志 ===
+                LogsService.simpleLog(context, "调整用户背包", "用户: " + userName + ", 物品: " + item + ", 数量: " + sum);
+                // === 记录日志 ===
                 context.renderJSON(StatusCodes.SUCC);
                 context.renderMsg("背包调整成功，附当前用户背包内容，请检查数据。");
                 context.renderData(new JSONObject(cloudService.getBag(userId)));
@@ -371,6 +574,9 @@ public class UserProcessor {
             final String userId = user.optString(Keys.OBJECT_ID);
             final String name = requestJSONObject.optString("name");
             cloudService.removeMetal(userId, name);
+            // === 记录日志 ===
+            LogsService.simpleLog(context, "移除勋章", "用户: " + userName + ", 勋章名称: " + name);
+            // === 记录日志 ===
             context.renderJSON(StatusCodes.SUCC);
             context.renderMsg("勋章移除成功。");
         } else {
@@ -396,6 +602,9 @@ public class UserProcessor {
             final String attr = requestJSONObject.optString("attr");
             final String data = requestJSONObject.optString("data");
             cloudService.giveMetal(userId, name, description, attr, data);
+            // === 记录日志 ===
+            LogsService.simpleLog(context, "添加勋章", "用户: " + userName + ", 勋章名称: " + name + ", 勋章描述: " + description + ", 勋章属性: " + attr);
+            // === 记录日志 ===
             context.renderJSON(StatusCodes.SUCC);
             context.renderMsg("勋章安装成功。");
         } else {
@@ -490,14 +699,24 @@ public class UserProcessor {
         filteredUserProfile.put(UserExt.ONLINE_MINUTE, user.optInt(UserExt.ONLINE_MINUTE));
         filteredUserProfile.put(User.USER_URL, user.optString(User.USER_URL));
         filteredUserProfile.put(UserExt.USER_NICKNAME, user.optString(UserExt.USER_NICKNAME));
-        filteredUserProfile.put(UserExt.USER_CITY, user.optString(UserExt.USER_CITY));
+        try {
+            if (user.optInt(UserExt.USER_GEO_STATUS) == UserExt.USER_GEO_STATUS_C_PUBLIC) {
+                filteredUserProfile.put(UserExt.USER_CITY, user.optString(UserExt.USER_CITY));
+            } else {
+                filteredUserProfile.put(UserExt.USER_CITY, "");
+            }
+        } catch (Exception ignored) {
+            filteredUserProfile.put(UserExt.USER_CITY, "");
+        }
         filteredUserProfile.put(UserExt.USER_AVATAR_URL, user.optString(UserExt.USER_AVATAR_URL));
+        avatarQueryService.fillUserAvatarURL(filteredUserProfile);
         filteredUserProfile.put(UserExt.USER_POINT, user.optInt(UserExt.USER_POINT));
         filteredUserProfile.put(UserExt.USER_INTRO, user.optString(UserExt.USER_INTRO));
         filteredUserProfile.put(Keys.OBJECT_ID, user.optString(Keys.OBJECT_ID));
         filteredUserProfile.put(UserExt.USER_NO, user.optString(UserExt.USER_NO));
         filteredUserProfile.put(UserExt.USER_APP_ROLE, user.optString(UserExt.USER_APP_ROLE));
         filteredUserProfile.put("sysMetal", cloudService.getEnabledMetal(user.optString(Keys.OBJECT_ID)));
+        filteredUserProfile.put("allMetalOwned", cloudService.getMetal(user.optString(Keys.OBJECT_ID)));
         final String userId = user.optString(Keys.OBJECT_ID);
         final long followerCnt = followQueryService.getFollowerCount(userId, Follow.FOLLOWING_TYPE_C_USER);
         filteredUserProfile.put("followerCount", followerCnt);
@@ -1268,6 +1487,7 @@ public class UserProcessor {
                 userName.put(User.USER_NAME, admin.optString(User.USER_NAME));
                 final String avatar = avatarQueryService.getAvatarURLByUser(admin, "20");
                 userName.put(UserExt.USER_AVATAR_URL, avatar);
+                avatarQueryService.fillUserAvatarURL(userName);
 
                 userNames.add(userName);
             }
@@ -1277,6 +1497,9 @@ public class UserProcessor {
         }
 
         final List<JSONObject> userNames = userQueryService.getUserNamesByPrefix(namePrefix);
+        for (JSONObject user : userNames) {
+            avatarQueryService.fillUserAvatarURL(user);
+        }
         result.put(Common.DATA, userNames);
     }
 
@@ -1307,7 +1530,7 @@ public class UserProcessor {
             String emojiChar = Emotions.toUnicode(":" + emoji + ":");
             if (StringUtils.contains(emojiChar, ":")) {
                 final String suffix = "huaji".equals(emoji) ? ".gif" : ".png";
-                emojiChar = Latkes.getStaticServePath() + "/emoji/graphics/" + emoji + suffix;
+                emojiChar = "https://file.fishpi.cn/emoji/graphics/" + emoji + suffix;
             }
 
             data.add(new JSONObject().put(emoji, emojiChar));

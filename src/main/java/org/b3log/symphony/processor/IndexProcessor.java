@@ -509,7 +509,7 @@ public class IndexProcessor {
             dataModel.put("need2fa", "no");
         }
 
-        dataModel.put(Common.MESSAGES, ChatroomProcessor.getMessages(1));
+        dataModel.put(Common.MESSAGES, ChatroomProcessor.getMessages(1,"html"));
 
         makeIndexData(dataModel);
 
@@ -531,6 +531,9 @@ public class IndexProcessor {
             // 不是周五
             dataModel.put("TGIF", "-1");
         }
+
+        // 最近注册的新人
+        dataModel.put("recentRegUsers", userQueryService.getRecentRegisteredUsers(20));
 
         dataModelService.fillHeaderAndFooter(context, dataModel);
         dataModelService.fillIndexTags(dataModel);

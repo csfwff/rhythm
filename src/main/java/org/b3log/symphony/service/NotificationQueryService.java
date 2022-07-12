@@ -367,6 +367,7 @@ public class NotificationQueryService {
         subFilters.add(new PropertyFilter(Notification.NOTIFICATION_DATA_TYPE, FilterOperator.EQUAL, Notification.DATA_TYPE_C_INVITATION_LINK_USED));
         subFilters.add(new PropertyFilter(Notification.NOTIFICATION_DATA_TYPE, FilterOperator.EQUAL, Notification.DATA_TYPE_C_POINT_PERFECT_ARTICLE));
         subFilters.add(new PropertyFilter(Notification.NOTIFICATION_DATA_TYPE, FilterOperator.EQUAL, Notification.DATA_TYPE_C_POINT_REPORT_HANDLED));
+        subFilters.add(new PropertyFilter(Notification.NOTIFICATION_DATA_TYPE, FilterOperator.EQUAL, Notification.DATA_TYPE_C_RED_PACKET_FROM_SKY));
         filters.add(new CompositeFilter(CompositeFilterOperator.OR, subFilters));
         final Query query = new Query().setFilter(new CompositeFilter(CompositeFilterOperator.AND, filters));
         try {
@@ -417,6 +418,7 @@ public class NotificationQueryService {
         subFilters.add(new PropertyFilter(Notification.NOTIFICATION_DATA_TYPE, FilterOperator.EQUAL, Notification.DATA_TYPE_C_INVITATION_LINK_USED));
         subFilters.add(new PropertyFilter(Notification.NOTIFICATION_DATA_TYPE, FilterOperator.EQUAL, Notification.DATA_TYPE_C_POINT_PERFECT_ARTICLE));
         subFilters.add(new PropertyFilter(Notification.NOTIFICATION_DATA_TYPE, FilterOperator.EQUAL, Notification.DATA_TYPE_C_POINT_REPORT_HANDLED));
+        subFilters.add(new PropertyFilter(Notification.NOTIFICATION_DATA_TYPE, FilterOperator.EQUAL, Notification.DATA_TYPE_C_RED_PACKET_FROM_SKY));
         filters.add(new CompositeFilter(CompositeFilterOperator.OR, subFilters));
         final Query query = new Query().setPage(currentPageNum, pageSize).
                 setFilter(new CompositeFilter(CompositeFilterOperator.AND, filters)).
@@ -609,6 +611,16 @@ public class NotificationQueryService {
                         break;
                     case Notification.DATA_TYPE_C_POINT_REPORT_HANDLED:
                         desTemplate = langPropsService.get("notification36Label");
+                        break;
+                    case Notification.DATA_TYPE_C_RED_PACKET_FROM_SKY:
+                        desTemplate = langPropsService.get("notification37Label");
+                        try {
+                            desTemplate = desTemplate.replace("{user}", dataId.split(":")[0]);
+                            desTemplate = desTemplate.replace("{point}", dataId.split(":")[1]);
+                        } catch (Exception e) {
+                            desTemplate = desTemplate.replace("{user}", dataId);
+                            desTemplate = desTemplate.replace("{point}", "?");
+                        }
                         break;
                     default:
                         throw new AssertionError();

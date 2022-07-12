@@ -63,6 +63,15 @@ var Util = {
     return 'https://fishpi.cn/gen?scale=0.79&txt=' + name + attr;
   },
 
+  genMiniMetal(attr) {
+    if (attr !== undefined && attr !== '') {
+      attr = '&' + attr;
+    } else {
+      attr = '';
+    }
+    return 'https://fishpi.cn/gen?scale=0.79&txt=' + attr;
+  },
+
   parseDom(arg) {
     var objE = document.createElement("div");
     objE.innerHTML = arg;
@@ -119,10 +128,10 @@ var Util = {
           for (var i = 0; i < result.data.length; i++) {
             atUsers.push({
               value: '@' + result.data[i].userName + " ",
-              html: '<img src="' + result.data[i].userAvatarURL +
+              html: '<img src="' + result.data[i].userAvatarURL48 +
                   '"/>' +
                   result.data[i].userName,
-              avatar: result.data[i].userAvatarURL,
+              avatar: result.data[i].userAvatarURL48,
               username: result.data[i].userName
             });
           }
@@ -807,7 +816,7 @@ var Util = {
                     for (var i = 0; i < result.data.length; i++) {
                       atUsers.push({
                         value: '@' + result.data[i].userName + " ",
-                        html: '<img src="' + result.data[i].userAvatarURL +
+                        html: '<img src="' + result.data[i].userAvatarURL48 +
                           '"/>' +
                           result.data[i].userName,
                       })
@@ -995,11 +1004,15 @@ var Util = {
         }
 
         // browser
+        let icon = '<svg style="height: 15px;padding-top: 2px;pointer-events: none;">' +
+                   '  <use xlink:href="#notification"></use>' +
+                   '</svg>' +
+                   '&nbsp;';
         if (0 < count) {
           $('#aNotifications').
             removeClass('no-msg tooltipped tooltipped-w').
             addClass('msg').
-            text(count).
+            html(icon + count).
             attr('href', 'javascript:void(0)')
           if (0 === result.userNotifyStatus &&
             window.localStorage.hadNotificate !== count.toString() &&
@@ -1037,7 +1050,7 @@ var Util = {
           $('#aNotifications').
             removeClass('msg').
             addClass('no-msg tooltipped tooltipped-w').
-            text(count).
+            html(icon + count).
             attr('href', Label.servePath + '/notifications')
         }
       },
@@ -1430,7 +1443,7 @@ var Util = {
         let followingUserCount = data.followingUserCount;
         let oId = data.oId;
         let onlineMinute = data.onlineMinute;
-        let userAvatarURL = data.userAvatarURL;
+        let userAvatarURL = data.userAvatarURL210;
         let userCity = data.userCity;
         let userIntro = data.userIntro;
         let userName = data.userName;
@@ -1522,7 +1535,16 @@ var Util = {
               '</a>\n';
         }
         html += '' +
+            '<a class="tooltipped-new tooltipped__n" rel="nofollow" onclick="javascript:void(0)" style="background-color:#eeeeeecc;border-radius:5px;padding:0 7px 0 4px;cursor:default;color:#6d6c6c;font-size:5px;"\n' +
+            '   aria-label="' + userNo + ' 号成员">\n' +
+            '    <svg style="height: 12px; vertical-align: -4.5px">\n' +
+            '        <use xlink:href="#no"></use>\n' +
+            '    </svg>' +
+            '    <span style="margin: 0;float: none;vertical-align: -3px;">' + userNo + '</span> \n' +
+            '</a>\n';
+        html += '' +
             '                </div>\n';
+
         if (userOnlineFlag === true) {
           html += '<span style="background-color:#d23f31;color:#fff;font-size:12px;line-height:20px;border-radius:3px;height:20px;display:inline-block;padding:0 5px;vertical-align:middle;box-sizing:border-box;">在线</span>';
         } else {
@@ -1607,18 +1629,44 @@ var Util = {
 
       switch (data.command) {
         case 'refreshNotification':
-          if (window.location.pathname === '/' || window.location.pathname === '/cr') {
+          if (window.location.pathname === '/cr') {
             Util.makeNotificationRead('at');
             Util.setUnreadNotificationCount(true);
           } else {
             Util.setUnreadNotificationCount(true);
-            Util.notice("default", 3000, "你有一条新的通知！<a href='/notifications'>点击查看</a>");
+            if (data.count !== 0) {
+              Util.notice("default", 3000, "你有新的通知！<a href='/notifications'>点击查看</a>");
+            }
           }
           break
+        case 'chatUnreadCountRefresh':
+          if (data.count === 0) {
+            Util.pauseBling();
+          }
+          $("#aChatCount").text(data.count);
+          break;
         case 'newIdleChatMessage':
+          $("#aChatCount").text(parseInt($("#aChatCount").text()) + 1);
           if (window.location.pathname !== "/chat") {
             Util.blingChat();
-            Util.notice("warning", 3000, "叮咚！你收到了一条私信。<a href='/chat'>点击查看</a>");
+            Util.notice("warning", 3000, "叮咚！" + data.senderUserName + " 向你发送了一条私信。<a href='/chat?toUser=" + data.senderUserName + "'>点击查看</a>");
+          } else {
+            let preview = data.preview.substring(0, 10);
+            let dot = data.preview.length > 10 ? "..." : "";
+            let senderUserName = data.senderUserName;
+            let senderAvatar = data.senderAvatar;
+            if ($("#chatTo" + senderUserName).length <= 0) {
+              Chat.addToMessageList(senderUserName, senderAvatar, preview);
+            } else {
+              $("#chatTo" + senderUserName).find("span").html(preview + dot);
+            }
+            if ($("#chatTo" + senderUserName).css("background-color") !== 'rgb(241, 241, 241)') {
+              $("#chatTo" + senderUserName).css("background-color", "#fff4eb");
+            }
+            // 新消息置顶
+            let html = $("#chatTo" + senderUserName).prop('outerHTML');
+            $("#chatTo" + senderUserName).remove();
+            $("#chatMessageList").prepend(html);
           }
           break;
         case 'warnBroadcast':
@@ -1657,6 +1705,9 @@ var Util = {
    * @description 让聊天图标闪烁
    */
   blingChat: function () {
+    $('#aChat').
+    removeClass('no-msg').
+    addClass('msg');
     if (!Util.isBlinging) {
       Util.isBlinging = true;
       $("#idleTalkIconContainer").html("<use xlink:href=\"#redIdleChat\"></use>");
@@ -1675,6 +1726,9 @@ var Util = {
    * @description 终止闪烁聊天图标
    */
   pauseBling: function () {
+    $('#aChat').
+    removeClass('msg').
+    addClass('no-msg');
     if (Util.isBlinging) {
       Util.isBlinging = false;
       clearInterval(bling);

@@ -710,7 +710,9 @@ public class CommentQueryService {
 
             final List<JSONObject> fRet = new ArrayList<>();
             for (String h : hashRet) {
-                fRet.add(userQueryService.getUser(h));
+                JSONObject user = userQueryService.getUser(h);
+                avatarQueryService.fillUserAvatarURL(user);
+                fRet.add(user);
             }
 
             return (List<JSONObject>)fRet;

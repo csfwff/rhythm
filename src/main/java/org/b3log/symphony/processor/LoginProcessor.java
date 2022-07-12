@@ -39,6 +39,7 @@ import org.b3log.latke.util.Locales;
 import org.b3log.latke.util.Requests;
 import org.b3log.latke.util.URLs;
 import org.b3log.symphony.model.*;
+import org.b3log.symphony.processor.channel.UserChannel;
 import org.b3log.symphony.processor.middleware.CSRFMidware;
 import org.b3log.symphony.processor.middleware.LoginCheckMidware;
 import org.b3log.symphony.processor.middleware.validate.UserForgetPwdValidationMidware;
@@ -47,6 +48,7 @@ import org.b3log.symphony.processor.middleware.validate.UserRegisterValidationMi
 import org.b3log.symphony.service.*;
 import org.b3log.symphony.util.Sessions;
 import org.b3log.symphony.util.StatusCodes;
+import org.b3log.symphony.util.Symphonys;
 import org.json.JSONObject;
 import pers.adlered.simplecurrentlimiter.main.SimpleCurrentLimiter;
 
@@ -160,6 +162,9 @@ public class LoginProcessor {
      */
     @Inject
     private TagQueryService tagQueryService;
+
+    @Inject
+    private LivenessQueryService livenessQueryService;
 
     /**
      * Register request handlers.
@@ -335,7 +340,7 @@ public class LoginProcessor {
                 verifycode.put(Verifycode.USER_ID, userId);
                 verifycodeMgmtService.addVerifycode(verifycode);
 
-                context.renderJSON(StatusCodes.SUCC).renderMsg("重置密码链接已通过短信的形式发送至您的手机，请查收。");
+                context.renderJSON(StatusCodes.SUCC).renderMsg("验证码已通过短信的形式发送至您的手机，请查收。");
             } else {
                 context.renderMsg("验证码发送频率过快，请稍候重试");
             }
@@ -351,23 +356,30 @@ public class LoginProcessor {
      *
      * @param context the specified context
      */
+    public static SimpleCurrentLimiter resetCodeLimiter = new SimpleCurrentLimiter(60, 4);
     public void showResetPwd(final RequestContext context) {
         final AbstractFreeMarkerRenderer renderer = new SkinRenderer(context, null);
         context.setRenderer(renderer);
         final Map<String, Object> dataModel = renderer.getDataModel();
 
-        final String code = context.param("code");
-        final JSONObject verifycode = verifycodeQueryService.getVerifycode(code);
-        if (null == verifycode) {
-            dataModel.put(Keys.MSG, langPropsService.get("verifycodeExpiredLabel"));
-            renderer.setTemplateName("error/custom.ftl");
-        } else {
-            renderer.setTemplateName("verify/reset-pwd.ftl");
+        final String ip = Requests.getRemoteAddr(context.getRequest());
+        if (resetCodeLimiter.access(ip)) {
+            final String code = context.param("code");
+            final JSONObject verifycode = verifycodeQueryService.getVerifycode(code);
+            if (null == verifycode) {
+                dataModel.put(Keys.MSG, langPropsService.get("verifycodeExpiredLabel"));
+                renderer.setTemplateName("error/custom.ftl");
+            } else {
+                renderer.setTemplateName("verify/reset-pwd.ftl");
 
-            final String userId = verifycode.optString(Verifycode.USER_ID);
-            final JSONObject user = userQueryService.getUser(userId);
-            dataModel.put(User.USER, user);
-            dataModel.put(Keys.CODE, code);
+                final String userId = verifycode.optString(Verifycode.USER_ID);
+                final JSONObject user = userQueryService.getUser(userId);
+                dataModel.put(User.USER, user);
+                dataModel.put(Keys.CODE, code);
+            }
+        } else {
+            dataModel.put(Keys.MSG, "验证码尝试次数过快，请稍候重试！");
+            renderer.setTemplateName("error/custom.ftl");
         }
 
         dataModelService.fillHeaderAndFooter(context, dataModel);
@@ -380,40 +392,44 @@ public class LoginProcessor {
      */
     public void resetPwd(final RequestContext context) {
         context.renderJSON(StatusCodes.ERR);
-
-        final Response response = context.getResponse();
-        final JSONObject requestJSONObject = context.requestJSON();
-        final String password = requestJSONObject.optString(User.USER_PASSWORD); // Hashed
-        final String userId = requestJSONObject.optString(UserExt.USER_T_ID);
-        final String code = requestJSONObject.optString(Keys.CODE);
-        final JSONObject verifycode = verifycodeQueryService.getVerifycode(code);
-        if (null == verifycode || !verifycode.optString(Verifycode.USER_ID).equals(userId)) {
-            context.renderMsg(langPropsService.get("verifycodeExpiredLabel"));
-            return;
-        }
-
-        String name = null;
-        String phone = null;
-        try {
-            final JSONObject user = userQueryService.getUser(userId);
-            if (null == user || UserExt.USER_STATUS_C_VALID != user.optInt(UserExt.USER_STATUS)) {
-                context.renderMsg(langPropsService.get("resetPwdLabel") + " - " + "User Not Found");
+        final String ip = Requests.getRemoteAddr(context.getRequest());
+        if (resetCodeLimiter.access(ip)) {
+            final Response response = context.getResponse();
+            final JSONObject requestJSONObject = context.requestJSON();
+            final String password = requestJSONObject.optString(User.USER_PASSWORD); // Hashed
+            final String userId = requestJSONObject.optString(UserExt.USER_T_ID);
+            final String code = requestJSONObject.optString(Keys.CODE);
+            final JSONObject verifycode = verifycodeQueryService.getVerifycode(code);
+            if (null == verifycode || !verifycode.optString(Verifycode.USER_ID).equals(userId)) {
+                context.renderMsg(langPropsService.get("verifycodeExpiredLabel"));
                 return;
             }
 
-            name = user.optString(User.USER_NAME);
-            phone = user.optString("userPhone");
+            String name = null;
+            String phone = null;
+            try {
+                final JSONObject user = userQueryService.getUser(userId);
+                if (null == user || UserExt.USER_STATUS_C_VALID != user.optInt(UserExt.USER_STATUS)) {
+                    context.renderMsg(langPropsService.get("resetPwdLabel") + " - " + "User Not Found");
+                    return;
+                }
 
-            user.put(User.USER_PASSWORD, password);
-            userMgmtService.updatePassword(user);
-            verifycodeMgmtService.removeByCode(code);
-            context.renderJSON(StatusCodes.SUCC);
-            LOGGER.info("User [phone=" + phone + "] reseted password");
-            Sessions.login(response, userId, true);
-        } catch (final ServiceException e) {
-            final String msg = langPropsService.get("resetPwdLabel") + " - " + e.getMessage();
-            LOGGER.log(Level.ERROR, msg + "[name={}, phone={}]", name, phone);
-            context.renderMsg(msg);
+                name = user.optString(User.USER_NAME);
+                phone = user.optString("userPhone");
+
+                user.put(User.USER_PASSWORD, password);
+                userMgmtService.updatePassword(user);
+                verifycodeMgmtService.removeByCode(code);
+                context.renderJSON(StatusCodes.SUCC);
+                LOGGER.info("User [phone=" + phone + "] reseted password");
+                Sessions.login(response, userId, true);
+            } catch (final ServiceException e) {
+                final String msg = langPropsService.get("resetPwdLabel") + " - " + e.getMessage();
+                LOGGER.log(Level.ERROR, msg + "[name={}, phone={}]", name, phone);
+                context.renderMsg(msg);
+            }
+        } else {
+            context.renderMsg("验证码尝试次数过快，请稍候重试！");
         }
     }
 
@@ -457,7 +473,7 @@ public class LoginProcessor {
      *
      * @param context the specified context
      */
-    public static SimpleCurrentLimiter verifyCodeLimiter = new SimpleCurrentLimiter(60, 2);
+    public static SimpleCurrentLimiter verifyCodeLimiter = new SimpleCurrentLimiter(60, 4);
     public void showRegister(final RequestContext context) {
         if (Sessions.isLoggedIn()) {
             context.sendRedirect(Latkes.getServePath());
@@ -534,12 +550,6 @@ public class LoginProcessor {
         final String name = requestJSONObject.optString(User.USER_NAME);
         final String userPhone = requestJSONObject.optString("userPhone");
         if (verifySMSCodeLimiterOfIP.access(ip) && verifySMSCodeLimiterOfName.access(name) && verifySMSCodeLimiterOfPhone.access(userPhone)) {
-            final String code = RandomStringUtils.randomNumeric(6);
-            if (!verifycodeMgmtService.sendVerifyCodeSMS(userPhone, code)) {
-                context.renderMsg("验证码发送失败，请稍候重试");
-                return;
-            }
-
             final String invitecode = requestJSONObject.optString(Invitecode.INVITECODE);
 
             final JSONObject user = new JSONObject();
@@ -551,6 +561,7 @@ public class LoginProcessor {
 
             try {
                 final String newUserId = userMgmtService.addUser(user);
+                final String code = RandomStringUtils.randomNumeric(6);
 
                 final JSONObject verifycode = new JSONObject();
                 verifycode.put(Verifycode.BIZ_TYPE, Verifycode.BIZ_TYPE_C_REGISTER);
@@ -571,6 +582,11 @@ public class LoginProcessor {
                     final String icId = ic.optString(Keys.OBJECT_ID);
 
                     invitecodeMgmtService.updateInvitecode(icId, ic);
+                }
+
+                if (!verifycodeMgmtService.sendVerifyCodeSMS(userPhone, code)) {
+                    context.renderMsg("验证码发送失败，请稍候重试");
+                    return;
                 }
 
                 context.renderJSON(StatusCodes.SUCC).renderMsg(langPropsService.get("verifycodeSentLabel"));
@@ -670,8 +686,36 @@ public class LoginProcessor {
                     }
                 }
 
-                context.renderJSON(StatusCodes.SUCC);
+                // 天降红包
+                String userName = user.optString(User.USER_NAME);
+                for (final String uId : UserChannel.SESSIONS.keySet()) {
+                    // 获取活跃度
+                    final JSONObject yesterdayLiveness = livenessQueryService.getYesterdayLiveness(uId);
+                    if (null != yesterdayLiveness) {
+                        final int currentLiveness = Liveness.calcPoint(yesterdayLiveness);
+                        final int livenessMax = Symphonys.ACTIVITY_YESTERDAY_REWARD_MAX;
+                        float liveness = (float) (Math.round((float) currentLiveness / livenessMax * 100 * 100)) / 100;
+                        if (liveness == 100) {
+                            // 满活跃，发放奖励
+                            // 范围 1-24
+                            int random = new Random().nextInt(24) + 1;
+                            pointtransferMgmtService.transfer(Pointtransfer.ID_C_SYS, uId,
+                                    Pointtransfer.TRANSFER_TYPE_C_ACTIVITY_REDPACKET_FROM_SKY, random,
+                                    userName, System.currentTimeMillis(), "");
+                            // 发通知
+                            try {
+                                final JSONObject notification = new JSONObject();
+                                notification.put(Notification.NOTIFICATION_USER_ID, uId);
+                                notification.put(Notification.NOTIFICATION_DATA_ID, userName + ":" + random);
+                                notificationMgmtService.addRedPacketFromSkyNotification(notification);
+                            } catch (Exception e) {
+                                LOGGER.log(Level.ERROR, "Cannot add red packet from sky notification", e);
+                            }
+                        }
+                    }
+                }
 
+                context.renderJSON(StatusCodes.SUCC);
                 LOGGER.log(Level.INFO, "Registered a user [name={}, phone={}]", name, phone);
             } catch (final ServiceException e) {
                 final String msg = langPropsService.get("registerFailLabel") + " - " + e.getMessage();

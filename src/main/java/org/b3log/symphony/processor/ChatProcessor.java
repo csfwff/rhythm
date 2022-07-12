@@ -19,6 +19,7 @@
 package org.b3log.symphony.processor;
 
 import org.apache.commons.lang.RandomStringUtils;
+import org.apache.commons.lang.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.b3log.latke.Keys;
@@ -31,17 +32,20 @@ import org.b3log.latke.ioc.Singleton;
 import org.b3log.latke.model.User;
 import org.b3log.latke.repository.*;
 import org.b3log.latke.util.Crypts;
+import org.b3log.symphony.model.Common;
 import org.b3log.symphony.model.UserExt;
+import org.b3log.symphony.processor.channel.ChatChannel;
+import org.b3log.symphony.processor.channel.UserChannel;
 import org.b3log.symphony.processor.middleware.ApiCheckMidware;
 import org.b3log.symphony.processor.middleware.LoginCheckMidware;
 import org.b3log.symphony.repository.ChatInfoRepository;
 import org.b3log.symphony.repository.ChatUnreadRepository;
-import org.b3log.symphony.service.ChatListService;
-import org.b3log.symphony.service.DataModelService;
-import org.b3log.symphony.service.ShortLinkQueryService;
-import org.b3log.symphony.service.UserQueryService;
+import org.b3log.symphony.service.*;
 import org.b3log.symphony.util.*;
+import org.json.JSONArray;
 import org.json.JSONObject;
+import org.jsoup.Jsoup;
+import org.jsoup.safety.Whitelist;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -83,6 +87,72 @@ public class ChatProcessor {
         Dispatcher.get("/chat/get-list", chatProcessor::getList, apiCheck::handle);
         Dispatcher.get("/chat/get-message", chatProcessor::getMessage, apiCheck::handle);
         Dispatcher.get("/chat/mark-as-read", chatProcessor::markAsRead, apiCheck::handle);
+        Dispatcher.get("/chat/mark-all-as-read", chatProcessor::markAllAsRead, apiCheck::handle);
+        Dispatcher.get("/chat/revoke", chatProcessor::revoke, apiCheck::handle);
+    }
+
+    public void revoke(final RequestContext context) {
+        context.renderJSON(new JSONObject().put("result", 0));
+        JSONObject currentUser = ApiProcessor.getUserByKey(context.param("apiKey"));
+        String userId = currentUser.optString(Keys.OBJECT_ID);
+        try {
+            String oId = context.param("oId");
+            JSONObject msg = chatInfoRepository.get(oId);
+            if (userId.equals(msg.optString("fromId"))) {
+                LogsService.chatLog(context, oId, currentUser.optString(User.USER_NAME));
+                final Transaction transaction = chatInfoRepository.beginTransaction();
+                chatInfoRepository.remove(oId);
+                transaction.commit();
+                ChatChannel.sendMsg(msg.optString("fromId"), msg.optString("toId"), oId);
+            } else {
+                context.renderJSON(new JSONObject()
+                        .put("result", -1)
+                        .put("msg", "撤回失败，这不是你发的消息。"));
+            }
+        } catch (Exception e) {
+            context.renderJSON(new JSONObject()
+                    .put("result", -1)
+                    .put("msg", "撤回失败 " + e.getMessage()));
+        }
+    }
+
+    public void markAllAsRead(final RequestContext context) {
+        context.renderJSON(new JSONObject().put("result", 0));
+        JSONObject currentUser = ApiProcessor.getUserByKey(context.param("apiKey"));
+        String userId = currentUser.optString(Keys.OBJECT_ID);
+        try {
+            Query query = new Query()
+                    .setFilter(
+                            new PropertyFilter("toId", FilterOperator.EQUAL, userId)
+                    );
+            List<JSONObject> unreadList = chatUnreadRepository.getList(query);
+            List<String> unreadUserNameList = new ArrayList<>();
+            for (JSONObject unread : unreadList) {
+                String targetUserId = unread.optString("user_session").replaceAll(userId, "").replaceAll("_", "");
+                try {
+                    JSONObject targetUser = userQueryService.getUser(targetUserId);
+                    String userName = targetUser.optString(User.USER_NAME);
+                    if (!unreadUserNameList.contains(userName)) {
+                        unreadUserNameList.add(userName);
+                    }
+                } catch (Exception ignored) {
+                }
+            }
+            final Transaction transaction = chatUnreadRepository.beginTransaction();
+            chatUnreadRepository.remove(query);
+            transaction.commit();
+            // 通知用户
+            final JSONObject cmd = new JSONObject();
+            cmd.put(UserExt.USER_T_ID, userId);
+            cmd.put(Common.COMMAND, "chatUnreadCountRefresh");
+            cmd.put("count", 0);
+            UserChannel.sendCmd(cmd);
+            context.renderJSON(new JSONObject().put("result", 0).put("users", unreadUserNameList));
+        } catch (Exception e) {
+            context.renderJSON(new JSONObject()
+                    .put("result", -1)
+                    .put("msg", "全部标记为已读失败 " + e.getMessage()));
+        }
     }
 
     public void markAsRead(final RequestContext context) {
@@ -101,6 +171,17 @@ public class ChatProcessor {
                     ));
             chatUnreadRepository.remove(query);
             transaction.commit();
+            // 通知用户
+            Query queryUnread = new Query().setFilter(new PropertyFilter("toId", FilterOperator.EQUAL, userId));
+            try {
+                List<JSONObject> result = chatUnreadRepository.getList(queryUnread);
+                final JSONObject cmd = new JSONObject();
+                cmd.put(UserExt.USER_T_ID, userId);
+                cmd.put(Common.COMMAND, "chatUnreadCountRefresh");
+                cmd.put("count", result.size());
+                UserChannel.sendCmd(cmd);
+            } catch (Exception ignored) {
+            }
         } catch (Exception e) {
             context.renderJSON(new JSONObject()
                     .put("result", -1)
@@ -112,95 +193,86 @@ public class ChatProcessor {
         context.renderJSON(new JSONObject().put("result", 0));
         JSONObject currentUser = ApiProcessor.getUserByKey(context.param("apiKey"));
         String userId = currentUser.optString(Keys.OBJECT_ID);
+        String sessionId = "";
         try {
             String toUser = context.param("toUser");
-            JSONObject toUserJSON = new JSONObject();
+            String toUserOId;
+            JSONObject receiverInfo = new JSONObject();
             if (toUser.equals("FileTransfer")) {
-                toUserJSON.put(Keys.OBJECT_ID, "1000000000086");
-                toUserJSON.put(User.USER_NAME, "文件传输助手");
-                toUserJSON.put(UserExt.USER_AVATAR_URL, "https://file.fishpi.cn/2022/06/e1541bfe4138c144285f11ea858b6bf6-ba777366.jpeg");
+                toUserOId = "1000000000086";
+                receiverInfo.put(User.USER_NAME, "文件传输助手");
+                receiverInfo.put(UserExt.USER_AVATAR_URL, "https://file.fishpi.cn/2022/06/e1541bfe4138c144285f11ea858b6bf6-ba777366.jpeg");
             } else {
-                toUserJSON = userQueryService.getUserByName(toUser);
-            }
-            String toUserOId = toUserJSON.optString(Keys.OBJECT_ID);
-            Query queryFrom = new Query()
-                    .setFilter(CompositeFilterOperator.and(
-                            new PropertyFilter("fromId", FilterOperator.EQUAL, userId),
-                            new PropertyFilter("toId", FilterOperator.EQUAL, toUserOId)
-                    ))
-                    .addSort(Keys.OBJECT_ID, SortDirection.DESCENDING);
-            List<JSONObject> listFrom = chatInfoRepository.getList(queryFrom);
-            Query queryTo = new Query()
-                    .setFilter(CompositeFilterOperator.and(
-                            new PropertyFilter("fromId", FilterOperator.EQUAL, toUserOId),
-                            new PropertyFilter("toId", FilterOperator.EQUAL, userId)
-                    ))
-                    .addSort(Keys.OBJECT_ID, SortDirection.DESCENDING);
-            List<JSONObject> listTo = chatInfoRepository.getList(queryTo);
-            List<JSONObject> list = new ArrayList<>();
-            list.addAll(listFrom);
-            list.addAll(listTo);
-            listFrom = null;
-            listTo = null;
-            Collections.sort(list, new Comparator<JSONObject>() {
-                @Override
-                public int compare(JSONObject o1, JSONObject o2) {
-                    return o2.optLong(Keys.OBJECT_ID) > o1.optLong(Keys.OBJECT_ID) ? 1 : -1;
+                try {
+                    final JSONObject reciver = userQueryService.getUserByName(toUser);
+                    toUserOId = reciver.optString(Keys.OBJECT_ID);
+                    receiverInfo.put("receiverUserName", reciver.optString(User.USER_NAME));
+                    receiverInfo.put("receiverAvatar", reciver.optString(UserExt.USER_AVATAR_URL));
+                } catch (NullPointerException e) {
+                    context.renderJSON(new JSONObject()
+                            .put("result", -1)
+                            .put("msg", "对象用户不存在 " + e.getMessage()));
+                    return;
                 }
-            });
+            }
+            sessionId = Strings.uniqueId(new String[]{userId, toUserOId});
             int page = Integer.parseInt(context.param("page"));
             int pageSize = Integer.parseInt(context.param("pageSize"));
-            int start = (page * pageSize) - pageSize;
-            int end = (page * pageSize) - 1;
-            if (end >= list.size()) {
-                end = list.size() - 1;
-            }
-            list = list.subList(start, end + 1);
+
+            Query query = new Query()
+                    .setFilter(new PropertyFilter("user_session", FilterOperator.EQUAL, sessionId))
+                    .setPage(page, pageSize)
+                    .addSort(Keys.OBJECT_ID, SortDirection.DESCENDING);
+            final List<JSONObject> list = chatInfoRepository.getList(query);
             for (JSONObject info : list) {
                 String fromId = info.optString("fromId");
-                String toId = info.optString("toId");
-                JSONObject senderJSON = userQueryService.getUser(fromId);
-                if (!fromId.equals("1000000000086")) {
-                    info.put("senderUserName", senderJSON.optString(User.USER_NAME));
-                    info.put("senderAvatar", senderJSON.optString(UserExt.USER_AVATAR_URL));
+                if (fromId.equals(userId)) {
+                    //我自己发的
+                    info.put("senderUserName", currentUser.optString(User.USER_NAME));
+                    info.put("senderAvatar", currentUser.optString(UserExt.USER_AVATAR_URL));
+                    info.put("receiverUserName", receiverInfo.optString("receiverUserName"));
+                    info.put("receiverAvatar", receiverInfo.optString("receiverAvatar"));
                 } else {
-                    info.put("receiverUserName", "文件传输助手");
-                    info.put("receiverAvatar", "https://file.fishpi.cn/2022/06/e1541bfe4138c144285f11ea858b6bf6-ba777366.jpeg");
-                }
-                JSONObject receiverJSON = userQueryService.getUser(toId);
-                if (!toId.equals("1000000000086")) {
-                    info.put("receiverUserName", receiverJSON.optString(User.USER_NAME));
-                    info.put("receiverAvatar", receiverJSON.optString(UserExt.USER_AVATAR_URL));
-                } else {
-                    info.put("receiverUserName", "文件传输助手");
-                    info.put("receiverAvatar", "https://file.fishpi.cn/2022/06/e1541bfe4138c144285f11ea858b6bf6-ba777366.jpeg");
+                    info.put("senderUserName", receiverInfo.optString("receiverUserName"));
+                    info.put("senderAvatar", receiverInfo.optString("receiverAvatar"));
+                    info.put("receiverUserName", currentUser.optString(User.USER_NAME));
+                    info.put("receiverAvatar", currentUser.optString(UserExt.USER_AVATAR_URL));
                 }
                 // 将content过滤为纯文本
                 String content = info.optString("content");
-                String preview = content.replaceAll("[^a-zA-Z0-9\\u4E00-\\u9FA5]", "");
-                info.put("preview", preview.length() > 20 ? preview.substring(0, 20) : preview);
+                info.put("preview", makePreview(content));
                 String markdown = info.optString("content");
                 String html = ChatProcessor.processMarkdown(markdown);
                 info.put("content", html);
                 info.put("markdown", markdown);
             }
-            if (start <= list.size()) {
-                context.renderJSON(new JSONObject()
-                        .put("result", 0)
-                        .put("data", list));
-            } else {
+            if (list.isEmpty()) {
                 context.renderJSON(new JSONObject()
                         .put("result", -1)
                         .put("msg", "没有更多消息了"));
+                return;
             }
+            context.renderJSON(new JSONObject()
+                    .put("result", 0)
+                    .put("data", list));
         } catch (Exception e) {
-           context.renderJSON(new JSONObject()
-                   .put("result", -1)
-                   .put("msg", "获取历史记录失败 " + e.getMessage()));
+            LOGGER.error("get chat message error in session [{}]", sessionId, e);
+            context.renderJSON(new JSONObject()
+                    .put("result", -1)
+                    .put("msg", "获取列表失败 " + e.getMessage()));
         }
     }
 
-    public void getList2(final RequestContext context) {
+    public static String makePreview(String content) {
+        content = Jsoup.clean(content, Whitelist.none());
+        content = StringUtils.trim(content);
+        if (StringUtils.isBlank(content)) {
+            content = "[聊天消息]";
+        }
+        return content.length() > 20 ? content.substring(0, 20) : content;
+    }
+
+    public void getList(final RequestContext context) {
         context.renderJSON(new JSONObject().put("result", 0));
         JSONObject currentUser = ApiProcessor.getUserByKey(context.param("apiKey"));
         String userId = currentUser.optString(Keys.OBJECT_ID);
@@ -210,156 +282,52 @@ public class ChatProcessor {
         } catch (Exception e) {
         }
         // 渲染用户信息
+        final ArrayList<JSONObject> res = new ArrayList<>();
         for (JSONObject listItem : infoList) {
             String sessionId = listItem.optString("sessionId");
             String[] ids = sessionId.split("_");
             final String otherId = Arrays.stream(ids).filter(id -> !id.equals(userId)).findAny().get();
-            JSONObject senderJSON = userQueryService.getUser(otherId);
+            JSONObject otherUser = userQueryService.getUser(otherId);
+            if (otherUser == null) {
+                continue;
+            }
             JSONObject info = null;
             final String lastMessageId = listItem.optString("lastMessageId");
             try {
                 info = chatInfoRepository.get(lastMessageId);
-                if (Objects.isNull(info)) continue;
+                if (Objects.isNull(info)) {
+                    Query query = new Query()
+                            .setFilter(new PropertyFilter("user_session", FilterOperator.EQUAL, listItem.optString("sessionId")))
+                            .addSort(Keys.OBJECT_ID, SortDirection.DESCENDING);
+                    info = chatInfoRepository.getFirst(query);
+                    if (Objects.isNull(info)) {
+                        continue;
+                    }
+                }
             } catch (Exception e) {
                 LOGGER.error("get chat info error by id: [{}]", lastMessageId);
                 continue;
             }
-
+            info.put("senderUserName", currentUser.optString(User.USER_NAME));
+            info.put("senderAvatar", currentUser.optString(UserExt.USER_AVATAR_URL));
             if (!otherId.equals("1000000000086")) {
-                info.put("receiverUserName", senderJSON.optString(User.USER_NAME));
-                info.put("receiverAvatar", senderJSON.optString(UserExt.USER_AVATAR_URL));
+                info.put("receiverUserName", otherUser.optString(User.USER_NAME));
+                info.put("receiverAvatar", otherUser.optString(UserExt.USER_AVATAR_URL));
             } else {
                 info.put("receiverUserName", "文件传输助手");
                 info.put("receiverAvatar", "https://file.fishpi.cn/2022/06/e1541bfe4138c144285f11ea858b6bf6-ba777366.jpeg");
             }
             // 将content过滤为纯文本
             String content = info.optString("content");
-            String preview = content.replaceAll("[^a-zA-Z0-9\\u4E00-\\u9FA5]", "");
-            info.put("preview", preview.length() > 20 ? preview.substring(0, 20) : preview);
+            info.put("preview", makePreview(content));
             String markdown = info.optString("content");
             String html = ChatProcessor.processMarkdown(markdown);
             info.put("content", html);
             info.put("markdown", markdown);
+            res.add(info);
         }
-    }
-
-    public void getList(final RequestContext context) {
-        context.renderJSON(new JSONObject().put("result", 0));
-        JSONObject currentUser = ApiProcessor.getUserByKey(context.param("apiKey"));
-        String userId = currentUser.optString(Keys.OBJECT_ID);
-        try {
-            List<JSONObject> chatUsersFrom = chatInfoRepository.select(
-                    "SELECT DISTINCT toId " +
-                            "FROM " + chatInfoRepository.getName() + " " +
-                            "WHERE fromId = ?", userId);
-            List<JSONObject> chatUsersTo = chatInfoRepository.select(
-                    "SELECT DISTINCT fromId " +
-                            "FROM " + chatInfoRepository.getName() + " " +
-                            "WHERE toId = ?", userId);
-
-            List<JSONObject> infoList = new LinkedList<>();
-            // 加载我发送的
-            for (JSONObject chatUser : chatUsersFrom) {
-                String toId = chatUser.optString("toId");
-                try {
-                    List<JSONObject> chatInfo = chatInfoRepository.select(
-                            "SELECT * FROM " + chatInfoRepository.getName() +
-                                    " WHERE fromId = ? AND toId = ? ORDER BY oId DESC LIMIT 1",
-                            userId, toId
-                    );
-                    if (chatInfo.size() > 0) {
-                        JSONObject result = chatInfo.get(0);
-                        infoList.add(result);
-                    }
-                } catch (Exception ignored) {
-                }
-            }
-            // 加载发给我的（要比对时间去重）
-            List<JSONObject> forMeList = new LinkedList<>();
-            for (JSONObject chatUser : chatUsersTo) {
-                String fromId = chatUser.optString("fromId");
-                try {
-                    List<JSONObject> chatInfo = chatInfoRepository.select(
-                            "SELECT * FROM " + chatInfoRepository.getName() +
-                                    " WHERE fromId = ? AND toId = ? ORDER BY oId DESC LIMIT 1",
-                            fromId, userId
-                    );
-                    if (chatInfo.size() > 0) {
-                        JSONObject result = chatInfo.get(0);
-                        Iterator<JSONObject> iterator = infoList.iterator();
-                        boolean add = true;
-                        while (iterator.hasNext()) {
-                            JSONObject info = iterator.next();
-                            String iFromId = info.optString("fromId");
-                            String iToId = info.optString("toId");
-                            String rFromId = result.optString("fromId");
-                            String rToId = result.optString("toId");
-                            if (iFromId.equals(rToId) && iToId.equals(rFromId)) {
-                                // 相同
-                                long iOId = Long.parseLong(info.optString(Keys.OBJECT_ID));
-                                long rOId = Long.parseLong(result.optString(Keys.OBJECT_ID));
-                                if (rOId > iOId) {
-                                    // 替换
-                                    iterator.remove();
-                                } else {
-                                    // 不加入这个
-                                    add = false;
-                                }
-                            }
-                        }
-                        if (add) {
-                            forMeList.add(result);
-                        }
-                    }
-                } catch (Exception ignored) {
-                }
-            }
-            List<JSONObject> forMeListDistinct = forMeList.stream().distinct().collect(Collectors.toList());
-            infoList.addAll(forMeListDistinct);
-            // 渲染用户信息
-            for (JSONObject info : infoList) {
-                String fromId = info.optString("fromId");
-                String toId = info.optString("toId");
-                JSONObject senderJSON = userQueryService.getUser(fromId);
-                if (!fromId.equals("1000000000086")) {
-                    info.put("senderUserName", senderJSON.optString(User.USER_NAME));
-                    info.put("senderAvatar", senderJSON.optString(UserExt.USER_AVATAR_URL));
-                } else {
-                    info.put("receiverUserName", "文件传输助手");
-                    info.put("receiverAvatar", "https://file.fishpi.cn/2022/06/e1541bfe4138c144285f11ea858b6bf6-ba777366.jpeg");
-                }
-                JSONObject receiverJSON = userQueryService.getUser(toId);
-                if (!toId.equals("1000000000086")) {
-                    info.put("receiverUserName", receiverJSON.optString(User.USER_NAME));
-                    info.put("receiverAvatar", receiverJSON.optString(UserExt.USER_AVATAR_URL));
-                } else {
-                    info.put("receiverUserName", "文件传输助手");
-                    info.put("receiverAvatar", "https://file.fishpi.cn/2022/06/e1541bfe4138c144285f11ea858b6bf6-ba777366.jpeg");
-                }
-                // 将content过滤为纯文本
-                String content = info.optString("content");
-                String preview = content.replaceAll("[^a-zA-Z0-9\\u4E00-\\u9FA5]", "");
-                info.put("preview", preview.length() > 20 ? preview.substring(0, 20) : preview);
-                String markdown = info.optString("content");
-                String html = ChatProcessor.processMarkdown(markdown);
-                info.put("content", html);
-                info.put("markdown", markdown);
-            }
-            int listLength = 50;
-            Collections.sort(infoList, new Comparator<JSONObject>() {
-                @Override
-                public int compare(JSONObject o1, JSONObject o2) {
-                    return o2.optLong(Keys.OBJECT_ID) > o1.optLong(Keys.OBJECT_ID) ? 1 : -1;
-                }
-            });
-            List<JSONObject> resultList = infoList.size() > listLength ? infoList.subList(0, listLength) : infoList;
-            context.renderJSON(new JSONObject().put("result", 0)
-                    .put("data", resultList));
-        } catch (Exception e) {
-            context.renderJSON(new JSONObject()
-                    .put("result", -1)
-                    .put("msg", "获取对象列表失败 " + e.getMessage()));
-        }
+        context.renderJSON(new JSONObject().put("result", 0)
+                .put("data", res));
     }
 
     public void showChat(final RequestContext context) {

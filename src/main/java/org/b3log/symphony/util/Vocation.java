@@ -37,7 +37,7 @@ public class Vocation {
      */
     private static final Logger LOGGER = LogManager.getLogger(Vocation.class);
 
-    final private static String UA = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/93.0.4577.63 Safari/537.36";
+    final public static String UA = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/93.0.4577.63 Safari/537.36";
     final public static JSONObject vocationData = new JSONObject();
 
     public void vocation(final RequestContext context) {

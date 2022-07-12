@@ -21,11 +21,14 @@ package org.b3log.symphony.processor.channel;
 import org.b3log.latke.Latkes;
 import org.b3log.latke.http.WebSocketChannel;
 import org.b3log.latke.http.WebSocketSession;
+import org.b3log.latke.ioc.BeanManager;
+import org.b3log.latke.ioc.Inject;
 import org.b3log.latke.ioc.Singleton;
 import org.b3log.latke.model.User;
 import org.b3log.symphony.model.Common;
 import org.b3log.symphony.model.UserExt;
 import org.b3log.symphony.processor.ApiProcessor;
+import org.b3log.symphony.service.AvatarQueryService;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -120,14 +123,18 @@ public class ChatroomChannel implements WebSocketChannel {
      *                }
      */
     public static void notifyChat(final JSONObject message) {
+        final BeanManager beanManager = BeanManager.getInstance();
+        final AvatarQueryService avatarQueryService = beanManager.getReference(AvatarQueryService.class);
         if (!message.has(Common.TYPE)) {
             message.put(Common.TYPE, "msg");
         }
+        avatarQueryService.fillUserAvatarURL(message);
         final String msgStr = message.toString();
-
         try {
             for (WebSocketSession session : SESSIONS) {
-                session.sendText(msgStr);
+                if (onlineUsers.containsKey(session)) {
+                    session.sendText(msgStr);
+                }
             }
         } catch (Exception ignored) {
         }
@@ -154,6 +161,8 @@ public class ChatroomChannel implements WebSocketChannel {
      * @return
      */
     public static JSONObject getOnline() {
+        final BeanManager beanManager = BeanManager.getInstance();
+        final AvatarQueryService avatarQueryService = beanManager.getReference(AvatarQueryService.class);
         try {
             // 使用 HashMap 去重
             Map<String, JSONObject> filteredOnlineUsers = new HashMap<>();
@@ -172,6 +181,7 @@ public class ChatroomChannel implements WebSocketChannel {
                 JSONObject generated = new JSONObject();
                 generated.put(User.USER_NAME, user);
                 generated.put(UserExt.USER_AVATAR_URL, avatar);
+                avatarQueryService.fillUserAvatarURL(generated);
                 generated.put("homePage", homePage);
                 onlineArray.put(generated);
             }

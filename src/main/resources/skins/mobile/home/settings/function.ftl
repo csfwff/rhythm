@@ -93,7 +93,7 @@
         <br>
         <textarea id="emotionList" rows="3" placeholder="${setEmotionTipLabel}" >${emotions}</textarea>
         <br><br>
-        <a href="${servePath}/emoji/index.html">EMOJI CHEAT SHEET</a>
+        <a href="https://file.fishpi.cn/emoji/index.html">EMOJI CHEAT SHEET</a>
         <button class="green fn-right" onclick="Settings.update('emotionList', '${csrfToken}')">${saveLabel}</button>
     </div>
 </div>

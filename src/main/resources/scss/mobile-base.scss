@@ -1877,6 +1877,15 @@ code .dec {
   background-size: cover;
 }
 
+#paintCanvas {
+  border: 1px solid #eee;
+  border-radius: 5px;
+  background-color: #fff;
+  display: block;
+  margin: 20px auto;
+  background-size: cover;
+}
+
 /* end activity */
 
 /* start chatroom */

@@ -286,7 +286,15 @@ public class ApiProcessor {
             filteredUserProfile.put(UserExt.ONLINE_MINUTE, user.optInt(UserExt.ONLINE_MINUTE));
             filteredUserProfile.put(User.USER_URL, user.optString(User.USER_URL));
             filteredUserProfile.put(UserExt.USER_NICKNAME, user.optString(UserExt.USER_NICKNAME));
-            filteredUserProfile.put(UserExt.USER_CITY, user.optString(UserExt.USER_CITY));
+            try {
+                if (user.optInt(UserExt.USER_GEO_STATUS) == UserExt.USER_GEO_STATUS_C_PUBLIC) {
+                    filteredUserProfile.put(UserExt.USER_CITY, user.optString(UserExt.USER_CITY));
+                } else {
+                    filteredUserProfile.put(UserExt.USER_CITY, "");
+                }
+            } catch (Exception ignored) {
+                filteredUserProfile.put(UserExt.USER_CITY, "");
+            }
             filteredUserProfile.put(UserExt.USER_AVATAR_URL, user.optString(UserExt.USER_AVATAR_URL));
             filteredUserProfile.put(UserExt.USER_POINT, user.optInt(UserExt.USER_POINT));
             filteredUserProfile.put(UserExt.USER_INTRO, user.optString(UserExt.USER_INTRO));

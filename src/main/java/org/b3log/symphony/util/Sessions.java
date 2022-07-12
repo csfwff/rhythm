@@ -411,6 +411,10 @@ public final class Sessions {
                     continue;
                 }
 
+                if (cookie.getValue().length() != 224) {
+                    return null;
+                }
+
                 final String value = Crypts.decryptByAES(cookie.getValue(), Symphonys.COOKIE_SECRET);
                 final JSONObject cookieJSONObject = new JSONObject(value);
 
@@ -450,8 +454,7 @@ public final class Sessions {
 
                 return JSONs.clone(ret);
             }
-        } catch (final Exception e) {
-            LOGGER.log(Level.WARN, "Parses cookie failed, clears cookie");
+        } catch (final Exception ignored) {
         }
 
         return null;
@@ -496,8 +499,7 @@ public final class Sessions {
 
                 return ret;
             }
-        } catch (final Exception e) {
-            LOGGER.log(Level.WARN, "Parses cookie failed, clears cookie");
+        } catch (final Exception ignored) {
         }
 
         return null;

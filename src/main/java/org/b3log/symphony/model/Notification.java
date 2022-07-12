@@ -223,6 +223,11 @@ public final class Notification {
      */
     public static final int DATA_TYPE_C_RED_PACKET = 39;
 
+    /**
+     * Data type - 天降红包提醒
+     */
+    public static final int DATA_TYPE_C_RED_PACKET_FROM_SKY = 40;
+
     //// Transient ////
     /**
      * Key of unread notification count.

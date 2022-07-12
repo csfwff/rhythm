@@ -208,12 +208,12 @@
                     <div class="metro-item">
                     <#if ADLabel != '' >
                         <a class="preview" href="${servePath}/about">
-                            <img src="${staticServePath}/emoji/graphics/heart.png" alt="${sponsorLabel}">
+                            <img src="https://file.fishpi.cn/emoji/graphics/heart.png" alt="${sponsorLabel}">
                             <b>${adDeliveryLabel}</b>
                         </a>
                     <#else>
                         <a class="preview" href="${servePath}/about">
-                            <img src="${staticServePath}/emoji/graphics/heart.png" alt="${sponsorLabel}">
+                            <img src="https://file.fishpi.cn/emoji/graphics/heart.png" alt="${sponsorLabel}">
                             <b>${adDeliveryLabel}</b>
                         </a>
                     </#if>
@@ -225,7 +225,7 @@
                         </div>
                     <#else>
                         <a class="preview" href="${servePath}/about">
-                            <img src="${staticServePath}/emoji/graphics/heart.png" alt="${sponsorLabel}">
+                            <img src="https://file.fishpi.cn/emoji/graphics/heart.png" alt="${sponsorLabel}">
                             <b>${adDeliveryLabel}</b>
                         </a>
                     </#if>

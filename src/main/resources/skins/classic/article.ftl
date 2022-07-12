@@ -245,7 +245,7 @@
                             <#list article.commentors as user>
                                 <a target="_blank" href="${servePath}/member/${user.userName}">
                                     <div class="article__participant">
-                                        <div class="avatar-small" aria-label="${user.userName}" style="background-image: url('${user.userAvatarURL}');"></div>
+                                        <div class="avatar-small" aria-label="${user.userName}" style="background-image: url('${user.userAvatarURL48}');"></div>
                                     </div>
                                 </a>
                             </#list>
@@ -405,7 +405,7 @@
                     <#if isLoggedIn>
                         <div class="fn__flex">
                             <span class="avatar"
-                                  style="background-image: url('${currentUser.userAvatarURL210}');"></span>
+                                  style="background-image: url('${currentUser.userAvatarURL48}');"></span>
                             <span class="reply__text fn-flex-1 commentToggleEditorBtn"
                                   onclick="Comment._toggleReply();">请输入回帖内容
                                             ...

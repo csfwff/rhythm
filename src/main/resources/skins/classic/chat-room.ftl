@@ -28,6 +28,7 @@
     <link rel="stylesheet" href="${staticServePath}/css/index.css?${staticResourceVersion}"/>
     <link rel="canonical" href="${servePath}/community">
     <link rel="stylesheet" href="${staticServePath}/css/viewer.min.css"/>
+    <link rel="stylesheet" href="https://file.fishpi.cn/cxColor/css/jquery.cxcolor.css">
 </head>
 <body>
 <#include "header.ftl">
@@ -51,13 +52,25 @@
                     </div>
                     <div class="reply">
                         <#if isLoggedIn>
-                            <div id="chatContent"></div><br>
+                            <div id="chatContent"></div>
+                            <#if nightDisableMode == true>
+                                <div class="discuss_title" style="border-radius: 10px">
+                                    <a style="text-decoration: none; display: inline-block; cursor: default; font-weight: normal; background-color: #f6f6f670;">
+                                        <span style="color: #616161">现在是聊天室宵禁时间 (19:30-08:00)，您发送的消息将不会产生活跃度，请早点下班休息 :)</span>
+                                    </a>
+                                </div>
+                            <#else>
+                                <br>
+                            </#if>
                             <div class="fn-clear" style="margin-bottom: 5px">
                                 <svg id="redPacketBtn" style="width: 30px; height: 30px; cursor:pointer;">
                                     <use xlink:href="#redPacketIcon"></use>
                                 </svg>
                                 <svg id="emojiBtn" style="width: 30px; height: 30px; cursor:pointer;">
                                     <use xlink:href="#emojiIcon"></use>
+                                </svg>
+                                <svg id="paintBtn" style="width: 30px; height: 30px; cursor:pointer;">
+                                    <use xlink:href="#icon-paint"></use>
                                 </svg>
                                 <div class="hide-list" id="emojiList">
                                     <div class="hide-list-emojis" id="emojis" style="max-height: 200px">
@@ -84,6 +97,18 @@
                                     </#if>
                                     <button class="red" onclick="$('#chats').empty();page=0;ChatRoom.more();">${cleanScreenLabel}</button>
                                     <button class="green" onclick="ChatRoom.send()">${postLabel}</button>
+                                </div>
+                                <div id="paintContent" style="display: none">
+                                    <div style="margin: 20px 0 0 0;">
+                                        <input id="selectColor" name="mycolor" type="text" class="input_cxcolor" readonly="" style="background-color: rgb(0, 0, 0);">
+                                        <input id="selectWidth" type="number" inputmode="decimal" pattern="[0-9]*" min="1" value="3" style="width: 50px">
+                                    </div>
+                                    <canvas id="paintCanvas" width="500" height="490"></canvas>
+                                    <div class="fn-right">
+                                        <button onclick="ChatRoom.revokeChatacter('paintCanvas')">撤销</button>
+                                        <button class="red" onclick="ChatRoom.clearCharacter('paintCanvas')">${clearLabel}</button>
+                                        <button class="green" onclick="ChatRoom.submitCharacter('paintCanvas')">${submitLabel}</button>
+                                    </div>
                                 </div>
                             </div>
                             <div class="fn-clear comment-submit">
@@ -143,6 +168,7 @@
 <script>
     Label.uploadLabel = "${uploadLabel}";
 </script>
+<script src="https://file.fishpi.cn/cxColor/js/jquery.cxcolor.min.js"></script>
 <script src="${staticServePath}/js/lib/jquery/file-upload-9.10.1/jquery.fileupload.min.js"></script>
 <script src="${staticServePath}/js/channel${miniPostfix}.js?${staticResourceVersion}"></script>
 <script src="${staticServePath}/js/chat-room${miniPostfix}.js?${staticResourceVersion}"></script>
@@ -172,6 +198,8 @@
     // Init [ChatRoom] channel
     ChatRoomChannel.init("${wsScheme}://${serverHost}:${serverPort}${contextPath}/chat-room-channel");
     var page = 0;
+    var pointsArray = [];
+    var linesArray = [];
     if ('${contextMode}' === 'no') {
         ChatRoom.more();
     } else {
