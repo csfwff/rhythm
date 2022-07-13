@@ -27,13 +27,13 @@
  * @description Add comment function.
  * @static
  */
-let el;
-let ctx;
-let isDrawing = false;
-let x = 0;
-let y = 0;
-let isClick = true;
-const ChatRoom = {
+var el;
+var ctx;
+var isDrawing = false;
+var x = 0;
+var y = 0;
+var isClick = true;
+var ChatRoom = {
     init: function () {
         // 聊天窗口高度设置
         /* if ($.ua.device.type !== 'mobile') {
@@ -103,26 +103,41 @@ const ChatRoom = {
             },
         })
 
+        // img preview
+        // $('.chat-room').on('click', '.vditor-reset img', function () {
+        //   if ($(this).hasClass('emoji')) {
+        //     return;
+        //   }
+        //   window.open($(this).attr('src'));
+        // });
+
         // 表情包初始化
         // 加载表情
         ChatRoom.listenUploadEmojis();
         ChatRoom.loadEmojis();
         // 监听按钮
         $("#emojiBtn").on('click', function () {
-            const emojilist = $("#emojiList")
-            if (emojilist.hasClass("showList")) {
-                emojilist.removeClass("showList");
+            if ($("#emojiList").hasClass("showList")) {
+                $("#emojiList").removeClass("showList");
             } else {
-                emojilist.addClass("showList");
+                $("#emojiList").addClass("showList");
                 setTimeout(function () {
-                    const body = $("body")
-                    body.click(function () {
-                        emojilist.removeClass("showList");
+                    $("body").unbind();
+                    $('body').click(function (event) {
                         if ($(event.target).closest('a').attr('id') !== 'aPersonListPanel' &&
                             $(event.target).closest('.module').attr('id') !== 'personListPanel') {
                             $('#personListPanel').hide()
-                            body.unbind();
                         }
+                    })
+                    $("body").click(function() {
+                        $("#emojiList").removeClass("showList");
+                        $("body").unbind();
+                        $('body').click(function (event) {
+                            if ($(event.target).closest('a').attr('id') !== 'aPersonListPanel' &&
+                                $(event.target).closest('.module').attr('id') !== 'personListPanel') {
+                                $('#personListPanel').hide()
+                            }
+                        })
                     });
                 }, 100);
             }
@@ -130,101 +145,98 @@ const ChatRoom = {
 
         // 红包初始化
         $("#redPacketBtn").on('click', function () {
-            const onlineUsers = new Map();
-            Util.alert(`<div class="form fn__flex-column">
-<label>
-<div class="ft__smaller ft__fade" style="float: left">红包类型</div>
-<div class="fn-hr5 fn__5"></div>
-<select id="redPacketType">
-<option value="random" selected>拼手气红包</option>
-<option value="average">普通红包</option>
-<option value="specify">专属红包</option>
-<option value="heartbeat">心跳红包</option>
-<option value="rockPaperScissors">猜拳红包</option>
-</select>
-</label>
-<label id="gesture" style="display:none;">
-<div class="ft__smaller ft__fade" style="float: left">出拳</div>
-<div class="fn-hr5 fn__5"></div>
-<select id="gestureType">
-<option value="0" selected>石头</option>
-<option value="1">剪刀</option>
-<option value="2">布</option>
-</select>
-</label>
-<label id="who" style="display:none;">
-<div class="ft__smaller ft__fade" style="float: left">发给谁</div>
-<div class="fn-hr5 fn__5"></div>
-<div id="recivers" class="chats__users">
-</div>
-<select id="userOption" multiple="multiple" style='height: 150px; left: 50px'>
-</select>
-<div id="chatUsernameSelectedPanel" class="completed-panel"
-style="height:170px;display:none;left:auto;top:auto;cursor:pointer;"></div>
-</label>
-<label id='redPacketMoneyLabel'>
-<div class="ft__smaller ft__fade" style="float: left">积分</div>
-<div class="fn-hr5 fn__5"></div>
-<input type="number" min="32" max="20000" required="" value="32" id="redPacketMoney"
-onkeypress="return(/[\\d]/.test(String.fromCharCode(event.keyCode)))">
-</label>
-<label id='redPacketCountLabel'>
-<div class="ft__smaller ft__fade" style="float: left" id="countx">个数</div>
-<div class="fn-hr5 fn__5"></div>
-<input type="number" min="1" max="1000" required="" value="2" id="redPacketCount"
-onkeypress="return(/[\\d]/.test(String.fromCharCode(event.keyCode)))">
-</label>
-<label>
-<div class="ft__smaller ft__fade" style="float: left">留言</div>
-<div class="fn-hr5 fn__5"></div>
-<input type="text" id="redPacketMsg" placeholder="摸鱼者，事竟成！" maxlength="20">
-</label>
-<div class="fn-hr5"></div>
-<div class="fn__flex" style="margin-top: 15px">
-<div id='totalAmount' class="fn__flex-1 fn__flex-center" style="text-align: left;">总计：<span
-id="redPacketAmount">32</span> 积分
-</div>
-<button class="btn btn--confirm" id="redPacketConfirm">发送</button>
-</div>
-</div>`, "发红包");
+            Util.alert("" +
+                "<div class=\"form fn__flex-column\">\n" +
+                "<label>\n" +
+                "  <div class=\"ft__smaller ft__fade\" style=\"float: left\">红包类型</div>\n" +
+                "  <div class=\"fn-hr5 fn__5\"></div>\n" +
+                "  <select id=\"redPacketType\">\n" +
+                "  <option value=\"random\" selected>拼手气红包</option>" +
+                "  <option value=\"average\">普通红包</option>" +
+                "  <option value=\"specify\">专属红包</option>" +
+                "  <option value=\"heartbeat\">心跳红包</option>" +
+                "  <option value=\"rockPaperScissors\">猜拳红包</option>" +
+                "  </select>\n" +
+                "</label>\n" +
+                "<label id=\"gesture\" style=\"display:none;\">\n" +
+                "  <div class=\"ft__smaller ft__fade\" style=\"float: left\">出拳</div>\n" +
+                "  <div class=\"fn-hr5 fn__5\"></div>\n" +
+                "  <select id=\"gestureType\">\n" +
+                "  <option value=\"0\" selected>石头</option>" +
+                "  <option value=\"1\">剪刀</option>" +
+                "  <option value=\"2\">布</option>" +
+                "  </select>\n" +
+                "</label>\n" +
+                "<label id = \"who\" style=\"display:none;\">\n" +
+                "  <div class=\"ft__smaller ft__fade\" style=\"float: left\">发给谁</div>\n" +
+                "  <div class=\"fn-hr5 fn__5\"></div>\n" +
+                "  <div id=\"recivers\" class=\"chats__users\">\n" +
+                "                            </div> \n" +
+                "  <select id=\"userOption\" multiple=\"multiple\" style='height: 150px; left: 50px'>\n" +
+                "  </select>\n" +
+                "  <div id=\"chatUsernameSelectedPanel\" class=\"completed-panel\"\n" +
+                "                             style=\"height:170px;display:none;left:auto;top:auto;cursor:pointer;\"></div> \n" +
+                "</label>\n" +
+                "<label id='redPacketMoneyLabel'>\n" +
+                "  <div class=\"ft__smaller ft__fade\" style=\"float: left\">积分</div>\n" +
+                "  <div class=\"fn-hr5 fn__5\"></div>\n" +
+                "  <input type=\"number\" min=\"32\" max=\"20000\" required=\"\" value=\"32\" id=\"redPacketMoney\" onkeypress=\"return(/[\\d]/.test(String.fromCharCode(event.keyCode)))\">\n" +
+                "</label>\n" +
+                "<label id='redPacketCountLabel'>\n" +
+                "  <div class=\"ft__smaller ft__fade\" style=\"float: left\" id=\"countx\">个数</div>\n" +
+                "  <div class=\"fn-hr5 fn__5\"></div>\n" +
+                "  <input type=\"number\" min=\"1\" max=\"1000\" required=\"\" value=\"2\" id=\"redPacketCount\" onkeypress=\"return(/[\\d]/.test(String.fromCharCode(event.keyCode)))\">\n" +
+                "</label>\n" +
+                "<label>\n" +
+                "  <div class=\"ft__smaller ft__fade\" style=\"float: left\">留言</div>\n" +
+                "  <div class=\"fn-hr5 fn__5\"></div>\n" +
+                "  <input type=\"text\" id=\"redPacketMsg\" placeholder=\"摸鱼者，事竟成！\" maxlength=\"20\">\n" +
+                "</label>\n" +
+                "<div class=\"fn-hr5\"></div>\n" +
+                "<div class=\"fn__flex\" style=\"margin-top: 15px\">\n" +
+                "  <div id='totalAmount' class=\"fn__flex-1 fn__flex-center\" style=\"text-align: left;\">总计：<span id=\"redPacketAmount\">32</span> 积分</div>\n" +
+                "  <button class=\"btn btn--confirm\" id=\"redPacketConfirm\">发送</button>\n" +
+                "</div>\n" +
+                "</div>" +
+                "", "发红包");
 
             $("#userOption").on('change', function () {
-                const users = $("#userOption").val();
-                const userInfos = [];
-                for (const index in users) {
-                    userInfos.push(onlineUsers.get(users[index]))
+                var users = $("#userOption").val()
+                var userInfos = []
+                for (index in users) {
+                    userInfos.push(onelineUsers.get(users[index]))
                 }
+                $("#recivers").html("");
                 $("#redPacketCount").val(userInfos.length);
-                let receiver = ''
-                for (const userInfo in userInfos) {
-                    receiver += `<a target="_blank" data-name="${userInfos[userInfo].userName}" href="${userInfos[userInfo].homePage}">
-<img style='margin-bottom: 10px' class="avatar avatar-small" aria-label="${userInfos[userInfo].userName}" src="${userInfos[userInfo].userAvatarURL}">
-</a>`
-                    $("#recivers").html(receiver);
+                for (var userInfo in userInfos) {
+                    $("#recivers").append("<a target=\"_blank\" data-name=\"" + userInfos[userInfo].userName + "\"\n" +
+                        "href=\"" + userInfos[userInfo].homePage + "\">\n" +
+                        "<img style='margin-bottom: 10px' class=\"avatar avatar-small\" aria-label=\"" + userInfos[userInfo].userName + "\"\n" +
+                        "src=\"" + userInfos[userInfo].userAvatarURL + "\">\n" +
+                        "</a>");
                 }
             });
 
-            const packetType = $("#redPacketType")
-            packetType.on('change', function () {
-                let type = packetType.val();
+            var onelineUsers = new Map();
+            $("#redPacketType").on('change',function () {
+                let type = $("#redPacketType").val();
                 if (type === 'specify') {
                     $('#who').removeAttr("style");
                     $("#redPacketCount").val("1");
-                    $('#redPacketCount').attr("readOnly", "true");
+                    $('#redPacketCount').attr("readOnly","true");
                     $.ajax({
                         url: Label.servePath + '/chat-room/online-users',
                         type: 'GET',
                         cache: false,
                         success: function (result) {
                             // console.log(result)
-                            if (0 === result.code) {
-                                let html = "";
-                                for (const userIndex in result.data.users) {
-                                    const user = result.data.users[userIndex];
-                                    onlineUsers.set(user.userName, user)
-                                    html += `"<option value="${user.userName}">${user.userName}</option>`
+                            if (0 == result.code) {
+                                $("#userOption").html("");
+                                for (var userIndex in result.data.users) {
+                                    var user = result.data.users[userIndex]
+                                    onelineUsers.set(user.userName,user)
+                                    $("#userOption").append("<option value=\""+user.userName+"\">"+user.userName+"</option>\n");
                                 }
-                                $("#userOption").html(html);
                             } else {
                                 // console.log("获取聊天室在线成员信息失败")
                             }
@@ -234,11 +246,11 @@ id="redPacketAmount">32</span> 积分
                         }
                     })
                 } else {
-                    $('#who').css('display', 'none')
-                    $('#gesture').css('display', 'none')
+                    $('#who').css('display','none')
+                    $('#gesture').css('display','none')
                     $('#redPacketCount').removeAttr("readOnly");
                     $('#redPacketMoneyLabel').removeAttr("style");
-                    $('#totalAmount').css('display', 'inline')
+                    $('#totalAmount').css('display','inline')
                     $("#countx").text("个数");
                     $("#redPacketCount").val("1");
                 }
@@ -249,59 +261,61 @@ id="redPacketAmount">32</span> 积分
                 if (type === 'rockPaperScissors') {
                     $('#gesture').removeAttr("style");
                     $("#redPacketCount").val("1");
-                    $('#redPacketCount').attr("readOnly", "true");
+                    $('#redPacketCount').attr("readOnly","true");
                 }
                 if (type === 'dice') {
-                    $('#redPacketMoneyLabel').css('display', 'none')
-                    $('#totalAmount').css('display', 'none')
+                    $('#redPacketMoneyLabel').css('display','none')
+                    $('#totalAmount').css('display','none')
                     $("#countx").text("开盘人数");
                     $("#redPacketCount").val("3");
                 }
             });
 
-            const packetMoney = $("#redPacketMoney"), packetCount = $("#redPacketCount")
-            packetMoney.unbind();
-            packetCount.unbind();
+            $("#redPacketMoney").unbind();
+            $("#redPacketCount").unbind();
 
-            packetMoney.on('change', function () {
-                if (!packetMoney.val() || packetMoney.val() < 32) {
-                    packetMoney.val("32");
+            $("#redPacketMoney").on('change', function () {
+                if ($("#redPacketMoney").val() === "") {
+                    $("#redPacketMoney").val("32");
                 }
-                $("#redPacketAmount").text(packetMoney.val());
+                if ($("#redPacketMoney").val() < 32) {
+                    $("#redPacketMoney").val("32");
+                }
+                $("#redPacketAmount").text($("#redPacketMoney").val());
             });
 
-            $('#redPacketMoney,#redPacketCount').bind('input propertychange', function () {
-                let type = packetType.val();
+            $('#redPacketMoney,#redPacketCount').bind('input propertychange', function() {
+                let type = $("#redPacketType").val();
                 if (type === 'average') {
-                    $("#redPacketAmount").text(packetMoney.val() * packetCount.val());
+                    $("#redPacketAmount").text($("#redPacketMoney").val() * $("#redPacketCount").val());
                     $("#redPacketMsg").val("平分红包，人人有份！");
                 } else if (type === 'random') {
-                    $("#redPacketAmount").text(packetMoney.val());
+                    $("#redPacketAmount").text($("#redPacketMoney").val());
                     $("#redPacketMsg").val("摸鱼者，事竟成！");
                 } else if (type === 'specify') {
-                    $("#redPacketAmount").text(packetMoney.val() * packetCount.val());
+                    $("#redPacketAmount").text($("#redPacketMoney").val() * $("#redPacketCount").val());
                     $("#redPacketMsg").val("试试看，这是给你的红包吗？");
                 } else if (type === 'heartbeat') {
-                    $("#redPacketAmount").text(packetMoney.val());
+                    $("#redPacketAmount").text($("#redPacketMoney").val());
                     $("#redPacketMsg").val("玩的就是心跳！");
                 } else if (type === 'rockPaperScissors') {
-                    $("#redPacketAmount").text(packetMoney.val());
+                    $("#redPacketAmount").text($("#redPacketMoney").val());
                 }
             });
 
-            packetType.on('change', function () {
-                let type = packetType.val();
+            $("#redPacketType").on('change', function () {
+                let type = $("#redPacketType").val();
                 if (type === 'average') {
-                    $("#redPacketAmount").text(packetMoney.val() * packetCount.val());
+                    $("#redPacketAmount").text($("#redPacketMoney").val() * $("#redPacketCount").val());
                     $("#redPacketMsg").val("平分红包，人人有份！");
                 } else if (type === 'random') {
-                    $("#redPacketAmount").text(packetMoney.val());
+                    $("#redPacketAmount").text($("#redPacketMoney").val());
                     $("#redPacketMsg").val("摸鱼者，事竟成！");
                 } else if (type === 'specify') {
-                    $("#redPacketAmount").text(packetMoney.val() * packetCount.val());
+                    $("#redPacketAmount").text($("#redPacketMoney").val() * $("#redPacketCount").val());
                     $("#redPacketMsg").val("试试看，这是给你的红包吗？");
                 } else if (type === 'heartbeat') {
-                    $("#redPacketAmount").text(packetMoney.val());
+                    $("#redPacketAmount").text($("#redPacketMoney").val());
                     $("#redPacketMsg").val("玩的就是心跳！");
                 } else if (type === 'rockPaperScissors') {
                     $("#redPacketMsg").val("石头剪刀布！");
@@ -310,41 +324,39 @@ id="redPacketAmount">32</span> 积分
                 }
             });
 
-            packetCount.on('change', function () {
-                const count = packetCount.val()
-                switch (packetType.val()) {
-                    case "dice":
-                        if (count > 15) {
-                            $("#redPacketCount").val("15");
-                        }
-                        if (count < 3) {
-                            $("#redPacketCount").val("3");
-                        }
-                        break
-                    case "heartbeat":
-                        if (count < 5) {
-                            $("#redPacketCount").val("5");
-                        }
-                        break
-                    default:
-                        if (Number(count) > Number(packetMoney.val())) {
-                            $("#redPacketCount").val(packetMoney.val());
-                        } else {
-                            if (count > 100) {
-                                $("#redPacketCount").val("100");
-                            }
-                            if (count <= 0) {
-                                $("#redPacketCount").val("1");
-                            }
-                        }
+            $("#redPacketCount").on('change', function () {
+                let type = $("#redPacketType").val();
+                if (type === 'dice') {
+                    if ($("#redPacketCount").val() > 15) {
+                        $("#redPacketCount").val("15");
+                    }
+                    if ($("#redPacketCount").val() < 3) {
+                        $("#redPacketCount").val("3");
+                    }
+                }
 
+                if (type === 'heartbeat') {
+                    if ($("#redPacketCount").val() < 5) {
+                        $("#redPacketCount").val("5");
+                    }
+                }
+
+                if (Number($("#redPacketCount").val()) > Number($("#redPacketMoney").val())) {
+                    $("#redPacketCount").val($("#redPacketMoney").val());
+                } else {
+                    if ($("#redPacketCount").val() > 100) {
+                        $("#redPacketCount").val("100");
+                    }
+                    if ($("#redPacketCount").val() <= 0) {
+                        $("#redPacketCount").val("1");
+                    }
                 }
             });
 
             $("#redPacketConfirm").on('click', function () {
-                let type = packetType.val();
-                let money = packetMoney.val();
-                let count = packetCount.val();
+                let type = $("#redPacketType").val();
+                let money = $("#redPacketMoney").val();
+                let count = $("#redPacketCount").val();
                 let msg = $("#redPacketMsg").val();
                 let recivers = $("#userOption").val();
                 let gesture = $("#gestureType").val();
@@ -354,8 +366,10 @@ id="redPacketAmount">32</span> 积分
                 if (recivers === undefined) {
                     recivers = []
                 }
-                if (recivers.length === 0 && type === 'specify') {
-                    $('#chatContentTip').addClass('error').html('<ul><li>请选择红包发送对象</li></ul>')
+                if(recivers.length == 0 && type === 'specify') {
+                    $('#chatContentTip').
+                    addClass('error').
+                    html('<ul><li>请选择红包发送对象</li></ul>')
                 }
                 if (msg === '') {
                     msg = '摸鱼者，事竟成！';
@@ -363,7 +377,7 @@ id="redPacketAmount">32</span> 积分
                 let content;
                 if (type !== "rockPaperScissors") {
                     content = {
-                        type: type,
+                        type:  type,
                         money: money,
                         count: count,
                         msg: msg,
@@ -371,7 +385,7 @@ id="redPacketAmount">32</span> 积分
                     }
                 } else {
                     content = {
-                        type: type,
+                        type:  type,
                         money: money,
                         count: count,
                         msg: msg,
@@ -389,11 +403,15 @@ id="redPacketAmount">32</span> 积分
                     data: JSON.stringify(requestJSONObject),
                     success: function (result) {
                         if (0 !== result.code) {
-                            $('#chatContentTip').addClass('error').html('<ul><li>' + result.msg + '</li></ul>')
+                            $('#chatContentTip').
+                            addClass('error').
+                            html('<ul><li>' + result.msg + '</li></ul>')
                         }
                     },
                     error: function (result) {
-                        $('#chatContentTip').addClass('error').html('<ul><li>' + result.statusText + '</li></ul>')
+                        $('#chatContentTip').
+                        addClass('error').
+                        html('<ul><li>' + result.statusText + '</li></ul>')
                     }
                 })
                 Util.closeAlert();
@@ -491,13 +509,13 @@ id="redPacketAmount">32</span> 积分
             linesArray.pop();
 
             // 遍历历史记录重新绘制
-            linesArray.forEach(arr => {
+            linesArray.forEach(arr=>{
                 ChatRoom.changeColor(arr.color);
                 ChatRoom.changeWidth(arr.width);
                 ctx.beginPath();
-                ctx.moveTo(arr.point[0].x, arr.point[0].y);
-                for (let i = 1; i < arr.point.length; i++) {
-                    ctx.lineTo(arr.point[i].x, arr.point[i].y);
+                ctx.moveTo(arr.point[0].x,arr.point[0].y);
+                for(let i = 1; i < arr.point.length; i++){
+                    ctx.lineTo(arr.point[i].x,arr.point[i].y);
                 }
                 ctx.stroke();
             })
@@ -508,7 +526,7 @@ id="redPacketAmount">32</span> 积分
      * @param {string} id canvas id.
      * @returns {undefined}
      */
-    changeColor: function (color) {
+    changeColor: function(color) {
         ctx.fillStyle = ctx.strokeStyle = ctx.shadowColor = color;
     },
     changeWidth: function (width) {
@@ -530,7 +548,7 @@ id="redPacketAmount">32</span> 积分
             ctx.beginPath();
             x = e.clientX - e.target.offsetLeft + $(window).scrollLeft();
             y = e.clientY - e.target.offsetTop + $(window).scrollTop();
-            pointsArray.push({x: x, y: y});
+            pointsArray.push({x:x,y:y});
             ctx.moveTo(x, y);
         };
 
@@ -542,7 +560,7 @@ id="redPacketAmount">32</span> 积分
 
             x = e.clientX - e.target.offsetLeft + $(window).scrollLeft();
             y = e.clientY - e.target.offsetTop + $(window).scrollTop();
-            pointsArray.push({x: x, y: y});
+            pointsArray.push({x:x,y:y});
             ctx.lineTo(x, y);
             ctx.stroke();
         };
@@ -566,7 +584,7 @@ id="redPacketAmount">32</span> 积分
             ctx.beginPath();
             x = e.changedTouches[0].pageX - e.target.offsetLeft;
             y = e.changedTouches[0].pageY - e.target.offsetTop;
-            pointsArray.push({x: x, y: y});
+            pointsArray.push({x:x,y:y});
             ctx.moveTo(x, y);
 
         }, false);
@@ -576,7 +594,7 @@ id="redPacketAmount">32</span> 积分
             e.preventDefault();
             x = e.changedTouches[0].pageX - e.target.offsetLeft;
             y = e.changedTouches[0].pageY - e.target.offsetTop;
-            pointsArray.push({x: x, y: y});
+            pointsArray.push({x:x,y:y});
             ctx.lineTo(x, y);
             ctx.stroke();
         }, false);
@@ -641,7 +659,7 @@ id="redPacketAmount">32</span> 积分
     useDiscuss: function () {
         let history = ChatRoom.editor.getValue();
         ChatRoom.editor.setValue("*`# " + $("#discuss-title").html() + " #`*  ");
-        ChatRoom.editor.insertValue(history, 0);
+        ChatRoom.editor.insertValue( history, 0);
         ChatRoom.editor.focus();
     },
     /**
@@ -704,14 +722,17 @@ id="redPacketAmount">32</span> 积分
      * 加载表情
      */
     loadEmojis: function () {
-        let emojis = ''
-        for (const emoji in ChatRoom.getEmojis()) emojis += `<button>
-<div class="divX" onclick='ChatRoom.delEmoji("${emoji}")'>
-<svg style="width: 15px; height: 15px;"><use xlink:href="#delIcon"></use></svg>
-</div>
-<img style='max-height: 50px' onclick="ChatRoom.editor.setValue(ChatRoom.editor.getValue() + '![图片表情](${emoji})')" class="vditor-emojis__icon" src="${emoji}">
-</button>`
-        $("#emojis").html(emojis);
+        $("#emojis").html("");
+        let emojis = ChatRoom.getEmojis();
+        for (let i = 0; i < emojis.length; i++) {
+            $("#emojis").append("" +
+                "<button>\n" +
+                "    <div class=\"divX\" onclick='ChatRoom.delEmoji(\"" + emojis[i] + "\")'>\n" +
+                "        <svg style=\"width: 15px; height: 15px;\"><use xlink:href=\"#delIcon\"></use></svg>\n" +
+                "    </div>" +
+                "    <img style='max-height: 50px' onclick=\"ChatRoom.editor.setValue(ChatRoom.editor.getValue() + '![图片表情](" + emojis[i] + ")')\" class=\"vditor-emojis__icon\" src=\"" + emojis[i] + "\">\n" +
+                "</button>");
+        }
     },
     /**
      * 上传表情
@@ -790,7 +811,7 @@ id="redPacketAmount">32</span> 积分
             "", "从URL导入表情包");
         $("#fromURL").focus();
         $("#fromURL").unbind();
-        $("#fromURL").bind('keypress', function (event) {
+        $("#fromURL").bind('keypress',function(event){
             if (event.keyCode == "13") {
                 ChatRoom.addEmoji($("#fromURL").val());
                 Util.closeAlert();
@@ -856,7 +877,7 @@ id="redPacketAmount">32</span> 积分
      * 发送聊天内容
      * @returns {undefined}
      */
-    isSend: false,
+    isSend:false,
     send: function () {
         if (ChatRoom.isSend) {
             return;
@@ -970,7 +991,7 @@ id="redPacketAmount">32</span> 积分
                 $('#personListPanel').hide()
             }
         })
-        $("body").click(function () {
+        $("body").click(function() {
             $("details[open]").removeAttr("open");
         });
     },
@@ -1018,7 +1039,7 @@ id="redPacketAmount">32</span> 积分
             url: Label.servePath + '/chat-room/revoke/' + oId,
             type: 'DELETE',
             cache: false,
-            success: function (result) {
+            success: function(result) {
                 if (0 === result.code) {
                 } else {
                     Util.notice("danger", 1500, result.msg);
@@ -1036,7 +1057,7 @@ id="redPacketAmount">32</span> 积分
                 url: Label.servePath + '/chat-room/revoke/' + oId,
                 type: 'DELETE',
                 cache: false,
-                success: function (result) {
+                success: function(result) {
                     if (0 === result.code) {
                         Util.notice("success", 1500, result.msg);
                     } else {
@@ -1140,7 +1161,7 @@ id="redPacketAmount">32</span> 积分
                 if (currentUserMoney !== undefined) {
                     if (currentUserMoney > 0) {
                         $("#redPacketIGot").text("抢到了 " + currentUserMoney + " 积分");
-                    } else if (currentUserMoney === 0) {
+                    } else if (currentUserMoney == 0) {
                         $("#redPacketIGot").text("恭喜你，抢了个寂寞");
                     } else {
                         $("#redPacketIGot").text("什么运气，你竟然被反向抢红包了");
@@ -1159,22 +1180,24 @@ id="redPacketAmount">32</span> 积分
             let userNameInfo = currentUserName
             switch (bet) {
                 case 'big':
-                    userNameInfo = currentUserName + " (" + "押大" + ")";
+                    userNameInfo = currentUserName + " (" + "押大" +")";
                     break
                 case 'small':
-                    userNameInfo = currentUserName + " (" + "押小" + ")";
+                    userNameInfo = currentUserName + " (" + "押小" +")";
                     break
                 case 'leopard':
-                    userNameInfo = currentUserName + " (" + "豹子" + ")";
+                    userNameInfo = currentUserName + " (" + "豹子" +")";
                     break
             }
             let currentUserTime = current.time;
             let currentUserAvatar = "";
             if (current.avatar !== undefined) {
-                currentUserAvatar = `"<img class="avatar avatar--mid" style="margin-right: 10px; background-image: none; background-color: transparent;" src="${current.avatar}">`;
+                currentUserAvatar = "<img class=\"avatar avatar--mid\" style=\"margin-right: 10px; background-image: none; background-color: transparent;\" src=\"" + current.avatar + "\">\n";
             }
-            let html = `<li class="fn__flex menu__item">${currentUserAvatar}<div class="fn__flex-1" style="text-align: left !important;">
-<h2 class="list__user"><a href="${Label.servePath}/member/${currentUserName}">${userNameInfo}</a></h2>`;
+            let html = "<li class=\"fn__flex menu__item\">\n" +
+                currentUserAvatar +
+                "    <div class=\"fn__flex-1\" style=\"text-align: left !important;\">\n" +
+                "        <h2 class=\"list__user\"><a href=\"" + Label.servePath + "/member/" + currentUserName +"\">" + userNameInfo + "</a></h2>\n";
             if (currentUserMoney > 0 && currentUserMoney === highest) {
                 highest = -1;
                 html += "<span class='green small btn'>来自老王的认可</span><br>\n";
@@ -1197,10 +1220,10 @@ id="redPacketAmount">32</span> 积分
             } else {
                 money = currentUserMoney
             }
-            html += `<span class="ft__fade ft__smaller">${currentUserTime}</span>
-</div>
-<div class="fn__flex-center">${money} 积分</div>
-</li>`;
+            html += "<span class=\"ft__fade ft__smaller\">" + currentUserTime + "</span>\n" +
+                "    </div>\n" +
+                "    <div class=\"fn__flex-center\">" + money + " 积分</div>\n" +
+                "</li>\n";
             $("#redPacketList").append(html);
         }
         if (!hasGot) {
@@ -1227,10 +1250,10 @@ id="redPacketAmount">32</span> 积分
             }
             switch (winner) {
                 case "big":
-                    content += sum + "点大"
+                    content += sum +"点大"
                     break
                 case "small":
-                    content += sum + "点小"
+                    content += sum +"点小"
                     break
                 case "leopard":
                     content += "豹子通杀"
@@ -1241,19 +1264,19 @@ id="redPacketAmount">32</span> 积分
     },
 
     bet: function (oId) {
-        Util.alert(`<div class="form fn__flex-column">
-<label id="betRadio">
-<input type="radio" name="bet" value="big" checked>大
-<input type="radio" name="bet" value="small">小
-<input type="radio" name="bet" value="leopard">豹子
-<div class="ft__smaller ft__fade" style="float: left">筹码</div>
-<div class="fn-hr5 fn__5"></div>
-<input type="number" min="32" max="100" required="" value="32" id="chipsLabel" name='chips' onkeypress="return(/[\\d]/.test(String.fromCharCode(event.keyCode)))">
-</label>
-<div class="fn__flex" style="margin-top: 15px">
-<button class="btn btn--confirm" onclick="ChatRoom.unpackRedPacket(${oId});Util.clearAlert()">押注</button>
-</div>
-</div>`, '买定离手');
+        Util.alert("<div class=\"form fn__flex-column\">\n" +
+            "<label id=\"betRadio\">\n" +
+            "  <input type=\"radio\" name=\"bet\" value=\"big\" checked>大\n" +
+            "  <input type=\"radio\" name=\"bet\" value=\"small\">小\n" +
+            "  <input type=\"radio\" name=\"bet\" value=\"leopard\">豹子\n" +
+            "  <div class=\"ft__smaller ft__fade\" style=\"float: left\">筹码</div>\n" +
+            "  <div class=\"fn-hr5 fn__5\"></div>\n" +
+            "  <input type=\"number\" min=\"32\" max=\"100\" required=\"\" value=\"32\" id=\"chipsLabel\" name='chips' onkeypress=\"return(/[\\d]/.test(String.fromCharCode(event.keyCode)))\">\n" +
+            "</label>\n" +
+            "<div class=\"fn__flex\" style=\"margin-top: 15px\">\n" +
+            "  <button class=\"btn btn--confirm\" onclick=\"ChatRoom.unpackRedPacket(" + oId + ")\;Util.clearAlert()\">押注</button>\n" +
+            "</div>\n" +
+            "</div>", '买定离手');
 
         $("#chipsLabel").on('change', function () {
             if ($("#chipsLabel").val() > 100) {
@@ -1267,16 +1290,16 @@ id="redPacketAmount">32</span> 积分
 
 
     selectGesture: function (oId) {
-        Util.alert(`<div class="form fn__flex-column">
-<label id="gestureRadio">
-<input type="radio" name="gesture" value="0" checked>石头
-<input type="radio" name="gesture" value="1">剪刀
-<input type="radio" name="gesture" value="2">布
-</label>
-<div class="fn__flex" style="margin-top: 15px">
-<button class="btn btn--confirm" onclick="ChatRoom.unpackRedPacket(${oId});Util.clearAlert()">出拳</button>
-</div>
-</div>`, '出拳');
+        Util.alert("<div class=\"form fn__flex-column\">\n" +
+            "<label id=\"gestureRadio\">\n" +
+            "  <input type=\"radio\" name=\"gesture\" value=\"0\" checked>石头\n" +
+            "  <input type=\"radio\" name=\"gesture\" value=\"1\">剪刀\n" +
+            "  <input type=\"radio\" name=\"gesture\" value=\"2\">布\n" +
+            "</label>\n" +
+            "<div class=\"fn__flex\" style=\"margin-top: 15px\">\n" +
+            "  <button class=\"btn btn--confirm\" onclick=\"ChatRoom.unpackRedPacket(" + oId + ")\;Util.clearAlert()\">出拳</button>\n" +
+            "</div>\n" +
+            "</div>", '出拳');
     },
     /**
      * 拆开红包
@@ -1299,7 +1322,7 @@ id="redPacketAmount">32</span> 积分
                     let gesture = "";
                     if (result.info.gesture !== undefined) {
                         gesture = result.info.userName + "出拳: ";
-                        switch (result.info.gesture) {
+                        switch(result.info.gesture) {
                             case 0:
                                 gesture += " 石头";
                                 break;
@@ -1312,32 +1335,46 @@ id="redPacketAmount">32</span> 积分
                             default:
                         }
                     }
-                    Util.alert(`<style>.dialog-header-bg {border-radius: 4px 4px 0px 0px; background-color: rgb(210, 63, 49); color: rgb(255, 255, 255);}.dialog-main {height: 456px;overflow: auto;}</style><div class="fn-hr5"></div>
-<div class="fn-hr5"></div>
-<div class="fn-hr5"></div>
-<div class="fn-hr5"></div>
-<div class="ft__center">
-    <div class="fn__flex-inline">
-        <img class="avatar avatar--small" src="${result.info.userAvatarURL48}" style="background-image: none; background-color: transparent; width: 20px; height: 20px; margin-right: 0px;">
-        <div class="fn__space5"></div>
-        <a href="${Label.servePath}/member/${result.info.userName}">${result.info.userName}</a>'s 红包
-    </div>
-    <div class="fn-hr5"></div>
-${gesture ? `<div class="ft__smaller ft__fade">${gesture}</div>` : ""}
-<div id = "msg" class="ft__smaller ft__fade">${result.info.msg}</div>
-    <div class="hongbao__count" id='redPacketIGot'>${iGot}</div>
-    <div class="ft__smaller ft__fade">总计 ${result.info.got}/${result.info.count}</div>
-</div>
-<div class="list"><ul id="redPacketList">
-</ul></div>`, "红包");
+                    Util.alert("" +
+                        "<style>" +
+                        ".dialog-header-bg {" +
+                        "border-radius: 4px 4px 0px 0px; background-color: rgb(210, 63, 49); color: rgb(255, 255, 255);" +
+                        "}" +
+                        ".dialog-main {" +
+                        "height: 456px;" +
+                        "overflow: auto;" +
+                        "}" +
+                        "</style>" +
+                        "<div class=\"fn-hr5\"></div>\n" +
+                        "<div class=\"fn-hr5\"></div>\n" +
+                        "<div class=\"fn-hr5\"></div>\n" +
+                        "<div class=\"fn-hr5\"></div>\n" +
+                        "<div class=\"ft__center\">\n" +
+                        "    <div class=\"fn__flex-inline\">\n" +
+                        "        <img class=\"avatar avatar--small\" src=\"" + result.info.userAvatarURL48 + "\" style=\"background-image: none; background-color: transparent; width: 20px; height: 20px; margin-right: 0px;\">\n" +
+                        "        <div class=\"fn__space5\"></div>\n" +
+                        "        <a href=\"" + Label.servePath + "/member/" + result.info.userName + "\">" + result.info.userName + "</a>'s 红包\n" +
+                        "    </div>\n" +
+                        "    <div class=\"fn-hr5\"></div>\n" +
+                        (gesture ? ("<div class=\"ft__smaller ft__fade\">" + gesture + "</div>\n") : "") +
+                        "    <div id = \"msg\" class=\"ft__smaller ft__fade\">\n" +
+                        result.info.msg + "\n" +
+                        "    </div>\n" +
+                        "    <div class=\"hongbao__count\" id='redPacketIGot'>\n" +
+                        iGot +
+                        "    </div>\n" +
+                        "    <div class=\"ft__smaller ft__fade\">总计 " + result.info.got + "/" + result.info.count + "</div>\n" +
+                        "</div>\n" +
+                        "<div class=\"list\"><ul id=\"redPacketList\">\n" +
+                        "</ul></div>" +
+                        "", "红包");
                     ChatRoom.renderRedPacket(result.who, result.info.count, result.info.got, result.recivers, result.diceRet)
                     if (result.info.count === result.info.got) {
-                        const chatroom = $("#chatroom" + oId)
-                        chatroom.find(".hongbao__item").css("opacity", ".36").attr('onclick', "ChatRoom.unpackRedPacket(" + oId + ")");
+                        $("#chatroom" + oId).find(".hongbao__item").css("opacity", ".36").attr('onclick', "ChatRoom.unpackRedPacket(" + oId + ")");
                         if (result.dice === true) {
-                            chatroom.find(".redPacketDesc").html("已开盘");
+                            $("#chatroom" + oId).find(".redPacketDesc").html("已开盘");
                         } else {
-                            chatroom.find(".redPacketDesc").html("已经被抢光啦");
+                            $("#chatroom" + oId).find(".redPacketDesc").html("已经被抢光啦");
                         }
                     }
                 } else {
@@ -1383,7 +1420,7 @@ ${gesture ? `<div class="ft__smaller ft__fade">${gesture}</div>` : ""}
                         break;
                     case "rockPaperScissors":
                         type = "石头剪刀布红包";
-                        if (msgJSON.senderId !== Label.currentUserId) {
+                        if (msgJSON.senderId != Label.currentUserId) {
                             onclick = 'ChatRoom.selectGesture(\'' + data.oId + '\')';
                         }
                         break;
@@ -1391,7 +1428,7 @@ ${gesture ? `<div class="ft__smaller ft__fade">${gesture}</div>` : ""}
                         type = "摇骰子";
                         if (msgJSON.senderId !== Label.currentUserId) {
                             let dup = false
-                            for (idx in msgJSON.who) {
+                            for (idx in msgJSON.who){
                                 if (msgJSON.who[idx].userId === Label.currentUserId) {
                                     dup = true
                                     break
@@ -1408,25 +1445,33 @@ ${gesture ? `<div class="ft__smaller ft__fade">${gesture}</div>` : ""}
                     if (msgJSON.type === 'dice') {
                         content = "已开盘"
                     }
-                    data.content = `<div style="opacity: .36;" class="hongbao__item fn__flex-inline" onclick="ChatRoom.unpackRedPacket('${data.oId}')">
-<svg class="ft__red hongbao__icon"><use xlink:href="#redPacketIcon"></use></svg>
-<div>
-    <div>${msgJSON.msg}<br><b>${type}</b></div>
-    <div class="ft__smaller ft__fade redPacketDesc">${content}</div>
-</div>
-</div>`;
+                    data.content = '' +
+                        '<div style="opacity: .36;" class="hongbao__item fn__flex-inline" onclick="ChatRoom.unpackRedPacket(\'' + data.oId + '\')">\n' +
+                        '    <svg class="ft__red hongbao__icon">\n' +
+                        '        <use xlink:href="#redPacketIcon"></use>\n' +
+                        '    </svg>\n' +
+                        '    <div>\n' +
+                        '        <div>' + msgJSON.msg + '<br><b>' + type + '</b></div>\n' +
+                        '        <div class="ft__smaller ft__fade redPacketDesc">\n' +
+                        content + '\n' +
+                        '        </div>\n' +
+                        '    </div>\n' +
+                        '</div>';
                 } else {
-                    data.content = `<div class="hongbao__item fn__flex-inline" onclick="${onclick}">
-<svg class="ft__red hongbao__icon"><use xlink:href="#redPacketIcon"></use></svg>
-<div>
-    <div>${msgJSON.msg}<br><b>${type}</b></div>
-    <div class="ft__smaller ft__fade redPacketDesc"></div>
-</div>
-</div>`;
+                    data.content = '' +
+                        '<div class="hongbao__item fn__flex-inline" onclick="' + onclick + '">\n' +
+                        '    <svg class="ft__red hongbao__icon">\n' +
+                        '        <use xlink:href="#redPacketIcon"></use>\n' +
+                        '    </svg>\n' +
+                        '    <div>\n' +
+                        '        <div>' + msgJSON.msg + '<br><b>' + type + '</b></div>\n' +
+                        '        <div class="ft__smaller ft__fade redPacketDesc">\n' +
+                        '        </div>\n' +
+                        '    </div>\n' +
+                        '</div>';
                 }
             }
-        } catch (err) {
-        }
+        } catch (err) {}
         let meTag1 = "";
         let meTag2 = "";
         if (data.userNickname !== undefined && data.userNickname !== "") {
@@ -1463,19 +1508,18 @@ ${gesture ? `<div class="ft__smaller ft__fade">${gesture}</div>` : ""}
             if (canCollect) {
                 meTag2 += "<a onclick=\"ChatRoom.addEmoji(" + srcs + ")\" class=\"item\">一键收藏表情</a>";
             }
-        } catch (err) {
-        }
-        let newHTML = `<div class="fn-none">
-<div id="chatroom${data.oId}" class="fn__flex chats__item${meTag1}">
-<a href="/member/${data.userName}" style="height: 38px">
-<div class="avatar tooltipped__user" aria-label="${data.userName}" style="background-image: url('${data.userAvatarURL}')"></div>
-</a>
-<div class="chats__content">
-<div class="chats__arrow"></div>`;
+        } catch (err) {}
+        let newHTML = '<div class="fn-none">';
+        newHTML += '<div id="chatroom' + data.oId + '" class="fn__flex chats__item' + meTag1 + '">\n' +
+            '    <a href="/member/' + data.userName + '" style="height: 38px">\n' +
+            '        <div class="avatar tooltipped__user" aria-label="' + data.userName + '" style="background-image: url(\'' + data.userAvatarURL + '\');"></div>\n' +
+            '    </a>\n' +
+            '    <div class="chats__content">\n' +
+            '        <div class="chats__arrow"></div>\n';
 
         let display = Label.currentUser === data.userName && !isPlusOne ? 'display: none;' : ''
-        newHTML += `<div id="userName" class="ft__fade ft__smaller" style="${display}padding-bottom: 3px;border-bottom: 1px solid #eee">
-<span class="ft-gray">${data.userNickname}</span>&nbsp;`;
+        newHTML += '<div id="userName" class="ft__fade ft__smaller" style="' + display + 'padding-bottom: 3px;border-bottom: 1px solid #eee">\n' +
+            '    <span class="ft-gray">' + data.userNickname + '</span>&nbsp;\n';
         if (data.sysMetal !== undefined && data.sysMetal !== "") {
             let list = JSON.parse(data.sysMetal).list;
             if (list !== undefined) {
@@ -1487,21 +1531,39 @@ ${gesture ? `<div class="ft__smaller ft__fade">${gesture}</div>` : ""}
         }
         newHTML += '</div>';
 
-        newHTML += `<div style="margin-top: 4px" class="vditor-reset ft__smaller ${Label.chatRoomPictureStatus}">${data.content}</div>
-<div class="ft__smaller ft__fade fn__right date-bar">${data.time}
-<span class="fn__space5"></span>
-<details class="details action__item fn__flex-center">
-<summary>
-···
-</summary>
-<details-menu class="fn__layer">
-    <a onclick="ChatRoom.at('${data.userName}', '${data.oId}', true)" class="item">@${data.userName}</a>
-    ${isRedPacket ? "" : `<a onclick="ChatRoom.at('${data.userName}', '${data.oId}', false)" class="item">引用</a>
-    <a onclick="ChatRoom.repeat('${data.oId}')" class="item">复读机</a>`}
-    <a onclick="ChatRoom.report('${data.oId}')" class="item"><svg><use xlink:href="#icon-report"></use></svg> 一键举报</a>${meTag2}
-</details-menu>
-</details>
-</div></div></div></div>`;
+        newHTML += '        <div style="margin-top: 4px" class="vditor-reset ft__smaller ' + Label.chatRoomPictureStatus + '">\n' +
+            '            ' + data.content + '\n' +
+            '        </div>\n' +
+            '        <div class="ft__smaller ft__fade fn__right date-bar">\n' +
+            '            ' + data.time + '\n' +
+            '                <span class="fn__space5"></span>\n';
+        if (!isRedPacket) {
+            newHTML += '                <details class="details action__item fn__flex-center">\n' +
+                '                    <summary>\n' +
+                '                        ···\n' +
+                '                    </summary>\n' +
+                '                    <details-menu class="fn__layer">\n' +
+                '                        <a onclick=\"ChatRoom.at(\'' + data.userName + '\', \'' + data.oId + '\', true)\" class="item">@' + data.userName + '</a>\n' +
+                '                        <a onclick=\"ChatRoom.at(\'' + data.userName + '\', \'' + data.oId + '\', false)\" class="item">引用</a>\n' +
+                '                        <a onclick=\"ChatRoom.repeat(\'' + data.oId + '\')\" class="item">复读机</a>\n' +
+                '                        <a onclick=\"ChatRoom.report(\'' + data.oId + '\')\" class="item"><svg><use xlink:href="#icon-report"></use></svg> 一键举报</a>\n' +
+                meTag2 +
+                '                    </details-menu>\n' +
+                '                </details>\n';
+        } else {
+            newHTML += '                <details class="details action__item fn__flex-center">\n' +
+                '                    <summary>\n' +
+                '                        ···\n' +
+                '                    </summary>\n' +
+                '                    <details-menu class="fn__layer">\n' +
+                '                        <a onclick=\"ChatRoom.at(\'' + data.userName + '\', \'' + data.oId + '\', true)\" class="item">@' + data.userName + '</a>\n' +
+                '                        <a onclick=\"ChatRoom.report(\'' + data.oId + '\')\" class="item"><svg><use xlink:href="#icon-report"></use></svg> 一键举报</a>\n' +
+                '                    </details-menu>\n' +
+                '                </details>\n';
+        }
+        newHTML += '        </div>\n' +
+            '    </div>\n' +
+            '</div></div>';
         if (more) {
             $('#chats').append(newHTML);
             let $fn = $('#chats>div.fn-none');
@@ -1511,15 +1573,17 @@ ${gesture ? `<div class="ft__smaller ft__fade">${gesture}</div>` : ""}
         // 堆叠复读机消息
         else if (isPlusOne) {
             let plusN = ++Label.plusN;
-            let $stacked = $('#stacked');
             if (plusN === 1) {
-                let stackedHtml = `<div id='stacked' class='fn__flex' style='position:relative;display:none;'><span id='plusOne' onclick='ChatRoom.plusOne()' style='display:block;margin-left: 20px'><svg style='width: 30px; height: 20px; cursor: pointer;'><use xlink:href='#plusOneIcon'></use></svg></span></div>`
+                let stackedHtml = "<div id='stacked' class='fn__flex' style='position:relative;display:none;'>" +
+                    "<span id='plusOne' onclick='ChatRoom.plusOne()' style='display:block;margin-left: 20px'><svg style='width: 30px; height: 20px; cursor: pointer;'><use xlink:href='#plusOneIcon'></use></svg></span>" +
+                    "</div>"
                 $('#chats').prepend(stackedHtml);
                 let latest = $('#chats>div.latest');
-                $stacked.prepend(latest);
+                $('#stacked').prepend(latest);
                 latest.find('#userName').show();
                 latest.removeClass('latest');
             }
+            let $stacked = $('#stacked');
             if (plusN !== 1) {
                 $stacked.fadeOut(100);
             }
@@ -1563,25 +1627,25 @@ ${gesture ? `<div class="ft__smaller ft__fade">${gesture}</div>` : ""}
     /**
      * 全屏看图插件渲染
      */
-    imageViewer: function () {
+    imageViewer: function() {
         // console.log("新消息")
         //没有新图片就不重载
         if (this.imgViewer && $("div.vditor-reset.ft__smaller img:not(.ft__smaller,.emoji)").length === this.imgViewer.length)
             return
         // console.log("包含图片")
-        this.imgViewer = this.imgViewer || new Viewer(document.querySelector('#chats'), {
+        this.imgViewer = this.imgViewer || new Viewer(document.querySelector('#chats'),{
             inline: false,
             className: "PWLimgViwer",
-            filter: (img) => !img.parentElement.classList.contains("ft__smaller") && !img.classList.contains("emoji"),
+            filter: (img)=>!img.parentElement.classList.contains("ft__smaller") && !img.classList.contains("emoji"),
             title() {
                 let ele = this.images[$(".PWLimgViwer .viewer-active").attr("data-index")];
                 while (ele = ele.parentElement,
-                    !ele.querySelector(".avatar")) ;
+                    !ele.querySelector(".avatar"));
                 return "From @" + ele.querySelector(".avatar").getAttribute("aria-label")
             }
         });
-        const delayshow = function () {
-            setTimeout(() => {
+        const delayshow = function() {
+            setTimeout(()=>{
                     if (!ChatRoom.imgViewer.isShown) {
                         ChatRoom.imgWaitting = false;
                         // console.log("重载")
@@ -1602,70 +1666,72 @@ ${gesture ? `<div class="ft__smaller ft__fade">${gesture}</div>` : ""}
      * xiaoIce Game
      * */
     iceWs: "",
-    IceGameCK: localStorage.getItem("IceGameCK") || null,
-    loadXiaoIceGame: function () {
+    IceGameCK : localStorage.getItem("IceGameCK") || null,
+    loadXiaoIceGame: function(){
         // 连接游戏服务器
-        const iceWs = new WebSocket('wss://game.yuis.cc/wss');
-        ChatRoom.iceWs = iceWs
+        iceWs = new WebSocket('wss://game.yuis.cc/wss');
         let iceWsHeart = null;
-        iceWs.onopen = function () {
+        iceWs.onopen = function(){
             iceWs.send(JSON.stringify({
-                type: 'setUser',
-                user: Label.currentUser,
-                ck: ChatRoom.IceGameCK,
-                uid: Label.currentUserId
+                type:'setUser',
+                user:Label.currentUser,
+                ck:ChatRoom.IceGameCK,
+                uid:Label.currentUserId
             }))
-            iceWsHeart = setInterval(() => {
-                iceWs.send(JSON.stringify({type: 'hb'}))
-            }, 15000)
+            iceWsHeart = setInterval(()=>{
+                iceWs.send(JSON.stringify({type:'hb'}))
+            },15000)
         }
-        iceWs.onclose = function () {
-            let html = `<div class="ice-msg-item"><div class="ice-msg-content">小冰网络失去连接</div></div>`
+        iceWs.onclose = function(){
+            let html = `<div class="ice-msg-item">
+                    <div class="ice-msg-content">小冰网络失去连接</div>
+                  </div>`
             $('#iceMsgList').prepend(html);
         }
-        iceWs.onerror = function (err) {
-            let html = `<div class="ice-msg-item"><div class="ice-msg-content">小冰网络维护中...</div></div>`
+        iceWs.onerror = function(err){
+            let html = `<div class="ice-msg-item">
+                    <div class="ice-msg-content">小冰网络维护中...</div>
+                  </div>`
             $('#iceMsgList').prepend(html);
         }
         // 收到消息
-        iceWs.onmessage = function (e) {
+        iceWs.onmessage = function (e){
             let data = JSON.parse(e.data);
-            if (data.user === "all" || data.user === Label.currentUser) {
+            if(data.user == "all" || data.user == Label.currentUser){
                 let html = `<div class="ice-msg-item">
                     <div class="ice-msg-content">${data.msg}</div>
                   </div>`
                 $('#iceMsgList').prepend(html);
             }
-            if (data.type === "setCK") {
+            if(data.type == "setCK"){
                 ChatRoom.IceGameCK = data.ck;
-                localStorage.setItem("IceGameCK", data.ck);
+                localStorage.setItem("IceGameCK",data.ck);
             }
         }
         // 打开游戏界面
-        $('#xiaoIceGameBtn').click(function () {
+        $('#xiaoIceGameBtn').click(function(){
             $("#xiaoIceGameBox").show(200);
             $('#xiaoIceGameBtn').hide(200);
-            setTimeout(() => {
+            setTimeout(()=>{
                 $("#xiaoIceGameBox").addClass('active');
-            }, 220)
+            },220)
         })
         // 关闭游戏界面
-        $('#iceClose').click(function () {
-            const box=$("#xiaoIceGameBox")
-            setTimeout(() => {
+        $('#iceClose').click(function(){
+            $("#xiaoIceGameBox").removeClass('active');
+            setTimeout(()=>{
                 $('.ice-chat-input').val("");
                 $("#xiaoIceGameBox").hide(200);
                 $('#xiaoIceGameBtn').show(200);
-            }, box.hasClass('active') ? 420 : 1)
-            box.removeClass('active');
+            },420)
         })
         // 最小化切换
-        $('#iceMinimize').click(function () {
+        $('#iceMinimize').click(function(){
             $("#xiaoIceGameBox").toggleClass('active');
         })
         // 发送指令
         $('#iceSendMsg').click(ChatRoom.sendIceMsg);
-        $('.ice-chat-input').bind('keypress', function (event) {
+        $('.ice-chat-input').bind('keypress', function(event) {
             if (event.keyCode === 13) {
                 event.preventDefault();
                 ChatRoom.sendIceMsg();
@@ -1676,11 +1742,13 @@ ${gesture ? `<div class="ft__smaller ft__fade">${gesture}</div>` : ""}
     sendIceMsg: function () {
         let msg = $('.ice-chat-input').val();
         $('.ice-chat-input').val("");
-        let uMsg = `<div class="ice-msg-item me"><div class="ice-msg-content">${msg}</div></div>`
+        let uMsg = `<div class="ice-msg-item me">
+                    <div class="ice-msg-content">${msg}</div>
+                  </div>`
         $('#iceMsgList').prepend(uMsg);
         let type = "gameMsg";
-        // console.log(/登录/.test(msg))
-        if (/登录/.test(msg)) {
+        console.log(/(登录)/.test(msg))
+        if(/(登录)/.test(msg)){
             type = "login"
         }
         iceWs.send(JSON.stringify({
@@ -1693,47 +1761,48 @@ ${gesture ? `<div class="ft__smaller ft__fade">${gesture}</div>` : ""}
     /**
      * 按时间加载头像挂件
      * */
-    loadAvatarPendant: function () {
+    loadAvatarPendant: function(){
         let year = new Date().getFullYear();
         let month = new Date().getMonth() + 1;
         let day = new Date().getDate();
         let formatDate = `${year}-${month}-${day}`;
         let SpringFestivalDateList = {
-            2021: ["2021-02-11", "2021-02-17"],
-            2022: ["2022-01-31", "2022-02-06"],
-            2023: ["2023-01-21", "2023-01-07"],
-            2024: ["2024-02-09", "2024-02-15"],
-            2025: ["2025-01-28", "2025-02-03"],
-            2026: ["2026-02-16", "2026-01-22"],
+            2021:["2021-02-11","2021-02-17"],
+            2022:["2022-01-31","2022-02-06"],
+            2023:["2023-01-21","2023-01-07"],
+            2024:["2024-02-09","2024-02-15"],
+            2025:["2025-01-28","2025-02-03"],
+            2026:["2026-02-16","2026-01-22"],
         }
         let MidAutumnFestivalDateList = {
-            2021: ["2021-09-19", "2021-09-21"],
-            2022: ["2022-09-10", "2022-09-12"],
-            2023: ["2023-09-29", "2023-10-01"],
-            2024: ["2024-09-17", "2024-09-19"],
-            2025: ["2025-10-06", "2025-10-09"],
-            2026: ["2026-09-25", "2026-09-27"],
+            2021:["2021-09-19","2021-09-21"],
+            2022:["2022-09-10","2022-09-12"],
+            2023:["2023-09-29","2023-10-01"],
+            2024:["2024-09-17","2024-09-19"],
+            2025:["2025-10-06","2025-10-09"],
+            2026:["2026-09-25","2026-09-27"],
         }
         //  国庆头像挂件
         let chatRoom = document.querySelector('body')
-        if (month === 10 && day <= 7) {
+        if(month === 10 && day <= 7){
             chatRoom.classList.add('NationalDay')
             return;
         }
         //  圣诞节头像挂件
-        if ((month === 12 && day >= 24) && (month === 12 && day <= 25)) {
+        if((month === 12 && day >= 24) && (month === 12 && day <= 25)){
             chatRoom.classList.add('Christmas')
             return;
         }
         //  中秋头像挂件
-        if (new Date(MidAutumnFestivalDateList[year][0]) <= new Date(formatDate) && new Date(MidAutumnFestivalDateList[year][1]) >= new Date(formatDate)) {
+        if(new Date(MidAutumnFestivalDateList[year][0]) <= new Date(formatDate) && new Date(MidAutumnFestivalDateList[year][1]) >= new Date(formatDate)){
             chatRoom.classList.add('MidAutumnFestival')
             return;
         }
         //  春节头像挂件
-        if (new Date(SpringFestivalDateList[year][0]) <= new Date(formatDate) && new Date(SpringFestivalDateList[year][1]) >= new Date(formatDate)) {
+        if(new Date(SpringFestivalDateList[year][0]) <= new Date(formatDate) && new Date(SpringFestivalDateList[year][1]) >= new Date(formatDate)){
             chatRoom.classList.add('SpringFestival')
+            return;
         }
     }
-};
+}
 

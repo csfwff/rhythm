@@ -423,8 +423,6 @@ a[class*=" icon-"]:hover {
   font-size: 18px;
   font-weight: normal;
   border-bottom: 1px solid #eee;
-  cursor: move;
-  user-select: none;
 }
 
 .dialog-header-bg .icon-close {
@@ -432,7 +430,6 @@ a[class*=" icon-"]:hover {
   font-size: 12px;
   float: right;
   font-weight: bold;
-  -webkit-user-drag: none;
 }
 
 .dialog-header-bg .icon-close:hover {
@@ -3054,8 +3051,8 @@ only screen and (device-width: 414px) and (device-height: 896px) and (-webkit-de
 }
 
 .module_new{
-    line-height: 16px;
-    padding: 0px 10px 8px 10px;
+  line-height: 16px;
+  padding: 0px 10px 8px 10px;
 }
 
 .tags{
@@ -3153,13 +3150,13 @@ only screen and (device-width: 414px) and (device-height: 896px) and (-webkit-de
 }
 
 .TGIF__item {
-   background-color: var(--layer-background-color);
-   color: var(--layer-color);
-   cursor: default;
-   padding: 10px;
-   border-radius: 3px;
-   box-shadow: 0 1px 2px rgba(0,0,0,.2);
-   margin: 0px 5px 10px 5px;
+  background-color: var(--layer-background-color);
+  color: var(--layer-color);
+  cursor: default;
+  padding: 10px;
+  border-radius: 3px;
+  box-shadow: 0 1px 2px rgba(0,0,0,.2);
+  margin: 0px 5px 10px 5px;
 }
 
 

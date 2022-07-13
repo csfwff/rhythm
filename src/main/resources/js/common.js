@@ -311,14 +311,6 @@ var Util = {
      * @description 关闭 alert
      */
     closeAlert: function () {
-        //移除相关拖拽监听
-        $(document).mouseup(function () {
-            $("body").css("overflow", "")
-            $(document).off('mousemove');
-        }).on('touchend', function (e) {
-            $("body").css("overflow", "")
-            $(document).off('touchmove');
-        })
         $("#alertDialogPanel,.dialog-background").fadeOut(200);
         setTimeout(function () {
             $("#alertDialogPanel,.dialog-background").remove();
@@ -331,69 +323,31 @@ var Util = {
     /**
      * @description alert
      * @param {String} content alert 内容
-     * @param {String} title 标题
      */
-    alert: function (content, title="") {
-        // 拖拽界面
-        function function_drag(ele) {
-            function ondown(e) {
-                // 获取鼠标离元素(0,0)位置的距离
-                const positionDiv = $(ele).offset();
-                e = e.pageX ? e : e.targetTouches[0]
-                const distenceX = e.pageX - positionDiv.left;
-                const distenceY = e.pageY - positionDiv.top;
-
-                function onmove(e) {
-                    $("body").css("overflow", "hidden")
-                    e = e.pageX ? e : e.targetTouches[0]
-                    let x = e.pageX - distenceX;
-                    let y = e.pageY - distenceY;
-                    if (x < 0) {
-                        x = 0;
-                    } else if (x > $(document).width() - $(ele).outerWidth(true)) {
-                        x = $(document).width() - $(ele).outerWidth(true);
-                    }
-                    if (y < 0) {
-                        y = 0;
-                    } else if (y > $(document).height() - $(ele).outerHeight(true)) {
-                        y = $(document).height() - $(ele).outerHeight(true);
-                    }
-                    $(ele).css({
-                        'left': x + 'px',
-                        'top': y + 'px'
-                    })
-                }
-
-                $(document).mousemove(onmove).on('touchmove', onmove)
-                $(document).mouseup(function () {
-                    $("body").css("overflow", "")
-                    $(document).off('mousemove');
-                }).on('touchend', function (e) {
-                    $("body").css("overflow", "")
-                    $(document).off('touchmove');
-                })
-            }
-
-            $(".dialog-header-bg").mousedown(ondown).on('touchstart', ondown)
+    alert: function (content, title) {
+        if (title === undefined) {
+            title = "";
         }
+        var alertHTML = '',
+            alertBgHTML = '<div onclick="Util.closeAlert(this)" style="height: ' +
+                document.documentElement.scrollHeight
+                + 'px;display: block;" class="dialog-background"></div>',
+            alertContentHTML = '<div class="dialog-panel" id="alertDialogPanel" tabindex="0">'
+                +
+                '<div class="fn-clear dialog-header-bg"><span style="font-size: 14px;">' + title + '</span><a class="icon-close" href="javascript:void(0);" onclick="Util.closeAlert()"><svg><use xlink:href="#close"></use></svg></a></div>'
+                +
+                '<div class="dialog-main" style="text-align:center;padding: 30px 10px 40px">' +
+                content + '</div></div>'
 
-        $('body').append('<div onclick="Util.closeAlert(this)" style="height: ' +
-            document.documentElement.scrollHeight
-            + 'px;display: block;" class="dialog-background"></div>' +
-            '<div class="dialog-panel" id="alertDialogPanel" tabindex="0">'
-            +
-            '<div class="fn-clear dialog-header-bg"><span style="font-size: 14px;">' + (title || "") + '</span><a class="icon-close" href="javascript:void(0);" onclick="Util.closeAlert()"><svg><use xlink:href="#close"></use></svg></a></div>'
-            +
-            '<div class="dialog-main" style="text-align:center;padding: 30px 10px 40px">' +
-            content + '</div></div>')
+        alertHTML = alertBgHTML + alertContentHTML
 
-        const panel = $('#alertDialogPanel')
-        panel.css({
-            'top': ($(window).height() - panel.height()) / 2 + 'px',
-            'left': ($(window).width() - panel.width()) / 2 + 'px',
+        $('body').append(alertHTML)
+
+        $('#alertDialogPanel').css({
+            'top': ($(window).height() - $('#alertDialogPanel').height()) / 2 + 'px',
+            'left': ($(window).width() - $('#alertDialogPanel').width()) / 2 + 'px',
             'outline': 'none',
         }).fadeIn(200).focus()
-        function_drag('#alertDialogPanel');
     },
     /**
      * @description 标记指定类型的消息通知为已读状态.
@@ -451,7 +405,8 @@ var Util = {
                     $focus.outerHeight()
                     || $(window).scrollTop() > $focus.offset().top) {
                     if (type === 'down') {
-                        $(window).scrollTop($focus.offset().top -
+                        $(window).
+                        scrollTop($focus.offset().top -
                             ($(window).height() - $focus.outerHeight()))
                     } else {
                         $(window).scrollTop($focus.offset().top - offsetHeight)
@@ -462,7 +417,7 @@ var Util = {
 
         // c 新建帖子
         if ($('#articleTitle').length === 0) {
-            $(document).bind('keydown', 'c', function assets(event) {
+            $(document).bind('keydown', 'c', function assets (event) {
                 if (Util.prevKey) {
                     return false
                 }
@@ -582,10 +537,12 @@ var Util = {
             }
             var href = $('.content .list:last > ul > li.focus > h2 > a').attr('href')
             if (!href) {
-                href = $('.content .list:last > ul > li.focus .fn-flex-1 > h2 > a').attr('href')
+                href = $('.content .list:last > ul > li.focus .fn-flex-1 > h2 > a').
+                attr('href')
             }
             if (!href) {
-                href = $('.content .list:last > ul > li.focus h2.fn-flex-1 > a').attr('href')
+                href = $('.content .list:last > ul > li.focus h2.fn-flex-1 > a').
+                attr('href')
             }
             if (href) {
                 window.location = href
@@ -598,10 +555,12 @@ var Util = {
             }
             var href = $('.content .list:last > ul > li.focus > h2 > a').attr('href')
             if (!href) {
-                href = $('.content .list:last > ul > li.focus .fn-flex-1 > h2 > a').attr('href')
+                href = $('.content .list:last > ul > li.focus .fn-flex-1 > h2 > a').
+                attr('href')
             }
             if (!href) {
-                href = $('.content .list:last > ul > li.focus h2.fn-flex-1 > a').attr('href')
+                href = $('.content .list:last > ul > li.focus h2.fn-flex-1 > a').
+                attr('href')
             }
             if (href) {
                 window.location = href
@@ -708,7 +667,8 @@ var Util = {
         } else {
             var div = document.createElement('div')
             div.innerHTML = text
-            text = div.innerText.replace(/\n{2,}/g, '\n\n').replace(/(^\s*)|(\s*)$/g, '')
+            text = div.innerText.replace(/\n{2,}/g, '\n\n').
+            replace(/(^\s*)|(\s*)$/g, '')
             return text
         }
     },
@@ -796,7 +756,7 @@ var Util = {
         }
 
         var options = {
-            outline: data.outline || {enable: false},
+            outline: data.outline || { enable: false },
             after: data.after || undefined,
             typewriterMode: data.typewriterMode || false,
             cache: {
@@ -1006,7 +966,11 @@ var Util = {
                 $.ua.set(navigator.userAgent)
                 if ($.ua.device.type && $.ua.device.type === 'mobile') {
                     if (0 < count) {
-                        $('#aNotifications').removeClass('no-msg').addClass('msg').text(count).attr('href', 'javascript:void(0)')
+                        $('#aNotifications').
+                        removeClass('no-msg').
+                        addClass('msg').
+                        text(count).
+                        attr('href', 'javascript:void(0)')
                         if (0 === result.userNotifyStatus &&
                             window.localStorage.hadNotificate !== count.toString() &&
                             isSendMsg) {
@@ -1020,7 +984,8 @@ var Util = {
                             $('#notificationsPanel ul').html(notiHTML)
                             return false
                         }
-                        $('.main:first').prepend(
+                        $('.main:first').
+                        prepend(
                             '<div id="notificationsPanel" class="tab-current fn-clear fn-none"><ul class="tab fn-clear">' +
                             notiHTML + '</ul></div>')
 
@@ -1029,7 +994,11 @@ var Util = {
                         })
                     } else {
                         window.localStorage.hadNotificate = 'false'
-                        $('#aNotifications').removeClass('msg').addClass('no-msg').text(count).attr('href', Label.servePath + '/notifications')
+                        $('#aNotifications').
+                        removeClass('msg').
+                        addClass('no-msg').
+                        text(count).
+                        attr('href', Label.servePath + '/notifications')
                     }
                     return false
                 }
@@ -1040,7 +1009,11 @@ var Util = {
                     '</svg>' +
                     '&nbsp;';
                 if (0 < count) {
-                    $('#aNotifications').removeClass('no-msg tooltipped tooltipped-w').addClass('msg').html(icon + count).attr('href', 'javascript:void(0)')
+                    $('#aNotifications').
+                    removeClass('no-msg tooltipped tooltipped-w').
+                    addClass('msg').
+                    html(icon + count).
+                    attr('href', 'javascript:void(0)')
                     if (0 === result.userNotifyStatus &&
                         window.localStorage.hadNotificate !== count.toString() &&
                         isSendMsg) {
@@ -1055,7 +1028,8 @@ var Util = {
                         return false
                     }
 
-                    $('#aNotifications').after(
+                    $('#aNotifications').
+                    after(
                         '<div id="notificationsPanel" class="module person-list"><ul>' +
                         notiHTML + '</ul></div>')
 
@@ -1073,7 +1047,11 @@ var Util = {
                 } else {
                     window.localStorage.hadNotificate = 'false'
                     $('#notificationsPanel').remove()
-                    $('#aNotifications').removeClass('msg').addClass('no-msg tooltipped tooltipped-w').html(icon + count).attr('href', Label.servePath + '/notifications')
+                    $('#aNotifications').
+                    removeClass('msg').
+                    addClass('no-msg tooltipped tooltipped-w').
+                    html(icon + count).
+                    attr('href', Label.servePath + '/notifications')
                 }
             },
         })
@@ -1109,21 +1087,31 @@ var Util = {
                     $(it).removeClass('disabled')
                     if (typeof (index) !== 'undefined') {
                         if ('article' === type || 'tag' === type) {
-                            $(it).html(
+                            $(it).
+                            html(
                                 '<svg class="icon-star"><use xlink:href="#star"></use></svg> ' +
-                                (index + 1)).attr('onclick', 'Util.unfollow(this, \'' + id + '\', \'' +
+                                (index + 1)).
+                            attr('onclick', 'Util.unfollow(this, \'' + id + '\', \'' +
                                 type +
-                                '\', ' + (index + 1) + ')').attr('aria-label', Label.uncollectLabel).addClass('ft-red')
+                                '\', ' + (index + 1) + ')').
+                            attr('aria-label', Label.uncollectLabel).
+                            addClass('ft-red')
                         } else if ('article-watch' === type) {
-                            $(it).html(
+                            $(it).
+                            html(
                                 '<svg class="icon-view"><use xlink:href="#view"></use></svg> ' +
-                                (index + 1)).attr('onclick', 'Util.unfollow(this, \'' + id + '\', \'' +
+                                (index + 1)).
+                            attr('onclick', 'Util.unfollow(this, \'' + id + '\', \'' +
                                 type +
-                                '\', ' + (index + 1) + ')').attr('aria-label', Label.unfollowLabel).addClass('ft-red')
+                                '\', ' + (index + 1) + ')').
+                            attr('aria-label', Label.unfollowLabel).
+                            addClass('ft-red')
                         }
                     } else {
-                        $(it).attr('onclick', 'Util.unfollow(this, \'' + id + '\', \'' + type +
-                            '\')').text('article' === type
+                        $(it).
+                        attr('onclick', 'Util.unfollow(this, \'' + id + '\', \'' + type +
+                            '\')').
+                        text('article' === type
                             ? Label.uncollectLabel
                             : Label.unfollowLabel)
                     }
@@ -1159,19 +1147,29 @@ var Util = {
                 if (0 === result.code) {
                     if (typeof (index) !== 'undefined') {
                         if ('article' === type || 'tag' === type) {
-                            $(it).removeClass('ft-red').html(
+                            $(it).
+                            removeClass('ft-red').
+                            html(
                                 '<svg class="icon-star"><use xlink:href="#star"></use></svg> ' +
-                                (index - 1)).attr('onclick', 'Util.follow(this, \'' + id + '\', \'' + type +
-                                '\',' + (index - 1) + ')').attr('aria-label', Label.collectLabel)
+                                (index - 1)).
+                            attr('onclick', 'Util.follow(this, \'' + id + '\', \'' + type +
+                                '\',' + (index - 1) + ')').
+                            attr('aria-label', Label.collectLabel)
                         } else if ('article-watch' === type) {
-                            $(it).removeClass('ft-red').html(
+                            $(it).
+                            removeClass('ft-red').
+                            html(
                                 '<svg class="icon-view"><use xlink:href="#view"></use></svg> ' +
-                                (index - 1)).attr('onclick', 'Util.follow(this, \'' + id + '\', \'' + type +
-                                '\',' + (index - 1) + ')').attr('aria-label', Label.followLabel)
+                                (index - 1)).
+                            attr('onclick', 'Util.follow(this, \'' + id + '\', \'' + type +
+                                '\',' + (index - 1) + ')').
+                            attr('aria-label', Label.followLabel)
                         }
                     } else {
-                        $(it).attr('onclick', 'Util.follow(this, \'' + id + '\', \'' + type +
-                            '\')').text('article' === type ? Label.collectLabel : Label.followLabel)
+                        $(it).
+                        attr('onclick', 'Util.follow(this, \'' + id + '\', \'' + type +
+                            '\')').
+                        text('article' === type ? Label.collectLabel : Label.followLabel)
                     }
                 }
             },
@@ -1707,7 +1705,9 @@ var Util = {
      * @description 让聊天图标闪烁
      */
     blingChat: function () {
-        $('#aChat').removeClass('no-msg').addClass('msg');
+        $('#aChat').
+        removeClass('no-msg').
+        addClass('msg');
         if (!Util.isBlinging) {
             Util.isBlinging = true;
             $("#idleTalkIconContainer").html("<use xlink:href=\"#redIdleChat\"></use>");
@@ -1726,7 +1726,9 @@ var Util = {
      * @description 终止闪烁聊天图标
      */
     pauseBling: function () {
-        $('#aChat').removeClass('msg').addClass('no-msg');
+        $('#aChat').
+        removeClass('msg').
+        addClass('no-msg');
         if (Util.isBlinging) {
             Util.isBlinging = false;
             clearInterval(bling);
@@ -1853,10 +1855,10 @@ var Util = {
     /**
      * @description 通知
      * options 说明
-     * 参数名    默认值    类型    参数说明
-     * type    success    {String}    提示框的类型，可填写参数 default, success, warning, danger
-     * duration    3000    {Number}    设置提示框消失时间，默认 3000 毫秒
-     * callback    function()    {Function}    提示框关闭时所调用的回调法。
+     * 参数名	默认值	类型	参数说明
+     * type	success	{String}	提示框的类型，可填写参数 default, success, warning, danger
+     * duration	3000	{Number}	设置提示框消失时间，默认 3000 毫秒
+     * callback	function()	{Function}	提示框关闭时所调用的回调法。
      */
     notice: function (type, duration, text, callback) {
         if (callback !== undefined) {
@@ -2011,13 +2013,13 @@ var wavMagic2 = [
     0x57, 0x41, 0x56, 0x45,
 ]
 
-function arraycopy(src, index, dist, distIndex, size) {
+function arraycopy (src, index, dist, distIndex, size) {
     for (i = 0; i < size; i++) {
         dist[distIndex + i] = src[index + i]
     }
 }
 
-function arrayEquals(arr1, arr2) {
+function arrayEquals (arr1, arr2) {
     if (arr1 == 'undefined' || arr2 == 'undefined') {
         return false
     }
@@ -2039,11 +2041,11 @@ function arrayEquals(arr1, arr2) {
     return false
 }
 
-function isImage(buf) {
+function isImage (buf) {
     return null !== getImageMime(buf)
 }
 
-function getImageMime(buf) {
+function getImageMime (buf) {
     if (buf == null || buf == 'undefined' || buf.length < 8) {
         return null
     }
@@ -2069,7 +2071,7 @@ function getImageMime(buf) {
     return null
 }
 
-function isAudio(buf) {
+function isAudio (buf) {
     if (buf == null || buf == 'undefined' || buf.length < 12) {
         return null
     }
@@ -2091,7 +2093,7 @@ function isAudio(buf) {
  * @param data first 6 bytes of file
  * @return gif image file true, other false
  */
-function isGif(data) {
+function isGif (data) {
     //console.log('GIF')
     return arrayEquals(data, gifMagic0) || arrayEquals(data, getGifMagic1)
 }
@@ -2100,7 +2102,7 @@ function isGif(data) {
  * @param data first 4 bytes of file
  * @return jpeg image file true, other false
  */
-function isJpeg(data) {
+function isJpeg (data) {
     //console.log('JPEG')
     return arrayEquals(data, jpegMagic) || arrayEquals(data, jpeg_jfif) ||
         arrayEquals(data, jpeg_exif)
@@ -2110,7 +2112,7 @@ function isJpeg(data) {
  * @param data first 8 bytes of file
  * @return png image file true, other false
  */
-function isPng(data) {
+function isPng (data) {
     //console.log('PNG')
     return arrayEquals(data, pngMagic)
 }
@@ -2119,12 +2121,12 @@ function isPng(data) {
  * @param data first 12 bytes of file
  * @return wav file true, other false
  */
-function isWav(data1, data2) {
+function isWav (data1, data2) {
     return arrayEquals(data1, wavMagic1) && arrayEquals(data2, wavMagic2)
 }
 
 // 结束 - 判断文件类型
-function getUUID() {
+function getUUID () {
     var d = new Date().getTime()
 
     var ret = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g,
@@ -2163,7 +2165,7 @@ var Audio = {
         }
 
         //Get user media failure callback function:
-        function failure(e) {
+        function failure (e) {
             console.log(
                 'getUserMedia->failure(): ERROR: Microphone access request failed!')
 
@@ -2186,7 +2188,7 @@ var Audio = {
         }
 
         //Get user media success callback function:
-        function success(e) {
+        function success (e) {
             var BUFFER_SIZE = 2048
             var RECORDING_MODE = PredefinedRecordingModes.MONO_5_KHZ // 单声道 5kHz 最低的采样率
             var SAMPLE_RATE = RECORDING_MODE.getSampleRate()
@@ -2239,7 +2241,6 @@ var Audio = {
         Audio.wavFileBlob = Audio.recorderObj.buildWavFileBlob()
     },
 }
-
 function Rotate(id) {
     let pause = false;
     let running = false;

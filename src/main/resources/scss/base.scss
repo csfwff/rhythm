@@ -765,8 +765,6 @@ a[class*=" icon-"]:hover {
   font-size: 18px;
   font-weight: normal;
   border-bottom: 1px solid #eee;
-  cursor: move;
-  user-select: none;
 }
 
 .dialog-header-bg .icon-close {
@@ -774,7 +772,6 @@ a[class*=" icon-"]:hover {
   font-size: 12px;
   float: right;
   font-weight: bold;
-  -webkit-user-drag: none;
 }
 
 .dialog-header-bg .icon-close:hover {
@@ -1627,13 +1624,13 @@ a[class*=" icon-"]:hover {
 }
 
 .index-head-title{
-    border-bottom:
-    1px solid #eee;
-    margin:0px 10px ;
+  border-bottom:
+          1px solid #eee;
+  margin:0px 10px ;
 }
 
 .index-bottom{
-background-color:#f6f8fa
+  background-color:#f6f8fa
 }
 
 .index-chat{
@@ -1641,11 +1638,11 @@ background-color:#f6f8fa
 }
 
 #userCard{
-background-color: white;
+  background-color: white;
 }
 
 /* xiaoIce Game */
-#xiaoIceGameBtn{
+.ice-game-btn{
   position: fixed;
   bottom: 40vh;
   right: 0;
@@ -1659,7 +1656,7 @@ background-color: white;
     border-radius: 50%;
   }
 }
-#xiaoIceGameBox{
+.ice-game-box{
   position: fixed;
   bottom: 0;
   right: 0;
@@ -1669,16 +1666,8 @@ background-color: white;
   transition: .4s;
   background-color: #fff;
   box-shadow: -2px -2px 5px rgba(0,0,0,.3);
-  &:not(.active){
-    .ice-minimize-btn{
-      display: none!important;
-    }
-  }
   &.active{
     height: 360px;
-    .ice-restore-btn{
-      display: none!important;
-    }
   }
   .ice-tool-bar {
     display: flex;
@@ -1695,13 +1684,27 @@ background-color: white;
       height: 25px;
       transform: rotateZ(-25deg);
     }
-    .ice-toolbar-btn{
+    .ice-tools{
       display: flex;
+      width: 40px;
       justify-content: space-between;
       align-items: center;
-      cursor: pointer;
-      svg{
+      .ice-tool-btn{
         display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 20px;
+        cursor: pointer;
+        .ice-minimize-btn{
+          width: 12px;
+          height: 2px;
+          background-color: #fff;
+        }
+      }
+      .ice-close-btn {
+        font-size: 20px;
+        color: #fff;
+        cursor: pointer;
       }
     }
   }
@@ -1729,7 +1732,7 @@ background-color: white;
       border-radius: 2px;
     }
   }
-  #iceMsgList{
+  .ice-msg-list{
     padding: 10px;
     height: 300px;
     box-sizing: border-box;

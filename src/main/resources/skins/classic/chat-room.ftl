@@ -42,17 +42,11 @@
                             <span style="color: #616161">当前话题：</span><span class="ft-green"># <span id="discuss-title">加载中...</span> #</span>
                         </a>
                         <div style="padding-left: 5px;display: inline-block;vertical-align: -2px;">
-                            <a onclick="ChatRoom.setDiscuss()" class="ft-a-title tooltipped tooltipped-se"
-                               aria-label="编辑话题" style="text-decoration: none;">
-                                <svg>
-                                    <use xlink:href="#edit-discuss"></use>
-                                </svg>
+                            <a onclick="ChatRoom.setDiscuss()" class="ft-a-title tooltipped tooltipped-se" aria-label="编辑话题" style="text-decoration: none;">
+                                <svg><use xlink:href="#edit-discuss"></use></svg>
                             </a>
-                            <a onclick="ChatRoom.useDiscuss()" class="ft-a-title tooltipped tooltipped-se"
-                               aria-label="引用话题" style="text-decoration: none;">
-                                <svg>
-                                    <use xlink:href="#pound"></use>
-                                </svg>
+                            <a onclick="ChatRoom.useDiscuss()" class="ft-a-title tooltipped tooltipped-se" aria-label="引用话题" style="text-decoration: none;">
+                                <svg><use xlink:href="#pound"></use></svg>
                             </a>
                         </div>
                     </div>
@@ -89,8 +83,7 @@
                                         <span>
                                             <a onclick="$('#uploadEmoji input').click()">上传表情包</a>
                                         </span>
-                                        <form style="display: none" id="uploadEmoji" method="POST"
-                                              enctype="multipart/form-data">
+                                        <form style="display: none" id="uploadEmoji" method="POST" enctype="multipart/form-data">
                                             <input type="file" name="file">
                                         </form>
                                     </div>
@@ -98,30 +91,23 @@
                                 <div class="fn-right">
                                     <#if level3Permitted == true>
                                         <button id="groupRevoke" onclick="ChatRoom.startGroupRevoke()" class="button">
-                                            <svg style="vertical-align: -2px;">
-                                                <use xlink:href="#administration"></use>
-                                            </svg>
+                                            <svg style="vertical-align: -2px;"><use xlink:href="#administration"></use></svg>
                                             批量撤回
                                         </button>
                                     </#if>
-                                    <button class="red"
-                                            onclick="$('#chats').empty();page=0;ChatRoom.more();">${cleanScreenLabel}</button>
+                                    <button class="red" onclick="$('#chats').empty();page=0;ChatRoom.more();">${cleanScreenLabel}</button>
                                     <button class="green" onclick="ChatRoom.send()">${postLabel}</button>
                                 </div>
                                 <div id="paintContent" style="display: none">
                                     <div style="margin: 20px 0 0 0;">
-                                        <input id="selectColor" name="mycolor" type="text" class="input_cxcolor"
-                                               readonly="" style="background-color: rgb(0, 0, 0);">
-                                        <input id="selectWidth" type="number" inputmode="decimal" pattern="[0-9]*"
-                                               min="1" value="3" style="width: 50px">
+                                        <input id="selectColor" name="mycolor" type="text" class="input_cxcolor" readonly="" style="background-color: rgb(0, 0, 0);">
+                                        <input id="selectWidth" type="number" inputmode="decimal" pattern="[0-9]*" min="1" value="3" style="width: 50px">
                                     </div>
                                     <canvas id="paintCanvas" width="500" height="490"></canvas>
                                     <div class="fn-right">
                                         <button onclick="ChatRoom.revokeChatacter('paintCanvas')">撤销</button>
-                                        <button class="red"
-                                                onclick="ChatRoom.clearCharacter('paintCanvas')">${clearLabel}</button>
-                                        <button class="green"
-                                                onclick="ChatRoom.submitCharacter('paintCanvas')">${submitLabel}</button>
+                                        <button class="red" onclick="ChatRoom.clearCharacter('paintCanvas')">${clearLabel}</button>
+                                        <button class="green" onclick="ChatRoom.submitCharacter('paintCanvas')">${submitLabel}</button>
                                     </div>
                                 </div>
                             </div>
@@ -130,9 +116,7 @@
                                 </div>
                                 <div class="tip fn-left" id="chatContentTip"></div>
                                 <a onclick="ChatRoom.toggleOnlineAvatar()" style="cursor:pointer;">
-                                    <svg style="vertical-align: -10px;" id="toggleAvatarBtn">
-                                        <use xlink:href="#showMore"></use>
-                                    </svg>
+                                    <svg style="vertical-align: -10px;" id="toggleAvatarBtn"><use xlink:href="#showMore"></use></svg>
                                 </a>
                             </div>
                             <div id="chatRoomOnlineCnt" class="chats__users" style="display: none">
@@ -149,8 +133,7 @@
             <div class="list module pd__15" id="comments" style="height: 100%; padding-top: 0">
                 <div id="chats">
                 </div>
-                <#if !isLoggedIn>
-                    <div style="color:rgba(0,0,0,0.54);">登录后查看更多</div></#if>
+                <#if !isLoggedIn><div style="color:rgba(0,0,0,0.54);">登录后查看更多</div></#if>
             </div>
         </div>
         <div class="side">
@@ -158,44 +141,28 @@
         </div>
     </div>
 </div>
-<div id="goToTop" style="position:fixed;bottom:20px;right:10%;display:none;"><a href="#">
-        <svg style="width:30px;height:30px;color:#626262;">
-            <use xlink:href="#toTopIcon"></use>
-        </svg>
-    </a></div>
+<div id="goToTop" style="position:fixed;bottom:20px;right:10%;display:none;"><a href="#"><svg style="width:30px;height:30px;color:#626262;"><use xlink:href="#toTopIcon"></use></svg></a></div>
 <div id="xiaoIceGameBtn" class="ice-game-btn">
     <img src="${staticServePath}/images/xiaoIce/xiaoIce.gif" class="ice-game-icon" alt="">
 </div>
-<div id="xiaoIceGameBox" style="display: none">
+<div id="xiaoIceGameBox" class="ice-game-box" style="display: none">
     <div class="ice-tool-bar">
-        <img src="${staticServePath}/images/xiaoIce/xiaoIce-icon.png" class="ice-logo" alt="">
-        xiaoIce Game
-        <div class="ice-toolbar-btn">
-            <div id="iceMinimize">
-                <svg class="ice-minimize-btn" viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg" width="32"
-                     height="32">
-                    <title>最小化</title>
-                    <path d="M128 448h768v128H128z" fill="#ffffff"></path>
-                </svg>
-                <svg class="ice-restore-btn" viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg" width="32"
-                     height="32">
-                    <title>还原窗口</title>
-                    <path d="M128.576377 895.420553 128.576377 128.578424l766.846222 0 0 766.842129L128.576377 895.420553zM799.567461 224.434585 224.432539 224.434585l0 575.134923 575.134923 0L799.567461 224.434585z"
-                          fill="#ffffff"></path>
-                </svg>
+        <div>
+            <img src="${staticServePath}/images/xiaoIce/xiaoIce-icon.png" class="ice-logo" alt="">
+            xiaoIce Game
+        </div>
+        <div class="ice-tools">
+            <div id="iceMinimize" class="ice-tool-btn" title="最小化">
+                <div class="ice-minimize-btn"></div>
             </div>
-            <svg id="iceClose" viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg" width="32" height="32">
-                <title>关闭</title>
-                <path d="M576 512l277.333333 277.333333-64 64-277.333333-277.333333L234.666667 853.333333 170.666667 789.333333l277.333333-277.333333L170.666667 234.666667 234.666667 170.666667l277.333333 277.333333L789.333333 170.666667 853.333333 234.666667 576 512z"
-                      fill="#ffffff"></path>
-            </svg>
+            <div id="iceClose" class="ice-close-btn" title="关闭">×</div>
         </div>
     </div>
     <div class="ice-chat-box">
         <input class="ice-chat-input" type="text" placeholder="开始游戏"/>
         <div id="iceSendMsg" class="ice-send-btn">发送</div>
     </div>
-    <div id="iceMsgList"></div>
+    <div id="iceMsgList" class="ice-msg-list"></div>
 </div>
 <#include "footer.ftl">
 <script>
@@ -269,7 +236,7 @@
 </script>
 <script>
     $(window).scroll(
-        function () {
+        function() {
             var scrollTop = $(this).scrollTop();
             var scrollHeight = $(document).height();
             var windowHeight = $(this).height();
@@ -280,18 +247,18 @@
     );
 </script>
 <script type="text/javascript">
-    $(document).ready(function () {
-        $(function () {
-            $(window).scroll(function () {
-                if ($(this).scrollTop() > 1) {
+    $(document).ready(function(){
+        $(function(){
+            $(window).scroll(function(){
+                if($(this).scrollTop()>1){
                     $("#goToTop").fadeIn();
                 } else {
                     $("#goToTop").fadeOut();
                 }
             });
         });
-        $("#goToTop a").click(function () {
-            $("html,body").animate({scrollTop: 0}, 800);
+        $("#goToTop a").click(function(){
+            $("html,body").animate({scrollTop:0},800);
             return false;
         });
     });
