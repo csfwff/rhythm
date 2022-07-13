@@ -204,7 +204,7 @@ public class ChatRoomBot {
                                 ChatroomChannel.quickSleep = quickSleep;
                                 sendBotMsg("广播设置成功。");
                             } catch (Exception e) {
-                                sendBotMsg("广播设置失败。");
+                                sendBotMsg("当前参数：" + ChatroomChannel.notQuickCheck + " " + ChatroomChannel.notQuickSleep + " " + ChatroomChannel.quickCheck + " " + ChatroomChannel.quickSleep);
                             }
                             break;
                         default:
@@ -213,7 +213,8 @@ public class ChatRoomBot {
                                     "* **禁言指定用户** 执法 禁言 @[用户名] [时间 `单位: 分钟` `如不填此项将查询剩余禁言时间` `设置为0将解除禁言`]\n" +
                                     "* **风控模式** 执法 风控 @[用户名] [时间 `单位：分钟` `如不填此项将查询剩余风控时间` `设置为0将解除风控`]\n" +
                                     "* **查询服务器状态** 执法 服务器状态\n" +
-                                    "* **刷新缓存** 刷新全体成员的聊天室缓存");
+                                    "* **刷新全体成员的聊天室缓存** 执法 刷新缓存\n" +
+                                    "* **广播设置** 执法 广播设置 [普通消息数目检测阈值] [普通消息间隔毫秒] [特殊消息数目检测阈值] [特殊消息间隔毫秒]");
                     }
                     return true;
                 } catch (Exception ignored) {
