@@ -134,7 +134,16 @@ public class ChatroomChannel implements WebSocketChannel {
         }
         String type = message.optString(Common.TYPE);
         String sender = message.optString(User.USER_NAME);
-        boolean quick = sender.isEmpty() || type.equals("redPacketStatus") || type.equals("revoke") || type.equals("discussChanged");
+        boolean isRedPacket = false;
+        try {
+            JSONObject content = new JSONObject(message.optString("content"));
+            String msgType = content.optString("msgType");
+            if (msgType.equals("redPacket")) {
+                isRedPacket = true;
+            }
+        } catch (Exception ignored) {
+        }
+        boolean quick = sender.isEmpty() || isRedPacket || type.equals("redPacketStatus") || type.equals("revoke") || type.equals("discussChanged");
         avatarQueryService.fillUserAvatarURL(message);
         final String msgStr = message.toString();
         // 先给发送人反馈
