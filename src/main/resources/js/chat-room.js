@@ -866,6 +866,7 @@ id="redPacketAmount">32</span> 积分
         var requestJSONObject = {
             content: content,
         }
+        ChatRoom.editor.setValue('')
         $.ajax({
             url: Label.servePath + '/chat-room/send',
             type: 'POST',
@@ -877,15 +878,14 @@ id="redPacketAmount">32</span> 积分
             success: function (result) {
                 if (0 === result.code) {
                     $('#chatContentTip').removeClass('error succ').html('')
-
-                    ChatRoom.editor.setValue('')
-
                 } else {
                     $('#chatContentTip').addClass('error').html('<ul><li>' + result.msg + '</li></ul>')
+                    ChatRoom.editor.setValue(content)
                 }
             },
             error: function (result) {
                 $('#chatContentTip').addClass('error').html('<ul><li>' + result.statusText + '</li></ul>')
+                ChatRoom.editor.setValue(content)
             },
             complete: function (jqXHR, textStatus) {
                 ChatRoom.isSend = false;

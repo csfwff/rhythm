@@ -75,13 +75,13 @@ public class ChatroomChannel implements WebSocketChannel {
         if (null != userStr) {
             final JSONObject user = new JSONObject(userStr);
             onlineUsers.put(session, user);
+            SESSIONS.add(session);
+            // 单独发送在线信息
+            final String msgStr = getOnline().toString();
+            session.sendText(msgStr);
+        } else {
+            session.close();
         }
-
-        SESSIONS.add(session);
-
-        // 单独发送在线信息
-        final String msgStr = getOnline().toString();
-        session.sendText(msgStr);
     }
 
     /**
@@ -122,21 +122,59 @@ public class ChatroomChannel implements WebSocketChannel {
      *                "content": ""
      *                }
      */
+    public static int notQuickCheck = 10;
+    public static int notQuickSleep = 50;
+    public static int quickCheck = 50;
+    public static int quickSleep = 100;
     public static void notifyChat(final JSONObject message) {
         final BeanManager beanManager = BeanManager.getInstance();
         final AvatarQueryService avatarQueryService = beanManager.getReference(AvatarQueryService.class);
         if (!message.has(Common.TYPE)) {
             message.put(Common.TYPE, "msg");
         }
+        String type = message.optString(Common.TYPE);
+        String sender = message.optString(User.USER_NAME);
+        boolean quick = sender.isEmpty() || type.equals("redPacketStatus") || type.equals("revoke") || type.equals("discussChanged");
         avatarQueryService.fillUserAvatarURL(message);
         final String msgStr = message.toString();
-        try {
-            for (WebSocketSession session : SESSIONS) {
-                if (onlineUsers.containsKey(session)) {
-                    session.sendText(msgStr);
+        // 先给发送人反馈
+        if (!quick) {
+            List<WebSocketSession> senderSessions = new ArrayList<>();
+            for (Map.Entry<WebSocketSession, JSONObject> entry : onlineUsers.entrySet()) {
+                String userName = entry.getValue().optString(User.USER_NAME);
+                if (userName.equals(sender)) {
+                    senderSessions.add(entry.getKey());
                 }
             }
-        } catch (Exception ignored) {
+            for (WebSocketSession session : senderSessions) {
+                session.sendText(msgStr);
+            }
+        }
+        int i = 0;
+        for (WebSocketSession session : SESSIONS) {
+            try {
+                i++;
+                if (!quick && i % notQuickCheck == 0) {
+                    try {
+                        Thread.sleep(notQuickSleep);
+                    } catch (Exception ignored) {
+                    }
+                } else if (quick && i % quickCheck == 0) {
+                    try {
+                        Thread.sleep(quickSleep);
+                    } catch (Exception ignored) {
+                    }
+                }
+                if (!quick) {
+                    String toUser = onlineUsers.get(session).optString(User.USER_NAME);
+                    if (!sender.equals(toUser)) {
+                        session.sendText(msgStr);
+                    }
+                } else {
+                    session.sendText(msgStr);
+                }
+            } catch (Exception ignored) {
+            }
         }
     }
 
@@ -203,12 +241,16 @@ public class ChatroomChannel implements WebSocketChannel {
     public synchronized static void sendOnlineMsg() {
         final String msgStr = getOnline().toString();
         try {
+            int i = 0;
             for (WebSocketSession s : SESSIONS) {
-                s.sendText(msgStr);
-                try {
-                    Thread.sleep(500);
-                } catch (Exception ignored) {
+                i++;
+                if (i % 10 == 0) {
+                    try {
+                        Thread.sleep(500);
+                    } catch (Exception ignored) {
+                    }
                 }
+                s.sendText(msgStr);
             }
         } catch (Exception ignored) {
         }

@@ -183,12 +183,37 @@ public class ChatRoomBot {
                             sendBotMsg("" +
                                     "当前聊天室会话数：" + sessions);
                             break;
+                        case "刷新缓存":
+                            sendBotMsg("请稍等，执行中...");
+                            ChatroomChannel.sendOnlineMsg();
+                            sendBotMsg("在线人数缓存已刷新。");
+                            JSONObject jsonObject = new JSONObject();
+                            jsonObject.put(Common.TYPE, "refresh");
+                            ChatroomChannel.notifyChat(jsonObject);
+                            sendBotMsg("已为在线用户清屏。");
+                            break;
+                        case "广播设置":
+                            try {
+                                int notQuickCheck = Integer.parseInt(cmd1.split("\\s")[1]);
+                                int notQuickSleep = Integer.parseInt(cmd1.split("\\s")[2]);
+                                int quickCheck = Integer.parseInt(cmd1.split("\\s")[3]);
+                                int quickSleep = Integer.parseInt(cmd1.split("\\s")[4]);
+                                ChatroomChannel.notQuickCheck = notQuickCheck;
+                                ChatroomChannel.notQuickSleep = notQuickSleep;
+                                ChatroomChannel.quickCheck = quickCheck;
+                                ChatroomChannel.quickSleep = quickSleep;
+                                sendBotMsg("广播设置成功。");
+                            } catch (Exception e) {
+                                sendBotMsg("广播设置失败。");
+                            }
+                            break;
                         default:
                             sendBotMsg("#### 执法帮助菜单\n" +
                                     "如无特殊备注，则需要纪律委员及以上分组才可执行\n\n" +
                                     "* **禁言指定用户** 执法 禁言 @[用户名] [时间 `单位: 分钟` `如不填此项将查询剩余禁言时间` `设置为0将解除禁言`]\n" +
                                     "* **风控模式** 执法 风控 @[用户名] [时间 `单位：分钟` `如不填此项将查询剩余风控时间` `设置为0将解除风控`]\n" +
-                                    "* **查询服务器状态** 执法 服务器状态");
+                                    "* **查询服务器状态** 执法 服务器状态\n" +
+                                    "* **刷新缓存** 刷新全体成员的聊天室缓存");
                     }
                     return true;
                 } catch (Exception ignored) {
