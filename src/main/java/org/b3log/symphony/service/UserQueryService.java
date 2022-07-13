@@ -677,6 +677,7 @@ public class UserQueryService {
         try {
             for (final JSONObject user : users) {
                 user.put(Common.IS_FOLLOWING, followRepository.exists(requestJSONObject.optString(Keys.OBJECT_ID), user.optString(Keys.OBJECT_ID), Follow.FOLLOWING_TYPE_C_USER));
+                avatarQueryService.fillUserAvatarURL(user);
             }
         } catch (final RepositoryException | JSONException e) {
             LOGGER.log(Level.ERROR, "Fills following failed", e);
