@@ -311,6 +311,13 @@ var Util = {
      * @description 关闭 alert
      */
     closeAlert: function () {
+        $(document).mouseup(function () {
+            $("body").css("overflow", "")
+            $(document).off('mousemove');
+        }).on('touchend', function (e) {
+            $("body").css("overflow", "")
+            $(document).off('touchmove');
+        })
         $("#alertDialogPanel,.dialog-background").fadeOut(200);
         setTimeout(function () {
             $("#alertDialogPanel,.dialog-background").remove();
