@@ -18,32 +18,36 @@
  */
 var Count = {
 
-    generateInterval: setInterval(function () {}),
+    generateInterval: 0,
     data: {},
     time: "",
+    lunch: 0,
 
     init: function () {
-        data = JSON.parse(localStorage.getItem("count"));
+        let data = JSON.parse(localStorage.getItem("count"));
         if (data === null) {
             // 初始化
             localStorage.setItem("count", "{}");
             data = {};
         }
+        data.time = data.time || "1800";
+        data.lunch = data.lunch || "1130";
+        this.data = data
+        this.save()
         if (data.status !== 'disabled') {
             // 初始化样式
-            Count.initStyle();
+            // Count.initStyle();
             // 初始化HTML
-            Count.initHtml();
             // 初始化时间，930代表早上9点半，1800代表下午6点
-            Count.time = data.time === undefined ? "1800" : data.time;
-            Count.lunch = data.lunch === undefined ? "1130" : data.lunch;
+            Count.initHtml();
             // 开始倒计时
             Count.start();
         }
     },
 
     initHtml: function () {
-        var wrap = document.createElement("div");
+        const data = this.data
+        const wrap = document.createElement("div");
         wrap.setAttribute("class", "time_content");
         wrap.setAttribute("id", "timeContent");
         if (data.left !== undefined && data.top !== undefined) {
@@ -52,8 +56,7 @@ var Count = {
             }
         }
         wrap.innerHTML = "<a class='time_box' id='countRemainBox'>距离下班:<br><span id='countRemain'></span></a>";
-        var first = document.body.firstChild;
-        document.body.insertBefore(wrap, first);
+        document.body.insertBefore(wrap, document.body.firstChild);
         // 获取拖拽实验对象
         let el = document.getElementById("timeContent");
         // 在该对象上绑定鼠标点击事件
@@ -92,55 +95,9 @@ var Count = {
         }
     },
 
-    initStyle: function () {
-        let style_element = document.createElement("style");
-        style_element.innerHTML = ("" +
-            ".time_content {" +
-            "   position: fixed;" +
-            "   top: 60px;" +
-            "   right: 24px;" +
-            "   width: 80px;" +
-            "   z-index: 1999;" +
-            "}" +
-            ".time_content a.time_box:hover {" +
-            "   background-color: rgb(252 252 252 / 96%);" +
-            "}" +
-            ".time_content a.time_box {" +
-            "   position: relative;" +
-            "   display: -webkit-box;" +
-            "   display: -ms-flexbox;" +
-            "   display: flex;" +
-            "   -webkit-box-orient: vertical;" +
-            "   -webkit-box-direction: normal;" +
-            "   -ms-flex-direction: column;" +
-            "   flex-direction: column;" +
-            "   -webkit-box-align: center;" +
-            "   -ms-flex-align: center;" +
-            "   align-items: center;" +
-            "   -webkit-box-pack: center;" +
-            "   -ms-flex-pack: center;" +
-            "   justify-content: center;" +
-            "   border-radius: 50%;" +
-            "   background: #000;" +
-            "   -webkit-box-shadow: 0 2px 4px 0 rgb(0 0 0 / 5%);" +
-            "   box-shadow: 0 2px 4px 0 rgb(0 0 0 / 5%);" +
-            "   background-color: #fff;" +
-            "   text-align: center;" +
-            "   height: 75px;" +
-            "   cursor: pointer;" +
-            "   margin-top: 8px;" +
-            "   text-decoration: none;" +
-            "   color: #616161;" +
-            "   -moz-user-select: none;" +
-            "   -ms-user-select: none;" +
-            "   -webkit-user-select: none;" +
-            "   user-select: none;" +
-            "}");
-        document.body.appendChild(style_element);
-    },
-
     generate: function () {
         // 生成设定时间为Date
+        const data = this.data
         let year = new Date().getFullYear();
         let month = new Date().getMonth() + 1;
         let day = new Date().getDate();
@@ -151,29 +108,14 @@ var Count = {
             day = "0" + day;
         }
         let dateString = year + "-" + month + "-" + day;
-        let hh = "18";
-        let mm = "00";
-        if (Count.time.length === 3) {
-            hh = "0" + Count.time.substr(0, 1);
-            mm = Count.time.substr(1, 2);
-        } else if (Count.time.length === 4) {
-            hh = Count.time.substr(0, 2);
-            mm = Count.time.substr(2, 2);
-        }
-        let timeDateString = dateString + " " + hh + ":" + mm + ":00";
+
+        let t = ("0" + data.time).match(/(\d{2})(\d{2})$/);
+        let timeDateString = dateString + " " + t[1] + ":" + t[2] + ":00";
         let setDate = new Date(timeDateString.replace(/-/g, '/'));
         // 计算倒计时
         let nowDate = new Date();
-        let lunch_hh = "11";
-        let lunch_mm = "30";
-        if (Count.lunch.length === 3) {
-            lunch_hh = "0" + Count.lunch.substr(0, 1);
-            lunch_mm = Count.lunch.substr(1, 2);
-        } else if (Count.lunch.length === 4) {
-            lunch_hh = Count.lunch.substr(0, 2);
-            lunch_mm = Count.lunch.substr(2, 2);
-        }
-        let lunchString = dateString + " " + lunch_hh + ":" + lunch_mm + ":00";
+        t = ("0" + data.lunch).match(/(\d{2})(\d{2})$/);
+        let lunchString = dateString + " " + t[1] + ":" + t[2] + ":00";
         let lunchDate = new Date(lunchString.replace(/-/g, '/'));
         if (nowDate.toString() === lunchDate.toString()) {
             Util.notice("success", 15000, "中午咯，该订饭啦～");
@@ -214,59 +156,40 @@ var Count = {
     },
 
     save: function () {
-        localStorage.setItem("count", JSON.stringify(data));
+        localStorage.setItem("count", JSON.stringify(this.data));
     },
 
     settings: function () {
-        Util.alert("" +
-            "<div class=\"form fn__flex-column\">\n" +
-            "<label>\n" +
-            "  <div class=\"ft__smaller ft__fade\" style=\"float: left\">状态（关闭后可点击右上角头像找到下班倒计时设定）</div>\n" +
-            "  <div class=\"fn-hr5 fn__5\"></div>\n" +
-            "  <select id=\"countSettingStatus\">\n" +
-            "  <option value=\"enabled\" selected>开启</option>" +
-            "  <option value=\"disabled\">关闭</option>" +
-            "  </select>\n" +
-            "</label>\n" +
-            "<label>\n" +
-            "  <div class=\"ft__smaller ft__fade\" style=\"float: left\">下班时间</div>\n" +
-            "  <div class=\"fn-hr5 fn__5\"></div>\n" +
-            "  <input id=\"countSettingsTime\" type=\"time\"/>\n" +
-            "</label>\n" +
-            "<label>\n" +
-            "  <div class=\"ft__smaller ft__fade\" style=\"float: left\">订饭时间</div>\n" +
-            "  <div class=\"fn-hr5 fn__5\"></div>\n" +
-            "  <input id=\"lunchSettingsTime\" type=\"time\"/>\n" +
-            "</label>\n" +
-            "<div class=\"fn-hr5\"></div>\n" +
-            "<div class=\"fn__flex\" style=\"margin-top: 15px\">\n" +
-            "<div class=\"fn__flex-1 fn__flex-center\" style=\"text-align: left;\"></div>\n" +
-            "  <button class=\"btn btn--confirm\" onclick='Count.saveSettings()'>保存</button>\n" +
-            "</div>\n" +
-            "</div>" +
-            "", "下班倒计时设定");
+        const data = this.data
+        Util.alert(`<div class="form fn__flex-column">
+<label>
+  <div class="ft__smaller ft__fade" style="float: left">状态（关闭后可点击右上角头像找到下班倒计时设定）</div>
+  <div class="fn-hr5 fn__5"></div>
+  <select id="countSettingStatus">
+  <option value="enabled" selected>开启</option>  <option value="disabled">关闭</option>  </select>
+</label>
+<label>
+  <div class="ft__smaller ft__fade" style="float: left">下班时间</div>
+  <div class="fn-hr5 fn__5"></div>
+  <input id="countSettingsTime" type="time"/>
+</label>
+<label>
+  <div class="ft__smaller ft__fade" style="float: left">订饭时间</div>
+  <div class="fn-hr5 fn__5"></div>
+  <input id="lunchSettingsTime" type="time"/>
+</label>
+<div class="fn-hr5"></div>
+<div class="fn__flex" style="margin-top: 15px">
+<div class="fn__flex-1 fn__flex-center" style="text-align: left;"></div>
+  <button class="btn btn--confirm" onclick='Count.saveSettings()'>保存</button>
+</div>
+</div>`, "下班倒计时设定");
         setTimeout(function () {
-            let hh = "18";
-            let mm = "00";
-            if (Count.time.length === 3) {
-                hh = "0" + Count.time.substr(0, 1);
-                mm = Count.time.substr(1, 2);
-            } else if (Count.time.length === 4) {
-                hh = Count.time.substr(0, 2);
-                mm = Count.time.substr(2, 2);
-            }
-            document.getElementById("countSettingsTime").value = hh + ":" + mm;
+            let t = ("0" + data.time).match(/(\d{2})(\d{2})$/);
+            document.getElementById("countSettingsTime").value = t[1] + ":" + t[2];
 
-            let lunch_hh = "11";
-            let lunch_mm = "30";
-            if (Count.lunch.length === 3) {
-                lunch_hh = "0" + Count.lunch.substr(0, 1);
-                lunch_mm = Count.lunch.substr(1, 2);
-            } else if (Count.lunch.length === 4) {
-                lunch_hh = Count.lunch.substr(0, 2);
-                lunch_mm = Count.lunch.substr(2, 2);
-            }
-            document.getElementById("lunchSettingsTime").value = lunch_hh + ":" + lunch_mm;
+            t = ("0" + data.lunch).match(/(\d{2})(\d{2})$/);
+            document.getElementById("lunchSettingsTime").value = t[1] + ":" + t[2];
             switch (data.status) {
                 case 'enabled':
                     document.getElementById("countSettingStatus").value = "enabled";
@@ -275,21 +198,22 @@ var Count = {
                     document.getElementById("countSettingStatus").value = "disabled";
                     break;
             }
-        }, 500);
+        }, 300);
     },
 
     saveSettings: function () {
+        const data = this.data
         let setTime = document.getElementById("countSettingsTime").value.replace(":", "");
         if (setTime !== "") {
-            // 保存时间
-            data.time = "" + setTime;
+            data.time = setTime;
         }
         let lunchTime = document.getElementById("lunchSettingsTime").value.replace(":", "");
         if (lunchTime !== "") {
-            data.lunch = "" + lunchTime;
+            data.lunch = lunchTime;
         }
         // 保存状态
         data.status = document.getElementById("countSettingStatus").value;
+        this.data = data
         Count.save();
         Util.closeAlert();
         location.reload();
