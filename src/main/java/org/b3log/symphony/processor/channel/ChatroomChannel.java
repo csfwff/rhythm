@@ -192,7 +192,7 @@ public class ChatroomChannel implements WebSocketChannel {
      *
      * @param session the specified session
      */
-    private synchronized void removeSession(final WebSocketSession session) {
+    public static synchronized void removeSession(final WebSocketSession session) {
         try {
             onlineUsers.remove(session);
         } catch (NullPointerException ignored) {
