@@ -423,6 +423,8 @@ a[class*=" icon-"]:hover {
   font-size: 18px;
   font-weight: normal;
   border-bottom: 1px solid #eee;
+  cursor: move;
+  user-select: none;
 }
 
 .dialog-header-bg .icon-close {
@@ -430,6 +432,7 @@ a[class*=" icon-"]:hover {
   font-size: 12px;
   float: right;
   font-weight: bold;
+  -webkit-user-drag: none;
 }
 
 .dialog-header-bg .icon-close:hover {

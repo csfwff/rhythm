@@ -100,7 +100,7 @@ var Count = {
             "   top: 60px;" +
             "   right: 24px;" +
             "   width: 80px;" +
-            "   z-index: 1999;" +
+            "   z-index: 80;" +
             "}" +
             ".time_content a.time_box:hover {" +
             "   background-color: rgb(252 252 252 / 96%);" +
@@ -122,8 +122,8 @@ var Count = {
             "   justify-content: center;" +
             "   border-radius: 50%;" +
             "   background: #000;" +
-            "   -webkit-box-shadow: 0 2px 4px 0 rgb(0 0 0 / 5%);" +
-            "   box-shadow: 0 2px 4px 0 rgb(0 0 0 / 5%);" +
+            "   -webkit-box-shadow: 0 2px 4px 0 rgb(0 0 0 / 20%);" +
+            "   box-shadow: 0 2px 4px 0 rgb(0 0 0 / 20%);" +
             "   background-color: #fff;" +
             "   text-align: center;" +
             "   height: 75px;" +

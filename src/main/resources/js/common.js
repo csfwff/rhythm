@@ -323,11 +323,51 @@ var Util = {
     /**
      * @description alert
      * @param {String} content alert 内容
+     * @param {String} title 标题
      */
-    alert: function (content, title) {
-        if (title === undefined) {
-            title = "";
+    alert: function (content, title="") {
+        function function_drag(ele) {
+            function ondown(e) {
+                // 获取鼠标离元素(0,0)位置的距离
+                const positionDiv = $(ele).offset();
+                e = e.pageX ? e : e.targetTouches[0]
+                const distenceX = e.pageX - positionDiv.left;
+                const distenceY = e.pageY - positionDiv.top;
+
+                function onmove(e) {
+                    $("body").css("overflow", "hidden")
+                    e = e.pageX ? e : e.targetTouches[0]
+                    let x = e.pageX - distenceX;
+                    let y = e.pageY - distenceY;
+                    if (x < 0) {
+                        x = 0;
+                    } else if (x > $(document).width() - $(ele).outerWidth(true)) {
+                        x = $(document).width() - $(ele).outerWidth(true);
+                    }
+                    if (y < 0) {
+                        y = 0;
+                    } else if (y > $(document).height() - $(ele).outerHeight(true)) {
+                        y = $(document).height() - $(ele).outerHeight(true);
+                    }
+                    $(ele).css({
+                        'left': x + 'px',
+                        'top': y + 'px'
+                    })
+                }
+
+                $(document).mousemove(onmove).on('touchmove', onmove)
+                $(document).mouseup(function () {
+                    $("body").css("overflow", "")
+                    $(document).off('mousemove');
+                }).on('touchend', function (e) {
+                    $("body").css("overflow", "")
+                    $(document).off('touchmove');
+                })
+            }
+
+            $(".dialog-header-bg").mousedown(ondown).on('touchstart', ondown)
         }
+
         var alertHTML = '',
             alertBgHTML = '<div onclick="Util.closeAlert(this)" style="height: ' +
                 document.documentElement.scrollHeight
@@ -348,6 +388,7 @@ var Util = {
             'left': ($(window).width() - $('#alertDialogPanel').width()) / 2 + 'px',
             'outline': 'none',
         }).fadeIn(200).focus()
+        function_drag('#alertDialogPanel');
     },
     /**
      * @description 标记指定类型的消息通知为已读状态.
