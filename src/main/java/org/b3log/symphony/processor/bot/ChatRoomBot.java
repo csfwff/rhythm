@@ -97,6 +97,24 @@ public class ChatRoomBot {
         String userId = currentUser.optString(Keys.OBJECT_ID);
         // ==! 前置参数 !==
 
+        // ==? 判断是否在 Channel 中 ==?
+        boolean atChannel = false;
+        for (Map.Entry<WebSocketSession, JSONObject> onlineUser : ChatroomChannel.onlineUsers.entrySet()) {
+            try {
+                String uName = onlineUser.getValue().optString(User.USER_NAME);
+                if (uName.equals(userName)) {
+                    atChannel = true;
+                    break;
+                }
+            } catch (Exception ignored) {
+            }
+        }
+        if (!atChannel) {
+            context.renderJSON(StatusCodes.ERR).renderMsg("发送失败：当前未在聊天室中，请刷新页面。");
+            return false;
+        }
+        // ==! 判断是否在 Channel 中 ==!
+
         // ==? 指令 ?==
         if (DataModelService.hasPermission(currentUser.optString(User.USER_ROLE), 3)) {
             if (content.startsWith("执法")) {
@@ -228,20 +246,27 @@ public class ChatRoomBot {
                         case "断开会话":
                             try {
                                 String disconnectUser = cmd1.split("\\s")[1];
-                                List<WebSocketSession> senderSessions = new ArrayList<>();
-                                for (Map.Entry<WebSocketSession, JSONObject> entry : ChatroomChannel.onlineUsers.entrySet()) {
+                                sendBotMsg("@" + disconnectUser + "  你的连接被管理员断开，请重新连接。");
+                                new Thread(() -> {
                                     try {
-                                        String tempUserName = entry.getValue().optString(User.USER_NAME);
-                                        if (tempUserName.equals(disconnectUser)) {
-                                            senderSessions.add(entry.getKey());
-                                        }
-                                    } catch (Exception ignored) {
+                                        Thread.sleep(2000);
+                                    } catch (InterruptedException e) {
+                                        e.printStackTrace();
                                     }
-                                }
-                                for (WebSocketSession session : senderSessions) {
-                                    ChatroomChannel.removeSession(session);
-                                }
-                                sendBotMsg(disconnectUser + "的全部聊天室会话已被断开。");
+                                    List<WebSocketSession> senderSessions = new ArrayList<>();
+                                    for (Map.Entry<WebSocketSession, JSONObject> entry : ChatroomChannel.onlineUsers.entrySet()) {
+                                        try {
+                                            String tempUserName = entry.getValue().optString(User.USER_NAME);
+                                            if (tempUserName.equals(disconnectUser)) {
+                                                senderSessions.add(entry.getKey());
+                                            }
+                                        } catch (Exception ignored) {
+                                        }
+                                    }
+                                    for (WebSocketSession session : senderSessions) {
+                                        ChatroomChannel.removeSession(session);
+                                    }
+                                }).start();
                             } catch (Exception e) {
                                 sendBotMsg("参数错误。");
                             }
