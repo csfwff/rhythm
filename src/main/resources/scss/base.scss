@@ -1660,7 +1660,7 @@ a[class*=" icon-"]:hover {
     border-radius: 50%;
   }
 }
-.ice-game-box{
+#xiaoIceGameBox{
   position: fixed;
   bottom: 0;
   right: 0;
@@ -1670,8 +1670,16 @@ a[class*=" icon-"]:hover {
   transition: .4s;
   background-color: #fff;
   box-shadow: -2px -2px 5px rgba(0,0,0,.3);
+  &:not(.active){
+    .ice-minimize-btn{
+      display: none!important;
+    }
+  }
   &.active{
     height: 360px;
+    .ice-restore-btn{
+      display: none!important;
+    }
   }
   .ice-tool-bar {
     display: flex;
@@ -1688,27 +1696,13 @@ a[class*=" icon-"]:hover {
       height: 25px;
       transform: rotateZ(-25deg);
     }
-    .ice-tools{
+    .ice-toolbar-btn{
       display: flex;
-      width: 40px;
       justify-content: space-between;
       align-items: center;
-      .ice-tool-btn{
+      cursor: pointer;
+      svg{
         display: flex;
-        justify-content: center;
-        align-items: center;
-        height: 20px;
-        cursor: pointer;
-        .ice-minimize-btn{
-          width: 12px;
-          height: 2px;
-          background-color: #fff;
-        }
-      }
-      .ice-close-btn {
-        font-size: 20px;
-        color: #fff;
-        cursor: pointer;
       }
     }
   }
@@ -1736,7 +1730,7 @@ a[class*=" icon-"]:hover {
       border-radius: 2px;
     }
   }
-  .ice-msg-list{
+  #iceMsgList{
     padding: 10px;
     height: 300px;
     box-sizing: border-box;
