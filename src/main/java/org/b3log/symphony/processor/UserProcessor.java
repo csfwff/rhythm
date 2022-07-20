@@ -647,7 +647,7 @@ public class UserProcessor {
             try {
                 JSONObject user = userQueryService.getUserByName(userName);
                 context.renderJSON(StatusCodes.SUCC);
-                context.renderData(new JSONObject().put("userLatestLoginIp", user.optString(UserExt.USER_LATEST_LOGIN_IP)));
+                context.renderData(new JSONObject().put("userLatestLoginIp", user.optString(UserExt.USER_LATEST_LOGIN_IP)).put("userId", user.optString(Keys.OBJECT_ID)));
             } catch (Exception e) {
                 context.renderJSON(StatusCodes.ERR);
                 context.renderMsg("查询失败，请检查用户名是否正确。");
