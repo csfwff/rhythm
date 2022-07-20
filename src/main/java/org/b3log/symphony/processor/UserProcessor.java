@@ -244,6 +244,7 @@ public class UserProcessor {
         Dispatcher.post("/user/query/latest-login-ip", userProcessor::getLatestLoginIp);
         Dispatcher.post("/user/edit/give-metal", userProcessor::giveMetal);
         Dispatcher.post("/user/edit/remove-metal", userProcessor::removeMetal);
+        Dispatcher.post("/user/edit/remove-metal-by-user-id", userProcessor::removeMetalByUserId);
         Dispatcher.post("/user/query/items", userProcessor::getItem);
         Dispatcher.post("/user/edit/items", userProcessor::adjustItem);
         Dispatcher.post("/user/edit/points", userProcessor::adjustPoint);
@@ -575,6 +576,27 @@ public class UserProcessor {
             cloudService.removeMetal(userId, name);
             // === 记录日志 ===
             LogsService.simpleLog(context, "移除勋章", "用户: " + userName + ", 勋章名称: " + name);
+            // === 记录日志 ===
+            context.renderJSON(StatusCodes.SUCC);
+            context.renderMsg("勋章移除成功。");
+        } else {
+            context.renderJSON(StatusCodes.ERR);
+            context.renderMsg("金手指(metal类型)不正确。");
+        }
+    }
+
+    public void removeMetalByUserId(final RequestContext context) {
+        JSONObject requestJSONObject = context.requestJSON();
+        final String goldFingerKey = requestJSONObject.optString("goldFingerKey");
+        final String metalKey = Symphonys.get("gold.finger.metal");
+        if (goldFingerKey.equals(metalKey)) {
+            final String userId = requestJSONObject.optString("userId");
+            JSONObject user = userQueryService.getUser(userId);
+            String userName = user.optString(User.USER_NAME);
+            final String name = requestJSONObject.optString("name");
+            cloudService.removeMetal(userId, name);
+            // === 记录日志 ===
+            LogsService.simpleLog(context, "移除勋章(使用UserId)", "用户: " + userName + ", 勋章名称: " + name);
             // === 记录日志 ===
             context.renderJSON(StatusCodes.SUCC);
             context.renderMsg("勋章移除成功。");
