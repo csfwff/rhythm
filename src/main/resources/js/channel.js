@@ -476,8 +476,8 @@ var ChatRoomChannel = {
                         "        </div>\n" +
                         "    </div>\n" +
                         "</li>");
-                    if ($("#chatRoomIndex li").length === 11) {
-                        $("#chatRoomIndex li:last").remove();
+                    if ($("#chatRoomIndex li.fn-flex").length === 11) {
+                        $("#chatRoomIndex li.fn-flex:last").remove();
                     }
                     $("#chatRoomIndex li:first").slideDown(200);
                     Util.listenUserCard();
