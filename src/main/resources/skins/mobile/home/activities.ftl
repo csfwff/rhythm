@@ -100,6 +100,22 @@
                             <li>
                                 <div class='fn-flex'>
                                     <div class="avatar"
+                                         style="background-image:url('${staticServePath}/images/mofish.png')"></div>
+                                    <div class="fn-flex-1">
+                                        <h2 class="ft-13">
+                                            <a href="https://p.hancel.org/" target="_blank">摸鱼小闯关</a>
+                                        </h2>
+                                        <span class="ft-fade vditor-reset">
+                                                 一个<a href="https://p.hancel.org/" target="_blank">摸鱼大闯关</a>的"山寨版"，但关卡内容为原创。
+                                                框架来自 <a href="https://fishpi.cn/member/imlinhanchao" target="_blank">跳跳</a><br>
+                                                参与 <a href="${servePath}/top/smallmofish">摸鱼小闯关排行榜</a>
+                                            </span>
+                                    </div>
+                                </div>
+                            </li>
+                            <li>
+                                <div class='fn-flex'>
+                                    <div class="avatar"
                                          style="background-image:url('${staticServePath}/games/handle/favicon.svg')"></div>
                                     <div class="fn-flex-1">
                                         <h2 class="ft-13">
