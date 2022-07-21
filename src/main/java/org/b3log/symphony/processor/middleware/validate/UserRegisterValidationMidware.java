@@ -27,16 +27,20 @@ import org.b3log.latke.http.RequestContext;
 import org.b3log.latke.ioc.Inject;
 import org.b3log.latke.ioc.Singleton;
 import org.b3log.latke.model.User;
+import org.b3log.latke.repository.Transaction;
 import org.b3log.latke.service.LangPropsService;
-import org.b3log.latke.util.Strings;
 import org.b3log.symphony.model.*;
 import org.b3log.symphony.processor.CaptchaProcessor;
+import org.b3log.symphony.repository.UserRepository;
 import org.b3log.symphony.service.InvitecodeQueryService;
 import org.b3log.symphony.service.OptionQueryService;
 import org.b3log.symphony.service.RoleQueryService;
 import org.b3log.symphony.service.UserQueryService;
 import org.json.JSONObject;
 
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.Map;
 import java.util.Objects;
 
@@ -110,6 +114,9 @@ public class UserRegisterValidationMidware {
      */
     @Inject
     private RoleQueryService roleQueryService;
+
+    @Inject
+    private UserRepository userRepository;
 
     /**
      * Checks whether the specified name is invalid.
@@ -255,10 +262,34 @@ public class UserRegisterValidationMidware {
             try {
                 JSONObject user = userQueryService.getUserByPhone(phone);
                 if (Objects.nonNull(user)) {
-                    if (user.optInt(UserExt.USER_STATUS) != UserExt.USER_STATUS_C_NOT_VERIFIED) {
-                        context.renderJSON(new JSONObject().put(Keys.MSG, langPropsService.get("registerFailLabel") + " - " + "该手机号已注册"));
-                        context.abort();
-                        return;
+                    if (user.optInt(UserExt.USER_STATUS) == UserExt.USER_STATUS_C_DEACTIVATED) {
+                        long userLatestLoginTime = user.optLong(UserExt.USER_LATEST_LOGIN_TIME);
+                        Date latestDate = new Date(userLatestLoginTime);
+                        Calendar monthAgoCalendar = Calendar.getInstance();
+                        monthAgoCalendar.setTime(latestDate);
+                        monthAgoCalendar.add(Calendar.MONTH, 1);
+                        Date monthAgo = monthAgoCalendar.getTime();
+                        long nowTimeMillis = System.currentTimeMillis();
+                        long monthAgoTimeMillis = monthAgo.getTime();
+                        if (nowTimeMillis < monthAgoTimeMillis) {
+                            context.renderJSON(new JSONObject().put(Keys.MSG, langPropsService.get("registerFailLabel") + " - " + "您的手机号处于注销等待期，在 " +
+                                    new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date(monthAgoTimeMillis)) +
+                                    " 后才能重新注册"));
+                            context.abort();
+                            return;
+                        } else {
+                            final Transaction transaction = userRepository.beginTransaction();
+                            JSONObject data = new JSONObject();
+                            data.put("userPhone", "");
+                            userRepository.update(user.optString(Keys.OBJECT_ID), data);
+                            transaction.commit();
+                        }
+                    } else {
+                        if (user.optInt(UserExt.USER_STATUS) != UserExt.USER_STATUS_C_NOT_VERIFIED) {
+                            context.renderJSON(new JSONObject().put(Keys.MSG, langPropsService.get("registerFailLabel") + " - " + "该手机号已注册"));
+                            context.abort();
+                            return;
+                        }
                     }
                 }
             } catch (Exception e) {

@@ -765,6 +765,8 @@ a[class*=" icon-"]:hover {
   font-size: 18px;
   font-weight: normal;
   border-bottom: 1px solid #eee;
+  cursor: move;
+  user-select: none;
 }
 
 .dialog-header-bg .icon-close {
@@ -772,6 +774,7 @@ a[class*=" icon-"]:hover {
   font-size: 12px;
   float: right;
   font-weight: bold;
+  -webkit-user-drag: none;
 }
 
 .dialog-header-bg .icon-close:hover {
@@ -952,6 +955,7 @@ a[class*=" icon-"]:hover {
     line-height: 21px;
     display: none;
     box-shadow: 0 1px 2px rgba(0, 0, 0, .2);
+    z-index: 90;
   }
 
   .person-list:after {
@@ -1094,7 +1098,7 @@ a[class*=" icon-"]:hover {
 }
 
 .has-view {
-  margin-right: 40px;
+  margin-right: 150px;
 }
 
 /* end list */
@@ -1103,7 +1107,8 @@ a[class*=" icon-"]:hover {
 .cmts {
   position: absolute;
   right: 15px;
-  top: 40%;
+  top: 50%;
+  transform: translateY(-50%);
 }
 /* end article */
 
@@ -1623,13 +1628,13 @@ a[class*=" icon-"]:hover {
 }
 
 .index-head-title{
-    border-bottom:
-    1px solid #eee;
-    margin:0px 10px ;
+  border-bottom:
+          1px solid #eee;
+  margin:0px 10px ;
 }
 
 .index-bottom{
-background-color:#f6f8fa
+  background-color:#f6f8fa
 }
 
 .index-chat{
@@ -1637,7 +1642,7 @@ background-color:#f6f8fa
 }
 
 #userCard{
-background-color: white;
+  background-color: white;
 }
 
 /* xiaoIce Game */
@@ -1655,7 +1660,7 @@ background-color: white;
     border-radius: 50%;
   }
 }
-.ice-game-box{
+#xiaoIceGameBox{
   position: fixed;
   bottom: 0;
   right: 0;
@@ -1665,8 +1670,16 @@ background-color: white;
   transition: .4s;
   background-color: #fff;
   box-shadow: -2px -2px 5px rgba(0,0,0,.3);
+  &:not(.active){
+    .ice-minimize-btn{
+      display: none!important;
+    }
+  }
   &.active{
     height: 360px;
+    .ice-restore-btn{
+      display: none!important;
+    }
   }
   .ice-tool-bar {
     display: flex;
@@ -1683,27 +1696,13 @@ background-color: white;
       height: 25px;
       transform: rotateZ(-25deg);
     }
-    .ice-tools{
+    .ice-toolbar-btn{
       display: flex;
-      width: 40px;
       justify-content: space-between;
       align-items: center;
-      .ice-tool-btn{
+      cursor: pointer;
+      svg{
         display: flex;
-        justify-content: center;
-        align-items: center;
-        height: 20px;
-        cursor: pointer;
-        .ice-minimize-btn{
-          width: 12px;
-          height: 2px;
-          background-color: #fff;
-        }
-      }
-      .ice-close-btn {
-        font-size: 20px;
-        color: #fff;
-        cursor: pointer;
       }
     }
   }
@@ -1731,7 +1730,7 @@ background-color: white;
       border-radius: 2px;
     }
   }
-  .ice-msg-list{
+  #iceMsgList{
     padding: 10px;
     height: 300px;
     box-sizing: border-box;
@@ -1780,7 +1779,49 @@ background-color: white;
   }
 }
 
+//下面是倒计时窗口
+#timeContent {
+  position: fixed;
+  top: 60px;
+  right: 24px;
+  width: 80px;
+  z-index: 85;
+}
 
+#timeContent a.time_box:hover {
+  background-color: rgb(252 252 252 / 96%);
+}
+
+#timeContent a.time_box {
+  position: relative;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+  -ms-flex-direction: column;
+  flex-direction: column;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+  -webkit-box-pack: center;
+  -ms-flex-pack: center;
+  justify-content: center;
+  border-radius: 50%;
+  -webkit-box-shadow: 0 2px 4px 0 rgb(0 0 0 / 20%);
+  box-shadow: 0 2px 4px 0 rgb(0 0 0 / 20%);
+  background-color: #fff;
+  text-align: center;
+  height: 75px;
+  cursor: pointer;
+  margin-top: 8px;
+  text-decoration: none;
+  color: #616161;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  -webkit-user-select: none;
+  user-select: none;
+}
 
 /*@keyframes swim {
   0% {
