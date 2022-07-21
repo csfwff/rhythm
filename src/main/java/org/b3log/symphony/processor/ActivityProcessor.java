@@ -171,6 +171,7 @@ public class ActivityProcessor {
         Dispatcher.post("/activity/gobang/start", activityProcessor::startGobang, loginCheck::handle);
         Dispatcher.post("/api/games/adarkroom/share", activityProcessor::shareADarkRoomScore, loginCheck::handle, csrfMidware::check);
         Dispatcher.post("/api/games/mofish/score", activityProcessor::shareMofishScore);
+        Dispatcher.post("/api/games/smallmofish/score", activityProcessor::shareSmallMofishScore);
         Dispatcher.post("/api/games/emojiPair/score", activityProcessor::shareEmojiPairScore, loginCheck::handle, csrfMidware::check);
         Dispatcher.get("/activity/catch-the-cat", activityProcessor::showCatchTheCat, loginCheck::handle, csrfMidware::fill);
         Dispatcher.get("/activity/2048", activityProcessor::show2048, loginCheck::handle, csrfMidware::fill);
@@ -266,6 +267,42 @@ public class ActivityProcessor {
             context.renderMsg("存储数据失败！原因：未知原因");
         }
     }
+
+    /**
+     * 上传摸鱼小闯关游戏成绩
+     *
+     * @param context
+     */
+    public void shareSmallMofishScore(final RequestContext context) {
+      try {
+          JSONObject requestJSONObject = context.requestJSON();
+          final String goldFingerKey = requestJSONObject.optString("goldFingerKey");
+          final String gameKey = Symphonys.get("gold.finger.game");
+          if (goldFingerKey.equals(gameKey)) {
+              final String userName = requestJSONObject.optString("userName");
+              final int stage = requestJSONObject.optInt("stage");
+              final long time = requestJSONObject.optLong("time");
+              final JSONObject user = userQueryService.getUserByName(userName);
+              final boolean succ = null != pointtransferMgmtService.transfer(Pointtransfer.ID_C_SYS, user.optString(Keys.OBJECT_ID),
+                      Pointtransfer.TRANSFER_TYPE_C_ACTIVITY_SMALLMOFISH, stage,
+                      time + "", System.currentTimeMillis(), "");
+              if (!succ) {
+                  throw new ServiceException(langPropsService.get("transferFailLabel"));
+              }
+              // === 记录日志 ===
+              LogsService.simpleLog(context, "上传摸鱼小闯关数据", "用户: " + userName + ", 通过关卡: " + stage + ", 通关时间: " + time);
+              // === 记录日志 ===
+              context.renderJSON(StatusCodes.SUCC);
+              context.renderMsg("数据上传成功！");
+          } else {
+              context.renderJSON(StatusCodes.ERR);
+              context.renderMsg("金手指(game类型)不正确。");
+          }
+      } catch (Exception e) {
+          context.renderJSON(StatusCodes.ERR);
+          context.renderMsg("存储数据失败！原因：未知原因");
+      }
+  }
 
 
     /**
