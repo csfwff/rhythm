@@ -63,6 +63,11 @@
                 <link rel="canonical" href="${servePath}/top/mofish">
             </@head>
         </#if>
+        <#if type == "smallmofish">
+            <@head title="摸鱼小闯关游戏排行 - ${symphonyLabel}">
+                <link rel="canonical" href="${servePath}/top/smallmofish">
+            </@head>
+        </#if>
         <#if type == "lifeRestart">
             <@head title="人生重开模拟器成就排行 - ${symphonyLabel}">
                 <link rel="canonical" href="${servePath}/top/lifeRestart">

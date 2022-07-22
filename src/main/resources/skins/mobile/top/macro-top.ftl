@@ -55,6 +55,10 @@
             <@head title="摸鱼大闯关游戏排行 - ${symphonyLabel}">
             </@head>
         </#if>
+        <#if type == "smallmofish">
+            <@head title="摸鱼小闯关游戏排行 - ${symphonyLabel}">
+            </@head>
+        </#if>
         <#if type == "lifeRestart">
             <@head title="人生重开模拟器成就排行 - ${symphonyLabel}">
             </@head>

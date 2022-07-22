@@ -443,6 +443,12 @@ public final class Pointtransfer {
     public static final int TRANSFER_TYPE_C_ACTIVITY_REDPACKET_FROM_SKY = 46;
 
     /**
+     * Transfer type - Activity - SmallMofish.
+     */
+    public static final int TRANSFER_TYPE_C_ACTIVITY_SMALLMOFISH = 47;
+
+
+    /**
      * Transfer sum - 摆龙门阵.
      */
     public static final int TRANSFER_SUM_C_BLMZ = 5;
