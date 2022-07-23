@@ -915,11 +915,11 @@
     let day = new Date().getDay();
     if ((now >= 19 && now <= 23) || (now >= 0 && now <= 7)) {
         $("head").append('<link rel="stylesheet" href="https://fonts.font.im/css2?family=Ma+Shan+Zheng&display=swap">');
-        loadTips();
+        //loadTips();
         goodNight();
     } else if (day === 0 || day === 6) {
         $("head").append('<link rel="stylesheet" href="https://fonts.font.im/css2?family=Ma+Shan+Zheng&display=swap">');
-        loadTips();
+        //loadTips();
     }
 
     function goodNight() {
@@ -933,7 +933,7 @@
             '   <div style="font-size: 17px; margin-top: 9px">现在是摸鱼派的休息时间，但小派还在默默地陪伴你，请尽快完成工作回家吧~ <span class="ft-red">♥️</span></div>' +
             '</div>');
         setTimeout(function () {
-            $("#goodNight").show(1500);
+            $("#goodNight").slideDown(1500);
         }, 2000)
     }
 
