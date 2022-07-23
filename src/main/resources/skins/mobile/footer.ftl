@@ -41,7 +41,8 @@
             <a target="_blank" href="https://www.lundao.pub/">论道社区</a><br>
             <a target="_blank" href="https://xyears.cn/">十年之约论坛</a><br>
             <a target="_blank" href="https://www.tsyvps.com/aff/HEHTPGYL">蓝易云</a><br>
-            <a target="_blank" href="https://my.fishpi.cn/">摸鱼导航网</a>
+            <a target="_blank" href="https://my.fishpi.cn/">摸鱼导航网</a><br>
+            <a target="_blank" href="https://bbs.tampermonkey.net.cn/">油猴中文网</a>
         </div>
         <div class="fn-hr5"></div>
         <div style="margin-top: 5px">
@@ -69,9 +70,11 @@
         </div>
         <div class="fn-hr5"></div>
         <div class="ft-smaller" style="display: inline-block">
-            <div onclick="window.open('https://www.tsyvps.com/aff/HEHTPGYL')" style="text-align: center;padding: 8px 0px;color: #0f8cee;background-color: #2f2e2e8f;line-height: 20px;border-radius: 12px;width: 175px;margin-bottom: 15px;cursor: pointer;">
+            <div onclick="window.open('https://www.tsyvps.com/aff/HEHTPGYL')" style="text-align: center;padding: 8px 0px;color: #0f8cee;background-color: #282727;line-height: 20px;border-radius: 12px;width: 175px;margin-bottom: 15px;cursor: pointer;">
                 <div>
-                    <img style="vertical-align: -3px;max-height: 18px;" src="https://file.fishpi.cn/2022/05/165184311051006-afb572fb.png">&nbsp;&nbsp;SCDN 由蓝易云支持<br>
+                    <svg style="vertical-align: -2px;">
+                        <use xlink:href="#shield"></use>
+                    </svg>&nbsp;&nbsp;防火墙由蓝易云支持<br>
                     <span style="color: #cdcdcd;">性价比主机，高防 CDN</span>
                 </div>
             </div>
