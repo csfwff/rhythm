@@ -61,7 +61,7 @@ public class BeforeRequestHandler implements Handler {
      */
     private static final Logger LOGGER = LogManager.getLogger(BeforeRequestHandler.class);
 
-    SimpleCurrentLimiter antiCCLimiter = new SimpleCurrentLimiter(5, 3);
+    SimpleCurrentLimiter antiCCLimiter = new SimpleCurrentLimiter(5, 5);
 
     @Override
     public void handle(final RequestContext context) {

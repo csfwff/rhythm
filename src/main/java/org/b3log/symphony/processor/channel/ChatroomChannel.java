@@ -122,10 +122,10 @@ public class ChatroomChannel implements WebSocketChannel {
      *                "content": ""
      *                }
      */
-    public static int notQuickCheck = 10;
-    public static int notQuickSleep = 50;
-    public static int quickCheck = 50;
-    public static int quickSleep = 100;
+    public static int notQuickCheck = 50;
+    public static int notQuickSleep = 200;
+    public static int quickCheck = 100;
+    public static int quickSleep = 200;
     public static void notifyChat(final JSONObject message) {
         final BeanManager beanManager = BeanManager.getInstance();
         final AvatarQueryService avatarQueryService = beanManager.getReference(AvatarQueryService.class);
