@@ -398,7 +398,7 @@ public class ChatRoomBot {
     }
 
     // 以人工智障的身份发送消息
-    public synchronized static void sendBotMsg(String content) {
+    public static void sendBotMsg(String content) {
         new Thread(() -> {
             try {
                 Thread.sleep(100);
