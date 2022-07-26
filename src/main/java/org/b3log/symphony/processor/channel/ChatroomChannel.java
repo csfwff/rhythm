@@ -247,7 +247,7 @@ public class ChatroomChannel implements WebSocketChannel {
     }
 
     // 发送在线信息
-    public synchronized static void sendOnlineMsg() {
+    public static void sendOnlineMsg() {
         final String msgStr = getOnline().toString();
         try {
             int i = 0;
