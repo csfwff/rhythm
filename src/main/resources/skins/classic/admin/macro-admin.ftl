@@ -81,6 +81,9 @@
         <#if type == "auditlog">
             <@head title="${auditlogLabel} - ${symphonyLabel}"></@head>
         </#if>
+        <#if type == "ip">
+            <@head title="IP 管理 - ${symphonyLabel}"></@head>
+        </#if>
         <link rel="stylesheet" href="${staticServePath}/css/home.css?${staticResourceVersion}" />
     </head>
     <body>
@@ -133,6 +136,9 @@
                                 </#if>
                                 <#if permissions["menuAdmin"].permissionGrant>
                                 <a href="${servePath}/admin/auditlog"<#if type == "auditlog"> class="current"</#if>>${auditlogLabel}</a>
+                                </#if>
+                                <#if permissions["ipManage"].permissionGrant>
+                                    <a href="${servePath}/admin/ip"<#if type == "ip"> class="current"</#if>>IP 管理</a>
                                 </#if>
                             </nav>
                         </div>

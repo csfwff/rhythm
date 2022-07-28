@@ -464,6 +464,11 @@ public final class Permission {
      */
     public static final String PERMISSION_ID_C_USER_REMOVE_MFA = "userRemoveMFA";
 
+    /**
+     * Id - ip - manage
+     */
+    public static final String PERMISSION_ID_C_IP_MANAGE = "ipManage";
+
     // Category constants
     /**
      * Category - common function.
