@@ -432,13 +432,13 @@ public class AdminProcessor {
                 case "unban":
                     for (String ip : ipList) {
                         String result = Execs.exec(new String[]{"sh", "-c", "ipset del fishpi " + ip}, 1000 * 3);
-                        LogsService.simpleLog(context, "解封IP", "操作员: " + operatorUserName + ", IP: " + ip + ", 结果: " + result);
+                        LogsService.simpleLog(context, "解封IP", "操作员: " + operatorUserName + ", IP: " + ip);
                     }
                     break;
                 case "ban":
                     for (String ip : ipList) {
                         String result = Execs.exec(new String[]{"sh", "-c", "ipset add fishpi " + ip}, 1000 * 3);
-                        LogsService.simpleLog(context, "封禁IP", "操作员: " + operatorUserName + ", IP: " + ip + ", 结果: " + result);
+                        LogsService.simpleLog(context, "封禁IP", "操作员: " + operatorUserName + ", IP: " + ip);
                     }
                     break;
             }
