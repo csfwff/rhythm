@@ -33,6 +33,20 @@ var Util = {
     bling: undefined,
     isBlinging: false,
 
+    ipAction: function (num) {
+        switch (num) {
+            case 1:
+                // 封禁
+                $("#ipType").val("ban");
+                break;
+            case 2:
+                // 解封
+                $("#ipType").val("unban");
+                break;
+        }
+        $("#ipListForm").submit();
+    },
+
     /**
      * 插入紧急公告模板
      * @param num

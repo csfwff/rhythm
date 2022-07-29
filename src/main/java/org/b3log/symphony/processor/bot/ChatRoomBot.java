@@ -212,21 +212,21 @@ public class ChatRoomBot {
                             }
                             StringBuilder userSessionList = new StringBuilder();
                             for (Map.Entry<String, Integer> s : sessionList.entrySet()) {
-                                userSessionList.append(s.getKey() + " " + s.getValue() + "\n");
+                                userSessionList.append(s.getKey() + " " + s.getValue() + "<br>");
                             }
                             int sessions = ChatroomChannel.SESSIONS.size();
                             sendBotMsg("" +
                                     "当前聊天室会话数：" + sessions + "\n" +
-                                    "用户会话详情：\n" + userSessionList);
+                                    "<details><summary>用户会话详情</summary>" + userSessionList + "</details>");
                             break;
                         case "刷新缓存":
                             sendBotMsg("请稍等，执行中...");
                             ChatroomChannel.sendOnlineMsg();
                             sendBotMsg("在线人数缓存已刷新。");
-                            JSONObject jsonObject = new JSONObject();
-                            jsonObject.put(Common.TYPE, "refresh");
-                            ChatroomChannel.notifyChat(jsonObject);
-                            sendBotMsg("已为在线用户清屏。");
+                            // JSONObject jsonObject = new JSONObject();
+                            // jsonObject.put(Common.TYPE, "refresh");
+                            // ChatroomChannel.notifyChat(jsonObject);
+                            // sendBotMsg("已为在线用户清屏。");
                             break;
                         case "广播设置":
                             try {
@@ -398,7 +398,7 @@ public class ChatRoomBot {
     }
 
     // 以人工智障的身份发送消息
-    public synchronized static void sendBotMsg(String content) {
+    public static void sendBotMsg(String content) {
         new Thread(() -> {
             try {
                 Thread.sleep(100);

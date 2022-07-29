@@ -103,7 +103,7 @@
                                          style="background-image:url('${staticServePath}/images/mofish.png')"></div>
                                     <div class="fn-flex-1">
                                         <h2 class="ft-13">
-                                            <a href="https://p.hancel.org/" target="_blank">摸鱼小闯关</a>
+                                            <a href="https://puzzle.iwpz.net/" target="_blank">摸鱼小闯关</a>
                                         </h2>
                                         <span class="ft-fade vditor-reset">
                                                  一个<a href="https://p.hancel.org/" target="_blank">摸鱼大闯关</a>的"山寨版"，但关卡内容为原创。
