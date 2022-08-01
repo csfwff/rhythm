@@ -688,32 +688,41 @@ public class LoginProcessor {
 
                 // 天降红包
                 String userName = user.optString(User.USER_NAME);
-                for (final String uId : UserChannel.SESSIONS.keySet()) {
-                    // 获取活跃度
-                    final JSONObject yesterdayLiveness = livenessQueryService.getYesterdayLiveness(uId);
-                    if (null != yesterdayLiveness) {
-                        final int currentLiveness = Liveness.calcPoint(yesterdayLiveness);
-                        final int livenessMax = Symphonys.ACTIVITY_YESTERDAY_REWARD_MAX;
-                        float liveness = (float) (Math.round((float) currentLiveness / livenessMax * 100 * 100)) / 100;
-                        if (liveness == 100) {
-                            // 满活跃，发放奖励
-                            // 范围 1-24
-                            int random = new Random().nextInt(24) + 1;
-                            pointtransferMgmtService.transfer(Pointtransfer.ID_C_SYS, uId,
-                                    Pointtransfer.TRANSFER_TYPE_C_ACTIVITY_REDPACKET_FROM_SKY, random,
-                                    userName, System.currentTimeMillis(), "");
-                            // 发通知
-                            try {
-                                final JSONObject notification = new JSONObject();
-                                notification.put(Notification.NOTIFICATION_USER_ID, uId);
-                                notification.put(Notification.NOTIFICATION_DATA_ID, userName + ":" + random);
-                                notificationMgmtService.addRedPacketFromSkyNotification(notification);
-                            } catch (Exception e) {
-                                LOGGER.log(Level.ERROR, "Cannot add red packet from sky notification", e);
+                new Thread(() -> {
+                    LOGGER.log(Level.INFO, "Red packet for joining matching...");
+                    for (final String uId : UserChannel.SESSIONS.keySet()) {
+                        // 获取活跃度
+                        try {
+                            Thread.sleep(500);
+                        } catch (Exception ignored) {
+                        }
+                        final JSONObject yesterdayLiveness = livenessQueryService.getYesterdayLiveness(uId);
+                        if (null != yesterdayLiveness) {
+                            final int currentLiveness = Liveness.calcPoint(yesterdayLiveness);
+                            final int livenessMax = Symphonys.ACTIVITY_YESTERDAY_REWARD_MAX;
+                            float liveness = (float) (Math.round((float) currentLiveness / livenessMax * 100 * 100)) / 100;
+                            if (liveness == 100) {
+                                // 满活跃，发放奖励
+                                // 范围 1-24
+                                int random = new Random().nextInt(24) + 1;
+                                LOGGER.log(Level.INFO, "Gave [from={}, for={}]", userName, uId);
+                                pointtransferMgmtService.transfer(Pointtransfer.ID_C_SYS, uId,
+                                        Pointtransfer.TRANSFER_TYPE_C_ACTIVITY_REDPACKET_FROM_SKY, random,
+                                        userName, System.currentTimeMillis(), "");
+                                // 发通知
+                                try {
+                                    final JSONObject notification = new JSONObject();
+                                    notification.put(Notification.NOTIFICATION_USER_ID, uId);
+                                    notification.put(Notification.NOTIFICATION_DATA_ID, userName + ":" + random);
+                                    notificationMgmtService.addRedPacketFromSkyNotification(notification);
+                                } catch (Exception e) {
+                                    LOGGER.log(Level.ERROR, "Cannot add red packet from sky notification", e);
+                                }
                             }
                         }
                     }
-                }
+                    LOGGER.log(Level.INFO, "Red packet for joining match done.");
+                }).start();
 
                 context.renderJSON(StatusCodes.SUCC);
                 LOGGER.log(Level.INFO, "Registered a user [name={}, phone={}]", name, phone);

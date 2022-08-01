@@ -16,41 +16,29 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-var Count = {
+const Count = {
 
     generateInterval: 0,
     data: {},
-    time: "",
-    lunch: 0,
-
     init: function () {
-        let data = JSON.parse(localStorage.getItem("count"));
-        if (data === null) {
-            // 初始化
-            localStorage.setItem("count", "{}");
-            data = {};
-        }
+        const data = JSON.parse(localStorage.getItem("count")) || {};
+        // 初始化时间，930代表早上9点半，1800代表下午6点
         data.time = data.time || "1800";
         data.lunch = data.lunch || "1130";
         this.data = data
         this.save()
         if (data.status !== 'disabled') {
-            // 初始化样式
-            // Count.initStyle();
             // 初始化HTML
-            // 初始化时间，930代表早上9点半，1800代表下午6点
-            Count.initHtml();
+            this.initHtml();
             // 开始倒计时
-            Count.start();
+            this.start();
         }
     },
 
     initHtml: function () {
-        const data = this.data
-        const wrap = document.createElement("div");
-        wrap.setAttribute("class", "time_content");
-        wrap.setAttribute("id", "timeContent");
-        if (data.left !== undefined && data.top !== undefined) {
+        const wrap = document.createElement("div"), data = this.data;
+        wrap.id = "timeContent";
+        if (data.left && data.top) {
             if (document.documentElement.clientHeight > data.top && document.documentElement.clientWidth > data.left) {
                 wrap.setAttribute("style", "left:" + data.left + "px;top:" + data.top + "px;");
             }
@@ -74,6 +62,7 @@ var Count = {
                 latestP = P;
                 data.left = t;
                 data.top = P;
+                Count.data = data
                 Count.save();
                 // 移动当前元素
                 if (t >= 0 && t <= window.innerWidth - el.offsetWidth) {
@@ -97,27 +86,17 @@ var Count = {
 
     generate: function () {
         // 生成设定时间为Date
-        const data = this.data
-        let year = new Date().getFullYear();
-        let month = new Date().getMonth() + 1;
-        let day = new Date().getDate();
-        if (month < 10) {
-            month = "0" + month;
-        }
-        if (day < 10) {
-            day = "0" + day;
-        }
-        let dateString = year + "-" + month + "-" + day;
-
-        let t = ("0" + data.time).match(/(\d{2})(\d{2})$/);
-        let timeDateString = dateString + " " + t[1] + ":" + t[2] + ":00";
-        let setDate = new Date(timeDateString.replace(/-/g, '/'));
+        const year = new Date().getFullYear();
+        const month = `0${new Date().getMonth() + 1}`.slice(-2);
+        const day = `0${new Date().getDate()}`.slice(-2);
+        const dateString = `${year}-${month}-${day}`;
+        const time = Count.data.time.match(/\d{2}/g);
+        const setDate = new Date(`${dateString} ${time[0]}:${time[1]}:00`);
         // 计算倒计时
-        let nowDate = new Date();
-        t = ("0" + data.lunch).match(/(\d{2})(\d{2})$/);
-        let lunchString = dateString + " " + t[1] + ":" + t[2] + ":00";
-        let lunchDate = new Date(lunchString.replace(/-/g, '/'));
-        if (nowDate.toString() === lunchDate.toString()) {
+        const nowDate = new Date();
+        const lunch = Count.data.lunch.match(/\d{2}/g);
+        const lunchDate = new Date(`${dateString} ${lunch[0]}:${lunch[1]}:00`);
+        if (nowDate.getTime() === lunchDate.getTime()) {
             Util.notice("success", 15000, "中午咯，该订饭啦～");
         }
         let leftTime = setDate.getTime() - nowDate.getTime();
@@ -125,15 +104,9 @@ var Count = {
         let leftMinute = Math.floor(leftTime / (1000 * 60) % 60);
         let leftSecond = Math.floor(leftTime / 1000 % 60);
         if (leftHour >= 0 && leftMinute >= 0 && leftSecond >= 0) {
-            if (leftHour < 10) {
-                leftHour = "0" + leftHour;
-            }
-            if (leftMinute < 10) {
-                leftMinute = "0" + leftMinute;
-            }
-            if (leftSecond < 10) {
-                leftSecond = "0" + leftSecond;
-            }
+            leftHour = `0${leftHour}`.slice(-2)
+            leftMinute = `0${leftMinute}`.slice(-2)
+            leftSecond = `0${leftSecond}`.slice(-2)
             leftTime = leftHour + ":" + leftMinute + ":" + leftSecond;
             if (leftHour === "00" && leftMinute === "02" && leftSecond === "00") {
                 Util.notice("danger", 3000, "马上就要下班啦，赶快收拾收拾吧～");
@@ -160,7 +133,6 @@ var Count = {
     },
 
     settings: function () {
-        const data = this.data
         Util.alert(`<div class="form fn__flex-column">
 <label>
   <div class="ft__smaller ft__fade" style="float: left">状态（关闭后可点击右上角头像找到下班倒计时设定）</div>
@@ -185,40 +157,27 @@ var Count = {
 </div>
 </div>`, "下班倒计时设定");
         setTimeout(function () {
-            let t = ("0" + data.time).match(/(\d{2})(\d{2})$/);
-            document.getElementById("countSettingsTime").value = t[1] + ":" + t[2];
+            const time = Count.data.time.match(/\d{2}/g);
+            document.getElementById("countSettingsTime").value = `${time[0]}:${time[1]}`;
 
-            t = ("0" + data.lunch).match(/(\d{2})(\d{2})$/);
-            document.getElementById("lunchSettingsTime").value = t[1] + ":" + t[2];
-            switch (data.status) {
-                case 'enabled':
-                    document.getElementById("countSettingStatus").value = "enabled";
-                    break;
-                case 'disabled':
-                    document.getElementById("countSettingStatus").value = "disabled";
-                    break;
-            }
-        }, 300);
+            const lunch = Count.data.lunch.match(/\d{2}/g);
+            document.getElementById("lunchSettingsTime").value = `${lunch[0]}:${lunch[1]}`;
+
+            document.getElementById("countSettingStatus").value = Count.data.status === "disabled" ? "disabled" : "enabled";
+        }, 500);
     },
 
     saveSettings: function () {
-        const data = this.data
-        let setTime = document.getElementById("countSettingsTime").value.replace(":", "");
-        if (setTime !== "") {
-            data.time = setTime;
-        }
-        let lunchTime = document.getElementById("lunchSettingsTime").value.replace(":", "");
-        if (lunchTime !== "") {
-            data.lunch = lunchTime;
-        }
+        // 保存时间
+        Count.data.time = document.getElementById("countSettingsTime").value.replace(":", "");
+        Count.data.lunch = document.getElementById("lunchSettingsTime").value.replace(":", "");
         // 保存状态
-        data.status = document.getElementById("countSettingStatus").value;
-        this.data = data
+        Count.data.status = document.getElementById("countSettingStatus").value;
         Count.save();
         Util.closeAlert();
         location.reload();
     }
-}
+};
 
 $(document).ready(function () {
     Count.init();

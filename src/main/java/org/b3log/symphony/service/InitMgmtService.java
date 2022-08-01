@@ -164,6 +164,7 @@ public class InitMgmtService {
         ADMIN_PERMISSIONS.add(Permission.PERMISSION_ID_C_USER_GIVE_METAL);
         ADMIN_PERMISSIONS.add(Permission.PERMISSION_ID_C_USER_REMOVE_METAL);
         ADMIN_PERMISSIONS.add(Permission.PERMISSION_ID_C_USER_REMOVE_MFA);
+        ADMIN_PERMISSIONS.add(Permission.PERMISSION_ID_C_IP_MANAGE);
     }
 
     /**
@@ -535,6 +536,8 @@ public class InitMgmtService {
             permission.put(Keys.OBJECT_ID, Permission.PERMISSION_ID_C_MENU_ADMIN_ROLES);
             permissionRepository.add(permission);
             permission.put(Keys.OBJECT_ID, Permission.PERMISSION_ID_C_MENU_ADMIN_REPORTS);
+            permissionRepository.add(permission);
+            permission.put(Keys.OBJECT_ID, Permission.PERMISSION_ID_C_IP_MANAGE);
             permissionRepository.add(permission);
 
             LOGGER.info("Initialized permission data");

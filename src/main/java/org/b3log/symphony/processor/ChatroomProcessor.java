@@ -592,7 +592,7 @@ public class ChatroomProcessor {
      *
      * @param context Everything
      */
-    public synchronized void addChatRoomMsg(final RequestContext context) {
+    public void addChatRoomMsg(final RequestContext context) {
         if (ChatRoomBot.record(context)) {
             final JSONObject requestJSONObject = (JSONObject) context.attr(Keys.REQUEST);
             String content = requestJSONObject.optString(Common.CONTENT);

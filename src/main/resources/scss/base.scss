@@ -955,6 +955,7 @@ a[class*=" icon-"]:hover {
     line-height: 21px;
     display: none;
     box-shadow: 0 1px 2px rgba(0, 0, 0, .2);
+    z-index: 90;
   }
 
   .person-list:after {
@@ -1627,13 +1628,13 @@ a[class*=" icon-"]:hover {
 }
 
 .index-head-title{
-    border-bottom:
-    1px solid #eee;
-    margin:0px 10px ;
+  border-bottom:
+          1px solid #eee;
+  margin:0px 10px ;
 }
 
 .index-bottom{
-background-color:#f6f8fa
+  background-color:#f6f8fa
 }
 
 .index-chat{
@@ -1641,11 +1642,11 @@ background-color:#f6f8fa
 }
 
 #userCard{
-background-color: white;
+  background-color: white;
 }
 
 /* xiaoIce Game */
-#xiaoIceGameBtn{
+.ice-game-btn{
   position: fixed;
   bottom: 40vh;
   right: 0;
@@ -1778,7 +1779,49 @@ background-color: white;
   }
 }
 
+//下面是倒计时窗口
+#timeContent {
+  position: fixed;
+  top: 60px;
+  right: 24px;
+  width: 80px;
+  z-index: 85;
+}
 
+#timeContent a.time_box:hover {
+  background-color: rgb(252 252 252 / 96%);
+}
+
+#timeContent a.time_box {
+  position: relative;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+  -ms-flex-direction: column;
+  flex-direction: column;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+  -webkit-box-pack: center;
+  -ms-flex-pack: center;
+  justify-content: center;
+  border-radius: 50%;
+  -webkit-box-shadow: 0 2px 4px 0 rgb(0 0 0 / 20%);
+  box-shadow: 0 2px 4px 0 rgb(0 0 0 / 20%);
+  background-color: #fff;
+  text-align: center;
+  height: 75px;
+  cursor: pointer;
+  margin-top: 8px;
+  text-decoration: none;
+  color: #616161;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  -webkit-user-select: none;
+  user-select: none;
+}
 
 /*@keyframes swim {
   0% {

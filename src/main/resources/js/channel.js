@@ -376,7 +376,7 @@ var ChatRoomChannel = {
                     let spell
                     if (dice === null || dice === undefined) {
                         spell = '<a href="' + Label.servePath + '/member/' + whoGot + '" target="_blank">' + whoGot + '</a> 抢到了 <a href="' + Label.servePath + '/member/' + whoGive + '" target="_blank">' + whoGive + '</a> 的 <a style="cursor: pointer" onclick="ChatRoom.unpackRedPacket(\'' + oId + '\')">红包</a>';
-                    }else {
+                    } else {
                         let bet
                         switch (dice.bet) {
                             case 'big':
@@ -431,6 +431,11 @@ var ChatRoomChannel = {
                     $("#chatroom" + data.oId).remove();
                     $("#chatindex" + data.oId).remove();
                     break;
+                case 'refresh':
+                    $('#chats').empty();
+                    page = 0;
+                    ChatRoom.more();
+                    break;
                 case 'msg':
                     // Chatroom
                     if ($("#chatRoomIndex").length === 0 && $("#chatroom" + data.oId).length <= 0) {
@@ -471,8 +476,8 @@ var ChatRoomChannel = {
                         "        </div>\n" +
                         "    </div>\n" +
                         "</li>");
-                    if ($("#chatRoomIndex li").length === 11) {
-                        $("#chatRoomIndex li:last").remove();
+                    if ($("#chatRoomIndex li.fn-flex").length === 11) {
+                        $("#chatRoomIndex li.fn-flex:last").remove();
                     }
                     $("#chatRoomIndex li:first").slideDown(200);
                     Util.listenUserCard();

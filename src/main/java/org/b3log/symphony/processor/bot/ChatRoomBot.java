@@ -24,6 +24,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.b3log.latke.Keys;
 import org.b3log.latke.http.RequestContext;
+import org.b3log.latke.http.WebSocketSession;
 import org.b3log.latke.ioc.BeanManager;
 import org.b3log.latke.model.User;
 import org.b3log.latke.repository.*;
@@ -95,6 +96,24 @@ public class ChatRoomBot {
         String userName = currentUser.optString(User.USER_NAME);
         String userId = currentUser.optString(Keys.OBJECT_ID);
         // ==! 前置参数 !==
+
+        // ==? 判断是否在 Channel 中 ==?
+        boolean atChannel = false;
+        for (Map.Entry<WebSocketSession, JSONObject> onlineUser : ChatroomChannel.onlineUsers.entrySet()) {
+            try {
+                String uName = onlineUser.getValue().optString(User.USER_NAME);
+                if (uName.equals(userName)) {
+                    atChannel = true;
+                    break;
+                }
+            } catch (Exception ignored) {
+            }
+        }
+        if (!atChannel) {
+            context.renderJSON(StatusCodes.ERR).renderMsg("发送失败：当前未在聊天室中，请刷新页面。");
+            return false;
+        }
+        // ==! 判断是否在 Channel 中 ==!
 
         // ==? 指令 ?==
         if (DataModelService.hasPermission(currentUser.optString(User.USER_ROLE), 3)) {
@@ -179,16 +198,89 @@ public class ChatRoomBot {
                             }
                             break;
                         case "服务器状态":
+                            Map<String, Integer> sessionList = new HashMap<>();
+                            for (WebSocketSession session : ChatroomChannel.SESSIONS) {
+                                try {
+                                    String uName = ChatroomChannel.onlineUsers.get(session).optString(User.USER_NAME);
+                                    if (sessionList.containsKey(uName)) {
+                                        sessionList.put(uName, sessionList.get(uName) + 1);
+                                    } else {
+                                        sessionList.put(uName, 1);
+                                    }
+                                } catch (Exception ignored) {
+                                }
+                            }
+                            StringBuilder userSessionList = new StringBuilder();
+                            for (Map.Entry<String, Integer> s : sessionList.entrySet()) {
+                                userSessionList.append(s.getKey() + " " + s.getValue() + "<br>");
+                            }
                             int sessions = ChatroomChannel.SESSIONS.size();
                             sendBotMsg("" +
-                                    "当前聊天室会话数：" + sessions);
+                                    "当前聊天室会话数：" + sessions + "\n" +
+                                    "<details><summary>用户会话详情</summary>" + userSessionList + "</details>");
+                            break;
+                        case "刷新缓存":
+                            sendBotMsg("请稍等，执行中...");
+                            ChatroomChannel.sendOnlineMsg();
+                            sendBotMsg("在线人数缓存已刷新。");
+                            // JSONObject jsonObject = new JSONObject();
+                            // jsonObject.put(Common.TYPE, "refresh");
+                            // ChatroomChannel.notifyChat(jsonObject);
+                            // sendBotMsg("已为在线用户清屏。");
+                            break;
+                        case "广播设置":
+                            try {
+                                int notQuickCheck = Integer.parseInt(cmd1.split("\\s")[1]);
+                                int notQuickSleep = Integer.parseInt(cmd1.split("\\s")[2]);
+                                int quickCheck = Integer.parseInt(cmd1.split("\\s")[3]);
+                                int quickSleep = Integer.parseInt(cmd1.split("\\s")[4]);
+                                ChatroomChannel.notQuickCheck = notQuickCheck;
+                                ChatroomChannel.notQuickSleep = notQuickSleep;
+                                ChatroomChannel.quickCheck = quickCheck;
+                                ChatroomChannel.quickSleep = quickSleep;
+                                sendBotMsg("广播设置成功。");
+                            } catch (Exception e) {
+                                sendBotMsg("当前参数：" + ChatroomChannel.notQuickCheck + " " + ChatroomChannel.notQuickSleep + " " + ChatroomChannel.quickCheck + " " + ChatroomChannel.quickSleep);
+                            }
+                            break;
+                        case "断开会话":
+                            try {
+                                String disconnectUser = cmd1.split("\\s")[1];
+                                sendBotMsg("@" + disconnectUser + "  你的连接被管理员断开，请重新连接。");
+                                new Thread(() -> {
+                                    try {
+                                        Thread.sleep(2000);
+                                    } catch (InterruptedException e) {
+                                        e.printStackTrace();
+                                    }
+                                    List<WebSocketSession> senderSessions = new ArrayList<>();
+                                    for (Map.Entry<WebSocketSession, JSONObject> entry : ChatroomChannel.onlineUsers.entrySet()) {
+                                        try {
+                                            String tempUserName = entry.getValue().optString(User.USER_NAME);
+                                            if (tempUserName.equals(disconnectUser)) {
+                                                senderSessions.add(entry.getKey());
+                                            }
+                                        } catch (Exception ignored) {
+                                        }
+                                    }
+                                    for (WebSocketSession session : senderSessions) {
+                                        ChatroomChannel.removeSession(session);
+                                    }
+                                }).start();
+                            } catch (Exception e) {
+                                sendBotMsg("参数错误。");
+                            }
                             break;
                         default:
-                            sendBotMsg("#### 执法帮助菜单\n" +
+                            sendBotMsg("<details><summary>执法帮助菜单</summary>\n" +
                                     "如无特殊备注，则需要纪律委员及以上分组才可执行\n\n" +
                                     "* **禁言指定用户** 执法 禁言 @[用户名] [时间 `单位: 分钟` `如不填此项将查询剩余禁言时间` `设置为0将解除禁言`]\n" +
                                     "* **风控模式** 执法 风控 @[用户名] [时间 `单位：分钟` `如不填此项将查询剩余风控时间` `设置为0将解除风控`]\n" +
-                                    "* **查询服务器状态** 执法 服务器状态");
+                                    "* **查询服务器状态** 执法 服务器状态\n" +
+                                    "* **刷新全体成员的聊天室缓存** 执法 刷新缓存\n" +
+                                    "* **广播设置** 执法 广播设置 [普通消息数目检测阈值] [普通消息间隔毫秒] [特殊消息数目检测阈值] [特殊消息间隔毫秒]\n" +
+                                    "* **断开指定用户的全部聊天室会话** 执法 断开会话 [用户名]</details>\n" +
+                                    "<p></p>");
                     }
                     return true;
                 } catch (Exception ignored) {
@@ -306,7 +398,7 @@ public class ChatRoomBot {
     }
 
     // 以人工智障的身份发送消息
-    public synchronized static void sendBotMsg(String content) {
+    public static void sendBotMsg(String content) {
         new Thread(() -> {
             try {
                 Thread.sleep(100);

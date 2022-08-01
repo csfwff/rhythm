@@ -116,6 +116,7 @@ public class TopProcessor {
         Dispatcher.get("/top/online", topProcessor::showOnline, anonymousViewCheckMidware::handle);
         Dispatcher.get("/top/adr", topProcessor::showADR, anonymousViewCheckMidware::handle);
         Dispatcher.get("/top/mofish", topProcessor::showMofish, anonymousViewCheckMidware::handle);
+        Dispatcher.get("/top/smallmofish", topProcessor::showSmallMofish, anonymousViewCheckMidware::handle);
         Dispatcher.get("/top/lifeRestart", topProcessor::showLifeRestart, anonymousViewCheckMidware::handle);
         Dispatcher.get("/top/evolve", topProcessor::showEvolve, anonymousViewCheckMidware::handle);
         Dispatcher.get("/top/emoji", topProcessor::showEmoji, anonymousViewCheckMidware::handle);
@@ -283,6 +284,24 @@ public class TopProcessor {
         dataModelService.fillSideTags(dataModel);
         dataModelService.fillLatestCmts(dataModel);
     }
+
+     /**
+     * Shows SmallMofish score ranking list.
+     *
+     * @param context
+     */
+    public void showSmallMofish(final RequestContext context) {
+      final AbstractFreeMarkerRenderer renderer = new SkinRenderer(context, "top/smallmofish.ftl");
+      final Map<String, Object> dataModel = renderer.getDataModel();
+      final List<JSONObject> users = activityQueryService.getTopSmallMofish(Symphonys.TOP_CNT);
+      dataModel.put("topUsers", users);
+
+      dataModelService.fillHeaderAndFooter(context, dataModel);
+      dataModelService.fillRandomArticles(dataModel);
+      dataModelService.fillSideHotArticles(dataModel);
+      dataModelService.fillSideTags(dataModel);
+      dataModelService.fillLatestCmts(dataModel);
+  }
 
     /**
      * Shows Life Restart ranking list.
