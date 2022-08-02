@@ -1509,7 +1509,7 @@ var ChatRoom = {
                 meTag2 += "<a onclick=\"ChatRoom.addEmoji(" + srcs + ")\" class=\"item\">一键收藏表情</a>";
             }
         } catch (err) {}
-        let newHTML = '<div class="fn-none" style="content-visibility: auto;">';
+        let newHTML = '<div class="fn-none">';
         newHTML += '<div id="chatroom' + data.oId + '" class="fn__flex chats__item' + meTag1 + '">\n' +
             '    <a href="/member/' + data.userName + '" style="height: 38px">\n' +
             '        <div class="avatar tooltipped__user" aria-label="' + data.userName + '" style="background-image: url(\'' + data.userAvatarURL + '\');"></div>\n' +
