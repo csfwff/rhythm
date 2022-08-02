@@ -62,6 +62,7 @@ public class ShopChannel implements WebSocketChannel {
         }
 
         if (null == user) {
+            session.close();
             return;
         }
 

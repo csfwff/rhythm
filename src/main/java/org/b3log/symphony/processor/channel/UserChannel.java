@@ -94,6 +94,7 @@ public class UserChannel implements WebSocketChannel {
         } catch (NullPointerException ignored) {
         }
         if (null == user) {
+            session.close();
             return;
         }
 

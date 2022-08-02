@@ -99,6 +99,7 @@ public class GobangChannel implements WebSocketChannel {
     public void onConnect(final WebSocketSession session) {
         final String userStr = session.getHttpSession().getAttribute(User.USER);
         if (null == userStr) {
+            session.close();
             return;
         }
 
