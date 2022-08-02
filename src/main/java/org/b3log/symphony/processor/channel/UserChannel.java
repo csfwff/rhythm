@@ -88,7 +88,11 @@ public class UserChannel implements WebSocketChannel {
     @Override
     public void onConnect(final WebSocketSession session) {
         final Session httpSession = session.getHttpSession();
-        JSONObject user = new JSONObject(httpSession.getAttribute(User.USER));
+        JSONObject user = null;
+        try {
+            user = new JSONObject(httpSession.getAttribute(User.USER));
+        } catch (NullPointerException ignored) {
+        }
         try {
             user = ApiProcessor.getUserByKey(session.getParameter("apiKey"));
         } catch (NullPointerException ignored) {
