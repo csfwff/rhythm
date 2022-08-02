@@ -129,13 +129,14 @@ public class BeforeRequestHandler implements Handler {
                 Locales.setLocale(Locales.getLocale(optionLangValue));
             }
 
+            httpSession.setAttribute(Common.IP, getIpAddr(request));
+
             JSONObject user = userQueryService.getCurrentUser(request);
             if (null == user) {
                 return;
             }
 
             httpSession.setAttribute(User.USER, user.toString());
-            httpSession.setAttribute(Common.IP, getIpAddr(request));
 
             final String skin = Sessions.isMobile() ? user.optString(UserExt.USER_MOBILE_SKIN) : user.optString(UserExt.USER_SKIN);
             httpSession.setAttribute(Keys.TEMPLATE_DIR_NAME, skin);
@@ -211,6 +212,6 @@ public class BeforeRequestHandler implements Handler {
         if (ip == null || ip.length() == 0) {
             ip = request.getRemoteAddr();
         }
-        return "0:0:0:0:0:0:0:1%0".equals(ip) ? "127.0.0.1" : ip;
+        return "[0:0:0:0:0:0:0:1]".equals(ip) ? "127.0.0.1" : ip;
     }
 }

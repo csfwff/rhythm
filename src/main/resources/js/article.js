@@ -438,7 +438,11 @@ var Comment = {
         }
       },
     });
-    ret.reverse();
+    try {
+      ret.reverse();
+    } catch (e) {
+      return [];
+    }
     return ret;
   },
   /**
