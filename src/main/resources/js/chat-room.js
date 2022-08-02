@@ -1630,7 +1630,7 @@ var ChatRoom = {
     imageViewer: function() {
         // console.log("新消息")
         //没有新图片就不重载
-        if (this.imgViewer && $("div.vditor-reset.ft__smaller img:not(.ft__smaller,.emoji)").length === this.imgViewer.length)
+        if (this.imgViewer && $("div.vditor-reset.ft__smaller img:not(.ft__smaller,.emoji,*[src*='shield'],*[src*='/gen?'])").length === this.imgViewer.length)
             return
         // console.log("包含图片")
         this.imgViewer = this.imgViewer || new Viewer(document.querySelector('#chats'),{
