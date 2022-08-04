@@ -725,13 +725,10 @@ var ChatRoom = {
         $("#emojis").html("");
         let emojis = ChatRoom.getEmojis();
         for (let i = 0; i < emojis.length; i++) {
-            $("#emojis").append("" +
-                "<button>\n" +
-                "    <div class=\"divX\" onclick='ChatRoom.delEmoji(\"" + emojis[i] + "\")'>\n" +
-                "        <svg style=\"width: 15px; height: 15px;\"><use xlink:href=\"#delIcon\"></use></svg>\n" +
-                "    </div>" +
-                "    <img style='max-height: 50px' onclick=\"ChatRoom.editor.setValue(ChatRoom.editor.getValue() + '![图片表情](" + emojis[i] + ")')\" class=\"vditor-emojis__icon\" src=\"" + emojis[i] + "\">\n" +
-                "</button>");
+            $("#emojis").append(`<button onclick="ChatRoom.editor.setValue(ChatRoom.editor.getValue() + '![图片表情](${emojis[i]})')">
+    <div class="divX"><svg onclick='ChatRoom.delEmoji("${emojis[i]}")' style="width: 15px; height: 15px;"><use xlink:href="#delIcon"></use></svg></div>
+    <img style='max-height: 50px' class="vditor-emojis__icon" src="${emojis[i]}">
+</button>`);
         }
     },
     /**

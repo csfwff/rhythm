@@ -2472,6 +2472,10 @@ code .dec {
   text-align: right;
   cursor: pointer;
   height: 15px;
+  >svg:hover {
+    border: dashed red 1px;
+    border-bottom-left-radius: 100px;
+  }
 }
 
 .TGIF__item {
