@@ -8,5 +8,7 @@ symphony.iml
 /.settings/
 /.classpath
 /.project
+.yarn/
+.vscode/
 ChatRoom.tmp
 delegated-apnic-latest.tmp

@@ -282,17 +282,17 @@
         <div class="wrapper">
             <div class="fn-flex-1">
                 <div class="metro-line fn-flex" style="align-items:center;">
-                    <#--  <canvas class="metro-item" style="flex:1.2;" id="adleredsCalendar"></canvas>  -->
                     <div class="metro-item" style="flex:1.2;">
-                        <div style="height:100%;display:flex;flex-direction:column;justify-content:center;align-items:center;">
-                            <div style="height:25%;font-size: 13px;background: #be4145;border-radius: 10px 10px 0 0;width:60%; color: white;display:flex;flex-direction:column;justify-content:center;align-items:center;" id="vLine1">距离放假还有 🎉</div>
-                            <div style="height:50%;font-size: 80px; font-weight: bold; color: #333333; background: white; width:60%; box-shadow: 0 1px 2px rgb(0 0 0 / 20%);border-radius: 0 0 5px 5px;" id="vLine2"><span
+                        <div class="calendar-container">
+                        <div class="canendar-body">
+                            <div class="calendar-head" id="vLine1">距离放假还有 🎉</div>
+                            <div class="calendar-content" id="vLine2"><span
                                         id="vDay">?</span><span style="font-size: 30px"> 天</span></div>
                             <#--  <div style="font-size: 10px; color: rgba(161,163,163,0.91)" id="vLine3">我还在编......</div>  -->
 <!--                            <a href="${servePath}/oldAlmanac">-->
 <!--                                <div style="font-size: 10px; color: rgba(161,163,163,0.91)">点击查看今日运势</div>-->
 <!--                            </a>-->
-                        </div>
+                        </div></div>
                     </div>
                     <div class="metro-item">
                         <a class="preview" style="padding-top:70px;">
