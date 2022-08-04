@@ -281,22 +281,21 @@
     <div class="index-bottom">
         <div class="wrapper">
             <div class="fn-flex-1">
-                <div class="metro-line fn-flex">
-                    <div class="metro-item">
-
-                        <div style="padding-top: 8%">
-                            <div style="font-size: 13px; color: rgba(101,101,104,0.91)" id="vLine1">距离放假还有 🎉</div>
-                            <div style="font-size: 80px; font-weight: bold; color: #fc7a15" id="vLine2"><span
+                <div class="metro-line fn-flex" style="align-items:center;">
+                    <#--  <canvas class="metro-item" style="flex:1.2;" id="adleredsCalendar"></canvas>  -->
+                    <div class="metro-item" style="flex:1.2;">
+                        <div style="height:100%;display:flex;flex-direction:column;justify-content:center;align-items:center;">
+                            <div style="height:25%;font-size: 13px;background: #be4145;border-radius: 10px 10px 0 0;width:60%; color: white;display:flex;flex-direction:column;justify-content:center;align-items:center;" id="vLine1">距离放假还有 🎉</div>
+                            <div style="height:50%;font-size: 80px; font-weight: bold; color: #333333; background: white; width:60%; box-shadow: 0 1px 2px rgb(0 0 0 / 20%);border-radius: 0 0 5px 5px;" id="vLine2"><span
                                         id="vDay">?</span><span style="font-size: 30px"> 天</span></div>
-                            <div style="font-size: 10px; color: rgba(161,163,163,0.91)" id="vLine3">我还在编......</div>
+                            <#--  <div style="font-size: 10px; color: rgba(161,163,163,0.91)" id="vLine3">我还在编......</div>  -->
 <!--                            <a href="${servePath}/oldAlmanac">-->
 <!--                                <div style="font-size: 10px; color: rgba(161,163,163,0.91)">点击查看今日运势</div>-->
 <!--                            </a>-->
                         </div>
-
                     </div>
                     <div class="metro-item">
-                        <a class="preview" style="padding-top: 60px">
+                        <a class="preview" style="padding-top:70px;">
                             <span id="checkedInStatus">
                             </span>
                             <div class="review" style="margin-bottom: 25px">
@@ -323,13 +322,6 @@
                         </a>
                     </div>
                     <div class="metro-item">
-                        <a class="preview" href="${servePath}/cr">
-                            <img style="border-radius: 0"
-                                 src="https://pwl.stackoverflow.wiki/2021/10/tips_wechat-cc864256.png">
-                            <b>聊天室</b>
-                        </a>
-                    </div>
-                    <div class="metro-item">
                         <a class="preview" href="${servePath}/shop">
                             <img style="border-radius: 0"
                                  src="https://pwl.stackoverflow.wiki/2022/03/ss-61cf1b96.png">
@@ -339,12 +331,11 @@
                 </div>
 
                 <div class="metro-border fn-flex">
-                    <div></div>
+                    <div style="background:transparent;;flex:1.2;"></div>
                     <div class="green"></div>
                     <div class="yellow"></div>
                     <div class="red"></div>
                     <div class="purple"></div>
-                    <div class="green"></div>
                 </div>
             </div>
         </div>
@@ -685,12 +676,12 @@
                 $("#vLine1").html("😰 今天是" + dayName + "<br><b>假期余额严重不足❗❗❗️</b>");
                 $("#vLine2").html("<span style='font-size:45px;color:#c9320c;'>明天<br>上班</span>");
                 $("#vLine2").css("line-height", "30px");
-                $("#vLine3").html("明天，你就可以见到久违的老板和可爱的同事们了！<b>你开心吗？</b>");
-                $("#vLine3").css("padding-top", "15px");
+                // $("#vLine3").html("明天，你就可以见到久违的老板和可爱的同事们了！<b>你开心吗？</b>");
+                // $("#vLine3").css("padding-top", "15px");
             } else {
                 $("#vLine1").html("" + dayName + "快乐 🏖️<br>假期余额还有<b>" + wRest + "</b>天！");
                 $("#vLine2").html("<span style='font-size:60px;color:#63bf8a;'>放假</span>");
-                $("#vLine3").html(randomPoem());
+                // $("#vLine3").html(randomPoem());
             }
         }
     });
@@ -805,6 +796,27 @@
     elementFadeOut(".topCheckInUsersElement", 90);*/
 </script>
 <script>
+    //drawCalendar();
+    function drawCalendar() {
+      var canvas = document.getElementById("adleredsCalendar");
+      var ctx = canvas.getContext("2d");
+      var width = canvas.width;
+      var height = canvas.height;
+      var leftEdge = width * 0.1;
+      var calenderWidth = width * 0.8;
+      var x = leftEdge;
+      var y = 20;
+      var radius = 10;
+      ctx.beginPath();
+      ctx.arc(x + radius, y+radius, radius,Math.PI, -0.5*Math.PI, false);
+      ctx.lineTo(x + calenderWidth - radius * 2, y);
+      ctx.arc(x + calenderWidth - radius, y+radius, radius, -0.5*Math.PI, 0, false);
+      ctx.lineTo(x + calenderWidth, y + radius * 4);
+      ctx.lineTo(x, y + radius * 4);
+      ctx.lineTo(x, y + radius);
+      ctx.fillStyle = "#be4145";
+      ctx.fill();
+    }
     var liveness = ${liveness};
     var checkedIn = <#if checkedIn == 1>true<#else>false</#if>;
     function getCheckedInStatus() {

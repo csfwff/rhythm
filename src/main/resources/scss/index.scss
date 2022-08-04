@@ -1253,16 +1253,18 @@ code .dec {
     text-align: center;
     overflow: hidden;
     position: relative;
+    height:100%;
     margin-right: 2px;
     margin-bottom: 2px;
 
     .preview {
       height: 100%;
       width: 100%;
-      padding-top: 108px;
+      // padding-top: 108px;
       position: relative;
       box-sizing: border-box;
-      display: block;
+      display: flex;
+      flex-direction: column;
       transition: all 0.2s ease-out 0s;
       color: #999;
       text-decoration: none;
