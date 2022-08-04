@@ -481,7 +481,7 @@ var ChatRoomChannel = {
                     }
                     $("#chatRoomIndex li:first").slideDown(200);
                     Util.listenUserCard();
-                    ChatRoom.imageViewer()
+                    ChatRoom&&ChatRoom.imageViewer()
                     break;
             }
         }
