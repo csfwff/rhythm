@@ -124,6 +124,9 @@
                         <a href="${servePath}/settings">${settingsLabel}</a>
                     </li>
                     <li>
+                        <a href="${servePath}/oldAlmanac">今日运势</a>
+                    </li>
+                    <li>
                         <a href="${servePath}/charge/point"><span class="ft-red">❤</span>️ ${chargePointLabel}</a>
                     </li>
                     <li>
