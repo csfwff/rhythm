@@ -1633,7 +1633,7 @@ var ChatRoom = {
         this.imgViewer = this.imgViewer || new Viewer(document.querySelector('#chats'),{
             inline: false,
             className: "PWLimgViwer",
-            filter: (img)=>!img.parentElement.classList.contains("ft__smaller") && !img.classList.contains("emoji")&& !img.src.contains("shield")&& !img.src.contains("/gen?"),
+            filter: (img)=>!img.parentElement.classList.contains("ft__smaller") && !img.classList.contains("emoji")&& img.src.indexOf("shield") < 0 && img.src.indexOf("/gen?") < 0,
             title() {
                 let ele = this.images[$(".PWLimgViwer .viewer-active").attr("data-index")];
                 while (ele = ele.parentElement,
