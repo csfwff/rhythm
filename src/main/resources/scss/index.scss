@@ -1253,18 +1253,16 @@ code .dec {
     text-align: center;
     overflow: hidden;
     position: relative;
-    height:100%;
     margin-right: 2px;
     margin-bottom: 2px;
 
     .preview {
       height: 100%;
       width: 100%;
-      // padding-top: 108px;
+      padding-top: 108px;
       position: relative;
       box-sizing: border-box;
-      display: flex;
-      flex-direction: column;
+      display: block;
       transition: all 0.2s ease-out 0s;
       color: #999;
       text-decoration: none;
@@ -2142,102 +2140,102 @@ code .dec {
 }
 
 .old-almanac{
-    width: 320px;
-    justify-content: center;
-    align-items: center;
+  width: 320px;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+
+
+  .date{
+    font-size:12pt;
+    line-height: 30pt;
+    vertical-align: center;
+    padding-left: 10px;
+    display: flex;
     flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
 
+  .split, .clear {
+    clear: both;
+    height: 1px;
+    overflow-y: hidden;
+  }
 
-    .date{
-      font-size:12pt;
-      line-height: 30pt;
-      vertical-align: center;
-      padding-left: 10px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-    }
+  .good, .bad {
+    clear: both;
+    position: relative;
+  }
 
-    .split, .clear {
-    	clear: both;
-    	height: 1px;
-    	overflow-y: hidden;
-    }
+  .bad {
+    /*top: -1px;*/
+  }
 
-    .good, .bad {
-    	clear: both;
-    	position: relative;
-    }
+  .good .title, .bad .title {
+    float: left;
+    width: 100px;
+    font-weight: bold;
+    text-align: center;
+    font-size: 20pt;
+    position:absolute;
+    top:0;
+    bottom:0;
+  }
 
-    .bad {
-    	/*top: -1px;*/
-    }
+  .good .title>table, .bad .title>table {
+    position:absolute;
+    width:100%;
+    height:100%;
+    border:none;
+  }
 
-    .good .title, .bad .title {
-    	float: left;
-    	width: 100px;
-    	font-weight: bold;
-    	text-align: center;
-    	font-size: 20pt;
-    	position:absolute;
-    	top:0;
-    	bottom:0;
-    }
+  .good .title {
+    background: #ffee44;
+  }
 
-    .good .title>table, .bad .title>table {
-    	position:absolute;
-    	width:100%;
-    	height:100%;
-    	border:none;
-    }
+  .someday .good .title {
+    background: #aaaaaa;
+  }
 
-    .good .title {
-    	background: #ffee44;
-    }
+  .bad .title {
+    background: #ff4444;
+    color: #fff;
+  }
 
-    .someday .good .title {
-    	background: #aaaaaa;
-    }
+  .someday .bad .title {
+    background: #666666;
+    color: #fff;
+  }
 
-    .bad .title {
-    	background: #ff4444;
-    	color: #fff;
-    }
+  .good .content, .bad .content {
+    margin-left: 115px;
+    padding-right: 10px;
+    padding-top: 1px;
+    font-size:15pt;
+  }
 
-    .someday .bad .title {
-    	background: #666666;
-    	color: #fff;
-    }
+  .content-item{
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+  }
 
-    .good .content, .bad .content {
-    	margin-left: 115px;
-    	padding-right: 10px;
-    	padding-top: 1px;
-    	font-size:15pt;
-    }
+  .someday .good {
+    background: #dddddd;
+  }
 
-    .content-item{
-      display: flex;
-      flex-direction: column;
-      align-items: flex-start;
-    }
+  .someday .bad {
+    background: #aaaaaa;
+  }
 
-    .someday .good {
-    	background: #dddddd;
-    }
+  .good {
+    background: #ffffaa;
+  }
 
-    .someday .bad {
-    	background: #aaaaaa;
-    }
-
-    .good {
-    	background: #ffffaa;
-    }
-
-    .bad {
-    	background: #ffddd3;
-    }
+  .bad {
+    background: #ffddd3;
+  }
 
   .content{
     height: 100%;
