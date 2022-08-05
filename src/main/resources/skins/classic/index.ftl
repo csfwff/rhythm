@@ -282,17 +282,17 @@
         <div class="wrapper">
             <div class="fn-flex-1">
                 <div class="metro-line fn-flex" style="align-items:center;">
-                    <#--  <canvas class="metro-item" style="flex:1.2;" id="adleredsCalendar"></canvas>  -->
                     <div class="metro-item" style="flex:1.2;">
-                        <div style="height:100%;display:flex;flex-direction:column;justify-content:center;align-items:center;">
-                            <div style="height:25%;font-size: 13px;background: #be4145;border-radius: 10px 10px 0 0;width:60%; color: white;display:flex;flex-direction:column;justify-content:center;align-items:center;" id="vLine1">距离放假还有 🎉</div>
-                            <div style="height:50%;font-size: 80px; font-weight: bold; color: #333333; background: white; width:60%; box-shadow: 0 1px 2px rgb(0 0 0 / 20%);border-radius: 0 0 5px 5px;" id="vLine2"><span
+                        <div class="calendar-container">
+                        <div class="canendar-body">
+                            <div class="calendar-head" id="vLine1">距离放假还有 🎉</div>
+                            <div class="calendar-content" id="vLine2"><span
                                         id="vDay">?</span><span style="font-size: 30px"> 天</span></div>
                             <#--  <div style="font-size: 10px; color: rgba(161,163,163,0.91)" id="vLine3">我还在编......</div>  -->
 <!--                            <a href="${servePath}/oldAlmanac">-->
 <!--                                <div style="font-size: 10px; color: rgba(161,163,163,0.91)">点击查看今日运势</div>-->
 <!--                            </a>-->
-                        </div>
+                        </div></div>
                     </div>
                     <div class="metro-item">
                         <a class="preview" style="padding-top:70px;">
@@ -658,29 +658,29 @@
             $("#vDay").html(vRest);
             if (vRest === 1) {
                 $("#vLine1").html("今天提桶！明天跑路！<br>" + vName + "马上就要到了！！！");
-                $("#vLine2").html("<span style='font-size:45px;color:#0cc958;'>🎉<br>明天<br>放假</span>");
+                $("#vLine2").html("<span style='font-size:30px;width:100%;height:100%;color:#0cc958;'>🎉<br>明天放假</span>");
                 $("#vLine2").css("line-height", "30px");
-                $("#vLine3").css("display", "none");
+                // $("#vLine3").css("display", "none");
             }
-            $.ajax({
-                url: "https://v1.hitokoto.cn/",
-                type: "GET",
-                cache: false,
-                success: function (result) {
-                    $("#vLine3").html(result.hitokoto);
-                }
-            });
+              //$.ajax({
+              //    url: "https://v1.hitokoto.cn/",
+              //    type: "GET",
+              //    cache: false,
+              //    success: function (result) {
+              //      $("#vLine3").html(result.hitokoto);
+              //  }
+              //});
         } else if (type === 1 || type === 2) {
             let wRest = result.wRest;
             if (wRest === 1) {
                 $("#vLine1").html("😰 今天是" + dayName + "<br><b>假期余额严重不足❗❗❗️</b>");
-                $("#vLine2").html("<span style='font-size:45px;color:#c9320c;'>明天<br>上班</span>");
+                $("#vLine2").html("<span style='font-size:30px;width:100%;height:100%;color:#c9320c;'>明天<br>上班</span>");
                 $("#vLine2").css("line-height", "30px");
                 // $("#vLine3").html("明天，你就可以见到久违的老板和可爱的同事们了！<b>你开心吗？</b>");
                 // $("#vLine3").css("padding-top", "15px");
             } else {
                 $("#vLine1").html("" + dayName + "快乐 🏖️<br>假期余额还有<b>" + wRest + "</b>天！");
-                $("#vLine2").html("<span style='font-size:60px;color:#63bf8a;'>放假</span>");
+                $("#vLine2").html("<span style='font-size:60px;height:100%;color:#63bf8a;'>放假</span>");
                 // $("#vLine3").html(randomPoem());
             }
         }
