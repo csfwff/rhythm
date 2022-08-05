@@ -659,7 +659,7 @@
             if (vRest === 1) {
                 $("#vLine1").html("今天提桶！明天跑路！<br>" + vName + "马上就要到了！！！");
                 $("#vLine2").html("<span style='font-size:30px;width:100%;height:100%;color:#0cc958;'>🎉<br>明天放假</span>");
-                $("#vLine2").css("line-height", "60px");
+                $("#vLine2").css("line-height", "30px");
                 // $("#vLine3").css("display", "none");
             }
               //$.ajax({
