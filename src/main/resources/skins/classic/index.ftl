@@ -658,29 +658,29 @@
             $("#vDay").html(vRest);
             if (vRest === 1) {
                 $("#vLine1").html("今天提桶！明天跑路！<br>" + vName + "马上就要到了！！！");
-                $("#vLine2").html("<span style='font-size:45px;color:#0cc958;'>🎉<br>明天<br>放假</span>");
-                $("#vLine2").css("line-height", "30px");
-                $("#vLine3").css("display", "none");
+                $("#vLine2").html("<span style='font-size:30px;width:100%;height:100%;color:#0cc958;'>🎉<br>明天放假</span>");
+                $("#vLine2").css("line-height", "60px");
+                // $("#vLine3").css("display", "none");
             }
-            $.ajax({
-                url: "https://v1.hitokoto.cn/",
-                type: "GET",
-                cache: false,
-                success: function (result) {
-                    $("#vLine3").html(result.hitokoto);
-                }
-            });
+              //$.ajax({
+              //    url: "https://v1.hitokoto.cn/",
+              //    type: "GET",
+              //    cache: false,
+              //    success: function (result) {
+              //      $("#vLine3").html(result.hitokoto);
+              //  }
+              //});
         } else if (type === 1 || type === 2) {
             let wRest = result.wRest;
             if (wRest === 1) {
                 $("#vLine1").html("😰 今天是" + dayName + "<br><b>假期余额严重不足❗❗❗️</b>");
-                $("#vLine2").html("<span style='font-size:45px;color:#c9320c;'>明天<br>上班</span>");
+                $("#vLine2").html("<span style='font-size:30px;width:100%;height:100%;color:#c9320c;'>明天<br>上班</span>");
                 $("#vLine2").css("line-height", "30px");
                 // $("#vLine3").html("明天，你就可以见到久违的老板和可爱的同事们了！<b>你开心吗？</b>");
                 // $("#vLine3").css("padding-top", "15px");
             } else {
                 $("#vLine1").html("" + dayName + "快乐 🏖️<br>假期余额还有<b>" + wRest + "</b>天！");
-                $("#vLine2").html("<span style='font-size:60px;color:#63bf8a;'>放假</span>");
+                $("#vLine2").html("<span style='font-size:60px;height:100%;color:#63bf8a;'>放假</span>");
                 // $("#vLine3").html(randomPoem());
             }
         }
