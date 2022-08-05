@@ -116,32 +116,66 @@ var ChatRoom = {
         ChatRoom.listenUploadEmojis();
         ChatRoom.loadEmojis();
         // 监听按钮
-        $("#emojiBtn").on('click', function () {
-            if ($("#emojiList").hasClass("showList")) {
-                $("#emojiList").removeClass("showList");
-            } else {
-                $("#emojiList").addClass("showList");
-                setTimeout(function () {
-                    $("body").unbind();
-                    $('body').click(function (event) {
-                        if ($(event.target).closest('a').attr('id') !== 'aPersonListPanel' &&
-                            $(event.target).closest('.module').attr('id') !== 'personListPanel') {
-                            $('#personListPanel').hide()
-                        }
-                    })
-                    $("body").click(function() {
-                        $("#emojiList").removeClass("showList");
-                        $("body").unbind();
-                        $('body').click(function (event) {
-                            if ($(event.target).closest('a').attr('id') !== 'aPersonListPanel' &&
-                                $(event.target).closest('.module').attr('id') !== 'personListPanel') {
-                                $('#personListPanel').hide()
-                            }
-                        })
-                    });
-                }, 100);
+
+        /*出问题就删除下面的*/
+        (()=>{
+            let time_out=new Date().getTime(),timeoutId=0
+            const closeEmoji=function () {
+                if(timeoutId!==0){
+                    clearTimeout(timeoutId)
+                    timeoutId=0
+                }
+                time_out=new Date().getTime()
+                timeoutId=setTimeout(()=>{
+                    new Date().getTime()-time_out<=700&&$("#emojiList").removeClass("showList")
+                },navigator.userAgent.match(/(phone|pad|pod|ios|Android|Mobile|BlackBerry|MQQBrowser|JUC|Fennec|wOSBrowser|BrowserNG|WebOS|Symbian)/i)!==null?0:600)
             }
-        });
+            $("#emojiBtn").hover(function (){
+                if(timeoutId!==0){
+                    clearTimeout(timeoutId)
+                    timeoutId=0
+                }
+                time_out=new Date().getTime()
+                setTimeout(()=>0!==$("#emojiBtn:hover").length&&$("#emojiList").addClass("showList"),300)
+            },closeEmoji)
+            $("#emojiList").hover(function () {
+                if(timeoutId!==0){
+                    clearTimeout(timeoutId)
+                    timeoutId=0
+                }
+                time_out=new Date().getTime()
+            },closeEmoji)
+        })()
+        /*出问题就恢复下面的，删除上面的*/
+        // $("#emojiBtn").on('click', function () {
+        //     if ($("#emojiList").hasClass("showList")) {
+        //         $("#emojiList").removeClass("showList");
+        //     } else {
+        //         $("#emojiList").addClass("showList");
+        //         setTimeout(function () {
+        //             $("body").unbind();
+        //             $('body').click(function (event) {
+        //                 if ($(event.target).closest('a').attr('id') !== 'aPersonListPanel' &&
+        //                     $(event.target).closest('.module').attr('id') !== 'personListPanel') {
+        //                     $('#personListPanel').hide()
+        //                 }
+        //             })
+        //             $("body").click(function() {
+        //                 $("#emojiList").removeClass("showList");
+        //                 $("body").unbind();
+        //                 $('body').click(function (event) {
+        //                     if ($(event.target).closest('a').attr('id') !== 'aPersonListPanel' &&
+        //                         $(event.target).closest('.module').attr('id') !== 'personListPanel') {
+        //                         $('#personListPanel').hide()
+        //                     }
+        //                 })
+        //             });
+        //         }, 100);
+        //     }
+        // });
+
+        /*出问题就恢复上面的*/
+
 
         // 红包初始化
         $("#redPacketBtn").on('click', function () {
@@ -726,7 +760,7 @@ var ChatRoom = {
         let emojis = ChatRoom.getEmojis();
         for (let i = 0; i < emojis.length; i++) {
             $("#emojis").append(`<button onclick="ChatRoom.editor.setValue(ChatRoom.editor.getValue() + '![图片表情](${emojis[i]})')">
-    <div class="divX"><svg onclick='ChatRoom.delEmoji("${emojis[i]}")' style="width: 15px; height: 15px;"><use xlink:href="#delIcon"></use></svg></div>
+    <div class="divX"><svg onclick='ChatRoom.delEmoji("${emojis[i]}");event.cancelBubble =true;' style="width: 15px; height: 15px;"><use xlink:href="#delIcon"></use></svg></div>
     <img style='max-height: 50px' class="vditor-emojis__icon" src="${emojis[i]}">
 </button>`);
         }
