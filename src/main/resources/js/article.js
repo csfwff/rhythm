@@ -252,17 +252,15 @@ var Comment = {
    * 加载表情
    */
   loadEmojis: function () {
-    $("#emojis").html("");
-    let emojis = Comment.getEmojis();
+    const emojis = Comment.getEmojis();
+    let temp=""
     for (let i = 0; i < emojis.length; i++) {
-      $("#emojis").append("" +
-          "<button>\n" +
-          "    <div class=\"divX\" onclick='Comment.delEmoji(\"" + emojis[i] + "\")'>\n" +
-          "        <svg style=\"width: 15px; height: 15px;\"><use xlink:href=\"#delIcon\"></use></svg>\n" +
-          "    </div>" +
-          "    <img style='max-height: 50px' onclick=\"Comment.editor.setValue(Comment.editor.getValue() + '![图片表情](" + emojis[i] + ")')\" class=\"vditor-emojis__icon\" src=\"" + emojis[i] + "\">\n" +
-          "</button>");
+      temp+=`<button>
+    <div class="divX" onclick='Comment.delEmoji("${emojis[i]}")'><svg style="width: 15px; height: 15px;"><use xlink:href="#delIcon"></use></svg></div>
+    <img style='max-height: 50px' onclick="Comment.editor.setValue(Comment.editor.getValue() + '![图片表情](${emojis[i]})')" class="vditor-emojis__icon" src="${emojis[i]}">
+</button>`;
     }
+    $("#emojis").html(temp);
   },
   /**
    * 删除表情包
