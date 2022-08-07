@@ -1120,24 +1120,27 @@ var ChatRoom = {
      * @param id
      */
     report: function (id) {
+      var res = confirm("确定举报吗？");
+      if(res){
         $.ajax({
-            url: Label.servePath + '/report',
-            type: 'POST',
-            cache: false,
-            data: JSON.stringify({
-                reportDataId: id,
-                reportDataType: 3,
-                reportType: 49,
-                reportMemo: '',
-            }),
-            complete: function (result) {
-                if (result.responseJSON.code === 0) {
-                    Util.alert('一键举报成功，感谢你的帮助！<br>管理员将进行审核，如情况属实系统会为举报人发放积分奖励，并对违规者进行相应处罚。');
-                } else {
-                    Util.alert(result.responseJSON.msg);
-                }
-            },
-        })
+          url: Label.servePath + '/report',
+          type: 'POST',
+          cache: false,
+          data: JSON.stringify({
+              reportDataId: id,
+              reportDataType: 3,
+              reportType: 49,
+              reportMemo: '',
+          }),
+          complete: function (result) {
+              if (result.responseJSON.code === 0) {
+                  Util.alert('一键举报成功，感谢你的帮助！<br>管理员将进行审核，如情况属实系统会为举报人发放积分奖励，并对违规者进行相应处罚。');
+              } else {
+                  Util.alert(result.responseJSON.msg);
+              }
+          },
+      })
+      }
     },
     /**
      * 艾特某个人
