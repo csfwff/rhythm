@@ -726,14 +726,14 @@ var ChatRoom = {
      * 加载表情
      */
     loadEmojis: function () {
-        $("#emojis").html("");
-        let emojis = ChatRoom.getEmojis();
+        let emojis = ChatRoom.getEmojis(),html="";
         for (let i = 0; i < emojis.length; i++) {
-            $("#emojis").append(`<button onclick="ChatRoom.editor.setValue(ChatRoom.editor.getValue() + '![图片表情](${emojis[i]})')">
+            html+=`<button onclick="ChatRoom.editor.setValue(ChatRoom.editor.getValue() + '![图片表情](${emojis[i]})')">
     <div class="divX"><svg onclick='ChatRoom.delEmoji("${emojis[i]}");event.cancelBubble =true;' style="width: 15px; height: 15px;"><use xlink:href="#delIcon"></use></svg></div>
     <img style='max-height: 50px' class="vditor-emojis__icon" src="${emojis[i]}">
-</button>`);
+</button>`;
         }
+        $("#emojis").html(html);
     },
     /**
      * 上传表情

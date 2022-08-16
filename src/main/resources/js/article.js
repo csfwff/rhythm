@@ -219,7 +219,7 @@ var Comment = {
 
     if ($('.footer').attr('style')) {
       $('.editor-panel .wrapper').slideUp(function () {
-        $('.editor-panel').hide()
+        $(".editor-panel").fadeOut(100)
         $('.footer').removeAttr('style')
       })
       return false
@@ -252,15 +252,14 @@ var Comment = {
    * 加载表情
    */
   loadEmojis: function () {
-    const emojis = Comment.getEmojis();
-    let temp=""
+    let emojis = Comment.getEmojis(),html="";
     for (let i = 0; i < emojis.length; i++) {
-      temp+=`<button>
-    <div class="divX" onclick='Comment.delEmoji("${emojis[i]}")'><svg style="width: 15px; height: 15px;"><use xlink:href="#delIcon"></use></svg></div>
-    <img style='max-height: 50px' onclick="Comment.editor.setValue(Comment.editor.getValue() + '![图片表情](${emojis[i]})')" class="vditor-emojis__icon" src="${emojis[i]}">
+      html+=`<button onclick="Comment.editor.setValue(Comment.editor.getValue() + '![图片表情](${emojis[i]})')">
+    <div class="divX"><svg onclick='Comment.delEmoji("${emojis[i]}");event.cancelBubble =true;' style="width: 15px; height: 15px;"><use xlink:href="#delIcon"></use></svg></div>
+    <img style='max-height: 50px' class="vditor-emojis__icon" src="${emojis[i]}">
 </button>`;
     }
-    $("#emojis").html(temp);
+    $("#emojis").html(html);
   },
   /**
    * 删除表情包

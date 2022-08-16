@@ -466,17 +466,14 @@ var Chat = {
      * 加载表情
      */
     loadEmojis: function () {
-        $("#emojis").html("");
-        let emojis = Chat.getEmojis();
+        let emojis = Chat.getEmojis(),html="";
         for (let i = 0; i < emojis.length; i++) {
-            $("#emojis").append("" +
-                "<button>\n" +
-                "    <div class=\"divX\" onclick='Chat.delEmoji(\"" + emojis[i] + "\")'>\n" +
-                "        <svg style=\"width: 15px; height: 15px;\"><use xlink:href=\"#delIcon\"></use></svg>\n" +
-                "    </div>" +
-                "    <img style='max-height: 50px' onclick=\"Chat.editor.setValue(Chat.editor.getValue() + '![图片表情](" + emojis[i] + ")')\" class=\"vditor-emojis__icon\" src=\"" + emojis[i] + "\">\n" +
-                "</button>");
+            html+=`<button onclick="Chat.editor.setValue(Chat.editor.getValue() + '![图片表情](${emojis[i]})')">
+    <div class="divX"><svg onclick='Chat.delEmoji("${emojis[i]}");event.cancelBubble =true;' style="width: 15px; height: 15px;"><use xlink:href="#delIcon"></use></svg></div>
+    <img style='max-height: 50px' class="vditor-emojis__icon" src="${emojis[i]}">
+</button>`;
         }
+        $("#emojis").html(html);
     },
     /**
      * 删除表情包
