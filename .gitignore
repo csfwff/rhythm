@@ -12,3 +12,4 @@ symphony.iml
 .vscode/
 ChatRoom.tmp
 delegated-apnic-latest.tmp
+*.lock
