@@ -275,6 +275,9 @@
     .vditor-reset p, .vditor-reset pre {
         margin: 0!important;
     }
+    #emojiList {
+         bottom: unset!important;
+    }
 </style>
 </body>
 </html>
