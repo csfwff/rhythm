@@ -1987,7 +1987,7 @@ $(document).ready(function () {
   Comment.listenUploadEmojis();
   Comment.loadEmojis();
   // 监听表情包按钮
-  /*出问题就删除下面的*/
+
   (()=>{
     let time_out=new Date().getTime(),timeoutId=0
     const closeEmoji=function () {
@@ -2016,34 +2016,6 @@ $(document).ready(function () {
       time_out=new Date().getTime()
     },closeEmoji)
   })()
-  /*出问题就恢复下面的，删除上面的*/
-  // $("#emojiBtn").on('click', function () {
-  //   if ($("#emojiList").hasClass("showList")) {
-  //     $("#emojiList").removeClass("showList");
-  //   } else {
-  //     $("#emojiList").addClass("showList");
-  //     setTimeout(function () {
-  //       $("body").unbind();
-  //       $('body').click(function (event) {
-  //         if ($(event.target).closest('a').attr('id') !== 'aPersonListPanel' &&
-  //             $(event.target).closest('.module').attr('id') !== 'personListPanel') {
-  //           $('#personListPanel').hide()
-  //         }
-  //       })
-  //       $("body").click(function() {
-  //         $("#emojiList").removeClass("showList");
-  //         $("body").unbind();
-  //         $('body').click(function (event) {
-  //           if ($(event.target).closest('a').attr('id') !== 'aPersonListPanel' &&
-  //               $(event.target).closest('.module').attr('id') !== 'personListPanel') {
-  //             $('#personListPanel').hide()
-  //           }
-  //         })
-  //       });
-  //     }, 100);
-  //   }
-  // });
-  /*出问题就恢复上面的*/
 
   // Init [Article] channel
   ArticleChannel.init(Label.articleChannel)
