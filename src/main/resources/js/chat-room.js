@@ -56,7 +56,7 @@ var ChatRoom = {
                 mode: 'editor',
             },
             resize: {
-                enable: false,
+                enable: true,
                 position: 'bottom',
             },
             toolbar: [
@@ -72,6 +72,7 @@ var ChatRoom = {
                 'redo',
                 '|',
                 'edit-mode',
+                'fullscreen',
                 {
                     name: 'more',
                     toolbar: [
@@ -85,13 +86,13 @@ var ChatRoom = {
                         'code',
                         'insert-before',
                         'insert-after',
-                        'fullscreen',
-                        'both',
-                        'preview',
-                        'outline',
-                        'content-theme',
-                        'code-theme',
-                        'devtools',
+                        // 'fullscreen',
+                        // 'both',
+                        // 'preview',
+                        // 'outline',
+                        // 'content-theme',
+                        // 'code-theme',
+                        // 'devtools',
                         'info',
                         'help',
                     ],
