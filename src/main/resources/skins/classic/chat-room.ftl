@@ -271,5 +271,10 @@
         });
     });
 </script>
+<style>
+    .vditor-reset p, .vditor-reset pre {
+        margin: 0!important;
+    }
+</style>
 </body>
 </html>

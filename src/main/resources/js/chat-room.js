@@ -1535,7 +1535,7 @@ var ChatRoom = {
         }
         newHTML += '</div>';
 
-        newHTML += '        <div style="margin-top: 4px" class="vditor-reset ft__smaller ' + Label.chatRoomPictureStatus + '">\n' +
+        newHTML += '        <div class="vditor-reset ft__smaller ' + Label.chatRoomPictureStatus + '">\n' +
             '            ' + data.content + '\n' +
             '        </div>\n' +
             '        <div class="ft__smaller ft__fade fn__right date-bar">\n' +
