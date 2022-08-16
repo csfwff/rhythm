@@ -1630,25 +1630,25 @@ var ChatRoom = {
     /**
      * 全屏看图插件渲染
      */
-    imageViewer: function() {
+    imageViewer: function () {
         // console.log("新消息")
         //没有新图片就不重载
-        if (this.imgViewer && $("div.vditor-reset.ft__smaller img:not(.ft__smaller,.emoji,*[src*='shield'],*[src*='/gen?'])").length === this.imgViewer.length)
+        if (this.imgViewer && $("div.vditor-reset.ft__smaller img:not(.ft__smaller,.emoji,.ext-emoji,*[src*='shield'],*[src*='/gen?'])").length === this.imgViewer.length)
             return
         // console.log("包含图片")
-        this.imgViewer = this.imgViewer || new Viewer(document.querySelector('#chats'),{
+        this.imgViewer = this.imgViewer || new Viewer(document.querySelector('#chats'), {
             inline: false,
             className: "PWLimgViwer",
-            filter: (img)=>!img.parentElement.classList.contains("ft__smaller") && !img.classList.contains("emoji")&& img.src.indexOf("shield") < 0 && img.src.indexOf("/gen?") < 0,
+            filter: (img) => !img.parentElement.classList.contains("ft__smaller") && !img.parentElement.classList.contains("ext-emoji") && !img.classList.contains("emoji") && img.src.indexOf("shield") < 0 && img.src.indexOf("/gen?") < 0,
             title() {
                 let ele = this.images[$(".PWLimgViwer .viewer-active").attr("data-index")];
                 while (ele = ele.parentElement,
-                    !ele.querySelector(".avatar"));
+                    !ele.querySelector(".avatar")) ;
                 return "From @" + ele.querySelector(".avatar").getAttribute("aria-label")
             }
         });
-        const delayshow = function() {
-            setTimeout(()=>{
+        const delayshow = function () {
+            setTimeout(() => {
                     if (!ChatRoom.imgViewer.isShown) {
                         ChatRoom.imgWaitting = false;
                         // console.log("重载")
