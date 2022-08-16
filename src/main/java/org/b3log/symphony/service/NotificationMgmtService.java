@@ -552,8 +552,28 @@ public class NotificationMgmtService {
      */
     @Transactional
     public void makeRead(final Collection<JSONObject> notifications) {
+        String userId = null;
         for (final JSONObject notification : notifications) {
             makeRead(notification);
+            userId = notification.optString(Notification.NOTIFICATION_USER_ID);
+        }
+        if (userId != null && notifications.size() != 0) {
+            try {
+                String finalUserId = userId;
+                Symphonys.EXECUTOR_SERVICE.submit(() -> {
+                    final JSONObject cmd = new JSONObject();
+                    cmd.put(UserExt.USER_T_ID, finalUserId);
+                    cmd.put(Common.COMMAND, "refreshNotification");
+                    Map<String, Object> dataModel = new HashMap<>();
+                    final BeanManager beanManager = BeanManager.getInstance();
+                    final NotificationProcessor notificationProcessor = beanManager.getReference(NotificationProcessor.class);
+                    notificationProcessor.fillNotificationCount(finalUserId, dataModel);
+                    cmd.put("count", Integer.parseInt(dataModel.get(Common.UNREAD_NOTIFICATION_CNT).toString()));
+
+                    UserChannel.sendCmd(cmd);
+                });
+            } catch (Exception ignored) {
+            }
         }
     }
 
@@ -580,23 +600,6 @@ public class NotificationMgmtService {
             record.put(Notification.NOTIFICATION_HAS_READ, true);
 
             notificationRepository.update(id, record);
-
-            try {
-                Symphonys.EXECUTOR_SERVICE.submit(() -> {
-                    final JSONObject cmd = new JSONObject();
-                    String userId = notification.optString(Notification.NOTIFICATION_USER_ID);
-                    cmd.put(UserExt.USER_T_ID, userId);
-                    cmd.put(Common.COMMAND, "refreshNotification");
-                    Map<String, Object> dataModel = new HashMap<>();
-                    final BeanManager beanManager = BeanManager.getInstance();
-                    final NotificationProcessor notificationProcessor = beanManager.getReference(NotificationProcessor.class);
-                    notificationProcessor.fillNotificationCount(userId, dataModel);
-                    cmd.put("count", Integer.parseInt(dataModel.get(Common.UNREAD_NOTIFICATION_CNT).toString()));
-
-                    UserChannel.sendCmd(cmd);
-                });
-            } catch (Exception ignored) {
-            }
         } catch (final RepositoryException e) {
             final String msg = "Makes notification as read failed";
             LOGGER.log(Level.ERROR, msg, e);
