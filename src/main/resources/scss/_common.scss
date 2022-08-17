@@ -350,6 +350,13 @@ blockquote {
   min-height: 100%;
   display: flex;
   flex-direction: column;
+  &.select-center{
+    flex-direction: column;
+    align-items: center;
+    label.gestureRadio {
+      padding: 0 10px;
+    }
+  }
 }
 
 .fn-flex-1,

@@ -3167,7 +3167,11 @@ only screen and (device-width: 414px) and (device-height: 896px) and (-webkit-de
   margin: 0px 5px 10px 5px;
 }
 
-
+#liveliness{
+  height: 1px;
+  background: red;
+  width: 0;
+}
 
 
 

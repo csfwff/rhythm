@@ -1139,7 +1139,7 @@ var ChatRoom = {
      *
      * @param who
      */
-    renderRedPacket: function (usersJSON, count, got, recivers, diceRet) {
+    renderRedPacket: function (usersJSON, count, got, recivers, diceRet, packMaster) {
         let hasGot = false;
         let highest = -1;
         let winner
@@ -1195,13 +1195,11 @@ var ChatRoom = {
             }
             let currentUserTime = current.time;
             let currentUserAvatar = "";
-            if (current.avatar !== undefined) {
-                currentUserAvatar = "<img class=\"avatar avatar--mid\" style=\"margin-right: 10px; background-image: none; background-color: transparent;\" src=\"" + current.avatar + "\">\n";
-            }
-            let html = "<li class=\"fn__flex menu__item\">\n" +
-                currentUserAvatar +
-                "    <div class=\"fn__flex-1\" style=\"text-align: left !important;\">\n" +
-                "        <h2 class=\"list__user\"><a href=\"" + Label.servePath + "/member/" + currentUserName +"\">" + userNameInfo + "</a></h2>\n";
+            if (current.avatar !== undefined) currentUserAvatar = `<img class="avatar avatar--mid" style="margin-right: 10px; background-image: none; background-color: transparent;" src="${current.avatar}">`;
+            let html = `<li class="fn__flex menu__item">${currentUserAvatar}
+<div class="fn__flex-1" style="text-align: left !important;">
+<h2 class="list__user"><a href="${Label.servePath}/member/${currentUserName}">${userNameInfo}</a>
+</h2>`;
             if (currentUserMoney > 0 && currentUserMoney === highest) {
                 highest = -1;
                 html += "<span class='green small btn'>来自老王的认可</span><br>\n";
@@ -1224,14 +1222,15 @@ var ChatRoom = {
             } else {
                 money = currentUserMoney
             }
-            html += "<span class=\"ft__fade ft__smaller\">" + currentUserTime + "</span>\n" +
-                "    </div>\n" +
-                "    <div class=\"fn__flex-center\">" + money + " 积分</div>\n" +
-                "</li>\n";
+            html += `<span class="ft__fade ft__smaller">${currentUserTime}</span>
+    </div>
+    <div class="fn__flex-center">${money} 积分</div>
+</li>
+`;
             $("#redPacketList").append(html);
         }
         if (!hasGot) {
-            $("#redPacketIGot").text("你错过了这个红包");
+            $("#redPacketIGot").text(Label.currentUser===packMaster?"金主来了":"你错过了这个红包");
         }
 
         if (undefined !== recivers) {
@@ -1241,7 +1240,7 @@ var ChatRoom = {
                 // console.log(index)
                 if (index === -1) {
                     $("#msg").text("这个红包属于 " + recivers)
-                    $("#redPacketIGot").text("这个红包不属于你");
+                    $("#redPacketIGot").text(Label.currentUser===packMaster?"金主来了":"这个红包不属于你");
                 }
             }
         }
@@ -1294,16 +1293,22 @@ var ChatRoom = {
 
 
     selectGesture: function (oId) {
-        Util.alert("<div class=\"form fn__flex-column\">\n" +
-            "<label id=\"gestureRadio\">\n" +
-            "  <input type=\"radio\" name=\"gesture\" value=\"0\" checked>石头\n" +
-            "  <input type=\"radio\" name=\"gesture\" value=\"1\">剪刀\n" +
-            "  <input type=\"radio\" name=\"gesture\" value=\"2\">布\n" +
-            "</label>\n" +
-            "<div class=\"fn__flex\" style=\"margin-top: 15px\">\n" +
-            "  <button class=\"btn btn--confirm\" onclick=\"ChatRoom.unpackRedPacket(" + oId + ")\;Util.clearAlert()\">出拳</button>\n" +
-            "</div>\n" +
-            "</div>", '出拳');
+        Util.alert(`<div class="form fn__flex-column select-center">
+<div>
+<label class="gestureRadio">
+  <input type="radio" name="gesture" value="0" checked>石头
+</label>
+<label class="gestureRadio">
+  <input type="radio" name="gesture" value="1">剪刀
+</label>
+<label class="gestureRadio">
+  <input type="radio" name="gesture" value="2">布
+</label>
+</div>
+<div class="fn__flex" style="margin-top: 15px">
+  <button class="btn btn--confirm" onclick="ChatRoom.unpackRedPacket(${oId});Util.clearAlert()">出拳</button>
+</div>
+</div>`, '出拳');
     },
     /**
      * 拆开红包
@@ -1314,7 +1319,7 @@ var ChatRoom = {
             method: "POST",
             data: JSON.stringify({
                 oId: oId,
-                gesture: $("#gestureRadio>input[name=gesture]:checked").val(),
+                gesture: $(".gestureRadio>input[name=gesture]:checked").val(),
                 dice: {
                     bet: $("#betRadio>input[name=bet]:checked").val(),
                     chips: $("#betRadio>input[name=chips]").val()
@@ -1325,54 +1330,25 @@ var ChatRoom = {
                     let iGot = "抢红包人数较多，加载中...";
                     let gesture = "";
                     if (result.info.gesture !== undefined) {
-                        gesture = result.info.userName + "出拳: ";
-                        switch(result.info.gesture) {
-                            case 0:
-                                gesture += " 石头";
-                                break;
-                            case 1:
-                                gesture += " 剪刀";
-                                break;
-                            case 2:
-                                gesture += " 布";
-                                break;
-                            default:
-                        }
+                        gesture = (Label.currentUser===result.info.userName?"你":result.info.userName) + "出拳:  "+["石头","剪刀","布"][result.info.gesture]
                     }
-                    Util.alert("" +
-                        "<style>" +
-                        ".dialog-header-bg {" +
-                        "border-radius: 4px 4px 0px 0px; background-color: rgb(210, 63, 49); color: rgb(255, 255, 255);" +
-                        "}" +
-                        ".dialog-main {" +
-                        "height: 456px;" +
-                        "overflow: auto;" +
-                        "}" +
-                        "</style>" +
-                        "<div class=\"fn-hr5\"></div>\n" +
-                        "<div class=\"fn-hr5\"></div>\n" +
-                        "<div class=\"fn-hr5\"></div>\n" +
-                        "<div class=\"fn-hr5\"></div>\n" +
-                        "<div class=\"ft__center\">\n" +
-                        "    <div class=\"fn__flex-inline\">\n" +
-                        "        <img class=\"avatar avatar--small\" src=\"" + result.info.userAvatarURL48 + "\" style=\"background-image: none; background-color: transparent; width: 20px; height: 20px; margin-right: 0px;\">\n" +
-                        "        <div class=\"fn__space5\"></div>\n" +
-                        "        <a href=\"" + Label.servePath + "/member/" + result.info.userName + "\">" + result.info.userName + "</a>'s 红包\n" +
-                        "    </div>\n" +
-                        "    <div class=\"fn-hr5\"></div>\n" +
-                        (gesture ? ("<div class=\"ft__smaller ft__fade\">" + gesture + "</div>\n") : "") +
-                        "    <div id = \"msg\" class=\"ft__smaller ft__fade\">\n" +
-                        result.info.msg + "\n" +
-                        "    </div>\n" +
-                        "    <div class=\"hongbao__count\" id='redPacketIGot'>\n" +
-                        iGot +
-                        "    </div>\n" +
-                        "    <div class=\"ft__smaller ft__fade\">总计 " + result.info.got + "/" + result.info.count + "</div>\n" +
-                        "</div>\n" +
-                        "<div class=\"list\"><ul id=\"redPacketList\">\n" +
-                        "</ul></div>" +
-                        "", "红包");
-                    ChatRoom.renderRedPacket(result.who, result.info.count, result.info.got, result.recivers, result.diceRet)
+                    Util.alert(`<style>.dialog-header-bg {border-radius: 4px 4px 0 0; background-color: rgb(210, 63, 49); color: rgb(255, 255, 255);}.dialog-main {height: 456px;overflow: auto;}</style><div class="fn-hr5"></div>
+<div class="ft__center">
+    <div class="fn__flex-inline">
+        <img class="avatar avatar--small" src="${result.info.userAvatarURL48}" style="background-image: none; background-color: transparent; width: 20px; height: 20px; margin-right: 0;">
+        <div class="fn__space5"></div>
+        <a href="${Label.servePath}/member/${result.info.userName}">${result.info.userName}</a>'s 红包
+    </div>
+    <div class="fn-hr5"></div>
+${gesture ? `<div class="ft__smaller ft__fade">${gesture}</div>` : ""}    <div id = "msg" class="ft__smaller ft__fade">
+${result.info.msg}
+    </div>
+    <div class="hongbao__count" id='redPacketIGot'>${iGot}</div>
+    <div class="ft__smaller ft__fade">总计 ${result.info.got}/${result.info.count}</div>
+</div>
+<div class="list"><ul id="redPacketList">
+</ul></div>`, "红包");
+                    ChatRoom.renderRedPacket(result.who, result.info.count, result.info.got, result.recivers, result.diceRet, result.info.userName)
                     if (result.info.count === result.info.got) {
                         $("#chatroom" + oId).find(".hongbao__item").css("opacity", ".36").attr('onclick', "ChatRoom.unpackRedPacket(" + oId + ")");
                         if (result.dice === true) {

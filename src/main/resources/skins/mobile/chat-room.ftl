@@ -64,6 +64,7 @@
             <div class="reply">
                 <#if isLoggedIn>
                     <div id="chatContent"></div>
+                    <div id="liveliness"></div>
                     <#if nightDisableMode == true>
                         <div class="discuss_title" style="border-radius: 10px">
                             <a style="text-decoration: none; display: inline-block; cursor: default; font-weight: normal; background-color: #f6f6f670;">
@@ -143,7 +144,6 @@
                     </div>
                 </#if>
             </div>
-            <br/>
             <div class="list" style="height: 100%">
                 <div id="chats">
                 </div>
@@ -228,33 +228,42 @@
     }
     Label.onlineAvatarData = "";
 </script>
-<script>
-    $(window).scroll(
-        function () {
+<script type="text/javascript">
+    function getActivityStatus() {
+        $.ajax({
+            url: Label.servePath + "/user/liveness",
+            method: "get",
+            cache: false,
+            async: false,
+            success: function (result) {
+                let liveness = result.liveness;
+                $('#liveliness').css("width", liveness + '%');
+            }
+        });
+    }
+    $(document).ready(function () {
+        $(window).scroll(function () {
             var scrollTop = $(this).scrollTop();
             var scrollHeight = $(document).height();
             var windowHeight = $(this).height();
             if (scrollTop + windowHeight + 500 >= scrollHeight) {
                 ChatRoom.more();
             }
-        }
-    );
-</script>
-<script type="text/javascript">
-    $(document).ready(function () {
-        $(function () {
-            $(window).scroll(function () {
-                if ($(this).scrollTop() > 1) {
-                    $("#goToTop").fadeIn();
-                } else {
-                    $("#goToTop").fadeOut();
-                }
-            });
+            if ($(this).scrollTop() > 1) {
+                $("#goToTop").fadeIn();
+            } else {
+                $("#goToTop").fadeOut();
+            }
         });
         $("#goToTop a").click(function () {
             $("html,body").animate({scrollTop: 0}, 800);
             return false;
         });
+
+        setInterval(function () {
+            getActivityStatus();
+        }, 30000);
+        getActivityStatus();
     });
 </script>
 </body>
