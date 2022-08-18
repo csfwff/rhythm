@@ -75,6 +75,11 @@
             <@head title="邀请成员排行 - ${symphonyLabel}">
             </@head>
         </#if>
+        <#if type == "donate">
+            <@head title="捐助成员排行 - ${symphonyLabel}">
+            </@head>
+        </#if>
+        
     </head>
     <body>
         <#include "../header.ftl">
