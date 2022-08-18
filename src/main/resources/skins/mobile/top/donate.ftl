@@ -19,7 +19,7 @@
 
 -->
 <#include "macro-top.ftl">
-<@top "invite">
+<@top "donate">
     <h2 class="sub-head">捐助成员排行</h2>
     <div class="list">
         <ul>
