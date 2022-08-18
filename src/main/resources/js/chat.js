@@ -466,17 +466,14 @@ var Chat = {
      * 加载表情
      */
     loadEmojis: function () {
-        $("#emojis").html("");
-        let emojis = Chat.getEmojis();
+        let emojis = Chat.getEmojis(),html="";
         for (let i = 0; i < emojis.length; i++) {
-            $("#emojis").append("" +
-                "<button>\n" +
-                "    <div class=\"divX\" onclick='Chat.delEmoji(\"" + emojis[i] + "\")'>\n" +
-                "        <svg style=\"width: 15px; height: 15px;\"><use xlink:href=\"#delIcon\"></use></svg>\n" +
-                "    </div>" +
-                "    <img style='max-height: 50px' onclick=\"Chat.editor.setValue(Chat.editor.getValue() + '![图片表情](" + emojis[i] + ")')\" class=\"vditor-emojis__icon\" src=\"" + emojis[i] + "\">\n" +
-                "</button>");
+            html+=`<button onclick="Chat.editor.setValue(Chat.editor.getValue() + '![图片表情](${emojis[i]})')">
+    <div class="divX"><svg onclick='Chat.delEmoji("${emojis[i]}");event.cancelBubble =true;' style="width: 15px; height: 15px;"><use xlink:href="#delIcon"></use></svg></div>
+    <img style='max-height: 50px' class="vditor-emojis__icon" src="${emojis[i]}">
+</button>`;
         }
+        $("#emojis").html(html);
     },
     /**
      * 删除表情包
@@ -713,7 +710,6 @@ $(document).ready(function () {
     Chat.loadEmojis();
     // 监听表情包按钮
 
-    /*出问题就删除下面的*/
     (()=>{
         let time_out=new Date().getTime(),timeoutId=0
         const closeEmoji=function () {
@@ -742,27 +738,4 @@ $(document).ready(function () {
             time_out=new Date().getTime()
         },closeEmoji)
     })()
-    /*出问题就恢复下面的，删除上面的*/
-    // $("#emojiBtn").on('click', function () {
-    //     if ($("#emojiList").hasClass("showList")) {
-    //         $("#emojiList").removeClass("showList");
-    //     } else {
-    //         $("#emojiList").addClass("showList");
-    //         setTimeout(function () {
-    //             $("body").unbind();
-    //             $("body").click(function() {
-    //                 $("#emojiList").removeClass("showList");
-    //                 $("body").unbind();
-    //                 $('body').click(function (event) {
-    //                     $("details[open]").removeAttr("open");
-    //                     if ($(event.target).closest('a').attr('id') !== 'aPersonListPanel' &&
-    //                         $(event.target).closest('.module').attr('id') !== 'personListPanel') {
-    //                         $('#personListPanel').hide()
-    //                     }
-    //                 })
-    //             });
-    //         }, 100);
-    //     }
-    // });
-    /*出问题就恢复上面的*/
 });

@@ -681,7 +681,10 @@ a[class*=" icon-"]:hover {
 }
 
 label.anonymous-check {
-  margin: 2px 15px 0 0;
+  margin: 0 9px;
+  input{
+    margin-left: 4px;
+  }
 }
 
 .cmts {
@@ -1098,6 +1101,8 @@ h1.article-title > a:hover {
 }
 
 .comment-submit {
+  display: flex;
+  align-items: center;
   margin-top: 10px;
 }
 
@@ -3162,7 +3167,11 @@ only screen and (device-width: 414px) and (device-height: 896px) and (-webkit-de
   margin: 0px 5px 10px 5px;
 }
 
-
+#liveliness{
+  height: 1px;
+  background: red;
+  width: 0;
+}
 
 
 

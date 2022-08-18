@@ -402,6 +402,14 @@
       box-sizing: border-box;
       width: 100%;
       max-width: initial;
+      #commentContent{
+        max-height: 600px;
+      }
+      .comment-submit {
+        display: flex;
+        align-items: center;
+        margin-top: 10px;
+      }
     }
 
     .form {
@@ -451,8 +459,10 @@
 }
 
 label.cmt-anonymous {
-  margin: 0 20px 0 0;
-  line-height: 33px;
+  margin: 0 9px;
+  input{
+    margin-left: 4px;
+  }
 }
 
 .action-btns > span,
@@ -2585,6 +2595,9 @@ code .dec {
 
 .showList {
   display: block;
+  &#emojiList{
+    bottom: 60px;
+  }
 }
 
 .divX {
