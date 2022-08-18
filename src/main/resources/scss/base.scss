@@ -115,7 +115,8 @@
 }
 
 .tooltipped-new {
-  position: relative;
+  //解决label遮盖问题
+  //position: relative;
   cursor: pointer;
 }
 
