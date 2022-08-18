@@ -32,6 +32,7 @@ import org.b3log.symphony.model.Common;
 import org.b3log.symphony.model.UserExt;
 import org.b3log.symphony.processor.middleware.AnonymousViewCheckMidware;
 import org.b3log.symphony.repository.PointtransferRepository;
+import org.b3log.symphony.repository.SponsorRepository;
 import org.b3log.symphony.service.*;
 import org.b3log.symphony.util.Symphonys;
 import org.b3log.symphony.util.Vocation;
@@ -97,6 +98,12 @@ public class TopProcessor {
     @Inject
     private PointtransferRepository pointtransferRepository;
 
+    /**
+     * Sponsor repository.
+     */
+    @Inject
+    private SponsorRepository sponsorRepository;
+
     @Inject
     private AvatarQueryService avatarQueryService;
 
@@ -122,6 +129,7 @@ public class TopProcessor {
         Dispatcher.get("/top/emoji", topProcessor::showEmoji, anonymousViewCheckMidware::handle);
         Dispatcher.get("/top/xiaoice", topProcessor::showXiaoice, anonymousViewCheckMidware::handle);
         Dispatcher.get("/top/invite", topProcessor::showInvite, anonymousViewCheckMidware::handle);
+        Dispatcher.get("/top/donate", topProcessor::showDonate, anonymousViewCheckMidware::handle);
     }
 
     /**
@@ -444,4 +452,48 @@ public class TopProcessor {
         dataModelService.fillSideTags(dataModel);
         dataModelService.fillLatestCmts(dataModel);
     }
+
+    /**
+     * Shows Donate ranking list.
+     *
+     * @param context
+     */
+    public void showDonate(final RequestContext context) {
+      final AbstractFreeMarkerRenderer renderer = new SkinRenderer(context, "top/donate.ftl");
+      final Map<String, Object> dataModel = renderer.getDataModel();
+      // try {
+      //   List<JSONObject> totalList = sponsorRepository.select("select sum(amount) as totalAmount " +
+      //             "from " + sponsorRepository.getName() + " " +
+      //             "limit 1;");
+      //             dataModel.put("totalData",totalList.get(0));
+      // }
+      // catch (Exception ignored) {
+      // }
+      try {
+          List<JSONObject> list = sponsorRepository.select("select userId as userId,sum(amount) as total,count(*) as totalCount " +
+                  "from " + sponsorRepository.getName() + " " +
+                  "group by userId " +
+                  "order by total desc " +
+                  "limit 64;");
+          List<JSONObject> result = new ArrayList<>();
+          for (JSONObject user : list) {
+              try {
+                  JSONObject userData = userQueryService.getUser(user.optString("userId"));
+                  avatarQueryService.fillUserAvatarURL(userData);
+                  user.put("profile", userData);
+                  result.add(user);
+              } catch (Exception e) {
+                  continue;
+              }
+          }
+          dataModel.put("data", result);
+      } catch (Exception ignored) {
+      }
+
+      dataModelService.fillHeaderAndFooter(context, dataModel);
+      dataModelService.fillRandomArticles(dataModel);
+      dataModelService.fillSideHotArticles(dataModel);
+      dataModelService.fillSideTags(dataModel);
+      dataModelService.fillLatestCmts(dataModel);
+  }
 }
