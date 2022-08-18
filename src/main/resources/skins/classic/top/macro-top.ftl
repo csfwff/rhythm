@@ -88,6 +88,11 @@
                 <link rel="canonical" href="${servePath}/top/invite">
             </@head>
         </#if>
+        <#if type == "donate">
+            <@head title="捐助成员排行 - ${symphonyLabel}">
+                <link rel="canonical" href="${servePath}/top/donate">
+            </@head>
+        </#if>
         <link rel="stylesheet" href="${staticServePath}/css/index.css?${staticResourceVersion}" />
         <link rel="stylesheet" href="${staticServePath}/css/responsive.css?${staticResourceVersion}" />
     </head>
