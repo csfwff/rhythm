@@ -21,7 +21,7 @@
 <#include "macro-top.ftl">
 <@top "donate">
     <h2 class="sub-head">捐助成员排行</h2>
-    <div class="fn-clear">
+    <div style="padding: 5px 0 5px 10px">
         总捐助金额 <b>${totalData.totalAmount} ¥</b><br>
         为社区运营续航 <b>${totalData.donateMakeDays} 天</b>
     </div>
