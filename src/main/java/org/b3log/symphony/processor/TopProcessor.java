@@ -39,6 +39,7 @@ import org.b3log.symphony.util.Vocation;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -461,14 +462,19 @@ public class TopProcessor {
     public void showDonate(final RequestContext context) {
       final AbstractFreeMarkerRenderer renderer = new SkinRenderer(context, "top/donate.ftl");
       final Map<String, Object> dataModel = renderer.getDataModel();
-      // try {
-      //   List<JSONObject> totalList = sponsorRepository.select("select sum(amount) as totalAmount " +
-      //             "from " + sponsorRepository.getName() + " " +
-      //             "limit 1;");
-      //             dataModel.put("totalData",totalList.get(0));
-      // }
-      // catch (Exception ignored) {
-      // }
+      try {
+        List<JSONObject> totalList = sponsorRepository.select("select sum(amount) as totalAmount " +
+                  "from " + sponsorRepository.getName() + " " +
+                  "limit 1;");
+        JSONObject totalJSON = totalList.get(0);
+        double totalAmount = totalJSON.optDouble("totalAmount");
+        BigDecimal donateMakeDaysBigDecimal = new BigDecimal(String.valueOf(totalAmount / 5));
+        double donateMakeDays = donateMakeDaysBigDecimal.setScale(0, BigDecimal.ROUND_HALF_UP).doubleValue();
+        totalJSON.put("donateMakeDays", donateMakeDays);
+        dataModel.put("totalData", totalJSON);
+      }
+      catch (Exception ignored) {
+      }
       try {
           List<JSONObject> list = sponsorRepository.select("select userId as userId,sum(amount) as total,count(*) as totalCount " +
                   "from " + sponsorRepository.getName() + " " +
