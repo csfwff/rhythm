@@ -66,9 +66,9 @@ public class SponsorService {
         }
     }
 
-    public List<JSONObject> list() {
+    public List<JSONObject> list(int page, int limit) {
         try {
-            final List<JSONObject> list = repository.list();
+            final List<JSONObject> list = repository.list(page, limit);
             return list.stream().peek(x -> {
                 x.put(User.USER_NAME, userQueryService.getUserName(x.optString(UserExt.USER_T_ID)));
                 x.put(Common.DATE, new SimpleDateFormat("yyyy-MM-dd").format(x.optLong(Common.TIME)));
