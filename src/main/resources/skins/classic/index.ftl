@@ -189,18 +189,18 @@
                         <#if user_index < 6>
                             <li class="fn-flex rank topCheckInUsersElement">
                                 <#if user_index == 0 || user_index == 1 || user_index == 2>
-                                    <span
+                                <span
                                         <#if user_index == 0>
-                                            style="border-color: #ffab10 transparent transparent #ffab10;-webkit-clip-path: polygon(0 100%, 0 0, 100% 0);clip-path: polygon(0 100%, 0 0, 100% 0);"
+                                            style="border-color: #ffab10 transparent transparent #ffab10;"
                                         <#elseif user_index == 1>
-                                            style="border-color: #c0c0c0 transparent transparent #c0c0c0;-webkit-clip-path: polygon(0 100%, 0 0, 100% 0);clip-path: polygon(0 100%, 0 0, 100% 0);"
+                                            style="border-color: #c0c0c0 transparent transparent #c0c0c0;"
                                         <#elseif user_index == 2>
-                                            style="border-color: #d9822b transparent transparent #d9822b;-webkit-clip-path: polygon(0 100%, 0 0, 100% 0);clip-path: polygon(0 100%, 0 0, 100% 0);"
+                                            style="border-color: #d9822b transparent transparent #d9822b;"
                                         </#if>
-                                    class="cb-stick" aria-label="第${user_index + 1}名">
+                                        class="cb-stick" aria-label="第${user_index + 1}名">
                                     <span class="icon-pin-rank">${user_index + 1}</span>
-                                    </span>
-                                </#if>
+                                    </#if>
+                                </span>
                                 <a rel="nofollow" href="${servePath}/member/${user.userName}">
                                     <span class="avatar-small slogan"
                                           aria-label="${user.userName}"
@@ -230,18 +230,18 @@
                         <#if user_index < 5>
                             <li class="fn-flex rank topCheckInUsersElement">
                                 <#if user_index == 0 || user_index == 1 || user_index == 2>
-                                    <span
+                                <span
                                         <#if user_index == 0>
-                                            style="border-color: #ffab10 transparent transparent #ffab10;-webkit-clip-path: polygon(0 100%, 0 0, 100% 0);clip-path: polygon(0 100%, 0 0, 100% 0);"
+                                            style="border-color: #ffab10 transparent transparent #ffab10;"
                                         <#elseif user_index == 1>
-                                            style="border-color: #c0c0c0 transparent transparent #c0c0c0;-webkit-clip-path: polygon(0 100%, 0 0, 100% 0);clip-path: polygon(0 100%, 0 0, 100% 0);"
+                                            style="border-color: #c0c0c0 transparent transparent #c0c0c0;"
                                         <#elseif user_index == 2>
-                                            style="border-color: #d9822b transparent transparent #d9822b;-webkit-clip-path: polygon(0 100%, 0 0, 100% 0);clip-path: polygon(0 100%, 0 0, 100% 0);"
+                                            style="border-color: #d9822b transparent transparent #d9822b;"
                                         </#if>
                                         class="cb-stick" aria-label="第${user_index + 1}名">
                                     <span class="icon-pin-rank">${user_index + 1}</span>
-                                    </span>
-                                </#if>
+                                    </#if>
+                                </span>
                                 <a rel="nofollow" href="${servePath}/member/${user.userName}">
                                     <span class="avatar-small slogan"
                                           aria-label="${user.userName}"
