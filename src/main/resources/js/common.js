@@ -1477,203 +1477,142 @@ var Util = {
      */
     userCardCache: new Map(),
     listenUserCard: function () {
-        var cardLock = false;
-        $(".avatar, .avatar-small, .avatar-middle, .avatar-mid, .avatar-big, .name-at").unbind();
-
-        $(".avatar, .avatar-small, .avatar-middle, .avatar-mid, .avatar-big, .name-at").hover(function () {
-            // 加载用户信息
-            if ($(this).attr("aria-label") !== undefined) {
-                let username = $(this).attr("aria-label");
-                // 请求数据
-                let data;
-                if (Util.userCardCache.has(username)) {
-                    data = Util.userCardCache.get(username);
-                } else {
-                    $.ajax({
-                        url: Label.servePath + "/user/" + username,
-                        type: "GET",
-                        cache: false,
-                        async: false,
-                        headers: {'csrfToken': Label.csrfToken},
-                        success: function (result) {
-                            data = result;
-                            Util.userCardCache.set(username, data);
-                        }
-                    });
+        let time_out=new Date().getTime(),timeoutId=0
+        const showHTML=function (data,el){
+            const {oId,userAvatarURL,userCity,userIntro,userName,userNickname,userOnlineFlag,userPoint,userRole,cardBg,canFollow,userNo,userAppRole}=data
+            let sysMetal = JSON.parse(data.sysMetal);
+            // 组合内容
+            let html = `<div class="user-card${cardBg?" user-card--bg":""}" style="background-image: url(${cardBg})" id="userCardContent">
+<div>
+<a href="${Label.servePath}/member/${userName}">
+<div class="avatar-mid-card" style="background-image: url(${userAvatarURL});"></div>
+</a>
+<div class="user-card__meta">
+<div class="fn__ellipsis">
+<a class="user-card__name" href="${Label.servePath}/member/${userName}"><b>${userNickname}</b></a>
+<a class="ft-gray ft-smaller" href="${Label.servePath}/member/${userName}"><b>${userName}</b></a>
+</div>
+<div class="user-card__info vditor-reset">
+${userIntro||`摸鱼派 ${userNo} 号成员，<b>${["黑客","画家"][userAppRole]}</b>`}
+</div>`
+            let list = sysMetal.list;
+            if (list && list.length) {
+                html += '<div class="user-card__info vditor-reset">';
+                for (let i = 0; i < list.length; i++) {
+                    html += `<img title='${list[i].description}' src='${Util.genMetal(list[i].name, list[i].attr)}'/>`;
                 }
-                let followerCount = data.followerCount;
-                let followingUserCount = data.followingUserCount;
-                let oId = data.oId;
-                let onlineMinute = data.onlineMinute;
-                let userAvatarURL = data.userAvatarURL210;
-                let userCity = data.userCity;
-                let userIntro = data.userIntro;
-                let userName = data.userName;
-                let userNickname = data.userNickname;
-                let userOnlineFlag = data.userOnlineFlag;
-                let userPoint = data.userPoint;
-                let userURL = data.userURL;
-                let userRole = data.userRole;
-                let cardBg = data.cardBg;
-                let canFollow = data.canFollow;
-                let userNo = data.userNo;
-                let userAppRole = data.userAppRole;
-                let sysMetal = JSON.parse(data.sysMetal);
-                // 组合内容
-                let html = "" +
-                    '<div class="user-card" id="userCardContent">\n' +
-                    '    <div>\n' +
-                    '        <a href="' + Label.servePath + '/member/' + userName + '">\n' +
-                    '            <div class="avatar-mid-card" style="background-image: url(' + userAvatarURL + ');"></div>\n' +
-                    '        </a>\n' +
-                    '        <div class="user-card__meta">\n' +
-                    '            <div class="fn__ellipsis">\n' +
-                    '                <a class="user-card__name" href="' + Label.servePath + '/member/' + userName + '"><b>' + userNickname + '</b></a>\n' +
-                    '                <a class="ft-gray ft-smaller" href="' + Label.servePath + '/member/' + userName + '"><b>' + userName + '</b></a>\n';
-                html += '            </div>\n';
-                if (userIntro !== "") {
-                    html += '' +
-                        '            <div class="user-card__info vditor-reset">\n' +
-                        '                ' + userIntro + '\n' +
-                        '            </div>\n';
-                } else {
-                    if (userAppRole === "0") {
-                        html += '<div class="user-card__info vditor-reset">' +
-                            '摸鱼派 ' + userNo + ' 号成员，<b>黑客</b>' +
-                            '</div>\n';
-                    } else if (userAppRole === "1") {
-                        html += '<div class="user-card__info vditor-reset">' +
-                            '摸鱼派 ' + userNo + ' 号成员，<b>画家</b>' +
-                            '</div>\n';
-                    }
-                }
-                let list = sysMetal.list;
-                if (list !== undefined && list.length !== 0) {
-                    html += '<div class="user-card__info vditor-reset">';
-                    for (let i = 0; i < list.length; i++) {
-                        let m = list[i];
-                        html += "<img title='" + m.description + "' src='" + Util.genMetal(m.name, m.attr) + "'/>";
-                    }
-                    html += '</div>';
-                }
-                html += '            <div class="user-card__icons fn__flex">\n' +
-                    '                <div class="fn__flex-1">\n' +
-                    '                    <a href="https://fishpi.cn/article/1630575841478" class="tooltipped__n tooltipped-new"\n' +
-                    '                       aria-label="用户分组：' + userRole + '">\n';
-                switch (userRole) {
-                    case '管理员':
-                        html += '<img style="height: 20px;margin: 0px;" src="https://pwl.stackoverflow.wiki/adminRole.png"/>';
-                        break;
-                    case 'OP':
-                        html += '<img style="height: 20px;margin: 0px;" src="https://pwl.stackoverflow.wiki/opRole.png"/>';
-                        break;
-                    case '纪律委员':
-                        html += '<img style="height: 20px;margin: 0px;" src="https://pwl.stackoverflow.wiki/policeRole.png"/>';
-                        break;
-                    case '超级会员':
-                        html += '<img style="height: 20px;margin: 0px;" src="https://pwl.stackoverflow.wiki/svipRole.png"/>';
-                        break;
-                    case '成员':
-                        html += '<img style="height: 20px;margin: 0px;" src="https://pwl.stackoverflow.wiki/vipRole.png"/>';
-                        break;
-                    default:
-                        html += '<img style="height: 20px;margin: 0px;" src="https://pwl.stackoverflow.wiki/newRole.png"/>';
-                        break;
-                }
-                html += '                    </a>\n';
-                html += '                    <a href="' + Label.servePath + '/member/' + userName + '/points" class="tooltipped-new tooltipped__n"\n' +
-                    '                       aria-label="' + userPoint + ' 积分">\n' +
-                    '                        <svg>\n' +
-                    '                            <use xlink:href="#iconPoints"></use>\n' +
-                    '                        </svg>\n' +
-                    '                    </a>\n';
-                if (userCity !== "") {
-                    html += '' +
-                        '<a href="' + Label.servePath + '/city/' + userCity + '" class="tooltipped-new tooltipped__n" rel="nofollow"\n' +
-                        '   aria-label="' + userCity + '">\n' +
-                        '    <svg>\n' +
-                        '        <use xlink:href="#icon-local"></use>\n' +
-                        '    </svg>\n' +
-                        '</a>\n';
-                }
-                html += '' +
-                    '<a class="tooltipped-new tooltipped__n" rel="nofollow" onclick="javascript:void(0)" style="background-color:#eeeeeecc;border-radius:5px;padding:0 7px 0 4px;cursor:default;color:#6d6c6c;font-size:5px;"\n' +
-                    '   aria-label="' + userNo + ' 号成员">\n' +
-                    '    <svg style="height: 12px; vertical-align: -4.5px">\n' +
-                    '        <use xlink:href="#no"></use>\n' +
-                    '    </svg>' +
-                    '    <span style="margin: 0;float: none;vertical-align: -3px;">' + userNo + '</span> \n' +
-                    '</a>\n';
-                html += '' +
-                    '                </div>\n';
-
-                if (userOnlineFlag === true) {
-                    html += '<span style="background-color:#d23f31;color:#fff;font-size:12px;line-height:20px;border-radius:3px;height:20px;display:inline-block;padding:0 5px;vertical-align:middle;box-sizing:border-box;">在线</span>';
-                } else {
-                    html += '<span style="background-color:rgba(0,0,0,0.54);color:#fff;font-size:12px;line-height:20px;border-radius:3px;height:20px;display:inline-block;padding:0 5px;vertical-align:middle;box-sizing:border-box;">离线</span>';
-                }
-                html += '                <div class="fn__shrink">\n' +
-                    '                    <a class="green small btn" href="' + Label.servePath + '/chat?toUser=' + userName + '" rel="nofollow">\n' +
-                    '                        私信\n' +
-                    '                    </a>\n';
-                if (canFollow === "yes") {
-                    html += '' +
-                        '<button class="follow small" onclick="Util.follow(this, \'' + oId + '\', \'user\')">\n' +
-                        ' 关注\n' +
-                        '</button>';
-                } else if (canFollow === "no") {
-                    html += '' +
-                        '<button class="follow small" onclick="Util.unfollow(this, \'' + oId + '\', \'user\')">\n' +
-                        ' 取消关注\n' +
-                        '</button>';
-                }
-                html += '' +
-                    '                </div>\n' +
-                    '            </div>\n' +
-                    '        </div>\n' +
-                    '    </div>\n' +
-                    '</div>';
-                $("#userCard").html(html);
-                if (cardBg !== "") {
-                    $("#userCardContent").addClass("user-card--bg");
-                    $("#userCardContent").css("background-image", "url(" + cardBg + ")");
-                    $("#userCardContent > div").attr("style", "background-image: linear-gradient(90deg, rgba(214, 227, 235, 0.36), rgba(255, 255, 255, 0.76), rgba(255, 255, 255, 0.76));");
-                    $("#userCardContent > div > a > div").css("width", "105px");
-                    $("#userCardContent > div > a > div").css("height", "105px");
-                    $("#userCardContent > div > a > div").css("top", "80px");
-                }
-
-                // 设置位置
-                let left = $(this).offset().left;
-                left = left + 30;
-                if (left + 350 > $(document.body).width()) {
-                    left = left - 350;
-                }
-                $("#userCard").css("left", left);
-                let top = $(this).offset().top - 110;
-                if (top < 45) {
-                    top = $(this).offset().top + 45;
-                }
-                $("#userCard").css("top", top + "px");
-                $("#userCard").show();
+                html += '</div>';
             }
-        }, function (event) {
-            setTimeout(function () {
-                let el = $(event.toElement);
-                if ($(el).parents("#userCard").length === 0) {
-                    if (!cardLock) {
-                        $("#userCard").hide();
+            let role="https://pwl.stackoverflow.wiki/newRole.png"
+            switch (userRole) {
+                case '管理员':
+                    role = "https://pwl.stackoverflow.wiki/adminRole.png"
+                    break;
+                case 'OP':
+                    role = "https://pwl.stackoverflow.wiki/opRole.png"
+                    break;
+                case '纪律委员':
+                    role = "https://pwl.stackoverflow.wiki/policeRole.png"
+                    break;
+                case '超级会员':
+                    role = "https://pwl.stackoverflow.wiki/svipRole.png"
+                    break;
+                case '成员':
+                    role = "https://pwl.stackoverflow.wiki/vipRole.png"
+            }
+            html += `<div class="user-card__icons fn__flex"><div class="fn__flex-1">
+<a href="https://fishpi.cn/article/1630575841478" class="tooltipped__n tooltipped-new" aria-label="用户分组：${userRole}">
+<img style="height: 20px;margin: 0;" src="${role}"/></a>
+<a href="${Label.servePath}/member/${userName}/points" class="tooltipped-new tooltipped__n" aria-label="${userPoint} 积分">
+<svg><use xlink:href="#iconPoints"></use></svg>
+</a>`;
+            if (userCity !== "") {
+                html += `<a href="${Label.servePath}/city/${userCity}" class="tooltipped-new tooltipped__n" rel="nofollow" aria-label="${userCity}">
+<svg><use xlink:href="#icon-local"></use></svg>
+</a>`;
+            }
+            html += `<a class="tooltipped-new tooltipped__n" rel="nofollow" onclick="#" style="background-color:#eeeeeecc;border-radius:5px;padding:0 7px 0 4px;cursor:default;color:#6d6c6c;font-size:5px;" aria-label="${userNo} 号成员">
+<svg style="height: 12px; vertical-align: -4.5px"><use xlink:href="#no"></use></svg>
+<span style="margin: 0;float: none;vertical-align: -3px;">${userNo}</span> 
+</a>
+</div>
+${userOnlineFlag?'<span style="background-color:#d23f31;color:#fff;font-size:12px;line-height:20px;border-radius:3px;height:20px;display:inline-block;padding:0 5px;vertical-align:middle;box-sizing:border-box;">在线</span>':'<span style="background-color:rgba(0,0,0,0.54);color:#fff;font-size:12px;line-height:20px;border-radius:3px;height:20px;display:inline-block;padding:0 5px;vertical-align:middle;box-sizing:border-box;">离线</span>'}
+<div class="fn__shrink">
+<a class="green small btn" href="${Label.servePath}/chat?toUser=${userName}" rel="nofollow">私信</a>`;
+            if (canFollow === "yes") {
+                html += `<button class="follow small" onclick="Util.follow(this, '${oId}', 'user')"> 关注</button>`;
+            } else if (canFollow === "no") {
+                html += `<button class="follow small" onclick="Util.unfollow(this,'${oId}','user')">取消关注</button>`;
+            }
+            html += `</div></div></div></div></div>`;
+            if (cardBg !== "") {
+                html +=`<style>#userCardContent > div{background-image: linear-gradient(90deg, rgba(214, 227, 235, 0.36), rgba(255, 255, 255, 0.76), rgba(255, 255, 255, 0.76));}
+#userCardContent > div > a > div{width: 105px;height: 105px;top: 80px}</style>`
+            }
+
+            // 设置位置
+            let left = $(el).offset().left;
+            if (left + 370 > $(document.body).width()) {
+                left = left - 360;
+            }
+            let top = $(el).offset().top - 110;
+            if (top < 45) {
+                top += 155;
+            }
+
+            $("#userCard").html(html).css({left: left+"px",top: top + "px"}).show();
+        }
+        const createHTML=function (el){
+            // 加载用户信息
+            const username = $(el).attr("aria-label");
+            if (username !== undefined) {
+                // 请求数据
+                let data=Util.userCardCache.get(username)
+                data|| $.ajax({
+                    url: Label.servePath + "/user/" + username,
+                    type: "GET",
+                    cache: false,
+                    async: false,
+                    headers: {'csrfToken': Label.csrfToken},
+                    success: function (result) {
+                        data = result;
+                        Util.userCardCache.set(username, data);
                     }
-                }
-            }, 50);
-        });
-        $("#userCard").unbind();
-        $("#userCard").hover(function () {
-            cardLock = true;
-        }, function () {
-            cardLock = false;
-            $("#userCard").hide();
-        });
+                });
+                showHTML(data,el)
+            }
+        }
+        const closeCard=function(){
+            if(timeoutId!==0){
+                clearTimeout(timeoutId)
+                timeoutId=0
+            }
+            time_out=new Date().getTime()
+            timeoutId=setTimeout(()=>{
+                new Date().getTime()-time_out<=110 && $("#userCard").hide();
+            },100)
+        }
+        $(".avatar, .avatar-small, .avatar-middle, .avatar-mid, .avatar-big, .name-at").unbind().hover(function (el) {
+            if($("#userCard").length) {
+                // 设置位置
+                let {left,top} = $(el.target).offset();
+                if (left + 360 > $(window).width()) left -= 360;
+                $("#userCard").css({left: left + "px", top: top < 155 ? top + 45 : top - 110 + "px"}).show();
+            }
+            if(timeoutId!==0){
+                clearTimeout(timeoutId)
+                timeoutId=0
+            }
+            time_out=new Date().getTime()
+            setTimeout(()=>0!==$(".avatar:hover, .avatar-small:hover, .avatar-middle:hover, .avatar-mid:hover, .avatar-big:hover, .name-at:hover").length&&createHTML(el.target),80)
+        }, closeCard);
+        $("#userCard").unbind().hover(function () {
+            if(timeoutId!==0){
+                clearTimeout(timeoutId)
+                timeoutId=0
+            }
+            time_out=new Date().getTime()
+        }, closeCard);
     },
     /**
      * @description 用户状态 channel.
