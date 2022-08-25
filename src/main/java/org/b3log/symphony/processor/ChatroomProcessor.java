@@ -1170,8 +1170,6 @@ public class ChatroomProcessor {
                 }
                 // 需要扣减的积分 首次免费 以后 f(x) = 32x
                 Integer needDelPoint = times * 32;
-                // 开启事务
-                final Transaction transaction = chatRoomRepository.beginTransaction();
                 // 扣钱
                 final boolean succ = null != pointtransferMgmtService.transfer(currentUser.optString(Keys.OBJECT_ID), Pointtransfer.ID_C_SYS,
                         Pointtransfer.TRANSFER_TYPE_C_CHAT_ROOM_REVOKE,
@@ -1180,6 +1178,8 @@ public class ChatroomProcessor {
                     context.renderJSON(StatusCodes.ERR).renderMsg("少年，你的积分不足！要为自己的言行负责~");
                     return;
                 }
+                // 开启事务
+                final Transaction transaction = chatRoomRepository.beginTransaction();
                 // 撤回
                 chatRoomRepository.remove(removeMessageId);
                 // 提交事务
@@ -1192,6 +1192,7 @@ public class ChatroomProcessor {
                 revoke.put(curUser, date + "," + (times + 1));
             }
         } catch (Exception e) {
+            e.printStackTrace();
             context.renderJSON(StatusCodes.ERR).renderMsg("撤回失败，请联系 @adlered。");
         }
     }
