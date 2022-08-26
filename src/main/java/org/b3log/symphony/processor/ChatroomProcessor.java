@@ -1111,7 +1111,7 @@ public class ChatroomProcessor {
      * @param context
      */
     private static Map<String/*userName*/, String/*data-times*/> revoke = new HashMap<>();
-    
+
     public void revokeMessage(final RequestContext context) {
         try {
             String removeMessageId = context.pathVar("oId");
@@ -1163,7 +1163,7 @@ public class ChatroomProcessor {
                     // 今天撤回过了, 免费了一次? 要不要追扣一把
                     times = 1;
                 }
-    
+
                 // 当前日期不是今天 还没撤回过, times 归 0
                 if (!nDate.equals(date)) {
                     times = 0;
@@ -1184,7 +1184,7 @@ public class ChatroomProcessor {
                 chatRoomRepository.remove(removeMessageId);
                 // 提交事务
                 transaction.commit();
-                context.renderJSON(StatusCodes.SUCC).renderMsg("撤回成功，下次发消息一定要三思哦！本次消耗积分 :" + needDelPoint);
+                context.renderJSON(StatusCodes.SUCC).renderMsg("撤回成功，下次发消息一定要三思哦！本次消耗积分: " + needDelPoint);
                 JSONObject jsonObject = new JSONObject();
                 jsonObject.put(Common.TYPE, "revoke");
                 jsonObject.put("oId", removeMessageId);
