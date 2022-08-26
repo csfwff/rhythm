@@ -1110,8 +1110,8 @@ public class ChatroomProcessor {
      *
      * @param context
      */
-    private static Map<String, String> revoke = new HashMap<>();
-
+    private static Map<String/*userName*/, String/*data-times*/> revoke = new HashMap<>();
+    
     public void revokeMessage(final RequestContext context) {
         try {
             String removeMessageId = context.pathVar("oId");
@@ -1145,29 +1145,57 @@ public class ChatroomProcessor {
                 jsonObject.put(Common.TYPE, "revoke");
                 jsonObject.put("oId", removeMessageId);
                 ChatroomChannel.notifyChat(jsonObject);
-                return;
             } else if (msgUser.equals(curUser)) {
                 final String date = DateFormatUtils.format(System.currentTimeMillis(), "yyyyMMdd");
-                if (revoke.get(curUser) == null || !revoke.get(curUser).equals(date)) {
-                    final Transaction transaction = chatRoomRepository.beginTransaction();
-                    chatRoomRepository.remove(removeMessageId);
-                    transaction.commit();
-                    context.renderJSON(StatusCodes.SUCC).renderMsg("撤回成功，下次发消息一定要三思哦！");
-                    JSONObject jsonObject = new JSONObject();
-                    jsonObject.put(Common.TYPE, "revoke");
-                    jsonObject.put("oId", removeMessageId);
-                    ChatroomChannel.notifyChat(jsonObject);
-                    revoke.put(curUser, date);
-                    return;
+                // 撤回记录
+                String dateTimes = revoke.getOrDefault(curUser, date + ",0");
+                // 分割
+                String[] date_times = dateTimes.split(",");
+                // 上次撤回日期
+                String nDate = date_times[0];
+                // 次数
+                Integer times;
+                // 兼容旧数据
+                if (date_times.length > 1) {
+                    // 撤回次数
+                    times = Integer.valueOf(date_times[1]);
                 } else {
-                    context.renderJSON(StatusCodes.ERR).renderMsg("撤回失败，你每天只有一次撤回的机会！");
+                    // 今天撤回过了, 免费了一次? 要不要追扣一把
+                    times = 1;
                 }
+    
+                // 当前日期不是今天 还没撤回过, times 归 0
+                if (!nDate.equals(date)) {
+                    times = 0;
+                }
+                // 需要扣减的积分 首次免费 以后 f(x) = 32x
+                Integer needDelPoint = times * 32;
+                // 扣钱
+                final boolean succ = null != pointtransferMgmtService.transfer(currentUser.optString(Keys.OBJECT_ID), Pointtransfer.ID_C_SYS,
+                        Pointtransfer.TRANSFER_TYPE_C_CHAT_ROOM_REVOKE,
+                        needDelPoint, "", System.currentTimeMillis(), "");
+                if (!succ) {
+                    context.renderJSON(StatusCodes.ERR).renderMsg("少年，你的积分不足！要为自己的言行负责~");
+                    return;
+                }
+                // 开启事务
+                final Transaction transaction = chatRoomRepository.beginTransaction();
+                // 撤回
+                chatRoomRepository.remove(removeMessageId);
+                // 提交事务
+                transaction.commit();
+                context.renderJSON(StatusCodes.SUCC).renderMsg("撤回成功，下次发消息一定要三思哦！本次消耗积分 :" + needDelPoint);
+                JSONObject jsonObject = new JSONObject();
+                jsonObject.put(Common.TYPE, "revoke");
+                jsonObject.put("oId", removeMessageId);
+                ChatroomChannel.notifyChat(jsonObject);
+                revoke.put(curUser, date + "," + (times + 1));
             }
         } catch (Exception e) {
+            e.printStackTrace();
             context.renderJSON(StatusCodes.ERR).renderMsg("撤回失败，请联系 @adlered。");
         }
     }
-
     /**
      * Get all messages from database.
      *
