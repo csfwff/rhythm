@@ -18,11 +18,11 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 -->
-<#include "../macro-head.ftl">
+<#include "macro-head.ftl">
 <!DOCTYPE html>
 <html>
 <head>
-    <@head title="Catch The Cat - ${activityLabel} - ${symphonyLabel}">
+    <@head title="老黄历 - ${activityLabel} - ${symphonyLabel}">
     <meta charset="UTF-8">
     <style>
         * {
@@ -44,7 +44,7 @@
 <link rel="stylesheet" href="${staticServePath}/css/index.css?${staticResourceVersion}" />
 </head>
 <body>
-<#include "../header.ftl">
+<#include "header.ftl">
 <div class="main">
     <div class="wrapper">
         <div class="content">
@@ -96,11 +96,11 @@
             </div>
         </div>
         <div class="side">
-            <#include "../side.ftl">
+            <#include "side.ftl">
         </div>
     </div>
 </div>
-<#include "../footer.ftl">
+<#include "footer.ftl">
 <script src="${staticServePath}/js/old-almanac${miniPostfix}.js?${staticResourceVersion}"></script>
 </body>
 </html>
