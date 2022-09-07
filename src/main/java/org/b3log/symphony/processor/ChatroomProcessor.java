@@ -51,6 +51,7 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import pers.adlered.simplecurrentlimiter.main.SimpleCurrentLimiter;
 
+import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
@@ -586,7 +587,6 @@ public class ChatroomProcessor {
     final private static SimpleCurrentLimiter chatRoomLivenessLimiter = new SimpleCurrentLimiter(30, 1);
     final private static SimpleCurrentLimiter risksControlMessageLimiter = new SimpleCurrentLimiter(15 * 60, 1);
     final private static SimpleCurrentLimiter openRedPacketLimiter = new SimpleCurrentLimiter(30 * 60, 1);
-
     /**
      * Send chatroom message.
      *
@@ -625,6 +625,10 @@ public class ChatroomProcessor {
             String userId = currentUser.optString(Keys.OBJECT_ID);
 
             if (content.startsWith("[redpacket]") && content.endsWith("[/redpacket]")) {
+                // 是否收税
+                Boolean collectTaxes = false;
+                // 税率 TODO 阿达, 这个可以改造下 admin 控制 ??? 嘿嘿嘿嘿
+                BigDecimal taxRate = new BigDecimal("0.02");
                 try {
                     String redpacketString = content.replaceAll("^\\[redpacket\\]", "").replaceAll("\\[/redpacket\\]$", "");
                     JSONObject redpacket = new JSONObject(redpacketString);
@@ -694,6 +698,8 @@ public class ChatroomProcessor {
                                 }
                                 count = 1;
                                 toatlMoney = money;
+                                // 征税
+                                collectTaxes = true;
                                 break;
                             case "average":
                                 toatlMoney = money * count;
@@ -724,7 +730,7 @@ public class ChatroomProcessor {
                         }
                         final boolean succ = null != pointtransferMgmtService.transfer(userId, Pointtransfer.ID_C_SYS,
                                 Pointtransfer.TRANSFER_TYPE_C_ACTIVITY_SEND_RED_PACKET,
-                                toatlMoney, "", System.currentTimeMillis(), "");
+                                toatlMoney, "", System.currentTimeMillis(), collectTaxes ? "collectTaxes" : "");
                         if (!succ) {
                             context.renderJSON(StatusCodes.ERR).renderMsg("少年，你的积分不足！");
                             return;
@@ -737,7 +743,8 @@ public class ChatroomProcessor {
                     JSONObject redPacketJSON = new JSONObject();
                     redPacketJSON.put("senderId", userId);
                     redPacketJSON.put("type", type);
-                    redPacketJSON.put("money", money);
+                    // 收税的时候 直接扣减
+                    redPacketJSON.put("money", collectTaxes ? BigDecimal.valueOf(money).multiply(BigDecimal.ONE.subtract(taxRate)).intValue() : money);
                     redPacketJSON.put("count", count);
                     redPacketJSON.put("msg", message);
                     redPacketJSON.put("recivers", recivers);
