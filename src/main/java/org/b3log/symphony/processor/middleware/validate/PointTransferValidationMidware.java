@@ -108,7 +108,8 @@ public class PointTransferValidationMidware {
             }
         }
 
-        final int balanceMinLimit = Symphonys.POINT_TRANSER_MIN;
+        // final int balanceMinLimit = Symphonys.POINT_TRANSER_MIN;
+        final int balanceMinLimit = 0;
         final int balance = currentUser.optInt(UserExt.USER_POINT);
         if (balance - amount < balanceMinLimit) {
             if (!currentUser.optString(User.USER_NAME).equals("admin")) {
