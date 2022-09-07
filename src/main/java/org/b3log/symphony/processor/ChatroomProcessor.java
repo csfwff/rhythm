@@ -627,8 +627,8 @@ public class ChatroomProcessor {
             if (content.startsWith("[redpacket]") && content.endsWith("[/redpacket]")) {
                 // 是否收税
                 Boolean collectTaxes = false;
-                // 税率 TODO 阿达, 这个可以改造下 admin 控制 ??? 嘿嘿嘿嘿
-                BigDecimal taxRate = new BigDecimal("0.02");
+                // 税率
+                BigDecimal taxRate = new BigDecimal("0.1");
                 try {
                     String redpacketString = content.replaceAll("^\\[redpacket\\]", "").replaceAll("\\[/redpacket\\]$", "");
                     JSONObject redpacket = new JSONObject(redpacketString);
