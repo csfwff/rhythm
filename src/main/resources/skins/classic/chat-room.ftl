@@ -130,7 +130,7 @@
                     </div>
                 </div>
             </div>
-            <div class="list module pd__15" id="comments" style="height: 100%; padding-top: 0">
+            <div class="list module pd__15" id="comments" style="height: 100%; margin-top: -15px">
                 <div id="chats">
                 </div>
                 <#if !isLoggedIn><div style="color:rgba(0,0,0,0.54);">登录后查看更多</div></#if>

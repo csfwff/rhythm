@@ -1956,8 +1956,10 @@ code .dec {
 }
 
 .MidAutumnFestival .avatar::after {
-  right: 0;
-  top: 0;
+  right: -7px;
+  top: -7px;
+  width: 52px;
+  height: 52px;
   background: url("../images/festival/MidAutumnFestival.png") no-repeat center
     center;
   background-size: cover;
@@ -2250,8 +2252,10 @@ code .dec {
 }
 
 .MidAutumnFestival .avatar-mid-card::after {
-  right: 0;
-  top: 0;
+  right: -14px;
+  top: -14px;
+  width: 100px;
+  height: 100px;
   background: url("../images/festival/MidAutumnFestival.png") no-repeat center
     center;
   background-size: cover;
