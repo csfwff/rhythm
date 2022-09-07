@@ -71,7 +71,7 @@ public class PointTransferValidationMidware {
         }
 
         final int amount = requestJSONObject.optInt(Common.AMOUNT);
-        if (amount < 1 || amount > 5000) {
+        if (amount < 1 || amount > 50000) {
             if (!currentUser.optString(User.USER_NAME).equals("admin")) {
                 context.renderJSON(new JSONObject().put(Keys.MSG, langPropsService.get("amountInvalidLabel")));
                 context.abort();
