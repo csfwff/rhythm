@@ -1773,7 +1773,8 @@ ${result.info.msg}
      * */
     loadAvatarPendant: function () {
         let year = new Date().getFullYear();
-        let month = new Date().getMonth() + 1;
+        let month = (new Date().getMonth() + 1).toString();
+        month = month[1] ? month : "0" + month;
         let day = new Date().getDate();
         let formatDate = `${year}-${month}-${day}`;
         let SpringFestivalDateList = {
@@ -1803,13 +1804,14 @@ ${result.info.msg}
             chatRoom.classList.add('Christmas')
             return;
         }
+        let toDayTimes = new Date(formatDate).getTime();
         //  中秋头像挂件
-        if (new Date(MidAutumnFestivalDateList[year][0]) <= new Date(formatDate) && new Date(MidAutumnFestivalDateList[year][1]) >= new Date(formatDate)) {
+        if (new Date(MidAutumnFestivalDateList[year][0]).getTime() <= toDayTimes && new Date(MidAutumnFestivalDateList[year][1]).getTime() >= toDayTimes) {
             chatRoom.classList.add('MidAutumnFestival')
             return;
         }
         //  春节头像挂件
-        if (new Date(SpringFestivalDateList[year][0]) <= new Date(formatDate) && new Date(SpringFestivalDateList[year][1]) >= new Date(formatDate)) {
+        if (new Date(SpringFestivalDateList[year][0]).getTime() <= toDayTimes && new Date(SpringFestivalDateList[year][1]).getTime() >= toDayTimes) {
             chatRoom.classList.add('SpringFestival')
         }
     }
