@@ -2251,6 +2251,11 @@ code .dec {
   background-size: cover;
 }
 
+.NationalDay .user-card.user-card--bg .avatar-mid-card::after {
+  width: 105px;
+  height: 105px;
+}
+
 .MidAutumnFestival .avatar-mid-card::after {
   right: -14px;
   top: -14px;
@@ -2260,6 +2265,12 @@ code .dec {
     center;
   background-size: cover;
 }
+.MidAutumnFestival .user-card.user-card--bg .avatar-mid-card::after {
+  right: -14px;
+  top: -14px;
+  width: 130px;
+  height: 130px;
+}
 
 .SpringFestival .avatar-mid-card::after {
   right: 0;
@@ -2267,6 +2278,11 @@ code .dec {
   background: url("../images/festival/SpringFestival.png") no-repeat center
     center;
   background-size: cover;
+}
+
+.SpringFestival .user-card.user-card--bg .avatar-mid-card::after {
+  width: 105px;
+  height: 105px;
 }
 
 .old-almanac {
