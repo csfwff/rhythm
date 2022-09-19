@@ -234,12 +234,27 @@ public class ChatroomProcessor {
             String userId = currentUser.optString(Keys.OBJECT_ID);
             // ==? 是否禁言中 ?==
             int muted = ChatRoomBot.muted(userId);
+            // 是否全员禁言中
+            boolean isAll = muted < 0 && muted != -1;
+            if (isAll){
+                if (DataModelService.hasPermission(currentUser.optString(User.USER_ROLE), 3)){
+                    // OP 豁免全员禁言
+                    muted = -1;
+                }else {
+                    // 回正
+                    muted *= -1;
+                }
+            }
             int muteDay = muted / (24 * 60 * 60);
             int muteHour = muted % (24 * 60 * 60) / (60 * 60);
             int muteMinute = muted % (24 * 60 * 60) % (60 * 60) / 60;
             int muteSecond = muted % (24 * 60 * 60) % (60 * 60) % 60;
             if (muted != -1) {
-                context.renderJSON(StatusCodes.ERR).renderMsg("抢红包失败，原因：正在禁言中，剩余时间 " + muteDay + " 天 " + muteHour + " 小时 " + muteMinute + " 分 " + muteSecond + " 秒。");
+                if (isAll){
+                    context.renderJSON(StatusCodes.ERR).renderMsg("抢红包失败，原因：正在全员禁言中，剩余时间 " + muteDay + " 天 " + muteHour + " 小时 " + muteMinute + " 分 " + muteSecond + " 秒。");
+                }else {
+                    context.renderJSON(StatusCodes.ERR).renderMsg("抢红包失败，原因：正在禁言中，剩余时间 " + muteDay + " 天 " + muteHour + " 小时 " + muteMinute + " 分 " + muteSecond + " 秒。");
+                }
                 return;
             }
             // ==! 是否禁言中 !==
