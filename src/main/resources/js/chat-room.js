@@ -1081,7 +1081,7 @@ var ChatRoom = {
      */
     shileds: ',',
     shiled: function (uName) {
-        if (confirm("友好的交流是沟通的基础, 确定要屏蔽 Ta 吗？\n 本次屏蔽仅针对当前页面有效, 刷新后需重新屏蔽 !")) {
+        if (confirm("友好的交流是沟通的基础, 确定要屏蔽 Ta 吗？\n本次屏蔽仅针对当前页面有效, 刷新后需重新屏蔽！")) {
             ChatRoom.shileds += uName +",";
         }
     },
