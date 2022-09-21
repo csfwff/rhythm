@@ -1076,6 +1076,16 @@ var ChatRoom = {
         });
     },
     /**
+     * 屏蔽聊天室 某人 消息
+     * @param userName
+     */
+    shileds: ',',
+    shiled: function (uName) {
+        if (confirm("友好的交流是沟通的基础, 确定要屏蔽 Ta 吗？\n 本次屏蔽仅针对当前页面有效, 刷新后需重新屏蔽 !")) {
+            ChatRoom.shileds += uName +",";
+        }
+    },
+    /**
      * 撤回聊天室消息
      * @param oId
      */
@@ -1404,6 +1414,10 @@ ${result.info.msg}
      * 渲染聊天室消息
      */
     renderMsg: function (data, more) {
+        if (ChatRoom.shileds.indexOf(data.userName) > 0){
+            // 被屏蔽了,
+            return;
+        }
         let isRedPacket = false;
         let isPlusOne = Label.latestMessage === data.md;
         try {
@@ -1481,7 +1495,7 @@ ${result.info.msg}
         } catch (err) {
         }
         let meTag1 = "";
-        let meTag2 = "";
+        let meTag2 = "<a onclick=\"ChatRoom.shiled('" + data.userName + "')\" class=\"item\" style='color: red'>屏蔽Ta</a>\n";
         if (data.userNickname !== undefined && data.userNickname !== "") {
             data.userNickname = data.userNickname + " (" + data.userName + ")"
         } else {
