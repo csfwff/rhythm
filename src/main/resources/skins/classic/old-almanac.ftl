@@ -51,7 +51,7 @@
             <div class="module">
                       <div class="wrapper" style="justify-content:center">
                           <div class="fn-flex old-almanac" >
-                              <div class="tip metro-item">
+                              <div class="tip metro-item" style="width: 100%;">
                                   <span class="date"></span>
                                   <div class="line-tip">
                                       <strong>座位朝向：</strong>面向<span class="direction_value"></span>写程序，BUG 最少。
@@ -64,7 +64,7 @@
                                   </div>
                                   <br/>
                               </div>
-                              <div class="good metro-item">
+                              <div class="good metro-item" style="width: 100%;">
                                   <div class="title">
                                       <table>
                                           <tr>
@@ -77,7 +77,7 @@
                                   </div>
                                   <div class="clear"></div>
                               </div>
-                              <div class="bad metro-item">
+                              <div class="bad metro-item" style="width: 100%;">
                                   <div class="title">
                                       <table>
                                           <tr>
