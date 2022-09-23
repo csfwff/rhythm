@@ -54,6 +54,8 @@ import org.b3log.symphony.service.*;
 import org.b3log.symphony.util.*;
 import org.json.JSONObject;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.*;
 
 /**
@@ -78,139 +80,138 @@ import java.util.*;
  * <li>Updates username (/settings/username), POST</li>
  * <li>Deactivates user (/settings/deactivate), POST</li>
  * </ul>
- *
  * @author <a href="http://88250.b3log.org">Liang Ding</a>
  * @version 2.0.1.0, Aug 17, 2020
  * @since 2.4.0
  */
 @Singleton
 public class SettingsProcessor {
-
+    
     /**
      * Logger.
      */
     private static final Logger LOGGER = LogManager.getLogger(SettingsProcessor.class);
-
+    
     /**
      * Post export service.
      */
     @Inject
     private PostExportService postExportService;
-
+    
     /**
      * Invitecode query service.
      */
     @Inject
     private InvitecodeQueryService invitecodeQueryService;
-
+    
     /**
      * Invitecode management service.
      */
     @Inject
     private InvitecodeMgmtService invitecodeMgmtService;
-
+    
     /**
      * Notification management service.
      */
     @Inject
     private NotificationMgmtService notificationMgmtService;
-
+    
     /**
      * User management service.
      */
     @Inject
     private UserMgmtService userMgmtService;
-
+    
     /**
      * User query service.
      */
     @Inject
     private UserQueryService userQueryService;
-
+    
     /**
      * Option query service.
      */
     @Inject
     private OptionQueryService optionQueryService;
-
+    
     /**
      * Language service.
      */
     @Inject
     private LangPropsService langPropsService;
-
+    
     /**
      * Emotion query service.
      */
     @Inject
     private EmotionQueryService emotionQueryService;
-
+    
     /**
      * Emotion management service.
      */
     @Inject
     private EmotionMgmtService emotionMgmtService;
-
+    
     /**
      * Data model service.
      */
     @Inject
     private DataModelService dataModelService;
-
+    
     /**
      * Avatar query service.
      */
     @Inject
     private AvatarQueryService avatarQueryService;
-
+    
     /**
      * Role query service.
      */
     @Inject
     private RoleQueryService roleQueryService;
-
+    
     /**
      * Verifycode query service.
      */
     @Inject
     private VerifycodeQueryService verifycodeQueryService;
-
+    
     /**
      * Verifycode management service.
      */
     @Inject
     private VerifycodeMgmtService verifycodeMgmtService;
-
+    
     /**
      * Pointtransfer management service.
      */
     @Inject
     private PointtransferMgmtService pointtransferMgmtService;
-
+    
     /**
      * System Settings service.
      */
     @Inject
     private SystemSettingsService settingsService;
-
+    
     /**
      * CLoud service.
      */
     @Inject
     private CloudService cloudService;
-
+    
     /**
      * Activity management service.
      */
     @Inject
     private ActivityMgmtService activityMgmtService;
-
+    
     /**
      * User repository.
      */
     @Inject
     private UserRepository userRepository;
-
+    
     /**
      * Register request handlers.
      */
@@ -221,7 +222,7 @@ public class SettingsProcessor {
         final UpdateProfilesValidationMidware updateProfilesValidationMidware = beanManager.getReference(UpdateProfilesValidationMidware.class);
         final UpdatePasswordValidationMidware updatePasswordValidationMidware = beanManager.getReference(UpdatePasswordValidationMidware.class);
         final PointTransferValidationMidware pointTransferValidationMidware = beanManager.getReference(PointTransferValidationMidware.class);
-
+        
         final SettingsProcessor settingsProcessor = beanManager.getReference(SettingsProcessor.class);
         Dispatcher.post("/settings/deactivate", settingsProcessor::deactivateUser, loginCheck::handle);
         Dispatcher.post("/settings/username", settingsProcessor::updateUserName, loginCheck::handle);
@@ -246,9 +247,9 @@ public class SettingsProcessor {
         Dispatcher.get("/bag/1dayCheckin", settingsProcessor::use1dayCheckinCard, loginCheck::handle, csrfMidware::check);
         Dispatcher.get("/bag/2dayCheckin", settingsProcessor::use2dayCheckinCard, loginCheck::handle, csrfMidware::check);
         Dispatcher.get("/bag/patchCheckin", settingsProcessor::usePatchCheckinCard, loginCheck::handle, csrfMidware::check);
-
+        
     }
-
+    
     /**
      * 使用补签卡
      */
@@ -263,7 +264,7 @@ public class SettingsProcessor {
             context.renderMsg("补签卡使用失败！可能没有需要补签的记录或背包中没有补签卡或当前是最长签到。");
         }
     }
-
+    
     /**
      * 使用单日免签卡
      */
@@ -285,7 +286,7 @@ public class SettingsProcessor {
             context.renderMsg("单日免签卡使用成功！明天的签到将由系统自动进行～");
         }
     }
-
+    
     /**
      * 使用两天免签卡
      */
@@ -307,16 +308,16 @@ public class SettingsProcessor {
             context.renderMsg("两天免签卡使用成功！未来两天的签到将由系统自动进行～");
         }
     }
-
+    
     /**
      * Deactivates user.
-     *
      * @param context the specified context
      */
     List<String> users = new ArrayList<>();
+    
     synchronized public void deactivateUser(final RequestContext context) {
         context.renderJSON(StatusCodes.ERR);
-
+        
         final Response response = context.getResponse();
         JSONObject currentUser = Sessions.getUser();
         try {
@@ -324,7 +325,7 @@ public class SettingsProcessor {
             currentUser = ApiProcessor.getUserByKey(requestJSONObject.optString("apiKey"));
         } catch (NullPointerException ignored) {
         }
-
+        
         final String userId = currentUser.optString(Keys.OBJECT_ID);
         if (users.contains(userId)) {
             for (int i = 0; i < users.size(); i++) {
@@ -335,7 +336,7 @@ public class SettingsProcessor {
             try {
                 Sessions.logout(currentUser.optString(Keys.OBJECT_ID), context.getRequest(), response);
                 userMgmtService.deactivateUser(userId);
-
+                
                 context.renderJSON(StatusCodes.SUCC);
                 context.renderMsg("操作已完成。");
             } catch (final Exception e) {
@@ -346,15 +347,14 @@ public class SettingsProcessor {
             context.renderMsg("用户注销申请已记录，如确认要注销该用户，请再请求一次本接口，如果是测试用途，请不要再次请求本接口。");
         }
     }
-
+    
     /**
      * Updates username.
-     *
      * @param context the specified context
      */
     public void updateUserName(final RequestContext context) {
         context.renderJSON(StatusCodes.ERR);
-
+        
         final JSONObject requestJSONObject = context.requestJSON();
         final JSONObject currentUser = Sessions.getUser();
         final String userId = currentUser.optString(Keys.OBJECT_ID);
@@ -362,35 +362,34 @@ public class SettingsProcessor {
             if (currentUser.optInt(UserExt.USER_POINT) < Pointtransfer.TRANSFER_SUM_C_CHANGE_USERNAME) {
                 throw new ServiceException(langPropsService.get("insufficientBalanceLabel"));
             }
-
+            
             final JSONObject user = userQueryService.getUser(userId);
             final String oldName = user.optString(User.USER_NAME);
             final String newName = requestJSONObject.optString(User.USER_NAME);
             user.put(User.USER_NAME, newName);
-
+            
             userMgmtService.updateUserName(userId, user);
-
+            
             pointtransferMgmtService.transfer(userId, Pointtransfer.ID_C_SYS,
                     Pointtransfer.TRANSFER_TYPE_C_CHANGE_USERNAME, Pointtransfer.TRANSFER_SUM_C_CHANGE_USERNAME,
                     oldName + "-" + newName, System.currentTimeMillis(), "");
-
+            
             // 将该用户 API 无效化
             ApiProcessor.removeKeyByUsername(oldName);
-
+            
             context.renderJSON(StatusCodes.SUCC);
         } catch (final ServiceException e) {
             context.renderMsg(e.getMessage());
         }
     }
-
+    
     /**
      * Sends phone verify code.
-     *
      * @param context the specified context
      */
     public void sendPhoneVC(final RequestContext context) {
         context.renderJSON(StatusCodes.ERR);
-
+        
         final JSONObject requestJSONObject = context.requestJSON();
         final String userPhone = requestJSONObject.optString("userPhone");
         if (!UserRegisterValidationMidware.isMobileNO(userPhone)) {
@@ -398,22 +397,22 @@ public class SettingsProcessor {
             context.renderMsg(msg);
             return;
         }
-
+        
         final String captcha = requestJSONObject.optString(CaptchaProcessor.CAPTCHA);
         if (CaptchaProcessor.invalidCaptcha(captcha)) {
             final String msg = langPropsService.get("sendFailedLabel") + " - " + langPropsService.get("captchaErrorLabel");
             context.renderMsg(msg);
             return;
         }
-
+        
         final JSONObject user = Sessions.getUser();
-
+        
         if (userPhone.equals(user.optString("userPhone"))) {
             final String msg = langPropsService.get("sendFailedLabel") + " - 该手机号与当前绑定手机号相同";
             context.renderMsg(msg);
             return;
         }
-
+        
         final String userId = user.optString(Keys.OBJECT_ID);
         try {
             JSONObject verifycode = verifycodeQueryService.getVerifycodeByUserId(Verifycode.TYPE_C_PHONE, Verifycode.BIZ_TYPE_C_BIND_PHONE, userId);
@@ -421,22 +420,22 @@ public class SettingsProcessor {
                 context.renderJSON(StatusCodes.SUCC).renderMsg(langPropsService.get("vcSentLabel"));
                 return;
             }
-
+            
             if (null != userQueryService.getUserByPhone(userPhone)) {
                 context.renderMsg("该手机号已绑定其他账号");
                 return;
             }
-
+            
             final String name = user.optString(User.USER_NAME);
             final String ip = Requests.getRemoteAddr(context.getRequest());
-
+            
             if (LoginProcessor.verifySMSCodeLimiterOfIP.access(ip) && LoginProcessor.verifySMSCodeLimiterOfName.access(name) && LoginProcessor.verifySMSCodeLimiterOfPhone.access(userPhone)) {
                 final String code = RandomStringUtils.randomNumeric(6);
                 if (!verifycodeMgmtService.sendVerifyCodeSMS(userPhone, code)) {
                     context.renderMsg("验证码发送失败，请稍候重试");
                     return;
                 }
-
+                
                 verifycode = new JSONObject();
                 verifycode.put(Verifycode.USER_ID, userId);
                 verifycode.put(Verifycode.BIZ_TYPE, Verifycode.BIZ_TYPE_C_BIND_PHONE);
@@ -447,7 +446,7 @@ public class SettingsProcessor {
                 verifycode.put(Verifycode.RECEIVER, userPhone);
                 verifycodeMgmtService.addVerifycode(verifycode);
                 LOGGER.log(Level.INFO, "Generated a verify code for binding [userName={}, phone={}, code={}]", name, userPhone, code);
-
+                
                 context.renderJSON(StatusCodes.SUCC).renderMsg(langPropsService.get("verifycodeSentLabel"));
             } else {
                 context.renderMsg("验证码发送频率过快，请稍候重试");
@@ -456,15 +455,14 @@ public class SettingsProcessor {
             context.renderMsg(e.getMessage());
         }
     }
-
+    
     /**
      * Sends email verify code.
-     *
      * @param context the specified context
      */
     public void sendEmailVC(final RequestContext context) {
         context.renderJSON(StatusCodes.ERR);
-
+        
         final JSONObject requestJSONObject = context.requestJSON();
         final String email = StringUtils.lowerCase(StringUtils.trim(requestJSONObject.optString(User.USER_EMAIL)));
         if (!Strings.isEmail(email)) {
@@ -472,21 +470,21 @@ public class SettingsProcessor {
             context.renderMsg(msg);
             return;
         }
-
+        
         final String captcha = requestJSONObject.optString(CaptchaProcessor.CAPTCHA);
         if (CaptchaProcessor.invalidCaptcha(captcha)) {
             final String msg = langPropsService.get("sendFailedLabel") + " - " + langPropsService.get("captchaErrorLabel");
             context.renderMsg(msg);
             return;
         }
-
+        
         final JSONObject user = Sessions.getUser();
         if (email.equalsIgnoreCase(user.optString(User.USER_EMAIL))) {
             final String msg = langPropsService.get("sendFailedLabel") + " - " + langPropsService.get("bindedLabel");
             context.renderMsg(msg);
             return;
         }
-
+        
         final String userId = user.optString(Keys.OBJECT_ID);
         try {
             JSONObject verifycode = verifycodeQueryService.getVerifycodeByUserId(Verifycode.TYPE_C_EMAIL, Verifycode.BIZ_TYPE_C_BIND_EMAIL, userId);
@@ -494,12 +492,12 @@ public class SettingsProcessor {
                 context.renderJSON(StatusCodes.SUCC).renderMsg(langPropsService.get("vcSentLabel"));
                 return;
             }
-
+            
             if (null != userQueryService.getUserByEmail(email)) {
                 context.renderMsg(langPropsService.get("duplicatedEmailLabel"));
                 return;
             }
-
+            
             final String code = RandomStringUtils.randomNumeric(6);
             verifycode = new JSONObject();
             verifycode.put(Verifycode.USER_ID, userId);
@@ -510,21 +508,20 @@ public class SettingsProcessor {
             verifycode.put(Verifycode.EXPIRED, DateUtils.addMinutes(new Date(), 10).getTime());
             verifycode.put(Verifycode.RECEIVER, email);
             verifycodeMgmtService.addVerifycode(verifycode);
-
+            
             context.renderJSON(StatusCodes.SUCC).renderMsg(langPropsService.get("verifycodeSentLabel"));
         } catch (final ServiceException e) {
             context.renderMsg(e.getMessage());
         }
     }
-
+    
     /**
      * Updates phone.
-     *
      * @param context the specified context
      */
     public void updatePhone(final RequestContext context) {
         context.renderJSON(StatusCodes.ERR);
-
+        
         final Request request = context.getRequest();
         final JSONObject requestJSONObject = context.requestJSON();
         final String captcha = requestJSONObject.optString(CaptchaProcessor.CAPTCHA);
@@ -538,35 +535,34 @@ public class SettingsProcessor {
                 context.renderJSONValue(Keys.CODE, 2);
                 return;
             }
-
+            
             if (!StringUtils.equals(verifycode.optString(Verifycode.CODE), captcha)) {
                 final String msg = langPropsService.get("updateFailLabel") + " - " + langPropsService.get("captchaErrorLabel");
                 context.renderMsg(msg);
                 context.renderJSONValue(Keys.CODE, 2);
                 return;
             }
-
+            
             final JSONObject user = userQueryService.getUser(userId);
             final String userPhone = verifycode.optString(Verifycode.RECEIVER);
             user.put("userPhone", userPhone);
             userMgmtService.updateUserPhone(userId, user);
             verifycodeMgmtService.removeByCode(captcha);
-
+            
             context.renderJSON(StatusCodes.SUCC);
         } catch (final ServiceException e) {
             context.renderMsg(e.getMessage());
         }
     }
-
-
+    
+    
     /**
      * Updates email.
-     *
      * @param context the specified context
      */
     public void updateEmail(final RequestContext context) {
         context.renderJSON(StatusCodes.ERR);
-
+        
         final Request request = context.getRequest();
         final JSONObject requestJSONObject = context.requestJSON();
         final String captcha = requestJSONObject.optString(CaptchaProcessor.CAPTCHA);
@@ -580,34 +576,33 @@ public class SettingsProcessor {
                 context.renderJSONValue(Keys.CODE, 2);
                 return;
             }
-
+            
             if (!StringUtils.equals(verifycode.optString(Verifycode.CODE), captcha)) {
                 final String msg = langPropsService.get("updateFailLabel") + " - " + langPropsService.get("captchaErrorLabel");
                 context.renderMsg(msg);
                 context.renderJSONValue(Keys.CODE, 2);
                 return;
             }
-
+            
             final JSONObject user = userQueryService.getUser(userId);
             final String email = verifycode.optString(Verifycode.RECEIVER);
             user.put(User.USER_EMAIL, email);
             userMgmtService.updateUserEmail(userId, user);
             verifycodeMgmtService.removeByCode(captcha);
-
+            
             context.renderJSON(StatusCodes.SUCC);
         } catch (final ServiceException e) {
             context.renderMsg(e.getMessage());
         }
     }
-
+    
     /**
      * Updates user i18n.
-     *
      * @param context the specified context
      */
     public void updateI18n(final RequestContext context) {
         context.renderJSON(StatusCodes.ERR);
-
+        
         final Request request = context.getRequest();
         JSONObject requestJSONObject;
         try {
@@ -615,39 +610,38 @@ public class SettingsProcessor {
             request.setAttribute(Keys.REQUEST, requestJSONObject);
         } catch (final Exception e) {
             LOGGER.warn(e.getMessage());
-
+            
             requestJSONObject = new JSONObject();
         }
-
+        
         String userLanguage = requestJSONObject.optString(UserExt.USER_LANGUAGE, Locale.SIMPLIFIED_CHINESE.toString());
         if (!Languages.getAvailableLanguages().contains(userLanguage)) {
             userLanguage = Locale.US.toString();
         }
-
+        
         String userTimezone = requestJSONObject.optString(UserExt.USER_TIMEZONE, TimeZone.getDefault().getID());
         if (!Arrays.asList(TimeZone.getAvailableIDs()).contains(userTimezone)) {
             userTimezone = TimeZone.getDefault().getID();
         }
-
+        
         try {
             JSONObject user = Sessions.getUser();
             final String userId = user.optString(Keys.OBJECT_ID);
             user = userQueryService.getUser(userId);
-
+            
             user.put(UserExt.USER_LANGUAGE, userLanguage);
             user.put(UserExt.USER_TIMEZONE, userTimezone);
-
+            
             userMgmtService.updateUser(user.optString(Keys.OBJECT_ID), user);
-
+            
             context.renderJSON(StatusCodes.SUCC);
         } catch (final ServiceException e) {
             context.renderMsg(e.getMessage());
         }
     }
-
+    
     /**
      * Shows settings pages.
-     *
      * @param context the specified context
      */
     public void showSettings(final RequestContext context) {
@@ -660,46 +654,46 @@ public class SettingsProcessor {
         page += ".ftl";
         renderer.setTemplateName("home/settings/" + page);
         final Map<String, Object> dataModel = renderer.getDataModel();
-
+        
         final JSONObject user = Sessions.getUser();
         UserProcessor.fillHomeUser(dataModel, user, roleQueryService);
-
+        
         avatarQueryService.fillUserAvatarURL(user);
-
+        
         final String userId = user.optString(Keys.OBJECT_ID);
-
+        
         final int invitedUserCount = userQueryService.getInvitedUserCount(userId);
         dataModel.put(Common.INVITED_USER_COUNT, invitedUserCount);
-
+        
         dataModelService.fillHeaderAndFooter(context, dataModel);
-
+        
         String inviteTipLabel = (String) dataModel.get("inviteTipLabel");
         inviteTipLabel = inviteTipLabel.replace("{point}", String.valueOf(Pointtransfer.TRANSFER_SUM_C_INVITE_REGISTER));
         dataModel.put("inviteTipLabel", inviteTipLabel);
-
+        
         String pointTransferTipLabel = (String) dataModel.get("pointTransferTipLabel");
         pointTransferTipLabel = pointTransferTipLabel.replace("{point}", Symphonys.POINT_TRANSER_MIN + "");
         dataModel.put("pointTransferTipLabel", pointTransferTipLabel);
-
+        
         String dataExportTipLabel = (String) dataModel.get("dataExportTipLabel");
         dataExportTipLabel = dataExportTipLabel.replace("{point}",
                 String.valueOf(Pointtransfer.TRANSFER_SUM_C_DATA_EXPORT));
         dataModel.put("dataExportTipLabel", dataExportTipLabel);
-
+        
         final String allowRegister = optionQueryService.getAllowRegister();
         dataModel.put("allowRegister", allowRegister);
-
+        
         String buyInvitecodeLabel = langPropsService.get("buyInvitecodeLabel");
         buyInvitecodeLabel = buyInvitecodeLabel.replace("${point}",
                 String.valueOf(Pointtransfer.TRANSFER_SUM_C_BUY_INVITECODE));
         buyInvitecodeLabel = buyInvitecodeLabel.replace("${point2}",
                 String.valueOf(Pointtransfer.TRANSFER_SUM_C_INVITECODE_USED));
         dataModel.put("buyInvitecodeLabel", buyInvitecodeLabel);
-
+        
         String updateNameTipLabel = (String) dataModel.get("updateNameTipLabel");
         updateNameTipLabel = updateNameTipLabel.replace("{point}", Symphonys.POINT_CHANGE_USERNAME + "");
         dataModel.put("updateNameTipLabel", updateNameTipLabel);
-
+        
         final List<JSONObject> invitecodes = invitecodeQueryService.getValidInvitecodes(userId);
         for (final JSONObject invitecode : invitecodes) {
             String msg = langPropsService.get("expireTipLabel");
@@ -707,47 +701,46 @@ public class SettingsProcessor {
                     + Symphonys.INVITECODE_EXPIRED, "yyyy-MM-dd HH:mm"));
             invitecode.put(Common.MEMO, msg);
         }
-
+        
         dataModel.put(Invitecode.INVITECODES, invitecodes);
-
+        
         final String requestURI = context.requestURI();
         if (requestURI.contains("function")) {
             dataModel.put(Emotion.EMOTIONS, emotionQueryService.getEmojis(userId));
             dataModel.put(Emotion.SHORT_T_LIST, emojiLists);
         }
-
+        
         if (requestURI.contains("i18n")) {
             dataModel.put(Common.LANGUAGES, Languages.getAvailableLanguages());
-
+            
             final List<JSONObject> timezones = new ArrayList<>();
             final List<TimeZones.TimeZoneWithDisplayNames> timeZones = TimeZones.getInstance().getTimeZones();
             for (final TimeZones.TimeZoneWithDisplayNames timeZone : timeZones) {
                 final JSONObject timezone = new JSONObject();
-
+                
                 timezone.put(Common.ID, timeZone.getTimeZone().getID());
                 timezone.put(Common.NAME, timeZone.getDisplayName());
-
+                
                 timezones.add(timezone);
             }
             dataModel.put(Common.TIMEZONES, timezones);
         }
-
+        
         dataModel.put(Common.TYPE, "settings");
         dataModel.put("sysBag", cloudService.getBag(userId));
         dataModel.put("sysMetal", cloudService.getMetal(userId));
-
+        
         // “感谢加入”系统通知已读置位 https://github.com/b3log/symphony/issues/907
         notificationMgmtService.makeRead(userId, Notification.DATA_TYPE_C_SYS_ANNOUNCE_NEW_USER);
     }
-
+    
     /**
      * Updates user geo status.
-     *
      * @param context the specified context
      */
     public void updateGeoStatus(final RequestContext context) {
         context.renderJSON(StatusCodes.ERR);
-
+        
         final Request request = context.getRequest();
         JSONObject requestJSONObject;
         try {
@@ -755,37 +748,36 @@ public class SettingsProcessor {
             request.setAttribute(Keys.REQUEST, requestJSONObject);
         } catch (final Exception e) {
             LOGGER.warn(e.getMessage());
-
+            
             requestJSONObject = new JSONObject();
         }
-
+        
         int geoStatus = requestJSONObject.optInt(UserExt.USER_GEO_STATUS);
         if (UserExt.USER_GEO_STATUS_C_PRIVATE != geoStatus && UserExt.USER_GEO_STATUS_C_PUBLIC != geoStatus) {
             geoStatus = UserExt.USER_GEO_STATUS_C_PUBLIC;
         }
-
+        
         try {
             JSONObject user = Sessions.getUser();
             final String userId = user.optString(Keys.OBJECT_ID);
             user = userQueryService.getUser(userId);
             user.put(UserExt.USER_GEO_STATUS, geoStatus);
-
+            
             userMgmtService.updateUser(user.optString(Keys.OBJECT_ID), user);
-
+            
             context.renderJSON(StatusCodes.SUCC);
         } catch (final ServiceException e) {
             context.renderMsg(e.getMessage());
         }
     }
-
+    
     /**
      * Updates user privacy.
-     *
      * @param context the specified context
      */
     public void updatePrivacy(final RequestContext context) {
         context.renderJSON(StatusCodes.ERR);
-
+        
         final Request request = context.getRequest();
         JSONObject requestJSONObject;
         try {
@@ -793,10 +785,10 @@ public class SettingsProcessor {
             request.setAttribute(Keys.REQUEST, requestJSONObject);
         } catch (final Exception e) {
             LOGGER.warn(e.getMessage());
-
+            
             requestJSONObject = new JSONObject();
         }
-
+        
         final boolean articleStatus = requestJSONObject.optBoolean(UserExt.USER_ARTICLE_STATUS);
         final boolean commentStatus = requestJSONObject.optBoolean(UserExt.USER_COMMENT_STATUS);
         final boolean followingUserStatus = requestJSONObject.optBoolean(UserExt.USER_FOLLOWING_USER_STATUS);
@@ -810,11 +802,11 @@ public class SettingsProcessor {
         final boolean uaStatus = requestJSONObject.optBoolean(UserExt.USER_UA_STATUS);
         final boolean userJoinPointRank = requestJSONObject.optBoolean(UserExt.USER_JOIN_POINT_RANK);
         final boolean userJoinUsedPointRank = requestJSONObject.optBoolean(UserExt.USER_JOIN_USED_POINT_RANK);
-
+        
         JSONObject user = Sessions.getUser();
         final String userId = user.optString(Keys.OBJECT_ID);
         user = userQueryService.getUser(userId);
-
+        
         user.put(UserExt.USER_ONLINE_STATUS, onlineStatus ? UserExt.USER_XXX_STATUS_C_ENABLED : UserExt.USER_XXX_STATUS_C_DISABLED);
         user.put(UserExt.USER_ARTICLE_STATUS, articleStatus ? UserExt.USER_XXX_STATUS_C_ENABLED : UserExt.USER_XXX_STATUS_C_DISABLED);
         user.put(UserExt.USER_COMMENT_STATUS, commentStatus ? UserExt.USER_XXX_STATUS_C_ENABLED : UserExt.USER_XXX_STATUS_C_DISABLED);
@@ -828,19 +820,18 @@ public class SettingsProcessor {
         user.put(UserExt.USER_UA_STATUS, uaStatus ? UserExt.USER_XXX_STATUS_C_ENABLED : UserExt.USER_XXX_STATUS_C_DISABLED);
         user.put(UserExt.USER_JOIN_POINT_RANK, userJoinPointRank ? UserExt.USER_XXX_STATUS_C_ENABLED : UserExt.USER_XXX_STATUS_C_DISABLED);
         user.put(UserExt.USER_JOIN_USED_POINT_RANK, userJoinUsedPointRank ? UserExt.USER_XXX_STATUS_C_ENABLED : UserExt.USER_XXX_STATUS_C_DISABLED);
-
+        
         try {
             userMgmtService.updateUser(user.optString(Keys.OBJECT_ID), user);
-
+            
             context.renderJSON(StatusCodes.SUCC);
         } catch (final ServiceException e) {
             context.renderMsg(e.getMessage());
         }
     }
-
+    
     /**
      * Updates user system settings.
-     *
      * @param context the specified context
      */
     public void updateSystem(final RequestContext context) {
@@ -872,15 +863,14 @@ public class SettingsProcessor {
             context.renderMsg(e.getMessage());
         }
     }
-
+    
     /**
      * Updates user function.
-     *
      * @param context the specified context
      */
     public void updateFunction(final RequestContext context) {
         context.renderJSON(StatusCodes.ERR);
-
+        
         final Request request = context.getRequest();
         JSONObject requestJSONObject;
         try {
@@ -888,10 +878,10 @@ public class SettingsProcessor {
             request.setAttribute(Keys.REQUEST, requestJSONObject);
         } catch (final Exception e) {
             LOGGER.warn(e.getMessage());
-
+            
             requestJSONObject = new JSONObject();
         }
-
+        
         String userListPageSizeStr = requestJSONObject.optString(UserExt.USER_LIST_PAGE_SIZE);
         final int userCommentViewMode = requestJSONObject.optInt(UserExt.USER_COMMENT_VIEW_MODE);
         final int userAvatarViewMode = requestJSONObject.optInt(UserExt.USER_AVATAR_VIEW_MODE);
@@ -919,7 +909,7 @@ public class SettingsProcessor {
                 indexRedirectURL = "";
             }
         }
-
+        
         int userListPageSize;
         try {
             userListPageSize = Integer.valueOf(userListPageSizeStr);
@@ -932,11 +922,11 @@ public class SettingsProcessor {
         } catch (final Exception e) {
             userListPageSize = Symphonys.ARTICLE_LIST_CNT;
         }
-
+        
         JSONObject user = Sessions.getUser();
         final String userId = user.optString(Keys.OBJECT_ID);
         user = userQueryService.getUser(userId);
-
+        
         user.put(UserExt.USER_LIST_PAGE_SIZE, userListPageSize);
         user.put(UserExt.USER_COMMENT_VIEW_MODE, userCommentViewMode);
         user.put(UserExt.USER_AVATAR_VIEW_MODE, userAvatarViewMode);
@@ -948,19 +938,18 @@ public class SettingsProcessor {
         user.put(UserExt.USER_FORWARD_PAGE_STATUS, forwardStatus ? UserExt.USER_XXX_STATUS_C_ENABLED : UserExt.USER_XXX_STATUS_C_DISABLED);
         user.put(UserExt.CHAT_ROOM_PICTURE_STATUS, chatRoomPictureStatus ? UserExt.USER_XXX_STATUS_C_ENABLED : UserExt.USER_XXX_STATUS_C_DISABLED);
         user.put(UserExt.USER_INDEX_REDIRECT_URL, indexRedirectURL);
-
+        
         try {
             userMgmtService.updateUser(user.optString(Keys.OBJECT_ID), user);
-
+            
             context.renderJSON(StatusCodes.SUCC);
         } catch (final ServiceException e) {
             context.renderMsg(e.getMessage());
         }
     }
-
+    
     /**
      * Updates user profiles.
-     *
      * @param context the specified context
      */
     public void updateProfiles(final RequestContext context) {
@@ -973,7 +962,7 @@ public class SettingsProcessor {
         userIntro = Escapes.escapeHTML(userIntro);
         String userNickname = StringUtils.trim(requestJSONObject.optString(UserExt.USER_NICKNAME));
         userNickname = Escapes.escapeHTML(userNickname);
-
+        
         final JSONObject user = Sessions.getUser();
         user.put(UserExt.USER_TAGS, userTags);
         user.put(User.USER_URL, userURL);
@@ -981,39 +970,38 @@ public class SettingsProcessor {
         user.put(UserExt.USER_INTRO, userIntro);
         user.put(UserExt.USER_NICKNAME, userNickname);
         user.put(UserExt.USER_AVATAR_TYPE, UserExt.USER_AVATAR_TYPE_C_UPLOAD);
-
+        
         try {
             userMgmtService.updateProfiles(user);
-
+            
             context.renderJSON(StatusCodes.SUCC);
         } catch (final ServiceException e) {
             context.renderMsg(e.getMessage());
         }
     }
-
+    
     /**
      * Updates user avatar.
-     *
      * @param context the specified context
      */
     public void updateAvatar(final RequestContext context) {
         context.renderJSON(StatusCodes.ERR);
-
+        
         final JSONObject requestJSONObject = context.requestJSON();
         final String userAvatarURL = requestJSONObject.optString(UserExt.USER_AVATAR_URL);
-
+        
         JSONObject user = Sessions.getUser();
         final String userId = user.optString(Keys.OBJECT_ID);
         user = userQueryService.getUser(userId);
         user.put(UserExt.USER_AVATAR_TYPE, UserExt.USER_AVATAR_TYPE_C_UPLOAD);
         user.put(UserExt.USER_UPDATE_TIME, System.currentTimeMillis());
-
+        
         if (Strings.contains(userAvatarURL, new String[]{"<", ">", "\"", "'"})) {
             user.put(UserExt.USER_AVATAR_URL, AvatarQueryService.DEFAULT_AVATAR_URL);
         } else {
             if (Symphonys.QN_ENABLED) {
                 final String qiniuDomain = Symphonys.UPLOAD_QINIU_DOMAIN;
-
+                
                 if (!StringUtils.startsWith(userAvatarURL, qiniuDomain)) {
                     user.put(UserExt.USER_AVATAR_URL, AvatarQueryService.DEFAULT_AVATAR_URL);
                 } else {
@@ -1023,99 +1011,116 @@ public class SettingsProcessor {
                 user.put(UserExt.USER_AVATAR_URL, userAvatarURL);
             }
         }
-
+        
         try {
             userMgmtService.updateUser(user.optString(Keys.OBJECT_ID), user);
-
+            
             context.renderJSON(StatusCodes.SUCC);
         } catch (final ServiceException e) {
             context.renderMsg(e.getMessage());
         }
     }
-
+    
     /**
      * Updates user password.
-     *
      * @param context the specified context
      */
     public void updatePassword(final RequestContext context) {
         context.renderJSON(StatusCodes.ERR);
-
+        
         final JSONObject requestJSONObject = context.requestJSON();
         final String password = requestJSONObject.optString(User.USER_PASSWORD);
         final String newPassword = requestJSONObject.optString(User.USER_NEW_PASSWORD);
-
+        
         final JSONObject user = Sessions.getUser();
         if (!password.equals(user.optString(User.USER_PASSWORD))) {
             context.renderMsg(langPropsService.get("invalidOldPwdLabel"));
             return;
         }
-
+        
         user.put(User.USER_PASSWORD, newPassword);
-
+        
         try {
             userMgmtService.updatePassword(user);
             context.renderJSON(StatusCodes.SUCC);
         } catch (final ServiceException e) {
             final String msg = langPropsService.get("updateFailLabel") + " - " + e.getMessage();
             LOGGER.log(Level.ERROR, msg, e);
-
+            
             context.renderMsg(msg);
         }
     }
-
+    
     /**
      * Updates user emotions.
-     *
      * @param context the specified context
      */
     public void updateEmoji(final RequestContext context) {
         context.renderJSON(StatusCodes.ERR);
-
+        
         final JSONObject requestJSONObject = context.requestJSON();
         final String emotionList = requestJSONObject.optString(Emotion.EMOTIONS);
-
+        
         final JSONObject user = Sessions.getUser();
         try {
             emotionMgmtService.setEmotionList(user.optString(Keys.OBJECT_ID), emotionList);
-
+            
             context.renderJSON(StatusCodes.SUCC);
         } catch (final ServiceException e) {
             final String msg = langPropsService.get("updateFailLabel") + " - " + e.getMessage();
             LOGGER.log(Level.ERROR, msg, e);
-
+            
             context.renderMsg(msg);
         }
     }
-
+    
     /**
      * Point transfer.
-     *
      * @param context the specified context
      */
     public void pointTransfer(final RequestContext context) {
+        // 税率
+        BigDecimal taxRate = new BigDecimal("0.1");
+        
         final JSONObject ret = new JSONObject().put(Keys.CODE, StatusCodes.ERR);
         context.renderJSON(ret);
-
+        
         final JSONObject requestJSONObject = context.requestJSON();
-
+        // 是否收税
+        Boolean collectTaxes = false;
+        // 征税
+        int tax = 0;
+        // 转账金额
         final int amount = requestJSONObject.optInt(Common.AMOUNT);
+        // 超过 1K 的收税
+        if (amount > 1000) {
+            // 向上取整
+            tax = BigDecimal.valueOf(amount).multiply(taxRate).setScale(0, RoundingMode.UP).intValue();
+            collectTaxes = true;
+        }
         final JSONObject toUser = (JSONObject) context.attr(Common.TO_USER);
         final JSONObject currentUser = Sessions.getUser();
         String memo = (String) context.attr(Pointtransfer.MEMO);
         if (StringUtils.isBlank(memo)) {
             memo = "";
         }
-
+        
         String fromId = currentUser.optString(Keys.OBJECT_ID);
         String fromUsername = currentUser.optString(User.USER_NAME);
         if (fromUsername.equals("admin")) {
             fromId = Pointtransfer.ID_C_SYS;
+            // admin 是无敌的. 自己就不杀自己了
+            collectTaxes = false;
+        } else {
+            // 不是 admin TODO 其余人一视同仁? 需不需要 op 豁免啊?
+            if (collectTaxes) {
+                memo += "(已扣除交易税 : " + tax + " 积分)";
+            }
         }
         final String toId = toUser.optString(Keys.OBJECT_ID);
-
+        // 征税扣除, 不征税原地踏步
         final String transferId = pointtransferMgmtService.transfer(fromId, toId,
-                Pointtransfer.TRANSFER_TYPE_C_ACCOUNT2ACCOUNT, amount, toId, System.currentTimeMillis(), memo);
+                Pointtransfer.TRANSFER_TYPE_C_ACCOUNT2ACCOUNT, collectTaxes ? amount - tax : amount, toId, System.currentTimeMillis(), memo);
         final boolean succ = null != transferId;
         if (succ) {
             ret.put(Keys.CODE, StatusCodes.SUCC);
@@ -1126,20 +1131,19 @@ public class SettingsProcessor {
             final JSONObject notification = new JSONObject();
             notification.put(Notification.NOTIFICATION_USER_ID, toId);
             notification.put(Notification.NOTIFICATION_DATA_ID, transferId);
-
+            
             notificationMgmtService.addPointTransferNotification(notification);
         }
     }
-
+    
     /**
      * Queries invitecode state.
-     *
      * @param context the specified context
      */
     public void queryInvitecode(final RequestContext context) {
         final JSONObject ret = new JSONObject().put(Keys.CODE, StatusCodes.ERR);
         context.renderJSON(ret);
-
+        
         final JSONObject requestJSONObject = context.requestJSON();
         String invitecode = requestJSONObject.optString(Invitecode.INVITECODE);
         if (StringUtils.isBlank(invitecode)) {
@@ -1147,18 +1151,18 @@ public class SettingsProcessor {
             ret.put(Keys.MSG, invitecode + " " + langPropsService.get("notFoundInvitecodeLabel"));
             return;
         }
-
+        
         invitecode = invitecode.trim();
-
+        
         final JSONObject result = invitecodeQueryService.getInvitecode(invitecode);
-
+        
         if (null == result) {
             ret.put(Keys.CODE, -1);
             ret.put(Keys.MSG, langPropsService.get("notFoundInvitecodeLabel"));
         } else {
             final int status = result.optInt(Invitecode.STATUS);
             ret.put(Keys.CODE, status);
-
+            
             switch (status) {
                 case Invitecode.STATUS_C_USED:
                     ret.put(Keys.MSG, langPropsService.get("invitecodeUsedLabel"));
@@ -1167,7 +1171,7 @@ public class SettingsProcessor {
                     String msg = langPropsService.get("invitecodeOkLabel");
                     msg = msg.replace("${time}", DateFormatUtils.format(result.optLong(Keys.OBJECT_ID)
                             + Symphonys.INVITECODE_EXPIRED, "yyyy-MM-dd HH:mm"));
-
+                    
                     ret.put(Keys.MSG, msg);
                     break;
                 case Invitecode.STATUS_C_STOPUSE:
@@ -1178,30 +1182,29 @@ public class SettingsProcessor {
             }
         }
     }
-
+    
     /**
      * Point buy invitecode.
-     *
      * @param context the specified context
      */
     public void pointBuy(final RequestContext context) {
         final JSONObject ret = new JSONObject().put(Keys.CODE, StatusCodes.ERR);
         context.renderJSON(ret);
-
+        
         final String allowRegister = optionQueryService.getAllowRegister();
         if (!"2".equals(allowRegister)) {
             return;
         }
-
+        
         final JSONObject currentUser = Sessions.getUser();
         final String fromId = currentUser.optString(Keys.OBJECT_ID);
         final String userName = currentUser.optString(User.USER_NAME);
-
+        
         // 故意先生成后返回校验，所以即使积分不够也是可以兑换成功的
         // 这是为了让积分不够的用户可以通过这个后门兑换、分发邀请码以实现积分“自充”
         // 后期可能会关掉这个【特性】
         final String invitecode = invitecodeMgmtService.userGenInvitecode(fromId, userName);
-
+        
         final String transferId = pointtransferMgmtService.transfer(fromId, Pointtransfer.ID_C_SYS,
                 Pointtransfer.TRANSFER_TYPE_C_BUY_INVITECODE, Pointtransfer.TRANSFER_SUM_C_BUY_INVITECODE,
                 invitecode, System.currentTimeMillis(), "");
@@ -1218,29 +1221,28 @@ public class SettingsProcessor {
             ret.put(Keys.MSG, invitecode + " " + msg);
         }
     }
-
+    
     /**
      * Exports posts(article/comment) to a file.
-     *
      * @param context the specified context
      */
     public void exportPosts(final RequestContext context) {
         context.renderJSON(StatusCodes.ERR);
-
+        
         final JSONObject user = Sessions.getUser();
         final String userId = user.optString(Keys.OBJECT_ID);
-
+        
         final String downloadURL = postExportService.exportPosts(userId);
         if ("-1".equals(downloadURL)) {
             context.renderJSONValue(Keys.MSG, langPropsService.get("insufficientBalanceLabel"));
-
+            
         } else if (StringUtils.isBlank(downloadURL)) {
             return;
         }
-
+        
         context.renderJSON(StatusCodes.SUCC).renderJSONValue("url", downloadURL);
     }
-
+    
     private static final String[][] emojiLists = {{
             "smile",
             "laughing",
@@ -1409,4 +1411,5 @@ public class SettingsProcessor {
             "tomato",
             Emotion.EOF_EMOJI // 标记结束以便在function.ftl中处理
     }};
+    
 }
