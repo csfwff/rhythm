@@ -539,13 +539,11 @@ public class UserMgmtService {
 
                 final JSONObject memberCntOption = optionRepository.get(Option.ID_C_STATISTIC_MEMBER_COUNT);
                 int memberCount = memberCntOption.optInt(Option.OPTION_VALUE) + 1; // Updates stat. (member count +1)
-                switch (memberCount) {
-                    case 8888:
-                        memberCount = 7003;
-                        break;
-                    case 9999:
-                        memberCount = 7004;
-                        break;
+                List<Integer> replacedNumbers = new ArrayList<>();
+                replacedNumbers.add(8888);
+                replacedNumbers.add(9999);
+                if (replacedNumbers.contains(memberCount)) {
+                    memberCount++;
                 }
 
                 user.put(UserExt.USER_NO, memberCount);

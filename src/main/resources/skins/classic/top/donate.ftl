@@ -21,11 +21,12 @@
 <#include "macro-top.ftl">
 <@top "donate">
     <h2 class="sub-head">捐助成员排行</h2>
-    <#--  <div class="module-header fn-clear">
-    <span class="fn-left">
-       共计 ${(data?size)} 位成员捐助了 ${totalData.totalAmount} 元。
-    </span>
-    </div>  -->
+    <div class="module-header fn-clear">
+        <span class="fn-left">
+            总捐助金额 <b>${totalData.totalAmount} ¥</b><br>
+            为社区运营续航 <b>${totalData.donateMakeDays} 天</b>
+        </span>
+    </div>
     <div class="list">
         <ul>
             <#list data as user>
@@ -61,7 +62,7 @@
                                 </div>
                             </div>
                             <div class="cmts tooltipped tooltipped-w" aria-label="共计捐助 ${user.totalCount}笔 ￥${user.total}元，谢谢老板！">
-                                ${user.total} 元 
+                                ${user.total} 元
                             </div>
                         </div>
                     </div>

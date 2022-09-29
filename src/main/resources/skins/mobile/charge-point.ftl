@@ -30,7 +30,7 @@
 <div class="main">
     <div class="wrapper">
         <div class="content">
-            <h2 class="sub-head"><span class="ft-red">❤</span> 捐助摸鱼派</h2>
+            <h2 class="sub-head">❤️ 捐助摸鱼派</h2>
             <div style="padding: 15px">
                 <p>鱼油你好！摸鱼派是由<a href="https://github.com/Programming-With-Love" target="_blank">用爱发电开源组织</a>衍生的科技社区。我们希望构建一个属于科技爱好者们、以<b>摸鱼</b>为社区精神的综合性社区。</p>
                 <p>摸鱼派的运营资金由 <em>摸鱼派管理组</em> 自掏腰包，如果你喜欢摸鱼派的氛围，欢迎通过捐助支持我们继续运营下去！你捐助的所有资金，我们都会在当前页面公示，收到的资金会被<b>完全用于摸鱼派的社区运营</b> :)</p><br>
@@ -56,6 +56,24 @@
                     }
                 }
             </script>
+            <#if isSponsor>
+                <h2 class="sub-head"><span class="ft-red">✨</span> 您的捐助信息</h2>
+                <div style="padding: 15px 50px">
+                    <div class="TGIF__item" style="display: flex; justify-content: center">
+                        <div style="text-align: center">
+                            亲爱的鱼油，感谢你对摸鱼派的支持与喜爱 ❤️
+                            <br><br>
+                            已累计捐助：<b>${donateTimes} 笔</b><br>
+                            总捐助金额：<b>${donateCount} ¥</b><br>
+                            为社区运营续航：<b>${donateMakeDays} 天</b>
+                            <br><br>
+                            <#list donateList as donate>
+                                <p style="margin-bottom: 5px" class="tooltipped tooltipped-e" aria-label="${donate.message}" ><span class="count">🧧 ${donate.date} ${donate.time} ${donate.amount} ¥</span></p>
+                            </#list>
+                        </div>
+                    </div>
+                </div>
+            </#if>
             <h2 class="sub-head"><span class="ft-red">🤗</span> 捐助称号回馈</h2>
             <div style="padding: 15px">
                 <p>感谢你的捐助，作为回馈，当你<b>累计</b>捐助至某个金额时，我们会赠送一个称号作为回馈：</p>
@@ -76,7 +94,7 @@
                     </div>
                 </div>
             </div>
-            <h2 class="sub-head">😘 感谢你们</h2>
+            <h2 class="sub-head">🙏 不胜感激</h2>
             <style>
                 .fn__space5 {
                     width: 5px;
