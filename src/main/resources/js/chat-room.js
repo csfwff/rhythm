@@ -914,12 +914,19 @@ var ChatRoom = {
         var content = ChatRoom.editor.getValue();
         if(content.length > 1){
           var withNSFW = false;
-          if($("#nsfwCheckbox:checked").val() === "on"){
-            withNSFW = true;
+          var theLastChar = content.charAt(content.length - 1);
+          content = content.substr(0, content.length - 1);
+          if($("#nsfwCheckbox").prop("checked") == true){
+            if(content.indexOf('##### 引用') == -1){
+              withNSFW = true;
+            }
+            else {
+              $("#nsfwCheckbox").prop("checked",false);
+            }
           }
-          if(withNSFW) {
-            content = "#NSFW#"+content;
-          }
+        }
+        if(withNSFW) {
+          content = "#NSFW" + content + "NSFW#" + theLastChar;
         }
         var requestJSONObject = {
             content: content,
@@ -1563,26 +1570,18 @@ ${result.info.msg}
         }
         newHTML += '</div>';
         var isNSFW = false;
-        if(data.content.indexOf('<p>#NSFW#') != -1) {
-          data.content = data.content.replace('<p>#NSFW#', '<p>');
+        if(data.content.indexOf('#NSFW') != -1 && data.content.indexOf('NSFW#' != -1)) {
+          data.content = data.content.replace('#NSFW', '<details><summary>可能引起不适的内容:</summary>');
+          data.content = data.content.replace('NSFW#', '</details>');
           isNSFW = true;
         }
-        if(isNSFW) {
-          newHTML += '        <div class="vditor-reset ft__smaller ' + Label.chatRoomPictureStatus + '">\n' +
-          '            <details><summary>可能引起不适的内容:</summary>' + data.content + '</details>\n' +
-          '        </div>\n' +
-          '        <div class="ft__smaller ft__fade fn__right date-bar">\n' +
-          '            ' + data.time + '\n' +
-          '                <span class="fn__space5"></span>\n';
-        }
-        else {
-          newHTML += '        <div class="vditor-reset ft__smaller ' + Label.chatRoomPictureStatus + '">\n' +
-          '            ' + data.content + '\n' +
-          '        </div>\n' +
-          '        <div class="ft__smaller ft__fade fn__right date-bar">\n' +
-          '            ' + data.time + '\n' +
-          '                <span class="fn__space5"></span>\n';
-        }
+        newHTML += '        <div class="vditor-reset ft__smaller ' + Label.chatRoomPictureStatus + '">\n' +
+        '            ' + data.content + '\n' +
+        '        </div>\n' +
+        '        <div class="ft__smaller ft__fade fn__right date-bar">\n' +
+        '            ' + data.time + '\n' +
+        '                <span class="fn__space5"></span>\n';
+      
 
         if (!isRedPacket) {
             newHTML += '                <details class="details action__item fn__flex-center">\n' +
