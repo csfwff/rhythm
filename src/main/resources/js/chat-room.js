@@ -884,7 +884,16 @@ var ChatRoom = {
             return;
         }
         ChatRoom.isSend = true;
-        var content = ChatRoom.editor.getValue()
+        var content = ChatRoom.editor.getValue();
+        if(content.length > 1){
+          var withNSFW = false;
+          if($("#nsfwCheckbox:checked").val() === "on"){
+            withNSFW = true;
+          }
+          if(withNSFW) {
+            content = "#NSFW#"+content;
+          }
+        }
         var requestJSONObject = {
             content: content,
         }
@@ -1510,13 +1519,28 @@ ${result.info.msg}
             }
         }
         newHTML += '</div>';
+        var isNSFW = false;
+        if(data.content.indexOf('<p>#NSFW#') != -1) {
+          data.content = data.content.replace('<p>#NSFW#', '<p>');
+          isNSFW = true;
+        }
+        if(isNSFW) {
+          newHTML += '        <div class="vditor-reset ft__smaller ' + Label.chatRoomPictureStatus + '">\n' +
+          '            <details><summary>可能引起不适的内容:</summary>' + data.content + '</details>\n' +
+          '        </div>\n' +
+          '        <div class="ft__smaller ft__fade fn__right date-bar">\n' +
+          '            ' + data.time + '\n' +
+          '                <span class="fn__space5"></span>\n';
+        }
+        else {
+          newHTML += '        <div class="vditor-reset ft__smaller ' + Label.chatRoomPictureStatus + '">\n' +
+          '            ' + data.content + '\n' +
+          '        </div>\n' +
+          '        <div class="ft__smaller ft__fade fn__right date-bar">\n' +
+          '            ' + data.time + '\n' +
+          '                <span class="fn__space5"></span>\n';
+        }
 
-        newHTML += '        <div class="vditor-reset ft__smaller ' + Label.chatRoomPictureStatus + '">\n' +
-            '            ' + data.content + '\n' +
-            '        </div>\n' +
-            '        <div class="ft__smaller ft__fade fn__right date-bar">\n' +
-            '            ' + data.time + '\n' +
-            '                <span class="fn__space5"></span>\n';
         if (!isRedPacket) {
             newHTML += '                <details class="details action__item fn__flex-center">\n' +
                 '                    <summary>\n' +

@@ -96,6 +96,10 @@
                                         </button>
                                     </#if>
                                     <button class="red" onclick="$('#chats').empty();page=0;ChatRoom.more();">${cleanScreenLabel}</button>
+                                    <div class="nsfw-checkbox">
+                                      <input type="checkbox" id="nsfwCheckbox"/>
+                                      <label for="scales" class="tooltipped tooltipped-se" aria-label="即便存在本功能，也必须遵守社区规范。"> NSFW </label>
+                                    </div>
                                     <button class="green" onclick="ChatRoom.send()">${postLabel}</button>
                                 </div>
                                 <div id="paintContent" style="display: none">
@@ -277,6 +281,10 @@
     }
     #emojiList {
          bottom: unset!important;
+    }
+    .nsfw-checkbox {
+      position: relative;
+      display: inline-block;
     }
 </style>
 </body>
