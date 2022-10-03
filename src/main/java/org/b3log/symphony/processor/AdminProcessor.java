@@ -1595,6 +1595,10 @@ public class AdminProcessor {
                 case UserExt.USER_POINT:
                 case UserExt.USER_APP_ROLE:
                 case UserExt.USER_STATUS:
+                    if (value.equals("3")) {
+                        LOGGER.log(Level.INFO, "1");
+                        System.out.println(value);
+                    }
                 case UserExt.USER_COMMENT_VIEW_MODE:
                 case UserExt.USER_AVATAR_VIEW_MODE:
                 case UserExt.USER_LIST_PAGE_SIZE:
