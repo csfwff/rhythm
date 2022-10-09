@@ -19,7 +19,6 @@
 package org.b3log.symphony.processor;
 
 import jodd.util.Base64;
-import jodd.util.CollectionUtil;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.time.DateFormatUtils;
@@ -42,7 +41,9 @@ import org.b3log.latke.model.User;
 import org.b3log.latke.repository.RepositoryException;
 import org.b3log.latke.service.LangPropsService;
 import org.b3log.latke.service.ServiceException;
-import org.b3log.latke.util.*;
+import org.b3log.latke.util.Paginator;
+import org.b3log.latke.util.Requests;
+import org.b3log.latke.util.Stopwatchs;
 import org.b3log.latke.util.Strings;
 import org.b3log.symphony.cache.DomainCache;
 import org.b3log.symphony.model.*;
@@ -63,10 +64,8 @@ import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.text.SimpleDateFormat;
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * Article processor.
