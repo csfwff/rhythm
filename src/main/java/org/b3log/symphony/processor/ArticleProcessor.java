@@ -19,6 +19,7 @@
 package org.b3log.symphony.processor;
 
 import jodd.util.Base64;
+import jodd.util.CollectionUtil;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.time.DateFormatUtils;
@@ -61,6 +62,8 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.File;
+import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -1347,7 +1350,29 @@ public class ArticleProcessor {
                 currentUser = ApiProcessor.getUserByKey(requestJSONObject.optString("apiKey"));
             } catch (NullPointerException ignored) {
             }
-
+            // 宵禁状态  TODO 多个地方用了, 阿达你要处理么?
+            int start = 1930;
+            int end = 800;
+            int now = Integer.parseInt(new SimpleDateFormat("HHmm").format(new Date()));
+            //是宵禁状态, 设置发帖间隔 一小时一贴?
+            if (now < end || now > start) {
+                // 用户帖子列表
+                final List<JSONObject> userArticles = articleQueryService.getUserArticles(currentUser.optString(Keys.OBJECT_ID),Article.ARTICLE_ANONYMOUS_C_PUBLIC, 1, 1);
+                // 帖子列表 不为空
+                if (!userArticles.isEmpty()){
+                    // 当前时间
+                    long nowTime = System.currentTimeMillis();
+                    // 最后一篇文章
+                    JSONObject lastArticle = userArticles.get(0);
+                    // 更新时间 毫秒
+                    long articleCreateTime = lastArticle.getLong(Keys.OBJECT_ID);
+                    // 小于一小时间隔
+                    if (nowTime - articleCreateTime < 1 * 60 * 60 * 1000){
+                        context.renderMsg("摸鱼派已进入宵禁模式, 充足的睡眠是摸鱼的关键, 良性的思考一定不会促使你高频的发帖, 为了你的身心健康，我们将调整发帖间隔为 1h (一小时)...感谢你的陪伴，我们明天再见，早点休息，(¦3[▓▓] 晚安");
+                        return;
+                    }
+                }
+            }
             article.put(Article.ARTICLE_AUTHOR_ID, currentUser.optString(Keys.OBJECT_ID));
 
             if (!Role.ROLE_ID_C_ADMIN.equals(currentUser.optString(User.USER_ROLE))) {
