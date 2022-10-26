@@ -44,14 +44,18 @@ import org.b3log.symphony.cache.ArticleCache;
 import org.b3log.symphony.model.*;
 import org.b3log.symphony.processor.middleware.AnonymousViewCheckMidware;
 import org.b3log.symphony.processor.middleware.LoginCheckMidware;
+import org.b3log.symphony.repository.SponsorRepository;
 import org.b3log.symphony.service.*;
 import org.b3log.symphony.util.*;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.io.InputStream;
+import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
+import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Index processor.
@@ -139,6 +143,12 @@ public class IndexProcessor {
      */
     @Inject
     private BreezemoonQueryService breezemoonQueryService;
+
+    @Inject
+    private SponsorRepository sponsorRepository;
+
+    @Inject
+    private SponsorService sponsorService;
 
     /**
      * Register request handlers.
@@ -772,5 +782,30 @@ public class IndexProcessor {
         dataModelService.fillSideHotArticles(dataModel);
         dataModelService.fillSideTags(dataModel);
         dataModelService.fillLatestCmts(dataModel);
+        // 个人捐助信息
+        dataModel.put("isSponsor", false);
+        JSONObject currentUser = Sessions.getUser();
+        if (currentUser != null) {
+            try {
+                String userId = currentUser.optString(Keys.OBJECT_ID);
+                List<JSONObject> sponsor = sponsorRepository.listByUserId(userId);
+                if (sponsor.size() > 0) {
+                    dataModel.put("isSponsor", true);
+                    dataModel.put("donateTimes", sponsor.size());
+                    double sum = sponsorService.getSum(userId);
+                    dataModel.put("donateCount", sum);
+                    BigDecimal donateMakeDaysBigDecimal = new BigDecimal(String.valueOf(sum / 5));
+                    double donateMakeDays = donateMakeDaysBigDecimal.setScale(0, BigDecimal.ROUND_HALF_UP).doubleValue();
+                    dataModel.put("donateMakeDays", donateMakeDays);
+                    sponsor = sponsor.stream().peek(x -> {
+                        x.put(Common.DATE, new SimpleDateFormat("yyyy-MM-dd").format(x.optLong(Common.TIME)));
+                        x.put(Common.TIME, new SimpleDateFormat("HH:mm:ss").format(x.optLong(Common.TIME)));
+                        x.remove(UserExt.USER_T_ID);
+                    }).collect(Collectors.toList());
+                    dataModel.put("donateList", sponsor);
+                }
+            } catch (Exception ignored) {
+            }
+        }
     }
 }

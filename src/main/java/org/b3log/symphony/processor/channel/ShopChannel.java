@@ -55,13 +55,18 @@ public class ShopChannel implements WebSocketChannel {
      */
     @Override
     public void onConnect(final WebSocketSession session) {
-        JSONObject user = new JSONObject(session.getHttpSession().getAttribute(User.USER));
+        JSONObject user = null;
+        try {
+            user = new JSONObject(session.getHttpSession().getAttribute(User.USER));
+        } catch (NullPointerException ignored) {
+        }
         try {
             user = ApiProcessor.getUserByKey(session.getParameter("apiKey"));
         } catch (NullPointerException ignored) {
         }
 
         if (null == user) {
+            session.close();
             return;
         }
 

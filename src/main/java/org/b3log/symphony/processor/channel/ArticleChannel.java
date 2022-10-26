@@ -186,14 +186,18 @@ public class ArticleChannel implements WebSocketChannel {
                     dataModel.put(Permission.PERMISSIONS, permissions);
                 }
                 Cache SESSION_CACHE = CacheFactory.getCache("sessions");
-                JSONObject csrfTokenValue = SESSION_CACHE.get(user.optString(Keys.OBJECT_ID) + Common.CSRF_TOKEN);
-                if (null == csrfTokenValue) {
-                    csrfTokenValue = new JSONObject();
-                    csrfTokenValue.put(Common.DATA, RandomStringUtils.randomAlphanumeric(12));
+                if (null != user) {
+                    JSONObject csrfTokenValue = SESSION_CACHE.get(user.optString(Keys.OBJECT_ID) + Common.CSRF_TOKEN);
+                    if (null == csrfTokenValue) {
+                        csrfTokenValue = new JSONObject();
+                        csrfTokenValue.put(Common.DATA, RandomStringUtils.randomAlphanumeric(12));
 
-                    SESSION_CACHE.put(user.optString(Keys.OBJECT_ID) + Common.CSRF_TOKEN, csrfTokenValue);
+                        SESSION_CACHE.put(user.optString(Keys.OBJECT_ID) + Common.CSRF_TOKEN, csrfTokenValue);
+                    }
+                    dataModel.put(Common.CSRF_TOKEN, csrfTokenValue.optString(Common.DATA));
+                } else {
+                    dataModel.put(Common.CSRF_TOKEN, "YouAreUnLogged");
                 }
-                dataModel.put(Common.CSRF_TOKEN, csrfTokenValue.optString(Common.DATA));
 
                 final CloudService cloudService = beanManager.getReference(CloudService.class);
                 JSONObject comment = (JSONObject) dataModel.get("comment");

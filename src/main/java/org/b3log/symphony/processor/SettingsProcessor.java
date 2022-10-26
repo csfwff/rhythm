@@ -260,7 +260,7 @@ public class SettingsProcessor {
             context.renderMsg("补签卡使用成功！");
         } else {
             context.renderJSON(StatusCodes.ERR);
-            context.renderMsg("补签卡使用失败！可能没有需要补签的记录或背包中没有补签卡。");
+            context.renderMsg("补签卡使用失败！可能没有需要补签的记录或背包中没有补签卡或当前是最长签到。");
         }
     }
 

@@ -23,11 +23,14 @@ import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.b3log.latke.Keys;
+import org.b3log.latke.http.Session;
 import org.b3log.latke.http.WebSocketSession;
 import org.b3log.latke.ioc.Inject;
+import org.b3log.latke.model.User;
 import org.b3log.latke.repository.*;
 import org.b3log.latke.service.LangPropsService;
 import org.b3log.latke.service.annotation.Service;
+import org.b3log.symphony.model.Common;
 import org.b3log.symphony.model.Option;
 import org.b3log.symphony.processor.channel.ArticleChannel;
 import org.b3log.symphony.processor.channel.ArticleListChannel;
@@ -37,6 +40,7 @@ import org.b3log.symphony.repository.OptionRepository;
 import org.json.JSONObject;
 
 import java.util.Collections;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -75,7 +79,9 @@ public class OptionQueryService {
     public int getOnlineMemberCount() {
         int ret = 0;
         for (final Set<WebSocketSession> value : UserChannel.SESSIONS.values()) {
-            ret += value.size();
+            if (value.size() != 0) {
+                ret ++;
+            }
         }
 
         return ret;
@@ -87,7 +93,29 @@ public class OptionQueryService {
      * @return online visitor count
      */
     public int getOnlineVisitorCount() {
-        final int ret = ArticleChannel.SESSIONS.size() + ArticleListChannel.SESSIONS.size() + ChatroomChannel.SESSIONS.size() + getOnlineMemberCount();
+        Set<String> duplicatedIp = new LinkedHashSet<>();
+        for (WebSocketSession session : ArticleChannel.SESSIONS) {
+            final Session httpSession = session.getHttpSession();
+            if (null == httpSession.getAttribute(User.USER)) {
+                final String ip = httpSession.getAttribute(Common.IP);
+                duplicatedIp.add(ip);
+            }
+        }
+        for (WebSocketSession session : ChatroomChannel.SESSIONS) {
+            final Session httpSession = session.getHttpSession();
+            if (null == httpSession.getAttribute(User.USER)) {
+                final String ip = httpSession.getAttribute(Common.IP);
+                duplicatedIp.add(ip);
+            }
+        }
+        for (WebSocketSession session : ArticleListChannel.SESSIONS.keySet()) {
+            final Session httpSession = session.getHttpSession();
+            if (null == httpSession.getAttribute(User.USER)) {
+                final String ip = httpSession.getAttribute(Common.IP);
+                duplicatedIp.add(ip);
+            }
+        }
+        final int ret = duplicatedIp.size() + getOnlineMemberCount();
 
         try {
             final JSONObject maxOnlineMemberCntRecord = optionRepository.get(Option.ID_C_STATISTIC_MAX_ONLINE_VISITOR_COUNT);

@@ -219,7 +219,7 @@ var Comment = {
 
     if ($('.footer').attr('style')) {
       $('.editor-panel .wrapper').slideUp(function () {
-        $('.editor-panel').hide()
+        $(".editor-panel").fadeOut(100)
         $('.footer').removeAttr('style')
       })
       return false
@@ -252,17 +252,14 @@ var Comment = {
    * 加载表情
    */
   loadEmojis: function () {
-    $("#emojis").html("");
-    let emojis = Comment.getEmojis();
+    let emojis = Comment.getEmojis(),html="";
     for (let i = 0; i < emojis.length; i++) {
-      $("#emojis").append("" +
-          "<button>\n" +
-          "    <div class=\"divX\" onclick='Comment.delEmoji(\"" + emojis[i] + "\")'>\n" +
-          "        <svg style=\"width: 15px; height: 15px;\"><use xlink:href=\"#delIcon\"></use></svg>\n" +
-          "    </div>" +
-          "    <img style='max-height: 50px' onclick=\"Comment.editor.setValue(Comment.editor.getValue() + '![图片表情](" + emojis[i] + ")')\" class=\"vditor-emojis__icon\" src=\"" + emojis[i] + "\">\n" +
-          "</button>");
+      html+=`<button onclick="Comment.editor.setValue(Comment.editor.getValue() + '![图片表情](${emojis[i]})')">
+    <div class="divX"><svg onclick='Comment.delEmoji("${emojis[i]}");event.cancelBubble =true;' style="width: 15px; height: 15px;"><use xlink:href="#delIcon"></use></svg></div>
+    <img style='max-height: 50px' class="vditor-emojis__icon" src="${emojis[i]}">
+</button>`;
     }
+    $("#emojis").html(html);
   },
   /**
    * 删除表情包
@@ -438,7 +435,11 @@ var Comment = {
         }
       },
     });
-    ret.reverse();
+    try {
+      ret.reverse();
+    } catch (e) {
+      return [];
+    }
     return ret;
   },
   /**
@@ -1985,32 +1986,35 @@ $(document).ready(function () {
   Comment.listenUploadEmojis();
   Comment.loadEmojis();
   // 监听表情包按钮
-  $("#emojiBtn").on('click', function () {
-    if ($("#emojiList").hasClass("showList")) {
-      $("#emojiList").removeClass("showList");
-    } else {
-      $("#emojiList").addClass("showList");
-      setTimeout(function () {
-        $("body").unbind();
-        $('body').click(function (event) {
-          if ($(event.target).closest('a').attr('id') !== 'aPersonListPanel' &&
-              $(event.target).closest('.module').attr('id') !== 'personListPanel') {
-            $('#personListPanel').hide()
-          }
-        })
-        $("body").click(function() {
-          $("#emojiList").removeClass("showList");
-          $("body").unbind();
-          $('body').click(function (event) {
-            if ($(event.target).closest('a').attr('id') !== 'aPersonListPanel' &&
-                $(event.target).closest('.module').attr('id') !== 'personListPanel') {
-              $('#personListPanel').hide()
-            }
-          })
-        });
-      }, 100);
+
+  (()=>{
+    let time_out=new Date().getTime(),timeoutId=0
+    const closeEmoji=function () {
+      if(timeoutId!==0){
+        clearTimeout(timeoutId)
+        timeoutId=0
+      }
+      time_out=new Date().getTime()
+      timeoutId=setTimeout(()=>{
+        new Date().getTime()-time_out<=700&&$("#emojiList").removeClass("showList")
+      },navigator.userAgent.match(/(phone|pad|pod|ios|Android|Mobile|BlackBerry|MQQBrowser|JUC|Fennec|wOSBrowser|BrowserNG|WebOS|Symbian)/i)!==null?0:600)
     }
-  });
+    $("#emojiBtn").hover(function (){
+      if(timeoutId!==0){
+        clearTimeout(timeoutId)
+        timeoutId=0
+      }
+      time_out=new Date().getTime()
+      setTimeout(()=>0!==$("#emojiBtn:hover").length&&$("#emojiList").addClass("showList"),300)
+    },closeEmoji)
+    $("#emojiList").hover(function () {
+      if(timeoutId!==0){
+        clearTimeout(timeoutId)
+        timeoutId=0
+      }
+      time_out=new Date().getTime()
+    },closeEmoji)
+  })()
 
   // Init [Article] channel
   ArticleChannel.init(Label.articleChannel)

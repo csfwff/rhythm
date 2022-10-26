@@ -56,7 +56,7 @@ var ChatRoom = {
                 mode: 'editor',
             },
             resize: {
-                enable: false,
+                enable: true,
                 position: 'bottom',
             },
             toolbar: [
@@ -72,6 +72,7 @@ var ChatRoom = {
                 'redo',
                 '|',
                 'edit-mode',
+                'fullscreen',
                 {
                     name: 'more',
                     toolbar: [
@@ -85,13 +86,13 @@ var ChatRoom = {
                         'code',
                         'insert-before',
                         'insert-after',
-                        'fullscreen',
-                        'both',
-                        'preview',
-                        'outline',
-                        'content-theme',
-                        'code-theme',
-                        'devtools',
+                        // 'fullscreen',
+                        // 'both',
+                        // 'preview',
+                        // 'outline',
+                        // 'content-theme',
+                        // 'code-theme',
+                        // 'devtools',
                         'info',
                         'help',
                     ],
@@ -116,32 +117,35 @@ var ChatRoom = {
         ChatRoom.listenUploadEmojis();
         ChatRoom.loadEmojis();
         // 监听按钮
-        $("#emojiBtn").on('click', function () {
-            if ($("#emojiList").hasClass("showList")) {
-                $("#emojiList").removeClass("showList");
-            } else {
-                $("#emojiList").addClass("showList");
-                setTimeout(function () {
-                    $("body").unbind();
-                    $('body').click(function (event) {
-                        if ($(event.target).closest('a').attr('id') !== 'aPersonListPanel' &&
-                            $(event.target).closest('.module').attr('id') !== 'personListPanel') {
-                            $('#personListPanel').hide()
-                        }
-                    })
-                    $("body").click(function() {
-                        $("#emojiList").removeClass("showList");
-                        $("body").unbind();
-                        $('body').click(function (event) {
-                            if ($(event.target).closest('a').attr('id') !== 'aPersonListPanel' &&
-                                $(event.target).closest('.module').attr('id') !== 'personListPanel') {
-                                $('#personListPanel').hide()
-                            }
-                        })
-                    });
-                }, 100);
+
+        (() => {
+            let time_out = new Date().getTime(), timeoutId = 0
+            const closeEmoji = function () {
+                if (timeoutId !== 0) {
+                    clearTimeout(timeoutId)
+                    timeoutId = 0
+                }
+                time_out = new Date().getTime()
+                timeoutId = setTimeout(() => {
+                    new Date().getTime() - time_out <= 700 && $("#emojiList").removeClass("showList")
+                }, navigator.userAgent.match(/(phone|pad|pod|ios|Android|Mobile|BlackBerry|MQQBrowser|JUC|Fennec|wOSBrowser|BrowserNG|WebOS|Symbian)/i) !== null ? 0 : 600)
             }
-        });
+            $("#emojiBtn").hover(function () {
+                if (timeoutId !== 0) {
+                    clearTimeout(timeoutId)
+                    timeoutId = 0
+                }
+                time_out = new Date().getTime()
+                setTimeout(() => 0 !== $("#emojiBtn:hover").length && $("#emojiList").addClass("showList"), 300)
+            }, closeEmoji)
+            $("#emojiList").hover(function () {
+                if (timeoutId !== 0) {
+                    clearTimeout(timeoutId)
+                    timeoutId = 0
+                }
+                time_out = new Date().getTime()
+            }, closeEmoji)
+        })()
 
         // 红包初始化
         $("#redPacketBtn").on('click', function () {
@@ -172,10 +176,9 @@ var ChatRoom = {
                 "  <div class=\"fn-hr5 fn__5\"></div>\n" +
                 "  <div id=\"recivers\" class=\"chats__users\">\n" +
                 "                            </div> \n" +
-                "  <select id=\"userOption\" multiple=\"multiple\" style='height: 150px; left: 50px'>\n" +
-                "  </select>\n" +
-                "  <div id=\"chatUsernameSelectedPanel\" class=\"completed-panel\"\n" +
-                "                             style=\"height:170px;display:none;left:auto;top:auto;cursor:pointer;\"></div> \n" +
+                "  <input id=\"userInput\" type='text' autocomplete='off'> \n" +
+                "  <div class='selected-username-box'><div id=\"chatUsernameSelectedPanel\" class=\"selected-username-panel\"\n" +
+                "                             style=\"height:170px;\"></div><div class='arrow_up'></div></div> \n" +
                 "</label>\n" +
                 "<label id='redPacketMoneyLabel'>\n" +
                 "  <div class=\"ft__smaller ft__fade\" style=\"float: left\">积分</div>\n" +
@@ -200,30 +203,60 @@ var ChatRoom = {
                 "</div>" +
                 "", "发红包");
 
-            $("#userOption").on('change', function () {
-                var users = $("#userOption").val()
-                var userInfos = []
-                for (index in users) {
-                    userInfos.push(onelineUsers.get(users[index]))
-                }
-                $("#recivers").html("");
-                $("#redPacketCount").val(userInfos.length);
-                for (var userInfo in userInfos) {
-                    $("#recivers").append("<a target=\"_blank\" data-name=\"" + userInfos[userInfo].userName + "\"\n" +
-                        "href=\"" + userInfos[userInfo].homePage + "\">\n" +
-                        "<img style='margin-bottom: 10px' class=\"avatar avatar-small\" aria-label=\"" + userInfos[userInfo].userName + "\"\n" +
-                        "src=\"" + userInfos[userInfo].userAvatarURL + "\">\n" +
-                        "</a>");
-                }
-            });
+            var UserSelectedList = [];
+            var SelectedPanelTimeout = 0;
+            $("#userInput").on('focus input', function () {
+                var inputName = $("#userInput").val().toUpperCase();
+
+                clearTimeout(SelectedPanelTimeout);
+                $(".selected-username-box").hide();
+                $("#chatUsernameSelectedPanel").html("");
+                var SelectedHtml = "";
+                onelineUsers.forEach((userInfo, userName) => {
+                    var testName = userName.toUpperCase();
+                    if (testName.includes(inputName)) {
+                        SelectedHtml += `<div class="candidateName">${userName}</div>`
+                    }
+                })
+                $("#chatUsernameSelectedPanel").html(SelectedHtml);
+
+                $(".selected-username-box").show();
+
+                $(".candidateName").on("click", function () {
+                    let clickUserName = $(this).html();
+                    console.log(UserSelectedList.includes(clickUserName))
+                    if (!UserSelectedList.includes(clickUserName)) {
+                        UserSelectedList.push(clickUserName);
+                        var userInfos = [];
+                        for (index in UserSelectedList) {
+                            userInfos.push(onelineUsers.get(UserSelectedList[index]))
+                        }
+                        $("#recivers").html("");
+                        $("#redPacketCount").val(userInfos.length);
+                        for (var userInfo in userInfos) {
+                            $("#recivers").append("<a target=\"_blank\" data-name=\"" + userInfos[userInfo].userName + "\"\n" +
+                                "href=\"" + userInfos[userInfo].homePage + "\">\n" +
+                                "<img style='margin-bottom: 10px' class=\"avatar avatar-small\" aria-label=\"" + userInfos[userInfo].userName + "\"\n" +
+                                "src=\"" + userInfos[userInfo].userAvatarURL + "\">\n" +
+                                "</a>");
+                        }
+                    }
+                })
+            })
+
+            $("#userInput").on("blur", function () {
+                SelectedPanelTimeout = setTimeout(() => {
+                    $(".selected-username-box").hide();
+                }, 500)
+            })
 
             var onelineUsers = new Map();
-            $("#redPacketType").on('change',function () {
+            $("#redPacketType").on('change', function () {
                 let type = $("#redPacketType").val();
                 if (type === 'specify') {
                     $('#who').removeAttr("style");
                     $("#redPacketCount").val("1");
-                    $('#redPacketCount').attr("readOnly","true");
+                    $('#redPacketCount').attr("readOnly", "true");
                     $.ajax({
                         url: Label.servePath + '/chat-room/online-users',
                         type: 'GET',
@@ -234,8 +267,7 @@ var ChatRoom = {
                                 $("#userOption").html("");
                                 for (var userIndex in result.data.users) {
                                     var user = result.data.users[userIndex]
-                                    onelineUsers.set(user.userName,user)
-                                    $("#userOption").append("<option value=\""+user.userName+"\">"+user.userName+"</option>\n");
+                                    onelineUsers.set(user.userName, user)
                                 }
                             } else {
                                 // console.log("获取聊天室在线成员信息失败")
@@ -246,11 +278,11 @@ var ChatRoom = {
                         }
                     })
                 } else {
-                    $('#who').css('display','none')
-                    $('#gesture').css('display','none')
+                    $('#who').css('display', 'none')
+                    $('#gesture').css('display', 'none')
                     $('#redPacketCount').removeAttr("readOnly");
                     $('#redPacketMoneyLabel').removeAttr("style");
-                    $('#totalAmount').css('display','inline')
+                    $('#totalAmount').css('display', 'inline')
                     $("#countx").text("个数");
                     $("#redPacketCount").val("1");
                 }
@@ -261,11 +293,12 @@ var ChatRoom = {
                 if (type === 'rockPaperScissors') {
                     $('#gesture').removeAttr("style");
                     $("#redPacketCount").val("1");
-                    $('#redPacketCount').attr("readOnly","true");
+                    $('#redPacketCount').attr("readOnly", "true");
+                    $("#redPacketAmount").text($("#redPacketMoney").val() + " (含猜拳红包税 5%，实际红包 " + Math.floor($("#redPacketMoney").val() * 0.95) + " 积分) ");
                 }
                 if (type === 'dice') {
-                    $('#redPacketMoneyLabel').css('display','none')
-                    $('#totalAmount').css('display','none')
+                    $('#redPacketMoneyLabel').css('display', 'none')
+                    $('#totalAmount').css('display', 'none')
                     $("#countx").text("开盘人数");
                     $("#redPacketCount").val("3");
                 }
@@ -282,9 +315,13 @@ var ChatRoom = {
                     $("#redPacketMoney").val("32");
                 }
                 $("#redPacketAmount").text($("#redPacketMoney").val());
+                let type = $("#redPacketType").val();
+                if (type === 'rockPaperScissors') {
+                    $("#redPacketAmount").text($("#redPacketMoney").val() + " (含猜拳红包税 5%，实际红包 " + Math.floor($("#redPacketMoney").val() * 0.95) + " 积分) ");
+                }
             });
 
-            $('#redPacketMoney,#redPacketCount').bind('input propertychange', function() {
+            $('#redPacketMoney,#redPacketCount').bind('input propertychange', function () {
                 let type = $("#redPacketType").val();
                 if (type === 'average') {
                     $("#redPacketAmount").text($("#redPacketMoney").val() * $("#redPacketCount").val());
@@ -299,7 +336,7 @@ var ChatRoom = {
                     $("#redPacketAmount").text($("#redPacketMoney").val());
                     $("#redPacketMsg").val("玩的就是心跳！");
                 } else if (type === 'rockPaperScissors') {
-                    $("#redPacketAmount").text($("#redPacketMoney").val());
+                    $("#redPacketAmount").text($("#redPacketMoney").val() + " (含猜拳红包税 5%，实际红包 " + Math.floor($("#redPacketMoney").val() * 0.95) + " 积分) ");
                 }
             });
 
@@ -358,7 +395,7 @@ var ChatRoom = {
                 let money = $("#redPacketMoney").val();
                 let count = $("#redPacketCount").val();
                 let msg = $("#redPacketMsg").val();
-                let recivers = $("#userOption").val();
+                let recivers = UserSelectedList;
                 let gesture = $("#gestureType").val();
                 if (type === '' || type === null || type === undefined) {
                     type = "random";
@@ -366,10 +403,8 @@ var ChatRoom = {
                 if (recivers === undefined) {
                     recivers = []
                 }
-                if(recivers.length == 0 && type === 'specify') {
-                    $('#chatContentTip').
-                    addClass('error').
-                    html('<ul><li>请选择红包发送对象</li></ul>')
+                if (recivers.length == 0 && type === 'specify') {
+                    $('#chatContentTip').addClass('error').html('<ul><li>请选择红包发送对象</li></ul>')
                 }
                 if (msg === '') {
                     msg = '摸鱼者，事竟成！';
@@ -377,7 +412,7 @@ var ChatRoom = {
                 let content;
                 if (type !== "rockPaperScissors") {
                     content = {
-                        type:  type,
+                        type: type,
                         money: money,
                         count: count,
                         msg: msg,
@@ -385,7 +420,7 @@ var ChatRoom = {
                     }
                 } else {
                     content = {
-                        type:  type,
+                        type: type,
                         money: money,
                         count: count,
                         msg: msg,
@@ -403,15 +438,11 @@ var ChatRoom = {
                     data: JSON.stringify(requestJSONObject),
                     success: function (result) {
                         if (0 !== result.code) {
-                            $('#chatContentTip').
-                            addClass('error').
-                            html('<ul><li>' + result.msg + '</li></ul>')
+                            $('#chatContentTip').addClass('error').html('<ul><li>' + result.msg + '</li></ul>')
                         }
                     },
                     error: function (result) {
-                        $('#chatContentTip').
-                        addClass('error').
-                        html('<ul><li>' + result.statusText + '</li></ul>')
+                        $('#chatContentTip').addClass('error').html('<ul><li>' + result.statusText + '</li></ul>')
                     }
                 })
                 Util.closeAlert();
@@ -509,13 +540,13 @@ var ChatRoom = {
             linesArray.pop();
 
             // 遍历历史记录重新绘制
-            linesArray.forEach(arr=>{
+            linesArray.forEach(arr => {
                 ChatRoom.changeColor(arr.color);
                 ChatRoom.changeWidth(arr.width);
                 ctx.beginPath();
-                ctx.moveTo(arr.point[0].x,arr.point[0].y);
-                for(let i = 1; i < arr.point.length; i++){
-                    ctx.lineTo(arr.point[i].x,arr.point[i].y);
+                ctx.moveTo(arr.point[0].x, arr.point[0].y);
+                for (let i = 1; i < arr.point.length; i++) {
+                    ctx.lineTo(arr.point[i].x, arr.point[i].y);
                 }
                 ctx.stroke();
             })
@@ -526,7 +557,7 @@ var ChatRoom = {
      * @param {string} id canvas id.
      * @returns {undefined}
      */
-    changeColor: function(color) {
+    changeColor: function (color) {
         ctx.fillStyle = ctx.strokeStyle = ctx.shadowColor = color;
     },
     changeWidth: function (width) {
@@ -548,7 +579,7 @@ var ChatRoom = {
             ctx.beginPath();
             x = e.clientX - e.target.offsetLeft + $(window).scrollLeft();
             y = e.clientY - e.target.offsetTop + $(window).scrollTop();
-            pointsArray.push({x:x,y:y});
+            pointsArray.push({x: x, y: y});
             ctx.moveTo(x, y);
         };
 
@@ -560,7 +591,7 @@ var ChatRoom = {
 
             x = e.clientX - e.target.offsetLeft + $(window).scrollLeft();
             y = e.clientY - e.target.offsetTop + $(window).scrollTop();
-            pointsArray.push({x:x,y:y});
+            pointsArray.push({x: x, y: y});
             ctx.lineTo(x, y);
             ctx.stroke();
         };
@@ -584,7 +615,7 @@ var ChatRoom = {
             ctx.beginPath();
             x = e.changedTouches[0].pageX - e.target.offsetLeft;
             y = e.changedTouches[0].pageY - e.target.offsetTop;
-            pointsArray.push({x:x,y:y});
+            pointsArray.push({x: x, y: y});
             ctx.moveTo(x, y);
 
         }, false);
@@ -594,7 +625,7 @@ var ChatRoom = {
             e.preventDefault();
             x = e.changedTouches[0].pageX - e.target.offsetLeft;
             y = e.changedTouches[0].pageY - e.target.offsetTop;
-            pointsArray.push({x:x,y:y});
+            pointsArray.push({x: x, y: y});
             ctx.lineTo(x, y);
             ctx.stroke();
         }, false);
@@ -659,7 +690,7 @@ var ChatRoom = {
     useDiscuss: function () {
         let history = ChatRoom.editor.getValue();
         ChatRoom.editor.setValue("*`# " + $("#discuss-title").html() + " #`*  ");
-        ChatRoom.editor.insertValue( history, 0);
+        ChatRoom.editor.insertValue(history, 0);
         ChatRoom.editor.focus();
     },
     /**
@@ -722,17 +753,14 @@ var ChatRoom = {
      * 加载表情
      */
     loadEmojis: function () {
-        $("#emojis").html("");
-        let emojis = ChatRoom.getEmojis();
+        let emojis = ChatRoom.getEmojis(), html = "";
         for (let i = 0; i < emojis.length; i++) {
-            $("#emojis").append("" +
-                "<button>\n" +
-                "    <div class=\"divX\" onclick='ChatRoom.delEmoji(\"" + emojis[i] + "\")'>\n" +
-                "        <svg style=\"width: 15px; height: 15px;\"><use xlink:href=\"#delIcon\"></use></svg>\n" +
-                "    </div>" +
-                "    <img style='max-height: 50px' onclick=\"ChatRoom.editor.setValue(ChatRoom.editor.getValue() + '![图片表情](" + emojis[i] + ")')\" class=\"vditor-emojis__icon\" src=\"" + emojis[i] + "\">\n" +
-                "</button>");
+            html += `<button onclick="ChatRoom.editor.setValue(ChatRoom.editor.getValue() + '![图片表情](${emojis[i]})')">
+    <div class="divX"><svg onclick='ChatRoom.delEmoji("${emojis[i]}");event.cancelBubble =true;' style="width: 15px; height: 15px;"><use xlink:href="#delIcon"></use></svg></div>
+    <img style='max-height: 50px' class="vditor-emojis__icon" src="${emojis[i]}">
+</button>`;
         }
+        $("#emojis").html(html);
     },
     /**
      * 上传表情
@@ -811,7 +839,7 @@ var ChatRoom = {
             "", "从URL导入表情包");
         $("#fromURL").focus();
         $("#fromURL").unbind();
-        $("#fromURL").bind('keypress',function(event){
+        $("#fromURL").bind('keypress', function (event) {
             if (event.keyCode == "13") {
                 ChatRoom.addEmoji($("#fromURL").val());
                 Util.closeAlert();
@@ -877,7 +905,7 @@ var ChatRoom = {
      * 发送聊天内容
      * @returns {undefined}
      */
-    isSend:false,
+    isSend: false,
     send: function () {
         if (ChatRoom.isSend) {
             return;
@@ -991,7 +1019,7 @@ var ChatRoom = {
                 $('#personListPanel').hide()
             }
         })
-        $("body").click(function() {
+        $("body").click(function () {
             $("details[open]").removeAttr("open");
         });
     },
@@ -1039,13 +1067,23 @@ var ChatRoom = {
             url: Label.servePath + '/chat-room/revoke/' + oId,
             type: 'DELETE',
             cache: false,
-            success: function(result) {
+            success: function (result) {
                 if (0 === result.code) {
                 } else {
                     Util.notice("danger", 1500, result.msg);
                 }
             }
         });
+    },
+    /**
+     * 屏蔽聊天室 某人 消息
+     * @param userName
+     */
+    shileds: ',',
+    shiled: function (uName) {
+        if (confirm("友好的交流是沟通的基础, 确定要屏蔽 Ta 吗？\n本次屏蔽仅针对当前页面有效, 刷新后需重新屏蔽！")) {
+            ChatRoom.shileds += uName +",";
+        }
     },
     /**
      * 撤回聊天室消息
@@ -1057,7 +1095,7 @@ var ChatRoom = {
                 url: Label.servePath + '/chat-room/revoke/' + oId,
                 type: 'DELETE',
                 cache: false,
-                success: function(result) {
+                success: function (result) {
                     if (0 === result.code) {
                         Util.notice("success", 1500, result.msg);
                     } else {
@@ -1089,24 +1127,27 @@ var ChatRoom = {
      * @param id
      */
     report: function (id) {
-        $.ajax({
-            url: Label.servePath + '/report',
-            type: 'POST',
-            cache: false,
-            data: JSON.stringify({
-                reportDataId: id,
-                reportDataType: 3,
-                reportType: 49,
-                reportMemo: '',
-            }),
-            complete: function (result) {
-                if (result.responseJSON.code === 0) {
-                    Util.alert('一键举报成功，感谢你的帮助！<br>管理员将进行审核，如情况属实系统会为举报人发放积分奖励，并对违规者进行相应处罚。');
-                } else {
-                    Util.alert(result.responseJSON.msg);
-                }
-            },
-        })
+        var res = confirm("确定举报吗？");
+        if (res) {
+            $.ajax({
+                url: Label.servePath + '/report',
+                type: 'POST',
+                cache: false,
+                data: JSON.stringify({
+                    reportDataId: id,
+                    reportDataType: 3,
+                    reportType: 49,
+                    reportMemo: '',
+                }),
+                complete: function (result) {
+                    if (result.responseJSON.code === 0) {
+                        Util.alert('一键举报成功，感谢你的帮助！<br>管理员将进行审核，如情况属实系统会为举报人发放积分奖励，并对违规者进行相应处罚。');
+                    } else {
+                        Util.alert(result.responseJSON.msg);
+                    }
+                },
+            })
+        }
     },
     /**
      * 艾特某个人
@@ -1135,7 +1176,7 @@ var ChatRoom = {
      *
      * @param who
      */
-    renderRedPacket: function (usersJSON, count, got, recivers, diceRet) {
+    renderRedPacket: function (usersJSON, count, got, recivers, diceRet, packMaster) {
         let hasGot = false;
         let highest = -1;
         let winner
@@ -1180,24 +1221,22 @@ var ChatRoom = {
             let userNameInfo = currentUserName
             switch (bet) {
                 case 'big':
-                    userNameInfo = currentUserName + " (" + "押大" +")";
+                    userNameInfo = currentUserName + " (" + "押大" + ")";
                     break
                 case 'small':
-                    userNameInfo = currentUserName + " (" + "押小" +")";
+                    userNameInfo = currentUserName + " (" + "押小" + ")";
                     break
                 case 'leopard':
-                    userNameInfo = currentUserName + " (" + "豹子" +")";
+                    userNameInfo = currentUserName + " (" + "豹子" + ")";
                     break
             }
             let currentUserTime = current.time;
             let currentUserAvatar = "";
-            if (current.avatar !== undefined) {
-                currentUserAvatar = "<img class=\"avatar avatar--mid\" style=\"margin-right: 10px; background-image: none; background-color: transparent;\" src=\"" + current.avatar + "\">\n";
-            }
-            let html = "<li class=\"fn__flex menu__item\">\n" +
-                currentUserAvatar +
-                "    <div class=\"fn__flex-1\" style=\"text-align: left !important;\">\n" +
-                "        <h2 class=\"list__user\"><a href=\"" + Label.servePath + "/member/" + currentUserName +"\">" + userNameInfo + "</a></h2>\n";
+            if (current.avatar !== undefined) currentUserAvatar = `<img class="avatar avatar--mid" style="margin-right: 10px; background-image: none; background-color: transparent;" src="${current.avatar}">`;
+            let html = `<li class="fn__flex menu__item">${currentUserAvatar}
+<div class="fn__flex-1" style="text-align: left !important;">
+<h2 class="list__user"><a href="${Label.servePath}/member/${currentUserName}">${userNameInfo}</a>
+</h2>`;
             if (currentUserMoney > 0 && currentUserMoney === highest) {
                 highest = -1;
                 html += "<span class='green small btn'>来自老王的认可</span><br>\n";
@@ -1220,14 +1259,15 @@ var ChatRoom = {
             } else {
                 money = currentUserMoney
             }
-            html += "<span class=\"ft__fade ft__smaller\">" + currentUserTime + "</span>\n" +
-                "    </div>\n" +
-                "    <div class=\"fn__flex-center\">" + money + " 积分</div>\n" +
-                "</li>\n";
+            html += `<span class="ft__fade ft__smaller">${currentUserTime}</span>
+    </div>
+    <div class="fn__flex-center">${money} 积分</div>
+</li>
+`;
             $("#redPacketList").append(html);
         }
         if (!hasGot) {
-            $("#redPacketIGot").text("你错过了这个红包");
+            $("#redPacketIGot").text(Label.currentUser === packMaster ? "金主来了" : "你错过了这个红包");
         }
 
         if (undefined !== recivers) {
@@ -1237,7 +1277,7 @@ var ChatRoom = {
                 // console.log(index)
                 if (index === -1) {
                     $("#msg").text("这个红包属于 " + recivers)
-                    $("#redPacketIGot").text("这个红包不属于你");
+                    $("#redPacketIGot").text(Label.currentUser === packMaster ? "金主来了" : "这个红包不属于你");
                 }
             }
         }
@@ -1250,10 +1290,10 @@ var ChatRoom = {
             }
             switch (winner) {
                 case "big":
-                    content += sum +"点大"
+                    content += sum + "点大"
                     break
                 case "small":
-                    content += sum +"点小"
+                    content += sum + "点小"
                     break
                 case "leopard":
                     content += "豹子通杀"
@@ -1290,16 +1330,22 @@ var ChatRoom = {
 
 
     selectGesture: function (oId) {
-        Util.alert("<div class=\"form fn__flex-column\">\n" +
-            "<label id=\"gestureRadio\">\n" +
-            "  <input type=\"radio\" name=\"gesture\" value=\"0\" checked>石头\n" +
-            "  <input type=\"radio\" name=\"gesture\" value=\"1\">剪刀\n" +
-            "  <input type=\"radio\" name=\"gesture\" value=\"2\">布\n" +
-            "</label>\n" +
-            "<div class=\"fn__flex\" style=\"margin-top: 15px\">\n" +
-            "  <button class=\"btn btn--confirm\" onclick=\"ChatRoom.unpackRedPacket(" + oId + ")\;Util.clearAlert()\">出拳</button>\n" +
-            "</div>\n" +
-            "</div>", '出拳');
+        Util.alert(`<div class="form fn__flex-column select-center">
+<div>
+<label class="gestureRadio">
+  <input type="radio" name="gesture" value="0" checked>石头
+</label>
+<label class="gestureRadio">
+  <input type="radio" name="gesture" value="1">剪刀
+</label>
+<label class="gestureRadio">
+  <input type="radio" name="gesture" value="2">布
+</label>
+</div>
+<div class="fn__flex" style="margin-top: 15px">
+  <button class="btn btn--confirm" onclick="ChatRoom.unpackRedPacket(${oId});Util.clearAlert()">出拳</button>
+</div>
+</div>`, '出拳');
     },
     /**
      * 拆开红包
@@ -1310,7 +1356,7 @@ var ChatRoom = {
             method: "POST",
             data: JSON.stringify({
                 oId: oId,
-                gesture: $("#gestureRadio>input[name=gesture]:checked").val(),
+                gesture: $(".gestureRadio>input[name=gesture]:checked").val(),
                 dice: {
                     bet: $("#betRadio>input[name=bet]:checked").val(),
                     chips: $("#betRadio>input[name=chips]").val()
@@ -1321,54 +1367,25 @@ var ChatRoom = {
                     let iGot = "抢红包人数较多，加载中...";
                     let gesture = "";
                     if (result.info.gesture !== undefined) {
-                        gesture = result.info.userName + "出拳: ";
-                        switch(result.info.gesture) {
-                            case 0:
-                                gesture += " 石头";
-                                break;
-                            case 1:
-                                gesture += " 剪刀";
-                                break;
-                            case 2:
-                                gesture += " 布";
-                                break;
-                            default:
-                        }
+                        gesture = (Label.currentUser === result.info.userName ? "你" : result.info.userName) + "出拳:  " + ["石头", "剪刀", "布"][result.info.gesture]
                     }
-                    Util.alert("" +
-                        "<style>" +
-                        ".dialog-header-bg {" +
-                        "border-radius: 4px 4px 0px 0px; background-color: rgb(210, 63, 49); color: rgb(255, 255, 255);" +
-                        "}" +
-                        ".dialog-main {" +
-                        "height: 456px;" +
-                        "overflow: auto;" +
-                        "}" +
-                        "</style>" +
-                        "<div class=\"fn-hr5\"></div>\n" +
-                        "<div class=\"fn-hr5\"></div>\n" +
-                        "<div class=\"fn-hr5\"></div>\n" +
-                        "<div class=\"fn-hr5\"></div>\n" +
-                        "<div class=\"ft__center\">\n" +
-                        "    <div class=\"fn__flex-inline\">\n" +
-                        "        <img class=\"avatar avatar--small\" src=\"" + result.info.userAvatarURL48 + "\" style=\"background-image: none; background-color: transparent; width: 20px; height: 20px; margin-right: 0px;\">\n" +
-                        "        <div class=\"fn__space5\"></div>\n" +
-                        "        <a href=\"" + Label.servePath + "/member/" + result.info.userName + "\">" + result.info.userName + "</a>'s 红包\n" +
-                        "    </div>\n" +
-                        "    <div class=\"fn-hr5\"></div>\n" +
-                        (gesture ? ("<div class=\"ft__smaller ft__fade\">" + gesture + "</div>\n") : "") +
-                        "    <div id = \"msg\" class=\"ft__smaller ft__fade\">\n" +
-                        result.info.msg + "\n" +
-                        "    </div>\n" +
-                        "    <div class=\"hongbao__count\" id='redPacketIGot'>\n" +
-                        iGot +
-                        "    </div>\n" +
-                        "    <div class=\"ft__smaller ft__fade\">总计 " + result.info.got + "/" + result.info.count + "</div>\n" +
-                        "</div>\n" +
-                        "<div class=\"list\"><ul id=\"redPacketList\">\n" +
-                        "</ul></div>" +
-                        "", "红包");
-                    ChatRoom.renderRedPacket(result.who, result.info.count, result.info.got, result.recivers, result.diceRet)
+                    Util.alert(`<style>.dialog-header-bg {border-radius: 4px 4px 0 0; background-color: rgb(210, 63, 49); color: rgb(255, 255, 255);}.dialog-main {height: 456px;overflow: auto;}</style><div class="fn-hr5"></div>
+<div class="ft__center">
+    <div class="fn__flex-inline">
+        <img class="avatar avatar--small" src="${result.info.userAvatarURL48}" style="background-image: none; background-color: transparent; width: 20px; height: 20px; margin-right: 0;">
+        <div class="fn__space5"></div>
+        <a href="${Label.servePath}/member/${result.info.userName}">${result.info.userName}</a>'s 红包
+    </div>
+    <div class="fn-hr5"></div>
+${gesture ? `<div class="ft__smaller ft__fade">${gesture}</div>` : ""}    <div id = "msg" class="ft__smaller ft__fade">
+${result.info.msg}
+    </div>
+    <div class="hongbao__count" id='redPacketIGot'>${iGot}</div>
+    <div class="ft__smaller ft__fade">总计 ${result.info.got}/${result.info.count}</div>
+</div>
+<div class="list"><ul id="redPacketList">
+</ul></div>`, "红包");
+                    ChatRoom.renderRedPacket(result.who, result.info.count, result.info.got, result.recivers, result.diceRet, result.info.userName)
                     if (result.info.count === result.info.got) {
                         $("#chatroom" + oId).find(".hongbao__item").css("opacity", ".36").attr('onclick', "ChatRoom.unpackRedPacket(" + oId + ")");
                         if (result.dice === true) {
@@ -1397,6 +1414,10 @@ var ChatRoom = {
      * 渲染聊天室消息
      */
     renderMsg: function (data, more) {
+        if (ChatRoom.shileds.indexOf(data.userName) > 0){
+            // 被屏蔽了,
+            return;
+        }
         let isRedPacket = false;
         let isPlusOne = Label.latestMessage === data.md;
         try {
@@ -1428,7 +1449,7 @@ var ChatRoom = {
                         type = "摇骰子";
                         if (msgJSON.senderId !== Label.currentUserId) {
                             let dup = false
-                            for (idx in msgJSON.who){
+                            for (idx in msgJSON.who) {
                                 if (msgJSON.who[idx].userId === Label.currentUserId) {
                                     dup = true
                                     break
@@ -1471,9 +1492,10 @@ var ChatRoom = {
                         '</div>';
                 }
             }
-        } catch (err) {}
+        } catch (err) {
+        }
         let meTag1 = "";
-        let meTag2 = "";
+        let meTag2 = "<a onclick=\"ChatRoom.shiled('" + data.userName + "')\" class=\"item\" style='color: red'>屏蔽Ta</a>\n";
         if (data.userNickname !== undefined && data.userNickname !== "") {
             data.userNickname = data.userNickname + " (" + data.userName + ")"
         } else {
@@ -1508,7 +1530,8 @@ var ChatRoom = {
             if (canCollect) {
                 meTag2 += "<a onclick=\"ChatRoom.addEmoji(" + srcs + ")\" class=\"item\">一键收藏表情</a>";
             }
-        } catch (err) {}
+        } catch (err) {
+        }
         let newHTML = '<div class="fn-none">';
         newHTML += '<div id="chatroom' + data.oId + '" class="fn__flex chats__item' + meTag1 + '">\n' +
             '    <a href="/member/' + data.userName + '" style="height: 38px">\n' +
@@ -1531,7 +1554,7 @@ var ChatRoom = {
         }
         newHTML += '</div>';
 
-        newHTML += '        <div style="margin-top: 4px" class="vditor-reset ft__smaller ' + Label.chatRoomPictureStatus + '">\n' +
+        newHTML += '        <div class="vditor-reset ft__smaller ' + Label.chatRoomPictureStatus + '">\n' +
             '            ' + data.content + '\n' +
             '        </div>\n' +
             '        <div class="ft__smaller ft__fade fn__right date-bar">\n' +
@@ -1627,25 +1650,25 @@ var ChatRoom = {
     /**
      * 全屏看图插件渲染
      */
-    imageViewer: function() {
+    imageViewer: function () {
         // console.log("新消息")
         //没有新图片就不重载
-        if (this.imgViewer && $("div.vditor-reset.ft__smaller img:not(.ft__smaller,.emoji)").length === this.imgViewer.length)
+        if (this.imgViewer && $("div.vditor-reset.ft__smaller img:not(.ft__smaller,.emoji,.ext-emoji,*[src*='shield'],*[src*='/gen?'])").length === this.imgViewer.length)
             return
         // console.log("包含图片")
-        this.imgViewer = this.imgViewer || new Viewer(document.querySelector('#chats'),{
+        this.imgViewer = this.imgViewer || new Viewer(document.querySelector('#chats'), {
             inline: false,
             className: "PWLimgViwer",
-            filter: (img)=>!img.parentElement.classList.contains("ft__smaller") && !img.classList.contains("emoji"),
+            filter: (img) => !img.parentElement.classList.contains("ft__smaller") && !img.parentElement.classList.contains("ext-emoji") && !img.classList.contains("emoji") && img.src.indexOf("shield") < 0 && img.src.indexOf("/gen?") < 0,
             title() {
                 let ele = this.images[$(".PWLimgViwer .viewer-active").attr("data-index")];
                 while (ele = ele.parentElement,
-                    !ele.querySelector(".avatar"));
+                    !ele.querySelector(".avatar")) ;
                 return "From @" + ele.querySelector(".avatar").getAttribute("aria-label")
             }
         });
-        const delayshow = function() {
-            setTimeout(()=>{
+        const delayshow = function () {
+            setTimeout(() => {
                     if (!ChatRoom.imgViewer.isShown) {
                         ChatRoom.imgWaitting = false;
                         // console.log("重载")
@@ -1666,73 +1689,73 @@ var ChatRoom = {
      * xiaoIce Game
      * */
     iceWs: "",
-    IceGameCK : localStorage.getItem("IceGameCK") || null,
-    loadXiaoIceGame: function(){
+    IceGameCK: localStorage.getItem("IceGameCK") || null,
+    loadXiaoIceGame: function () {
         // 连接游戏服务器
         iceWs = new WebSocket('wss://game.yuis.cc/wss');
         let iceWsHeart = null;
-        iceWs.onopen = function(){
+        iceWs.onopen = function () {
             iceWs.send(JSON.stringify({
-                type:'setUser',
-                user:Label.currentUser,
-                ck:ChatRoom.IceGameCK,
-                uid:Label.currentUserId
+                type: 'setUser',
+                user: Label.currentUser,
+                ck: ChatRoom.IceGameCK,
+                uid: Label.currentUserId
             }))
-            iceWsHeart = setInterval(()=>{
-                iceWs.send(JSON.stringify({type:'hb'}))
-            },15000)
+            iceWsHeart = setInterval(() => {
+                iceWs.send(JSON.stringify({type: 'hb'}))
+            }, 15000)
         }
-        iceWs.onclose = function(){
+        iceWs.onclose = function () {
             let html = `<div class="ice-msg-item">
                     <div class="ice-msg-content">小冰网络失去连接</div>
                   </div>`
             $('#iceMsgList').prepend(html);
         }
-        iceWs.onerror = function(err){
+        iceWs.onerror = function (err) {
             let html = `<div class="ice-msg-item">
                     <div class="ice-msg-content">小冰网络维护中...</div>
                   </div>`
             $('#iceMsgList').prepend(html);
         }
         // 收到消息
-        iceWs.onmessage = function (e){
+        iceWs.onmessage = function (e) {
             let data = JSON.parse(e.data);
-            if(data.user === "all" || data.user === Label.currentUser){
+            if (data.user === "all" || data.user === Label.currentUser) {
                 let html = `<div class="ice-msg-item">
                     <div class="ice-msg-content">${data.msg}</div>
                   </div>`
                 $('#iceMsgList').prepend(html);
             }
-            if(data.type === "setCK"){
+            if (data.type === "setCK") {
                 ChatRoom.IceGameCK = data.ck;
-                localStorage.setItem("IceGameCK",data.ck);
+                localStorage.setItem("IceGameCK", data.ck);
             }
         }
         // 打开游戏界面
-        $('#xiaoIceGameBtn').click(function(){
+        $('#xiaoIceGameBtn').click(function () {
             $("#xiaoIceGameBox").show(200);
             $('#xiaoIceGameBtn').hide(200);
-            setTimeout(()=>{
+            setTimeout(() => {
                 $("#xiaoIceGameBox").addClass('active');
-            },220)
+            }, 220)
         })
         // 关闭游戏界面
-        $('#iceClose').click(function(){
-            const gameBox=$("#xiaoIceGameBox")
-            setTimeout(()=>{
+        $('#iceClose').click(function () {
+            const gameBox = $("#xiaoIceGameBox")
+            setTimeout(() => {
                 $('.ice-chat-input').val("");
                 $("#xiaoIceGameBox").hide(200);
                 $('#xiaoIceGameBtn').show(200);
-            },gameBox.hasClass('active')?420:1)
+            }, gameBox.hasClass('active') ? 420 : 1)
             gameBox.removeClass('active');
         })
         // 最小化切换
-        $('#iceMinimize').click(function(){
+        $('#iceMinimize').click(function () {
             $("#xiaoIceGameBox").toggleClass('active');
         })
         // 发送指令
         $('#iceSendMsg').click(ChatRoom.sendIceMsg);
-        $('.ice-chat-input').bind('keypress', function(event) {
+        $('.ice-chat-input').bind('keypress', function (event) {
             if (event.keyCode === 13) {
                 event.preventDefault();
                 ChatRoom.sendIceMsg();
@@ -1749,7 +1772,7 @@ var ChatRoom = {
         $('#iceMsgList').prepend(uMsg);
         let type = "gameMsg";
         console.log(/(登录)/.test(msg))
-        if(/(登录)/.test(msg)){
+        if (/(登录)/.test(msg)) {
             type = "login"
         }
         iceWs.send(JSON.stringify({
@@ -1762,45 +1785,47 @@ var ChatRoom = {
     /**
      * 按时间加载头像挂件
      * */
-    loadAvatarPendant: function(){
+    loadAvatarPendant: function () {
         let year = new Date().getFullYear();
-        let month = new Date().getMonth() + 1;
+        let month = (new Date().getMonth() + 1).toString();
+        month = month[1] ? month : "0" + month;
         let day = new Date().getDate();
         let formatDate = `${year}-${month}-${day}`;
         let SpringFestivalDateList = {
-            2021:["2021-02-11","2021-02-17"],
-            2022:["2022-01-31","2022-02-06"],
-            2023:["2023-01-21","2023-01-07"],
-            2024:["2024-02-09","2024-02-15"],
-            2025:["2025-01-28","2025-02-03"],
-            2026:["2026-02-16","2026-01-22"],
+            2022: ["2022-01-31", "2022-02-06"],
+            2023: ["2023-01-21", "2023-01-27"],
+            2024: ["2024-02-09", "2024-02-15"],
+            2025: ["2025-01-28", "2025-02-03"],
+            2026: ["2026-02-16", "2026-02-22"],
+            2027: ["2027-02-06", "2027-02-12"],
         }
         let MidAutumnFestivalDateList = {
-            2021:["2021-09-19","2021-09-21"],
-            2022:["2022-09-10","2022-09-12"],
-            2023:["2023-09-29","2023-10-01"],
-            2024:["2024-09-17","2024-09-19"],
-            2025:["2025-10-06","2025-10-09"],
-            2026:["2026-09-25","2026-09-27"],
+            2022: ["2022-09-10", "2022-09-12"],
+            2023: ["2023-09-29", "2023-10-01"],
+            2024: ["2024-09-17", "2024-09-19"],
+            2025: ["2025-10-06", "2025-10-09"],
+            2026: ["2026-09-25", "2026-09-27"],
+            2027: ["2027-09-15", "2027-09-17"],
         }
         //  国庆头像挂件
         let chatRoom = document.querySelector('body')
-        if(month === 10 && day <= 7){
+        if (month === 10 && day <= 7) {
             chatRoom.classList.add('NationalDay')
             return;
         }
         //  圣诞节头像挂件
-        if((month === 12 && day >= 24) && (month === 12 && day <= 25)){
+        if ((month === 12 && day >= 24) && (month === 12 && day <= 25)) {
             chatRoom.classList.add('Christmas')
             return;
         }
+        let toDayTimes = new Date(formatDate).getTime();
         //  中秋头像挂件
-        if(new Date(MidAutumnFestivalDateList[year][0]) <= new Date(formatDate) && new Date(MidAutumnFestivalDateList[year][1]) >= new Date(formatDate)){
+        if (new Date(MidAutumnFestivalDateList[year][0]).getTime() <= toDayTimes && new Date(MidAutumnFestivalDateList[year][1]).getTime() >= toDayTimes) {
             chatRoom.classList.add('MidAutumnFestival')
             return;
         }
         //  春节头像挂件
-        if(new Date(SpringFestivalDateList[year][0]) <= new Date(formatDate) && new Date(SpringFestivalDateList[year][1]) >= new Date(formatDate)){
+        if (new Date(SpringFestivalDateList[year][0]).getTime() <= toDayTimes && new Date(SpringFestivalDateList[year][1]).getTime() >= toDayTimes) {
             chatRoom.classList.add('SpringFestival')
         }
     }

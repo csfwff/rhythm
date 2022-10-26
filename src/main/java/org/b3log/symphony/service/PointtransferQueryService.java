@@ -573,6 +573,16 @@ public class PointtransferQueryService {
                     case Pointtransfer.TRANSFER_TYPE_C_ACTIVITY_REDPACKET_FROM_SKY:
                         desTemplate = desTemplate.replace("{user}", dataId);
                         break;
+                    case Pointtransfer.TRANSFER_TYPE_C_CHAT_ROOM_REVOKE:
+                        // 消耗积分
+                        int optInt = record.optInt(Pointtransfer.SUM);
+                        if (optInt == 0){
+                            desTemplate = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date(record.optLong(Pointtransfer.TIME))) + " 在聊天室撤回了一条消息, 每日首次免费";
+                        }else {
+                            desTemplate = desTemplate.replace("{time}", new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date(record.optLong(Pointtransfer.TIME))));
+                            desTemplate = desTemplate.replace("{score}", String.valueOf(record.optInt(Pointtransfer.SUM)));
+                        }
+                        break;
                     default:
                         LOGGER.warn("Invalid point type [" + type + "]");
                 }

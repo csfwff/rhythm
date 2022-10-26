@@ -51,6 +51,7 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import pers.adlered.simplecurrentlimiter.main.SimpleCurrentLimiter;
 
+import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
@@ -233,12 +234,27 @@ public class ChatroomProcessor {
             String userId = currentUser.optString(Keys.OBJECT_ID);
             // ==? 是否禁言中 ?==
             int muted = ChatRoomBot.muted(userId);
+            // 是否全员禁言中
+            boolean isAll = muted < 0 && muted != -1;
+            if (isAll){
+                if (DataModelService.hasPermission(currentUser.optString(User.USER_ROLE), 3)){
+                    // OP 豁免全员禁言
+                    muted = -1;
+                }else {
+                    // 回正
+                    muted *= -1;
+                }
+            }
             int muteDay = muted / (24 * 60 * 60);
             int muteHour = muted % (24 * 60 * 60) / (60 * 60);
             int muteMinute = muted % (24 * 60 * 60) % (60 * 60) / 60;
             int muteSecond = muted % (24 * 60 * 60) % (60 * 60) % 60;
             if (muted != -1) {
-                context.renderJSON(StatusCodes.ERR).renderMsg("抢红包失败，原因：正在禁言中，剩余时间 " + muteDay + " 天 " + muteHour + " 小时 " + muteMinute + " 分 " + muteSecond + " 秒。");
+                if (isAll){
+                    context.renderJSON(StatusCodes.ERR).renderMsg("抢红包失败，原因：正在全员禁言中，剩余时间 " + muteDay + " 天 " + muteHour + " 小时 " + muteMinute + " 分 " + muteSecond + " 秒。");
+                }else {
+                    context.renderJSON(StatusCodes.ERR).renderMsg("抢红包失败，原因：正在禁言中，剩余时间 " + muteDay + " 天 " + muteHour + " 小时 " + muteMinute + " 分 " + muteSecond + " 秒。");
+                }
                 return;
             }
             // ==! 是否禁言中 !==
@@ -586,7 +602,6 @@ public class ChatroomProcessor {
     final private static SimpleCurrentLimiter chatRoomLivenessLimiter = new SimpleCurrentLimiter(30, 1);
     final private static SimpleCurrentLimiter risksControlMessageLimiter = new SimpleCurrentLimiter(15 * 60, 1);
     final private static SimpleCurrentLimiter openRedPacketLimiter = new SimpleCurrentLimiter(30 * 60, 1);
-
     /**
      * Send chatroom message.
      *
@@ -625,6 +640,10 @@ public class ChatroomProcessor {
             String userId = currentUser.optString(Keys.OBJECT_ID);
 
             if (content.startsWith("[redpacket]") && content.endsWith("[/redpacket]")) {
+                // 是否收税
+                Boolean collectTaxes = false;
+                // 税率
+                BigDecimal taxRate = new BigDecimal("0.05");
                 try {
                     String redpacketString = content.replaceAll("^\\[redpacket\\]", "").replaceAll("\\[/redpacket\\]$", "");
                     JSONObject redpacket = new JSONObject(redpacketString);
@@ -694,6 +713,8 @@ public class ChatroomProcessor {
                                 }
                                 count = 1;
                                 toatlMoney = money;
+                                // 征税
+                                collectTaxes = true;
                                 break;
                             case "average":
                                 toatlMoney = money * count;
@@ -724,7 +745,7 @@ public class ChatroomProcessor {
                         }
                         final boolean succ = null != pointtransferMgmtService.transfer(userId, Pointtransfer.ID_C_SYS,
                                 Pointtransfer.TRANSFER_TYPE_C_ACTIVITY_SEND_RED_PACKET,
-                                toatlMoney, "", System.currentTimeMillis(), "");
+                                toatlMoney, "", System.currentTimeMillis(), collectTaxes ? "collectTaxes" : "");
                         if (!succ) {
                             context.renderJSON(StatusCodes.ERR).renderMsg("少年，你的积分不足！");
                             return;
@@ -737,7 +758,8 @@ public class ChatroomProcessor {
                     JSONObject redPacketJSON = new JSONObject();
                     redPacketJSON.put("senderId", userId);
                     redPacketJSON.put("type", type);
-                    redPacketJSON.put("money", money);
+                    // 收税的时候 直接扣减
+                    redPacketJSON.put("money", collectTaxes ? BigDecimal.valueOf(money).multiply(BigDecimal.ONE.subtract(taxRate)).intValue() : money);
                     redPacketJSON.put("count", count);
                     redPacketJSON.put("msg", message);
                     redPacketJSON.put("recivers", recivers);
@@ -1110,7 +1132,7 @@ public class ChatroomProcessor {
      *
      * @param context
      */
-    private static Map<String, String> revoke = new HashMap<>();
+    private static Map<String/*userName*/, String/*data-times*/> revoke = new HashMap<>();
 
     public void revokeMessage(final RequestContext context) {
         try {
@@ -1145,29 +1167,57 @@ public class ChatroomProcessor {
                 jsonObject.put(Common.TYPE, "revoke");
                 jsonObject.put("oId", removeMessageId);
                 ChatroomChannel.notifyChat(jsonObject);
-                return;
             } else if (msgUser.equals(curUser)) {
                 final String date = DateFormatUtils.format(System.currentTimeMillis(), "yyyyMMdd");
-                if (revoke.get(curUser) == null || !revoke.get(curUser).equals(date)) {
-                    final Transaction transaction = chatRoomRepository.beginTransaction();
-                    chatRoomRepository.remove(removeMessageId);
-                    transaction.commit();
-                    context.renderJSON(StatusCodes.SUCC).renderMsg("撤回成功，下次发消息一定要三思哦！");
-                    JSONObject jsonObject = new JSONObject();
-                    jsonObject.put(Common.TYPE, "revoke");
-                    jsonObject.put("oId", removeMessageId);
-                    ChatroomChannel.notifyChat(jsonObject);
-                    revoke.put(curUser, date);
-                    return;
+                // 撤回记录
+                String dateTimes = revoke.getOrDefault(curUser, date + ",0");
+                // 分割
+                String[] date_times = dateTimes.split(",");
+                // 上次撤回日期
+                String nDate = date_times[0];
+                // 次数
+                Integer times;
+                // 兼容旧数据
+                if (date_times.length > 1) {
+                    // 撤回次数
+                    times = Integer.valueOf(date_times[1]);
                 } else {
-                    context.renderJSON(StatusCodes.ERR).renderMsg("撤回失败，你每天只有一次撤回的机会！");
+                    // 今天撤回过了, 免费了一次? 要不要追扣一把
+                    times = 1;
                 }
+
+                // 当前日期不是今天 还没撤回过, times 归 0
+                if (!nDate.equals(date)) {
+                    times = 0;
+                }
+                // 需要扣减的积分 首次免费 以后 f(x) = 32x
+                Integer needDelPoint = times * 32;
+                // 扣钱
+                final boolean succ = null != pointtransferMgmtService.transfer(currentUser.optString(Keys.OBJECT_ID), Pointtransfer.ID_C_SYS,
+                        Pointtransfer.TRANSFER_TYPE_C_CHAT_ROOM_REVOKE,
+                        needDelPoint, "", System.currentTimeMillis(), "");
+                if (!succ) {
+                    context.renderJSON(StatusCodes.ERR).renderMsg("少年，你的积分不足！要为自己的言行负责~");
+                    return;
+                }
+                // 开启事务
+                final Transaction transaction = chatRoomRepository.beginTransaction();
+                // 撤回
+                chatRoomRepository.remove(removeMessageId);
+                // 提交事务
+                transaction.commit();
+                context.renderJSON(StatusCodes.SUCC).renderMsg("撤回成功，下次发消息一定要三思哦！本次消耗积分: " + needDelPoint);
+                JSONObject jsonObject = new JSONObject();
+                jsonObject.put(Common.TYPE, "revoke");
+                jsonObject.put("oId", removeMessageId);
+                ChatroomChannel.notifyChat(jsonObject);
+                revoke.put(curUser, date + "," + (times + 1));
             }
         } catch (Exception e) {
+            e.printStackTrace();
             context.renderJSON(StatusCodes.ERR).renderMsg("撤回失败，请联系 @adlered。");
         }
     }
-
     /**
      * Get all messages from database.
      *

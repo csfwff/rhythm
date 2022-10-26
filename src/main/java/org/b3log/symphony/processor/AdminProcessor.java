@@ -1595,6 +1595,16 @@ public class AdminProcessor {
                 case UserExt.USER_POINT:
                 case UserExt.USER_APP_ROLE:
                 case UserExt.USER_STATUS:
+                    if (value.equals(String.valueOf(UserExt.USER_STATUS_C_INVALID))) {
+                        LOGGER.log(Level.INFO, "Banned user and articles [userName=" + user.optString(User.USER_NAME) + "]");
+                        final List<JSONObject> userArticles = articleQueryService.getUserArticles(user.optString(Keys.OBJECT_ID), Article.ARTICLE_ANONYMOUS_C_PUBLIC, 1, 10000);
+                        for (JSONObject article : userArticles) {
+                            String articleId = article.optString(Keys.OBJECT_ID);
+                            JSONObject editArticle = articleQueryService.getArticle(articleId);
+                            editArticle.put(Article.ARTICLE_STATUS, Article.ARTICLE_STATUS_C_INVALID);
+                            articleMgmtService.updateArticleByAdmin(articleId, editArticle);
+                        }
+                    }
                 case UserExt.USER_COMMENT_VIEW_MODE:
                 case UserExt.USER_AVATAR_VIEW_MODE:
                 case UserExt.USER_LIST_PAGE_SIZE:

@@ -359,7 +359,7 @@ var Util = {
                     $("body").css("overflow", "hidden")
                     e = e.pageX ? e : e.targetTouches[0]
                     let x = e.pageX - distenceX;
-                    let y = e.pageY - distenceY;
+                    let y = e.pageY - distenceY-$(window).scrollTop();
                     if (x < 0) {
                         x = 0;
                     } else if (x > $(document).width() - $(ele).outerWidth(true)) {

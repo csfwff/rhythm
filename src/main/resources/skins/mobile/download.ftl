@@ -93,44 +93,60 @@
     </div>
     <div class="download__contain">
         <div class="item">
-            <img src="${staticServePath}/images/clients/android.png">
-            <h3 class="item__title">Android 客户端</h3>
-            <div style="flex:1">Author:<a href="https://fishpi.cn/member/Yui">@Yui</a>&nbsp;<a href="https://fishpi.cn/member/iwpz">@iwpz</a></div>
-            <div class="fn__flex">
-                <a class="download__link" href="https://github.com/rLingMX/pwl-chat-uniapp/releases" target="_blank">Github Releases</a>
-            </div>
-             <div class="fn__flex">
-                <a class="download__link" href="https://lmx.lanzouj.com/b0dxiaxsb" target="_blank">备用地址（密码pwl）</a>
-            </div>
-        </div>
-        <div class="item">
             <img src="${staticServePath}/images/clients/ios.png">
             <h3 class="item__title">iOS 客户端</h3>
-             <div style="flex:1">Author:<a href="https://fishpi.cn/member/Yui">@Yui</a>&nbsp;<a href="https://fishpi.cn/member/iwpz">@iwpz</a></div>
+             <div style="flex:1">Author:<a href="${staticServePath}/member/Yui">@Yui</a>&nbsp;<a href="${staticServePath}/member/iwpz">@iwpz</a></div>
             <div class="fn__flex">
                 <a class="download__link" href="https://apps.apple.com/cn/app/%E6%91%B8%E9%B1%BC%E6%B4%BE/id1617385824" target="_blank">App Store</a>
             </div>
         </div>
         <div class="item">
+            <img src="${staticServePath}/images/clients/android.png">
+            <h3 class="item__title">Android 客户端</h3>
+            <div style="flex:1">Author:<a href="${staticServePath}/member/Yui">@Yui</a>&nbsp;<a href="${staticServePath}/member/iwpz">@iwpz</a></div>
+            <div class="fn__flex">
+                <a class="download__link" href="https://github.com/rLingMX/pwl-chat-uniapp/releases" target="_blank">Github Releases</a>
+            </div>
+            <div class="fn__flex">
+                <a class="download__link" href="https://lmx.lanzouj.com/b0dxiaxsb" target="_blank">备用地址（密码pwl）</a>
+            </div>
+        </div>
+        <div class="item">
+            <img src="${staticServePath}/images/clients/android.png">
+            <h3 class="item__title">Android客户端(Flutter)</h3>
+            <div style="flex:1">Author:&nbsp;<a href="${staticServePath}/member/iwpz">@iwpz</a></div>
+            <div class="fn__flex">
+                <a class="download__link" href="${staticServePath}/article/1654133472152" target="_blank">详细地址</a>
+            </div>
+        </div>
+        <div class="item">
+            <img src="${staticServePath}/images/clients/android.png">
+            <h3 class="item__title">Android客户端(原生)</h3>
+            <div style="flex:1">Author:<a href="${staticServePath}/member/csfwff">@csfwff</a></div>
+            <div class="fn__flex">
+                <a class="download__link" href="${staticServePath}/article/1656144820684" target="_blank">详细地址</a>
+            </div>
+        </div>
+        <div class="item">
             <img src="${staticServePath}/images/clients/windows.png">
             <h3 class="item__title">Windows 客户端</h3>
-            <div style="flex:1">Author:<a href="https://fishpi.cn/member/imlinhanchao">@imlinhanchao</a></div>
+            <div style="flex:1">Author:<a href="${staticServePath}/member/imlinhanchao">@imlinhanchao</a></div>
             <div class="fn__flex">
-                <a class="download__link" href="https://github.com/imlinhanchao/pwl-chat/releases" target="_blank">Github Releases</a>
+                <a class="download__link" href="https://github.com/imlinhanchao/fishpi-desktop/releases" target="_blank">Github Releases</a>
             </div>
         </div>
         <div class="item">
             <img src="${staticServePath}/images/clients/macos.png">
             <h3 class="item__title">macOS 客户端</h3>
-            <div style="flex:1">Author:<a href="https://fishpi.cn/member/imlinhanchao">@imlinhanchao</a></div>
+            <div style="flex:1">Author:<a href="${staticServePath}/member/imlinhanchao">@imlinhanchao</a></div>
             <div class="fn__flex">
-                <a class="download__link" href="https://github.com/imlinhanchao/pwl-chat/releases" target="_blank">Github Releases</a>
+                <a class="download__link" href="https://github.com/imlinhanchao/fishpi-desktop/releases" target="_blank">Github Releases</a>
             </div>
         </div>
         <div class="item">
             <img src="${staticServePath}/images/clients/vscode.png">
             <h3 class="item__title">VSCode 插件</h3>
-            <div style="flex:1">Author:<a href="https://fishpi.cn/member/imlinhanchao">@imlinhanchao</a></div>
+            <div style="flex:1">Author:<a href="${staticServePath}/member/imlinhanchao">@imlinhanchao</a></div>
             <div class="fn__flex">
                 <a class="download__link" href="https://marketplace.visualstudio.com/items?itemName=hancel.pwl-chat" target="_blank">Visual Studio Marketplace</a>
             </div>
@@ -138,7 +154,7 @@
         <div class="item">
             <img src="${staticServePath}/images/clients/chrome.png">
             <h3 class="item__title">Chrome 插件</h3>
-            <div style="flex:1">Author:<a href="https://fishpi.cn/member/lemon">@Lemon</a></div>
+            <div style="flex:1">Author:<a href="${staticServePath}/member/lemon">@Lemon</a></div>
             <div class="fn__flex">
                 <a class="download__link" href="https://github.com/Lemon-cxh/pwl-chat-extension/releases" target="_blank">Github Releases</a>
             </div>
@@ -152,7 +168,7 @@
         <div class="item">
             <img src="${staticServePath}/images/clients/idea.jpg">
             <h3 class="item__title">IDEA 插件</h3>
-            <div style="flex:1">Author:<a href="https://fishpi.cn/member/Danbai">@Danbai</a></div>
+            <div style="flex:1">Author:<a href="${staticServePath}/member/Danbai">@Danbai</a></div>
             <div class="fn__flex">
                 <a class="download__link" href="https://github.com/danbai225/pwl-chat/releases" target="_blank">Github Releases</a>
             </div>
@@ -163,7 +179,7 @@
         <div class="item">
             <img src="${staticServePath}/images/clients/python.png">
             <h3 class="item__title">Python 客户端</h3>
-            <div style="flex:1">Author:<a href="https://fishpi.cn/member/Gakkiyomi">@Gakkiyomi</a></div>
+            <div style="flex:1">Author:<a href="${staticServePath}/member/Gakkiyomi">@Gakkiyomi</a></div>
             <div class="fn__flex">
                 <a class="download__link" href="https://github.com/gakkiyomi/pwl-chat-python" target="_blank">Github</a>
             </div>
@@ -171,7 +187,7 @@
         <div class="item">
             <img src="${staticServePath}/images/clients/Golang.png">
             <h3 class="item__title">Golang 分布式客户端</h3>
-            <div style="flex:1">Author:<a href="https://fishpi.cn/member/bulabula">@bulabula</a></div>
+            <div style="flex:1">Author:<a href="${staticServePath}/member/bulabula">@bulabula</a></div>
             <div class="fn__flex">
                 <a class="download__link" href="https://github.com/New-arkssac/Golang-fishpi-chatroom-Distributed-client" target="_blank">Github</a>
             </div>

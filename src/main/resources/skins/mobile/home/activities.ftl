@@ -85,6 +85,20 @@
                             <li>
                                 <div class='fn-flex'>
                                     <div class="avatar"
+                                         style="background-image:url('https://file.fishpi.cn/2022/08/image-39430724.png')"></div>
+                                    <div class="fn-flex-1">
+                                        <h2 class="ft-13">
+                                            <a href="${servePath}/games/fight/index.html">《Fight》</a>
+                                        </h2>
+                                        <span class="ft-fade vditor-reset">
+                                                一款由社区成员 <a href="https://fishpi.cn/member/YARI" target="_blank">YARI</a> 自主开发的格斗式游戏。
+                                            </span>
+                                    </div>
+                                </div>
+                            </li>
+                            <li>
+                                <div class='fn-flex'>
+                                    <div class="avatar"
                                          style="background-image:url('${staticServePath}/images/mofish.png')"></div>
                                     <div class="fn-flex-1">
                                         <h2 class="ft-13">

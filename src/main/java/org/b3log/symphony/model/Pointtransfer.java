@@ -446,6 +446,11 @@ public final class Pointtransfer {
      * Transfer type - Activity - SmallMofish.
      */
     public static final int TRANSFER_TYPE_C_ACTIVITY_SMALLMOFISH = 47;
+    
+    /**
+     * Transfer type - chat-room - revoke
+     */
+    public static final int TRANSFER_TYPE_C_CHAT_ROOM_REVOKE = 48;
 
 
     /**
