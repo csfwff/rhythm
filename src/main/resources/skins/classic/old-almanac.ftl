@@ -18,11 +18,11 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 -->
-<#include "../macro-head.ftl">
+<#include "macro-head.ftl">
 <!DOCTYPE html>
 <html>
 <head>
-    <@head title="Catch The Cat - ${activityLabel} - ${symphonyLabel}">
+    <@head title="老黄历 - ${activityLabel} - ${symphonyLabel}">
     <meta charset="UTF-8">
     <style>
         * {
@@ -44,14 +44,14 @@
 <link rel="stylesheet" href="${staticServePath}/css/index.css?${staticResourceVersion}" />
 </head>
 <body>
-<#include "../header.ftl">
+<#include "header.ftl">
 <div class="main">
     <div class="wrapper">
         <div class="content">
             <div class="module">
                       <div class="wrapper" style="justify-content:center">
                           <div class="fn-flex old-almanac" >
-                              <div class="tip metro-item">
+                              <div class="tip metro-item" style="width: 100%;">
                                   <span class="date"></span>
                                   <div class="line-tip">
                                       <strong>座位朝向：</strong>面向<span class="direction_value"></span>写程序，BUG 最少。
@@ -64,7 +64,7 @@
                                   </div>
                                   <br/>
                               </div>
-                              <div class="good metro-item">
+                              <div class="good metro-item" style="width: 100%;">
                                   <div class="title">
                                       <table>
                                           <tr>
@@ -77,7 +77,7 @@
                                   </div>
                                   <div class="clear"></div>
                               </div>
-                              <div class="bad metro-item">
+                              <div class="bad metro-item" style="width: 100%;">
                                   <div class="title">
                                       <table>
                                           <tr>
@@ -96,11 +96,11 @@
             </div>
         </div>
         <div class="side">
-            <#include "../side.ftl">
+            <#include "side.ftl">
         </div>
     </div>
 </div>
-<#include "../footer.ftl">
+<#include "footer.ftl">
 <script src="${staticServePath}/js/old-almanac${miniPostfix}.js?${staticResourceVersion}"></script>
 </body>
 </html>

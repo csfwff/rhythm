@@ -43,6 +43,7 @@ import org.b3log.symphony.service.UserQueryService;
 import org.b3log.symphony.util.Sessions;
 import org.b3log.symphony.util.Symphonys;
 import org.json.JSONObject;
+import pers.adlered.simplecurrentlimiter.main.SimpleCurrentLimiter;
 
 import java.util.Locale;
 
@@ -60,12 +61,29 @@ public class BeforeRequestHandler implements Handler {
      */
     private static final Logger LOGGER = LogManager.getLogger(BeforeRequestHandler.class);
 
+    SimpleCurrentLimiter antiCCLimiter = new SimpleCurrentLimiter(15, 15);
+
     @Override
     public void handle(final RequestContext context) {
         Stopwatchs.start("Request initialized [" + context.requestURI() + "]");
 
         if (context.header(Common.USER_AGENT) == null) {
             context.sendStatus(500);
+            return;
+        }
+
+        try {
+            String method = context.getRequest().getMethod();
+            String uri = context.getRequest().getRequestURI();
+            String ip = Requests.getRemoteAddr(context.getRequest());
+            String union = ip + " " + method + " " + uri;
+            if (!antiCCLimiter.access(union)) {
+                context.sendStatus(503);
+                return;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            context.sendStatus(503);
             return;
         }
 
@@ -111,13 +129,14 @@ public class BeforeRequestHandler implements Handler {
                 Locales.setLocale(Locales.getLocale(optionLangValue));
             }
 
+            httpSession.setAttribute(Common.IP, getIpAddr(request));
+
             JSONObject user = userQueryService.getCurrentUser(request);
             if (null == user) {
                 return;
             }
 
             httpSession.setAttribute(User.USER, user.toString());
-            httpSession.setAttribute(Common.IP, getIpAddr(request));
 
             final String skin = Sessions.isMobile() ? user.optString(UserExt.USER_MOBILE_SKIN) : user.optString(UserExt.USER_SKIN);
             httpSession.setAttribute(Keys.TEMPLATE_DIR_NAME, skin);
@@ -193,6 +212,6 @@ public class BeforeRequestHandler implements Handler {
         if (ip == null || ip.length() == 0) {
             ip = request.getRemoteAddr();
         }
-        return "0:0:0:0:0:0:0:1%0".equals(ip) ? "127.0.0.1" : ip;
+        return "[0:0:0:0:0:0:0:1]".equals(ip) ? "127.0.0.1" : ip;
     }
 }

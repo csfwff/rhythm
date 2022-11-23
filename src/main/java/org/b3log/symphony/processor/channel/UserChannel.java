@@ -32,6 +32,7 @@ import org.b3log.latke.ioc.Singleton;
 import org.b3log.latke.model.User;
 import org.b3log.symphony.model.Common;
 import org.b3log.symphony.model.UserExt;
+import org.b3log.symphony.processor.ApiProcessor;
 import org.b3log.symphony.service.UserMgmtService;
 import org.b3log.symphony.service.UserQueryService;
 import org.json.JSONObject;
@@ -87,9 +88,17 @@ public class UserChannel implements WebSocketChannel {
     @Override
     public void onConnect(final WebSocketSession session) {
         final Session httpSession = session.getHttpSession();
-
-        final JSONObject user = new JSONObject(httpSession.getAttribute(User.USER));
+        JSONObject user = null;
+        try {
+            user = new JSONObject(httpSession.getAttribute(User.USER));
+        } catch (NullPointerException ignored) {
+        }
+        try {
+            user = ApiProcessor.getUserByKey(session.getParameter("apiKey"));
+        } catch (NullPointerException ignored) {
+        }
         if (null == user) {
+            session.close();
             return;
         }
 

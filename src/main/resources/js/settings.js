@@ -30,6 +30,146 @@
  * @static
  */
 var Settings = {
+  submitIdentity: function () {
+    let info = {};
+    info.type = $("#id-type").children('option:selected').val();
+    let pause = false;
+    switch (info.type) {
+      case 'LGBT 群体认证':
+        if (idCert === '' || idId === '') {
+          alert('上传资料不完整，请重新上传');
+          pause = true;
+        }
+        break;
+      case '00 后认证':
+        if (idCert === '' || idId === '') {
+          alert('上传资料不完整，请重新上传');
+          pause = true;
+        }
+        break;
+      default:
+        if (idCert === '') {
+          alert('上传资料不完整，请重新上传');
+          pause = true;
+        }
+        break;
+    }
+    if (!pause) {
+      info.idCert = idCert;
+      info.idId = idId;
+      $.ajax({
+        url: Label.servePath + '/user/identify',
+        type: 'POST',
+        data: JSON.stringify(info),
+        success: function (result) {
+          alert(result.msg);
+          location.reload();
+        },
+      });
+    }
+  },
+  initIdentity: function () {
+    $("#id-type").change(function () {
+      let selected = $(this).children('option:selected').val();
+      Settings.changeIdentityType(selected);
+    });
+    Settings.changeIdentityType('企业入驻认证');
+  },
+  changeIdentityType: function (selected) {
+    idCert = '';
+    idId = '';
+    let html = '';
+    switch (selected) {
+      case '企业入驻认证':
+        html += '' +
+            '<div class="fn-clear">申请企业认证，我们会通过私信联系您补交企业信息、官网、Logo等内容，以用来定制专属勋章，请耐心等待。</div><br>\n' +
+            '<div class="fn-clear" style="margin: 0 30px 20px 0; display: inline-block">\n' +
+            '    <div class="avatar-big" id="id-cert"\n' +
+            '         onclick="$(\'#id-cert-upload input\').click()"' +
+            '         style="background-image:url(https://file.fishpi.cn/id/%E8%90%A5%E4%B8%9A%E6%89%A7%E7%85%A7%E5%89%AF%E6%9C%AC%E5%A4%8D%E5%8D%B0%E4%BB%B6.png)"></div>\n' +
+            '</div>\n' +
+            '<form id="id-cert-upload" style="display: none" method="POST" enctype="multipart/form-data">\n' +
+            '        <input type="file" name="file">\n' +
+            '</form>' +
+            '';
+        break;
+      case '小姐姐认证':
+        html += '' +
+            '<div class="fn-clear" style="margin: 0 30px 20px 0; display: inline-block">\n' +
+            '    <div class="avatar-big" id="id-cert"\n' +
+            '         onclick="$(\'#id-cert-upload input\').click()"\n' +
+            '         style="background-image:url(https://file.fishpi.cn/id/%E6%89%8B%E5%86%99%E7%A4%BE%E5%8C%BAID%E8%87%AA%E6%8B%8D%E7%85%A7.png)"></div>\n' +
+            '</div>\n' +
+            '<form id="id-cert-upload" style="display: none" method="POST" enctype="multipart/form-data">\n' +
+            '        <input type="file" name="file">\n' +
+            '</form>' +
+            '';
+        break;
+      case 'LGBT 群体认证':
+        html += '' +
+            '<div class="fn-clear" style="margin: 0 30px 20px 0; display: inline-block">\n' +
+            '    <div class="avatar-big" id="id-id"\n' +
+            '         onclick="$(\'#id-id-upload input\').click()"\n' +
+            '         style="background-image:url(https://file.fishpi.cn/id/%E6%89%8B%E6%8C%81%E8%BA%AB%E4%BB%BD%E8%AF%81%E8%87%AA%E6%8B%8D%E7%85%A7.png)"></div>\n' +
+            '</div>\n' +
+            '<form id="id-id-upload" style="display: none" method="POST" enctype="multipart/form-data">\n' +
+            '        <input type="file" name="file">\n' +
+            '</form>' +
+            '';
+        html += '' +
+            '<div class="fn-clear" style="margin: 0 30px 20px 0; display: inline-block">\n' +
+            '    <div class="avatar-big" id="id-cert"\n' +
+            '         onclick="$(\'#id-cert-upload input\').click()"\n' +
+            '         style="background-image:url(https://file.fishpi.cn/id/%E8%BA%AB%E4%BB%BD%E8%AF%81%E6%98%8E.png)"></div>\n' +
+            '</div>\n' +
+            '<form id="id-cert-upload" style="display: none" method="POST" enctype="multipart/form-data">\n' +
+            '        <input type="file" name="file">\n' +
+            '</form>' +
+            '';
+        break;
+      case '00 后认证':
+        html += '' +
+            '<div class="fn-clear" style="margin: 0 30px 20px 0; display: inline-block">\n' +
+            '    <div class="avatar-big" id="id-cert"\n' +
+            '         onclick="$(\'#id-cert-upload input\').click()"\n' +
+            '         style="background-image:url(https://file.fishpi.cn/id/%E6%89%8B%E6%8C%81%E8%BA%AB%E4%BB%BD%E8%AF%81%E8%87%AA%E6%8B%8D%E7%85%A7.png)"></div>\n' +
+            '</div>\n' +
+            '<form id="id-cert-upload" style="display: none" method="POST" enctype="multipart/form-data">\n' +
+            '        <input type="file" name="file">\n' +
+            '</form>' +
+            '';
+        html += '' +
+            '<div class="fn-clear" style="margin: 0 30px 20px 0; display: inline-block">\n' +
+            '    <div class="avatar-big" id="id-id"\n' +
+            '         onclick="$(\'#id-id-upload input\').click()"\n' +
+            '         style="background-image:url(https://file.fishpi.cn/id/%E6%89%8B%E5%86%99%E7%A4%BE%E5%8C%BAID%E8%87%AA%E6%8B%8D%E7%85%A7.png)"></div>\n' +
+            '</div>\n' +
+            '<form id="id-id-upload" style="display: none" method="POST" enctype="multipart/form-data">\n' +
+            '        <input type="file" name="file">\n' +
+            '</form>' +
+            '';
+        break;
+    }
+    $('#id-content').html(html);
+    Settings.initUploadAvatar({
+      id: 'id-cert-upload',
+      userId: '${currentUser.oId}',
+      maxSize: '${imgMaxSize?c}'
+    }, function (data) {
+      var uploadKey = data.result.key;
+      $('#id-cert').css("background-image", 'url(' + uploadKey + ')').data('imageurl', uploadKey);
+      idCert = uploadKey;
+    });
+    Settings.initUploadAvatar({
+      id: 'id-id-upload',
+      userId: '${currentUser.oId}',
+      maxSize: '${imgMaxSize?c}'
+    }, function (data) {
+      var uploadKey = data.result.key;
+      $('#id-id').css("background-image", 'url(' + uploadKey + ')').data('imageurl', uploadKey);
+      idId = uploadKey;
+    });
+  },
   /**
    * 解绑两步验证
    */
@@ -132,6 +272,9 @@ var Settings = {
     }
     if (bag.patchCheckinCard !== undefined && bag.patchCheckinCard > 0) {
       html += '<button style="margin:0 5px 5px 0" onclick="Settings.usePatchCheckinCard(\'' + Label.csrfToken + '\', ' + bag.patchStart + ')">补签卡 x' + bag.patchCheckinCard + '</button>';
+    }
+    if (bag.metalTicket !== undefined && bag.metalTicket > 0) {
+      html += '<button style="margin:0 5px 5px 0" onclick="alert(\'您已取得摸鱼派一周年纪念勋章领取权限，请静待系统公告\')">摸鱼派一周年纪念勋章领取券 x' + bag.metalTicket + '</button>';
     }
 
     // 下面内容不要变更顺序
@@ -723,7 +866,7 @@ var Settings = {
    * 向用户确认是否真的注销账号
    */
   requestDeactive: function (csrfToken) {
-    if (confirm("请注意！这不是保存按钮！！！\n点击确定后，您的摸鱼派账号将会被永久停用，无法登录，账户信息将被部分抹除，确定继续吗？")) {
+    if (confirm("请注意！这不是保存按钮！！！\n点击确定后，您的摸鱼派账号将会被永久停用，无法登录，账户信息将被部分抹除，您绑定的手机号需要一个月后才能在摸鱼派重新注册账号，确定继续吗？")) {
       if (confirm("亲爱的鱼油，再次向您确认！\n您的账号数据非常宝贵，如果对社区的发展有任何意见或建议，欢迎联系摸鱼派管理组。\n本次确认后，您的账户将被永久停用。")) {
         Settings.update('deactivate', csrfToken);
       }

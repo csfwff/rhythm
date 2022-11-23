@@ -40,9 +40,16 @@ public class SponsorRepository extends AbstractRepository {
         return super.add(jsonObject);
     }
 
-    public List<JSONObject> list() throws RepositoryException {
+    public List<JSONObject> list(int page, int limit) throws RepositoryException {
         final Query query = new Query();
         query.addSort("time", SortDirection.DESCENDING);
+        query.setPage(page, limit);
+        return getList(query);
+    }
+
+    public List<JSONObject> listAsc() throws RepositoryException {
+        final Query query = new Query();
+        query.addSort("time", SortDirection.ASCENDING);
         return getList(query);
     }
 

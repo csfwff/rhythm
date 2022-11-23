@@ -41,6 +41,7 @@ import org.b3log.latke.model.User;
 import org.b3log.latke.service.LangPropsService;
 import org.b3log.latke.service.ServiceException;
 import org.b3log.latke.util.CollectionUtils;
+import org.b3log.latke.util.Execs;
 import org.b3log.latke.util.Paginator;
 import org.b3log.latke.util.Strings;
 import org.b3log.symphony.event.ArticleBaiduSender;
@@ -436,6 +437,44 @@ public class AdminProcessor {
         Dispatcher.post("/admin/search/index", adminProcessor::rebuildArticleSearchIndex, middlewares);
         Dispatcher.post("/admin/search-index-article", adminProcessor::rebuildOneArticleSearchIndex, middlewares);
         Dispatcher.post("/admin/broadcast/warn", adminProcessor::warnBroadcast, middlewares);
+        Dispatcher.get("/admin/ip", adminProcessor::showIp, middlewares);
+        Dispatcher.post("/admin/ip", adminProcessor::modifyIp, middlewares);
+    }
+
+    public void modifyIp(final RequestContext context) {
+        JSONObject currentUser = Sessions.getUser();
+        try {
+            currentUser = ApiProcessor.getUserByKey(context.param("apiKey"));
+        } catch (NullPointerException ignored) {
+        }
+        String operatorUserName = currentUser.optString(User.USER_NAME);
+        String type = context.param("type");
+        String ipListStr = context.param("ipList").replaceAll("\r\n", "\n");
+        List<String> ipList = new ArrayList<>(Arrays.asList(ipListStr.split("\n")));
+        new Thread(() -> {
+            switch (type) {
+                case "unban":
+                    for (String ip : ipList) {
+                        String result = Execs.exec(new String[]{"sh", "-c", "ipset del fishpi " + ip}, 1000 * 3);
+                        LogsService.simpleLog(context, "解封IP", "操作员: " + operatorUserName + ", IP: " + ip);
+                    }
+                    break;
+                case "ban":
+                    for (String ip : ipList) {
+                        String result = Execs.exec(new String[]{"sh", "-c", "ipset add fishpi " + ip}, 1000 * 3);
+                        LogsService.simpleLog(context, "封禁IP", "操作员: " + operatorUserName + ", IP: " + ip);
+                    }
+                    break;
+            }
+        }).start();
+        context.sendRedirect(Latkes.getServePath() + "/admin/ip");
+    }
+
+    public void showIp(final RequestContext context) {
+        final AbstractFreeMarkerRenderer renderer = new SkinRenderer(context, "admin/ip.ftl");
+        final Map<String, Object> dataModel = renderer.getDataModel();
+
+        dataModelService.fillHeaderAndFooter(context, dataModel);
     }
 
     /**
@@ -1655,6 +1694,16 @@ public class AdminProcessor {
                 case UserExt.USER_POINT:
                 case UserExt.USER_APP_ROLE:
                 case UserExt.USER_STATUS:
+                    if (value.equals(String.valueOf(UserExt.USER_STATUS_C_INVALID))) {
+                        LOGGER.log(Level.INFO, "Banned user and articles [userName=" + user.optString(User.USER_NAME) + "]");
+                        final List<JSONObject> userArticles = articleQueryService.getUserArticles(user.optString(Keys.OBJECT_ID), Article.ARTICLE_ANONYMOUS_C_PUBLIC, 1, 10000);
+                        for (JSONObject article : userArticles) {
+                            String articleId = article.optString(Keys.OBJECT_ID);
+                            JSONObject editArticle = articleQueryService.getArticle(articleId);
+                            editArticle.put(Article.ARTICLE_STATUS, Article.ARTICLE_STATUS_C_INVALID);
+                            articleMgmtService.updateArticleByAdmin(articleId, editArticle);
+                        }
+                    }
                 case UserExt.USER_COMMENT_VIEW_MODE:
                 case UserExt.USER_AVATAR_VIEW_MODE:
                 case UserExt.USER_LIST_PAGE_SIZE:

@@ -51,7 +51,7 @@
     <div class="wrapper">
         <div class="content">
             <div class="module">
-                <h2 class="sub-head"><span class="ft-red">❤</span> 捐助摸鱼派</h2>
+                <h2 class="sub-head">❤️ 捐助摸鱼派</h2>
                 <div style="padding: 15px 50px">
                     <p>鱼油你好！摸鱼派是由<a href="https://github.com/Programming-With-Love" target="_blank">用爱发电开源组织</a>衍生的科技社区。我们希望构建一个属于科技爱好者们、以<b>摸鱼</b>为社区精神的综合性社区。</p>
                     <p>摸鱼派的运营资金由 <em>摸鱼派管理组</em> 自掏腰包，如果你喜欢摸鱼派的氛围，欢迎通过捐助支持我们继续运营下去！你捐助的所有资金，我们都会在当前页面公示，收到的资金会被<b>完全用于摸鱼派的社区运营</b> :)</p><br>
@@ -77,6 +77,24 @@
                         }
                     }
                 </script>
+                <#if isSponsor>
+                    <h2 class="sub-head"><span class="ft-red">✨</span> 您的捐助信息</h2>
+                    <div style="padding: 15px 50px">
+                        <div class="TGIF__item" style="display: flex; justify-content: center">
+                            <div style="text-align: center">
+                                亲爱的鱼油，感谢你对摸鱼派的支持与喜爱 ❤️
+                                <br><br>
+                                已累计捐助：<b>${donateTimes} 笔</b><br>
+                                总捐助金额：<b>${donateCount} ¥</b><br>
+                                为社区运营续航：<b>${donateMakeDays} 天</b>
+                                <br><br>
+                                <#list donateList as donate>
+                                    <p style="margin-bottom: 5px" class="tooltipped tooltipped-e" aria-label="${donate.message}" ><span class="count">🧧 ${donate.date} ${donate.time} ${donate.amount} ¥</span></p>
+                                </#list>
+                            </div>
+                        </div>
+                    </div>
+                </#if>
                 <h2 class="sub-head"><span class="ft-red">🤗</span> 捐助称号回馈</h2>
                 <div style="padding: 15px 50px">
                     <p>感谢你的捐助，作为回馈，当你<b>累计</b>捐助至某个金额时，我们会赠送一个称号作为回馈：</p>
@@ -97,7 +115,7 @@
                         </div>
                     </div>
                 </div>
-                <h2 class="sub-head">😘 感谢你们</h2>
+                <h2 class="sub-head">🙏 不胜感激</h2>
                 <style>
                     .fn__space5 {
                         width: 5px;
@@ -138,380 +156,6 @@
                             </div>
                         </li>
                         </#list>
-                        <li class="fn__flex">
-                            <div class="ft-nowrap">
-                                2022-01-21<br>
-                                <span class="ft-gray">15:11:39</span>
-                            </div>
-                            <span class="fn__space5"></span>
-                            <span class="fn__space5"></span>
-                            <div class="ft__gray fn__flex-1">
-                                没有填写捐助信息 :)
-                            </div>
-                            <span class="fn__space5"></span>
-                            <span class="fn__space5"></span>
-                            <b class="ft__original7" style="width: 90px">16 RMB</b>
-                            <div class="ft__gray" style="width: 70px;text-align: right">
-                                <a href="https://fishpi.cn/member/imlinhanchao" class="tooltipped__user">imlinhanchao</a>
-                            </div>
-                        </li>
-                        <li class="fn__flex">
-                            <div class="ft-nowrap">
-                                2022-01-12<br>
-                                <span class="ft-gray">14:24:40</span>
-                            </div>
-                            <span class="fn__space5"></span>
-                            <span class="fn__space5"></span>
-                            <div class="ft__gray fn__flex-1">
-                                域名鱼皮纪念！
-                            </div>
-                            <span class="fn__space5"></span>
-                            <span class="fn__space5"></span>
-                            <b class="ft__original7" style="width: 90px">20 RMB</b>
-                            <div class="ft__gray" style="width: 70px;text-align: right">
-                                <a href="https://fishpi.cn/member/SImov" class="tooltipped__user">SImov</a>
-                            </div>
-                        </li>
-                        <li class="fn__flex">
-                            <div class="ft-nowrap">
-                                2022-01-11<br>
-                                <span class="ft-gray">11:06:06</span>
-                            </div>
-                            <span class="fn__space5"></span>
-                            <span class="fn__space5"></span>
-                            <div class="ft__gray fn__flex-1">
-                                加油呀
-                            </div>
-                            <span class="fn__space5"></span>
-                            <span class="fn__space5"></span>
-                            <b class="ft__original7" style="width: 90px">20 RMB</b>
-                            <div class="ft__gray" style="width: 70px;text-align: right">
-                                <a href="https://fishpi.cn/member/daxing" class="tooltipped__user">daxing</a>
-                            </div>
-                        </li>
-                        <li class="fn__flex">
-                            <div class="ft-nowrap">
-                                2022-01-11<br>
-                                <span class="ft-gray">10:07:16</span>
-                            </div>
-                            <span class="fn__space5"></span>
-                            <span class="fn__space5"></span>
-                            <div class="ft__gray fn__flex-1">
-                                等阿达年底女装
-                            </div>
-                            <span class="fn__space5"></span>
-                            <span class="fn__space5"></span>
-                            <b class="ft__original7" style="width: 90px">23.33 RMB</b>
-                            <div class="ft__gray" style="width: 70px;text-align: right">
-                                <a href="https://fishpi.cn/member/Yui" class="tooltipped__user">Yui</a>
-                            </div>
-                        </li>
-                        <li class="fn__flex">
-                            <div class="ft-nowrap">
-                                2022-01-07<br>
-                                <span class="ft-gray">16:38:44</span>
-                            </div>
-                            <span class="fn__space5"></span>
-                            <span class="fn__space5"></span>
-                            <div class="ft__gray fn__flex-1">
-                                新人报道！
-                            </div>
-                            <span class="fn__space5"></span>
-                            <span class="fn__space5"></span>
-                            <b class="ft__original7" style="width: 90px">16 RMB</b>
-                            <div class="ft__gray" style="width: 70px;text-align: right">
-                                <a href="https://fishpi.cn/member/Alex05" class="tooltipped__user">Alex05</a>
-                            </div>
-                        </li>
-                        <li class="fn__flex">
-                            <div class="ft-nowrap">
-                                2022-01-06<br>
-                                <span class="ft-gray">20:54:33</span>
-                            </div>
-                            <span class="fn__space5"></span>
-                            <span class="fn__space5"></span>
-                            <div class="ft__gray fn__flex-1">
-                                没有填写捐助信息 :)
-                            </div>
-                            <span class="fn__space5"></span>
-                            <span class="fn__space5"></span>
-                            <b class="ft__original7" style="width: 90px">10 RMB</b>
-                            <div class="ft__gray" style="width: 70px;text-align: right">
-                                <a href="https://fishpi.cn/member/qwer123" class="tooltipped__user">qwer123</a>
-                            </div>
-                        </li>
-                        <li class="fn__flex">
-                            <div class="ft-nowrap">
-                                2022-01-04<br>
-                                <span class="ft-gray">15:38:38</span>
-                            </div>
-                            <span class="fn__space5"></span>
-                            <span class="fn__space5"></span>
-                            <div class="ft__gray fn__flex-1">
-                                摸鱼派牛逼
-                            </div>
-                            <span class="fn__space5"></span>
-                            <span class="fn__space5"></span>
-                            <b class="ft__original7" style="width: 90px">20 RMB</b>
-                            <div class="ft__gray" style="width: 70px;text-align: right">
-                                <a href="https://fishpi.cn/member/min" class="tooltipped__user">min</a>
-                            </div>
-                        </li>
-                        <li class="fn__flex">
-                            <div class="ft-nowrap">
-                                2021-12-25<br>
-                                <span class="ft-gray">22:16:41</span>
-                            </div>
-                            <span class="fn__space5"></span>
-                            <span class="fn__space5"></span>
-                            <div class="ft__gray fn__flex-1">
-                                什么时候女装？
-                            </div>
-                            <span class="fn__space5"></span>
-                            <span class="fn__space5"></span>
-                            <b class="ft__original7" style="width: 90px">22.22 RMB</b>
-                            <div class="ft__gray" style="width: 70px;text-align: right">
-                                <a href="https://fishpi.cn/member/huny" class="tooltipped__user">huny</a>
-                            </div>
-                        </li>
-                        <li class="fn__flex">
-                            <div class="ft-nowrap">
-                                2021-12-23<br>
-                                <span class="ft-gray">11:05:38</span>
-                            </div>
-                            <span class="fn__space5"></span>
-                            <span class="fn__space5"></span>
-                            <div class="ft__gray fn__flex-1">
-                                没有填写捐助信息 :)
-                            </div>
-                            <span class="fn__space5"></span>
-                            <span class="fn__space5"></span>
-                            <b class="ft__original7" style="width: 90px">50 RMB</b>
-                            <div class="ft__gray" style="width: 70px;text-align: right">
-                                <a href="https://fishpi.cn/member/MBL186" class="tooltipped__user">MBL186</a>
-                            </div>
-                        </li>
-                        <li class="fn__flex">
-                            <div class="ft-nowrap">
-                                2021-12-23<br>
-                                <span class="ft-gray">11:01:27</span>
-                            </div>
-                            <span class="fn__space5"></span>
-                            <span class="fn__space5"></span>
-                            <div class="ft__gray fn__flex-1">
-                                加油
-                            </div>
-                            <span class="fn__space5"></span>
-                            <span class="fn__space5"></span>
-                            <b class="ft__original7" style="width: 90px">20 RMB</b>
-                            <div class="ft__gray" style="width: 70px;text-align: right">
-                                <a href="https://fishpi.cn/member/bongbongdan" class="tooltipped__user">bongbongdan</a>
-                            </div>
-                        </li>
-                        <li class="fn__flex">
-                            <div class="ft-nowrap">
-                                2021-12-22<br>
-                                <span class="ft-gray">17:17:45</span>
-                            </div>
-                            <span class="fn__space5"></span>
-                            <span class="fn__space5"></span>
-                            <div class="ft__gray fn__flex-1">
-                                爱你
-                            </div>
-                            <span class="fn__space5"></span>
-                            <span class="fn__space5"></span>
-                            <b class="ft__original7" style="width: 90px">20 RMB</b>
-                            <div class="ft__gray" style="width: 70px;text-align: right">
-                                <a href="https://fishpi.cn/member/BiuXiaoXiong" class="tooltipped__user">BiuXiaoXiong</a>
-                            </div>
-                        </li>
-                        <li class="fn__flex">
-                            <div class="ft-nowrap">
-                                2021-12-22<br>
-                                <span class="ft-gray">11:14:03</span>
-                            </div>
-                            <span class="fn__space5"></span>
-                            <span class="fn__space5"></span>
-                            <div class="ft__gray fn__flex-1">
-                                女装
-                            </div>
-                            <span class="fn__space5"></span>
-                            <span class="fn__space5"></span>
-                            <b class="ft__original7" style="width: 90px">20 RMB</b>
-                            <div class="ft__gray" style="width: 70px;text-align: right">
-                                <a href="https://fishpi.cn/member/Fairyfox" class="tooltipped__user">Fairyfox</a>
-                            </div>
-                        </li>
-                        <li class="fn__flex">
-                            <div class="ft-nowrap">
-                                2021-12-15<br>
-                                <span class="ft-gray">15:09:52</span>
-                            </div>
-                            <span class="fn__space5"></span>
-                            <span class="fn__space5"></span>
-                            <div class="ft__gray fn__flex-1">
-                                破60人纪念！
-                            </div>
-                            <span class="fn__space5"></span>
-                            <span class="fn__space5"></span>
-                            <b class="ft__original7" style="width: 90px">20 RMB</b>
-                            <div class="ft__gray" style="width: 70px;text-align: right">
-                                <a href="https://fishpi.cn/member/SImov" class="tooltipped__user">SImov</a>
-                            </div>
-                        </li>
-                        <li class="fn__flex">
-                            <div class="ft-nowrap">
-                                2021-11-26<br>
-                                <span class="ft-gray">17:05:00</span>
-                            </div>
-                            <span class="fn__space5"></span>
-                            <span class="fn__space5"></span>
-                            <div class="ft__gray fn__flex-1">
-                                有点小清新，支持
-                            </div>
-                            <span class="fn__space5"></span>
-                            <span class="fn__space5"></span>
-                            <b class="ft__original7" style="width: 90px">20 RMB</b>
-                            <div class="ft__gray" style="width: 70px;text-align: right">
-                                <a href="https://fishpi.cn/member/iwpz" class="tooltipped__user">iwpz</a>
-                            </div>
-                        </li>
-                        <li class="fn__flex">
-                            <div class="ft-nowrap">
-                                2021-10-16<br>
-                                <span class="ft-gray">17:53:35</span>
-                            </div>
-                            <span class="fn__space5"></span>
-                            <span class="fn__space5"></span>
-                            <div class="ft__gray fn__flex-1">
-                                没有填写捐助信息 :)
-                            </div>
-                            <span class="fn__space5"></span>
-                            <span class="fn__space5"></span>
-                            <b class="ft__original7" style="width: 90px">10 RMB</b>
-                            <div class="ft__gray" style="width: 70px;text-align: right">
-                                <a href="https://fishpi.cn/member/LLaamar" class="tooltipped__user">LLaamar</a>
-                            </div>
-                        </li>
-                        <li class="fn__flex">
-                            <div class="ft-nowrap">
-                                2021-10-13<br>
-                                <span class="ft-gray">10:09:01</span>
-                            </div>
-                            <span class="fn__space5"></span>
-                            <span class="fn__space5"></span>
-                            <div class="ft__gray fn__flex-1">
-                                没有填写捐助信息 :)
-                            </div>
-                            <span class="fn__space5"></span>
-                            <span class="fn__space5"></span>
-                            <b class="ft__original7" style="width: 90px">30 RMB</b>
-                            <div class="ft__gray" style="width: 70px;text-align: right">
-                                <a href="https://fishpi.cn/member/Suvern" class="tooltipped__user">Suvern</a>
-                            </div>
-                        </li>
-                        <li class="fn__flex">
-                            <div class="ft-nowrap">
-                                2021-10-13<br>
-                                <span class="ft-gray">10:03:49</span>
-                            </div>
-                            <span class="fn__space5"></span>
-                            <span class="fn__space5"></span>
-                            <div class="ft__gray fn__flex-1">
-                                加油
-                            </div>
-                            <span class="fn__space5"></span>
-                            <span class="fn__space5"></span>
-                            <b class="ft__original7" style="width: 90px">20 RMB</b>
-                            <div class="ft__gray" style="width: 70px;text-align: right">
-                                <a href="https://fishpi.cn/member/xuwujing" class="tooltipped__user">xuwujing</a>
-                            </div>
-                        </li>
-                        <li class="fn__flex">
-                            <div class="ft-nowrap">
-                                2021-10-13<br>
-                                <span class="ft-gray">09:58:06</span>
-                            </div>
-                            <span class="fn__space5"></span>
-                            <span class="fn__space5"></span>
-                            <div class="ft__gray fn__flex-1">
-                                女装 😎
-                            </div>
-                            <span class="fn__space5"></span>
-                            <span class="fn__space5"></span>
-                            <b class="ft__original7" style="width: 90px">50 RMB</b>
-                            <div class="ft__gray" style="width: 70px;text-align: right">
-                                <a href="https://fishpi.cn/member/danbai" class="tooltipped__user">danbai</a>
-                            </div>
-                        </li>
-                        <li class="fn__flex">
-                            <div class="ft-nowrap">
-                                2021-10-13<br>
-                                <span class="ft-gray">09:55:48</span>
-                            </div>
-                            <span class="fn__space5"></span>
-                            <span class="fn__space5"></span>
-                            <div class="ft__gray fn__flex-1">
-                                摸鱼社区加油
-                            </div>
-                            <span class="fn__space5"></span>
-                            <span class="fn__space5"></span>
-                            <b class="ft__original7" style="width: 90px">18.88 RMB</b>
-                            <div class="ft__gray" style="width: 70px;text-align: right">
-                                <a href="https://fishpi.cn/member/SignV" class="tooltipped__user">SignV</a>
-                            </div>
-                        </li>
-                        <li class="fn__flex">
-                            <div class="ft-nowrap">
-                                2021-09-27<br>
-                                <span class="ft-gray">12:14:37</span>
-                            </div>
-                            <span class="fn__space5"></span>
-                            <span class="fn__space5"></span>
-                            <div class="ft__gray fn__flex-1">
-                                社区很棒！大佬加油
-                            </div>
-                            <span class="fn__space5"></span>
-                            <span class="fn__space5"></span>
-                            <b class="ft__original7" style="width: 90px">20 RMB</b>
-                            <div class="ft__gray" style="width: 70px;text-align: right">
-                                <a href="https://fishpi.cn/member/FreerKnight" class="tooltipped__user">FreerKnight</a>
-                            </div>
-                        </li>
-                        <li class="fn__flex">
-                            <div class="ft-nowrap">
-                                2021-09-23<br>
-                                <span class="ft-gray">12:42:16</span>
-                            </div>
-                            <span class="fn__space5"></span>
-                            <span class="fn__space5"></span>
-                            <div class="ft__gray fn__flex-1">
-                                没有填写捐助信息 :)
-                            </div>
-                            <span class="fn__space5"></span>
-                            <span class="fn__space5"></span>
-                            <b class="ft__original7" style="width: 90px">10 RMB</b>
-                            <div class="ft__gray" style="width: 70px;text-align: right">
-                                <a href="https://fishpi.cn/member/camden" class="tooltipped__user">camden</a>
-                            </div>
-                        </li>
-                        <li class="fn__flex">
-                            <div class="ft-nowrap">
-                                2021-09-23<br>
-                                <span class="ft-gray">12:37:05</span>
-                            </div>
-                            <span class="fn__space5"></span>
-                            <span class="fn__space5"></span>
-                            <div class="ft__gray fn__flex-1">
-                                没有填写捐助信息 :)
-                            </div>
-                            <span class="fn__space5"></span>
-                            <span class="fn__space5"></span>
-                            <b class="ft__original7" style="width: 90px">7.71 RMB</b>
-                            <div class="ft__gray" style="width: 70px;text-align: right">
-                                <a href="https://fishpi.cn/member/camden" class="tooltipped__user">camden</a>
-                            </div>
-                        </li>
                     </ul>
                 </div>
                 <div class="top-ranking">

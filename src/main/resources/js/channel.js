@@ -376,7 +376,7 @@ var ChatRoomChannel = {
                     let spell
                     if (dice === null || dice === undefined) {
                         spell = '<a href="' + Label.servePath + '/member/' + whoGot + '" target="_blank">' + whoGot + '</a> 抢到了 <a href="' + Label.servePath + '/member/' + whoGive + '" target="_blank">' + whoGive + '</a> 的 <a style="cursor: pointer" onclick="ChatRoom.unpackRedPacket(\'' + oId + '\')">红包</a>';
-                    }else {
+                    } else {
                         let bet
                         switch (dice.bet) {
                             case 'big':
@@ -422,7 +422,7 @@ var ChatRoomChannel = {
                         Label.onlineAvatarData += "<a target=\"_blank\" data-name=\"" + userInfo.userName + "\"\n" +
                             "href=\"" + userInfo.homePage + "\">\n" +
                             "<img style='margin-bottom: 10px' class=\"avatar avatar-small\" aria-label=\"" + userInfo.userName + "\"\n" +
-                            "src=\"" + userInfo.userAvatarURL + "\">\n" +
+                            "src=\"" + userInfo.userAvatarURL48 + "\">\n" +
                             "</a>";
                     }
                     Util.listenUserCard();
@@ -430,6 +430,11 @@ var ChatRoomChannel = {
                 case 'revoke':
                     $("#chatroom" + data.oId).remove();
                     $("#chatindex" + data.oId).remove();
+                    break;
+                case 'refresh':
+                    $('#chats').empty();
+                    page = 0;
+                    ChatRoom.more();
                     break;
                 case 'msg':
                     // Chatroom
@@ -458,7 +463,7 @@ var ChatRoomChannel = {
                         "    <a rel=\"nofollow\" href=\"/member/" + data.userName + "\">\n" +
                         "        <div class=\"avatar tooltipped tooltipped-n\"\n" +
                         "             aria-label=\"" + data.userName + "\"\n" +
-                        "             style=\"background-image:url('" + data.userAvatarURL + "')\"></div>\n" +
+                        "             style=\"background-image:url('" + data.userAvatarURL48 + "')\"></div>\n" +
                         "    </a>\n" +
                         "    <div class=\"fn-flex-1\">\n" +
                         "        <div class=\"ft-smaller\">\n" +
@@ -471,12 +476,12 @@ var ChatRoomChannel = {
                         "        </div>\n" +
                         "    </div>\n" +
                         "</li>");
-                    if ($("#chatRoomIndex li").length === 11) {
-                        $("#chatRoomIndex li:last").remove();
+                    if ($("#chatRoomIndex li.fn-flex").length === 11) {
+                        $("#chatRoomIndex li.fn-flex:last").remove();
                     }
                     $("#chatRoomIndex li:first").slideDown(200);
                     Util.listenUserCard();
-                    ChatRoom.imageViewer()
+                    typeof ChatRoom==="object"&&ChatRoom.imageViewer()
                     break;
             }
         }

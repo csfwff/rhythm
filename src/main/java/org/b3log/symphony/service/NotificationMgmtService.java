@@ -22,6 +22,7 @@ import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.b3log.latke.Keys;
+import org.b3log.latke.ioc.BeanManager;
 import org.b3log.latke.ioc.Inject;
 import org.b3log.latke.repository.*;
 import org.b3log.latke.repository.annotation.Transactional;
@@ -30,14 +31,13 @@ import org.b3log.latke.service.annotation.Service;
 import org.b3log.symphony.model.Common;
 import org.b3log.symphony.model.Notification;
 import org.b3log.symphony.model.UserExt;
+import org.b3log.symphony.processor.NotificationProcessor;
 import org.b3log.symphony.processor.channel.UserChannel;
 import org.b3log.symphony.repository.NotificationRepository;
 import org.b3log.symphony.util.Symphonys;
 import org.json.JSONObject;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
+import java.util.*;
 
 /**
  * Notification management service.
@@ -111,6 +111,28 @@ public class NotificationMgmtService {
             notificationRepository.remove(notificationId);
         } catch (final Exception e) {
             LOGGER.log(Level.ERROR, "Removes a notification [id=" + notificationId + "] failed", e);
+        }
+    }
+
+    /**
+     * Adds a 'red packet from sky' type notification with the specified request json object.
+     *
+     * @param requestJSONObject the specified request json object, for example,
+     *                          "userId"; "",
+     *                          "dataId": "" // comment id
+     * @throws ServiceException service exception
+     */
+    @Transactional
+    public void addRedPacketFromSkyNotification(final JSONObject requestJSONObject) throws ServiceException {
+        try {
+            requestJSONObject.put(Notification.NOTIFICATION_DATA_TYPE, Notification.DATA_TYPE_C_RED_PACKET_FROM_SKY);
+
+            addNotification(requestJSONObject);
+        } catch (final RepositoryException e) {
+            final String msg = "Adds a notification [type=red_packet_from_sky] failed";
+            LOGGER.log(Level.ERROR, msg, e);
+
+            throw new ServiceException(msg);
         }
     }
 
@@ -530,8 +552,28 @@ public class NotificationMgmtService {
      */
     @Transactional
     public void makeRead(final Collection<JSONObject> notifications) {
+        String userId = null;
         for (final JSONObject notification : notifications) {
             makeRead(notification);
+            userId = notification.optString(Notification.NOTIFICATION_USER_ID);
+        }
+        if (userId != null && notifications.size() != 0) {
+            try {
+                String finalUserId = userId;
+                Symphonys.EXECUTOR_SERVICE.submit(() -> {
+                    final JSONObject cmd = new JSONObject();
+                    cmd.put(UserExt.USER_T_ID, finalUserId);
+                    cmd.put(Common.COMMAND, "refreshNotification");
+                    Map<String, Object> dataModel = new HashMap<>();
+                    final BeanManager beanManager = BeanManager.getInstance();
+                    final NotificationProcessor notificationProcessor = beanManager.getReference(NotificationProcessor.class);
+                    notificationProcessor.fillNotificationCount(finalUserId, dataModel);
+                    cmd.put("count", Integer.parseInt(dataModel.get(Common.UNREAD_NOTIFICATION_CNT).toString()));
+
+                    UserChannel.sendCmd(cmd);
+                });
+            } catch (Exception ignored) {
+            }
         }
     }
 

@@ -423,6 +423,8 @@ a[class*=" icon-"]:hover {
   font-size: 18px;
   font-weight: normal;
   border-bottom: 1px solid #eee;
+  cursor: move;
+  user-select: none;
 }
 
 .dialog-header-bg .icon-close {
@@ -430,6 +432,7 @@ a[class*=" icon-"]:hover {
   font-size: 12px;
   float: right;
   font-weight: bold;
+  -webkit-user-drag: none;
 }
 
 .dialog-header-bg .icon-close:hover {
@@ -678,7 +681,10 @@ a[class*=" icon-"]:hover {
 }
 
 label.anonymous-check {
-  margin: 2px 15px 0 0;
+  margin: 0 9px;
+  input{
+    margin-left: 4px;
+  }
 }
 
 .cmts {
@@ -1095,6 +1101,8 @@ h1.article-title > a:hover {
 }
 
 .comment-submit {
+  display: flex;
+  align-items: center;
   margin-top: 10px;
 }
 
@@ -1874,6 +1882,15 @@ code .dec {
   display: block;
   margin: 20px auto;
   background-image: url(../images/m-char.png);
+  background-size: cover;
+}
+
+#paintCanvas {
+  border: 1px solid #eee;
+  border-radius: 5px;
+  background-color: #fff;
+  display: block;
+  margin: 20px auto;
   background-size: cover;
 }
 
@@ -3042,8 +3059,8 @@ only screen and (device-width: 414px) and (device-height: 896px) and (-webkit-de
 }
 
 .module_new{
-    line-height: 16px;
-    padding: 0px 10px 8px 10px;
+  line-height: 16px;
+  padding: 0px 10px 8px 10px;
 }
 
 .tags{
@@ -3141,16 +3158,20 @@ only screen and (device-width: 414px) and (device-height: 896px) and (-webkit-de
 }
 
 .TGIF__item {
-   background-color: var(--layer-background-color);
-   color: var(--layer-color);
-   cursor: default;
-   padding: 10px;
-   border-radius: 3px;
-   box-shadow: 0 1px 2px rgba(0,0,0,.2);
-   margin: 0px 5px 10px 5px;
+  background-color: var(--layer-background-color);
+  color: var(--layer-color);
+  cursor: default;
+  padding: 10px;
+  border-radius: 3px;
+  box-shadow: 0 1px 2px rgba(0,0,0,.2);
+  margin: 0px 5px 10px 5px;
 }
 
-
+#liveliness{
+  height: 1px;
+  background: red;
+  width: 0;
+}
 
 
 

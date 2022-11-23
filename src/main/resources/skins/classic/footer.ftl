@@ -25,9 +25,11 @@
         </div>
         <div class="fn-flex-1">
             <div class="fn-clear ft-smaller">
-                <div onclick="window.open('https://www.tsyvps.com/aff/HEHTPGYL')" style="text-align: center;padding: 8px 0px;color: #0f8cee;background-color: #2f2e2e8f;line-height: 20px;border-radius: 12px;width: 175px;margin-bottom: 15px;cursor: pointer;">
+                <div onclick="window.open('https://www.tsyvps.com/aff/HEHTPGYL')" style="text-align: center;padding: 8px 0px;color: #0f8cee;background-color: #282727;line-height: 20px;border-radius: 12px;width: 175px;margin-bottom: 15px;cursor: pointer;">
                     <div>
-                        <img style="vertical-align: -3px;max-height: 18px;" src="https://file.fishpi.cn/2022/05/165184311051006-afb572fb.png">&nbsp;&nbsp;SCDN 由蓝易云支持<br>
+                        <svg style="vertical-align: -2px;">
+                            <use xlink:href="#shield"></use>
+                        </svg>&nbsp;&nbsp;防火墙由蓝易云支持<br>
                         <span style="color: #cdcdcd;">性价比主机，高防 CDN</span>
                     </div>
                 </div>
@@ -41,6 +43,10 @@
                 <a style="margin-right: 0px; padding-right: 0px" target="_blank" href="https://xyears.cn/">十年之约论坛</a>
                 &nbsp;｜&nbsp;
                 <a style="margin-right: 0px; padding-right: 0px" target="_blank" href="https://www.tsyvps.com/aff/HEHTPGYL">蓝易云</a>
+                &nbsp;｜&nbsp;
+                <a style="margin-right: 0px; padding-right: 0px" target="_blank" href="https://my.fishpi.cn/">摸鱼导航网</a>
+                &nbsp;｜&nbsp;
+                <a style="margin-right: 0px; padding-right: 0px" target="_blank" href="https://bbs.tampermonkey.net.cn/">油猴中文网</a>
             </div>
             <div class="fn-clear ft-smaller">
                 <div style="margin-top: 5px">探索</div>
@@ -49,12 +55,12 @@
                     &nbsp;|&nbsp;
                     技术支持 <a href="mailto:chenhui@admin.fishpi.cn" target="_blank">chenhui@admin.fishpi.cn</a>
                     &nbsp;|&nbsp;
-                    <a href="https://qm.qq.com/cgi-bin/qm/qr?k=dpq3N-bezENSsshZERxvTw2dV85WtTdV&jump_from=webapi" target="_blank"><svg style="vertical-align: -2px;"><use xlink:href="#ic-qgroup"></use></svg> 公告/反馈QQ群</a>
+                    <a href="https://fishpi.cn/article/1655691776330" target="_blank"><svg style="vertical-align: -2px;"><use xlink:href="#ic-wechat"></use></svg> 官方微信群</a>
                     &nbsp;|&nbsp;
                     <a href="${servePath}/download">摸鱼派客户端</a>&nbsp;&nbsp;
                     <span>
                         <a href="https://fishpi.cn/article/1653059669471" target="_blank" title="iOS 客户端"><svg style="vertical-align: -1px;"><use xlink:href="#ic-apple"></use></svg></a>&nbsp;
-                        <a href="https://fishpi.cn/article/1637143985245" target="_blank" title="PC 客户端"><svg style="vertical-align: -2px;"><use xlink:href="#ic-pc"></use></svg></a>&nbsp;
+                        <a href="https://fishpi.cn/article/1662284317542" target="_blank" title="PC 客户端"><svg style="vertical-align: -2px;"><use xlink:href="#ic-pc"></use></svg></a>&nbsp;
                         <a href="https://fishpi.cn/article/1638189205758" target="_blank" title="IntelliJ IDEA插件"><svg style="vertical-align: -2px;"><use xlink:href="#ic-idea"></use></svg></a>&nbsp;
                         <a href="https://fishpi.cn/article/1639648815789" target="_blank" title="Chrome 插件"><svg style="vertical-align: -2px;"><use xlink:href="#ic-chrome"></use></svg></a>&nbsp;
                         <a href="https://fishpi.cn/article/1641291342622" target="_blank" title="安卓 APK 应用"><svg style="vertical-align: -2px;"><use xlink:href="#ic-apk"></use></svg></a>&nbsp;
@@ -79,6 +85,7 @@
                 <a href="${servePath}/statistic">${dataStatLabel}</a>
                 <a href="${servePath}/article/1636516552191">开放 API</a>
                 <a href="${servePath}/privacy" target="_blank">隐私政策</a>
+                <a href="${servePath}/logs" target="_blank">日志公开</a>
             </div>
         </div>
     </div>
@@ -154,7 +161,13 @@
 </#if>
 <script src="${staticServePath}/js/lib/tooltips/tooltips.min.js?${staticResourceVersion}"></script>
 <script>
-    !function(p){"use strict";!function(t){var s=window,e=document,i=p,c="".concat("https:"===e.location.protocol?"https://":"http://","sdk.51.la/js-sdk-pro.min.js"),n=e.createElement("script"),r=e.getElementsByTagName("script")[0];n.type="text/javascript",n.setAttribute("charset","UTF-8"),n.async=!0,n.src=c,n.id="LA_COLLECT",i.d=n;var o=function(){s.LA.ids.push(i)};s.LA?s.LA.ids&&o():(s.LA=p,s.LA.ids=[],o()),r.parentNode.insertBefore(n,r)}()}({id:"JRkLwpTk0DlpkOHh",ck:"JRkLwpTk0DlpkOHh"});
+    var _hmt = _hmt || [];
+    (function() {
+        var hm = document.createElement("script");
+        hm.src = "https://hm.baidu.com/hm.js?bab35868f6940b3c4bfc020eac6fe61f";
+        var s = document.getElementsByTagName("script")[0];
+        s.parentNode.insertBefore(hm, s);
+    })();
 </script>
 <script>
     function iframeCheck () {

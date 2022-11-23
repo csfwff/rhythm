@@ -393,6 +393,21 @@ public class ActivityMgmtService {
 
             final String datePattern = "yyyyMMdd";
             final JSONObject user = userQueryService.getUser(userId);
+            int longestStart = user.optInt(UserExt.USER_LONGEST_CHECKIN_STREAK_START);
+            int longestEnd = user.optInt(UserExt.USER_LONGEST_CHECKIN_STREAK_END);
+            int currentStart = user.optInt(UserExt.USER_CURRENT_CHECKIN_STREAK_START);
+
+            if(longestStart == currentStart){
+                //当前签到是最长签到，不允许补签
+                return -1;
+            }
+
+            final Date afterStartDate = DateUtils.parseDate(String.valueOf(afterStart), new String[]{datePattern});
+            final Date longestEndDate = DateUtils.parseDate(String.valueOf(longestEnd), new String[]{datePattern});
+            if((int) ((afterStartDate.getTime() - longestEndDate.getTime()) / 86400000)<=1){
+                //如果补签后开始日期跟之前最长日期的结尾在一天内，说明是接上去的 所以afterStart要变成开始的start
+                afterStart =user.optInt(UserExt.USER_LONGEST_CHECKIN_STREAK_START);
+            }
 
             user.put(UserExt.USER_CURRENT_CHECKIN_STREAK_START, afterStart);
             int currentStreakStart = user.optInt(UserExt.USER_CURRENT_CHECKIN_STREAK_START);

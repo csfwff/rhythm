@@ -21,6 +21,7 @@ package org.b3log.symphony.repository;
 import org.b3log.latke.repository.*;
 import org.b3log.latke.repository.annotation.Repository;
 import org.b3log.symphony.model.Reward;
+import org.json.JSONObject;
 
 /**
  * Reward repository.
@@ -31,6 +32,15 @@ import org.b3log.symphony.model.Reward;
  */
 @Repository
 public class RewardRepository extends AbstractRepository {
+
+    @Override
+    public JSONObject get(String id) throws RepositoryException {
+        JSONObject result = super.get(id);
+        if (result == null) {
+            return new JSONObject();
+        }
+        return result;
+    }
 
     /**
      * Removes rewards by the specified data id.

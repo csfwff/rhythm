@@ -37,6 +37,21 @@
                             <ul>
                                 <li>
                                     <div class='fn-flex'>
+                                        <div class="fn-flex-1">
+                                            <h2>
+                                                <svg style="width: 26px;height: 27px;vertical-align: -7px;">
+                                                    <use xlink:href="#logo"></use>
+                                                </svg>
+                                                <a target="_blank" href="https://my.fishpi.cn">特别推荐：摸鱼导航网</a>
+                                            </h2>
+                                            <span class="ft-fade vditor-reset">
+                                                摸鱼导航网由鱼油 <a href="https://fishpi.cn/member/Chestnut">栗子</a> 开发，汇集了众多摸鱼小游戏以及值得推荐的网站，快来逛逛吧！
+                                            </span>
+                                        </div>
+                                    </div>
+                                </li>
+                                <li>
+                                    <div class='fn-flex'>
                                         <div class="avatar"
                                              style="background-image:url('https://pwl.stackoverflow.wiki/evolve/evolved.ico')"></div>
                                         <div class="fn-flex-1">
@@ -68,6 +83,20 @@
                                 <li>
                                     <div class='fn-flex'>
                                         <div class="avatar"
+                                             style="background-image:url('https://file.fishpi.cn/2022/08/image-39430724.png')"></div>
+                                        <div class="fn-flex-1">
+                                            <h2>
+                                                <a href="${servePath}/games/fight/index.html">《Fight》</a>
+                                            </h2>
+                                            <span class="ft-fade vditor-reset">
+                                                一款由社区成员 <a href="https://fishpi.cn/member/YARI" target="_blank">YARI</a> 自主开发的格斗式游戏。
+                                            </span>
+                                        </div>
+                                    </div>
+                                </li>
+                                <li>
+                                    <div class='fn-flex'>
+                                        <div class="avatar"
                                              style="background-image:url('${staticServePath}/images/mofish.png')"></div>
                                         <div class="fn-flex-1">
                                             <h2>
@@ -76,6 +105,22 @@
                                             <span class="ft-fade vditor-reset">
                                                 一个非常烧脑的 CTF 类闯关游（酷）戏（刑）。这个游戏的目标就只有一个：进入下一关。在大部分关卡中，你需要利用网页上的提示来找到密码并进入下一关。<br>
                                                 参与 <a href="${servePath}/top/mofish">摸鱼大闯关排行榜</a>
+                                            </span>
+                                        </div>
+                                    </div>
+                                </li>
+                                <li>
+                                    <div class='fn-flex'>
+                                        <div class="avatar"
+                                             style="background-image:url('${staticServePath}/images/mofish.png')"></div>
+                                        <div class="fn-flex-1">
+                                            <h2>
+                                                <a href="https://puzzle.iwpz.net/" target="_blank">摸鱼小闯关</a>
+                                            </h2>
+                                            <span class="ft-fade vditor-reset">
+                                               一个<a href="https://p.hancel.org/" target="_blank">摸鱼大闯关</a>的"山寨版"，但关卡内容为原创。
+                                                框架来自 <a href="https://fishpi.cn/member/imlinhanchao" target="_blank">跳跳</a><br>
+                                                参与 <a href="${servePath}/top/smallmofish">摸鱼小闯关排行榜</a>
                                             </span>
                                         </div>
                                     </div>

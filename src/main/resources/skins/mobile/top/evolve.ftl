@@ -39,7 +39,7 @@
                     <div class="fn-flex">
                         <a rel="nofollow"
                            href="${servePath}/member/${user.profile.userName}"
-                        ><div class="avatar" aria-label="${user.profile.userName}" style="background-image:url('${user.profile.userAvatarURL}')"></div></a>
+                        ><div class="avatar" aria-label="${user.profile.userName}" style="background-image:url('${user.profile.userAvatarURL48}')"></div></a>
                         <div class="has-view fn-flex-1">
                             <h2>
                                 ${user_index + 1}.

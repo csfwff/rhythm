@@ -55,6 +55,10 @@
             <@head title="摸鱼大闯关游戏排行 - ${symphonyLabel}">
             </@head>
         </#if>
+        <#if type == "smallmofish">
+            <@head title="摸鱼小闯关游戏排行 - ${symphonyLabel}">
+            </@head>
+        </#if>
         <#if type == "lifeRestart">
             <@head title="人生重开模拟器成就排行 - ${symphonyLabel}">
             </@head>
@@ -63,6 +67,19 @@
             <@head title="Emoji 真假小黄脸 游戏总分排行 - ${symphonyLabel}">
             </@head>
         </#if>
+        <#if type == "xiaoice">
+            <@head title="小冰游戏排行 - ${symphonyLabel}">
+            </@head>
+        </#if>
+        <#if type == "invite">
+            <@head title="邀请成员排行 - ${symphonyLabel}">
+            </@head>
+        </#if>
+        <#if type == "donate">
+            <@head title="捐助成员排行 - ${symphonyLabel}">
+            </@head>
+        </#if>
+        
     </head>
     <body>
         <#include "../header.ftl">

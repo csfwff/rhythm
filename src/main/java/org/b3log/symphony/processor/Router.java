@@ -58,6 +58,8 @@ public final class Router {
         Dispatcher.webSocket("/chat-channel", chatChannel);
         final ShopChannel shopChannel = beanManager.getReference(ShopChannel.class);
         Dispatcher.webSocket("/shop-channel", shopChannel);
+        final LogsChannel logsChannel = beanManager.getReference(LogsChannel.class);
+        Dispatcher.webSocket("/logs-channel", logsChannel);
 
         // 注册 HTTP 错误处理
         final ErrorProcessor errorProcessor = beanManager.getReference(ErrorProcessor.class);
@@ -117,6 +119,8 @@ public final class Router {
         MFAProcessor.register();
         // Chat
         ChatProcessor.register();
+        // 日志
+        LogsProcessor.register();
 
         final BeanManager beanManager = BeanManager.getInstance();
         final LoginCheckMidware loginCheck = beanManager.getReference(LoginCheckMidware.class);

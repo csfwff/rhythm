@@ -677,6 +677,7 @@ public class UserQueryService {
         try {
             for (final JSONObject user : users) {
                 user.put(Common.IS_FOLLOWING, followRepository.exists(requestJSONObject.optString(Keys.OBJECT_ID), user.optString(Keys.OBJECT_ID), Follow.FOLLOWING_TYPE_C_USER));
+                avatarQueryService.fillUserAvatarURL(user);
             }
         } catch (final RepositoryException | JSONException e) {
             LOGGER.log(Level.ERROR, "Fills following failed", e);
@@ -775,6 +776,24 @@ public class UserQueryService {
             return results.get(0).optString("secret2fa");
         } catch (final RepositoryException e) {
             return "";
+        }
+    }
+
+    public List<JSONObject> getRecentRegisteredUsers(int size) {
+        try {
+            Query query = new Query()
+                    .setFilter(new PropertyFilter(UserExt.USER_STATUS, FilterOperator.EQUAL, UserExt.USER_STATUS_C_VALID))
+                    .addSort(Keys.OBJECT_ID, SortDirection.DESCENDING)
+                    .setPage(1, size);
+            List<JSONObject> userList = userRepository.getList(query);
+            for (JSONObject user : userList) {
+                avatarQueryService.fillUserAvatarURL(user);
+            }
+            return userList;
+        } catch (final RepositoryException e) {
+            LOGGER.log(Level.ERROR, "Gets recent registered users failed", e);
+
+            return new ArrayList<>();
         }
     }
 }

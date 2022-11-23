@@ -24,6 +24,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.b3log.latke.Keys;
 import org.b3log.latke.http.RequestContext;
+import org.b3log.latke.http.WebSocketSession;
 import org.b3log.latke.ioc.BeanManager;
 import org.b3log.latke.model.User;
 import org.b3log.latke.repository.*;
@@ -96,6 +97,24 @@ public class ChatRoomBot {
         String userId = currentUser.optString(Keys.OBJECT_ID);
         // ==! 前置参数 !==
 
+        // ==? 判断是否在 Channel 中 ==?
+        boolean atChannel = false;
+        for (Map.Entry<WebSocketSession, JSONObject> onlineUser : ChatroomChannel.onlineUsers.entrySet()) {
+            try {
+                String uName = onlineUser.getValue().optString(User.USER_NAME);
+                if (uName.equals(userName)) {
+                    atChannel = true;
+                    break;
+                }
+            } catch (Exception ignored) {
+            }
+        }
+        if (!atChannel) {
+            context.renderJSON(StatusCodes.ERR).renderMsg("发送失败：当前未在聊天室中，请刷新页面。");
+            return false;
+        }
+        // ==! 判断是否在 Channel 中 ==!
+
         // ==? 指令 ?==
         if (DataModelService.hasPermission(currentUser.optString(User.USER_ROLE), 3)) {
             if (content.startsWith("执法")) {
@@ -121,13 +140,25 @@ public class ChatRoomBot {
                                 String targetUserId = targetUser.optString(Keys.OBJECT_ID);
                                 if (time.isEmpty()) {
                                     int muted = muted(targetUserId);
+                                    // 是否全员禁言中
+                                    boolean isAll = muted < 0 && muted != -1;
+                                    if (isAll){
+                                        // 回正
+                                        muted *= -1;
+                                    }
                                     if (muted != -1) {
                                         int muteDay = muted / (24 * 60 * 60);
                                         int muteHour = muted % (24 * 60 * 60) / (60 * 60);
                                         int muteMinute = muted % (24 * 60 * 60) % (60 * 60) / 60;
                                         int muteSecond = muted % (24 * 60 * 60) % (60 * 60) % 60;
                                         sendBotMsg("查询结果：该用户剩余禁言时间为：" + muteDay + " 天 " + muteHour + " 小时 " + muteMinute + " 分 " + muteSecond + " 秒。");
-                                    } else {
+                                    } else if (isAll){
+                                        int muteDay = muted / (24 * 60 * 60);
+                                        int muteHour = muted % (24 * 60 * 60) / (60 * 60);
+                                        int muteMinute = muted % (24 * 60 * 60) % (60 * 60) / 60;
+                                        int muteSecond = muted % (24 * 60 * 60) % (60 * 60) % 60;
+                                        sendBotMsg("查询结果：全员禁言中 剩余禁言时间为：" + muteDay + " 天 " + muteHour + " 小时 " + muteMinute + " 分 " + muteSecond + " 秒。");
+                                    }else {
                                         sendBotMsg("查询结果：该用户当前未被禁言。");
                                     }
                                 } else {
@@ -136,6 +167,36 @@ public class ChatRoomBot {
                                 }
                             } catch (Exception e) {
                                 sendBotMsg("指令执行失败，禁言命令的正确格式：\n执法 禁言 @[用户名] [时间 `单位: 分钟` `如不填此项将查询剩余禁言时间` `设置为0将解除禁言`]");
+                            }
+                            break;
+                        case "全员禁言":
+                            try {
+                                String time = "";
+                                try {
+                                    time = cmd1.split("\\s")[1];
+                                } catch (Exception ignored) {
+                                    // 切出去. 什么也不干. 拿不到命令
+                                }
+                                // 目标特殊 key 全员禁言
+                                String targetUserId = "all:fish:mute";
+                                if (time.isEmpty()) {
+                                    int muted = muted(targetUserId);
+                                    if (muted != -1) {
+                                        int muteDay = muted / (24 * 60 * 60);
+                                        int muteHour = muted % (24 * 60 * 60) / (60 * 60);
+                                        int muteMinute = muted % (24 * 60 * 60) % (60 * 60) / 60;
+                                        int muteSecond = muted % (24 * 60 * 60) % (60 * 60) % 60;
+                                        sendBotMsg("查询结果：全员剩余禁言时间为：" + muteDay + " 天 " + muteHour + " 小时 " + muteMinute + " 分 " + muteSecond + " 秒。");
+                                    } else {
+                                        sendBotMsg("查询结果：当前未开启全员禁言。");
+                                    }
+                                } else {
+                                    int minute = Integer.parseInt(time);
+                                    // 全员禁言
+                                    allMuteAndNotice(currentUser.optString(User.USER_NAME), targetUserId, minute);
+                                }
+                            } catch (Exception e) {
+                                sendBotMsg("指令执行失败，禁言命令的正确格式：\n执法 全员禁言 [时间 `单位: 分钟` `如不填此项将查询剩余禁言时间` `设置为0将解除禁言`]");
                             }
                             break;
                         case "风控":
@@ -179,16 +240,90 @@ public class ChatRoomBot {
                             }
                             break;
                         case "服务器状态":
+                            Map<String, Integer> sessionList = new HashMap<>();
+                            for (WebSocketSession session : ChatroomChannel.SESSIONS) {
+                                try {
+                                    String uName = ChatroomChannel.onlineUsers.get(session).optString(User.USER_NAME);
+                                    if (sessionList.containsKey(uName)) {
+                                        sessionList.put(uName, sessionList.get(uName) + 1);
+                                    } else {
+                                        sessionList.put(uName, 1);
+                                    }
+                                } catch (Exception ignored) {
+                                }
+                            }
+                            StringBuilder userSessionList = new StringBuilder();
+                            for (Map.Entry<String, Integer> s : sessionList.entrySet()) {
+                                userSessionList.append(s.getKey() + " " + s.getValue() + "<br>");
+                            }
                             int sessions = ChatroomChannel.SESSIONS.size();
                             sendBotMsg("" +
-                                    "当前聊天室会话数：" + sessions);
+                                    "当前聊天室会话数：" + sessions + "\n" +
+                                    "<details><summary>用户会话详情</summary>" + userSessionList + "</details>");
+                            break;
+                        case "刷新缓存":
+                            sendBotMsg("请稍等，执行中...");
+                            ChatroomChannel.sendOnlineMsg();
+                            sendBotMsg("在线人数缓存已刷新。");
+                            // JSONObject jsonObject = new JSONObject();
+                            // jsonObject.put(Common.TYPE, "refresh");
+                            // ChatroomChannel.notifyChat(jsonObject);
+                            // sendBotMsg("已为在线用户清屏。");
+                            break;
+                        case "广播设置":
+                            try {
+                                int notQuickCheck = Integer.parseInt(cmd1.split("\\s")[1]);
+                                int notQuickSleep = Integer.parseInt(cmd1.split("\\s")[2]);
+                                int quickCheck = Integer.parseInt(cmd1.split("\\s")[3]);
+                                int quickSleep = Integer.parseInt(cmd1.split("\\s")[4]);
+                                ChatroomChannel.notQuickCheck = notQuickCheck;
+                                ChatroomChannel.notQuickSleep = notQuickSleep;
+                                ChatroomChannel.quickCheck = quickCheck;
+                                ChatroomChannel.quickSleep = quickSleep;
+                                sendBotMsg("广播设置成功。");
+                            } catch (Exception e) {
+                                sendBotMsg("当前参数：" + ChatroomChannel.notQuickCheck + " " + ChatroomChannel.notQuickSleep + " " + ChatroomChannel.quickCheck + " " + ChatroomChannel.quickSleep);
+                            }
+                            break;
+                        case "断开会话":
+                            try {
+                                String disconnectUser = cmd1.split("\\s")[1];
+                                sendBotMsg("@" + disconnectUser + "  你的连接被管理员断开，请重新连接。");
+                                new Thread(() -> {
+                                    try {
+                                        Thread.sleep(2000);
+                                    } catch (InterruptedException e) {
+                                        e.printStackTrace();
+                                    }
+                                    List<WebSocketSession> senderSessions = new ArrayList<>();
+                                    for (Map.Entry<WebSocketSession, JSONObject> entry : ChatroomChannel.onlineUsers.entrySet()) {
+                                        try {
+                                            String tempUserName = entry.getValue().optString(User.USER_NAME);
+                                            if (tempUserName.equals(disconnectUser)) {
+                                                senderSessions.add(entry.getKey());
+                                            }
+                                        } catch (Exception ignored) {
+                                        }
+                                    }
+                                    for (WebSocketSession session : senderSessions) {
+                                        ChatroomChannel.removeSession(session);
+                                    }
+                                }).start();
+                            } catch (Exception e) {
+                                sendBotMsg("参数错误。");
+                            }
                             break;
                         default:
-                            sendBotMsg("#### 执法帮助菜单\n" +
+                            sendBotMsg("<details><summary>执法帮助菜单</summary>\n" +
                                     "如无特殊备注，则需要纪律委员及以上分组才可执行\n\n" +
                                     "* **禁言指定用户** 执法 禁言 @[用户名] [时间 `单位: 分钟` `如不填此项将查询剩余禁言时间` `设置为0将解除禁言`]\n" +
+                                    "* **全员禁言** 执法 全员禁言 [时间 `单位: 分钟` `如不填此项将查询剩余禁言时间` `设置为0将解除全员禁言`]\n" +
                                     "* **风控模式** 执法 风控 @[用户名] [时间 `单位：分钟` `如不填此项将查询剩余风控时间` `设置为0将解除风控`]\n" +
-                                    "* **查询服务器状态** 执法 服务器状态");
+                                    "* **查询服务器状态** 执法 服务器状态\n" +
+                                    "* **刷新全体成员的聊天室缓存** 执法 刷新缓存\n" +
+                                    "* **广播设置** 执法 广播设置 [普通消息数目检测阈值] [普通消息间隔毫秒] [特殊消息数目检测阈值] [特殊消息间隔毫秒]\n" +
+                                    "* **断开指定用户的全部聊天室会话** 执法 断开会话 [用户名]</details>\n" +
+                                    "<p></p>");
                     }
                     return true;
                 } catch (Exception ignored) {
@@ -229,12 +364,27 @@ public class ChatRoomBot {
 
         // ==? 是否禁言中 ?==
         int muted = muted(userId);
+        // 是否全员禁言中
+        boolean isAll = muted < 0 && muted != -1;
+        if (isAll){
+            // OP 豁免全员禁言
+            if (DataModelService.hasPermission(currentUser.optString(User.USER_ROLE), 3)){
+                muted = -1;
+            }else {
+                // 回正
+                muted *= -1;
+            }
+        }
         int muteDay = muted / (24 * 60 * 60);
         int muteHour = muted % (24 * 60 * 60) / (60 * 60);
         int muteMinute = muted % (24 * 60 * 60) % (60 * 60) / 60;
         int muteSecond = muted % (24 * 60 * 60) % (60 * 60) % 60;
         if (muted != -1) {
-            context.renderJSON(StatusCodes.ERR).renderMsg("你的消息被机器人打回，原因：正在禁言中，剩余时间 " + muteDay + " 天 " + muteHour + " 小时 " + muteMinute + " 分 " + muteSecond + " 秒。");
+            if (isAll){
+                context.renderJSON(StatusCodes.ERR).renderMsg("你的消息被机器人打回，原因：全员禁言中，剩余时间 " + muteDay + " 天 " + muteHour + " 小时 " + muteMinute + " 分 " + muteSecond + " 秒。");
+            }else {
+                context.renderJSON(StatusCodes.ERR).renderMsg("你的消息被机器人打回，原因：正在禁言中，剩余时间 " + muteDay + " 天 " + muteHour + " 小时 " + muteMinute + " 分 " + muteSecond + " 秒。");
+            }
             return false;
         }
         // ==! 是否禁言中 !==
@@ -304,9 +454,9 @@ public class ChatRoomBot {
         }
         return true;
     }
-
+    
     // 以人工智障的身份发送消息
-    public synchronized static void sendBotMsg(String content) {
+    public static void sendBotMsg(String content) {
         new Thread(() -> {
             try {
                 Thread.sleep(100);
@@ -400,16 +550,43 @@ public class ChatRoomBot {
 
     // 禁言并提醒
     public static void muteAndNotice(String username, String userId, int minute) {
-        sendBotMsg("提醒：@" + username + "  被管理员禁言 " + minute + " 分钟。");
+        if (minute == 0){
+            sendBotMsg("提醒：@" + username + "  被管理员 解除 禁言");
+        }else {
+            sendBotMsg("提醒：@" + username + "  被管理员 禁言 " + minute + " 分钟。");
+        }
         mute(userId, minute);
     }
-
+    
+    /**
+     * 全员禁言并提醒
+     * @param sourceUser
+     * @param targetUserId
+     * @param minute
+     */
+    private static void allMuteAndNotice(String sourceUser, String targetUserId, int minute) {
+        if (minute == 0){
+            sendBotMsg("提醒：管理员 "+sourceUser+" 已解除 全员禁言 。(如存在滥用执法情形, 请及时保留证据, 举报处理)");
+        }else {
+            sendBotMsg("提醒：管理员 "+sourceUser+" 已开启 全员禁言 " + minute + " 分钟。(如存在滥用执法情形, 请及时保留证据, 举报处理)");
+        }
+        // 全员禁言的 目标 id 是 specialId, 不存在当前体系
+        mute(targetUserId, minute);
+    }
     // 检查禁言
     public static int muted(String userId) {
         final BeanManager beanManager = BeanManager.getInstance();
         CloudService cloudService = beanManager.getReference(CloudService.class);
         CloudRepository cloudRepository = beanManager.getReference(CloudRepository.class);
-
+        // 检查是否在全员禁言中  优先级高于个人禁言
+        String allMute = cloudService.getFromCloud("all:fish:mute", CloudService.SYS_MUTE);
+        // 全员禁言存在 且 有效. 直接返回对象
+        if (allMute.isEmpty() || (System.currentTimeMillis() < Long.parseLong(allMute))){
+            long remainMinute = (Long.parseLong(allMute) - System.currentTimeMillis()) / 1000;
+            // 区别个人设置
+            return (- (int) remainMinute);
+        }
+        // 检查个人禁言
         String muteData = cloudService.getFromCloud(userId, CloudService.SYS_MUTE);
         if (muteData.isEmpty()) {
             return -1;
@@ -505,6 +682,23 @@ public class ChatRoomBot {
                 long remainMinute = (Long.parseLong(risksControlData) - System.currentTimeMillis()) / 1000;
                 return (int) remainMinute;
             }
+        }
+    }
+
+    /**
+     * 宵禁检测
+     */
+    public static void nightDisableCheck() {
+        int now = Integer.parseInt(new SimpleDateFormat("HHmm").format(new Date()));
+        switch (now) {
+            case 800:
+                sendBotMsg("早上好 ☀️\n" +
+                        "新的一天开始啦～ 开始愉快的聊天吧 :D");
+                break;
+            case 1930:
+                sendBotMsg("现在时间是 19:30 分，摸鱼派已进入宵禁模式，期间聊天消息将不会计为活跃度...\n" +
+                        "感谢你的陪伴，我们明天再见，早点休息，晚安 \uD83D\uDCA4");
+                break;
         }
     }
 }

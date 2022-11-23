@@ -306,36 +306,37 @@
                 <#if isLoggedIn>
                 <#if discussionViewable && article.articleCommentable && permissions["commonAddComment"].permissionGrant>
                 <div class="fn-clear comment-wrap">
-                    <br/>
                     <div id="replyUseName"> </div>
                     <div id="commentContent"></div>
-                    <br><br>
                     <div class="tip" id="addCommentTip"></div>
 
                     <div class="fn-clear comment-submit">
-                        <svg id="emojiBtn" style="width: 30px; height: 30px; cursor:pointer;">
-                            <use xlink:href="#emojiIcon"></use>
-                        </svg>
-                        <div class="hide-list" id="emojiList">
-                            <div class="hide-list-emojis" id="emojis" style="max-height: 200px">
-                            </div>
-                            <div class="hide-list-emojis__tail">
-                                        <span>
-                                        <a onclick="Comment.fromURL()">从URL导入表情包</a>
-                                        </span>
-                                <span class="hide-list-emojis__tip"></span>
-                                <span>
-                                            <a onclick="$('#uploadEmoji input').click()">上传表情包</a>
-                                        </span>
-                                <form style="display: none" id="uploadEmoji" method="POST" enctype="multipart/form-data">
-                                    <input type="file" name="file">
-                                </form>
+                        <div>
+                            <svg id="emojiBtn" style="width: 30px; height: 30px; cursor:pointer;">
+                                <use xlink:href="#emojiIcon"></use>
+                            </svg>
+                            <div class="hide-list" id="emojiList">
+                                <div class="hide-list-emojis" id="emojis" style="max-height: 200px">
+                                </div>
+                                <div class="hide-list-emojis__tail">
+                                            <span>
+                                            <a onclick="Comment.fromURL()">从URL导入表情包</a>
+                                            </span>
+                                    <span class="hide-list-emojis__tip"></span>
+                                    <span>
+                                                <a onclick="$('#uploadEmoji input').click()">上传表情包</a>
+                                            </span>
+                                    <form style="display: none" id="uploadEmoji" method="POST" enctype="multipart/form-data">
+                                        <input type="file" name="file">
+                                    </form>
+                                </div>
                             </div>
                         </div>
                         <#if permissions["commonAddCommentAnonymous"].permissionGrant>
                         <label class="anonymous-check">${anonymousLabel}<input type="checkbox" id="commentAnonymous"></label>
                         </#if>
                         <label class="anonymous-check">${onlyArticleAuthorVisibleLabel}<input type="checkbox" id="commentVisible"></label>
+                        <div class="fn-flex-1"></div>
                         <button id="articleCommentBtn" class="red fn-right" onclick="Comment.add('${article.oId}', '${csrfToken}'), this">${submitLabel}</button>
                     </div>
                 </div>
@@ -538,6 +539,8 @@
             <#if 3 == article.articleType>
                 Article.playThought('${article.articleContent}');
             </#if>
+
+            $(".editor-bg").click(Comment._toggleReply)
         </script>
     </body>
 </html>

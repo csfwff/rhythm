@@ -22,6 +22,7 @@ import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.b3log.latke.Keys;
+import org.b3log.latke.http.RequestContext;
 import org.b3log.latke.ioc.Inject;
 import org.b3log.latke.model.User;
 import org.b3log.latke.repository.RepositoryException;
@@ -33,8 +34,7 @@ import org.b3log.symphony.repository.SponsorRepository;
 import org.json.JSONObject;
 
 import java.text.SimpleDateFormat;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -66,9 +66,9 @@ public class SponsorService {
         }
     }
 
-    public List<JSONObject> list() {
+    public List<JSONObject> list(int page, int limit) {
         try {
-            final List<JSONObject> list = repository.list();
+            final List<JSONObject> list = repository.list(page, limit);
             return list.stream().peek(x -> {
                 x.put(User.USER_NAME, userQueryService.getUserName(x.optString(UserExt.USER_T_ID)));
                 x.put(Common.DATE, new SimpleDateFormat("yyyy-MM-dd").format(x.optLong(Common.TIME)));

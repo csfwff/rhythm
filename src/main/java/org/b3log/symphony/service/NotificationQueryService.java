@@ -367,6 +367,7 @@ public class NotificationQueryService {
         subFilters.add(new PropertyFilter(Notification.NOTIFICATION_DATA_TYPE, FilterOperator.EQUAL, Notification.DATA_TYPE_C_INVITATION_LINK_USED));
         subFilters.add(new PropertyFilter(Notification.NOTIFICATION_DATA_TYPE, FilterOperator.EQUAL, Notification.DATA_TYPE_C_POINT_PERFECT_ARTICLE));
         subFilters.add(new PropertyFilter(Notification.NOTIFICATION_DATA_TYPE, FilterOperator.EQUAL, Notification.DATA_TYPE_C_POINT_REPORT_HANDLED));
+        subFilters.add(new PropertyFilter(Notification.NOTIFICATION_DATA_TYPE, FilterOperator.EQUAL, Notification.DATA_TYPE_C_RED_PACKET_FROM_SKY));
         filters.add(new CompositeFilter(CompositeFilterOperator.OR, subFilters));
         final Query query = new Query().setFilter(new CompositeFilter(CompositeFilterOperator.AND, filters));
         try {
@@ -417,6 +418,7 @@ public class NotificationQueryService {
         subFilters.add(new PropertyFilter(Notification.NOTIFICATION_DATA_TYPE, FilterOperator.EQUAL, Notification.DATA_TYPE_C_INVITATION_LINK_USED));
         subFilters.add(new PropertyFilter(Notification.NOTIFICATION_DATA_TYPE, FilterOperator.EQUAL, Notification.DATA_TYPE_C_POINT_PERFECT_ARTICLE));
         subFilters.add(new PropertyFilter(Notification.NOTIFICATION_DATA_TYPE, FilterOperator.EQUAL, Notification.DATA_TYPE_C_POINT_REPORT_HANDLED));
+        subFilters.add(new PropertyFilter(Notification.NOTIFICATION_DATA_TYPE, FilterOperator.EQUAL, Notification.DATA_TYPE_C_RED_PACKET_FROM_SKY));
         filters.add(new CompositeFilter(CompositeFilterOperator.OR, subFilters));
         final Query query = new Query().setPage(currentPageNum, pageSize).
                 setFilter(new CompositeFilter(CompositeFilterOperator.AND, filters)).
@@ -503,9 +505,14 @@ public class NotificationQueryService {
                     case Notification.DATA_TYPE_C_ABUSE_POINT_DEDUCT:
                         desTemplate = langPropsService.get("notificationAbusePointDeductLabel");
 
+                        int sum7 = 0;
+                        String memo7 = "Data broked";
+
                         final JSONObject transfer7 = pointtransferRepository.get(dataId);
-                        final int sum7 = transfer7.optInt(Pointtransfer.SUM);
-                        final String memo7 = transfer7.optString(Pointtransfer.DATA_ID);
+                        if (Objects.nonNull(transfer7)) {
+                            sum7 = transfer7.optInt(Pointtransfer.SUM);
+                            memo7 = transfer7.optString(Pointtransfer.DATA_ID);
+                        }
 
                         desTemplate = desTemplate.replace("{action}", memo7);
                         desTemplate = desTemplate.replace("{point}", String.valueOf(sum7));
@@ -609,6 +616,16 @@ public class NotificationQueryService {
                         break;
                     case Notification.DATA_TYPE_C_POINT_REPORT_HANDLED:
                         desTemplate = langPropsService.get("notification36Label");
+                        break;
+                    case Notification.DATA_TYPE_C_RED_PACKET_FROM_SKY:
+                        desTemplate = langPropsService.get("notification37Label");
+                        try {
+                            desTemplate = desTemplate.replace("{user}", dataId.split(":")[0]);
+                            desTemplate = desTemplate.replace("{point}", dataId.split(":")[1]);
+                        } catch (Exception e) {
+                            desTemplate = desTemplate.replace("{user}", dataId);
+                            desTemplate = desTemplate.replace("{point}", "?");
+                        }
                         break;
                     default:
                         throw new AssertionError();

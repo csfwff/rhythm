@@ -82,7 +82,7 @@
                 </div>
             <#else>
                 <a target="_blank" rel="nofollow" href="${servePath}/member/${notification.userName}">
-                    <div class="avatar tooltipped tooltipped-se" aria-label="${notification.userName}" style="background-image:url('${notification.userAvatarURL}')"></div>
+                    <div class="avatar tooltipped tooltipped-se" aria-label="${notification.userName}" style="background-image:url('${notification.userAvatarURL48}')"></div>
                 </a>
                 <div class="fn-flex-1">
                     <div class="fn-flex">
@@ -100,7 +100,7 @@
             </#if>
         <#elseif 39 == notification.dataType>
             <a target="_blank" rel="nofollow" href="${servePath}/member/${notification.userName}">
-                <div class="avatar tooltipped tooltipped-se" aria-label="${notification.userName}" style="background-image:url('${notification.userAvatarURL}')"></div>
+                <div class="avatar tooltipped tooltipped-se" aria-label="${notification.userName}" style="background-image:url('${notification.userAvatarURL48}')"></div>
             </a>
             <div class="fn-flex-1">
                 <div class="fn-flex">

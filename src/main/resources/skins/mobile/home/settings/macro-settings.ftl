@@ -55,6 +55,8 @@
                     ${helpLabel}
                     <#elseif type == "system">
                     个性化
+                    <#elseif type == "identity">
+                        <svg style="vertical-align: -1px;"><use xlink:href="#identity"></use></svg>&nbsp;官方身份认证
                     </#if>
 
                     <svg class="fn-right"><use xlink:href="#chevron-down"></use></svg>
@@ -70,6 +72,7 @@
                     <li<#if 'point' == type> class="fn-none"</#if>><a href="${servePath}/settings/point">${pointLabel}</a></li>
                     <li<#if 'location' == type> class="fn-none"</#if>><a href="${servePath}/settings/location">${geoLabel}</a></li>
                     <li<#if 'privacy' == type> class="fn-none"</#if>><a href="${servePath}/settings/privacy">${privacyLabel}</a></li>
+                    <li<#if 'identity' == type> class="fn-none"</#if>><a href="${servePath}/settings/identity"><svg style="vertical-align: -1px;"><use xlink:href="#identity"></use></svg>&nbsp;官方身份认证</a></li>
                     <li<#if 'i18n' == type> class="fn-none"</#if>><a href="${servePath}/settings/i18n">${i18nLabel}</a></li>
                     <li<#if 'data' == type> class="fn-none"</#if>><a href="${servePath}/settings/data">${dataLabel}</a></li>
                     <li<#if 'help' == type> class="current"</#if>><a href="${servePath}/settings/help">${helpLabel}</a></li>

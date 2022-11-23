@@ -399,21 +399,21 @@
                 <div class="fn__flex">
                     <label class="mid">
                         <div>勋章名称</div>
-                        <input type="text" name="name" value=""/>
+                        <input id="metal-name" type="text" name="name" value=""/>
                     </label>
                     <label>
                         <div>描述</div>
-                        <input type="text" name="description" value=""/>
+                        <input id="metal-desc" type="text" name="description" value=""/>
                     </label>
                 </div>
                 <div class="fn__flex">
                     <label class="mid">
                         <div>属性</div>
-                        <input type="text" name="attr" value=""/>
+                        <input id="metal-attr" type="text" name="attr" value=""/>
                     </label>
                     <label>
                         <div>数据</div>
-                        <input type="text" name="data" value=""/>
+                        <input id="metal-data" type="text" name="data" value=""/>
                     </label>
                 </div>
                 <br/>
@@ -425,7 +425,48 @@
                 属性示例：<br>
                 url=[图标URL]&backcolor=0000ff&fontcolor=ffffff<br>
                 数据示例：<br>
-                暂时无需填写，留空即可
+                暂时无需填写，留空即可<br><br>
+                快捷勋章：<br>
+                <button class="btn" onclick="
+                    $('#metal-name').val('纪律委员');
+                    $('#metal-desc').val('摸鱼派管理组成员');
+                    $('#metal-attr').val('url=https://pwl.stackoverflow.wiki/2021/12/011shield-46ce360b.jpg&backcolor=2568ff&fontcolor=ffffff');
+                ">纪律委员</button>
+                <button class="btn" onclick="
+                    $('#metal-name').val('开发');
+                    $('#metal-desc').val('摸鱼派官方开发组成员');
+                    $('#metal-attr').val('url=https://pwl.stackoverflow.wiki/2021/12/metaldev-db507262.png&backcolor=483d8b&fontcolor=f8f8ff');
+                ">开发</button>
+                <button class="btn" onclick="
+                    $('#metal-name').val('Operator');
+                    $('#metal-desc').val('摸鱼派管理组成员');
+                    $('#metal-attr').val('url=https://www.lingmx.com/52pj/images/op3.png&backcolor=b91c22&fontcolor=ffffff');
+                ">Operator</button>
+                <button class="btn" onclick="
+                    $('#metal-name').val('超级会员');
+                    $('#metal-desc').val('摸鱼派超级会籍成员');
+                    $('#metal-attr').val('url=https://pwl.stackoverflow.wiki/2021/12/vip-aff3ea5d.png&backcolor=696969&fontcolor=ffd700');
+                ">超级会员</button>
+                <button class="btn" onclick="
+                    $('#metal-name').val('礼仪委员');
+                    $('#metal-desc').val('摸鱼派文明标兵，有什么不懂的请问我哦');
+                    $('#metal-attr').val('url=https://file.fishpi.cn/2022/06/013happy-6e078931.png&backcolor=f0e68c&fontcolor=ff0000');
+                ">礼仪委员</button>
+                <button class="btn" onclick="
+                    $('#metal-name').val('小姐姐认证 ');
+                    $('#metal-desc').val('摸鱼派官方认证，她是小姐姐哟');
+                    $('#metal-attr').val('url=https://file.fishpi.cn/2022/07/girl-73f46e57.jpg&backcolor=ffb6c1&fontcolor=ff1493');
+                ">小姐姐认证</button>
+                <button class="btn" onclick="
+                    $('#metal-name').val('LGBT ');
+                    $('#metal-desc').val('摸鱼派最可爱的群体 🏳️‍🌈');
+                    $('#metal-attr').val('url=https://file.fishpi.cn/2022/07/截屏20220707234552-4c0711d1.png&backcolor=b0c4de&fontcolor=f0f8ff');
+                ">LGBT</button>
+                <button class="btn" onclick="
+                    $('#metal-name').val('00后');
+                    $('#metal-desc').val('这片江山已经是00后的天下了');
+                    $('#metal-attr').val('url=https://file.fishpi.cn/2022/07/啤酒-8227499a.jpg&backcolor=ffffff&fontcolor=ffa500');
+                ">00后</button>
             </div>
         </div>
     </div>
@@ -445,12 +486,30 @@
                     </label>
                     <label class="mid">
                         <div>勋章名称</div>
-                        <input type="text" name="name" value=""/>
+                        <input id="remove-metal-name" type="text" name="name" value=""/>
                     </label>
                 </div>
                 <br/>
                 <button type="submit" class="green fn-right">${submitLabel}</button>
             </form>
+            <div style="float: left;font-size: 12px;color: rgba(0,0,0,0.38);">
+                快速移除勋章：<br>
+                <div id="remove-metal-panel">
+                </div>
+                <script>
+                    let html = '';
+                    let sysMetal = ${sysMetal};
+                    let list = sysMetal.list;
+                    if (list !== undefined && list.length !== 0) {
+                        for (let i = 0; i < list.length; i++) {
+                            let m = list[i];
+                            html += '' +
+                                '<button class="btn" onclick="$(\'#remove-metal-name\').val(\'' + m.name + '\')">' + m.name + '</button>';
+                        }
+                    }
+                    document.getElementById('remove-metal-panel').innerHTML = html;
+                </script>
+            </div>
         </div>
     </div>
     </#if>

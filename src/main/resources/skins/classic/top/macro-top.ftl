@@ -63,6 +63,11 @@
                 <link rel="canonical" href="${servePath}/top/mofish">
             </@head>
         </#if>
+        <#if type == "smallmofish">
+            <@head title="摸鱼小闯关游戏排行 - ${symphonyLabel}">
+                <link rel="canonical" href="${servePath}/top/smallmofish">
+            </@head>
+        </#if>
         <#if type == "lifeRestart">
             <@head title="人生重开模拟器成就排行 - ${symphonyLabel}">
                 <link rel="canonical" href="${servePath}/top/lifeRestart">
@@ -71,6 +76,21 @@
         <#if type == "emoji">
             <@head title="Emoji 真假小黄脸 游戏总分排行 - ${symphonyLabel}">
                 <link rel="canonical" href="${servePath}/top/emoji">
+            </@head>
+        </#if>
+        <#if type == "xiaoice">
+            <@head title="小冰游戏排行 - ${symphonyLabel}">
+                <link rel="canonical" href="${servePath}/top/xiaoice">
+            </@head>
+        </#if>
+        <#if type == "invite">
+            <@head title="邀请成员排行 - ${symphonyLabel}">
+                <link rel="canonical" href="${servePath}/top/invite">
+            </@head>
+        </#if>
+        <#if type == "donate">
+            <@head title="捐助成员排行 - ${symphonyLabel}">
+                <link rel="canonical" href="${servePath}/top/donate">
             </@head>
         </#if>
         <link rel="stylesheet" href="${staticServePath}/css/index.css?${staticResourceVersion}" />

@@ -80,6 +80,9 @@
         <#if type == "auditlog">
             <@head title="${auditlogLabel} - ${symphonyLabel}"></@head>
         </#if>
+        <#if type == "ip">
+            <@head title="IP 管理 - ${symphonyLabel}"></@head>
+        </#if>
     </head>
     <body>
         <#include "../header.ftl">
@@ -129,6 +132,9 @@
                     <#if type == "auditlog"  && permissions["menuAdmin"].permissionGrant>
                         ${auditlogLabel}
                     </#if>
+                    <#if type == "ip"  && permissions["ipManage"].permissionGrant>
+                        IP 管理
+                    </#if>
                     <svg class="fn-right"><use xlink:href="#chevron-down"></use></svg>
                 </div>
                 <div class="fn-hr5"></div>
@@ -174,6 +180,9 @@
                     </#if>
                     <#if permissions["menuAdmin"].permissionGrant>
                     <li<#if type == "auditlog"> class="fn-none"</#if>><a href="${servePath}/admin/auditlog">${auditlogLabel}</a></li>
+                    </#if>
+                    <#if permissions["ipManage"].permissionGrant>
+                    <li<#if type == "ip"> class="fn-none"</#if>><a href="${servePath}/admin/ip">IP 管理</a></li>
                     </#if>
                 </ul>
             </div>

@@ -51,6 +51,7 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import pers.adlered.simplecurrentlimiter.main.SimpleCurrentLimiter;
 
+import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
@@ -179,6 +180,9 @@ public class ChatroomProcessor {
     @Inject
     private UserRepository userRepository;
 
+    @Inject
+    private AvatarQueryService avatarQueryService;
+
     /**
      * Register request handlers.
      */
@@ -230,12 +234,27 @@ public class ChatroomProcessor {
             String userId = currentUser.optString(Keys.OBJECT_ID);
             // ==? 是否禁言中 ?==
             int muted = ChatRoomBot.muted(userId);
+            // 是否全员禁言中
+            boolean isAll = muted < 0 && muted != -1;
+            if (isAll){
+                if (DataModelService.hasPermission(currentUser.optString(User.USER_ROLE), 3)){
+                    // OP 豁免全员禁言
+                    muted = -1;
+                }else {
+                    // 回正
+                    muted *= -1;
+                }
+            }
             int muteDay = muted / (24 * 60 * 60);
             int muteHour = muted % (24 * 60 * 60) / (60 * 60);
             int muteMinute = muted % (24 * 60 * 60) % (60 * 60) / 60;
             int muteSecond = muted % (24 * 60 * 60) % (60 * 60) % 60;
             if (muted != -1) {
-                context.renderJSON(StatusCodes.ERR).renderMsg("抢红包失败，原因：正在禁言中，剩余时间 " + muteDay + " 天 " + muteHour + " 小时 " + muteMinute + " 分 " + muteSecond + " 秒。");
+                if (isAll){
+                    context.renderJSON(StatusCodes.ERR).renderMsg("抢红包失败，原因：正在全员禁言中，剩余时间 " + muteDay + " 天 " + muteHour + " 小时 " + muteMinute + " 分 " + muteSecond + " 秒。");
+                }else {
+                    context.renderJSON(StatusCodes.ERR).renderMsg("抢红包失败，原因：正在禁言中，剩余时间 " + muteDay + " 天 " + muteHour + " 小时 " + muteMinute + " 分 " + muteSecond + " 秒。");
+                }
                 return;
             }
             // ==! 是否禁言中 !==
@@ -260,6 +279,7 @@ public class ChatroomProcessor {
             JSONObject info = new JSONObject();
             JSONObject sender = userQueryService.getUser(redPacket.optString("senderId"));
             info.put(UserExt.USER_AVATAR_URL, sender.optString(UserExt.USER_AVATAR_URL));
+            avatarQueryService.fillUserAvatarURL(info);
             info.put(User.USER_NAME, sender.optString(User.USER_NAME));
             info.put("count", redPacket.optInt("count"));
             info.put("got", redPacket.optInt("got"));
@@ -491,7 +511,7 @@ public class ChatroomProcessor {
             JSONArray source3 = source2.optJSONArray("who");
             source3.put(new JSONObject().put("userMoney", meGot).put("userId", userId).put("userName", userName).put("time", new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(System.currentTimeMillis())).put("avatar", userQueryService.getUser(userId).optString(UserExt.USER_AVATAR_URL)));
             source2.put("who", source3);
-            source.put("content", source2);
+            source.put("content", source2.toString());
             final Transaction transaction = chatRoomRepository.beginTransaction();
             chatRoomRepository.update(oId, new JSONObject().put("content", source.toString()));
             transaction.commit();
@@ -529,9 +549,7 @@ public class ChatroomProcessor {
             } else if ("rockPaperScissors".equalsIgnoreCase(redPacket.getString("type"))) {
                 RED_PACKET_BUCKET.remove(oId);
             }
-            if (count == got + 1) {
-                ChatroomChannel.notifyChat(redPacketStatus);
-            }
+            ChatroomChannel.notifyChat(redPacketStatus);
         } catch (Exception e) {
             context.renderJSON(StatusCodes.ERR).renderMsg("红包非法");
             LOGGER.log(Level.ERROR, "Open Red Packet failed on ChatRoomProcessor.");
@@ -584,13 +602,12 @@ public class ChatroomProcessor {
     final private static SimpleCurrentLimiter chatRoomLivenessLimiter = new SimpleCurrentLimiter(30, 1);
     final private static SimpleCurrentLimiter risksControlMessageLimiter = new SimpleCurrentLimiter(15 * 60, 1);
     final private static SimpleCurrentLimiter openRedPacketLimiter = new SimpleCurrentLimiter(30 * 60, 1);
-
     /**
      * Send chatroom message.
      *
      * @param context Everything
      */
-    public synchronized void addChatRoomMsg(final RequestContext context) {
+    public void addChatRoomMsg(final RequestContext context) {
         if (ChatRoomBot.record(context)) {
             final JSONObject requestJSONObject = (JSONObject) context.attr(Keys.REQUEST);
             String content = requestJSONObject.optString(Common.CONTENT);
@@ -623,6 +640,10 @@ public class ChatroomProcessor {
             String userId = currentUser.optString(Keys.OBJECT_ID);
 
             if (content.startsWith("[redpacket]") && content.endsWith("[/redpacket]")) {
+                // 是否收税
+                Boolean collectTaxes = false;
+                // 税率
+                BigDecimal taxRate = new BigDecimal("0.05");
                 try {
                     String redpacketString = content.replaceAll("^\\[redpacket\\]", "").replaceAll("\\[/redpacket\\]$", "");
                     JSONObject redpacket = new JSONObject(redpacketString);
@@ -692,6 +713,8 @@ public class ChatroomProcessor {
                                 }
                                 count = 1;
                                 toatlMoney = money;
+                                // 征税
+                                collectTaxes = true;
                                 break;
                             case "average":
                                 toatlMoney = money * count;
@@ -722,7 +745,7 @@ public class ChatroomProcessor {
                         }
                         final boolean succ = null != pointtransferMgmtService.transfer(userId, Pointtransfer.ID_C_SYS,
                                 Pointtransfer.TRANSFER_TYPE_C_ACTIVITY_SEND_RED_PACKET,
-                                toatlMoney, "", System.currentTimeMillis(), "");
+                                toatlMoney, "", System.currentTimeMillis(), collectTaxes ? "collectTaxes" : "");
                         if (!succ) {
                             context.renderJSON(StatusCodes.ERR).renderMsg("少年，你的积分不足！");
                             return;
@@ -735,7 +758,8 @@ public class ChatroomProcessor {
                     JSONObject redPacketJSON = new JSONObject();
                     redPacketJSON.put("senderId", userId);
                     redPacketJSON.put("type", type);
-                    redPacketJSON.put("money", money);
+                    // 收税的时候 直接扣减
+                    redPacketJSON.put("money", collectTaxes ? BigDecimal.valueOf(money).multiply(BigDecimal.ONE.subtract(taxRate)).intValue() : money);
                     redPacketJSON.put("count", count);
                     redPacketJSON.put("msg", message);
                     redPacketJSON.put("recivers", recivers);
@@ -831,23 +855,29 @@ public class ChatroomProcessor {
 
                 context.renderJSON(StatusCodes.SUCC);
             } else {
-                // 加活跃
-                int risksControlled = ChatRoomBot.risksControlled(userId);
-                if (risksControlled != -1) {
-                    if (risksControlMessageLimiter.access(userId)) {
+                // 宵禁
+                int start = 1930;
+                int end = 800;
+                int now = Integer.parseInt(new SimpleDateFormat("HHmm").format(new Date()));
+                if (now > end && now < start) {
+                    // 加活跃
+                    int risksControlled = ChatRoomBot.risksControlled(userId);
+                    if (risksControlled != -1) {
+                        if (risksControlMessageLimiter.access(userId)) {
+                            try {
+                                if (chatRoomLivenessLimiter.access(userId)) {
+                                    livenessMgmtService.incLiveness(userId, Liveness.LIVENESS_COMMENT);
+                                }
+                            } catch (Exception ignored) {
+                            }
+                        }
+                    } else {
                         try {
                             if (chatRoomLivenessLimiter.access(userId)) {
                                 livenessMgmtService.incLiveness(userId, Liveness.LIVENESS_COMMENT);
                             }
                         } catch (Exception ignored) {
                         }
-                    }
-                } else {
-                    try {
-                        if (chatRoomLivenessLimiter.access(userId)) {
-                            livenessMgmtService.incLiveness(userId, Liveness.LIVENESS_COMMENT);
-                        }
-                    } catch (Exception ignored) {
                     }
                 }
 
@@ -999,6 +1029,15 @@ public class ChatroomProcessor {
             dataModel.put(UserExt.CHAT_ROOM_PICTURE_STATUS, UserExt.USER_XXX_STATUS_C_ENABLED);
             dataModel.put("level3Permitted", false);
         }
+        // 是否宵禁
+        int start = 1930;
+        int end = 800;
+        int now = Integer.parseInt(new SimpleDateFormat("HHmm").format(new Date()));
+        if (now > end && now < start) {
+            dataModel.put("nightDisableMode", false);
+        } else {
+            dataModel.put("nightDisableMode", true);
+        }
         dataModelService.fillHeaderAndFooter(context, dataModel);
         dataModelService.fillRandomArticles(dataModel);
         dataModelService.fillSideHotArticles(dataModel);
@@ -1035,6 +1074,7 @@ public class ChatroomProcessor {
             String oId = context.param("oId");
             int size = Integer.parseInt(context.param("size"));
             int mode = Integer.parseInt(context.param("mode"));
+            String type = context.param("type");
             JSONObject currentUser = Sessions.getUser();
             try {
                 currentUser = ApiProcessor.getUserByKey(context.param("apiKey"));
@@ -1048,7 +1088,7 @@ public class ChatroomProcessor {
             JSONObject ret = new JSONObject();
             ret.put(Keys.CODE, StatusCodes.SUCC);
             ret.put(Keys.MSG, "");
-            ret.put(Keys.DATA, getContext(oId, size, mode));
+            ret.put(Keys.DATA, getContext(oId, size, mode, type));
             context.renderJSON(ret);
         } catch (Exception e) {
             context.sendStatus(500);
@@ -1075,7 +1115,8 @@ public class ChatroomProcessor {
                     return;
                 }
             }
-            List<JSONObject> jsonObject = getMessages(page);
+            String type = context.param("type");
+            List<JSONObject> jsonObject = getMessages(page,type);
             JSONObject ret = new JSONObject();
             ret.put(Keys.CODE, StatusCodes.SUCC);
             ret.put(Keys.MSG, "");
@@ -1091,7 +1132,7 @@ public class ChatroomProcessor {
      *
      * @param context
      */
-    private static Map<String, String> revoke = new HashMap<>();
+    private static Map<String/*userName*/, String/*data-times*/> revoke = new HashMap<>();
 
     public void revokeMessage(final RequestContext context) {
         try {
@@ -1115,6 +1156,7 @@ public class ChatroomProcessor {
             String msgUser = new JSONObject(message.optString("content")).optString(User.USER_NAME);
             String curUser = currentUser.optString(User.USER_NAME);
             boolean isAdmin = DataModelService.hasPermission(currentUser.optString(User.USER_ROLE), 3);
+            LogsService.chatroomLog(context, removeMessageId, curUser);
 
             if (isAdmin) {
                 final Transaction transaction = chatRoomRepository.beginTransaction();
@@ -1125,51 +1167,85 @@ public class ChatroomProcessor {
                 jsonObject.put(Common.TYPE, "revoke");
                 jsonObject.put("oId", removeMessageId);
                 ChatroomChannel.notifyChat(jsonObject);
-                return;
             } else if (msgUser.equals(curUser)) {
                 final String date = DateFormatUtils.format(System.currentTimeMillis(), "yyyyMMdd");
-                if (revoke.get(curUser) == null || !revoke.get(curUser).equals(date)) {
-                    final Transaction transaction = chatRoomRepository.beginTransaction();
-                    chatRoomRepository.remove(removeMessageId);
-                    transaction.commit();
-                    context.renderJSON(StatusCodes.SUCC).renderMsg("撤回成功，下次发消息一定要三思哦！");
-                    JSONObject jsonObject = new JSONObject();
-                    jsonObject.put(Common.TYPE, "revoke");
-                    jsonObject.put("oId", removeMessageId);
-                    ChatroomChannel.notifyChat(jsonObject);
-                    revoke.put(curUser, date);
-                    return;
+                // 撤回记录
+                String dateTimes = revoke.getOrDefault(curUser, date + ",0");
+                // 分割
+                String[] date_times = dateTimes.split(",");
+                // 上次撤回日期
+                String nDate = date_times[0];
+                // 次数
+                Integer times;
+                // 兼容旧数据
+                if (date_times.length > 1) {
+                    // 撤回次数
+                    times = Integer.valueOf(date_times[1]);
                 } else {
-                    context.renderJSON(StatusCodes.ERR).renderMsg("撤回失败，你每天只有一次撤回的机会！");
+                    // 今天撤回过了, 免费了一次? 要不要追扣一把
+                    times = 1;
                 }
+
+                // 当前日期不是今天 还没撤回过, times 归 0
+                if (!nDate.equals(date)) {
+                    times = 0;
+                }
+                // 需要扣减的积分 首次免费 以后 f(x) = 32x
+                Integer needDelPoint = times * 32;
+                // 扣钱
+                final boolean succ = null != pointtransferMgmtService.transfer(currentUser.optString(Keys.OBJECT_ID), Pointtransfer.ID_C_SYS,
+                        Pointtransfer.TRANSFER_TYPE_C_CHAT_ROOM_REVOKE,
+                        needDelPoint, "", System.currentTimeMillis(), "");
+                if (!succ) {
+                    context.renderJSON(StatusCodes.ERR).renderMsg("少年，你的积分不足！要为自己的言行负责~");
+                    return;
+                }
+                // 开启事务
+                final Transaction transaction = chatRoomRepository.beginTransaction();
+                // 撤回
+                chatRoomRepository.remove(removeMessageId);
+                // 提交事务
+                transaction.commit();
+                context.renderJSON(StatusCodes.SUCC).renderMsg("撤回成功，下次发消息一定要三思哦！本次消耗积分: " + needDelPoint);
+                JSONObject jsonObject = new JSONObject();
+                jsonObject.put(Common.TYPE, "revoke");
+                jsonObject.put("oId", removeMessageId);
+                ChatroomChannel.notifyChat(jsonObject);
+                revoke.put(curUser, date + "," + (times + 1));
             }
         } catch (Exception e) {
+            e.printStackTrace();
             context.renderJSON(StatusCodes.ERR).renderMsg("撤回失败，请联系 @adlered。");
         }
     }
-
     /**
      * Get all messages from database.
      *
      * @return
      */
-    public static List<JSONObject> getMessages(int page) {
+    public static List<JSONObject> getMessages(int page, String type) {
         try {
             final BeanManager beanManager = BeanManager.getInstance();
             final ChatRoomRepository chatRoomRepository = beanManager.getReference(ChatRoomRepository.class);
+            final AvatarQueryService avatarQueryService = beanManager.getReference(AvatarQueryService.class);
             List<JSONObject> messageList = chatRoomRepository.getList(new Query()
                     .setPage(page, 25)
                     .addSort(Keys.OBJECT_ID, SortDirection.DESCENDING));
             List<JSONObject> msgs = messageList.stream().map(msg -> new JSONObject(msg.optString("content")).put("oId", msg.optString(Keys.OBJECT_ID))).collect(Collectors.toList());
             msgs = msgs.stream().map(msg -> JSONs.clone(msg).put(Common.TIME, new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(msg.optLong(Common.TIME)))).collect(Collectors.toList());
-            msgs = msgs.stream().map(msg -> JSONs.clone(msg.put("content", processMarkdown(msg.optString("content"))))).collect(Collectors.toList());
+            if(!"md".equals(type)){
+                msgs = msgs.stream().map(msg -> JSONs.clone(msg.put("content", processMarkdown(msg.optString("content"))))).collect(Collectors.toList());
+            }
+            for (JSONObject msg : msgs) {
+                avatarQueryService.fillUserAvatarURL(msg);
+            }
             return msgs;
         } catch (RepositoryException e) {
             return new LinkedList<>();
         }
     }
 
-    public static List<JSONObject> getContext(String oId, int size, int mode) {
+    public static List<JSONObject> getContext(String oId, int size, int mode, String type) {
         try {
             final BeanManager beanManager = BeanManager.getInstance();
             final ChatRoomRepository chatRoomRepository = beanManager.getReference(ChatRoomRepository.class);
@@ -1205,7 +1281,9 @@ public class ChatroomProcessor {
             }
             msgs = msgs.stream().map(msg -> new JSONObject(msg.optString("content")).put("oId", msg.optString(Keys.OBJECT_ID))).collect(Collectors.toList());
             msgs = msgs.stream().map(msg -> JSONs.clone(msg).put(Common.TIME, new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(msg.optLong(Common.TIME)))).collect(Collectors.toList());
-            msgs = msgs.stream().map(msg -> JSONs.clone(msg.put("content", processMarkdown(msg.optString("content"))))).collect(Collectors.toList());
+            if(!"md".equals(type)){
+                msgs = msgs.stream().map(msg -> JSONs.clone(msg.put("content", processMarkdown(msg.optString("content"))))).collect(Collectors.toList());
+            }
             return msgs;
         } catch (RepositoryException e) {
             return new LinkedList<>();

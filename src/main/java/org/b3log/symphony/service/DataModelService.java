@@ -206,7 +206,7 @@ public class DataModelService {
     public void fillSponsors(final Map<String, Object> dataModel) {
         Stopwatchs.start("Fills sponsor user list info");
         try {
-            List<JSONObject> sponsors = sponsorService.list();
+            List<JSONObject> sponsors = sponsorService.list(1, 64);
             String recent;
             if (Objects.isNull(sponsors) || sponsors.isEmpty()) {
                 sponsors = Collections.emptyList();

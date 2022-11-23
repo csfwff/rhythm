@@ -18,6 +18,8 @@
  */
 package org.b3log.symphony.processor;
 
+import jodd.http.HttpRequest;
+import jodd.http.HttpResponse;
 import org.b3log.latke.http.Dispatcher;
 import org.b3log.latke.http.Request;
 import org.b3log.latke.http.RequestContext;
@@ -25,14 +27,24 @@ import org.b3log.latke.http.renderer.AbstractFreeMarkerRenderer;
 import org.b3log.latke.ioc.BeanManager;
 import org.b3log.latke.ioc.Inject;
 import org.b3log.latke.ioc.Singleton;
+import org.b3log.latke.model.User;
 import org.b3log.symphony.model.Common;
+import org.b3log.symphony.model.UserExt;
 import org.b3log.symphony.processor.middleware.AnonymousViewCheckMidware;
+import org.b3log.symphony.repository.PointtransferRepository;
+import org.b3log.symphony.repository.SponsorRepository;
 import org.b3log.symphony.service.*;
 import org.b3log.symphony.util.Symphonys;
+import org.b3log.symphony.util.Vocation;
+import org.json.JSONArray;
 import org.json.JSONObject;
 
+import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+
+import static org.b3log.symphony.model.Common.UA;
 
 /**
  * Top ranking list processor.
@@ -82,6 +94,21 @@ public class TopProcessor {
     private LinkQueryService linkQueryService;
 
     /**
+     * Point transfer repository.
+     */
+    @Inject
+    private PointtransferRepository pointtransferRepository;
+
+    /**
+     * Sponsor repository.
+     */
+    @Inject
+    private SponsorRepository sponsorRepository;
+
+    @Inject
+    private AvatarQueryService avatarQueryService;
+
+    /**
      * Register request handlers.
      */
     public static void register() {
@@ -97,9 +124,13 @@ public class TopProcessor {
         Dispatcher.get("/top/online", topProcessor::showOnline, anonymousViewCheckMidware::handle);
         Dispatcher.get("/top/adr", topProcessor::showADR, anonymousViewCheckMidware::handle);
         Dispatcher.get("/top/mofish", topProcessor::showMofish, anonymousViewCheckMidware::handle);
+        Dispatcher.get("/top/smallmofish", topProcessor::showSmallMofish, anonymousViewCheckMidware::handle);
         Dispatcher.get("/top/lifeRestart", topProcessor::showLifeRestart, anonymousViewCheckMidware::handle);
         Dispatcher.get("/top/evolve", topProcessor::showEvolve, anonymousViewCheckMidware::handle);
         Dispatcher.get("/top/emoji", topProcessor::showEmoji, anonymousViewCheckMidware::handle);
+        Dispatcher.get("/top/xiaoice", topProcessor::showXiaoice, anonymousViewCheckMidware::handle);
+        Dispatcher.get("/top/invite", topProcessor::showInvite, anonymousViewCheckMidware::handle);
+        Dispatcher.get("/top/donate", topProcessor::showDonate, anonymousViewCheckMidware::handle);
     }
 
     /**
@@ -263,6 +294,24 @@ public class TopProcessor {
         dataModelService.fillLatestCmts(dataModel);
     }
 
+     /**
+     * Shows SmallMofish score ranking list.
+     *
+     * @param context
+     */
+    public void showSmallMofish(final RequestContext context) {
+      final AbstractFreeMarkerRenderer renderer = new SkinRenderer(context, "top/smallmofish.ftl");
+      final Map<String, Object> dataModel = renderer.getDataModel();
+      final List<JSONObject> users = activityQueryService.getTopSmallMofish(Symphonys.TOP_CNT);
+      dataModel.put("topUsers", users);
+
+      dataModelService.fillHeaderAndFooter(context, dataModel);
+      dataModelService.fillRandomArticles(dataModel);
+      dataModelService.fillSideHotArticles(dataModel);
+      dataModelService.fillSideTags(dataModel);
+      dataModelService.fillLatestCmts(dataModel);
+  }
+
     /**
      * Shows Life Restart ranking list.
      *
@@ -273,6 +322,11 @@ public class TopProcessor {
         final Map<String, Object> dataModel = renderer.getDataModel();
         final List<JSONObject> users = activityQueryService.getTopLifeRestart(Symphonys.TOP_CNT);
         dataModel.put("topUsers", users);
+        for (JSONObject user : users) {
+            JSONObject profile = user.optJSONObject("profile");
+            avatarQueryService.fillUserAvatarURL(profile);
+            user.put("profile", profile);
+        }
 
         dataModelService.fillHeaderAndFooter(context, dataModel);
         dataModelService.fillRandomArticles(dataModel);
@@ -293,6 +347,11 @@ public class TopProcessor {
                 request.getParameter("type") : "achievement";
         final Map<String, Object> dataModel = renderer.getDataModel();
         final List<JSONObject> users = activityQueryService.getEvolve(type, Symphonys.TOP_CNT);
+        for (JSONObject user : users) {
+            JSONObject profile = user.optJSONObject("profile");
+            avatarQueryService.fillUserAvatarURL(profile);
+            user.put("profile", profile);
+        }
         dataModel.put("topUsers", users);
         dataModel.put("type", type);
 
@@ -302,4 +361,145 @@ public class TopProcessor {
         dataModelService.fillSideTags(dataModel);
         dataModelService.fillLatestCmts(dataModel);
     }
+
+    /**
+     * Shows Xiaoice ranking list.
+     *
+     * @param context
+     */
+    public void showXiaoice(final RequestContext context) {
+        final AbstractFreeMarkerRenderer renderer = new SkinRenderer(context, "top/xiaoice.ftl");
+        final Map<String, Object> dataModel = renderer.getDataModel();
+        final Request request = context.getRequest();
+        final String type = request.getParameter("type") != null ?
+                request.getParameter("type") : "0";
+        dataModel.put("type", type);
+        final HttpResponse response = HttpRequest.get("https://pwl.yuis.cc/GetXiaoIceGameRank?key=xiaoIceGame&type=" + type)
+                .connectionTimeout(3000).timeout(7000).header("User-Agent", Vocation.UA)
+                .send();
+        if (200 == response.statusCode()) {
+            response.charset("UTF-8");
+            final JSONObject result = new JSONObject(response.bodyText());
+            JSONArray dataList = result.optJSONArray("data");
+            List<JSONObject> resultList = new ArrayList<>();
+            for (int i = 0; i < dataList.length(); i++) {
+                JSONObject data = dataList.optJSONObject(i);
+                String uname = data.optString("uname");
+                JSONObject family = new JSONObject(data.optString("family"));
+
+                String[] lvFilter = new String[]{"黄阶低级", "黄阶中级", "黄阶高级", "玄阶低级", "玄阶中级", "玄阶高级", "地阶低级", "地阶中级", "地阶高级", "天阶低级", "天阶中级", "天阶高级"};
+                int ancestry = family.optInt("ancestry");
+                int gongfa = family.optInt("gongfa");
+                data.put("ancestry", lvFilter[ancestry]);
+                data.put("gongfa", lvFilter[gongfa]);
+                data.remove("family");
+                try {
+                    JSONObject user = userQueryService.getUserByName(uname);
+                    data.put("userAvatarURL", user.optString(UserExt.USER_AVATAR_URL));
+                    data.put("userIntro", user.optString(UserExt.USER_INTRO));
+                    data.put("userURL", user.optString(User.USER_URL));
+                    data.put("userNo", user.optInt(UserExt.USER_NO));
+                    data.put("userAppRole", user.optInt(UserExt.USER_APP_ROLE));
+                    avatarQueryService.fillUserAvatarURL(data);
+                } catch (Exception e) {
+                    continue;
+                }
+
+                resultList.add(data);
+            }
+            dataModel.put("data", resultList);
+        }
+
+        dataModelService.fillHeaderAndFooter(context, dataModel);
+        dataModelService.fillRandomArticles(dataModel);
+        dataModelService.fillSideHotArticles(dataModel);
+        dataModelService.fillSideTags(dataModel);
+        dataModelService.fillLatestCmts(dataModel);
+    }
+
+    /**
+     * Shows Invite ranking list.
+     *
+     * @param context
+     */
+    public void showInvite(final RequestContext context) {
+        final AbstractFreeMarkerRenderer renderer = new SkinRenderer(context, "top/invite.ftl");
+        final Map<String, Object> dataModel = renderer.getDataModel();
+        try {
+            List<JSONObject> list = pointtransferRepository.select("select toId,count(toId) as c " +
+                    "from " + pointtransferRepository.getName() + " " +
+                    "where type = 6 " +
+                    "group by toId " +
+                    "order by c desc " +
+                    "limit 64;");
+            List<JSONObject> result = new ArrayList<>();
+            for (JSONObject user : list) {
+                try {
+                    JSONObject userData = userQueryService.getUser(user.optString("toId"));
+                    avatarQueryService.fillUserAvatarURL(userData);
+                    user.put("profile", userData);
+                    result.add(user);
+                } catch (Exception e) {
+                    continue;
+                }
+            }
+            dataModel.put("data", result);
+        } catch (Exception ignored) {
+        }
+
+        dataModelService.fillHeaderAndFooter(context, dataModel);
+        dataModelService.fillRandomArticles(dataModel);
+        dataModelService.fillSideHotArticles(dataModel);
+        dataModelService.fillSideTags(dataModel);
+        dataModelService.fillLatestCmts(dataModel);
+    }
+
+    /**
+     * Shows Donate ranking list.
+     *
+     * @param context
+     */
+    public void showDonate(final RequestContext context) {
+      final AbstractFreeMarkerRenderer renderer = new SkinRenderer(context, "top/donate.ftl");
+      final Map<String, Object> dataModel = renderer.getDataModel();
+      try {
+        List<JSONObject> totalList = sponsorRepository.select("select sum(amount) as totalAmount " +
+                  "from " + sponsorRepository.getName() + " " +
+                  "limit 1;");
+        JSONObject totalJSON = totalList.get(0);
+        double totalAmount = totalJSON.optDouble("totalAmount");
+        BigDecimal donateMakeDaysBigDecimal = new BigDecimal(String.valueOf(totalAmount / 5));
+        double donateMakeDays = donateMakeDaysBigDecimal.setScale(0, BigDecimal.ROUND_HALF_UP).doubleValue();
+        totalJSON.put("donateMakeDays", donateMakeDays);
+        dataModel.put("totalData", totalJSON);
+      }
+      catch (Exception ignored) {
+      }
+      try {
+          List<JSONObject> list = sponsorRepository.select("select userId as userId,sum(amount) as total,count(*) as totalCount " +
+                  "from " + sponsorRepository.getName() + " " +
+                  "group by userId " +
+                  "order by total desc " +
+                  "limit 64;");
+          List<JSONObject> result = new ArrayList<>();
+          for (JSONObject user : list) {
+              try {
+                  JSONObject userData = userQueryService.getUser(user.optString("userId"));
+                  avatarQueryService.fillUserAvatarURL(userData);
+                  user.put("profile", userData);
+                  result.add(user);
+              } catch (Exception e) {
+                  continue;
+              }
+          }
+          dataModel.put("data", result);
+      } catch (Exception ignored) {
+      }
+
+      dataModelService.fillHeaderAndFooter(context, dataModel);
+      dataModelService.fillRandomArticles(dataModel);
+      dataModelService.fillSideHotArticles(dataModel);
+      dataModelService.fillSideTags(dataModel);
+      dataModelService.fillLatestCmts(dataModel);
+  }
 }

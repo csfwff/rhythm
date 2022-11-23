@@ -84,6 +84,37 @@
                                 </div>
                             </li>
                             <li class="fn__flex">
+                                <svg class="avatar"><use xlink:href="#invite"></use></svg>
+                                <div class="fn-flex-1">
+                                    <h2>
+                                        <a class="title"
+                                           href="${servePath}/top/invite">邀请成员排行</a>
+                                    </h2>
+                                    <div class="ft-fade ft-smaller">感谢你们对摸鱼派的杰出贡献</div>
+                                </div>
+                            </li>
+                            <li class="fn__flex">
+                                <div class="avatar" style=" font-size: 2rem; margin-bottom: 0.5rem;display: flex;
+                                            justify-content: center;align-items: center;">💰</div>
+                                <div class="fn-flex-1">
+                                    <h2>
+                                        <a class="title"
+                                           href="${servePath}/top/donate">捐助排行</a>
+                                    </h2>
+                                    <div class="ft-fade ft-smaller">摸鱼派金主爸爸排名，谢谢老板！</div>
+                                </div>
+                            </li>
+                            <li class="fn__flex">
+                                <img class="avatar" src="https://file.fishpi.cn/2022/06/83501655456862pic-9bdc4e42.jpg" />
+                                <div class="fn-flex-1">
+                                    <h2>
+                                        <a class="title"
+                                           href="${servePath}/top/xiaoice">小冰游戏排行</a>
+                                    </h2>
+                                    <div class="ft-fade ft-smaller">看看是谁最肝？</div>
+                                </div>
+                            </li>
+                            <li class="fn__flex">
                                 <img class="avatar" src="https://pwl.stackoverflow.wiki/evolve/evolved.ico" />
                                 <div class="fn-flex-1">
                                     <h2>
@@ -111,6 +142,16 @@
                                            href="${servePath}/top/mofish">摸鱼大闯关排行榜</a>
                                     </h2>
                                     <div class="ft-fade ft-smaller">摸鱼大闯关排行榜的玩家闯关数排名</div>
+                                </div>
+                            </li>
+                            <li class="fn__flex">
+                                <img class="avatar" src="${staticServePath}/images/mofish.png" />
+                                <div class="fn-flex-1">
+                                    <h2>
+                                        <a class="title"
+                                           href="${servePath}/top/smallmofish">摸鱼小闯关排行榜</a>
+                                    </h2>
+                                    <div class="ft-fade ft-smaller">摸鱼小闯关排行榜的玩家闯关数排名</div>
                                 </div>
                             </li>
                             <li class="fn__flex">

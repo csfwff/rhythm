@@ -28,6 +28,7 @@
     <link rel="stylesheet" href="${staticServePath}/css/index.css?${staticResourceVersion}"/>
     <link rel="canonical" href="${servePath}/community">
     <link rel="stylesheet" href="${staticServePath}/css/viewer.min.css"/>
+    <link rel="stylesheet" href="https://file.fishpi.cn/cxColor/css/jquery.cxcolor.css">
 </head>
 <body>
 <#include "header.ftl">
@@ -51,13 +52,25 @@
                     </div>
                     <div class="reply">
                         <#if isLoggedIn>
-                            <div id="chatContent"></div><br>
+                            <div id="chatContent"></div>
+                            <#if nightDisableMode == true>
+                                <div class="discuss_title" style="border-radius: 10px">
+                                    <a style="text-decoration: none; display: inline-block; cursor: default; font-weight: normal; background-color: #f6f6f670;">
+                                        <span style="color: #616161">现在是聊天室宵禁时间 (19:30-08:00)，您发送的消息将不会产生活跃度，请早点下班休息 :)</span>
+                                    </a>
+                                </div>
+                            <#else>
+                                <br>
+                            </#if>
                             <div class="fn-clear" style="margin-bottom: 5px">
                                 <svg id="redPacketBtn" style="width: 30px; height: 30px; cursor:pointer;">
                                     <use xlink:href="#redPacketIcon"></use>
                                 </svg>
                                 <svg id="emojiBtn" style="width: 30px; height: 30px; cursor:pointer;">
                                     <use xlink:href="#emojiIcon"></use>
+                                </svg>
+                                <svg id="paintBtn" style="width: 30px; height: 30px; cursor:pointer;">
+                                    <use xlink:href="#icon-paint"></use>
                                 </svg>
                                 <div class="hide-list" id="emojiList">
                                     <div class="hide-list-emojis" id="emojis" style="max-height: 200px">
@@ -85,6 +98,18 @@
                                     <button class="red" onclick="$('#chats').empty();page=0;ChatRoom.more();">${cleanScreenLabel}</button>
                                     <button class="green" onclick="ChatRoom.send()">${postLabel}</button>
                                 </div>
+                                <div id="paintContent" style="display: none">
+                                    <div style="margin: 20px 0 0 0;">
+                                        <input id="selectColor" name="mycolor" type="text" class="input_cxcolor" readonly="" style="background-color: rgb(0, 0, 0);">
+                                        <input id="selectWidth" type="number" inputmode="decimal" pattern="[0-9]*" min="1" value="3" style="width: 50px">
+                                    </div>
+                                    <canvas id="paintCanvas" width="500" height="490"></canvas>
+                                    <div class="fn-right">
+                                        <button onclick="ChatRoom.revokeChatacter('paintCanvas')">撤销</button>
+                                        <button class="red" onclick="ChatRoom.clearCharacter('paintCanvas')">${clearLabel}</button>
+                                        <button class="green" onclick="ChatRoom.submitCharacter('paintCanvas')">${submitLabel}</button>
+                                    </div>
+                                </div>
                             </div>
                             <div class="fn-clear comment-submit">
                                 <div class="fn-left online-cnt">${onlineVisitorCountLabel} <span id="onlineCnt"></span>
@@ -105,7 +130,7 @@
                     </div>
                 </div>
             </div>
-            <div class="list module pd__15" id="comments" style="height: 100%; padding-top: 0">
+            <div class="list module pd__15" id="comments" style="height: 100%; margin-top: -15px">
                 <div id="chats">
                 </div>
                 <#if !isLoggedIn><div style="color:rgba(0,0,0,0.54);">登录后查看更多</div></#if>
@@ -120,29 +145,38 @@
 <div id="xiaoIceGameBtn" class="ice-game-btn">
     <img src="${staticServePath}/images/xiaoIce/xiaoIce.gif" class="ice-game-icon" alt="">
 </div>
-<div id="xiaoIceGameBox" class="ice-game-box" style="display: none">
+<div id="xiaoIceGameBox" style="display: none">
     <div class="ice-tool-bar">
-        <div>
-            <img src="${staticServePath}/images/xiaoIce/xiaoIce-icon.png" class="ice-logo" alt="">
-            xiaoIce Game
-        </div>
-        <div class="ice-tools">
-            <div id="iceMinimize" class="ice-tool-btn" title="最小化">
-                <div class="ice-minimize-btn"></div>
+        <img src="${staticServePath}/images/xiaoIce/xiaoIce-icon.png" class="ice-logo" alt="">
+        xiaoIce Game
+        <div class="ice-toolbar-btn">
+            <div id="iceMinimize">
+                <svg class="ice-minimize-btn" viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg" width="32" height="32">
+                    <title>最小化</title>
+                    <path d="M128 448h768v128H128z" fill="#ffffff"></path>
+                </svg>
+                <svg class="ice-restore-btn" viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg" width="32" height="32">
+                    <title>还原窗口</title>
+                    <path d="M128.576377 895.420553 128.576377 128.578424l766.846222 0 0 766.842129L128.576377 895.420553zM799.567461 224.434585 224.432539 224.434585l0 575.134923 575.134923 0L799.567461 224.434585z" fill="#ffffff"></path>
+                </svg>
             </div>
-            <div id="iceClose" class="ice-close-btn" title="关闭">×</div>
+            <svg id="iceClose" viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg" width="32" height="32">
+                <title>关闭</title>
+                <path d="M576 512l277.333333 277.333333-64 64-277.333333-277.333333L234.666667 853.333333 170.666667 789.333333l277.333333-277.333333L170.666667 234.666667 234.666667 170.666667l277.333333 277.333333L789.333333 170.666667 853.333333 234.666667 576 512z" fill="#ffffff"></path>
+            </svg>
         </div>
     </div>
     <div class="ice-chat-box">
         <input class="ice-chat-input" type="text" placeholder="开始游戏"/>
         <div id="iceSendMsg" class="ice-send-btn">发送</div>
     </div>
-    <div id="iceMsgList" class="ice-msg-list"></div>
+    <div id="iceMsgList"></div>
 </div>
 <#include "footer.ftl">
 <script>
     Label.uploadLabel = "${uploadLabel}";
 </script>
+<script src="https://file.fishpi.cn/cxColor/js/jquery.cxcolor.min.js"></script>
 <script src="${staticServePath}/js/lib/jquery/file-upload-9.10.1/jquery.fileupload.min.js"></script>
 <script src="${staticServePath}/js/channel${miniPostfix}.js?${staticResourceVersion}"></script>
 <script src="${staticServePath}/js/chat-room${miniPostfix}.js?${staticResourceVersion}"></script>
@@ -172,6 +206,8 @@
     // Init [ChatRoom] channel
     ChatRoomChannel.init("${wsScheme}://${serverHost}:${serverPort}${contextPath}/chat-room-channel");
     var page = 0;
+    var pointsArray = [];
+    var linesArray = [];
     if ('${contextMode}' === 'no') {
         ChatRoom.more();
     } else {
@@ -235,5 +271,13 @@
         });
     });
 </script>
+<style>
+    .vditor-reset p, .vditor-reset pre {
+        margin: 0!important;
+    }
+    #emojiList {
+         bottom: unset!important;
+    }
+</style>
 </body>
 </html>

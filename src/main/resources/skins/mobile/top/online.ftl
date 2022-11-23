@@ -28,7 +28,7 @@
                     <div class="fn-flex">
                         <a rel="nofollow"
                            href="${servePath}/member/${user.userName}"
-                           title="${user.userName}"><div class="avatar" style="background-image:url('${user.userAvatarURL}')"></div></a>
+                           title="${user.userName}"><div class="avatar" style="background-image:url('${user.userAvatarURL48}')"></div></a>
                         <div class="fn-flex-1">
                             <div class="fn-clear">
                                 <h2 class="fn-left">
