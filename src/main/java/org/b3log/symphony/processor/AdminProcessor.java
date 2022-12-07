@@ -1592,8 +1592,6 @@ public class AdminProcessor {
             final String value = context.param(name);
 
             switch (name) {
-                case UserExt.USER_POINT:
-                case UserExt.USER_APP_ROLE:
                 case UserExt.USER_STATUS:
                     if (value.equals(String.valueOf(UserExt.USER_STATUS_C_INVALID))) {
                         LOGGER.log(Level.INFO, "Banned user and articles [userName=" + user.optString(User.USER_NAME) + "]");
@@ -1605,6 +1603,8 @@ public class AdminProcessor {
                             articleMgmtService.updateArticleByAdmin(articleId, editArticle);
                         }
                     }
+                case UserExt.USER_POINT:
+                case UserExt.USER_APP_ROLE:
                 case UserExt.USER_COMMENT_VIEW_MODE:
                 case UserExt.USER_AVATAR_VIEW_MODE:
                 case UserExt.USER_LIST_PAGE_SIZE:
