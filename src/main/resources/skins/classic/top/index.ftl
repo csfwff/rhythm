@@ -96,6 +96,17 @@
                             </li>
                             <li class="fn__flex">
                                 <div class="avatar" style=" font-size: 2rem; margin-bottom: 0.5rem;display: flex;
+                                            justify-content: center;align-items: center;">👍</div>
+                                <div class="fn-flex-1">
+                                    <h2>
+                                        <a class="title"
+                                           href="${servePath}/top/perfect">优选排行</a>
+                                    </h2>
+                                    <div class="ft-fade ft-smaller">摸鱼派大佬排名，抱紧大腿！</div>
+                                </div>
+                            </li>
+                            <li class="fn__flex">
+                                <div class="avatar" style=" font-size: 2rem; margin-bottom: 0.5rem;display: flex;
                                             justify-content: center;align-items: center;">💰</div>
                                 <div class="fn-flex-1">
                                     <h2>
