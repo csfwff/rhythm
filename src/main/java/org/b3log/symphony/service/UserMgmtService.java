@@ -720,7 +720,8 @@ public class UserMgmtService {
         final Transaction transaction = userRepository.beginTransaction();
 
         try {
-            if (null != userRepository.getByPhone(newPhone)) {
+            //允许将手机号置空
+            if (!UserExt.NULL_USER_PHONE.equals(newPhone) && null != userRepository.getByPhone(newPhone)) {
                 throw new ServiceException("手机号重复 [" + newPhone + "]");
             }
 
