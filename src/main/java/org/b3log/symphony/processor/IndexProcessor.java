@@ -526,7 +526,7 @@ public class IndexProcessor {
         // TGIF
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(new Date());
-        if (calendar.get(Calendar.DAY_OF_WEEK) == 6) {
+        if (calendar.get(Calendar.DAY_OF_WEEK) == 6 && calendar.get(Calendar.HOUR_OF_DAY) > 8) {
             // 周五
             String date = DateFormatUtils.format(new Date(), "yyyyMMdd");
             String articleTitle = "摸鱼周报 " + date;
