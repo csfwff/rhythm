@@ -1809,12 +1809,12 @@ ${result.info.msg}
         }
         //  国庆头像挂件
         let chatRoom = document.querySelector('body')
-        if (month === 10 && day <= 7) {
+        if (month == 10 && day <= 7) {
             chatRoom.classList.add('NationalDay')
             return;
         }
         //  圣诞节头像挂件
-        if ((month === 12 && day >= 24) && (month === 12 && day <= 25)) {
+        if ((month == 12 && day >= 24) && (month == 12 && day <= 25)) {
             chatRoom.classList.add('Christmas')
             return;
         }
