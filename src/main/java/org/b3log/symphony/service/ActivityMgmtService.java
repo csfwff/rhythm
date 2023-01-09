@@ -396,10 +396,19 @@ public class ActivityMgmtService {
             int longestStart = user.optInt(UserExt.USER_LONGEST_CHECKIN_STREAK_START);
             int longestEnd = user.optInt(UserExt.USER_LONGEST_CHECKIN_STREAK_END);
             int currentStart = user.optInt(UserExt.USER_CURRENT_CHECKIN_STREAK_START);
+            int currentEnd = user.optInt(UserExt.USER_CURRENT_CHECKIN_STREAK_END);
 
             if(longestStart == currentStart){
                 //当前签到是最长签到，不允许补签
-                return -1;
+                return -2;
+            }
+
+            final Date nowDate = new Date();
+            final String todayStr = DateFormatUtils.format(nowDate, datePattern);
+            final int todayInt = Integer.valueOf(todayStr);
+            if(todayInt!=currentEnd){
+                //如果今天没签到 不能使用
+                return -3;
             }
 
             final Date afterStartDate = DateUtils.parseDate(String.valueOf(afterStart), new String[]{datePattern});
@@ -432,7 +441,7 @@ public class ActivityMgmtService {
             userMgmtService.updateUser(userId, user);
             return 0;
         } catch (final Exception e) {
-            return -1;
+            return -4;
         }
     }
 

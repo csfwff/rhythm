@@ -99,7 +99,7 @@
             <h3 class="item__title">Windows 客户端</h3>
             <div style="flex:1">Author:<a href="${staticServePath}/member/imlinhanchao">@imlinhanchao</a></div>
             <div class="fn__flex">
-                <a class="download__link" href="https://github.com/imlinhanchao/pwl-chat/releases" target="_blank">Github Releases</a>
+                <a class="download__link" href="https://github.com/imlinhanchao/fishpi-desktop/releases" target="_blank">Github Releases</a>
             </div>
         </div>
         <div class="item">
@@ -107,7 +107,7 @@
             <h3 class="item__title">macOS 客户端</h3>
             <div style="flex:1">Author:<a href="${staticServePath}/member/imlinhanchao">@imlinhanchao</a></div>
             <div class="fn__flex">
-                <a class="download__link" href="https://github.com/imlinhanchao/pwl-chat/releases" target="_blank">Github Releases</a>
+                <a class="download__link" href="https://github.com/imlinhanchao/fishpi-desktop/releases" target="_blank">Github Releases</a>
             </div>
         </div>
         <div class="item">
@@ -191,7 +191,7 @@
             <h3 class="item__title">Golang 分布式客户端</h3>
             <div style="flex:1">Author:<a href="${staticServePath}/member/bulabula">@bulabula</a></div>
             <div class="fn__flex">
-                <a class="download__link" href="https://github.com/New-arkssac/Golang-fishpi-chatroom-Distributed-client" target="_blank">Github</a>
+                <a class="download__link" href="https://github.com/New-arkssac/fishpi-Goclient" target="_blank">Github</a>
             </div>
         </div>
         <div class="item">

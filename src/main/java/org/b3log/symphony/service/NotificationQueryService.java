@@ -505,9 +505,14 @@ public class NotificationQueryService {
                     case Notification.DATA_TYPE_C_ABUSE_POINT_DEDUCT:
                         desTemplate = langPropsService.get("notificationAbusePointDeductLabel");
 
+                        int sum7 = 0;
+                        String memo7 = "Data broked";
+
                         final JSONObject transfer7 = pointtransferRepository.get(dataId);
-                        final int sum7 = transfer7.optInt(Pointtransfer.SUM);
-                        final String memo7 = transfer7.optString(Pointtransfer.DATA_ID);
+                        if (Objects.nonNull(transfer7)) {
+                            sum7 = transfer7.optInt(Pointtransfer.SUM);
+                            memo7 = transfer7.optString(Pointtransfer.DATA_ID);
+                        }
 
                         desTemplate = desTemplate.replace("{action}", memo7);
                         desTemplate = desTemplate.replace("{point}", String.valueOf(sum7));

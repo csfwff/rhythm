@@ -752,7 +752,8 @@ public class ArticleQueryService {
         try {
             final Query query = new Query().addSort(Keys.OBJECT_ID, SortDirection.DESCENDING).
                     setFilter(CompositeFilterOperator.and(new PropertyFilter(Article.ARTICLE_CITY, FilterOperator.EQUAL, city),
-                            new PropertyFilter(Article.ARTICLE_SHOW_IN_LIST, FilterOperator.NOT_EQUAL, Article.ARTICLE_SHOW_IN_LIST_C_NOT))).
+                            new PropertyFilter(Article.ARTICLE_SHOW_IN_LIST, FilterOperator.NOT_EQUAL, Article.ARTICLE_SHOW_IN_LIST_C_NOT),
+                            new PropertyFilter(Article.ARTICLE_STATUS,FilterOperator.EQUAL,Article.ARTICLE_STATUS_C_VALID))).
                     setPageCount(1).setPage(currentPageNum, pageSize);
             final List<JSONObject> ret = articleRepository.getList(query);
             organizeArticles(ret);
