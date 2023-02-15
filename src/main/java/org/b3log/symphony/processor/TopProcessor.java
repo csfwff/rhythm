@@ -183,20 +183,41 @@ public class TopProcessor {
     }
 
     /**
-     * package rank list data, remove usless value.
+     * remove private datas.
+     *
+     * @param result rank's list data
+     */
+    private void removePrivateDatas(List<JSONObject> result) {
+        for (int i = 0; i < result.size(); i++) {
+            removePrivateData(result.get(i));
+        }
+    }
+
+    /**
+     * remove private data.
+     *
+     * @param result rank's data
+     */
+    private void removePrivateData(JSONObject result){
+        result.remove("userPassword");
+        result.remove("userLatestLoginIP");
+        result.remove("userPhone");
+        result.remove("userQQ");
+        result.remove("userCity");
+        result.remove("userCountry");
+        result.remove("userEmail");
+        result.remove("secret2fa");
+    }
+
+    /**
+     * package rank list data.
      *
      * @param result rank's data
      * @param type rank's type
      */
     private JSONObject packageListData(List<JSONObject> result,final String type){
       JSONObject ret = new JSONObject();
-      for (int i = 0; i < result.size(); i++) {
-        result.get(i).remove("userPassword");
-        result.get(i).remove("breezemoonIP");
-        result.get(i).remove("breezemoonUA");
-        result.get(i).remove("breezemoonAuthorId");
-        result.get(i).remove("breezemoonStatus");
-      }
+      removePrivateDatas(result);
       ret.put("type",type);
       ret.put("data", result);
       return ret;
@@ -328,14 +349,6 @@ public class TopProcessor {
     public void getLink(final RequestContext context) {
       try {
           final List<JSONObject> result = linkQueryService.getTopLink(Symphonys.TOP_CNT);
-          // 结果去敏
-          for (int i = 0; i < result.size(); i++) {
-            result.get(i).remove("userPassword");
-            result.get(i).remove("breezemoonIP");
-            result.get(i).remove("breezemoonUA");
-            result.get(i).remove("breezemoonAuthorId");
-            result.get(i).remove("breezemoonStatus");
-          }
           context.renderJSON(new JSONObject().put("data", new JSONArray(result))).renderCode(StatusCodes.SUCC);
           } catch (Exception e) {
               context.renderJSON(new JSONObject()).renderCode(StatusCodes.ERR).renderMsg("请求非法");
@@ -368,14 +381,7 @@ public class TopProcessor {
     public void getBalance(final RequestContext context) {
       try {
         final List<JSONObject> result = pointtransferQueryService.getTopBalanceUsers(Symphonys.TOP_CNT);
-        // 结果去敏
-        for (int i = 0; i < result.size(); i++) {
-          result.get(i).remove("userPassword");
-          result.get(i).remove("breezemoonIP");
-          result.get(i).remove("breezemoonUA");
-          result.get(i).remove("breezemoonAuthorId");
-          result.get(i).remove("breezemoonStatus");
-        }
+        removePrivateDatas(result);
         context.renderJSON(new JSONObject().put("data", new JSONArray(result))).renderCode(StatusCodes.SUCC);
         } catch (Exception e) {
             context.renderJSON(new JSONObject()).renderCode(StatusCodes.ERR).renderMsg("请求非法");
@@ -408,13 +414,7 @@ public class TopProcessor {
     public void getConsumption(final RequestContext context) {
       try{
           final List<JSONObject> result = pointtransferQueryService.getTopConsumptionUsers(Symphonys.TOP_CNT);
-          for (int i = 0; i < result.size(); i++) {
-            result.get(i).remove("userPassword");
-            result.get(i).remove("breezemoonIP");
-            result.get(i).remove("breezemoonUA");
-            result.get(i).remove("breezemoonAuthorId");
-            result.get(i).remove("breezemoonStatus");
-          }
+          removePrivateDatas(result);
             context.renderJSON(new JSONObject().put("data", new JSONArray(result))).renderCode(StatusCodes.SUCC);
           } catch (Exception e) {
               context.renderJSON(new JSONObject()).renderCode(StatusCodes.ERR).renderMsg("请求非法");
@@ -447,13 +447,7 @@ public class TopProcessor {
       try {
           final List<JSONObject> result = activityQueryService.getTopCheckinUsers(Symphonys.TOP_CNT);
           // 结果去敏
-          for (int i = 0; i < result.size(); i++) {
-            result.get(i).remove("userPassword");
-            result.get(i).remove("breezemoonIP");
-            result.get(i).remove("breezemoonUA");
-            result.get(i).remove("breezemoonAuthorId");
-            result.get(i).remove("breezemoonStatus");
-          }
+          removePrivateDatas(result);
           context.renderJSON(new JSONObject().put("data", new JSONArray(result))).renderCode(StatusCodes.SUCC);
           } catch (Exception e) {
               context.renderJSON(new JSONObject()).renderCode(StatusCodes.ERR).renderMsg("请求非法");
@@ -486,13 +480,7 @@ public class TopProcessor {
       try {
           final List<JSONObject> result = activityQueryService.getTopOnlineTimeUsers(Symphonys.TOP_CNT);
           // 结果去敏
-          for (int i = 0; i < result.size(); i++) {
-            result.get(i).remove("userPassword");
-            result.get(i).remove("breezemoonIP");
-            result.get(i).remove("breezemoonUA");
-            result.get(i).remove("breezemoonAuthorId");
-            result.get(i).remove("breezemoonStatus");
-          }
+          removePrivateDatas(result);
           JSONObject ret = new JSONObject();
           ret.put("data", result);
           context.renderJSON(ret).renderCode(StatusCodes.SUCC);
@@ -527,13 +515,7 @@ public class TopProcessor {
       try {
           final List<JSONObject> result = activityQueryService.getTopADR(Symphonys.TOP_CNT);
           // 结果去敏
-          for (int i = 0; i < result.size(); i++) {
-            result.get(i).remove("userPassword");
-            result.get(i).remove("breezemoonIP");
-            result.get(i).remove("breezemoonUA");
-            result.get(i).remove("breezemoonAuthorId");
-            result.get(i).remove("breezemoonStatus");
-          }
+          removePrivateDatas(result);
           context.renderJSON(new JSONObject().put("data", new JSONArray(result))).renderCode(StatusCodes.SUCC);
           } catch (Exception e) {
               context.renderJSON(new JSONObject()).renderCode(StatusCodes.ERR).renderMsg("请求非法");
@@ -565,13 +547,7 @@ public class TopProcessor {
     public void getEmoji(final RequestContext context) {
       try {
           final List<JSONObject> result = activityQueryService.getTopEmoji(Symphonys.TOP_CNT);
-          for (int i = 0; i < result.size(); i++) {
-            result.get(i).remove("userPassword");
-            result.get(i).remove("breezemoonIP");
-            result.get(i).remove("breezemoonUA");
-            result.get(i).remove("breezemoonAuthorId");
-            result.get(i).remove("breezemoonStatus");
-          }
+          removePrivateDatas(result);
           context.renderJSON(new JSONObject().put("data", new JSONArray(result))).renderCode(StatusCodes.SUCC);
           } catch (Exception e) {
               context.renderJSON(new JSONObject()).renderCode(StatusCodes.ERR).renderMsg("请求非法");
@@ -604,13 +580,7 @@ public class TopProcessor {
       try {
           final List<JSONObject> result = activityQueryService.getTopMofish(Symphonys.TOP_CNT);
           // 结果去敏
-          for (int i = 0; i < result.size(); i++) {
-            result.get(i).remove("userPassword");
-            result.get(i).remove("breezemoonIP");
-            result.get(i).remove("breezemoonUA");
-            result.get(i).remove("breezemoonAuthorId");
-            result.get(i).remove("breezemoonStatus");
-          }
+          removePrivateDatas(result);
           context.renderJSON(new JSONObject().put("data", new JSONArray(result))).renderCode(StatusCodes.SUCC);
           } catch (Exception e) {
               context.renderJSON(new JSONObject()).renderCode(StatusCodes.ERR).renderMsg("请求非法");
@@ -643,13 +613,7 @@ public class TopProcessor {
       try {
           final List<JSONObject> result = activityQueryService.getTopSmallMofish(Symphonys.TOP_CNT);
           // 结果去敏
-          for (int i = 0; i < result.size(); i++) {
-            result.get(i).remove("userPassword");
-            result.get(i).remove("breezemoonIP");
-            result.get(i).remove("breezemoonUA");
-            result.get(i).remove("breezemoonAuthorId");
-            result.get(i).remove("breezemoonStatus");
-          }
+          removePrivateDatas(result);
           context.renderJSON(new JSONObject().put("data", new JSONArray(result))).renderCode(StatusCodes.SUCC);
           } catch (Exception e) {
               context.renderJSON(new JSONObject()).renderCode(StatusCodes.ERR).renderMsg("请求非法");
@@ -687,13 +651,7 @@ public class TopProcessor {
       try {
           final List<JSONObject> result = activityQueryService.getTopLifeRestart(Symphonys.TOP_CNT);
           // 结果去敏
-          for (int i = 0; i < result.size(); i++) {
-            result.get(i).remove("userPassword");
-            result.get(i).remove("breezemoonIP");
-            result.get(i).remove("breezemoonUA");
-            result.get(i).remove("breezemoonAuthorId");
-            result.get(i).remove("breezemoonStatus");
-          }
+          removePrivateDatas(result);
           context.renderJSON(new JSONObject().put("data", new JSONArray(result))).renderCode(StatusCodes.SUCC);
           } catch (Exception e) {
               context.renderJSON(new JSONObject()).renderCode(StatusCodes.ERR).renderMsg("请求非法");
@@ -737,13 +695,6 @@ public class TopProcessor {
         final String type = request.getParameter("type") != null ?
                 request.getParameter("type") : "achievement";
           final List<JSONObject> result = activityQueryService.getEvolve(type, Symphonys.TOP_CNT);
-          for (int i = 0; i < result.size(); i++) {
-            result.get(i).remove("userPassword");
-            result.get(i).remove("breezemoonIP");
-            result.get(i).remove("breezemoonUA");
-            result.get(i).remove("breezemoonAuthorId");
-            result.get(i).remove("breezemoonStatus");
-          }
           JSONObject ret = new JSONObject();
           ret.put("data", new JSONArray(result));
           ret.put("type", type);
@@ -916,6 +867,7 @@ public class TopProcessor {
                 try {
                     JSONObject userData = userQueryService.getUser(user.optString("toId"));
                     avatarQueryService.fillUserAvatarURL(userData);
+                    removePrivateData(userData);
                     user.put("profile", userData);
                     result.add(user);
                 } catch (Exception e) {
@@ -1022,6 +974,7 @@ public class TopProcessor {
           for (JSONObject user : list) {
               try {
                   JSONObject userData = userQueryService.getUser(user.optString("userId"));
+                  removePrivateData(userData);
                   avatarQueryService.fillUserAvatarURL(userData);
                   user.put("profile", userData);
                   result.add(user);
@@ -1104,6 +1057,7 @@ public class TopProcessor {
                 JSONObject userData = userQueryService.getUser(user.optString("userId"));
                 avatarQueryService.fillUserAvatarURL(userData);
                 user.put("profile", userData);
+                removePrivateData(userData);
                 result.add(user);
             } catch (Exception e) {
                 continue;
