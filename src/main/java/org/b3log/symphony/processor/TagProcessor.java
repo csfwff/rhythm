@@ -40,6 +40,7 @@ import org.b3log.symphony.util.StatusCodes;
 import org.b3log.symphony.util.Symphonys;
 import org.json.JSONObject;
 
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -219,7 +220,7 @@ public class TagProcessor {
             dataModel.put(Common.IS_FOLLOWING, isFollowing);
         }
 
-        String sortModeStr = StringUtils.substringAfter(context.requestURI(), "/tag/" + tagURI);
+        String sortModeStr = StringUtils.substringAfter(context.requestURI(), "/tag/" + URLEncoder.encode(tagURI).toLowerCase());
         int sortMode;
         switch (sortModeStr) {
             case "":

@@ -436,6 +436,12 @@ public final class UserExt {
      */
     public static final String NULL_USER_NAME = "_";
 
+    //// Null user phone
+    /**
+     * Null user phone.
+     */
+    public static final String NULL_USER_PHONE = "_";
+
     //// Anonymous user.
     /**
      * Anonymous user name.

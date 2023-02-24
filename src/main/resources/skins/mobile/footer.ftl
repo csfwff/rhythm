@@ -81,7 +81,7 @@
         </div>
         <div class="fn-hr5"></div>
         <div class="ft-smaller" style="padding: 10px 15px 0 15px">
-            Copyright © 2021 - 2022 W&P Tech. All Rights Reserved. 北京白与画科技有限公司 版权所有
+            Copyright © 2021 - 2023 W&P Tech. All Rights Reserved. 北京白与画科技有限公司 版权所有
         </div>
         <br>
     </div>

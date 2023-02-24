@@ -28,9 +28,11 @@ import org.b3log.latke.ioc.BeanManager;
 import org.b3log.latke.ioc.Inject;
 import org.b3log.latke.ioc.Singleton;
 import org.b3log.latke.model.User;
+import org.b3log.symphony.model.Article;
 import org.b3log.symphony.model.Common;
 import org.b3log.symphony.model.UserExt;
 import org.b3log.symphony.processor.middleware.AnonymousViewCheckMidware;
+import org.b3log.symphony.repository.ArticleRepository;
 import org.b3log.symphony.repository.PointtransferRepository;
 import org.b3log.symphony.repository.SponsorRepository;
 import org.b3log.symphony.service.*;
@@ -105,6 +107,12 @@ public class TopProcessor {
     @Inject
     private SponsorRepository sponsorRepository;
 
+    /**
+     * Sponsor repository.
+     */
+    @Inject
+    private ArticleRepository articleRepository;
+
     @Inject
     private AvatarQueryService avatarQueryService;
 
@@ -131,6 +139,7 @@ public class TopProcessor {
         Dispatcher.get("/top/xiaoice", topProcessor::showXiaoice, anonymousViewCheckMidware::handle);
         Dispatcher.get("/top/invite", topProcessor::showInvite, anonymousViewCheckMidware::handle);
         Dispatcher.get("/top/donate", topProcessor::showDonate, anonymousViewCheckMidware::handle);
+        Dispatcher.get("/top/perfect", topProcessor::showPerfect, anonymousViewCheckMidware::handle);
     }
 
     /**
@@ -502,4 +511,42 @@ public class TopProcessor {
       dataModelService.fillSideTags(dataModel);
       dataModelService.fillLatestCmts(dataModel);
   }
+
+    /**
+     * Shows Donate ranking list.
+     *
+     * @param context
+     */
+    public void showPerfect(final RequestContext context) {
+        final AbstractFreeMarkerRenderer renderer = new SkinRenderer(context, "top/perfect.ftl");
+        final Map<String, Object> dataModel = renderer.getDataModel();
+
+        try {
+            List<JSONObject> list = articleRepository.select("select "+ Article.ARTICLE_AUTHOR_ID +" as userId,count(*) as count " +
+                    "from " + articleRepository.getName() + " " +
+                    "where " + Article.ARTICLE_PERFECT + " = " + Article.ARTICLE_PERFECT_C_PERFECT+ " " +
+                    "group by userId " +
+                    "order by count desc " +
+                    "limit 64;");
+            List<JSONObject> result = new ArrayList<>();
+            for (JSONObject user : list) {
+                try {
+                    JSONObject userData = userQueryService.getUser(user.optString("userId"));
+                    avatarQueryService.fillUserAvatarURL(userData);
+                    user.put("profile", userData);
+                    result.add(user);
+                } catch (Exception e) {
+                    continue;
+                }
+            }
+            dataModel.put("data", result);
+        } catch (Exception ignored) {
+        }
+
+        dataModelService.fillHeaderAndFooter(context, dataModel);
+        dataModelService.fillRandomArticles(dataModel);
+        dataModelService.fillSideHotArticles(dataModel);
+        dataModelService.fillSideTags(dataModel);
+        dataModelService.fillLatestCmts(dataModel);
+    }
 }

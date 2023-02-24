@@ -255,12 +255,26 @@ public class SettingsProcessor {
     public void usePatchCheckinCard(final RequestContext context) {
         JSONObject user = Sessions.getUser();
         final String userId = user.optString(Keys.OBJECT_ID);
-        if (activityMgmtService.patchCheckin(userId) == 0) {
+        int result = activityMgmtService.patchCheckin(userId);
+        if ( result == 0) {
             context.renderJSON(StatusCodes.SUCC);
             context.renderMsg("补签卡使用成功！");
         } else {
             context.renderJSON(StatusCodes.ERR);
-            context.renderMsg("补签卡使用失败！可能没有需要补签的记录或背包中没有补签卡或当前是最长签到。");
+            switch (result){
+                case -1:
+                    context.renderMsg("没有补签卡，怎么补嘛~");
+                    break;
+                case -2:
+                    context.renderMsg("当前签到是最长签到，不可以补签哟");
+                    break;
+                case -3:
+                    context.renderMsg("今天还没签到，不可以补签哟");
+                    break;
+                default:
+                    context.renderMsg("补签卡使用失败！如果吞卡请联系管理员");
+                    break;
+            }
         }
     }
 
