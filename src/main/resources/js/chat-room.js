@@ -1540,7 +1540,8 @@ ${result.info.msg}
             '    <div class="chats__content">\n' +
             '        <div class="chats__arrow"></div>\n';
 
-        let display = Label.currentUser === data.userName && !isPlusOne ? 'display: none;' : ''
+        // let display = Label.currentUser === data.userName && !isPlusOne ? 'display: none;' : ''
+        let display = '';
         newHTML += '<div id="userName" class="ft__fade ft__smaller" style="' + display + 'padding-bottom: 3px;border-bottom: 1px solid #eee">\n' +
             '    <span class="ft-gray">' + data.userNickname + '</span>&nbsp;\n';
         if (data.sysMetal !== undefined && data.sysMetal !== "") {
@@ -1554,7 +1555,7 @@ ${result.info.msg}
         }
         newHTML += '</div>';
 
-        newHTML += '        <div class="vditor-reset ft__smaller ' + Label.chatRoomPictureStatus + '">\n' +
+        newHTML += '        <div class="vditor-reset ft__smaller ' + Label.chatRoomPictureStatus + '" style="margin-top: 3px">\n' +
             '            ' + data.content + '\n' +
             '        </div>\n' +
             '        <div class="ft__smaller ft__fade fn__right date-bar">\n' +
