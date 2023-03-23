@@ -477,7 +477,7 @@ public class TopProcessor {
                   "limit 1;");
         JSONObject totalJSON = totalList.get(0);
         double totalAmount = totalJSON.optDouble("totalAmount");
-        BigDecimal donateMakeDaysBigDecimal = new BigDecimal(String.valueOf(totalAmount / 5));
+        BigDecimal donateMakeDaysBigDecimal = new BigDecimal(String.valueOf(totalAmount / 13.33));
         double donateMakeDays = donateMakeDaysBigDecimal.setScale(0, BigDecimal.ROUND_HALF_UP).doubleValue();
         totalJSON.put("donateMakeDays", donateMakeDays);
         dataModel.put("totalData", totalJSON);

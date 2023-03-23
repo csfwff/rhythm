@@ -794,7 +794,7 @@ public class IndexProcessor {
                     dataModel.put("donateTimes", sponsor.size());
                     double sum = sponsorService.getSum(userId);
                     dataModel.put("donateCount", sum);
-                    BigDecimal donateMakeDaysBigDecimal = new BigDecimal(String.valueOf(sum / 5));
+                    BigDecimal donateMakeDaysBigDecimal = new BigDecimal(String.valueOf(sum / 13.33));
                     double donateMakeDays = donateMakeDaysBigDecimal.setScale(0, BigDecimal.ROUND_HALF_UP).doubleValue();
                     dataModel.put("donateMakeDays", donateMakeDays);
                     sponsor = sponsor.stream().peek(x -> {
