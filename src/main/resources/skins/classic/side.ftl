@@ -44,7 +44,7 @@
 </#if>
 
 <div class="module">
-    <div class="module-header form">
+    <div class="module-header form" style="border: none;">
         <input id="breezemoonInput"
                type="text"
                class="comment__text breezemoon__input"

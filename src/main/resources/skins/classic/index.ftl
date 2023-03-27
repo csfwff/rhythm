@@ -354,7 +354,7 @@
                     <div style="clear:both;"></div>
                 </div>
                 <div class="module-panel">
-                    <div class="module-header form">
+                    <div class="module-header form" style="border: none;">
                         <input id="chatRoomInput"
                                type="text"
                                class="comment__text breezemoon__input"
@@ -501,7 +501,7 @@
                     <div style="clear:both;"></div>
                 </div>
                 <div class="module-panel">
-                    <div class="module-header form">
+                    <div class="module-header form" style="border: none;">
                         <input id="breezemoonInput"
                                type="text"
                                class="comment__text breezemoon__input"
