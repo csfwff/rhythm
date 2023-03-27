@@ -278,7 +278,7 @@
 
     <div class="wrapper index-full-size" id="goodNight" style="display: none"></div>
 
-    <div class="index-bottom">
+    <div class="index-bottom" style="border-top: 1px solid #f3f3f3;">
         <div class="wrapper">
             <div class="fn-flex-1">
                 <div class="metro-line fn-flex" style="align-items:center;">
@@ -358,11 +358,11 @@
                         <input id="chatRoomInput"
                                type="text"
                                class="comment__text breezemoon__input"
-                               placeholder="简单聊聊 (高级功能请访问完整版聊天室哦)"/>
+                               placeholder="说点什么..."/>
                         <div id="chatUsernameSelectedPanel" class="completed-panel"
                              style="height:170px;display:none;left:auto;top:auto;cursor:pointer;"></div>
                         <span id="chatRoomPostBtn" class="btn breezemoon__btn" data-csrf="${csrfToken}"
-                              onclick="sendChat()">Biu~</span>
+                              onclick="sendChat()">发送</span>
                     </div>
                     <div class="module-panel">
                         <ul class="module-list" id="chatRoomIndex">

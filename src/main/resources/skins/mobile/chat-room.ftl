@@ -72,7 +72,7 @@
                             </a>
                         </div>
                     </#if>
-                    <div class="fn-clear" style="margin-bottom: 5px; margin-top: 10px;">
+                    <div class="fn-clear" style="padding: 5px 0px 12px 0px;margin-bottom: 5px;border-bottom: 1px solid #eee;">
                         <svg id="redPacketBtn" style="width: 30px; height: 30px; cursor:pointer;">
                             <use xlink:href="#redPacketIcon"></use>
                         </svg>
@@ -102,15 +102,12 @@
                         <div class="fn-right">
                             <#if level3Permitted == true>
                                 <button id="groupRevoke" onclick="ChatRoom.startGroupRevoke()" class="button">
-                                    <svg style="vertical-align: -2px;">
-                                        <use xlink:href="#administration"></use>
-                                    </svg>
                                     批量撤回
                                 </button>
                             </#if>
-                            <button class="red"
+                            <button class="button"
                                     onclick="$('#chats').empty();page=0;ChatRoom.more();">${cleanScreenLabel}</button>
-                            <button class="green" onclick="ChatRoom.send()">${postLabel}</button>
+                            <button class="green" onclick="ChatRoom.send()">发送</button>
                         </div>
                     </div>
                     <div id="paintContent" style="display: none">
@@ -130,7 +127,7 @@
                         <div class="fn-left online-cnt">${onlineVisitorCountLabel} <span id="onlineCnt"></span></div>
                         <div class="tip fn-left" id="chatContentTip"></div>
                         <a onclick="ChatRoom.toggleOnlineAvatar()" style="cursor:pointer;">
-                            <svg style="vertical-align: -10px;" id="toggleAvatarBtn">
+                            <svg style="vertical-align: -3px;" id="toggleAvatarBtn">
                                 <use xlink:href="#showMore"></use>
                             </svg>
                         </a>

@@ -293,28 +293,35 @@
 button,
 .btn {
   cursor: pointer;
-  color: $black-text;
+  color: #333333;
   border-radius: 3px;
   padding: 6px 12px;
-  background-color: rgba(0, 0, 0, .02);
+  background-color: #fff;
   border: 1px solid #D5D5D5;
   border-bottom-color: #E1E1E1;
   box-sizing: border-box;
   line-height: 19px;
   white-space: nowrap;
+  transition: all 100ms linear;
+}
+
+button:focus,
+.btn:focus {
+  box-shadow: 0 0 0 0.3rem rgba(25, 140, 255, 0.2);
 }
 
 button:hover,
 .btn:hover {
   text-decoration: none;
-  border-color: $fade;
-  background-color: #eee;
+  color: #198cff;
+  box-shadow: 0.2rem 0.2rem 1rem 0 rgba(25, 140, 255, 0.2);
+  background-color: #ffffff;
 }
 
 button:active,
 .btn:active {
-  background-color: $fade;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05) inset;
+  color: rgba(25, 140, 255, 0.6);
+  background-color: #fafcff;
 }
 
 button.green,
@@ -453,22 +460,23 @@ a[class*=" icon-"]:hover {
 
 /* start tip */
 .tip.error {
-  color: $theme-accent;
-  background-color: #ffdce0;
-  border: 1px solid rgba(27, 31, 35, 0.15);
-  border-radius: 2px;
+  color: #b22c39;
+  border: 1px solid #f0dddf;
+  background-color: #fff0f1;
+  border-radius: 0.3rem;
 }
 
 .tip ul {
   margin: 5px 30px;
   text-align: left;
+  list-style-type: none;
 }
 
 .tip.succ {
-  background-color: #dbedff;
-  border: 1px solid rgba(27, 31, 35, 0.15);
-  border-radius: 2px;
-  color: #032f62;
+  border: 1px solid #e1f0e5;
+  color: #3b7649;
+  background-color: #edfaf0;
+  border-radius: 0.3rem;
 }
 
 #registerTip,
@@ -603,24 +611,41 @@ a[class*=" icon-"]:hover {
 .form input[type=number],
 .form select,
 .form textarea {
-  border: 1px solid $fade;
-  background-color: #FAFAFA;
-  border-radius: 3px;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.075) inset;
-  padding: 7px 8px;
-  width: 100%;
   line-height: 17px;
+  padding: 7px 8px;
+  border: 1px solid #e0e0e0;
+  box-sizing: border-box;
+  border-radius: 0.3rem;
+  width: 100%;
   box-sizing: border-box;
   -moz-box-sizing: border-box;
   -webkit-box-sizing: border-box;
 }
 
+.form input[type=text]:not([readonly]):not([disabled]):hover,
+.form input[type=datetime]:not([readonly]):not([disabled]):hover,
+.form input[type=datetime-local]:not([readonly]):not([disabled]):hover,
+.form input[type=password]:not([readonly]):not([disabled]):hover,
+.form input[type=number]:not([readonly]):not([disabled]):hover,
+.form select:not([readonly]):not([disabled]):hover,
+.form textarea:not([readonly]):not([disabled]):hover {
+  border-color: rgba(25, 140, 255, 0.5);
+}
+
+.form select:focus {
+  box-shadow: 0 0 0 0.1rem rgba(25, 140, 255, 0.2);
+  border-color: rgba(25, 140, 255, 0.5) !important;
+}
+
 .form input[type=text]:focus,
+.form input[type=datetime]:focus,
+.form input[type=datetime-local]:focus,
 .form input[type=password]:focus,
+.form input[type=number]:focus,
 .form textarea:focus {
-  background-color: #FFF;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.075) inset, 0 0 5px rgba(81, 167, 232, 0.5);
-  border: 1px solid #51A7E8;
+  color: #198cff;
+  box-shadow: 0 0 0 0.1rem rgba(25, 140, 255, 0.2);
+  border-color: rgba(25, 140, 255, 0.5) !important;
 }
 
 .form label {
@@ -1679,7 +1704,7 @@ a[class*=" icon-"]:hover {
 }
 
 .index-bottom{
-  background-color:#f6f8fa
+  background-color:#fdfdfd
 }
 
 .index-chat{
@@ -1853,8 +1878,8 @@ a[class*=" icon-"]:hover {
   -ms-flex-pack: center;
   justify-content: center;
   border-radius: 50%;
-  -webkit-box-shadow: 0 2px 4px 0 rgb(0 0 0 / 20%);
-  box-shadow: 0 2px 4px 0 rgb(0 0 0 / 20%);
+  -webkit-box-shadow: 0 1px 6px 0 rgba(0,0,0,.2);
+  box-shadow: 0 1px 6px 0 rgba(0,0,0,.2);
   background-color: #fff;
   text-align: center;
   height: 75px;

@@ -62,7 +62,7 @@
                             <#else>
                                 <br>
                             </#if>
-                            <div class="fn-clear" style="margin-bottom: 5px">
+                            <div class="fn-clear" style="padding: 5px 0px 12px 0px;margin-bottom: 5px;border-bottom: 1px solid #eee;">
                                 <svg id="redPacketBtn" style="width: 30px; height: 30px; cursor:pointer;">
                                     <use xlink:href="#redPacketIcon"></use>
                                 </svg>
@@ -91,12 +91,11 @@
                                 <div class="fn-right">
                                     <#if level3Permitted == true>
                                         <button id="groupRevoke" onclick="ChatRoom.startGroupRevoke()" class="button">
-                                            <svg style="vertical-align: -2px;"><use xlink:href="#administration"></use></svg>
                                             批量撤回
                                         </button>
                                     </#if>
-                                    <button class="red" onclick="$('#chats').empty();page=0;ChatRoom.more();">${cleanScreenLabel}</button>
-                                    <button class="green" onclick="ChatRoom.send()">${postLabel}</button>
+                                    <button class="button" onclick="$('#chats').empty();page=0;ChatRoom.more();">${cleanScreenLabel}</button>
+                                    <button class="green" onclick="ChatRoom.send()">发送</button>
                                 </div>
                                 <div id="paintContent" style="display: none">
                                     <div style="margin: 20px 0 0 0;">
