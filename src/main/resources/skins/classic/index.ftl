@@ -186,7 +186,7 @@
             <div class="module-panel">
                 <ul class="module-list">
                     <#list topCheckinUsers as user>
-                        <#if user_index < 6>
+                        <#if user_index < 7>
                             <li class="fn-flex rank topCheckInUsersElement">
                                 <#if user_index == 0 || user_index == 1 || user_index == 2>
                                 <span
@@ -227,7 +227,7 @@
             <div class="module-panel">
                 <ul class="module-list">
                     <#list onlineTopUsers as user>
-                        <#if user_index < 5>
+                        <#if user_index < 6>
                             <li class="fn-flex rank topCheckInUsersElement">
                                 <#if user_index == 0 || user_index == 1 || user_index == 2>
                                 <span

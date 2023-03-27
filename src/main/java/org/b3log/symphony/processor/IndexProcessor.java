@@ -420,15 +420,15 @@ public class IndexProcessor {
         Map<String, Object> dataModel = new HashMap<>();
 
         // 签到排行
-        final List<JSONObject> users = activityQueryService.getTopCheckinUsers(6);
+        final List<JSONObject> users = activityQueryService.getTopCheckinUsers(7);
         dataModel.put(Common.TOP_CHECKIN_USERS, users);
 
         // 在线时间排行
-        final List<JSONObject> onlineTopUsers = activityQueryService.getTopOnlineTimeUsers(5);
+        final List<JSONObject> onlineTopUsers = activityQueryService.getTopOnlineTimeUsers(6);
         dataModel.put("onlineTopUsers", onlineTopUsers);
 
         // 随机文章
-        dataModel.put("indexRandomArticles", ArticleProcessor.getRandomArticles(12));
+        dataModel.put("indexRandomArticles", ArticleProcessor.getRandomArticles(14));
 
         // 问题文章
         final JSONObject result = articleQueryService.getQuestionArticles(0, 1, 10);
@@ -436,7 +436,7 @@ public class IndexProcessor {
         dataModel.put(Common.QNA,qaArticles);
 
         // 最近文章
-        final List<JSONObject> recentArticles = articleQueryService.getIndexRecentArticles();
+        final List<JSONObject> recentArticles = articleQueryService.getIndexRecentArticles(14);
         dataModel.put(Common.RECENT_ARTICLES, recentArticles);
 
         // 活跃用户
