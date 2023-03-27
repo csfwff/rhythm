@@ -751,7 +751,7 @@
             rotate.submit();
             $("#randomArticles").fadeOut(100);
             $.ajax({
-                url: "${servePath}/article/random/12",
+                url: "${servePath}/article/random/14",
                 method: "GET",
                 cache: false,
                 async: true,

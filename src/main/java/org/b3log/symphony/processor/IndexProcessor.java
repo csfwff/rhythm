@@ -439,6 +439,10 @@ public class IndexProcessor {
         final List<JSONObject> recentArticles = articleQueryService.getIndexRecentArticles(14);
         dataModel.put(Common.RECENT_ARTICLES, recentArticles);
 
+        // 最近文章（移动端）
+        final List<JSONObject> recentArticlesMobile = articleQueryService.getIndexRecentArticles(50);
+        dataModel.put("recentArticlesMobile", recentArticlesMobile);
+
         // 活跃用户
         final List<JSONObject> niceUsers = userQueryService.getNiceUsers(10);
         dataModel.put(Common.NICE_USERS, niceUsers);

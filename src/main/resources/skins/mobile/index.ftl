@@ -40,8 +40,8 @@
 <div class="main" >
 
     <ul>
-        <#if recentArticles??>
-        <#list recentArticles as article>
+        <#if recentArticlesMobile??>
+        <#list recentArticlesMobile as article>
             <#include "common/list-item.ftl">
         </#list>
         </#if>
@@ -193,7 +193,7 @@
             rotate.submit();
             $("#randomArticles").fadeOut(100);
             $.ajax({
-                url: "${servePath}/article/random/12",
+                url: "${servePath}/article/random/14",
                 method: "GET",
                 cache: false,
                 async: true,
