@@ -1310,6 +1310,23 @@ var Util = {
      */
     _initActivity: function () {
         var $percent = $('.person-info'),
+            percent = $percent.data('percent');
+        console.log(percent)
+        if (percent == 100) {
+            $percent.find('.bottom').css({
+                'background-color': '#0068be',
+                'box-shadow': '0 0 5px #fff, 0 0 10px #0589F5;'
+            });
+        }
+        if (percent > 85) {
+            percent = 85;
+        }
+        $percent.find('.bottom').css({
+            'width': percent + '%',
+            'left': ((100 - percent) / 2) + '%',
+        })
+
+        /* var $percent = $('.person-info'),
             percent = $percent.data('percent'),
             bottom = 0,
             side = 0,
@@ -1348,7 +1365,7 @@ var Util = {
         $percent.find('.right').css({
             'height': side + '%',
             'top': (100 - side) + '%',
-        })
+        })*/
     },
     /**
      * 初始化清风明月

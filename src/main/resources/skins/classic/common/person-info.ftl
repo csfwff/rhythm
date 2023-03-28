@@ -33,7 +33,7 @@
 
 <#if isLoggedIn>
 <div class="module person-info" data-percent="${liveness}">
-    <div class="module-panel tooltipped tooltipped-s" aria-label="${todayActivityLabel} ${liveness}%">
+    <div class="module-panel">
         <ul class="status fn-flex">
             <li class="fn-pointer" onclick="window.location.href = '${servePath}/member/${currentUser.userName}/following/tags'">
                 <strong id="ftc">${currentUser.followingTagCnt?c}</strong>
@@ -50,21 +50,21 @@
         </ul>
 
         <div class="fn-clear">
-            <span>♠</span> <a href="${servePath}/top/balance">${wealthRankLabel}</a>
-            <span class="ft-red">♥</span> <a href="${servePath}/top/consumption">${consumptionRankLabel}</a>
-
             <div class="fn-right">
-                <a href="${servePath}/member/${currentUser.userName}/points" class="tooltipped tooltipped-w ft-fade"
-                   aria-label="${pointLabel} ${currentUser.userPoint?c}">
-                    <#if 0 == currentUser.userAppRole>0x${currentUser.userPointHex}<#else><div class="painter-point" style="background-color: #${currentUser.userPointCC}"></div></#if></a>
+                <a href="${servePath}/settings/point" style="text-decoration: none" class="tooltipped tooltipped-w ft-fade"
+                   aria-label="快捷转账" target="_blank">
+                    <svg style="vertical-align: -2px">
+                        <use xlink:href="#coin"></use>
+                    </svg> ${currentUser.userPoint?c}
+                </a>
             </div>
         </div>
     </div>
-    <div class="top-left activity-board"></div>
+    <!--<div class="top-left activity-board"></div>
     <div class="top-right activity-board"></div>
-    <div class="right activity-board"></div>
-    <div class="bottom activity-board"></div>
-    <div class="left activity-board"></div>
+    <div class="right activity-board"></div>-->
+    <div class="bottom activity-board tooltipped tooltipped-n" aria-label="${todayActivityLabel} ${liveness}%"aria-label="${todayActivityLabel} ${liveness}%"></div>
+    <!--<div class="left activity-board"></div>-->
     <script>
         function getActivityStatus() {
             $.ajax({

@@ -1406,12 +1406,12 @@ a[class*=" icon-"]:hover {
 }
 
 .person-info {
+  border-radius: 20px;
   border: 1px solid #eee;
   position: relative;
 
   .status {
     margin-top: 0;
-    margin-bottom: 20px;
     padding-top: 0;
   }
 
@@ -1425,8 +1425,8 @@ a[class*=" icon-"]:hover {
 
   .activity-board {
     position: absolute;
-    height: 2px;
-    background-color: $theme-accent;
+    height: 1px;
+    background-color: #60b044;
     top: -1px;
   }
 
@@ -1445,6 +1445,8 @@ a[class*=" icon-"]:hover {
   .bottom {
     top: auto;
     bottom: -1px;
+    box-shadow: 0 0 5px #fff,
+    0 0 10px #00a67c;
   }
 }
 
