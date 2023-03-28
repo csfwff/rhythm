@@ -41,26 +41,6 @@
     <#--            <@subNav 'community' ''/>-->
     <div class="wrapper">
         <div class="content chat-room">
-            <div class="discuss_title">
-                <a style="text-decoration: none; display: inline-block; cursor: default">
-                    <span style="color: #616161">当前话题：</span><span class="ft-green"># <span
-                                id="discuss-title">加载中...</span> #</span>
-                </a>
-                <div style="padding-left: 5px;display: inline-block;vertical-align: -2px;">
-                    <a onclick="ChatRoom.setDiscuss()" class="ft-a-title tooltipped tooltipped-se" aria-label="编辑话题"
-                       style="text-decoration: none;">
-                        <svg>
-                            <use xlink:href="#edit-discuss"></use>
-                        </svg>
-                    </a>
-                    <a onclick="ChatRoom.useDiscuss()" class="ft-a-title tooltipped tooltipped-se" aria-label="引用话题"
-                       style="text-decoration: none;">
-                        <svg>
-                            <use xlink:href="#pound"></use>
-                        </svg>
-                    </a>
-                </div>
-            </div>
             <div class="reply">
                 <#if isLoggedIn>
                     <div id="chatContent"></div>
@@ -82,6 +62,26 @@
                         <svg id="paintBtn" style="width: 30px; height: 30px; cursor:pointer;">
                             <use xlink:href="#icon-paint"></use>
                         </svg>
+                        <div class="discuss_title">
+                            <a style="text-decoration: none; display: inline-block; cursor: default">
+                                <span style="color: #616161">当前话题：</span><span class="ft-green"># <span
+                                            id="discuss-title">加载中...</span> #</span>
+                            </a>
+                            <div style="padding-left: 5px;display: inline-block;vertical-align: -2px;">
+                                <a onclick="ChatRoom.setDiscuss()" class="ft-a-title tooltipped tooltipped-se" aria-label="编辑话题"
+                                   style="text-decoration: none;">
+                                    <svg>
+                                        <use xlink:href="#edit-discuss"></use>
+                                    </svg>
+                                </a>
+                                <a onclick="ChatRoom.useDiscuss()" class="ft-a-title tooltipped tooltipped-se" aria-label="引用话题"
+                                   style="text-decoration: none;">
+                                    <svg>
+                                        <use xlink:href="#pound"></use>
+                                    </svg>
+                                </a>
+                            </div>
+                        </div>
                         <div class="hide-list" id="emojiList">
                             <div class="hide-list-emojis" id="emojis" style="max-height: 200px">
                             </div>
@@ -99,7 +99,8 @@
                                 </form>
                             </div>
                         </div>
-                        <div class="fn-right">
+                        <br>
+                        <div class="fn-right" style="margin-top: 6px">
                             <#if level3Permitted == true>
                                 <button id="groupRevoke" onclick="ChatRoom.startGroupRevoke()" class="button">
                                     批量撤回

@@ -473,17 +473,14 @@ blockquote {
 }
 
 .discuss_title {
-  cursor: pointer;
-  text-align: center;
+  vertical-align: 10px;
+  padding-left: 20px;
   text-decoration: none;
-  padding: 6px 2px;
-  margin: 9px 0;
   font-size: 13px;
   font-weight: 600;
   line-height: 1;
   color: $theme-secondary;
-  border-radius: 3px;
-  display: block;
+  display: inline-block;
 }
 
 .count {
