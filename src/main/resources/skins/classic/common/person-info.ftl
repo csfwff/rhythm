@@ -47,6 +47,9 @@
                 <strong>${currentUser.followingArticleCnt?c}</strong>
                 <span class="ft-gray">${followingArticlesLabel}</span>
             </li>
+            <li class="fn-pointer">
+                <div id="activityProcessor" class="fn-right" style="margin-top: 6px"></div>
+            </li>
         </ul>
 
         <div class="fn-clear">
@@ -57,19 +60,10 @@
                         <use xlink:href="#coin"></use>
                     </svg> ${currentUser.userPoint?c}
                 </a>
-                <div id="activityProcessor"></div>
             </div>
         </div>
     </div>
     <script>
-        setTimeout(function () {
-            var ccref = document.createElement('script')
-            ccref.setAttribute("type", "text/javascript")
-            ccref.setAttribute("src", '${staticServePath}/js/lib/circleChart.min.js')
-            document.getElementsByTagName("head")[0].appendChild(ccref)
-            console.log("Circle Chart loaded.")
-        }, 2000);
-
         function getActivityStatus() {
             $.ajax({
                 url: Label.servePath + "/user/liveness",
@@ -77,17 +71,36 @@
                 cache: false,
                 async: false,
                 success: function (result) {
-                    Util._initActivity(result.liveness);
+                    let percent = result.liveness;
+                    if (percent == 100) {
+                        Util._initActivity(percent, "#ff6515");
+                    } else if (percent > 80) {
+                        Util._initActivity(percent, "#ff930c");
+                    } else if (percent > 50) {
+                        Util._initActivity(percent, "#fdd802");
+                    } else if (percent > 15) {
+                        Util._initActivity(percent, "#587aff");
+                    } else {
+                        Util._initActivity(percent, "#5bde0f");
+                    }
                 }
             });
         }
+
+        setTimeout(function () {
+            var ccref = document.createElement('script')
+            ccref.setAttribute("type", "text/javascript")
+            ccref.setAttribute("src", '${staticServePath}/js/lib/circleChart.min.js')
+            document.getElementsByTagName("head")[0].appendChild(ccref)
+            console.log("Circle Chart loaded.")
+        }, 1000);
 
         setTimeout(function () {
             getActivityStatus();
             setInterval(function () {
                 getActivityStatus();
             }, 30000);
-        }, 3000);
+        }, 2000);
     </script>
 </div>
 </#if>

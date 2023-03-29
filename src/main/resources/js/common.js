@@ -1308,9 +1308,22 @@ var Util = {
      * 每日活跃样式
      * @returns {undefined}
      */
-    _initActivity: function (percent) {
+    _initActivity: function (percent, color) {
+        if (percent <= 0) {
+            percent = 1;
+        }
         $("#activityProcessor").circleChart({
-            value: percent
+            value: percent,
+            text: percent + '%',
+            color: color,
+            backgroundColor: "#e6e6e6",
+            size: 50,
+            widthRatio: 0.1,
+            background: false,
+            startAngle: 50,
+            onDraw: function(el, circle) {
+                circle.text(Math.round(circle.value) + "%");
+            }
         });
     },
     /**
