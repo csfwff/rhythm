@@ -79,7 +79,7 @@
                                         </form>
                                     </div>
                                 </div>
-                                <#if nightDisableMode == false>
+                                <#if nightDisableMode == true>
                                     <br>
                                     <div class="discuss_title" style="border-radius: 10px; padding: 10px 0 0 0">
                                         <a style="text-decoration: none; display: inline-block; cursor: default; font-weight: normal; background-color: #f6f6f670;">
