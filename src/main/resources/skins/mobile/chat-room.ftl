@@ -42,6 +42,7 @@
     <div class="wrapper">
         <div class="content chat-room">
             <div class="reply">
+                <br>
                 <#if isLoggedIn>
                     <div id="chatContent"></div>
                     <div id="liveliness"></div>
