@@ -29,10 +29,7 @@ import org.b3log.latke.ioc.BeanManager;
 import org.b3log.latke.model.User;
 import org.b3log.latke.repository.*;
 import org.b3log.latke.service.ServiceException;
-import org.b3log.symphony.model.Common;
-import org.b3log.symphony.model.Notification;
-import org.b3log.symphony.model.Pointtransfer;
-import org.b3log.symphony.model.UserExt;
+import org.b3log.symphony.model.*;
 import org.b3log.symphony.processor.ApiProcessor;
 import org.b3log.symphony.processor.ChatroomProcessor;
 import org.b3log.symphony.processor.channel.ChatroomChannel;
@@ -359,6 +356,36 @@ public class ChatRoomBot {
                             }
                             break;
                         case "处罚":
+                            try {
+                                String user = cmd1.split("\\s")[1].replaceAll("^(@)", "");
+                                int point = Integer.parseInt(cmd1.split("\\s")[2].replaceAll("[-.]", ""));
+                                String reas0n = cmd1.split("\\s")[3];
+                                final BeanManager beanManager = BeanManager.getInstance();
+                                UserQueryService userQueryService = beanManager.getReference(UserQueryService.class);
+                                JSONObject targetUser = userQueryService.getUserByName(user);
+                                if (null == targetUser) {
+                                    sendBotMsg("指令执行失败，用户不存在。");
+                                    break;
+                                }
+                                String targetUserId = targetUser.optString(Keys.OBJECT_ID);
+
+                                PointtransferMgmtService pointtransferMgmtService = beanManager.getReference(PointtransferMgmtService.class);
+                                OperationMgmtService operationMgmtService = beanManager.getReference(OperationMgmtService.class);
+                                NotificationMgmtService notificationMgmtService = beanManager.getReference(NotificationMgmtService.class);
+
+                                final String transferId = pointtransferMgmtService.transfer(targetUserId, Pointtransfer.ID_C_SYS,
+                                        Pointtransfer.TRANSFER_TYPE_C_ABUSE_DEDUCT, point, reas0n, System.currentTimeMillis(), "");
+                                operationMgmtService.addOperation(Operation.newOperation(context.getRequest(), Operation.OPERATION_CODE_C_DEDUCT_POINT, transferId));
+
+                                final JSONObject notification = new JSONObject();
+                                notification.put(Notification.NOTIFICATION_USER_ID, targetUserId);
+                                notification.put(Notification.NOTIFICATION_DATA_ID, transferId);
+                                notificationMgmtService.addAbusePointDeductNotification(notification);
+
+                                sendBotMsg("成功扣除成员 " + user + " 的 " + point + " 积分，原因：" + reas0n);
+                            } catch (Exception e) {
+                                sendBotMsg("参数错误。");
+                            }
                             break;
                         default:
                             sendBotMsg("<details><summary>执法帮助菜单</summary>\n" +
