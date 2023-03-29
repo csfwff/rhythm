@@ -57,15 +57,19 @@
                         <use xlink:href="#coin"></use>
                     </svg> ${currentUser.userPoint?c}
                 </a>
+                <div id="activityProcessor"></div>
             </div>
         </div>
     </div>
-    <!--<div class="top-left activity-board"></div>
-    <div class="top-right activity-board"></div>
-    <div class="right activity-board"></div>-->
-    <div class="bottom activity-board tooltipped tooltipped-n" aria-label="${todayActivityLabel} ${liveness}%"aria-label="${todayActivityLabel} ${liveness}%"></div>
-    <!--<div class="left activity-board"></div>-->
     <script>
+        setTimeout(function () {
+            var ccref = document.createElement('script')
+            ccref.setAttribute("type", "text/javascript")
+            ccref.setAttribute("src", '${staticServePath}/js/lib/circleChart.min.js')
+            document.getElementsByTagName("head")[0].appendChild(ccref)
+            console.log("Circle Chart loaded.")
+        }, 2000);
+
         function getActivityStatus() {
             $.ajax({
                 url: Label.servePath + "/user/liveness",
@@ -73,16 +77,17 @@
                 cache: false,
                 async: false,
                 success: function (result) {
-                    let liveness = result.liveness;
-                    $('.person-info').data('percent', liveness);
-                    Util._initActivity();
-                    $('.person-info>.module-panel').attr('aria-label', '今日活跃 ' + liveness + '%');
+                    Util._initActivity(result.liveness);
                 }
             });
         }
-        setInterval(function () {
+
+        setTimeout(function () {
             getActivityStatus();
-        }, 30000);
+            setInterval(function () {
+                getActivityStatus();
+            }, 30000);
+        }, 3000);
     </script>
 </div>
 </#if>

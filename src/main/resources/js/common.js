@@ -1308,64 +1308,10 @@ var Util = {
      * 每日活跃样式
      * @returns {undefined}
      */
-    _initActivity: function () {
-        var $percent = $('.person-info'),
-            percent = $percent.data('percent');
-        console.log(percent)
-        if (percent == 100) {
-            $percent.find('.bottom').css({
-                'background-color': '#0068be',
-                'box-shadow': '0 0 5px #fff, 0 0 10px #0589F5;'
-            });
-        }
-        if (percent > 85) {
-            percent = 85;
-        }
-        $percent.find('.bottom').css({
-            'width': percent + '%',
-            'left': ((100 - percent) / 2) + '%',
-        })
-
-        /* var $percent = $('.person-info'),
-            percent = $percent.data('percent'),
-            bottom = 0,
-            side = 0,
-            top = 0
-        if (percent <= 25) {
-            bottom = parseInt(percent / 0.25)
-        } else if (percent <= 75) {
-            bottom = 100
-            side = parseInt((percent - 25) / 2 / 0.25)
-        } else if (percent <= 100) {
-            bottom = 100
-            side = 100
-            top = parseInt((percent - 75) / 0.25)
-        }
-
-        $percent.find('.bottom').css({
-            'width': bottom + '%',
-            'left': ((100 - bottom) / 2) + '%',
-        })
-
-        $percent.find('.top-left').css({
-            'width': parseInt(top / 2) + '%',
-            'left': 0,
-        })
-
-        $percent.find('.top-right').css({
-            'width': parseInt(top / 2) + '%',
-            'right': 0,
-        })
-
-        $percent.find('.left').css({
-            'height': side + '%',
-            'top': (100 - side) + '%',
-        })
-
-        $percent.find('.right').css({
-            'height': side + '%',
-            'top': (100 - side) + '%',
-        })*/
+    _initActivity: function (percent) {
+        $("#activityProcessor").circleChart({
+            value: percent
+        });
     },
     /**
      * 初始化清风明月
@@ -1450,7 +1396,7 @@ var Util = {
         // 导航
         this._initNav()
         // 每日活跃
-        this._initActivity()
+        // this._initActivity()
         // 移动端分页
         if ($('.pagination select').length === 1) {
             $('.pagination select').change(function () {
