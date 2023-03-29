@@ -99,7 +99,7 @@
             getActivityStatus();
             setInterval(function () {
                 getActivityStatus();
-            }, 30000);
+            }, 1000 * 60 * 5);
         }, 2000);
     </script>
 </div>
