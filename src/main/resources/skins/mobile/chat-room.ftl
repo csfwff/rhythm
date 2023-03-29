@@ -45,13 +45,6 @@
                 <#if isLoggedIn>
                     <div id="chatContent"></div>
                     <div id="liveliness"></div>
-                    <#if nightDisableMode == true>
-                        <div class="discuss_title" style="border-radius: 10px">
-                            <a style="text-decoration: none; display: inline-block; cursor: default; font-weight: normal; background-color: #f6f6f670;">
-                                <span style="color: #616161">现在是聊天室宵禁时间 (19:30-08:00)，您发送的消息将不会产生活跃度，请早点下班休息 :)</span>
-                            </a>
-                        </div>
-                    </#if>
                     <div class="fn-clear" style="padding: 15px 0px 12px 0px;margin-bottom: 5px;border-bottom: 1px solid #eee;">
                         <svg id="redPacketBtn" style="width: 30px; height: 30px; cursor:pointer;">
                             <use xlink:href="#redPacketIcon"></use>
@@ -99,6 +92,15 @@
                                 </form>
                             </div>
                         </div>
+                        <br>
+                        <#if nightDisableMode == false>
+                            <br>
+                            <div class="discuss_title" style="border-radius: 10px; padding: 0 0 0 0">
+                                <a style="text-decoration: none; display: inline-block; cursor: default; font-weight: normal; background-color: #f6f6f670;">
+                                    <span style="color: #616161">💤 现在是聊天室宵禁时间 (19:30-08:00)，您发送的消息将不会产生活跃度，请早点下班休息 :)</span>
+                                </a>
+                            </div>
+                        </#if>
                         <br>
                         <div class="fn-right" style="margin-top: 6px">
                             <#if level3Permitted == true>
