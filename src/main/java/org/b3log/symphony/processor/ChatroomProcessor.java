@@ -627,6 +627,8 @@ public class ChatroomProcessor {
             } catch (NullPointerException ignored) {
             }
             final String userName = currentUser.optString(User.USER_NAME);
+            // 保存 Active 信息
+            chatroomChannel.userActive.put(userName, System.currentTimeMillis());
 
             final long time = System.currentTimeMillis();
             JSONObject msg = new JSONObject();
