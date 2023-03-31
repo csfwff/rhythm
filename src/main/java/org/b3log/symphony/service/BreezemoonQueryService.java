@@ -113,13 +113,14 @@ public class BreezemoonQueryService {
             while (iterator.hasNext()) {
                 final JSONObject bm = iterator.next();
                 String content = bm.optString(Breezemoon.BREEZEMOON_CONTENT);
-                content = Jsoup.clean(content, Whitelist.none());
+                content = Jsoup.clean(content, Whitelist.none().addTags("img")
+                        .addAttributes("img", "src", "alt")
+                        .addEnforcedAttribute("img", "style", "max-width: 1.3em; max-height: 1.3em;"));
                 content = StringUtils.trim(content);
                 if (StringUtils.isBlank(content)) {
                     iterator.remove();
                 }
 
-                content = StringUtils.substring(content, 0, 52);
                 bm.put(Breezemoon.BREEZEMOON_CONTENT, content);
             }
 

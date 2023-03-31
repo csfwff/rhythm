@@ -210,7 +210,7 @@ public class UserProcessor {
     public static final Map<String, Float> livenessCache = Collections.synchronizedMap(new LinkedHashMap<String, Float>() {
         @Override
         protected boolean removeEldestEntry(Map.Entry eldest) {
-            return size() > 1000;
+            return size() > 2000;
         }
     });
 

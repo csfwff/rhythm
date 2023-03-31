@@ -1308,47 +1308,23 @@ var Util = {
      * 每日活跃样式
      * @returns {undefined}
      */
-    _initActivity: function () {
-        var $percent = $('.person-info'),
-            percent = $percent.data('percent'),
-            bottom = 0,
-            side = 0,
-            top = 0
-        if (percent <= 25) {
-            bottom = parseInt(percent / 0.25)
-        } else if (percent <= 75) {
-            bottom = 100
-            side = parseInt((percent - 25) / 2 / 0.25)
-        } else if (percent <= 100) {
-            bottom = 100
-            side = 100
-            top = parseInt((percent - 75) / 0.25)
+    _initActivity: function (percent, color) {
+        if (percent <= 0) {
+            percent = 1;
         }
-
-        $percent.find('.bottom').css({
-            'width': bottom + '%',
-            'left': ((100 - bottom) / 2) + '%',
-        })
-
-        $percent.find('.top-left').css({
-            'width': parseInt(top / 2) + '%',
-            'left': 0,
-        })
-
-        $percent.find('.top-right').css({
-            'width': parseInt(top / 2) + '%',
-            'right': 0,
-        })
-
-        $percent.find('.left').css({
-            'height': side + '%',
-            'top': (100 - side) + '%',
-        })
-
-        $percent.find('.right').css({
-            'height': side + '%',
-            'top': (100 - side) + '%',
-        })
+        $("#activityProcessor").circleChart({
+            value: percent,
+            text: percent + '%',
+            color: color,
+            backgroundColor: "#e6e6e6",
+            size: 50,
+            widthRatio: 0.1,
+            background: false,
+            startAngle: 50,
+            onDraw: function(el, circle) {
+                circle.text(Math.round(circle.value) + "%");
+            }
+        });
     },
     /**
      * 初始化清风明月
@@ -1385,7 +1361,26 @@ var Util = {
                 }),
                 success: function (result) {
                     if (result.code === 0) {
-                        window.location.reload()
+                        let breezemoonAuthorName = result.data.breezemoonAuthorName;
+                        let breezemoonAuthorThumbnailURL48 = result.data.breezemoonAuthorThumbnailURL48;
+                        let breezemoonContent = result.data.breezemoonContent;
+                        let breezemoonOId = result.data.oId;
+                        let list = $btn.parent().parent().find('.module-list');
+                        list.prepend(
+                            "<li style=\"display: none\">\n" +
+                            "<a href=\"" + Label.servePath + "/member/" + breezemoonAuthorName + "\">\n" +
+                            "<span class=\"avatar-small slogan\" aria-label=\"" + breezemoonAuthorName + "\" style=\"background-image: url(" + breezemoonAuthorThumbnailURL48 + ")\"></span>\n" +
+                            "</a>\n" +
+                            "<a href=\"" + Label.servePath + "/member/" + breezemoonAuthorName + "/breezemoons/" + breezemoonOId + "\" class=\"title\">" + breezemoonContent + "</a>\n" +
+                            "</li>"
+                        );
+                        let input = $btn.parent().find("input");
+                        input.val("");
+                        list.find("li:last").fadeOut(199, function () {
+                            list.find("li:last").remove();
+                        });
+                        list.find("li:first").slideDown(200);
+                        Util.listenUserCard();
                     } else {
                         Util.alert(result.msg)
                     }
@@ -1414,7 +1409,7 @@ var Util = {
         // 导航
         this._initNav()
         // 每日活跃
-        this._initActivity()
+        // this._initActivity()
         // 移动端分页
         if ($('.pagination select').length === 1) {
             $('.pagination select').change(function () {

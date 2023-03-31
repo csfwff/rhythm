@@ -1785,17 +1785,7 @@ public class ArticleProcessor {
 
         Stopwatchs.start("Load random articles");
         try {
-            int tried = 0;
-            int arraySize = 0;
-            List<JSONObject> articles = null;
-            while (arraySize < size) {
-                articles = articleRepository.getRandomly(size * 5);
-                arraySize = articles.size();
-                tried++;
-                if (tried > 50) {
-                    return null;
-                }
-            }
+            List<JSONObject> articles = articleRepository.getRandomly(size);
             articleQueryService.organizeArticles(articles);
             Collections.shuffle(articles);
             return articles.subList(0, size);

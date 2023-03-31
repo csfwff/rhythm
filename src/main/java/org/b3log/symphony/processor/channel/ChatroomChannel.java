@@ -32,6 +32,7 @@ import org.b3log.symphony.service.AvatarQueryService;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -60,6 +61,8 @@ public class ChatroomChannel implements WebSocketChannel {
      */
     public static String discussing = "暂无";
 
+    public static final Map<String, Long> userActive = Collections.synchronizedMap(new HashMap<>());
+
     /**
      * Called when the socket connection with the browser is established.
      *
@@ -79,6 +82,8 @@ public class ChatroomChannel implements WebSocketChannel {
             // 单独发送在线信息
             final String msgStr = getOnline().toString();
             session.sendText(msgStr);
+            // 保存 Active 信息
+            userActive.put(user.optString("userName"), System.currentTimeMillis());
         } else {
             session.close();
         }
@@ -201,6 +206,58 @@ public class ChatroomChannel implements WebSocketChannel {
         }
 
         SESSIONS.remove(session);
+    }
+
+    public static Map<String, Long> check() {
+        Map<String, JSONObject> filteredOnlineUsers = new HashMap<>();
+        for (JSONObject object : onlineUsers.values()) {
+            String name = object.optString(User.USER_NAME);
+            filteredOnlineUsers.put(name, object);
+        }
+        Long currentTime = System.currentTimeMillis();
+        int sixHours = 1000 * 60 * 60 * 6;
+        Map<String, Long> needKickUsers = new HashMap<>();
+        for (String user : filteredOnlineUsers.keySet()) {
+            try {
+                Long activeTime = userActive.get(user);
+                Long spareTime = currentTime - activeTime;
+                if (spareTime >= sixHours) {
+                    needKickUsers.put(user, (spareTime / (1000 * 60 * 60)));
+                    new Thread(() -> {
+                        List<WebSocketSession> senderSessions = new ArrayList<>();
+                        for (Map.Entry<WebSocketSession, JSONObject> entry : onlineUsers.entrySet()) {
+                            try {
+                                String tempUserName = entry.getValue().optString(User.USER_NAME);
+                                if (tempUserName.equals(user)) {
+                                    senderSessions.add(entry.getKey());
+                                }
+                            } catch (Exception ignored) {
+                            }
+                        }
+                        for (WebSocketSession session : senderSessions) {
+                            session.sendText("{\n" +
+                                    "    \"md\": \"由于您超过6小时未活跃，已将您断开连接，如要继续聊天请刷新页面，谢谢 :)\",\n" +
+                                    "    \"userAvatarURL\": \"https://pwl.stackoverflow.wiki/2022/01/robot3-89631199.png\",\n" +
+                                    "    \"userAvatarURL20\": \"https://pwl.stackoverflow.wiki/2022/01/robot3-89631199.png\",\n" +
+                                    "    \"userNickname\": \"人工智障\",\n" +
+                                    "    \"sysMetal\": \"\",\n" +
+                                    "    \"time\": \"" + new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(System.currentTimeMillis()) + "\",\n" +
+                                    "    \"oId\": \"" + System.currentTimeMillis() + "\",\n" +
+                                    "    \"userName\": \"摸鱼派官方巡逻机器人\",\n" +
+                                    "    \"type\": \"msg\",\n" +
+                                    "    \"userAvatarURL210\": \"https://pwl.stackoverflow.wiki/2022/01/robot3-89631199.png\",\n" +
+                                    "    \"content\": \"<p>由于您超过6小时未活跃，已将您断开连接，如要继续聊天请刷新页面，谢谢 :)</p>\",\n" +
+                                    "    \"userAvatarURL48\": \"https://pwl.stackoverflow.wiki/2022/01/robot3-89631199.png\"\n" +
+                                    "}");
+                            removeSession(session);
+                        }
+                    }).start();
+                }
+            } catch (Exception ignored) {
+            }
+        }
+
+        return needKickUsers;
     }
 
     /**

@@ -186,7 +186,7 @@
             <div class="module-panel">
                 <ul class="module-list">
                     <#list topCheckinUsers as user>
-                        <#if user_index < 6>
+                        <#if user_index < 7>
                             <li class="fn-flex rank topCheckInUsersElement">
                                 <#if user_index == 0 || user_index == 1 || user_index == 2>
                                 <span
@@ -227,7 +227,7 @@
             <div class="module-panel">
                 <ul class="module-list">
                     <#list onlineTopUsers as user>
-                        <#if user_index < 5>
+                        <#if user_index < 6>
                             <li class="fn-flex rank topCheckInUsersElement">
                                 <#if user_index == 0 || user_index == 1 || user_index == 2>
                                 <span
@@ -278,7 +278,7 @@
 
     <div class="wrapper index-full-size" id="goodNight" style="display: none"></div>
 
-    <div class="index-bottom">
+    <div class="index-bottom" style="border-top: 1px solid #f3f3f3;">
         <div class="wrapper">
             <div class="fn-flex-1">
                 <div class="metro-line fn-flex" style="align-items:center;">
@@ -354,15 +354,15 @@
                     <div style="clear:both;"></div>
                 </div>
                 <div class="module-panel">
-                    <div class="module-header form">
+                    <div class="module-header form" style="border: none;">
                         <input id="chatRoomInput"
                                type="text"
                                class="comment__text breezemoon__input"
-                               placeholder="简单聊聊 (高级功能请访问完整版聊天室哦)"/>
+                               placeholder="说点什么..."/>
                         <div id="chatUsernameSelectedPanel" class="completed-panel"
                              style="height:170px;display:none;left:auto;top:auto;cursor:pointer;"></div>
                         <span id="chatRoomPostBtn" class="btn breezemoon__btn" data-csrf="${csrfToken}"
-                              onclick="sendChat()">Biu~</span>
+                              onclick="sendChat()">发送</span>
                     </div>
                     <div class="module-panel">
                         <ul class="module-list" id="chatRoomIndex">
@@ -501,7 +501,7 @@
                     <div style="clear:both;"></div>
                 </div>
                 <div class="module-panel">
-                    <div class="module-header form">
+                    <div class="module-header form" style="border: none;">
                         <input id="breezemoonInput"
                                type="text"
                                class="comment__text breezemoon__input"
@@ -751,7 +751,7 @@
             rotate.submit();
             $("#randomArticles").fadeOut(100);
             $.ajax({
-                url: "${servePath}/article/random/12",
+                url: "${servePath}/article/random/14",
                 method: "GET",
                 cache: false,
                 async: true,
