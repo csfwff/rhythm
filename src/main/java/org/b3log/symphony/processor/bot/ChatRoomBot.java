@@ -70,7 +70,7 @@ public class ChatRoomBot {
     private static final Map<String, String> RECORD_MAP = Collections.synchronizedMap(new LinkedHashMap<String, String>() {
         @Override
         protected boolean removeEldestEntry(Map.Entry eldest) {
-            return size() > 100;
+            return size() > 2000;
         }
     });
 
