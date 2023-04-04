@@ -344,7 +344,19 @@ public class ChatRoomBot {
                             break;
                         case "维护":
                             Map<String, Long> result = ChatroomChannel.check();
-
+                            StringBuilder stringBuilder = new StringBuilder();
+                            if (result.isEmpty()) {
+                                sendBotMsg("报告！没有超过6小时未活跃的成员，一切都很和谐~");
+                            } else {
+                                stringBuilder.append("报告！成功扫描超过6小时未活跃的成员，并已在通知后将他们断开连接：<br>");
+                                stringBuilder.append("<details><summary>不活跃用户列表</summary>");
+                                for (String i : result.keySet()) {
+                                    long time = result.get(i);
+                                    stringBuilder.append(i + " AFK " + time + "小时<br>");
+                                }
+                                stringBuilder.append("</details>");
+                                sendBotMsg(stringBuilder.toString());
+                            }
                             break;
                         case "处罚":
                             break;
