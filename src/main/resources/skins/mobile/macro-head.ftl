@@ -32,5 +32,5 @@
 <link rel="apple-touch-icon" href="${staticServePath}/images/faviconH.png">
 <link rel="stylesheet" href="${staticServePath}/js/lib/tooltips/tooltips.min.css?${staticResourceVersion}">
 ${siteVisitStatCode}
-<script type="text/javascript" charset="UTF-8" src="https://cdn.wwads.cn/js/makemoney.js" async></script>
+<script type="text/javascript" charset="UTF-8" src="https://cdn.wwads.cn/js/makemoney.js"></script>
 </#macro>
