@@ -64,7 +64,7 @@
                 <div>
                     <label>
                         <input id="showTopAd" type="checkbox" <#if showTopAd>checked="checked"</#if>>
-                        显示主页广告
+                        显示顶部广告
                     </label>
                 </div>
             </div>

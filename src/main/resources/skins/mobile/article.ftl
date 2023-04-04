@@ -39,6 +39,9 @@
         <#include "header.ftl">
         <div class="main">
             <div class="wrapper">
+                <#if showTopAd>
+                    ${HeaderBannerLabel}
+                </#if>
                 <div class="article-actions fn-clear">
                     <span class="fn-right">
                         <#if permissions["commonViewArticleHistory"].permissionGrant && article.articleRevisionCount &gt; 1>

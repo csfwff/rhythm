@@ -66,6 +66,9 @@
 <p itemprop="description" class="fn-none">"${article.articlePreviewContent}"</p>
 <#include "header.ftl">
 <div class="article-body">
+    <#if showTopAd>
+        ${HeaderBannerLabel}
+    </#if>
     <div class="wrapper">
         <h1 class="article-title" itemprop="name">
             <@icon article.articlePerfect article.articleType></@icon>
