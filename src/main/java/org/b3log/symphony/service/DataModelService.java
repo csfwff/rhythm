@@ -541,7 +541,7 @@ public class DataModelService {
                         dataModel.put("cardBg", "");
                         dataModel.put(SystemSettings.ONLINE_TIME_UNIT, "m");
                         dataModel.put("showSideAd", true);
-                        dataModel.put("showTopAd", false);
+                        dataModel.put("showTopAd", true);
                         return;
                     }
                     final String settingsJson = systemSettings.optString(SystemSettings.SETTINGS);
