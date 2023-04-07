@@ -58,13 +58,13 @@
                 <div>
                     <label>
                         <input id="showSideAd" type="checkbox" <#if showSideAd>checked="checked"</#if>>
-                        显示侧栏广告 (融入感强，默认开启)
+                        显示侧栏广告
                     </label>
                 </div>
                 <div>
                     <label>
                         <input id="showTopAd" type="checkbox" <#if showTopAd>checked="checked"</#if>>
-                        显示顶栏广告 (较突兀，默认关闭)
+                        显示顶部广告
                     </label>
                 </div>
             </div>

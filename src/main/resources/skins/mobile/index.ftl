@@ -28,17 +28,15 @@
     </@head>
 </head>
 <body class="index" style="background-color: #f6f6f6;">
-<#if showTopAd>
-    ${HeaderBannerLabel}
-</#if>
 <div class="mobile-head">
     <#include "header.ftl">
     <@indexNav ''/>
 </div>
 <div style="height: 74px;width: 1px;" ></div>
-
+<#if showTopAd>
+    ${HeaderBannerLabel}
+</#if>
 <div class="main" >
-
     <ul>
         <#if recentArticlesMobile??>
         <#list recentArticlesMobile as article>

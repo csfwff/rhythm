@@ -31,10 +31,10 @@
 </head>
 <body class="index">
 
+<#include "header.ftl">
 <#if showTopAd>
     ${HeaderBannerLabel}
 </#if>
-<#include "header.ftl">
 <div class="main">
     <div class="wrapper index-full-size-white" id="nightTips" style="display: none"></div>
     <div class="wrapper" style="padding-bottom: 20px">
