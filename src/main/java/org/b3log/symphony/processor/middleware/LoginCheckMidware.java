@@ -18,9 +18,6 @@
  */
 package org.b3log.symphony.processor.middleware;
 
-import org.apache.logging.log4j.Level;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.b3log.latke.http.RequestContext;
 import org.b3log.latke.ioc.Singleton;
 import org.b3log.latke.model.User;
@@ -28,9 +25,6 @@ import org.b3log.symphony.model.UserExt;
 import org.b3log.symphony.processor.ApiProcessor;
 import org.b3log.symphony.util.Sessions;
 import org.json.JSONObject;
-
-import java.util.Iterator;
-
 /**
  * Login check. Gets user from request attribute named "user" if logged in.
  *
@@ -40,12 +34,6 @@ import java.util.Iterator;
  */
 @Singleton
 public class LoginCheckMidware {
-
-    /**
-     * Logger.
-     */
-    private static final Logger LOGGER = LogManager.getLogger(LoginCheckMidware.class);
-
     public void handle(final RequestContext context) {
         JSONObject currentUser = Sessions.getUser();
         try {
@@ -58,11 +46,6 @@ public class LoginCheckMidware {
         } catch (NullPointerException ignored) {
         }
         if (null == currentUser) {
-            LOGGER.log(Level.ERROR, "Unauthorized error 401 " + context.getRequest().getRequestURI());
-            for (Iterator<String> it = context.getRequest().getHeaderNames(); it.hasNext(); ) {
-                String i = it.next();
-                System.out.println(i + " " + context.getRequest().getHeader(i));
-            }
             context.sendError(401);
             context.abort();
             return;
