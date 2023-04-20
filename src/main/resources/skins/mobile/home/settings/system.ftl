@@ -128,6 +128,7 @@
         $('#iconURL').data('imageurl', imgUrl);
         $('#iconURL').css('background-image', 'url(\'' + imgUrl + '\')');
         Settings.update('system', '${csrfToken}');
+        location.reload();
     });
 
     let currentCardBg = "${cardBg}";

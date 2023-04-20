@@ -33,7 +33,7 @@
 <meta http-equiv="Window-target" content="_top" />
 <link rel="stylesheet" href="${staticServePath}/css/responsive.css?${staticResourceVersion}" />
 <link rel="stylesheet" href="${staticServePath}/css/base.css?${staticResourceVersion}" />
-<link rel="icon" type="image/png" href="${staticServePath}/images/favicon.png" />
+<link rel="icon" type="image/png" href="${iconURL}" />
 <link rel="apple-touch-icon" href="${staticServePath}/images/faviconH.png">
 <link rel="search" type="application/opensearchdescription+xml" title="Rym" href="/opensearch.xml">
 <link rel="stylesheet" href="${staticServePath}/js/lib/tooltips/tooltips.min.css?${staticResourceVersion}">

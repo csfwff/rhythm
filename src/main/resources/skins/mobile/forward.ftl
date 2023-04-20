@@ -25,9 +25,9 @@
     <title>${forwardingLabel} - ${symphonyLabel}</title>
     <meta name="description" content="${forwardingLabel}"/>
     <meta name="robots" content="noindex">
-    <link rel="icon" type="image/png" href="${staticServePath}/images/favicon.png"/>
+    <link rel="icon" type="image/png" href="${iconURL}"/>
     <link rel="apple-touch-icon" href="${staticServePath}/images/apple-touch-icon.png">
-    <link rel="shortcut icon" type="image/x-icon" href="${staticServePath}/images/favicon.png">
+    <link rel="shortcut icon" type="image/x-icon" href="${iconURL}">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"/>
     <style>
         html {
