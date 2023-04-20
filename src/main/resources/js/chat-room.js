@@ -525,7 +525,7 @@ border-bottom: none;
             success: function (result) {
                 let list = result.data;
                 if (list.length == 0) {
-                    $("#si-guo-list").prepend('<li style="color: #3caf36">目前沒有受到處罰的魚油，請繼續保持！</li>');
+                    $("#si-guo-list").prepend('<li style="color: #3caf36; font-weight: bold;">目前沒有受到處罰的魚油，請繼續保持！</li>');
                 }
                 for (let i = 0; i < list.length; i++) {
                     let j = list[i];
