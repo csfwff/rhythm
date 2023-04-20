@@ -474,6 +474,40 @@ var ChatRoom = {
         });
     },
     /**
+     * 打开思过崖
+     */
+    showSiGuoYar: function () {
+        Util.alert(`
+<style>
+.dialog-panel {
+border-radius: 20px 20px 20px 20px;
+border: 0;
+box-shadow: none;
+}
+.dialog-header-bg {
+display: none;
+}
+.dialog-main {
+height: 456px;
+overflow: auto;
+padding: 10px 10px 20px !important;
+color: #e1e1e1;
+background: url(https://file.fishpi.cn/2023/04/面壁-5e5b04c3.jpg) no-repeat;
+background-size: 100% 100%;
+background-attachment: fixed;
+}
+</style>
+<div class="fn-hr5"></div>
+<div class="ft__center">
+    <div>
+        <h2>思过崖</h2>
+        <div class="fn-hr5"></div>
+        <span>摸鱼派倡导自由、友善的交流环境。<br>这里收留了因不遵守摸鱼法则受到面壁处罚的鱼油。</span>
+    </div>
+</div>
+`);
+    },
+    /**
      * 提交写好字的图片.
      *
      * @param {string} id canvas id.

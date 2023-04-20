@@ -641,7 +641,7 @@ public class ChatRoomBot {
         }
     }
 
-    public static String getSiGuoList() {
+    public static JSONArray getSiGuoList() {
         try {
             final BeanManager beanManager = BeanManager.getInstance();
             CloudRepository cloudRepository = beanManager.getReference(CloudRepository.class);
@@ -652,13 +652,13 @@ public class ChatRoomBot {
                     ));
             JSONObject result = cloudRepository.getFirst(cloudQuery);
             if (null != result) {
-                return result.optString("data");
+                return new JSONArray(result.optString("data"));
             } else {
-                return "[]";
+                return new JSONArray();
             }
         } catch (Exception e) {
             LOGGER.log(Level.ERROR, "Get SiGuo failed", e);
-            return "[]";
+            return new JSONArray();
         }
     }
 
