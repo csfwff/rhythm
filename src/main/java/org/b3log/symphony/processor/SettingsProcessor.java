@@ -870,12 +870,14 @@ public class SettingsProcessor {
         }
         String systemTitle = requestJSONObject.optString(SystemSettings.SYSTEM_TITLE);
         String cardBg = requestJSONObject.optString("cardBg");
+        String iconURL = requestJSONObject.optString("iconURL");
         String onlineTimeUnit = requestJSONObject.optString(SystemSettings.ONLINE_TIME_UNIT);
         boolean showSideAd = requestJSONObject.optBoolean("showSideAd");
         boolean showTopAd = requestJSONObject.optBoolean("showTopAd");
         final JSONObject settings = new JSONObject();
         settings.put(SystemSettings.SYSTEM_TITLE, systemTitle);
         settings.put("cardBg", cardBg);
+        settings.put("iconURL", iconURL);
         settings.put(SystemSettings.ONLINE_TIME_UNIT, onlineTimeUnit);
         settings.put("showSideAd", showSideAd);
         settings.put("showTopAd", showTopAd);
