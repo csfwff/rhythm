@@ -605,6 +605,12 @@ public class ChatRoomBot {
         }
     }
 
+    public static void registerSiGuo(String userId, String time) {
+        final BeanManager beanManager = BeanManager.getInstance();
+        CloudRepository cloudRepository = beanManager.getReference(CloudRepository.class);
+
+    }
+
     // 禁言
     public static void mute(String userId, int minute) {
         final BeanManager beanManager = BeanManager.getInstance();
@@ -633,7 +639,7 @@ public class ChatRoomBot {
     public static void muteAndNotice(String username, String userId, int minute) {
         if (minute == 0){
             sendBotMsg("提醒：@" + username + "  被管理员 解除 禁言");
-        }else {
+        } else {
             sendBotMsg("提醒：@" + username + "  被管理员 禁言 " + minute + " 分钟。");
         }
         mute(userId, minute);

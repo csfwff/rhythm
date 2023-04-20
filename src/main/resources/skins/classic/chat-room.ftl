@@ -41,7 +41,7 @@
                         <#if isLoggedIn>
                             <div id="chatContent"></div>
                             <br>
-                            <div class="fn-clear" style="padding: 5px 0px 12px 0px;margin-bottom: 5px;border-bottom: 1px solid #eee;">
+                            <div class="fn-clear" style="padding: 5px 0 7px 0;">
                                 <svg id="redPacketBtn" style="width: 30px; height: 30px; cursor:pointer;">
                                     <use xlink:href="#redPacketIcon"></use>
                                 </svg>
