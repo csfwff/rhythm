@@ -641,6 +641,27 @@ public class ChatRoomBot {
         }
     }
 
+    public static String getSiGuoList() {
+        try {
+            final BeanManager beanManager = BeanManager.getInstance();
+            CloudRepository cloudRepository = beanManager.getReference(CloudRepository.class);
+            Query cloudQuery = new Query()
+                    .setFilter(CompositeFilterOperator.and(
+                            new PropertyFilter("userId", FilterOperator.EQUAL, "si:guo"),
+                            new PropertyFilter("gameId", FilterOperator.EQUAL, "record")
+                    ));
+            JSONObject result = cloudRepository.getFirst(cloudQuery);
+            if (null != result) {
+                return result.optString("data");
+            } else {
+                return "[]";
+            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, "Get SiGuo failed", e);
+            return "[]";
+        }
+    }
+
     public static void registerSiGuo(String userId, long time) {
         try {
             JSONArray oldJSON = new JSONArray();
@@ -660,14 +681,17 @@ public class ChatRoomBot {
                 transaction.commit();
             }
             JSONArray data = new JSONArray();
-            if (time > System.currentTimeMillis()) {
-                data.put(new JSONObject().put("userName", userQueryService.getUser(userId).optString(User.USER_NAME)).put("time", time));
-            }
+            String userName = userQueryService.getUser(userId).optString(User.USER_NAME);
             for (int i = 0; i < oldJSON.length(); i++) {
                 JSONObject json = oldJSON.optJSONObject(i);
                 if (json.optLong("time") > System.currentTimeMillis()) {
-                    data.put(json);
+                    if (!json.optString("userName").equals(userName)) {
+                        data.put(json);
+                    }
                 }
+            }
+            if (time > System.currentTimeMillis()) {
+                data.put(new JSONObject().put("userName", userName).put("time", time));
             }
             JSONObject cloudJSON = new JSONObject();
             cloudJSON.put("userId", "si:guo")
