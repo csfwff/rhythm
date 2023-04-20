@@ -533,15 +533,16 @@ border-bottom: none;
                     let userAvatarURL = j.userAvatarURL;
                     let userName = j.userName;
                     let userNickname = j.userNickname;
+                    let useName = userName;
                     if (userNickname != '') {
-                        userName = userNickname;
+                        useName = userNickname;
                     }
                     $("#si-guo-list").prepend(`
     <li class="fn__flex menu__item">
         <img class="avatar avatar--mid" style="width: 24px; height: 24px; margin-right: 10px; background-image: none; background-color: transparent; filter: blur(1px);" src="` + userAvatarURL + `">
         <div class="fn__flex-1" style="text-align: left !important;">
             <h2 class="list__user">
-                <a target="_blank" href="` + Label.servePath + `/member/` + userName + `" style="color: #c0c0c0; text-decoration: none;">` + userName + `</a>
+                <a target="_blank" href="` + Label.servePath + `/member/` + userName + `" style="color: #c0c0c0; text-decoration: none;">` + useName + `</a>
             </h2>
         </div>
         <div class="fn__flex-center" style="color: #ff1919; font-weight: bold">將於 ` + date.getFullYear() + `年` + (date.getMonth()+1 < 10 ? '0'+(date.getMonth()+1) : date.getMonth()+1) + `月` + date.getDate() + `日 ` + date.getHours() + `時` + date.getMinutes() + `分 釋放</div>
