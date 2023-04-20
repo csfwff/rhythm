@@ -109,6 +109,7 @@
                                     批量撤回
                                 </button>
                             </#if>
+                            <button class="button" onclick="ChatRoom.showSiGuoYar()">思过崖</button>
                             <button class="button"
                                     onclick="$('#chats').empty();page=0;ChatRoom.more();">${cleanScreenLabel}</button>
                             <button class="green" onclick="ChatRoom.send()">发送</button>

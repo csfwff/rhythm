@@ -495,17 +495,58 @@ color: #e1e1e1;
 background: url(https://file.fishpi.cn/2023/04/面壁-5e5b04c3.jpg) no-repeat;
 background-size: 100% 100%;
 background-attachment: fixed;
+font-family: STKaiti;
+}
+.list>ul {
+margin-top: 15px;
+}
+.list>ul>li {
+padding: 6px 8px;
+border-bottom: none;
 }
 </style>
 <div class="fn-hr5"></div>
 <div class="ft__center">
     <div>
-        <h2>思过崖</h2>
+        <h2>思過崖</h2>
         <div class="fn-hr5"></div>
-        <span>摸鱼派倡导自由、友善的交流环境。<br>这里收留了因不遵守摸鱼法则受到面壁处罚的鱼油。</span>
+        <span>摸魚派倡導自由、友善的交流環境。<br>這裏收留了因不遵守摸魚法則而受到處罰的魚油。</span>
     </div>
-</div>
-`);
+    <div class="list">
+    <ul id="si-guo-list">
+    </ul>
+    </div>
+</div>`);
+        $.ajax({
+            url: Label.servePath + '/chat-room/si-guo-list',
+            type: 'GET',
+            cache: false,
+            async: false,
+            success: function (result) {
+                let list = result.data;
+                for (let i = 0; i < list.length; i++) {
+                    let j = list[i];
+                    let date = new Date(j.time);
+                    let userAvatarURL = j.userAvatarURL;
+                    let userName = j.userName;
+                    let userNickname = j.userNickname;
+                    if (userNickname != '') {
+                        userName = userNickname;
+                    }
+                    $("#si-guo-list").prepend(`
+    <li class="fn__flex menu__item">
+        <img class="avatar avatar--mid" style="width: 24px; height: 24px; margin-right: 10px; background-image: none; background-color: transparent; filter: blur(1px);" src="` + userAvatarURL + `">
+        <div class="fn__flex-1" style="text-align: left !important;">
+            <h2 class="list__user">
+                <a target="_blank" href="` + Label.servePath + `/member/` + userName + `" style="color: #c0c0c0; text-decoration: none;">` + userName + `</a>
+            </h2>
+        </div>
+        <div class="fn__flex-center" style="color: #ff1919; font-weight: bold">將於 ` + date.getFullYear() + `年` + (date.getMonth()+1 < 10 ? '0'+(date.getMonth()+1) : date.getMonth()+1) + `月` + date.getDate() + `日 ` + date.getHours() + `時` + date.getMinutes() + `分 釋放</div>
+    </li>
+                `);
+                }
+            }
+        })
     },
     /**
      * 提交写好字的图片.

@@ -211,6 +211,12 @@ public class ChatroomProcessor {
      */
     public void getSiGuoList(final RequestContext context) {
         JSONArray list = ChatRoomBot.getSiGuoList();
+        for (Object i : list) {
+            JSONObject j = (JSONObject) i;
+            JSONObject user = userQueryService.getUserByName(j.optString(User.USER_NAME));
+            j.put(UserExt.USER_AVATAR_URL, user.optString(UserExt.USER_AVATAR_URL));
+            j.put(UserExt.USER_NICKNAME, user.optString(UserExt.USER_NICKNAME));
+        }
         JSONObject ret = new JSONObject();
         ret.put(Keys.CODE, StatusCodes.SUCC);
         ret.put(Keys.MSG, "");
