@@ -39,6 +39,7 @@ import org.b3log.symphony.service.*;
 import org.b3log.symphony.util.JSONs;
 import org.b3log.symphony.util.Sessions;
 import org.b3log.symphony.util.StatusCodes;
+import org.json.JSONArray;
 import org.json.JSONObject;
 import pers.adlered.simplecurrentlimiter.main.SimpleCurrentLimiter;
 
@@ -605,10 +606,79 @@ public class ChatRoomBot {
         }
     }
 
-    public static void registerSiGuo(String userId, String time) {
-        final BeanManager beanManager = BeanManager.getInstance();
-        CloudRepository cloudRepository = beanManager.getReference(CloudRepository.class);
+    public static void refreshSiGuo() {
+        try {
+            final BeanManager beanManager = BeanManager.getInstance();
+            CloudRepository cloudRepository = beanManager.getReference(CloudRepository.class);
+            Query cloudQuery = new Query()
+                    .setFilter(CompositeFilterOperator.and(
+                            new PropertyFilter("userId", FilterOperator.EQUAL, "si:guo"),
+                            new PropertyFilter("gameId", FilterOperator.EQUAL, "record")
+                    ));
+            JSONObject result = cloudRepository.getFirst(cloudQuery);
+            JSONArray array = new JSONArray();
+            if (null != result) {
+                // 删除旧记录
+                Transaction transaction = cloudRepository.beginTransaction();
+                cloudRepository.remove(cloudQuery);
+                // 写入新记录
+                JSONArray jsonArray = new JSONArray(result.optString("data"));
+                for (int i = 0; i < jsonArray.length(); i++) {
+                    JSONObject jsonObject = jsonArray.optJSONObject(i);
+                    if (jsonObject.optLong("time") > System.currentTimeMillis()) {
+                        array.put(jsonObject);
+                    }
+                }
+                JSONObject cloudJSON = new JSONObject();
+                cloudJSON.put("userId", "si:guo")
+                        .put("gameId", "record")
+                        .put("data", array.toString());
+                cloudRepository.add(cloudJSON);
+                transaction.commit();
+            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, "Refresh SiGuo failed", e);
+        }
+    }
 
+    public static void registerSiGuo(String userId, long time) {
+        try {
+            JSONArray oldJSON = new JSONArray();
+            final BeanManager beanManager = BeanManager.getInstance();
+            CloudRepository cloudRepository = beanManager.getReference(CloudRepository.class);
+            UserQueryService userQueryService = beanManager.getReference(UserQueryService.class);
+            Query cloudQuery = new Query()
+                    .setFilter(CompositeFilterOperator.and(
+                            new PropertyFilter("userId", FilterOperator.EQUAL, "si:guo"),
+                            new PropertyFilter("gameId", FilterOperator.EQUAL, "record")
+                    ));
+            JSONObject result = cloudRepository.getFirst(cloudQuery);
+            if (null != result) {
+                oldJSON = new JSONArray(result.optString("data"));
+                Transaction transaction = cloudRepository.beginTransaction();
+                cloudRepository.remove(cloudQuery);
+                transaction.commit();
+            }
+            JSONArray data = new JSONArray();
+            if (time > System.currentTimeMillis()) {
+                data.put(new JSONObject().put("userName", userQueryService.getUser(userId).optString(User.USER_NAME)).put("time", time));
+            }
+            for (int i = 0; i < oldJSON.length(); i++) {
+                JSONObject json = oldJSON.optJSONObject(i);
+                if (json.optLong("time") > System.currentTimeMillis()) {
+                    data.put(json);
+                }
+            }
+            JSONObject cloudJSON = new JSONObject();
+            cloudJSON.put("userId", "si:guo")
+                    .put("gameId", "record")
+                    .put("data", data.toString());
+            Transaction transaction = cloudRepository.beginTransaction();
+            cloudRepository.add(cloudJSON);
+            transaction.commit();
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, "Register SiGuo failed", e);
+        }
     }
 
     // 禁言
@@ -625,11 +695,13 @@ public class ChatRoomBot {
                     ));
             cloudRepository.remove(cloudDeleteQuery);
             JSONObject cloudJSON = new JSONObject();
+            long time = System.currentTimeMillis() + muteTime;
             cloudJSON.put("userId", userId)
                     .put("gameId", CloudService.SYS_MUTE)
-                    .put("data", ("" + (System.currentTimeMillis() + muteTime)));
+                    .put("data", "" + time);
             cloudRepository.add(cloudJSON);
             transaction.commit();
+            registerSiGuo(userId, time);
         } catch (RepositoryException e) {
             LOGGER.log(Level.ERROR, "Unable to mute [userId={}]", userId);
         }
