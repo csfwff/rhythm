@@ -38,7 +38,7 @@
         </div>
         <div class="module-panel form fn-clear">
             <label>你可以自定义网页标题的图标。</label>
-            <div class="avatar-big" id="iconURL" data-imageurl="" style="background-image:url('${iconURL}')"></div>
+            <div class="avatar-big" id="iconURL" data-imageurl="${iconURL}" style="background-image:url('${iconURL}')"></div>
             <div class="fn__clear" id="iconUploadButtons" style="margin-top: 15px;">
                 <form id="iconUpload" method="POST" enctype="multipart/form-data">
                     <label class="btn green label__upload" style="height: 37px;margin: 0;">

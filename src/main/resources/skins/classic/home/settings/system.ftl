@@ -37,7 +37,7 @@
             自定义社区图标
         </div>
         <div class="module-panel form fn-clear">
-            <div class="avatar-big" id="iconURL" data-imageurl="" style="height: 128px; width: 128px; background-image:url('${iconURL}')"></div>
+            <div class="avatar-big" id="iconURL" data-imageurl="${iconURL}" style="height: 128px; width: 128px; background-image:url('${iconURL}')"></div>
             <div class="fn__clear" id="iconUploadButtons" style="margin-top: 15px;">
                 <form id="iconUpload" method="POST" enctype="multipart/form-data">
                     <label class="btn green label__upload" style="height: 37px;margin: 0;">
