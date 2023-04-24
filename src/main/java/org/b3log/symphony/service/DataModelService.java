@@ -531,6 +531,7 @@ public class DataModelService {
                 if (Objects.isNull(currentUser)) {
                     dataModel.put("hasSystemTitle", false);
                     dataModel.put("cardBg", "");
+                    dataModel.put("iconURL", "https://fishpi.cn/images/favicon.png");
                     dataModel.put(SystemSettings.ONLINE_TIME_UNIT, "m");
                     dataModel.put("showSideAd", true);
                     dataModel.put("showTopAd", true);
@@ -539,6 +540,7 @@ public class DataModelService {
                     if (Objects.isNull(systemSettings)) {
                         dataModel.put("hasSystemTitle", false);
                         dataModel.put("cardBg", "");
+                        dataModel.put("iconURL", "https://fishpi.cn/images/favicon.png");
                         dataModel.put(SystemSettings.ONLINE_TIME_UNIT, "m");
                         dataModel.put("showSideAd", true);
                         dataModel.put("showTopAd", true);
@@ -570,6 +572,12 @@ public class DataModelService {
                     } else {
                         dataModel.put("cardBg", cardBg);
                     }
+                    final String iconURL = settings.optString("iconURL");
+                    if (StringUtils.isBlank(iconURL)) {
+                        dataModel.put("iconURL", "https://fishpi.cn/images/favicon.png");
+                    } else {
+                        dataModel.put("iconURL", iconURL);
+                    }
                     final String unit = settings.optString(SystemSettings.ONLINE_TIME_UNIT);
                     if (StringUtils.isBlank(unit)) {
                         dataModel.put(SystemSettings.ONLINE_TIME_UNIT, "m");
@@ -580,6 +588,7 @@ public class DataModelService {
             } else {
                 dataModel.put("hasSystemTitle", false);
                 dataModel.put("cardBg", "");
+                dataModel.put("iconURL", "https://fishpi.cn/images/favicon.png");
                 dataModel.put("showSideAd", true);
                 dataModel.put("showTopAd", true);
             }

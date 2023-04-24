@@ -22,14 +22,10 @@
 <@home "system">
     <div id="systemTip" class="tip"></div>
     <div class="module-header">
-        自定义
+        自定义社区标题
     </div>
     <div class="module">
         <div class="module-panel form fn-clear">
-            <label>当前社区标题</label>
-            <input value="<#if hasSystemTitle>${systemTitle}<#else>${symphonyLabel}</#if>" type="text" readonly />
-
-            <label>新的社区标题</label>
             <input id="newSystemTitle" type="text" value="<#if hasSystemTitle>${systemTitle}<#else>${symphonyLabel}</#if>"/><br/><br/>
 
             <button class="fn-right" onclick="Settings.update('system', '${csrfToken}')">${saveLabel}</button>
@@ -37,8 +33,30 @@
     </div>
 
     <div class="module">
+        <div class="module-header">
+            自定义社区图标
+        </div>
         <div class="module-panel form fn-clear">
-            <label>在线时间显示单位</label>
+            <div class="avatar-big" id="iconURL" data-imageurl="${iconURL}" style="height: 128px; width: 128px; background-image:url('${iconURL}')"></div>
+            <div class="fn__clear" id="iconUploadButtons" style="margin-top: 15px;">
+                <form id="iconUpload" method="POST" enctype="multipart/form-data">
+                    <label class="btn green label__upload" style="height: 37px;margin: 0;">
+                        ${uploadLabel}<input type="file" name="file">
+                    </label>
+                </form>
+                <button class="fn-right" style="height: 37px;" onclick="$('#iconURL').data('imageurl', ''); Settings.update('system', '${csrfToken}');location.reload();">恢复默认</button>
+            </div>
+        </div>
+        <label style="padding-left: 15px">
+            如果自定义网站图标后不生效，请使用 CTRL+F5 快捷键强行刷新页面；为确保浏览体验，建议使用128KB以下图片。
+        </label>
+    </div>
+
+    <div class="module">
+        <div class="module-header">
+            在线时间显示单位
+        </div>
+        <div class="module-panel form fn-clear">
             <select id="onlineTimeUnit" onchange="Settings.update('system', '${csrfToken}')">
                 <option value="m" <#if 'm' == onlineTimeUnit>selected</#if>>分钟</option>
                 <option value="h" <#if 'h' == onlineTimeUnit>selected</#if>>小时</option>
@@ -118,8 +136,8 @@
                         ${uploadLabel}<input type="file" name="file">
                     </label>
                 </form>
+                <button class="fn-right" style="height: 37px;" onclick="$('#userCardSettings').attr('bgUrl', '');Settings.update('system', '${csrfToken}');location.reload();">恢复默认</button>
             </div>
-            <button class="fn-right" style="height: 37px;" onclick="$('#userCardSettings').attr('bgUrl', '');Settings.update('system', '${csrfToken}');location.reload();">恢复默认</button>
         </div>
     </div>
 </@home>
@@ -140,6 +158,18 @@
         $("#userCardSettings > div > a > div").css("top", "80px");
         $("#userCardSettings").attr("bgUrl", imgUrl);
         Settings.update('system', '${csrfToken}');
+    });
+
+    Settings.initUploadAvatar({
+        id: 'iconUpload',
+        userId: '${currentUser.oId}',
+        maxSize: '${imgMaxSize?c}'
+    }, function (data) {
+        let imgUrl = data.result.key;
+        $('#iconURL').data('imageurl', imgUrl);
+        $('#iconURL').css('background-image', 'url(\'' + imgUrl + '\')');
+        Settings.update('system', '${csrfToken}');
+        location.reload();
     });
 
     let currentCardBg = "${cardBg}";

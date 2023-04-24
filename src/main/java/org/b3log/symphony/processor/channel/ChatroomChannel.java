@@ -34,7 +34,7 @@ import org.json.JSONObject;
 
 import java.text.SimpleDateFormat;
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.*;
 
 /**
  * Chatroom channel.
@@ -128,9 +128,19 @@ public class ChatroomChannel implements WebSocketChannel {
      *                }
      */
     public static int notQuickCheck = 50;
-    public static int notQuickSleep = 200;
+    public static int notQuickSleep = 100;
     public static int quickCheck = 100;
-    public static int quickSleep = 200;
+    public static int quickSleep = 100;
+
+    //用于消息发送的线程池
+    private static final ThreadPoolExecutor MESSAGE_POOL = new ThreadPoolExecutor(
+            4,
+            4,
+            120L,
+            TimeUnit.SECONDS,
+            new LinkedBlockingQueue<>()
+            );
+
     public static void notifyChat(final JSONObject message) {
         final BeanManager beanManager = BeanManager.getInstance();
         final AvatarQueryService avatarQueryService = beanManager.getReference(AvatarQueryService.class);
@@ -164,32 +174,34 @@ public class ChatroomChannel implements WebSocketChannel {
                 session.sendText(msgStr);
             }
         }
-        int i = 0;
-        for (WebSocketSession session : SESSIONS) {
-            try {
-                i++;
-                if (!quick && i % notQuickCheck == 0) {
-                    try {
-                        Thread.sleep(notQuickSleep);
-                    } catch (Exception ignored) {
+        MESSAGE_POOL.submit(() -> {
+            int i = 0;
+            for (WebSocketSession session : SESSIONS) {
+                try {
+                    i++;
+                    if (!quick && i % notQuickCheck == 0) {
+                        try {
+                            Thread.sleep(notQuickSleep);
+                        } catch (Exception ignored) {
+                        }
+                    } else if (quick && i % quickCheck == 0) {
+                        try {
+                            Thread.sleep(quickSleep);
+                        } catch (Exception ignored) {
+                        }
                     }
-                } else if (quick && i % quickCheck == 0) {
-                    try {
-                        Thread.sleep(quickSleep);
-                    } catch (Exception ignored) {
-                    }
-                }
-                if (!quick) {
-                    String toUser = onlineUsers.get(session).optString(User.USER_NAME);
-                    if (!sender.equals(toUser)) {
+                    if (!quick) {
+                        String toUser = onlineUsers.get(session).optString(User.USER_NAME);
+                        if (!sender.equals(toUser)) {
+                            session.sendText(msgStr);
+                        }
+                    } else {
                         session.sendText(msgStr);
                     }
-                } else {
-                    session.sendText(msgStr);
+                } catch (Exception ignored) {
                 }
-            } catch (Exception ignored) {
             }
-        }
+        });
     }
 
     /**
@@ -306,11 +318,11 @@ public class ChatroomChannel implements WebSocketChannel {
     // 发送在线信息
     public static void sendOnlineMsg() {
         final String msgStr = getOnline().toString();
-        try {
+        new Thread(() -> {
             int i = 0;
             for (WebSocketSession s : SESSIONS) {
                 i++;
-                if (i % 10 == 0) {
+                if (i % 5 == 0) {
                     try {
                         Thread.sleep(500);
                     } catch (Exception ignored) {
@@ -318,7 +330,6 @@ public class ChatroomChannel implements WebSocketChannel {
                 }
                 s.sendText(msgStr);
             }
-        } catch (Exception ignored) {
-        }
+        }).start();
     }
 }
