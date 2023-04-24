@@ -1223,12 +1223,11 @@ public class ArticleQueryService {
      *
      * @return recent articles, returns an empty list if not found
      */
-    public List<JSONObject> getIndexRecentArticles() {
+    public List<JSONObject> getIndexRecentArticles(int fetchSize) {
         List<JSONObject> ret;
         try {
             Stopwatchs.start("Query index recent articles");
             try {
-                final int fetchSize = 12;
                 Query query = new Query().
                         setFilter(CompositeFilterOperator.and(
                                 new PropertyFilter(Article.ARTICLE_TYPE, FilterOperator.NOT_EQUAL, Article.ARTICLE_TYPE_C_DISCUSSION),

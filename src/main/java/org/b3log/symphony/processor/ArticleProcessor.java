@@ -1364,8 +1364,8 @@ public class ArticleProcessor {
 
             article.put(Article.ARTICLE_TAGS, articleTags);
 
-            // TGIF
-            if(articleTitle.startsWith("摸鱼周报")){
+            // TGIF  判断开头和长度
+            if(articleTitle.startsWith("摸鱼周报")&&articleTitle.length()==13){
                 Calendar calendar = Calendar.getInstance();
                 calendar.setTime(new Date());
                 String date = DateFormatUtils.format(new Date(), "yyyyMMdd");
@@ -1377,18 +1377,15 @@ public class ArticleProcessor {
                 if (calendar.get(Calendar.DAY_OF_WEEK) == 6 && calendar.get(Calendar.HOUR_OF_DAY) > 8) {
                     JSONObject checkArticle = articleQueryService.getArticleByTitle(articleTitleShouldBe);
                     if (checkArticle == null) {
-                        // 没有 TGIF
-                        if (articleTitle.equals(articleTitleShouldBe)) {
-                            // 检查 TGIF 帖子质量
-                            if (articleContent.length() < 128) {
-                                context.renderMsg("您的摸鱼周报字数不合格，请认真对待！<br>请注意：根据摸鱼守则，摸鱼周报应该是抒发一周所想的灵感篇章，而不是为了水积分而随意撰写的一两句话，请保证摸鱼周报有个人情感、话题性，发送摸鱼周报带有明显水帖行为的，将取消摸鱼周报的帖子标识（恢复本周摸鱼周报的开放权限），并扣除奖励的积分，并处罚金 1000 积分。");
-                                return;
-                            }
-                            // 发放奖励
-                            pointtransferMgmtService.transfer(Pointtransfer.ID_C_SYS, currentUser.optString(Keys.OBJECT_ID),
-                                    Pointtransfer.TRANSFER_TYPE_C_ACTIVITY_SEND_TGIF,
-                                    1000, "", System.currentTimeMillis(), "");
+                        // 检查 TGIF 帖子质量
+                        if (articleContent.length() < 128) {
+                            context.renderMsg("您的摸鱼周报字数不合格，请认真对待！<br>请注意：根据摸鱼守则，摸鱼周报应该是抒发一周所想的灵感篇章，而不是为了水积分而随意撰写的一两句话，请保证摸鱼周报有个人情感、话题性，发送摸鱼周报带有明显水帖行为的，将取消摸鱼周报的帖子标识（恢复本周摸鱼周报的开放权限），并扣除奖励的积分，并处罚金 1000 积分。");
+                            return;
                         }
+                        // 发放奖励
+                        pointtransferMgmtService.transfer(Pointtransfer.ID_C_SYS, currentUser.optString(Keys.OBJECT_ID),
+                                Pointtransfer.TRANSFER_TYPE_C_ACTIVITY_SEND_TGIF,
+                                1000, "", System.currentTimeMillis(), "");
                     }
                 }else {
                     context.renderMsg("还没到摸鱼周报的时间哟~周报时间是每周五9点以后哟~");
@@ -1764,17 +1761,7 @@ public class ArticleProcessor {
 
         Stopwatchs.start("Load random articles");
         try {
-            int tried = 0;
-            int arraySize = 0;
-            List<JSONObject> articles = null;
-            while (arraySize < size) {
-                articles = articleRepository.getRandomly(size * 5);
-                arraySize = articles.size();
-                tried++;
-                if (tried > 50) {
-                    return null;
-                }
-            }
+            List<JSONObject> articles = articleRepository.getRandomly(size);
             articleQueryService.organizeArticles(articles);
             Collections.shuffle(articles);
             return articles.subList(0, size);

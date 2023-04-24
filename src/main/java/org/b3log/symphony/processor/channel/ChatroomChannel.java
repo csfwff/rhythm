@@ -32,8 +32,9 @@ import org.b3log.symphony.service.AvatarQueryService;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import java.text.SimpleDateFormat;
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.*;
 
 /**
  * Chatroom channel.
@@ -60,6 +61,8 @@ public class ChatroomChannel implements WebSocketChannel {
      */
     public static String discussing = "暂无";
 
+    public static final Map<String, Long> userActive = Collections.synchronizedMap(new HashMap<>());
+
     /**
      * Called when the socket connection with the browser is established.
      *
@@ -79,6 +82,8 @@ public class ChatroomChannel implements WebSocketChannel {
             // 单独发送在线信息
             final String msgStr = getOnline().toString();
             session.sendText(msgStr);
+            // 保存 Active 信息
+            userActive.put(user.optString("userName"), System.currentTimeMillis());
         } else {
             session.close();
         }
@@ -123,9 +128,19 @@ public class ChatroomChannel implements WebSocketChannel {
      *                }
      */
     public static int notQuickCheck = 50;
-    public static int notQuickSleep = 200;
+    public static int notQuickSleep = 100;
     public static int quickCheck = 100;
-    public static int quickSleep = 200;
+    public static int quickSleep = 100;
+
+    //用于消息发送的线程池
+    private static final ThreadPoolExecutor MESSAGE_POOL = new ThreadPoolExecutor(
+            4,
+            4,
+            120L,
+            TimeUnit.SECONDS,
+            new LinkedBlockingQueue<>()
+            );
+
     public static void notifyChat(final JSONObject message) {
         final BeanManager beanManager = BeanManager.getInstance();
         final AvatarQueryService avatarQueryService = beanManager.getReference(AvatarQueryService.class);
@@ -159,32 +174,34 @@ public class ChatroomChannel implements WebSocketChannel {
                 session.sendText(msgStr);
             }
         }
-        int i = 0;
-        for (WebSocketSession session : SESSIONS) {
-            try {
-                i++;
-                if (!quick && i % notQuickCheck == 0) {
-                    try {
-                        Thread.sleep(notQuickSleep);
-                    } catch (Exception ignored) {
+        MESSAGE_POOL.submit(() -> {
+            int i = 0;
+            for (WebSocketSession session : SESSIONS) {
+                try {
+                    i++;
+                    if (!quick && i % notQuickCheck == 0) {
+                        try {
+                            Thread.sleep(notQuickSleep);
+                        } catch (Exception ignored) {
+                        }
+                    } else if (quick && i % quickCheck == 0) {
+                        try {
+                            Thread.sleep(quickSleep);
+                        } catch (Exception ignored) {
+                        }
                     }
-                } else if (quick && i % quickCheck == 0) {
-                    try {
-                        Thread.sleep(quickSleep);
-                    } catch (Exception ignored) {
-                    }
-                }
-                if (!quick) {
-                    String toUser = onlineUsers.get(session).optString(User.USER_NAME);
-                    if (!sender.equals(toUser)) {
+                    if (!quick) {
+                        String toUser = onlineUsers.get(session).optString(User.USER_NAME);
+                        if (!sender.equals(toUser)) {
+                            session.sendText(msgStr);
+                        }
+                    } else {
                         session.sendText(msgStr);
                     }
-                } else {
-                    session.sendText(msgStr);
+                } catch (Exception ignored) {
                 }
-            } catch (Exception ignored) {
             }
-        }
+        });
     }
 
     /**
@@ -201,6 +218,58 @@ public class ChatroomChannel implements WebSocketChannel {
         }
 
         SESSIONS.remove(session);
+    }
+
+    public static Map<String, Long> check() {
+        Map<String, JSONObject> filteredOnlineUsers = new HashMap<>();
+        for (JSONObject object : onlineUsers.values()) {
+            String name = object.optString(User.USER_NAME);
+            filteredOnlineUsers.put(name, object);
+        }
+        Long currentTime = System.currentTimeMillis();
+        int sixHours = 1000 * 60 * 60 * 6;
+        Map<String, Long> needKickUsers = new HashMap<>();
+        for (String user : filteredOnlineUsers.keySet()) {
+            try {
+                Long activeTime = userActive.get(user);
+                Long spareTime = currentTime - activeTime;
+                if (spareTime >= sixHours) {
+                    needKickUsers.put(user, (spareTime / (1000 * 60 * 60)));
+                    new Thread(() -> {
+                        List<WebSocketSession> senderSessions = new ArrayList<>();
+                        for (Map.Entry<WebSocketSession, JSONObject> entry : onlineUsers.entrySet()) {
+                            try {
+                                String tempUserName = entry.getValue().optString(User.USER_NAME);
+                                if (tempUserName.equals(user)) {
+                                    senderSessions.add(entry.getKey());
+                                }
+                            } catch (Exception ignored) {
+                            }
+                        }
+                        for (WebSocketSession session : senderSessions) {
+                            session.sendText("{\n" +
+                                    "    \"md\": \"由于您超过6小时未活跃，已将您断开连接，如要继续聊天请刷新页面，谢谢 :)\",\n" +
+                                    "    \"userAvatarURL\": \"https://pwl.stackoverflow.wiki/2022/01/robot3-89631199.png\",\n" +
+                                    "    \"userAvatarURL20\": \"https://pwl.stackoverflow.wiki/2022/01/robot3-89631199.png\",\n" +
+                                    "    \"userNickname\": \"人工智障\",\n" +
+                                    "    \"sysMetal\": \"\",\n" +
+                                    "    \"time\": \"" + new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(System.currentTimeMillis()) + "\",\n" +
+                                    "    \"oId\": \"" + System.currentTimeMillis() + "\",\n" +
+                                    "    \"userName\": \"摸鱼派官方巡逻机器人\",\n" +
+                                    "    \"type\": \"msg\",\n" +
+                                    "    \"userAvatarURL210\": \"https://pwl.stackoverflow.wiki/2022/01/robot3-89631199.png\",\n" +
+                                    "    \"content\": \"<p>由于您超过6小时未活跃，已将您断开连接，如要继续聊天请刷新页面，谢谢 :)</p>\",\n" +
+                                    "    \"userAvatarURL48\": \"https://pwl.stackoverflow.wiki/2022/01/robot3-89631199.png\"\n" +
+                                    "}");
+                            removeSession(session);
+                        }
+                    }).start();
+                }
+            } catch (Exception ignored) {
+            }
+        }
+
+        return needKickUsers;
     }
 
     /**
@@ -249,11 +318,11 @@ public class ChatroomChannel implements WebSocketChannel {
     // 发送在线信息
     public static void sendOnlineMsg() {
         final String msgStr = getOnline().toString();
-        try {
+        new Thread(() -> {
             int i = 0;
             for (WebSocketSession s : SESSIONS) {
                 i++;
-                if (i % 10 == 0) {
+                if (i % 5 == 0) {
                     try {
                         Thread.sleep(500);
                     } catch (Exception ignored) {
@@ -261,7 +330,6 @@ public class ChatroomChannel implements WebSocketChannel {
                 }
                 s.sendText(msgStr);
             }
-        } catch (Exception ignored) {
-        }
+        }).start();
     }
 }

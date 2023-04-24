@@ -46,7 +46,10 @@ import org.b3log.symphony.service.OptionQueryService;
 import org.b3log.symphony.util.*;
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.jsoup.Jsoup;
+import org.jsoup.safety.Whitelist;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -208,7 +211,14 @@ public class BreezemoonProcessor {
         }
 
         final JSONObject breezemoon = new JSONObject();
-        final String breezemoonContent = requestJSONObject.optString(Breezemoon.BREEZEMOON_CONTENT);
+        String breezemoonContent = requestJSONObject.optString(Breezemoon.BREEZEMOON_CONTENT);
+        breezemoonContent = Jsoup.clean(breezemoonContent, Whitelist.none());
+        breezemoonContent = StringUtils.trim(breezemoonContent);
+        if (breezemoonContent.isEmpty()) {
+            context.renderMsg("非法内容");
+            context.renderJSONValue(Keys.CODE, StatusCodes.ERR);
+            return;
+        }
         breezemoon.put(Breezemoon.BREEZEMOON_CONTENT, breezemoonContent);
         final String authorId = user.optString(Keys.OBJECT_ID);
         breezemoon.put(Breezemoon.BREEZEMOON_AUTHOR_ID, authorId);
@@ -222,8 +232,11 @@ public class BreezemoonProcessor {
         }
 
         try {
-            breezemoonMgmtService.addBreezemoon(breezemoon);
-
+            String oId = breezemoonMgmtService.addBreezemoon(breezemoon);
+            List<JSONObject> list = new ArrayList<>();
+            list.add(breezemoonQueryService.getBreezemoon(oId));
+            breezemoonQueryService.organizeBreezemoons(authorId, list);
+            context.renderData(list.get(0));
             context.renderJSONValue(Keys.CODE, StatusCodes.SUCC);
         } catch (final Exception e) {
             context.renderMsg(e.getMessage());

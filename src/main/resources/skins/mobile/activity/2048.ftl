@@ -32,7 +32,7 @@
     <meta property="og:type" content="website" />
     <meta property="og:url" content="https://veerasundar.com/2048/" />
     <meta property="og:image" content="https://veerasundar.com/img/projects/2048.png" />
-    <link rel="icon" type="image/png" href="${staticServePath}/images/favicon.png" />
+    <link rel="icon" type="image/png" href="${iconURL}" />
     <link rel="apple-touch-icon" href="${staticServePath}/images/faviconH.png">
 
     <link rel="stylesheet" type="text/css" href="../../games/2048/css/normalize.css">

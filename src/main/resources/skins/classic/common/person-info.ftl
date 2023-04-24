@@ -33,7 +33,7 @@
 
 <#if isLoggedIn>
 <div class="module person-info" data-percent="${liveness}">
-    <div class="module-panel tooltipped tooltipped-s" aria-label="${todayActivityLabel} ${liveness}%">
+    <div class="module-panel">
         <ul class="status fn-flex">
             <li class="fn-pointer" onclick="window.location.href = '${servePath}/member/${currentUser.userName}/following/tags'">
                 <strong id="ftc">${currentUser.followingTagCnt?c}</strong>
@@ -47,24 +47,22 @@
                 <strong>${currentUser.followingArticleCnt?c}</strong>
                 <span class="ft-gray">${followingArticlesLabel}</span>
             </li>
+            <li class="fn-pointer">
+                <div id="activityProcessor" class="fn-right" style="margin-top: 6px"></div>
+            </li>
         </ul>
 
         <div class="fn-clear">
-            <span>♠</span> <a href="${servePath}/top/balance">${wealthRankLabel}</a>
-            <span class="ft-red">♥</span> <a href="${servePath}/top/consumption">${consumptionRankLabel}</a>
-
             <div class="fn-right">
-                <a href="${servePath}/member/${currentUser.userName}/points" class="tooltipped tooltipped-w ft-fade"
-                   aria-label="${pointLabel} ${currentUser.userPoint?c}">
-                    <#if 0 == currentUser.userAppRole>0x${currentUser.userPointHex}<#else><div class="painter-point" style="background-color: #${currentUser.userPointCC}"></div></#if></a>
+                <a href="${servePath}/settings/point" style="text-decoration: none" class="tooltipped tooltipped-w ft-fade"
+                   aria-label="快捷转账" target="_blank">
+                    <svg style="vertical-align: -2px">
+                        <use xlink:href="#coin"></use>
+                    </svg> ${currentUser.userPoint?c}
+                </a>
             </div>
         </div>
     </div>
-    <div class="top-left activity-board"></div>
-    <div class="top-right activity-board"></div>
-    <div class="right activity-board"></div>
-    <div class="bottom activity-board"></div>
-    <div class="left activity-board"></div>
     <script>
         function getActivityStatus() {
             $.ajax({
@@ -73,16 +71,36 @@
                 cache: false,
                 async: false,
                 success: function (result) {
-                    let liveness = result.liveness;
-                    $('.person-info').data('percent', liveness);
-                    Util._initActivity();
-                    $('.person-info>.module-panel').attr('aria-label', '今日活跃 ' + liveness + '%');
+                    let percent = result.liveness;
+                    if (percent == 100) {
+                        Util._initActivity(percent, "#ff6515");
+                    } else if (percent > 80) {
+                        Util._initActivity(percent, "#ff930c");
+                    } else if (percent > 50) {
+                        Util._initActivity(percent, "#fdd802");
+                    } else if (percent > 15) {
+                        Util._initActivity(percent, "#587aff");
+                    } else {
+                        Util._initActivity(percent, "#5bde0f");
+                    }
                 }
             });
         }
-        setInterval(function () {
+
+        setTimeout(function () {
+            var ccref = document.createElement('script')
+            ccref.setAttribute("type", "text/javascript")
+            ccref.setAttribute("src", '${staticServePath}/js/lib/circleChart.min.js')
+            document.getElementsByTagName("head")[0].appendChild(ccref)
+            console.log("Circle Chart loaded.")
+        }, 1000);
+
+        setTimeout(function () {
             getActivityStatus();
-        }, 30000);
+            setInterval(function () {
+                getActivityStatus();
+            }, 1000 * 60 * 5);
+        }, 2000);
     </script>
 </div>
 </#if>

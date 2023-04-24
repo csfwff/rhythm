@@ -29,10 +29,7 @@ import org.b3log.latke.ioc.BeanManager;
 import org.b3log.latke.model.User;
 import org.b3log.latke.repository.*;
 import org.b3log.latke.service.ServiceException;
-import org.b3log.symphony.model.Common;
-import org.b3log.symphony.model.Notification;
-import org.b3log.symphony.model.Pointtransfer;
-import org.b3log.symphony.model.UserExt;
+import org.b3log.symphony.model.*;
 import org.b3log.symphony.processor.ApiProcessor;
 import org.b3log.symphony.processor.ChatroomProcessor;
 import org.b3log.symphony.processor.channel.ChatroomChannel;
@@ -42,6 +39,7 @@ import org.b3log.symphony.service.*;
 import org.b3log.symphony.util.JSONs;
 import org.b3log.symphony.util.Sessions;
 import org.b3log.symphony.util.StatusCodes;
+import org.json.JSONArray;
 import org.json.JSONObject;
 import pers.adlered.simplecurrentlimiter.main.SimpleCurrentLimiter;
 
@@ -73,7 +71,7 @@ public class ChatRoomBot {
     private static final Map<String, String> RECORD_MAP = Collections.synchronizedMap(new LinkedHashMap<String, String>() {
         @Override
         protected boolean removeEldestEntry(Map.Entry eldest) {
-            return size() > 100;
+            return size() > 2000;
         }
     });
 
@@ -117,10 +115,39 @@ public class ChatRoomBot {
 
         // ==? 指令 ?==
         if (DataModelService.hasPermission(currentUser.optString(User.USER_ROLE), 3)) {
-            if (content.startsWith("执法")) {
+            if (content.startsWith("执法") || content.startsWith("zf")) {
                 try {
-                    String cmd1 = content.replaceAll("(执法)(\\s)+", "");
+                    String cmd1 = content.replaceAll("(执法)(\\s)+", "").replaceAll("(zf)(\\s)+", "");
                     String cmd2 = cmd1.split("\\s")[0];
+                    switch (cmd2) {
+                        case "jy":
+                            cmd2 = "禁言";
+                            break;
+                        case "qyjy":
+                            cmd2 = "全员禁言";
+                            break;
+                        case "fk":
+                            cmd2 = "风控";
+                            break;
+                        case "fwqzt":
+                            cmd2 = "服务器状态";
+                            break;
+                        case "sxhc":
+                            cmd2 = "刷新缓存";
+                            break;
+                        case "gbsz":
+                            cmd2 = "广播设置";
+                            break;
+                        case "wh":
+                            cmd2 = "维护";
+                            break;
+                        case "cf":
+                            cmd2 = "处罚";
+                            break;
+                        case "dkhh":
+                            cmd2 = "断开会话";
+                            break;
+                    }
                     switch (cmd2) {
                         case "禁言":
                             try {
@@ -313,15 +340,70 @@ public class ChatRoomBot {
                                 sendBotMsg("参数错误。");
                             }
                             break;
+                        case "维护":
+                            Map<String, Long> result = ChatroomChannel.check();
+                            StringBuilder stringBuilder = new StringBuilder();
+                            if (result.isEmpty()) {
+                                sendBotMsg("报告！没有超过6小时未活跃的成员，一切都很和谐~");
+                            } else {
+                                stringBuilder.append("报告！成功扫描超过6小时未活跃的成员，并已在通知后将他们断开连接：<br>");
+                                stringBuilder.append("<details><summary>不活跃用户列表</summary>");
+                                for (String i : result.keySet()) {
+                                    long time = result.get(i);
+                                    stringBuilder.append(i + " AFK " + time + "小时<br>");
+                                }
+                                stringBuilder.append("</details>");
+                                sendBotMsg(stringBuilder.toString());
+                            }
+                            break;
+                        case "处罚":
+                            try {
+                                String user = cmd1.split("\\s")[1].replaceAll("^(@)", "");
+                                int point = Integer.parseInt(cmd1.split("\\s")[2].replaceAll("[-.]", ""));
+                                String reas0n = cmd1.split("\\s")[3];
+                                final BeanManager beanManager = BeanManager.getInstance();
+                                UserQueryService userQueryService = beanManager.getReference(UserQueryService.class);
+                                JSONObject targetUser = userQueryService.getUserByName(user);
+                                if (null == targetUser) {
+                                    sendBotMsg("指令执行失败，用户不存在。");
+                                    break;
+                                }
+                                final int currentPoint = targetUser.optInt(UserExt.USER_POINT);
+                                if (currentPoint - point < 0) {
+                                    sendBotMsg("指令执行失败，他没有这么多分可以扣。");
+                                    break;
+                                }
+                                String targetUserId = targetUser.optString(Keys.OBJECT_ID);
+
+                                PointtransferMgmtService pointtransferMgmtService = beanManager.getReference(PointtransferMgmtService.class);
+                                OperationMgmtService operationMgmtService = beanManager.getReference(OperationMgmtService.class);
+                                NotificationMgmtService notificationMgmtService = beanManager.getReference(NotificationMgmtService.class);
+
+                                final String transferId = pointtransferMgmtService.transfer(targetUserId, Pointtransfer.ID_C_SYS,
+                                        Pointtransfer.TRANSFER_TYPE_C_ABUSE_DEDUCT, point, reas0n, System.currentTimeMillis(), "");
+                                operationMgmtService.addOperation(Operation.newOperation(context.getRequest(), Operation.OPERATION_CODE_C_DEDUCT_POINT, transferId));
+
+                                final JSONObject notification = new JSONObject();
+                                notification.put(Notification.NOTIFICATION_USER_ID, targetUserId);
+                                notification.put(Notification.NOTIFICATION_DATA_ID, transferId);
+                                notificationMgmtService.addAbusePointDeductNotification(notification);
+
+                                sendBotMsg("成功扣除成员 " + user + " 的 " + point + " 积分，原因：" + reas0n);
+                            } catch (Exception e) {
+                                sendBotMsg("参数错误。");
+                            }
+                            break;
                         default:
                             sendBotMsg("<details><summary>执法帮助菜单</summary>\n" +
                                     "如无特殊备注，则需要纪律委员及以上分组才可执行\n\n" +
-                                    "* **禁言指定用户** 执法 禁言 @[用户名] [时间 `单位: 分钟` `如不填此项将查询剩余禁言时间` `设置为0将解除禁言`]\n" +
+                                    "* **禁言指定用户** 执法 禁言 [用户名] [时间 `单位: 分钟` `如不填此项将查询剩余禁言时间` `设置为0将解除禁言`]\n" +
                                     "* **全员禁言** 执法 全员禁言 [时间 `单位: 分钟` `如不填此项将查询剩余禁言时间` `设置为0将解除全员禁言`]\n" +
-                                    "* **风控模式** 执法 风控 @[用户名] [时间 `单位：分钟` `如不填此项将查询剩余风控时间` `设置为0将解除风控`]\n" +
+                                    "* **风控模式** 执法 风控 [用户名] [时间 `单位：分钟` `如不填此项将查询剩余风控时间` `设置为0将解除风控`]\n" +
                                     "* **查询服务器状态** 执法 服务器状态\n" +
                                     "* **刷新全体成员的聊天室缓存** 执法 刷新缓存\n" +
                                     "* **广播设置** 执法 广播设置 [普通消息数目检测阈值] [普通消息间隔毫秒] [特殊消息数目检测阈值] [特殊消息间隔毫秒]\n" +
+                                    "* **检测聊天室内长时间不发言的成员，并将其移除** 执法 维护\n" +
+                                    "* **扣除指定成员的积分** 执法 处罚 [用户名] [扣除积分数量] [理由]\n" +
                                     "* **断开指定用户的全部聊天室会话** 执法 断开会话 [用户名]</details>\n" +
                                     "<p></p>");
                     }
@@ -524,6 +606,105 @@ public class ChatRoomBot {
         }
     }
 
+    public static void refreshSiGuo() {
+        try {
+            final BeanManager beanManager = BeanManager.getInstance();
+            CloudRepository cloudRepository = beanManager.getReference(CloudRepository.class);
+            Query cloudQuery = new Query()
+                    .setFilter(CompositeFilterOperator.and(
+                            new PropertyFilter("userId", FilterOperator.EQUAL, "si:guo"),
+                            new PropertyFilter("gameId", FilterOperator.EQUAL, "record")
+                    ));
+            JSONObject result = cloudRepository.getFirst(cloudQuery);
+            JSONArray array = new JSONArray();
+            if (null != result) {
+                // 删除旧记录
+                Transaction transaction = cloudRepository.beginTransaction();
+                cloudRepository.remove(cloudQuery);
+                // 写入新记录
+                JSONArray jsonArray = new JSONArray(result.optString("data"));
+                for (int i = 0; i < jsonArray.length(); i++) {
+                    JSONObject jsonObject = jsonArray.optJSONObject(i);
+                    if (jsonObject.optLong("time") > System.currentTimeMillis()) {
+                        array.put(jsonObject);
+                    }
+                }
+                JSONObject cloudJSON = new JSONObject();
+                cloudJSON.put("userId", "si:guo")
+                        .put("gameId", "record")
+                        .put("data", array.toString());
+                cloudRepository.add(cloudJSON);
+                transaction.commit();
+            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, "Refresh SiGuo failed", e);
+        }
+    }
+
+    public static JSONArray getSiGuoList() {
+        try {
+            final BeanManager beanManager = BeanManager.getInstance();
+            CloudRepository cloudRepository = beanManager.getReference(CloudRepository.class);
+            Query cloudQuery = new Query()
+                    .setFilter(CompositeFilterOperator.and(
+                            new PropertyFilter("userId", FilterOperator.EQUAL, "si:guo"),
+                            new PropertyFilter("gameId", FilterOperator.EQUAL, "record")
+                    ));
+            JSONObject result = cloudRepository.getFirst(cloudQuery);
+            if (null != result) {
+                return new JSONArray(result.optString("data"));
+            } else {
+                return new JSONArray();
+            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, "Get SiGuo failed", e);
+            return new JSONArray();
+        }
+    }
+
+    public static void registerSiGuo(String userId, long time) {
+        try {
+            JSONArray oldJSON = new JSONArray();
+            final BeanManager beanManager = BeanManager.getInstance();
+            CloudRepository cloudRepository = beanManager.getReference(CloudRepository.class);
+            UserQueryService userQueryService = beanManager.getReference(UserQueryService.class);
+            Query cloudQuery = new Query()
+                    .setFilter(CompositeFilterOperator.and(
+                            new PropertyFilter("userId", FilterOperator.EQUAL, "si:guo"),
+                            new PropertyFilter("gameId", FilterOperator.EQUAL, "record")
+                    ));
+            JSONObject result = cloudRepository.getFirst(cloudQuery);
+            if (null != result) {
+                oldJSON = new JSONArray(result.optString("data"));
+                Transaction transaction = cloudRepository.beginTransaction();
+                cloudRepository.remove(cloudQuery);
+                transaction.commit();
+            }
+            JSONArray data = new JSONArray();
+            String userName = userQueryService.getUser(userId).optString(User.USER_NAME);
+            for (int i = 0; i < oldJSON.length(); i++) {
+                JSONObject json = oldJSON.optJSONObject(i);
+                if (json.optLong("time") > System.currentTimeMillis()) {
+                    if (!json.optString("userName").equals(userName)) {
+                        data.put(json);
+                    }
+                }
+            }
+            if (time > System.currentTimeMillis()) {
+                data.put(new JSONObject().put("userName", userName).put("time", time));
+            }
+            JSONObject cloudJSON = new JSONObject();
+            cloudJSON.put("userId", "si:guo")
+                    .put("gameId", "record")
+                    .put("data", data.toString());
+            Transaction transaction = cloudRepository.beginTransaction();
+            cloudRepository.add(cloudJSON);
+            transaction.commit();
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, "Register SiGuo failed", e);
+        }
+    }
+
     // 禁言
     public static void mute(String userId, int minute) {
         final BeanManager beanManager = BeanManager.getInstance();
@@ -538,11 +719,13 @@ public class ChatRoomBot {
                     ));
             cloudRepository.remove(cloudDeleteQuery);
             JSONObject cloudJSON = new JSONObject();
+            long time = System.currentTimeMillis() + muteTime;
             cloudJSON.put("userId", userId)
                     .put("gameId", CloudService.SYS_MUTE)
-                    .put("data", ("" + (System.currentTimeMillis() + muteTime)));
+                    .put("data", "" + time);
             cloudRepository.add(cloudJSON);
             transaction.commit();
+            registerSiGuo(userId, time);
         } catch (RepositoryException e) {
             LOGGER.log(Level.ERROR, "Unable to mute [userId={}]", userId);
         }
@@ -552,7 +735,7 @@ public class ChatRoomBot {
     public static void muteAndNotice(String username, String userId, int minute) {
         if (minute == 0){
             sendBotMsg("提醒：@" + username + "  被管理员 解除 禁言");
-        }else {
+        } else {
             sendBotMsg("提醒：@" + username + "  被管理员 禁言 " + minute + " 分钟。");
         }
         mute(userId, minute);

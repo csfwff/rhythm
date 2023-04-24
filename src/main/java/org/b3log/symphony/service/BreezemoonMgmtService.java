@@ -85,7 +85,7 @@ public class BreezemoonMgmtService {
      * @throws ServiceException service exception
      */
     @Transactional
-    public void addBreezemoon(final JSONObject requestJSONObject) throws ServiceException {
+    public String addBreezemoon(final JSONObject requestJSONObject) throws ServiceException {
         final String content = requestJSONObject.optString(Breezemoon.BREEZEMOON_CONTENT);
         if (optionQueryService.containReservedWord(content)) {
             throw new ServiceException(langPropsService.get("contentContainReservedWordLabel"));
@@ -106,7 +106,7 @@ public class BreezemoonMgmtService {
         bm.put(Breezemoon.BREEZEMOON_CITY, requestJSONObject.optString(Breezemoon.BREEZEMOON_CITY));
 
         try {
-            breezemoonRepository.add(bm);
+            return breezemoonRepository.add(bm);
         } catch (final Exception e) {
             LOGGER.log(Level.ERROR, "Adds a breezemoon failed", e);
 

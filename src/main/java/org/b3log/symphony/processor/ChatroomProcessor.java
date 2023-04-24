@@ -201,8 +201,28 @@ public class ChatroomProcessor {
         Dispatcher.get("/cr/raw/{id}", chatroomProcessor::getChatRaw, anonymousViewCheckMidware::handle);
         Dispatcher.delete("/chat-room/revoke/{oId}", chatroomProcessor::revokeMessage, loginCheck::handle);
         Dispatcher.post("/chat-room/red-packet/open", chatroomProcessor::openRedPacket, loginCheck::handle);
+        Dispatcher.get("/chat-room/si-guo-list", chatroomProcessor::getSiGuoList);
+
     }
 
+    /**
+     * 获得思过崖
+     * @param context
+     */
+    public void getSiGuoList(final RequestContext context) {
+        JSONArray list = ChatRoomBot.getSiGuoList();
+        for (Object i : list) {
+            JSONObject j = (JSONObject) i;
+            JSONObject user = userQueryService.getUserByName(j.optString(User.USER_NAME));
+            j.put(UserExt.USER_AVATAR_URL, user.optString(UserExt.USER_AVATAR_URL));
+            j.put(UserExt.USER_NICKNAME, user.optString(UserExt.USER_NICKNAME));
+        }
+        JSONObject ret = new JSONObject();
+        ret.put(Keys.CODE, StatusCodes.SUCC);
+        ret.put(Keys.MSG, "");
+        ret.put(Keys.DATA, list);
+        context.renderJSON(ret);
+    }
 
     /**
      * 获取聊天室在线人数
@@ -627,6 +647,8 @@ public class ChatroomProcessor {
             } catch (NullPointerException ignored) {
             }
             final String userName = currentUser.optString(User.USER_NAME);
+            // 保存 Active 信息
+            chatroomChannel.userActive.put(userName, System.currentTimeMillis());
 
             final long time = System.currentTimeMillis();
             JSONObject msg = new JSONObject();
@@ -1228,9 +1250,13 @@ public class ChatroomProcessor {
             final BeanManager beanManager = BeanManager.getInstance();
             final ChatRoomRepository chatRoomRepository = beanManager.getReference(ChatRoomRepository.class);
             final AvatarQueryService avatarQueryService = beanManager.getReference(AvatarQueryService.class);
-            List<JSONObject> messageList = chatRoomRepository.getList(new Query()
-                    .setPage(page, 25)
-                    .addSort(Keys.OBJECT_ID, SortDirection.DESCENDING));
+            int start = 0;
+            int count = 25;
+            if (page > 1) {
+                start = (page - 1) * 25;
+            }
+            List<JSONObject> messageList = chatRoomRepository.select("" +
+                    "SELECT  *  FROM `" + chatRoomRepository.getName() + "` ORDER BY oId DESC LIMIT " + start + "," + count);
             List<JSONObject> msgs = messageList.stream().map(msg -> new JSONObject(msg.optString("content")).put("oId", msg.optString(Keys.OBJECT_ID))).collect(Collectors.toList());
             msgs = msgs.stream().map(msg -> JSONs.clone(msg).put(Common.TIME, new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(msg.optLong(Common.TIME)))).collect(Collectors.toList());
             if(!"md".equals(type)){

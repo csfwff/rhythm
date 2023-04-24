@@ -37,32 +37,11 @@
         <div class="content chat-room">
             <div class="module" style="margin-bottom: 0">
                 <div class="fn-content" style="padding-top: 0;">
-                    <div class="discuss_title">
-                        <a style="text-decoration: none; display: inline-block; cursor: default">
-                            <span style="color: #616161">当前话题：</span><span class="ft-green"># <span id="discuss-title">加载中...</span> #</span>
-                        </a>
-                        <div style="padding-left: 5px;display: inline-block;vertical-align: -2px;">
-                            <a onclick="ChatRoom.setDiscuss()" class="ft-a-title tooltipped tooltipped-se" aria-label="编辑话题" style="text-decoration: none;">
-                                <svg><use xlink:href="#edit-discuss"></use></svg>
-                            </a>
-                            <a onclick="ChatRoom.useDiscuss()" class="ft-a-title tooltipped tooltipped-se" aria-label="引用话题" style="text-decoration: none;">
-                                <svg><use xlink:href="#pound"></use></svg>
-                            </a>
-                        </div>
-                    </div>
                     <div class="reply">
                         <#if isLoggedIn>
                             <div id="chatContent"></div>
-                            <#if nightDisableMode == true>
-                                <div class="discuss_title" style="border-radius: 10px">
-                                    <a style="text-decoration: none; display: inline-block; cursor: default; font-weight: normal; background-color: #f6f6f670;">
-                                        <span style="color: #616161">现在是聊天室宵禁时间 (19:30-08:00)，您发送的消息将不会产生活跃度，请早点下班休息 :)</span>
-                                    </a>
-                                </div>
-                            <#else>
-                                <br>
-                            </#if>
-                            <div class="fn-clear" style="margin-bottom: 5px">
+                            <br>
+                            <div class="fn-clear" style="padding: 5px 0 7px 0;">
                                 <svg id="redPacketBtn" style="width: 30px; height: 30px; cursor:pointer;">
                                     <use xlink:href="#redPacketIcon"></use>
                                 </svg>
@@ -72,6 +51,19 @@
                                 <svg id="paintBtn" style="width: 30px; height: 30px; cursor:pointer;">
                                     <use xlink:href="#icon-paint"></use>
                                 </svg>
+                                <div class="discuss_title">
+                                    <a style="text-decoration: none; display: inline-block; cursor: default">
+                                        <span style="color: #616161">当前话题：</span><span class="ft-green"># <span id="discuss-title">加载中...</span> #</span>
+                                    </a>
+                                    <div style="padding-left: 5px;display: inline-block;vertical-align: -2px;">
+                                        <a onclick="ChatRoom.setDiscuss()" class="ft-a-title tooltipped tooltipped-se" aria-label="编辑话题" style="text-decoration: none;">
+                                            <svg><use xlink:href="#edit-discuss"></use></svg>
+                                        </a>
+                                        <a onclick="ChatRoom.useDiscuss()" class="ft-a-title tooltipped tooltipped-se" aria-label="引用话题" style="text-decoration: none;">
+                                            <svg><use xlink:href="#pound"></use></svg>
+                                        </a>
+                                    </div>
+                                </div>
                                 <div class="hide-list" id="emojiList">
                                     <div class="hide-list-emojis" id="emojis" style="max-height: 200px">
                                     </div>
@@ -88,15 +80,23 @@
                                         </form>
                                     </div>
                                 </div>
+                                <#if nightDisableMode == true>
+                                    <br>
+                                    <div class="discuss_title" style="border-radius: 10px; padding: 10px 0 0 0">
+                                        <a style="text-decoration: none; display: inline-block; cursor: default; font-weight: normal; background-color: #f6f6f670;">
+                                            <span style="color: #616161">💤 现在是聊天室宵禁时间 (19:30-08:00)，您发送的消息将不会产生活跃度，请早点下班休息 :)</span>
+                                        </a>
+                                    </div>
+                                </#if>
                                 <div class="fn-right">
                                     <#if level3Permitted == true>
                                         <button id="groupRevoke" onclick="ChatRoom.startGroupRevoke()" class="button">
-                                            <svg style="vertical-align: -2px;"><use xlink:href="#administration"></use></svg>
                                             批量撤回
                                         </button>
                                     </#if>
-                                    <button class="red" onclick="$('#chats').empty();page=0;ChatRoom.more();">${cleanScreenLabel}</button>
-                                    <button class="green" onclick="ChatRoom.send()">${postLabel}</button>
+                                    <button class="button" onclick="ChatRoom.showSiGuoYar()">思过崖</button>
+                                    <button class="button" onclick="$('#chats').empty();page=0;ChatRoom.more();">${cleanScreenLabel}</button>
+                                    <button class="green" onclick="ChatRoom.send()">发送</button>
                                 </div>
                                 <div id="paintContent" style="display: none">
                                     <div style="margin: 20px 0 0 0;">
