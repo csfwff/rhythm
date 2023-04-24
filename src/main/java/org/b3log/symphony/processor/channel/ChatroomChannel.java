@@ -127,15 +127,15 @@ public class ChatroomChannel implements WebSocketChannel {
      *                "content": ""
      *                }
      */
-    public static int notQuickCheck = 1;
-    public static int notQuickSleep = 1;
-    public static int quickCheck = 2;
-    public static int quickSleep = 1;
+    public static int notQuickCheck = 50;
+    public static int notQuickSleep = 100;
+    public static int quickCheck = 100;
+    public static int quickSleep = 100;
 
     //用于消息发送的线程池
     private static final ThreadPoolExecutor MESSAGE_POOL = new ThreadPoolExecutor(
-            2,
-            2,
+            4,
+            4,
             120L,
             TimeUnit.SECONDS,
             new LinkedBlockingQueue<>()
