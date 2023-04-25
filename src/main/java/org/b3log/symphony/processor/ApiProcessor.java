@@ -118,7 +118,6 @@ public class ApiProcessor {
         Dispatcher.get("/api/user/exists/{user}", apiProcessor::userExists);
         Dispatcher.post("/api/getKey", apiProcessor::getKey);
         Dispatcher.get("/api/user", apiProcessor::getUser);
-        Dispatcher.get("/api/user/recentReg", apiProcessor::getRecentReg);
 
         final RewardQueryService rewardQueryService = beanManager.getReference(RewardQueryService.class);
         Dispatcher.get("/api/article/reward/senders/{aId}", rewardQueryService::rewardedSenders);
@@ -337,26 +336,6 @@ public class ApiProcessor {
         }
     }
 
-    /**
-     * 获取最近注册的20个鱼油
-     * @param context
-     */
-    private void getRecentReg(final RequestContext context) {
-        JSONObject ret = new JSONObject();
-        try {
-            // 根据API获取当前操作用户
-            ApiProcessor.getUserByKey(context.param("apiKey"));
-            // 返回对象
-            ret.put(Keys.CODE, StatusCodes.SUCC);
-            ret.put(Keys.MSG, "");
-            ret.put(Keys.DATA, userQueryService.getRecentRegisteredUsers(20));
-            context.renderJSON(ret);
-        } catch (Exception e) {
-            ret.put(Keys.CODE, StatusCodes.ERR);
-            ret.put(Keys.MSG, "Invalid Api Key.");
-            context.renderJSON(ret);
-        }
-    }
     public void userExists(final RequestContext context) {
         String user = context.pathVar("user");
         JSONObject userJSON = userQueryService.getUserByName(user);
