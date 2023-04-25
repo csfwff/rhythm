@@ -1357,7 +1357,7 @@ public class AdminProcessor {
         final String id = context.pathVar("id");
         final AbstractFreeMarkerRenderer renderer = new SkinRenderer(context, "admin/reserved-word.ftl");
         final Map<String, Object> dataModel = renderer.getDataModel();
-        final JSONObject word = optionQueryService.getOption(id);
+        final JSONObject word = ReservedWords.get(id);
         dataModel.put(Common.WORD, word);
         dataModelService.fillHeaderAndFooter(context, dataModel);
     }
@@ -1371,10 +1371,8 @@ public class AdminProcessor {
         final Request request = context.getRequest();
 
         final String id = context.param("id");
-        final JSONObject option = optionQueryService.getOption(id);
-        final String word = option.optString(Option.OPTION_VALUE);
-        optionMgmtService.removeOption(id);
-        operationMgmtService.addOperation(Operation.newOperation(request, Operation.OPERATION_CODE_C_REMOVE_RESERVED_WORD, word));
+        ReservedWords.remove(id);
+        operationMgmtService.addOperation(Operation.newOperation(request, Operation.OPERATION_CODE_C_REMOVE_RESERVED_WORD, id));
 
         context.sendRedirect(Latkes.getServePath() + "/admin/reserved-words");
     }

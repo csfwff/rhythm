@@ -63,6 +63,39 @@ public class ReservedWords {
         }
     }
 
+    public static void remove(String word) {
+        if (CACHE.contains(word)) {
+            JSONObject option = optionQueryService.getOption(OPTION_NAME);
+            JSONArray array = new JSONArray(option.optString(Option.OPTION_VALUE));
+            for (int i = array.length() - 1; i >= 0; i--) {
+                if (String.valueOf(array.get(i)).equals(word)) {
+                    array.remove(i);
+                }
+            }
+            JSONObject addOption = new JSONObject();
+            addOption.put(Keys.OBJECT_ID, OPTION_NAME);
+            addOption.put(Option.OPTION_CATEGORY, "reversed-word-list");
+            addOption.put(Option.OPTION_VALUE, array.toString());
+            optionMgmtService.updateOption(OPTION_NAME, addOption);
+            for (int i = CACHE.size() - 1; i >= 0; i--) {
+                if (CACHE.get(i).equals(word)) {
+                    CACHE.remove(i);
+                }
+            }
+        }
+    }
+
+    public static JSONObject get(String word) {
+        if (CACHE.contains(word)) {
+            JSONObject option = new JSONObject();
+            option.put(Keys.OBJECT_ID, word);
+            option.put(Option.OPTION_CATEGORY, word);
+            option.put(Option.OPTION_VALUE, word);
+            return option;
+        }
+        return new JSONObject();
+    }
+
     public static List<JSONObject> getList() {
         List<JSONObject> list = new ArrayList<>();
         for (String i : CACHE) {

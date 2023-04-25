@@ -33,7 +33,7 @@
             <li>
                 <div class="fn-clear">
                     ${item.optionValue}
-                    <a href="${servePath}/admin/reserved-word/${item.oId}" class="fn-right tooltipped tooltipped-w ft-a-title" aria-label="${removeLabel}"><svg><use xlink:href="#remove"></use></svg></a>
+                    <a href="${servePath}/admin/reserved-word/${item.oId}" class="fn-right tooltipped tooltipped-w ft-a-title" aria-label="${editLabel}"><svg><use xlink:href="#edit"></use></svg></a>
                 </div>
             </li>
             </#list>
