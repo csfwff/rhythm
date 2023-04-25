@@ -472,6 +472,15 @@ var ChatRoom = {
             let width = $("#selectWidth").val();
             ChatRoom.changeWidth(width);
         });
+
+        setInterval(ChatRoom.reloadMessages, 30 * 60 * 1000);
+    },
+    reloadMessages: function () {
+        if (document.documentElement.scrollTop <= 200) {
+            $('#chats').empty();
+            page=0;
+            ChatRoom.more();
+        }
     },
     /**
      * 打开思过崖
