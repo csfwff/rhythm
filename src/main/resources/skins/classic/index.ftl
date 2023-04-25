@@ -73,7 +73,7 @@
                         }
 
                         .rank {
-                            padding: 7px 15px 8px 15px !important;
+                            padding: 7px 15px 7px 15px !important;
                         }
                     </style>
                     <#list recentArticles as article>
@@ -749,7 +749,6 @@
         if (!loading) {
             loading = true;
             rotate.submit();
-            $("#randomArticles").fadeOut(100);
             $.ajax({
                 url: "${servePath}/article/random/14",
                 method: "GET",
@@ -772,7 +771,6 @@
                             '<a class="fn-right count ft-gray ft-smaller" href="${servePath}' + article.articlePermalink + '">' + viewCount + '</a>' +
                             '</li>');
                     }
-                    $("#randomArticles").fadeIn(500);
                 }
             });
         }

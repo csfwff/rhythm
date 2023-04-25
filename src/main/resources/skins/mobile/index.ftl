@@ -182,42 +182,6 @@
 
     var fishingPiVersion = "${fishingPiVersion}";
 
-    var loading = false;
-    var rotate = new Rotate("randomArticlesRefreshSvg");
-
-    function randomArticles() {
-        if (!loading) {
-            loading = true;
-            rotate.submit();
-            $("#randomArticles").fadeOut(100);
-            $.ajax({
-                url: "${servePath}/article/random/14",
-                method: "GET",
-                cache: false,
-                async: true,
-                success: function (result) {
-                    rotate.stop();
-                    loading = false;
-                    $("#randomArticles").html('');
-                    for (let articleCur in result.articles) {
-                        let article = result.articles[articleCur];
-                        let viewCount = article.articleViewCount;
-                        if (viewCount >= 1000) {
-                            viewCount = article.articleViewCntDisplayFormat;
-                        }
-                        $("#randomArticles").append('<li class="fn-flex">' +
-                            '<a rel="nofollow" href="${servePath}/member/' + article.articleAuthorName + '">' +
-                            '<span class="avatar-small tooltipped tooltipped-se slogan" aria-label="' + article.articleAuthorName + '" style="background-image:url(\'' + article.articleAuthorThumbnailURL210 + '\')"></span></a>' +
-                            '<a rel="nofollow" class="title fn-ellipsis fn-flex-1" href="${servePath}' + article.articlePermalink + '">' + article.articleTitleEmoj + '</a>' +
-                            '<a class="fn-right count ft-gray ft-smaller" href="${servePath}' + article.articlePermalink + '">' + viewCount + '</a>' +
-                            '</li>');
-                    }
-                    $("#randomArticles").fadeIn(500);
-                }
-            });
-        }
-    }
-
     function yesterday() {
         $("#yesterday").fadeOut(500, function () {
             $.ajax({
