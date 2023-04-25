@@ -86,22 +86,6 @@ $black-light: #616161 !default;
   font-display: swap
 }
 
-@font-face {
-  font-family: HarmonyOS;
-  src: url(//resource.hellofont.cn/font/HarmonyOS_SansSC_Light-J.woff2) format('woff2'),url(//resource.hellofont.cn/font/HarmonyOS_SansSC_Light-J.woff) format('woff');
-  font-weight: 300;
-  font-style: normal;
-  font-display: swap
-}
-
-@font-face {
-  font-family: HarmonyOS;
-  src: url(//resource.hellofont.cn/font/HarmonyOS_SansSC_Thin-J.woff2) format('woff2'),url(//resource.hellofont.cn/font/HarmonyOS_SansSC_Thin-J.woff) format('woff');
-  font-weight: 200;
-  font-style: normal;
-  font-display: swap
-}
-
 // Fonts
 $font-family-base: "HarmonyOS", "Helvetica Neue", "Luxi Sans", "DejaVu Sans", Tahoma, "Hiragino Sans GB", "Microsoft Yahei", sans-serif !default;
 $font-family-code: mononoki, Consolas, "Liberation Mono", Menlo, Courier, monospace !default;

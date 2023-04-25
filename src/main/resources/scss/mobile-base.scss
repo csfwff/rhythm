@@ -85,6 +85,7 @@ button,
   line-height: 19px;
   white-space: nowrap;
   transition: all 100ms linear;
+  font-weight: 500;
 }
 
 button:focus,
@@ -2585,6 +2586,11 @@ only screen and (device-width: 414px) and (device-height: 896px) and (-webkit-de
 
 .ft__smaller {
   font-size: 12px;
+}
+
+.chats__content .ft__smaller {
+  font-weight: 500;
+  font-size: 13px;
 }
 
 .fn__right {

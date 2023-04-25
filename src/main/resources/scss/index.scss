@@ -1841,6 +1841,11 @@ code .dec {
   font-size: 12px;
 }
 
+.chats__content .ft__smaller {
+  font-weight: 500;
+  font-size: 13px;
+}
+
 .article__participant {
   float: left;
   cursor: pointer;
@@ -1989,10 +1994,6 @@ code .dec {
 
 .ft__fade {
   color: var(--text-fade-color);
-}
-
-.ft__smaller {
-  font-size: 12px;
 }
 
 .fn__right {
