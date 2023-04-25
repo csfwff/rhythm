@@ -1,5 +1,6 @@
 package org.b3log.symphony.util;
 
+import com.alibaba.fastjson.JSON;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -46,5 +47,35 @@ public class ReservedWords {
             }
         }
         LOGGER.log(Level.INFO, "Reserved words system is ready.");
+    }
+
+    public static void add(String word) {
+        if (!CACHE.contains(word)) {
+            JSONObject option = optionQueryService.getOption(OPTION_NAME);
+            JSONArray array = new JSONArray(option.optString(Option.OPTION_VALUE));
+            array.put(word);
+            JSONObject addOption = new JSONObject();
+            addOption.put(Keys.OBJECT_ID, OPTION_NAME);
+            addOption.put(Option.OPTION_CATEGORY, "reversed-word-list");
+            addOption.put(Option.OPTION_VALUE, array.toString());
+            optionMgmtService.updateOption(OPTION_NAME, addOption);
+            CACHE.add(word);
+        }
+    }
+
+    public static List<JSONObject> getList() {
+        List<JSONObject> list = new ArrayList<>();
+        for (String i : CACHE) {
+            JSONObject jsonObject = new JSONObject();
+            jsonObject.put(Option.OPTION_VALUE, i);
+            jsonObject.put(Option.OPTION_CATEGORY, i);
+            jsonObject.put(Keys.OBJECT_ID, i);
+            list.add(jsonObject);
+        }
+        return list;
+    }
+
+    public static boolean contains(String word) {
+        return CACHE.contains(word);
     }
 }

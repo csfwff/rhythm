@@ -54,10 +54,7 @@ import org.b3log.symphony.processor.middleware.validate.UserRegister2ValidationM
 import org.b3log.symphony.processor.middleware.validate.UserRegisterValidationMidware;
 import org.b3log.symphony.repository.ReportRepository;
 import org.b3log.symphony.service.*;
-import org.b3log.symphony.util.Escapes;
-import org.b3log.symphony.util.Sessions;
-import org.b3log.symphony.util.StatusCodes;
-import org.b3log.symphony.util.Symphonys;
+import org.b3log.symphony.util.*;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -1278,17 +1275,13 @@ public class AdminProcessor {
             return;
         }
 
-        if (optionQueryService.isReservedWord(word)) {
+        if (ReservedWords.contains(word)) {
             context.sendRedirect(Latkes.getServePath() + "/admin/reserved-words");
             return;
         }
 
         try {
-            final JSONObject reservedWord = new JSONObject();
-            reservedWord.put(Option.OPTION_CATEGORY, Option.CATEGORY_C_RESERVED_WORDS);
-            reservedWord.put(Option.OPTION_VALUE, word);
-
-            optionMgmtService.addOption(reservedWord);
+            ReservedWords.add(word);
             operationMgmtService.addOperation(Operation.newOperation(request, Operation.OPERATION_CODE_C_ADD_RESERVED_WORD, word));
         } catch (final Exception e) {
             final AbstractFreeMarkerRenderer renderer = new SkinRenderer(context, "admin/error.ftl");
@@ -1349,7 +1342,7 @@ public class AdminProcessor {
     public void showReservedWords(final RequestContext context) {
         final AbstractFreeMarkerRenderer renderer = new SkinRenderer(context, "admin/reserved-words.ftl");
         final Map<String, Object> dataModel = renderer.getDataModel();
-        final List<JSONObject> words = optionQueryService.getReservedWords();
+        final List<JSONObject> words = ReservedWords.getList();
         words.forEach(Escapes::escapeHTML);
         dataModel.put(Common.WORDS, words);
         dataModelService.fillHeaderAndFooter(context, dataModel);
