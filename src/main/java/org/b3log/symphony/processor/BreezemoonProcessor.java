@@ -325,17 +325,12 @@ public class BreezemoonProcessor {
     }
 
     private boolean isInvalid(final RequestContext context, final JSONObject requestJSONObject) {
+        requestJSONObject.put(Breezemoon.BREEZEMOON_CONTENT, ReservedWords.processReservedWord(requestJSONObject.optString(Breezemoon.BREEZEMOON_CONTENT)));
         String breezemoonContent = requestJSONObject.optString(Breezemoon.BREEZEMOON_CONTENT);
         breezemoonContent = StringUtils.trim(breezemoonContent);
         final long length = StringUtils.length(breezemoonContent);
         if (1 > length || 512 < length) {
             context.renderMsg(langPropsService.get("breezemoonLengthLabel"));
-            context.renderJSONValue(Keys.CODE, StatusCodes.ERR);
-            return true;
-        }
-
-        if (optionQueryService.containReservedWord(breezemoonContent)) {
-            context.renderMsg(langPropsService.get("contentContainReservedWordLabel"));
             context.renderJSONValue(Keys.CODE, StatusCodes.ERR);
             return true;
         }

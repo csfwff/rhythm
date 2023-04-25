@@ -1,6 +1,11 @@
 package org.b3log.symphony.util;
 
-import com.alibaba.fastjson.JSON;
+import net.sourceforge.pinyin4j.PinyinHelper;
+import net.sourceforge.pinyin4j.format.HanyuPinyinCaseType;
+import net.sourceforge.pinyin4j.format.HanyuPinyinOutputFormat;
+import net.sourceforge.pinyin4j.format.HanyuPinyinToneType;
+import net.sourceforge.pinyin4j.format.HanyuPinyinVCharType;
+import org.apache.commons.lang.StringUtils;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -26,6 +31,36 @@ public class ReservedWords {
     private static final String OPTION_NAME = "reservedWordList";
 
     private static final List<String> CACHE = new ArrayList<>();
+
+    public static String processReservedWord(String content) {
+        if (StringUtils.isBlank(content)) {
+            return "";
+        }
+
+        try {
+            HanyuPinyinOutputFormat hanyuPinyinOutputFormat = new HanyuPinyinOutputFormat();
+            hanyuPinyinOutputFormat.setCaseType(HanyuPinyinCaseType.LOWERCASE);
+            hanyuPinyinOutputFormat.setToneType(HanyuPinyinToneType.WITH_TONE_MARK);
+            hanyuPinyinOutputFormat.setVCharType(HanyuPinyinVCharType.WITH_U_UNICODE);
+
+            List<String> list = getCache();
+            for (String i : list) {
+                if (i.matches("[\\u4e00-\\u9fa5]+")) {
+                    content = content.replaceAll(i, PinyinHelper.toHanYuPinyinString(i, hanyuPinyinOutputFormat, " ", false));
+                } else {
+                    StringBuilder output = new StringBuilder();
+                    for (int j = 0; j < i.length(); j++) {
+                        output.append("*");
+                    }
+                    content = content.replaceAll(i, output.toString());
+                }
+            }
+
+            return content;
+        } catch (final Exception e) {
+            return "本段敏感字处理时出现错误，请联系管理员。";
+        }
+    }
 
     public static void init() {
         final BeanManager beanManager = BeanManager.getInstance();
@@ -85,6 +120,11 @@ public class ReservedWords {
         }
     }
 
+    public static void update(String word, String newWord) {
+        remove(word);
+        add(newWord);
+    }
+
     public static JSONObject get(String word) {
         if (CACHE.contains(word)) {
             JSONObject option = new JSONObject();
@@ -94,6 +134,10 @@ public class ReservedWords {
             return option;
         }
         return new JSONObject();
+    }
+
+    public static List<String> getCache() {
+        return CACHE;
     }
 
     public static List<JSONObject> getList() {

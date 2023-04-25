@@ -32,6 +32,7 @@ import org.b3log.symphony.model.Breezemoon;
 import org.b3log.symphony.model.Common;
 import org.b3log.symphony.repository.BreezemoonRepository;
 import org.b3log.symphony.repository.UserRepository;
+import org.b3log.symphony.util.ReservedWords;
 import org.json.JSONObject;
 
 /**
@@ -86,10 +87,8 @@ public class BreezemoonMgmtService {
      */
     @Transactional
     public String addBreezemoon(final JSONObject requestJSONObject) throws ServiceException {
+        requestJSONObject.put(Breezemoon.BREEZEMOON_CONTENT, ReservedWords.processReservedWord(requestJSONObject.optString(Breezemoon.BREEZEMOON_CONTENT)));
         final String content = requestJSONObject.optString(Breezemoon.BREEZEMOON_CONTENT);
-        if (optionQueryService.containReservedWord(content)) {
-            throw new ServiceException(langPropsService.get("contentContainReservedWordLabel"));
-        }
         final JSONObject bm = new JSONObject();
         bm.put(Breezemoon.BREEZEMOON_CONTENT, content);
         bm.put(Breezemoon.BREEZEMOON_AUTHOR_ID, requestJSONObject.optString(Breezemoon.BREEZEMOON_AUTHOR_ID));
@@ -128,10 +127,8 @@ public class BreezemoonMgmtService {
      */
     @Transactional
     public void updateBreezemoon(final JSONObject requestJSONObject) throws ServiceException {
+        requestJSONObject.put(Breezemoon.BREEZEMOON_CONTENT, ReservedWords.processReservedWord(requestJSONObject.optString(Breezemoon.BREEZEMOON_CONTENT)));
         final String content = requestJSONObject.optString(Breezemoon.BREEZEMOON_CONTENT);
-        if (optionQueryService.containReservedWord(content)) {
-            throw new ServiceException(langPropsService.get("contentContainReservedWordLabel"));
-        }
 
         final String id = requestJSONObject.optString(Keys.OBJECT_ID);
         JSONObject old;

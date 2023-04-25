@@ -1313,25 +1313,11 @@ public class AdminProcessor {
     public void updateReservedWord(final RequestContext context) {
         final String id = context.pathVar("id");
         final Request request = context.getRequest();
+        final String word = request.getParameter(Option.OPTION_VALUE);
+        ReservedWords.update(id, word);
+        operationMgmtService.addOperation(Operation.newOperation(request, Operation.OPERATION_CODE_C_UPDATE_RESERVED_WORD, word));
 
-        final AbstractFreeMarkerRenderer renderer = new SkinRenderer(context, "admin/reserved-word.ftl");
-        final Map<String, Object> dataModel = renderer.getDataModel();
-
-        final JSONObject word = optionQueryService.getOption(id);
-        dataModel.put(Common.WORD, word);
-
-        final Iterator<String> parameterNames = request.getParameterNames().iterator();
-        while (parameterNames.hasNext()) {
-            final String name = parameterNames.next();
-            final String value = context.param(name);
-
-            word.put(name, value);
-        }
-
-        optionMgmtService.updateOption(id, word);
-        operationMgmtService.addOperation(Operation.newOperation(request, Operation.OPERATION_CODE_C_UPDATE_RESERVED_WORD, word.optString(Option.OPTION_VALUE)));
-
-        dataModelService.fillHeaderAndFooter(context, dataModel);
+        context.sendRedirect(Latkes.getServePath() + "/admin/reserved-words");
     }
 
     /**

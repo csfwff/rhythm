@@ -32,10 +32,7 @@ import org.b3log.symphony.model.Tag;
 import org.b3log.symphony.processor.ApiProcessor;
 import org.b3log.symphony.service.OptionQueryService;
 import org.b3log.symphony.service.TagQueryService;
-import org.b3log.symphony.util.Emotions;
-import org.b3log.symphony.util.Sessions;
-import org.b3log.symphony.util.StatusCodes;
-import org.b3log.symphony.util.Symphonys;
+import org.b3log.symphony.util.*;
 import org.json.JSONObject;
 
 import java.util.Arrays;
@@ -87,18 +84,12 @@ public class ArticlePostValidationMidware {
         final JSONObject exception = new JSONObject();
         exception.put(Keys.CODE, StatusCodes.ERR);
 
+        requestJSONObject.put(Article.ARTICLE_TITLE, ReservedWords.processReservedWord(requestJSONObject.optString(Article.ARTICLE_TITLE)));
         String articleTitle = requestJSONObject.optString(Article.ARTICLE_TITLE);
         articleTitle = StringUtils.trim(articleTitle);
         articleTitle = Emotions.clear(articleTitle);
         if (StringUtils.isBlank(articleTitle) || articleTitle.length() > MAX_ARTICLE_TITLE_LENGTH) {
             context.renderJSON(exception.put(Keys.MSG, langPropsService.get("articleTitleErrorLabel")));
-            context.abort();
-            return;
-        }
-
-        if (optionQueryService.containReservedWord(articleTitle)) {
-            final String msg = langPropsService.get("contentContainReservedWordLabel");
-            context.renderJSON(new JSONObject().put(Keys.MSG, msg));
             context.abort();
             return;
         }
@@ -112,6 +103,7 @@ public class ArticlePostValidationMidware {
             return;
         }
 
+        requestJSONObject.put(Article.ARTICLE_TAGS, ReservedWords.processReservedWord(requestJSONObject.optString(Article.ARTICLE_TAGS)));
         String articleTags = requestJSONObject.optString(Article.ARTICLE_TAGS);
         articleTags = Tag.formatTags(articleTags);
 
@@ -122,12 +114,6 @@ public class ArticlePostValidationMidware {
 
         if (StringUtils.isBlank(articleTags)) {
             context.renderJSON(exception.put(Keys.MSG, langPropsService.get("tagsEmptyErrorLabel")));
-            context.abort();
-            return;
-        }
-        if (optionQueryService.containReservedWord(articleTags)) {
-            final String msg = langPropsService.get("contentContainReservedWordLabel");
-            context.renderJSON(new JSONObject().put(Keys.MSG, msg));
             context.abort();
             return;
         }
@@ -190,6 +176,7 @@ public class ArticlePostValidationMidware {
             requestJSONObject.put(Article.ARTICLE_TAGS, tagBuilder.toString());
         }
 
+        requestJSONObject.put(Article.ARTICLE_CONTENT, ReservedWords.processReservedWord(requestJSONObject.optString(Article.ARTICLE_CONTENT)));
         String articleContent = requestJSONObject.optString(Article.ARTICLE_CONTENT);
         articleContent = StringUtils.trim(articleContent);
         if (StringUtils.isBlank(articleContent) || articleContent.length() > MAX_ARTICLE_CONTENT_LENGTH
@@ -198,13 +185,6 @@ public class ArticlePostValidationMidware {
             msg = msg.replace("{maxArticleContentLength}", String.valueOf(MAX_ARTICLE_CONTENT_LENGTH));
 
             context.renderJSON(exception.put(Keys.MSG, msg));
-            context.abort();
-            return;
-        }
-
-        if (optionQueryService.containReservedWord(articleContent)) {
-            final String msg = langPropsService.get("contentContainReservedWordLabel");
-            context.renderJSON(new JSONObject().put(Keys.MSG, msg));
             context.abort();
             return;
         }

@@ -18,7 +18,6 @@
  */
 package org.b3log.symphony.service;
 
-import org.apache.commons.lang.StringUtils;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -169,32 +168,6 @@ public class OptionQueryService {
     }
 
     /**
-     * Checks whether the specified content contains reserved words.
-     *
-     * @param content the specified content
-     * @return {@code true} if it contains reserved words, returns {@code false} otherwise
-     */
-    public boolean containReservedWord(final String content) {
-        if (StringUtils.isBlank(content)) {
-            return false;
-        }
-
-        try {
-            final List<JSONObject> reservedWords = getReservedWords();
-
-            for (final JSONObject reservedWord : reservedWords) {
-                if (content.contains(reservedWord.optString(Option.OPTION_VALUE))) {
-                    return true;
-                }
-            }
-
-            return false;
-        } catch (final Exception e) {
-            return true;
-        }
-    }
-
-    /**
      * Gets the reserved words.
      *
      * @return reserved words
@@ -206,27 +179,6 @@ public class OptionQueryService {
         } catch (final RepositoryException e) {
             LOGGER.log(Level.ERROR, "Gets reserved words failed", e);
             return Collections.emptyList();
-        }
-    }
-
-    /**
-     * Checks whether the specified word is a reserved word.
-     *
-     * @param word the specified word
-     * @return {@code true} if it is a reserved word, returns {@code false} otherwise
-     */
-    public boolean isReservedWord(final String word) {
-        final Query query = new Query().
-                setFilter(CompositeFilterOperator.and(
-                        new PropertyFilter(Option.OPTION_VALUE, FilterOperator.EQUAL, word),
-                        new PropertyFilter(Option.OPTION_CATEGORY, FilterOperator.EQUAL, Option.CATEGORY_C_RESERVED_WORDS)
-                ));
-        try {
-            return optionRepository.count(query) > 0;
-        } catch (final RepositoryException e) {
-            LOGGER.log(Level.ERROR, "Checks reserved word failed", e);
-
-            return true;
         }
     }
 

@@ -30,6 +30,7 @@ import org.b3log.symphony.model.Comment;
 import org.b3log.symphony.service.ArticleQueryService;
 import org.b3log.symphony.service.CommentQueryService;
 import org.b3log.symphony.service.OptionQueryService;
+import org.b3log.symphony.util.ReservedWords;
 import org.b3log.symphony.util.StatusCodes;
 import org.json.JSONObject;
 
@@ -78,19 +79,13 @@ public class CommentUpdateValidationMidware {
         final JSONObject exception = new JSONObject();
         exception.put(Keys.CODE, StatusCodes.ERR);
 
+        requestJSONObject.put(Comment.COMMENT_CONTENT, ReservedWords.processReservedWord(requestJSONObject.optString(Comment.COMMENT_CONTENT)));
         final String commentContent = StringUtils.trim(requestJSONObject.optString(Comment.COMMENT_CONTENT));
         if (StringUtils.isBlank(commentContent) || commentContent.length() > Comment.MAX_COMMENT_CONTENT_LENGTH) {
             context.renderJSON(exception.put(Keys.MSG, langPropsService.get("commentErrorLabel")));
             context.abort();
             return;
         }
-
-        if (optionQueryService.containReservedWord(commentContent)) {
-            context.renderJSON(exception.put(Keys.MSG, langPropsService.get("contentContainReservedWordLabel")));
-            context.abort();
-            return;
-        }
-
         context.handle();
     }
 }
