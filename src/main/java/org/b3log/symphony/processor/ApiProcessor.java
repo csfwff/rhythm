@@ -48,7 +48,9 @@ import org.b3log.symphony.util.Symphonys;
 import org.json.JSONObject;
 import pers.adlered.simplecurrentlimiter.main.SimpleCurrentLimiter;
 
+import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 /**
  * 专业团队，专业的 API 接口
@@ -338,10 +340,10 @@ public class ApiProcessor {
     }
 
     /**
-     * 获取最近注册的20个鱼油
+     * 获取最近注册的20个鱼油  只需要用户名和昵称吧
      * @param context
      */
-    private void getRecentReg(final RequestContext context) {
+    public void getRecentReg(final RequestContext context) {
         JSONObject ret = new JSONObject();
         try {
             // 根据API获取当前操作用户
@@ -349,7 +351,15 @@ public class ApiProcessor {
             // 返回对象
             ret.put(Keys.CODE, StatusCodes.SUCC);
             ret.put(Keys.MSG, "");
-            ret.put(Keys.DATA, userQueryService.getRecentRegisteredUsers(20));
+            List<JSONObject> users = userQueryService.getRecentRegisteredUsers(20);
+            ret.put(Keys.DATA, users.stream().map(
+                    x -> {
+                        JSONObject user = new JSONObject();
+                        user.put(User.USER_NAME, user.optString(User.USER_NAME));
+                        user.put(UserExt.USER_NICKNAME, user.optString(UserExt.USER_NICKNAME));
+                        return user;
+                    }
+            ).collect(Collectors.toList()));
             context.renderJSON(ret);
         } catch (Exception e) {
             ret.put(Keys.CODE, StatusCodes.ERR);
