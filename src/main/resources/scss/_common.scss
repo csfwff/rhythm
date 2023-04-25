@@ -25,6 +25,10 @@
 
 @import "vditor/dist/index";
 
+.vditor-reset {
+  font-family: "AlibabaPuHuiTi-2-55-Regular","Helvetica Neue","Luxi Sans","DejaVu Sans","Hiragino Sans GB","Microsoft Yahei",sans-serif,"Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji","Segoe UI Symbol","Android Emoji","EmojiSymbols" !important;
+}
+
 .vditor {
   --border-color: #f1f1f1;
   --second-color: rgba(88, 96, 105, 0.36);

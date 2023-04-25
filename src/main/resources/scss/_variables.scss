@@ -54,8 +54,17 @@ $black: #3b3e43 !default;
 $black-text: rgba(0, 0, 0, .87) !default;
 $black-light: #616161 !default;
 
+@font-face {
+  font-family: AlibabaPuHuiTi-2-55-Regular;
+  src:url(https://puhuiti.oss-cn-hangzhou.aliyuncs.com/AlibabaPuHuiTi-2/AlibabaPuHuiTi-2-55-Regular/AlibabaPuHuiTi-2-55-Regular.eot) format('embedded-opentype'),
+  url(https://puhuiti.oss-cn-hangzhou.aliyuncs.com/AlibabaPuHuiTi-2/AlibabaPuHuiTi-2-55-Regular/AlibabaPuHuiTi-2-55-Regular.otf) format('opentype'),
+  url(https://puhuiti.oss-cn-hangzhou.aliyuncs.com/AlibabaPuHuiTi-2/AlibabaPuHuiTi-2-55-Regular/AlibabaPuHuiTi-2-55-Regular.ttf) format('TrueType'),
+  url(https://puhuiti.oss-cn-hangzhou.aliyuncs.com/AlibabaPuHuiTi-2/AlibabaPuHuiTi-2-55-Regular/AlibabaPuHuiTi-2-55-Regular.woff) format('woff'),
+  url(https://puhuiti.oss-cn-hangzhou.aliyuncs.com/AlibabaPuHuiTi-2/AlibabaPuHuiTi-2-55-Regular/AlibabaPuHuiTi-2-55-Regular.woff2) format('woff2');
+}
+
 // Fonts
-$font-family-base: "Helvetica Neue", "Luxi Sans", "DejaVu Sans", Tahoma, "Hiragino Sans GB", "Microsoft Yahei", sans-serif !default;
+$font-family-base: "AlibabaPuHuiTi-2-55-Regular", "Helvetica Neue", "Luxi Sans", "DejaVu Sans", Tahoma, "Hiragino Sans GB", "Microsoft Yahei", sans-serif !default;
 $font-family-code: mononoki, Consolas, "Liberation Mono", Menlo, Courier, monospace !default;
 
 // shadow
