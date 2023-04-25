@@ -364,9 +364,7 @@ public class AdminProcessor {
         Dispatcher.post("/admin/add-article", adminProcessor::addArticle, middlewares);
         Dispatcher.post("/admin/add-reserved-word", adminProcessor::addReservedWord, middlewares);
         Dispatcher.get("/admin/add-reserved-word", adminProcessor::showAddReservedWord, middlewares);
-        Dispatcher.post("/admin/reserved-word/{id}", adminProcessor::updateReservedWord, middlewares);
         Dispatcher.get("/admin/reserved-words", adminProcessor::showReservedWords, middlewares);
-        Dispatcher.get("/admin/reserved-word/{id}", adminProcessor::showReservedWord, middlewares);
         Dispatcher.post("/admin/remove-reserved-word", adminProcessor::removeReservedWord, middlewares);
         Dispatcher.post("/admin/remove-comment", adminProcessor::removeComment, middlewares);
         Dispatcher.post("/admin/remove-article", adminProcessor::removeArticle, middlewares);
@@ -1283,8 +1281,10 @@ public class AdminProcessor {
         try {
             if (word.contains("\r\n")) {
                 for (String i : word.split("\r\n")) {
-                    ReservedWords.add(i);
-                    operationMgmtService.addOperation(Operation.newOperation(request, Operation.OPERATION_CODE_C_ADD_RESERVED_WORD, i));
+                    if (!i.replaceAll(" ", "").isEmpty()) {
+                        ReservedWords.add(i);
+                        operationMgmtService.addOperation(Operation.newOperation(request, Operation.OPERATION_CODE_C_ADD_RESERVED_WORD, i));
+                    }
                 }
             } else {
                 ReservedWords.add(word);
@@ -1313,21 +1313,6 @@ public class AdminProcessor {
     }
 
     /**
-     * Updates a reserved word.
-     *
-     * @param context the specified context
-     */
-    public void updateReservedWord(final RequestContext context) {
-        final String id = context.pathVar("id");
-        final Request request = context.getRequest();
-        final String word = request.getParameter(Option.OPTION_VALUE);
-        ReservedWords.update(id, word);
-        operationMgmtService.addOperation(Operation.newOperation(request, Operation.OPERATION_CODE_C_UPDATE_RESERVED_WORD, word));
-
-        context.sendRedirect(Latkes.getServePath() + "/admin/reserved-words");
-    }
-
-    /**
      * Shows reserved words.
      *
      * @param context the specified context
@@ -1338,20 +1323,6 @@ public class AdminProcessor {
         final List<JSONObject> words = ReservedWords.getList();
         words.forEach(Escapes::escapeHTML);
         dataModel.put(Common.WORDS, words);
-        dataModelService.fillHeaderAndFooter(context, dataModel);
-    }
-
-    /**
-     * Shows a reserved word.
-     *
-     * @param context the specified context
-     */
-    public void showReservedWord(final RequestContext context) {
-        final String id = context.pathVar("id");
-        final AbstractFreeMarkerRenderer renderer = new SkinRenderer(context, "admin/reserved-word.ftl");
-        final Map<String, Object> dataModel = renderer.getDataModel();
-        final JSONObject word = ReservedWords.get(id);
-        dataModel.put(Common.WORD, word);
         dataModelService.fillHeaderAndFooter(context, dataModel);
     }
 
@@ -1367,7 +1338,7 @@ public class AdminProcessor {
         ReservedWords.remove(id);
         operationMgmtService.addOperation(Operation.newOperation(request, Operation.OPERATION_CODE_C_REMOVE_RESERVED_WORD, id));
 
-        context.sendRedirect(Latkes.getServePath() + "/admin/reserved-words");
+        context.renderJSON(StatusCodes.SUCC);
     }
 
     /**
