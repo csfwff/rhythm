@@ -1281,8 +1281,15 @@ public class AdminProcessor {
         }
 
         try {
-            ReservedWords.add(word);
-            operationMgmtService.addOperation(Operation.newOperation(request, Operation.OPERATION_CODE_C_ADD_RESERVED_WORD, word));
+            if (word.contains("\r\n")) {
+                for (String i : word.split("\r\n")) {
+                    ReservedWords.add(i);
+                    operationMgmtService.addOperation(Operation.newOperation(request, Operation.OPERATION_CODE_C_ADD_RESERVED_WORD, i));
+                }
+            } else {
+                ReservedWords.add(word);
+                operationMgmtService.addOperation(Operation.newOperation(request, Operation.OPERATION_CODE_C_ADD_RESERVED_WORD, word));
+            }
         } catch (final Exception e) {
             final AbstractFreeMarkerRenderer renderer = new SkinRenderer(context, "admin/error.ftl");
             final Map<String, Object> dataModel = renderer.getDataModel();
