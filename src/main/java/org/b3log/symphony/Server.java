@@ -43,6 +43,7 @@ import org.b3log.symphony.repository.UserRepository;
 import org.b3log.symphony.service.CronMgmtService;
 import org.b3log.symphony.service.InitMgmtService;
 import org.b3log.symphony.util.Markdowns;
+import org.b3log.symphony.util.ReservedWords;
 import org.b3log.symphony.util.Symphonys;
 import org.json.JSONObject;
 
@@ -262,6 +263,8 @@ public final class Server extends BaseServer {
 
             LOGGER.log(Level.ERROR, "Cannot offline all users forced", e);
         }
+
+        ReservedWords.init();
 
         LOGGER.log(Level.INFO, "Everything is ready, Thank you for using Rhythm!");
 
