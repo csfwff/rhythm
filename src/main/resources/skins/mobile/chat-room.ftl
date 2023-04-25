@@ -110,6 +110,7 @@
                                 </button>
                             </#if>
                             <button class="button" onclick="ChatRoom.showSiGuoYar()">思过崖</button>
+                            <button class="button" onclick="ChatRoom.flashScreen()">清屏</button>
                             <button class="green" onclick="ChatRoom.send()">发送</button>
                         </div>
                     </div>

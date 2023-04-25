@@ -473,14 +473,27 @@ var ChatRoom = {
             ChatRoom.changeWidth(width);
         });
 
-        setInterval(ChatRoom.reloadMessages, 30 * 60 * 1000);
+        setInterval(ChatRoom.reloadMessages, 15 * 60 * 1000);
     },
     reloadMessages: function () {
         if (document.documentElement.scrollTop <= 200) {
-            $('#chats').empty();
-            page=0;
-            ChatRoom.more();
+            ChatRoom.flashScreen();
         }
+    },
+    flashScreen: function () {
+        NProgress.start();
+        $('#chats').css("display", "none");
+        page = 1;
+        let chatLength = $(".chats__content").length;
+        if (chatLength > 25) {
+            for (let i = chatLength - 1; i > 24; i--) {
+                $($($($(".chats__content")[i]).parent()).parent()).remove();
+            }
+        }
+        setTimeout(function() {
+            $('#chats').css("display", "block");
+            NProgress.done();
+        }, 150);
     },
     /**
      * 打开思过崖
