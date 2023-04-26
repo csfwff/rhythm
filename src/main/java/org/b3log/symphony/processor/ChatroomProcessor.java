@@ -880,12 +880,22 @@ public class ChatroomProcessor {
             } else if (content.startsWith("[barrager]") && content.endsWith("[/barrager]")) {
                 try {
                     // 扣钱
-                    final boolean succ = null != pointtransferMgmtService.transfer(userId, Pointtransfer.ID_C_SYS,
-                            Pointtransfer.TRANSFER_TYPE_C_CHAT_ROOM_SEND_BARRAGER,
-                            20, "", System.currentTimeMillis(), "");
-                    if (!succ) {
-                        context.renderJSON(StatusCodes.ERR).renderMsg("少年，你的积分不足！");
-                        return;
+                    if (userName.equals("dissoluteFate")) {
+                        final boolean succ = null != pointtransferMgmtService.transfer(userId, Pointtransfer.ID_C_SYS,
+                                Pointtransfer.TRANSFER_TYPE_C_CHAT_ROOM_SEND_BARRAGER,
+                                5, "", System.currentTimeMillis(), "");
+                        if (!succ) {
+                            context.renderJSON(StatusCodes.ERR).renderMsg("崖主，你的积分不足！");
+                            return;
+                        }
+                    } else {
+                        final boolean succ = null != pointtransferMgmtService.transfer(userId, Pointtransfer.ID_C_SYS,
+                                Pointtransfer.TRANSFER_TYPE_C_CHAT_ROOM_SEND_BARRAGER,
+                                20, "", System.currentTimeMillis(), "");
+                        if (!succ) {
+                            context.renderJSON(StatusCodes.ERR).renderMsg("少年，你的积分不足！");
+                            return;
+                        }
                     }
                     String barragerString = content.replaceAll("^\\[barrager\\]", "").replaceAll("\\[/barrager\\]$", "");
                     JSONObject barrager = new JSONObject(barragerString);
