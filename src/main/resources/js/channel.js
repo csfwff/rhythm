@@ -374,7 +374,6 @@ var ChatRoomChannel = {
                         speed: Math.round(Math.random()*10+10),
                         color: barragerColor
                     }
-                    console.log(item)
                     $('body').barrager(item);
                     break;
                 case 'discussChanged':
