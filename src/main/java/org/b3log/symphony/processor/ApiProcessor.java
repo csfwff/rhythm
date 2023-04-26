@@ -48,7 +48,9 @@ import org.b3log.symphony.util.Symphonys;
 import org.json.JSONObject;
 import pers.adlered.simplecurrentlimiter.main.SimpleCurrentLimiter;
 
+import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 /**
  * 专业团队，专业的 API 接口
@@ -118,6 +120,7 @@ public class ApiProcessor {
         Dispatcher.get("/api/user/exists/{user}", apiProcessor::userExists);
         Dispatcher.post("/api/getKey", apiProcessor::getKey);
         Dispatcher.get("/api/user", apiProcessor::getUser);
+        Dispatcher.get("/api/user/recentReg", apiProcessor::getRecentReg);
 
         final RewardQueryService rewardQueryService = beanManager.getReference(RewardQueryService.class);
         Dispatcher.get("/api/article/reward/senders/{aId}", rewardQueryService::rewardedSenders);
@@ -336,6 +339,34 @@ public class ApiProcessor {
         }
     }
 
+    /**
+     * 获取最近注册的20个鱼油  只需要用户名和昵称吧
+     * @param context
+     */
+    public void getRecentReg(final RequestContext context) {
+        JSONObject ret = new JSONObject();
+        try {
+            // 根据API获取当前操作用户
+            ApiProcessor.getUserByKey(context.param("apiKey"));
+            // 返回对象
+            ret.put(Keys.CODE, StatusCodes.SUCC);
+            ret.put(Keys.MSG, "");
+            List<JSONObject> users = userQueryService.getRecentRegisteredUsers(20);
+            ret.put(Keys.DATA, users.stream().map(
+                    x -> {
+                        JSONObject user = new JSONObject();
+                        user.put(User.USER_NAME, user.optString(User.USER_NAME));
+                        user.put(UserExt.USER_NICKNAME, user.optString(UserExt.USER_NICKNAME));
+                        return user;
+                    }
+            ).collect(Collectors.toList()));
+            context.renderJSON(ret);
+        } catch (Exception e) {
+            ret.put(Keys.CODE, StatusCodes.ERR);
+            ret.put(Keys.MSG, "Invalid Api Key.");
+            context.renderJSON(ret);
+        }
+    }
     public void userExists(final RequestContext context) {
         String user = context.pathVar("user");
         JSONObject userJSON = userQueryService.getUserByName(user);
