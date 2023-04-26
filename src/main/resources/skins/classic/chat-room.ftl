@@ -29,6 +29,7 @@
     <link rel="canonical" href="${servePath}/community">
     <link rel="stylesheet" href="${staticServePath}/css/viewer.min.css"/>
     <link rel="stylesheet" href="https://file.fishpi.cn/cxColor/css/jquery.cxcolor.css">
+    <link rel="stylesheet" href="${staticServePath}/js/lib/barrager/barrager.css">
 </head>
 <body>
 <#include "header.ftl">
@@ -50,6 +51,9 @@
                                 </svg>
                                 <svg id="paintBtn" style="width: 30px; height: 30px; cursor:pointer;">
                                     <use xlink:href="#icon-paint"></use>
+                                </svg>
+                                <svg id="barragerBtn" style="width: 30px; height: 30px; cursor:pointer;">
+                                    <use xlink:href="#danmu"></use>
                                 </svg>
                                 <div class="discuss_title">
                                     <a style="text-decoration: none; display: inline-block; cursor: default">
@@ -108,6 +112,22 @@
                                         <button onclick="ChatRoom.revokeChatacter('paintCanvas')">撤销</button>
                                         <button class="red" onclick="ChatRoom.clearCharacter('paintCanvas')">${clearLabel}</button>
                                         <button class="green" onclick="ChatRoom.submitCharacter('paintCanvas')">${submitLabel}</button>
+                                    </div>
+                                </div>
+                                <div id="barragerContent" style="display: none">
+                                    <div style="margin: 20px 0 0 0;">
+                                        <div>
+                                            <div class="module-panel">
+                                                <div class="module-header form" style="border: none;">
+                                                    <input id="barragerInput" type="text" class="comment__text breezemoon__input" placeholder="友善弹幕，最多32个字哦">
+                                                    <span id="barragerPostBtn" onclick="ChatRoom.sendBarrager();" class="btn breezemoon__btn">发射!</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div style="margin-top: 10px;">
+                                            弹幕颜色：<input id="selectBarragerColor" name="mycolor" type="text" class="input_cxcolor" readonly="" style="background-color: rgb(0, 0, 0);">
+                                        </div>
+                                        <div class="ft__smaller ft__fade" style="margin-top: 10px;">发送弹幕每次将花费 <b>20</b> 积分</div>
                                     </div>
                                 </div>
                             </div>
@@ -181,6 +201,7 @@
 <script src="${staticServePath}/js/channel${miniPostfix}.js?${staticResourceVersion}"></script>
 <script src="${staticServePath}/js/chat-room${miniPostfix}.js?${staticResourceVersion}"></script>
 <script src="${staticServePath}/js/lib/viewer.min.js"></script>
+<script src="${staticServePath}/js/lib/barrager/jquery.barrager.min.js"></script>
 <script>
     Label.addBoldLabel = '${addBoldLabel}';
     Label.addItalicLabel = '${addItalicLabel}';

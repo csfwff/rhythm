@@ -455,6 +455,14 @@ var ChatRoom = {
         ChatRoom.loadXiaoIceGame();
         // 加载画图
         ChatRoom.charInit('paintCanvas');
+        // 监听弹幕
+        $("#barragerBtn").on('click', function () {
+            if ($("#barragerContent").css("display") === 'none') {
+                $("#barragerContent").slideDown(1000);
+            } else {
+                $("#barragerContent").slideUp(1000);
+            }
+        });
         // 监听画图按钮
         $("#paintBtn").on('click', function () {
             if ($("#paintContent").css("display") === 'none') {
@@ -463,6 +471,8 @@ var ChatRoom = {
                 $("#paintContent").slideUp(1000);
             }
         });
+        // 监听弹幕颜色
+        $('#selectBarragerColor').cxColor();
         // 监听修改颜色
         $('#selectColor').cxColor();
         $("#selectColor").bind("change", function () {
@@ -474,6 +484,31 @@ var ChatRoom = {
         });
 
         setInterval(ChatRoom.reloadMessages, 15 * 60 * 1000);
+    },
+    sendBarrager: function () {
+        let color = $("#selectBarragerColor")[0].value;
+        let content = $('#barragerInput').val();
+        let json = {
+            color: color,
+            content: content
+        };
+        let requestJSONObject = {
+            content: "[barrager]" + JSON.stringify(json) + "[/barrager]",
+        }
+        $.ajax({
+            url: Label.servePath + '/chat-room/send',
+            type: 'POST',
+            cache: false,
+            data: JSON.stringify(requestJSONObject),
+            success: function (result) {
+                if (0 !== result.code) {
+                    $('#chatContentTip').addClass('error').html('<ul><li>' + result.msg + '</li></ul>')
+                }
+            },
+            error: function (result) {
+                $('#chatContentTip').addClass('error').html('<ul><li>' + result.statusText + '</li></ul>')
+            }
+        });
     },
     reloadMessages: function () {
         if (document.documentElement.scrollTop <= 200) {
