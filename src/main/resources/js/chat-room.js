@@ -528,7 +528,11 @@ var ChatRoom = {
         let chatLength = $(".chats__content").length;
         if (chatLength > 25) {
             for (let i = chatLength - 1; i > 24; i--) {
-                $($($($(".chats__content")[i]).parent()).parent()).remove();
+                if ($($($($($(".chats__content")[i]).parent()).parent()).parent()).attr("id") == 'stacked') {
+                    $($($($($(".chats__content")[i]).parent()).parent()).parent()).remove();
+                } else {
+                    $($($($(".chats__content")[i]).parent()).parent()).remove();
+                }
             }
         }
         setTimeout(function() {
