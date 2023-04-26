@@ -751,7 +751,7 @@ public class ChatRoomBot {
         if (minute == 0){
             sendBotMsg("提醒：@" + username + "  被管理员 解除 禁言");
         } else {
-            sendBotMsg("提醒：@" + username + "  被管理员 禁言 " + minute + " 分钟。");
+            sendBotMsg("提醒：@" + username + "  被管理员 禁言 " + minute + " 分钟。\n *被禁言了也能聊天？* 试试发送一个 **弹幕** 吧！");
         }
         mute(userId, minute);
     }
