@@ -346,17 +346,14 @@ public class ApiProcessor {
     public void getRecentReg(final RequestContext context) {
         JSONObject ret = new JSONObject();
         try {
-            // 根据API获取当前操作用户
-            ApiProcessor.getUserByKey(context.param("apiKey"));
-            // 返回对象
             ret.put(Keys.CODE, StatusCodes.SUCC);
             ret.put(Keys.MSG, "");
             List<JSONObject> users = userQueryService.getRecentRegisteredUsers(20);
             ret.put(Keys.DATA, users.stream().map(
                     x -> {
                         JSONObject user = new JSONObject();
-                        user.put(User.USER_NAME, user.optString(User.USER_NAME));
-                        user.put(UserExt.USER_NICKNAME, user.optString(UserExt.USER_NICKNAME));
+                        user.put(User.USER_NAME, x.optString(User.USER_NAME));
+                        user.put(UserExt.USER_NICKNAME, x.optString(UserExt.USER_NICKNAME));
                         return user;
                     }
             ).collect(Collectors.toList()));
