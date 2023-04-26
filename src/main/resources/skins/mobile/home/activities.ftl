@@ -38,21 +38,6 @@
                         <ul class="module-list">
                             <li>
                                 <div class='fn-flex'>
-                                    <div class="fn-flex-1">
-                                        <h2 class="ft-13">
-                                            <svg style="width: 26px;height: 27px;vertical-align: -7px;">
-                                                <use xlink:href="#logo"></use>
-                                            </svg>
-                                            <a target="_blank" href="https://my.fishpi.cn">特别推荐：摸鱼导航网</a>
-                                        </h2>
-                                        <span class="ft-fade vditor-reset">
-                                                摸鱼导航网由鱼油 <a href="https://fishpi.cn/member/Chestnut">栗子</a> 开发，汇集了众多摸鱼小游戏以及值得推荐的网站，快来逛逛吧！
-                                        </span>
-                                    </div>
-                                </div>
-                            </li>
-                            <li>
-                                <div class='fn-flex'>
                                     <div class="avatar"
                                          style="background-image:url('https://pwl.stackoverflow.wiki/evolve/evolved.ico')"></div>
                                     <div class="fn-flex-1">
