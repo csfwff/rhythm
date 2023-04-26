@@ -102,7 +102,7 @@
                                     <button class="button" onclick="ChatRoom.flashScreen()">清屏</button>
                                     <button class="green" onclick="ChatRoom.send()">发送</button>
                                 </div>
-                                <div id="paintContent" style="display: none">
+                                <div id="paintContent" style="display: none;">
                                     <div style="margin: 20px 0 0 0;">
                                         <input id="selectColor" name="mycolor" type="text" class="input_cxcolor" readonly="" style="background-color: rgb(0, 0, 0);">
                                         <input id="selectWidth" type="number" inputmode="decimal" pattern="[0-9]*" min="1" value="3" style="width: 50px">
@@ -114,7 +114,13 @@
                                         <button class="green" onclick="ChatRoom.submitCharacter('paintCanvas')">${submitLabel}</button>
                                     </div>
                                 </div>
-                                <div id="barragerContent" style="display: none">
+                                <div id="barragerContent" style="display:none;
+                                                                 background-color: var(--layer-background-color);
+                                                                 padding: 8px 34px 22px 34px;
+                                                                 box-shadow: 0px 0px 4px 0px rgba(0,0,0,.2);
+                                                                 margin: 19px 10px 10px 10px;
+                                                                 border-radius: 49px;
+                                                                ">
                                     <div style="margin: 20px 0 0 0;">
                                         <div>
                                             <div class="module-panel">
@@ -125,9 +131,9 @@
                                             </div>
                                         </div>
                                         <div style="margin-top: 10px;">
-                                            弹幕颜色：<input id="selectBarragerColor" name="mycolor" type="text" class="input_cxcolor" readonly="" style="background-color: rgb(0, 0, 0);">
+                                            弹幕颜色：<input id="selectBarragerColor" name="mycolor" type="text" class="input_cxcolor" readonly="">
                                         </div>
-                                        <div class="ft__smaller ft__fade" style="margin-top: 10px;">发送弹幕每次将花费 <b>20</b> 积分</div>
+                                        <div class="ft__smaller ft__fade" style="margin-top: 10px; margin-bottom: 10px;">发送弹幕每次将花费 <b>20</b> 积分</div>
                                     </div>
                                 </div>
                             </div>

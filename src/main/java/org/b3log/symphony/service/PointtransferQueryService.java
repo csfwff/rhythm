@@ -583,6 +583,8 @@ public class PointtransferQueryService {
                             desTemplate = desTemplate.replace("{score}", String.valueOf(record.optInt(Pointtransfer.SUM)));
                         }
                         break;
+                    case Pointtransfer.TRANSFER_TYPE_C_CHAT_ROOM_SEND_BARRAGER:
+                        break;
                     default:
                         LOGGER.warn("Invalid point type [" + type + "]");
                 }

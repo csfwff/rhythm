@@ -64,6 +64,8 @@ public class ChatRoomBot {
     private static final SimpleCurrentLimiter RECORD_POOL_6_IN_15M = new SimpleCurrentLimiter(15 * 60, 5);
     private static final SimpleCurrentLimiter RECORD_POOL_5_IN_24H = new SimpleCurrentLimiter(24 * 60 * 60, 4);
     private static final SimpleCurrentLimiter RECORD_POOL_2_IN_1M = new SimpleCurrentLimiter(60, 2);
+    private static final SimpleCurrentLimiter RECORD_POOL_BARRAGER = new SimpleCurrentLimiter(60, 5);
+
 
     /**
      * 对应关系池
@@ -112,6 +114,19 @@ public class ChatRoomBot {
             return false;
         }
         // ==! 判断是否在 Channel 中 ==!
+
+        // ==? 发弹幕频率限制 ?==
+        if (!userName.equals("admin")) {
+            if (content.startsWith("[barrager]") && content.endsWith("[/barrager]")) {
+                if (!RECORD_POOL_BARRAGER.access(userName)) {
+                    context.renderJSON(StatusCodes.ERR).renderMsg("弹幕发的太快啦！休息一下吧（每分钟最多5个）");
+                    return false;
+                }
+
+                return true;
+            }
+        }
+        // ==! 发红包频率限制 !==
 
         // ==? 指令 ?==
         if (DataModelService.hasPermission(currentUser.optString(User.USER_ROLE), 3)) {

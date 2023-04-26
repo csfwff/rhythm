@@ -459,6 +459,7 @@ var ChatRoom = {
         $("#barragerBtn").on('click', function () {
             if ($("#barragerContent").css("display") === 'none') {
                 $("#barragerContent").slideDown(1000);
+                $("#paintContent").slideUp(1000);
             } else {
                 $("#barragerContent").slideUp(1000);
             }
@@ -467,12 +468,15 @@ var ChatRoom = {
         $("#paintBtn").on('click', function () {
             if ($("#paintContent").css("display") === 'none') {
                 $("#paintContent").slideDown(1000);
+                $("#barragerContent").slideUp(1000);
             } else {
                 $("#paintContent").slideUp(1000);
             }
         });
         // 监听弹幕颜色
-        $('#selectBarragerColor').cxColor();
+        $('#selectBarragerColor').cxColor({
+            color: '#ffffff'
+        });
         // 监听修改颜色
         $('#selectColor').cxColor();
         $("#selectColor").bind("change", function () {
@@ -503,6 +507,8 @@ var ChatRoom = {
             success: function (result) {
                 if (0 !== result.code) {
                     $('#chatContentTip').addClass('error').html('<ul><li>' + result.msg + '</li></ul>')
+                } else {
+                    $('#barragerInput').val('');
                 }
             },
             error: function (result) {

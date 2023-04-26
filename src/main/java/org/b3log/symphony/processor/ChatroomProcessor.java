@@ -48,6 +48,7 @@ import org.json.JSONObject;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
+import org.jsoup.safety.Whitelist;
 import org.jsoup.select.Elements;
 import pers.adlered.simplecurrentlimiter.main.SimpleCurrentLimiter;
 
@@ -876,6 +877,42 @@ public class ChatroomProcessor {
                 ChatroomChannel.notifyChat(discussStatus);
 
                 context.renderJSON(StatusCodes.SUCC);
+            } else if (content.startsWith("[barrager]") && content.endsWith("[/barrager]")) {
+                try {
+                    // 扣钱
+                    final boolean succ = null != pointtransferMgmtService.transfer(userId, Pointtransfer.ID_C_SYS,
+                            Pointtransfer.TRANSFER_TYPE_C_CHAT_ROOM_SEND_BARRAGER,
+                            20, "", System.currentTimeMillis(), "");
+                    if (!succ) {
+                        context.renderJSON(StatusCodes.ERR).renderMsg("少年，你的积分不足！");
+                        return;
+                    }
+                    String barragerString = content.replaceAll("^\\[barrager\\]", "").replaceAll("\\[/barrager\\]$", "");
+                    JSONObject barrager = new JSONObject(barragerString);
+                    String barragerContent = barrager.optString("content");
+                    barragerContent = Jsoup.clean(barragerContent, Whitelist.none());
+                    barragerContent = StringUtils.trim(barragerContent);
+                    String barragerColor = barrager.optString("color");
+                    if (barragerContent.length() > 32) {
+                        barragerContent = barragerContent.substring(0, 32);
+                    }
+                    if (barragerContent.isEmpty()) {
+                        context.renderJSON(StatusCodes.ERR).renderMsg("这样不好玩哦～");
+                        return;
+                    }
+                    JSONObject barragerJSON = new JSONObject();
+                    barragerJSON.put(Common.TYPE, "barrager");
+                    barragerJSON.put("barragerContent", barragerContent);
+                    barragerJSON.put("barragerColor", barragerColor);
+                    barragerJSON.put(User.USER_NAME, userName);
+                    barragerJSON.put(UserExt.USER_AVATAR_URL, currentUser.optString(UserExt.USER_AVATAR_URL));
+                    barragerJSON.put(UserExt.USER_NICKNAME, currentUser.optString(UserExt.USER_NICKNAME));
+                    ChatroomChannel.notifyChat(barragerJSON);
+
+                    context.renderJSON(StatusCodes.SUCC);
+                } catch (Exception e) {
+                    LOGGER.log(Level.INFO, "User " + userName + " failed to send a barrager.");
+                }
             } else {
                 // 宵禁
                 int start = 1930;

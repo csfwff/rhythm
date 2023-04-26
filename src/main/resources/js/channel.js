@@ -354,6 +354,29 @@ var ChatRoomChannel = {
             var data = JSON.parse(evt.data)
 
             switch (data.type) {
+                case 'barrager':
+                    let barragerContent = data.barragerContent;
+                    let barragerColor = data.barragerColor;
+                    let barragerUserName = data.userName;
+                    let barragerUserAvatarURL = data.userAvatarURL;
+                    let barragerUserNickname = data.userNickname;
+                    let barrager = '';
+                    if (barragerUserNickname != '' && barragerUserNickname != undefined) {
+                        barrager = barragerUserNickname + '：' + barragerContent;
+                    } else {
+                        barrager = barragerUserName + '：' + barragerContent;
+                    }
+                    let item = {
+                        img: barragerUserAvatarURL,
+                        info: barrager,
+                        href: Label.servePath + '/member/' + barragerUserName,
+                        close: false,
+                        speed: Math.round(Math.random()*10+10),
+                        color: barragerColor
+                    }
+                    console.log(item)
+                    $('body').barrager(item);
+                    break;
                 case 'discussChanged':
                     let whoChanged = data.whoChanged;
                     let newDiscuss = data.newDiscuss;

@@ -452,6 +452,10 @@ public final class Pointtransfer {
      */
     public static final int TRANSFER_TYPE_C_CHAT_ROOM_REVOKE = 48;
 
+    /**
+     * Transfer type - chat-room - send barrager
+     */
+    public static final int TRANSFER_TYPE_C_CHAT_ROOM_SEND_BARRAGER = 49;
 
     /**
      * Transfer sum - 摆龙门阵.
