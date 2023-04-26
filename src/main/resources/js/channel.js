@@ -362,9 +362,9 @@ var ChatRoomChannel = {
                     let barragerUserNickname = data.userNickname;
                     let barrager = '';
                     if (barragerUserNickname != '' && barragerUserNickname != undefined) {
-                        barrager = barragerUserNickname + '：' + barragerContent;
+                        barrager = barragerUserNickname + ': ' + barragerContent;
                     } else {
-                        barrager = barragerUserName + '：' + barragerContent;
+                        barrager = barragerUserName + ': ' + barragerContent;
                     }
                     let item = {
                         img: barragerUserAvatarURL,

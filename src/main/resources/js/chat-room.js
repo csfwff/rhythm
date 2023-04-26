@@ -464,6 +464,11 @@ var ChatRoom = {
                 $("#barragerContent").slideUp(1000);
             }
         });
+        $("#barragerInput").keydown(function(event) {
+            if (event.keyCode == 13) {
+                ChatRoom.sendBarrager();
+            }
+        });
         // 监听画图按钮
         $("#paintBtn").on('click', function () {
             if ($("#paintContent").css("display") === 'none') {

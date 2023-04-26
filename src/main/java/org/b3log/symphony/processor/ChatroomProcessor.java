@@ -909,6 +909,7 @@ public class ChatroomProcessor {
                     barragerJSON.put(UserExt.USER_NICKNAME, currentUser.optString(UserExt.USER_NICKNAME));
                     ChatroomChannel.notifyChat(barragerJSON);
 
+                    LogsService.simpleLog(context, "发送弹幕", "用户: " + userName + " 颜色: " + barragerColor + " 内容: " + barragerContent);
                     context.renderJSON(StatusCodes.SUCC);
                 } catch (Exception e) {
                     LOGGER.log(Level.INFO, "User " + userName + " failed to send a barrager.");
