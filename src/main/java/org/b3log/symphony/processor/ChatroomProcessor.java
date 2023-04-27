@@ -1113,6 +1113,7 @@ public class ChatroomProcessor {
         dataModelService.fillSideHotArticles(dataModel);
         dataModelService.fillSideTags(dataModel);
         dataModelService.fillLatestCmts(dataModel);
+        dataModel.put(Common.SELECTED, "cr");
     }
 
     /**
