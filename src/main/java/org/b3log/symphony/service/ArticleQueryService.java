@@ -1065,18 +1065,6 @@ public class ArticleQueryService {
     }
 
     /**
-     * Makes article showing filters.
-     *
-     * @return filter the article showing to user
-     */
-    private CompositeFilter makeArticleShowingFilter() {
-        final List<Filter> filters = new ArrayList<>();
-        filters.add(new PropertyFilter(Article.ARTICLE_STATUS, FilterOperator.NOT_EQUAL, Article.ARTICLE_STATUS_C_INVALID));
-        filters.add(new PropertyFilter(Article.ARTICLE_TYPE, FilterOperator.NOT_EQUAL, Article.ARTICLE_TYPE_C_DISCUSSION));
-        return new CompositeFilter(CompositeFilterOperator.AND, filters);
-    }
-
-    /**
      * Makes recent articles showing filter.
      *
      * @return filter the article showing to user
@@ -1261,17 +1249,16 @@ public class ArticleQueryService {
     public void refreshHotArticlesCache() {
         try {
             List<JSONObject> ret = articleRepository.select("" +
-                    "SELECT sa.*, COALESCE(SUM(sc.comment_count) + sa.articleThankCnt + sa.articleGoodCnt + sa.articleCollectCnt + sa.articleWatchCnt - sa.articleBadCnt, 0) AS score " +
-                    "FROM symphony_article sa " +
-                    "LEFT JOIN ( " +
-                    "    SELECT commentOnArticleId, COUNT(*) AS comment_count, COALESCE(SUM(commentGoodCnt), 0) - COALESCE(SUM(commentBadCnt), 0) AS total_score " +
-                    "    FROM symphony_comment " +
-                    "    GROUP BY commentOnArticleId " +
-                    ") sc ON sa.oId = sc.commentOnArticleId " +
-                    "WHERE sa.articleStatus != 1 " +
-                    "GROUP BY sa.oId " +
-                    "ORDER BY score DESC " +
-                    "limit 300");
+                    "SELECT " +
+                    "    *, " +
+                    "    (articleThankCnt + articleGoodCnt + articleCollectCnt + articleWatchCnt - articleBadCnt + articleCommentCount) AS total_score " +
+                    "FROM " +
+                    "    symphony_article " +
+                    "WHERE " +
+                    "    articleStatus <> 1 AND articleType <> 1 " +
+                    "ORDER BY " +
+                    "    total_score DESC " +
+                    "limit 100");
             ret.sort((o1, o2) -> {
                 long o1Time = o1.optLong(Article.ARTICLE_UPDATE_TIME);
                 long o2Time = o2.optLong(Article.ARTICLE_UPDATE_TIME);
