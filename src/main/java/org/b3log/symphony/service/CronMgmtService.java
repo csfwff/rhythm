@@ -207,13 +207,23 @@ public class CronMgmtService {
         Symphonys.SCHEDULED_EXECUTOR_SERVICE.scheduleAtFixedRate(() -> {
             try {
                 cacheMgmtService.refreshIndexCache();
-                articleQueryService.refreshHotArticlesCache();
             } catch (final Exception e) {
                 LOGGER.log(Level.ERROR, "Executes cron failed", e);
             } finally {
                 Stopwatchs.release();
             }
         }, delay, 60 * 1000, TimeUnit.MILLISECONDS);
+        delay += 2000;
+
+        Symphonys.SCHEDULED_EXECUTOR_SERVICE.scheduleAtFixedRate(() -> {
+            try {
+                articleQueryService.refreshHotArticlesCache();
+            } catch (final Exception e) {
+                LOGGER.log(Level.ERROR, "Executes cron failed", e);
+            } finally {
+                Stopwatchs.release();
+            }
+        }, delay, 15 * 60 * 1000, TimeUnit.MILLISECONDS);
         delay += 2000;
 
         Symphonys.SCHEDULED_EXECUTOR_SERVICE.scheduleAtFixedRate(() -> {
