@@ -34,7 +34,7 @@
 <body>
 <div class="mobile-head">
     <#include "header.ftl">
-    <@indexNav ""/>
+    <@indexNav "cr"/>
 
 </div>
 <div style="height: 74px;width: 1px;"></div>

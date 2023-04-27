@@ -21,6 +21,7 @@
 <#include "macro-head.ftl">
 <#include "macro-list.ftl">
 <#include "common/sub-nav.ftl">
+<#include "common/index-nav.ftl">
 <!DOCTYPE html>
 <html>
     <head>
@@ -31,7 +32,11 @@
     <body>
         <#include "header.ftl">
         <div class="main">
-            <@subNav 'hot' ''/>
+            <div class="mobile-head">
+                <#include "header.ftl">
+                <@indexNav "hot"/>
+            </div>
+            <div style="height: 40px;width: 1px;" ></div>
             <div class="content fn-clear">
                 <@list listData=indexArticles/>
                 <a href="${servePath}/recent" class="ft-gray more-article">${moreRecentArticleLabel}</a>

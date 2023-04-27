@@ -30,6 +30,11 @@
             <svg>
                 <use xlink:href="#refresh"></use>
             </svg> ${latestLabel}</a>
+        <a pjax-title="${latestLabel} - ${symphonyLabel}"
+           href="${servePath}/hot"<#if selected?? && 'hot' == selected> class="current"</#if>>
+            <svg>
+                <use xlink:href="#fire"></use>
+            </svg> ${hotLabel}</a>
         <a pjax-title="${breezemoonLabel} - ${symphonyLabel}"
            href="${servePath}/breezemoons"<#if selected?? && 'breezemoons' == selected> class="current"</#if>>
             <svg>

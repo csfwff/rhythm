@@ -1278,9 +1278,19 @@ public class ArticleQueryService {
         }
     }
     public List<JSONObject> getHotArticles(final int fetchSize) {
-
         try {
             List<JSONObject> ret = hotArticlesCache.subList(0, fetchSize);
+            ret.sort((o1, o2) -> {
+                int o1Time = o1.optInt("total_score");
+                int o2Time = o2.optInt("total_score");
+                if (o1Time > o2Time) {
+                    return -1;
+                } else if (o1Time == o2Time) {
+                    return 0;
+                } else {
+                    return 1;
+                }
+            });
 
             Stopwatchs.start("Checks author status");
             try {

@@ -118,8 +118,11 @@
                             <a rel="nofollow" class="title fn-ellipsis fn-flex-1"
                                href="${servePath}${article.articlePermalink}">${article.articleTitleEmoj}</a>
                             <a class="fn-right count ft-gray ft-smaller"
-                               href="${servePath}${article.articlePermalink}"><#if article.articleViewCount < 1000>
-                                    ${article.articleViewCount}<#else>${article.articleViewCntDisplayFormat}</#if></a>
+                               href="${servePath}${article.articlePermalink}">
+                                <svg style="padding-top: 1px;vertical-align: -2px;">
+                                    <use xlink:href="#fire"></use>
+                                </svg> ${article.total_score}
+                            </a>
                         </li>
                     </#list>
                 </ul>
