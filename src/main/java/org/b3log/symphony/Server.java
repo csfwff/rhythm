@@ -255,7 +255,7 @@ public final class Server extends BaseServer {
                 }
             }
             transaction.commit();
-            System.out.println("Users online status has been reset successfully.");
+            LOGGER.log(Level.INFO, "Users online status has been reset successfully.");
         } catch (Exception e) {
             if (transaction.isActive()) {
                 transaction.rollback();

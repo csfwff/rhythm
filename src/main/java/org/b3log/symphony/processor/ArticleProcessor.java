@@ -63,7 +63,6 @@ import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.util.List;
 import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * Article processor.
@@ -1764,6 +1763,9 @@ public class ArticleProcessor {
             List<JSONObject> articles = articleRepository.getRandomly(size);
             articleQueryService.organizeArticles(articles);
             Collections.shuffle(articles);
+            if (articles.size() <= size) {
+                return articles;
+            }
             return articles.subList(0, size);
         } catch (final RepositoryException e) {
             LOGGER.log(Level.ERROR, "Loads random articles failed", e);
