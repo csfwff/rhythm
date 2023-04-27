@@ -779,13 +779,12 @@ public class ChatRoomBot {
         // 检查是否在全员禁言中  优先级高于个人禁言
         String allMute = cloudService.getFromCloud("all:fish:mute", CloudService.SYS_MUTE);
         // 全员禁言存在 且 有效. 直接返回对象
-        if (allMute.isEmpty()) {
-            return -1;
-        }
-        if ((System.currentTimeMillis() < Long.parseLong(allMute))){
-            long remainMinute = (Long.parseLong(allMute) - System.currentTimeMillis()) / 1000;
-            // 区别个人设置
-            return (- (int) remainMinute);
+        if (!allMute.isEmpty()) {
+            if ((System.currentTimeMillis() < Long.parseLong(allMute))){
+                long remainMinute = (Long.parseLong(allMute) - System.currentTimeMillis()) / 1000;
+                // 区别个人设置
+                return (- (int) remainMinute);
+            }
         }
         // 检查个人禁言
         String muteData = cloudService.getFromCloud(userId, CloudService.SYS_MUTE);
