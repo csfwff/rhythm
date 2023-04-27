@@ -427,8 +427,9 @@ public class IndexProcessor {
         final List<JSONObject> onlineTopUsers = activityQueryService.getTopOnlineTimeUsers(6);
         dataModel.put("onlineTopUsers", onlineTopUsers);
 
-        // 随机文章
-        dataModel.put("indexRandomArticles", ArticleProcessor.getRandomArticles(14));
+        // 热议
+        final List<JSONObject> hotArticles = articleQueryService.getHotArticles(14);
+        dataModel.put(Common.HOT, hotArticles);
 
         // 问题文章
         final JSONObject result = articleQueryService.getQuestionArticles(0, 1, 10);

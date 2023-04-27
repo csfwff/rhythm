@@ -100,35 +100,28 @@
         </div>
         <div class="index-recent fn-flex-1">
             <div class="index-head-title">
-                <div style="float:left;font-size:13px;margin:5px 0 10px 0; font-weight:bold;">随便看看</div>
+                <div style="float:left;font-size:13px;margin:5px 0 10px 0; font-weight:bold;">热议</div>
                 <div style="float:right;font-size:13px;margin:5px 0 0 0;">
-                    <a onclick="randomArticles()" style="cursor: pointer; color: #c8383a; text-decoration: none;">
-                        <svg id="randomArticlesRefreshSvg">
-                            <use xlink:href="#refreshQ"></use>
-                        </svg>
-                        换点别的
-                    </a>
+                    <a href="${servePath}/hot">更多</a>
                 </div>
                 <div style="clear:both;"></div>
             </div>
             <div class="module-panel">
-                <ul class="module-list" id="randomArticles">
-                    <#if indexRandomArticles??>
-                        <#list indexRandomArticles as article>
-                            <li class="fn-flex">
-                                <a rel="nofollow" href="${servePath}/member/${article.articleAuthorName}">
-                                    <span class="avatar-small slogan"
-                                          aria-label="${article.articleAuthorName}"
-                                          style="background-image:url('${article.articleAuthorThumbnailURL48}')"></span>
-                                </a>
-                                <a rel="nofollow" class="title fn-ellipsis fn-flex-1"
-                                   href="${servePath}${article.articlePermalink}">${article.articleTitleEmoj}</a>
-                                <a class="fn-right count ft-gray ft-smaller"
-                                   href="${servePath}${article.articlePermalink}"><#if article.articleViewCount < 1000>
-                                        ${article.articleViewCount}<#else>${article.articleViewCntDisplayFormat}</#if></a>
-                            </li>
-                        </#list>
-                    </#if>
+                <ul class="module-list" id="hotArticles">
+                    <#list hot as article>
+                        <li class="fn-flex">
+                            <a rel="nofollow" href="${servePath}/member/${article.articleAuthorName}">
+                                <span class="avatar-small slogan"
+                                      aria-label="${article.articleAuthorName}"
+                                      style="background-image:url('${article.articleAuthorThumbnailURL48}')"></span>
+                            </a>
+                            <a rel="nofollow" class="title fn-ellipsis fn-flex-1"
+                               href="${servePath}${article.articlePermalink}">${article.articleTitleEmoj}</a>
+                            <a class="fn-right count ft-gray ft-smaller"
+                               href="${servePath}${article.articlePermalink}"><#if article.articleViewCount < 1000>
+                                    ${article.articleViewCount}<#else>${article.articleViewCntDisplayFormat}</#if></a>
+                        </li>
+                    </#list>
                 </ul>
             </div>
         </div>
@@ -744,37 +737,6 @@
 
     var loading = false;
     var rotate = new Rotate("randomArticlesRefreshSvg");
-
-    function randomArticles() {
-        if (!loading) {
-            loading = true;
-            rotate.submit();
-            $.ajax({
-                url: "${servePath}/article/random/14",
-                method: "GET",
-                cache: false,
-                async: true,
-                success: function (result) {
-                    rotate.stop();
-                    loading = false;
-                    $("#randomArticles").html('');
-                    for (let articleCur in result.articles) {
-                        let article = result.articles[articleCur];
-                        let viewCount = article.articleViewCount;
-                        if (viewCount >= 1000) {
-                            viewCount = article.articleViewCntDisplayFormat;
-                        }
-                        $("#randomArticles").append('<li class="fn-flex">' +
-                            '<a rel="nofollow" href="${servePath}/member/' + article.articleAuthorName + '">' +
-                            '<span class="avatar-small slogan" aria-label="' + article.articleAuthorName + '" style="background-image:url(\'' + article.articleAuthorThumbnailURL48 + '\')"></span></a>' +
-                            '<a rel="nofollow" class="title fn-ellipsis fn-flex-1" href="${servePath}' + article.articlePermalink + '">' + article.articleTitleEmoj + '</a>' +
-                            '<a class="fn-right count ft-gray ft-smaller" href="${servePath}' + article.articlePermalink + '">' + viewCount + '</a>' +
-                            '</li>');
-                    }
-                }
-            });
-        }
-    }
 </script>
 <script>
     // 渐变输出
