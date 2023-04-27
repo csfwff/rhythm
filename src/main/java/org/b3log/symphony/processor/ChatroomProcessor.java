@@ -659,6 +659,7 @@ public class ChatroomProcessor {
             msg.put(Common.TIME, time);
             msg.put(UserExt.USER_NICKNAME, currentUser.optString(UserExt.USER_NICKNAME));
             msg.put("sysMetal", cloudService.getEnabledMetal(currentUser.optString(Keys.OBJECT_ID)));
+            msg.put("userOId", currentUser.optLong(Keys.OBJECT_ID));
 
             String userId = currentUser.optString(Keys.OBJECT_ID);
 
