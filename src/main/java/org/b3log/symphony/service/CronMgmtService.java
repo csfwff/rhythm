@@ -113,6 +113,9 @@ public class CronMgmtService {
     @Inject
     private LivenessMgmtService livenessMgmtService;
 
+    @Inject
+    private ArticleQueryService articleQueryService;
+
 
     /**
      * Start all cron tasks.
@@ -204,6 +207,7 @@ public class CronMgmtService {
         Symphonys.SCHEDULED_EXECUTOR_SERVICE.scheduleAtFixedRate(() -> {
             try {
                 cacheMgmtService.refreshIndexCache();
+                articleQueryService.refreshHotArticlesCache();
             } catch (final Exception e) {
                 LOGGER.log(Level.ERROR, "Executes cron failed", e);
             } finally {

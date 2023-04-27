@@ -40,6 +40,7 @@ import org.b3log.symphony.model.UserExt;
 import org.b3log.symphony.processor.Router;
 import org.b3log.symphony.processor.channel.UserChannel;
 import org.b3log.symphony.repository.UserRepository;
+import org.b3log.symphony.service.ArticleQueryService;
 import org.b3log.symphony.service.CronMgmtService;
 import org.b3log.symphony.service.InitMgmtService;
 import org.b3log.symphony.util.Markdowns;
@@ -265,6 +266,9 @@ public final class Server extends BaseServer {
         }
 
         ReservedWords.init();
+
+        final ArticleQueryService articleQueryService = beanManager.getReference(ArticleQueryService.class);
+        articleQueryService.refreshHotArticlesCache();
 
         LOGGER.log(Level.INFO, "Everything is ready, Thank you for using Rhythm!");
 

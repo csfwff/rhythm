@@ -1108,22 +1108,6 @@ public class ArticleQueryService {
     }
 
     /**
-     * Makes the top articles with the specified fetch size.
-     *
-     * @param currentPageNum the specified current page number
-     * @param pageSize       the specified page size
-     * @return top articles query
-     */
-    private Query makeTopQuery(final int currentPageNum, final int pageSize) {
-        final Query query = new Query().
-                addSort(Article.REDDIT_SCORE, SortDirection.DESCENDING).
-                addSort(Article.ARTICLE_LATEST_CMT_TIME, SortDirection.DESCENDING).
-                setPageCount(1).setPage(currentPageNum, pageSize);
-        query.setFilter(makeArticleShowingFilter());
-        return query;
-    }
-
-    /**
      * Gets the recent articles with the specified fetch size.
      *
      * @param sortMode       the specified sort mode, 0: default, 1: hot, 2: score, 3: reply
@@ -1273,19 +1257,43 @@ public class ArticleQueryService {
      * @param fetchSize the specified fetch size
      * @return hot articles, returns an empty list if not found
      */
+    private static List<JSONObject> hotArticlesCache = new ArrayList<>();
+    public void refreshHotArticlesCache() {
+        try {
+            List<JSONObject> ret = articleRepository.select("" +
+                    "SELECT sa.*, COALESCE(SUM(sc.comment_count) + sa.articleThankCnt + sa.articleGoodCnt + sa.articleCollectCnt + sa.articleWatchCnt - sa.articleBadCnt, 0) AS score " +
+                    "FROM symphony_article sa " +
+                    "LEFT JOIN ( " +
+                    "    SELECT commentOnArticleId, COUNT(*) AS comment_count, COALESCE(SUM(commentGoodCnt), 0) - COALESCE(SUM(commentBadCnt), 0) AS total_score " +
+                    "    FROM symphony_comment " +
+                    "    GROUP BY commentOnArticleId " +
+                    ") sc ON sa.oId = sc.commentOnArticleId " +
+                    "WHERE sa.articleStatus != 1 " +
+                    "GROUP BY sa.oId " +
+                    "ORDER BY score DESC " +
+                    "limit 300");
+            ret.sort((o1, o2) -> {
+                long o1Time = o1.optLong(Article.ARTICLE_UPDATE_TIME);
+                long o2Time = o2.optLong(Article.ARTICLE_UPDATE_TIME);
+                if (o1Time > o2Time) {
+                    return -1;
+                } else if (o1Time == o2Time) {
+                    return 0;
+                } else {
+                    return 1;
+                }
+            });
+            organizeArticles(ret);
+            hotArticlesCache = ret;
+            LOGGER.log(Level.INFO, "Refreshed hot articles cache.");
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, "Refresh hot articles cache failed", e);
+        }
+    }
     public List<JSONObject> getHotArticles(final int fetchSize) {
-        final Query query = makeTopQuery(1, fetchSize);
 
         try {
-            List<JSONObject> ret;
-            Stopwatchs.start("Query hot articles");
-            try {
-                ret = articleRepository.getList(query);
-            } finally {
-                Stopwatchs.end();
-            }
-
-            organizeArticles(ret);
+            List<JSONObject> ret = hotArticlesCache.subList(0, fetchSize);
 
             Stopwatchs.start("Checks author status");
             try {
