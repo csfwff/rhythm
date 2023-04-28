@@ -150,7 +150,7 @@
                             <div style="margin-top: 10px;">
                                 弹幕颜色：<input id="selectBarragerColor" name="mycolor" type="text" class="input_cxcolor" readonly="">
                             </div>
-                            <div class="ft__smaller ft__fade" style="margin-top: 10px; margin-bottom: 10px;">发送弹幕每次将花费 <b>20</b> 积分</div>
+                            <div class="ft__smaller ft__fade" style="margin-top: 10px; margin-bottom: 10px;">发送弹幕每次将花费 <b>${barragerCost}</b> ${barragerUnit}</div>
                         </div>
                     </div>
                     <div class="fn-clear comment-submit">

@@ -184,6 +184,10 @@ public class ChatroomProcessor {
     @Inject
     private AvatarQueryService avatarQueryService;
 
+    public static int barragerCost = 5;
+
+    public static String barragerUnit = "积分";
+
     /**
      * Register request handlers.
      */
@@ -881,22 +885,12 @@ public class ChatroomProcessor {
             } else if (content.startsWith("[barrager]") && content.endsWith("[/barrager]")) {
                 try {
                     // 扣钱
-                    if (userName.equals("dissoluteFate")) {
-                        final boolean succ = null != pointtransferMgmtService.transfer(userId, Pointtransfer.ID_C_SYS,
-                                Pointtransfer.TRANSFER_TYPE_C_CHAT_ROOM_SEND_BARRAGER,
-                                5, "", System.currentTimeMillis(), "");
-                        if (!succ) {
-                            context.renderJSON(StatusCodes.ERR).renderMsg("崖主，你的积分不足！");
-                            return;
-                        }
-                    } else {
-                        final boolean succ = null != pointtransferMgmtService.transfer(userId, Pointtransfer.ID_C_SYS,
-                                Pointtransfer.TRANSFER_TYPE_C_CHAT_ROOM_SEND_BARRAGER,
-                                20, "", System.currentTimeMillis(), "");
-                        if (!succ) {
-                            context.renderJSON(StatusCodes.ERR).renderMsg("少年，你的积分不足！");
-                            return;
-                        }
+                    final boolean succ = null != pointtransferMgmtService.transfer(userId, Pointtransfer.ID_C_SYS,
+                            Pointtransfer.TRANSFER_TYPE_C_CHAT_ROOM_SEND_BARRAGER,
+                            barragerCost, "", System.currentTimeMillis(), "");
+                    if (!succ) {
+                        context.renderJSON(StatusCodes.ERR).renderMsg("少年，你的积分不足！");
+                        return;
                     }
                     String barragerString = content.replaceAll("^\\[barrager\\]", "").replaceAll("\\[/barrager\\]$", "");
                     JSONObject barrager = new JSONObject(barragerString);
@@ -1115,6 +1109,8 @@ public class ChatroomProcessor {
         dataModelService.fillSideTags(dataModel);
         dataModelService.fillLatestCmts(dataModel);
         dataModel.put(Common.SELECTED, "cr");
+        dataModel.put("barragerCost", barragerCost);
+        dataModel.put("barragerUnit", barragerUnit);
     }
 
     /**
