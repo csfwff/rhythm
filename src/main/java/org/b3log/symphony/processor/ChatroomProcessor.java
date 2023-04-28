@@ -1130,10 +1130,18 @@ public class ChatroomProcessor {
         try {
             JSONObject object = chatRoomRepository.getFirst(query);
             String content = new JSONObject(object.optString("content")).optString("content");
+            try {
+                JSONObject jsonObject = new JSONObject(content);
+                String msgType = jsonObject.optString("msgType");
+                if (!msgType.isEmpty()) {
+                    dataModel.put("raw", "{\"msg\":\"想看红包金额，想得美 :)\",\"recivers\":\"[]\",\"senderId\":\"1380013800000\",\"msgType\":\"redPacket\",\"money\":14250,\"count\":250,\"type\":\"random\",\"got\":0,\"who\":[]}");
+                    return;
+                }
+            } catch (Exception ignored) {
+            }
             dataModel.put("raw", content);
         } catch (RepositoryException e) {
             context.renderCodeMsg(StatusCodes.ERR, "Invalid chat id.");
-            return;
         }
     }
 
