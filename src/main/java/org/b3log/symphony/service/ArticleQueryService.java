@@ -1255,7 +1255,7 @@ public class ArticleQueryService {
                     "FROM " +
                     "    symphony_article " +
                     "WHERE " +
-                    "    articleStatus <> 1 AND articleType <> 1 " +
+                    "    articleStatus <> 1 AND articleType <> 1 AND articleShowInList <> 0 " +
                     "ORDER BY " +
                     "    total_score DESC " +
                     "limit 100");
