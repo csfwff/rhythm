@@ -162,6 +162,9 @@ public class ChatRoomBot {
                         case "dkhh":
                             cmd2 = "断开会话";
                             break;
+                        case "dm":
+                            cmd2 = "弹幕";
+                            break;
                     }
                     switch (cmd2) {
                         case "禁言":
@@ -408,6 +411,19 @@ public class ChatRoomBot {
                                 sendBotMsg("参数错误。");
                             }
                             break;
+                        case "弹幕":
+                            try {
+                                int cost = Integer.parseInt(cmd1.split("\\s")[1]);
+                                String unit = cmd1.split("\\s")[2];
+                                ChatroomProcessor.barragerCost = cost;
+                                ChatroomProcessor.barragerUnit = unit;
+                                sendBotMsg("弹幕价格设置为: **" + cost + "** " + unit + "/次。\n" +
+                                        "弹幕价格将在下次重启服务器后自动恢复为默认值 (5积分/次)。\n" +
+                                        "刷新页面即可使用新价格发送弹幕。");
+                            } catch (Exception e) {
+                                sendBotMsg("参数错误。");
+                            }
+                            break;
                         default:
                             sendBotMsg("<details><summary>执法帮助菜单</summary>\n" +
                                     "如无特殊备注，则需要纪律委员及以上分组才可执行\n\n" +
@@ -420,6 +436,7 @@ public class ChatRoomBot {
                                     "* **检测聊天室内长时间不发言的成员，并将其移除** 执法 维护\n" +
                                     "* **扣除指定成员的积分** 执法 处罚 [用户名] [扣除积分数量] [理由]\n" +
                                     "* **断开指定用户的全部聊天室会话** 执法 断开会话 [用户名]</details>\n" +
+                                    "* **设置弹幕价格(服务器重启后失效)** 执法 弹幕 [价格] [单位]</details>\n" +
                                     "<p></p>");
                     }
                     return true;
