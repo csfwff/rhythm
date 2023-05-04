@@ -696,8 +696,8 @@ public class ChatroomProcessor {
                             }
                         }
                         // 扣积分
-                        if (money > calcRedpacketMax()) {
-                            context.renderJSON(StatusCodes.ERR).renderMsg("红包发送失败！根据社区成员积分储蓄平均数，当前红包最大限额为" + calcRedpacketMax() + "！");
+                        if (money > 10240) {
+                            context.renderJSON(StatusCodes.ERR).renderMsg("红包发送失败！红包最大限额为" + 10240 + "！");
                             return;
                         }
                         if (money < 32) {
