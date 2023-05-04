@@ -624,7 +624,7 @@ public class ChatroomProcessor {
      *
      * @param context the specified context
      */
-    final private static SimpleCurrentLimiter chatRoomLivenessLimiter = new SimpleCurrentLimiter(30, 1);
+    final private static SimpleCurrentLimiter chatRoomLivenessLimiter = new SimpleCurrentLimiter(10 * 60, 10);
     final private static SimpleCurrentLimiter risksControlMessageLimiter = new SimpleCurrentLimiter(15 * 60, 1);
     final private static SimpleCurrentLimiter openRedPacketLimiter = new SimpleCurrentLimiter(30 * 60, 1);
     /**
@@ -913,6 +913,8 @@ public class ChatroomProcessor {
                     barragerJSON.put(UserExt.USER_AVATAR_URL, currentUser.optString(UserExt.USER_AVATAR_URL));
                     barragerJSON.put(UserExt.USER_NICKNAME, currentUser.optString(UserExt.USER_NICKNAME));
                     ChatroomChannel.notifyChat(barragerJSON);
+                    // 加活跃
+                    incLiveness(userId);
 
                     LogsService.simpleLog(context, "发送弹幕", "用户: " + userName + " 颜色: " + barragerColor + " 内容: " + barragerContent);
                     context.renderJSON(StatusCodes.SUCC);
@@ -920,31 +922,8 @@ public class ChatroomProcessor {
                     LOGGER.log(Level.INFO, "User " + userName + " failed to send a barrager.");
                 }
             } else {
-                // 宵禁
-                int start = 1930;
-                int end = 800;
-                int now = Integer.parseInt(new SimpleDateFormat("HHmm").format(new Date()));
-                if (now > end && now < start) {
-                    // 加活跃
-                    int risksControlled = ChatRoomBot.risksControlled(userId);
-                    if (risksControlled != -1) {
-                        if (risksControlMessageLimiter.access(userId)) {
-                            try {
-                                if (chatRoomLivenessLimiter.access(userId)) {
-                                    livenessMgmtService.incLiveness(userId, Liveness.LIVENESS_COMMENT);
-                                }
-                            } catch (Exception ignored) {
-                            }
-                        }
-                    } else {
-                        try {
-                            if (chatRoomLivenessLimiter.access(userId)) {
-                                livenessMgmtService.incLiveness(userId, Liveness.LIVENESS_COMMENT);
-                            }
-                        } catch (Exception ignored) {
-                        }
-                    }
-                }
+                // 加活跃
+                incLiveness(userId);
 
                 // 聊天室内容保存到数据库
                 final Transaction transaction = chatRoomRepository.beginTransaction();
@@ -982,6 +961,32 @@ public class ChatroomProcessor {
                     userMgmtService.updateUser(userId, user);
                 } catch (final Exception e) {
                     LOGGER.log(Level.ERROR, "Update user latest comment time failed", e);
+                }
+            }
+        }
+    }
+
+    private void incLiveness(String userId) {
+        int start = 1930;
+        int end = 800;
+        int now = Integer.parseInt(new SimpleDateFormat("HHmm").format(new Date()));
+        if (now > end && now < start) {
+            int risksControlled = ChatRoomBot.risksControlled(userId);
+            if (risksControlled != -1) {
+                if (risksControlMessageLimiter.access(userId)) {
+                    try {
+                        if (chatRoomLivenessLimiter.access(userId)) {
+                            livenessMgmtService.incLiveness(userId, Liveness.LIVENESS_COMMENT);
+                        }
+                    } catch (Exception ignored) {
+                    }
+                }
+            } else {
+                try {
+                    if (chatRoomLivenessLimiter.access(userId)) {
+                        livenessMgmtService.incLiveness(userId, Liveness.LIVENESS_COMMENT);
+                    }
+                } catch (Exception ignored) {
                 }
             }
         }
