@@ -1718,6 +1718,21 @@ ${result.info.msg}
             '        <div class="ft__smaller ft__fade fn__right date-bar">\n' +
             '            ' + data.time + '\n' +
             '                <span class="fn__space5"></span>\n';
+        // 客户端标识
+        if (data.client !== undefined && data.client !== '') {
+            console.log(data.client);
+            let client = data.client.split('/')[0];
+            let version = data.client.split('/')[1];
+            switch (client) {
+                case 'PC':
+                    newHTML += '<span class="tooltipped tooltipped-n" aria-label="' + client + '端 ' + version + '">' +
+                        '<svg style="vertical-align: -3px;"><use xlink:href="#ic-pc"></use></svg>' +
+                        '</span>';
+                    newHTML += '<span class="fn__space5"></span>\n';
+                    break;
+            }
+        }
+        // === 客户端标识
         if (!isRedPacket) {
             newHTML += '                <details class="details action__item fn__flex-center">\n' +
                 '                    <summary>\n' +
