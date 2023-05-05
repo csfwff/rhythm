@@ -1720,7 +1720,6 @@ ${result.info.msg}
             '                <span class="fn__space5"></span>\n';
         // 客户端标识
         if (data.client !== undefined && data.client !== '') {
-            console.log(data.client);
             let client = data.client.split('/')[0];
             let version = data.client.split('/')[1];
             switch (client) {
