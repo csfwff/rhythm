@@ -636,6 +636,31 @@ public class ChatroomProcessor {
         if (ChatRoomBot.record(context)) {
             final JSONObject requestJSONObject = (JSONObject) context.attr(Keys.REQUEST);
             String content = requestJSONObject.optString(Common.CONTENT);
+            String clientMark = requestJSONObject.optString("client");
+            String source = "";
+            try {
+                String client = clientMark.split("/")[0];
+                String version = clientMark.split("/")[1].replaceAll("[^0-9a-zA-Z\\u4e00-\\u9fa5.-]", "");
+                List<String> legalClient = new ArrayList<>();
+                legalClient.add("Web");
+                legalClient.add("PC");
+                legalClient.add("Mobile");
+                legalClient.add("Windows");
+                legalClient.add("macOS");
+                legalClient.add("iOS");
+                legalClient.add("Android");
+                legalClient.add("Extension");
+                legalClient.add("IDEA");
+                legalClient.add("Chrome");
+                legalClient.add("VSCode");
+                legalClient.add("Python");
+                legalClient.add("Golang");
+                legalClient.add("Other");
+                if (legalClient.contains(client)) {
+                    source = client + "/" + version;
+                }
+            } catch (Exception ignored) {
+            }
 
             try {
                 JSONObject checkContent = new JSONObject(content);
@@ -664,6 +689,9 @@ public class ChatroomProcessor {
             msg.put(UserExt.USER_NICKNAME, currentUser.optString(UserExt.USER_NICKNAME));
             msg.put("sysMetal", cloudService.getEnabledMetal(currentUser.optString(Keys.OBJECT_ID)));
             msg.put("userOId", currentUser.optLong(Keys.OBJECT_ID));
+            if (!source.isEmpty()) {
+                msg.put("client", source);
+            }
 
             String userId = currentUser.optString(Keys.OBJECT_ID);
 
