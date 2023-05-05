@@ -1724,6 +1724,42 @@ ${result.info.msg}
             let client = data.client.split('/')[0];
             let version = data.client.split('/')[1];
             switch (client) {
+                case 'Web':
+                    newHTML += '<span class="tooltipped tooltipped-n" aria-label="' + client + '端 ' + version + '">' +
+                        '<svg style="vertical-align: -3px;"><use xlink:href="#ic-web"></use></svg>' +
+                        '</span>';
+                    newHTML += '<span class="fn__space5"></span>\n';
+                    break;
+                case 'Mobile':
+                    newHTML += '<span class="tooltipped tooltipped-n" aria-label="' + client + '端 ' + version + '">' +
+                        '<svg style="vertical-align: -3px;"><use xlink:href="#ic-mobile"></use></svg>' +
+                        '</span>';
+                    newHTML += '<span class="fn__space5"></span>\n';
+                    break;
+                case 'Windows':
+                    newHTML += '<span class="tooltipped tooltipped-n" aria-label="' + client + '端 ' + version + '">' +
+                        '<svg style="vertical-align: -3px;"><use xlink:href="#ic-windows"></use></svg>' +
+                        '</span>';
+                    newHTML += '<span class="fn__space5"></span>\n';
+                    break;
+                case 'Extension':
+                    newHTML += '<span class="tooltipped tooltipped-n" aria-label="' + client + '端 ' + version + '">' +
+                        '<svg style="vertical-align: -3px;"><use xlink:href="#ic-extension"></use></svg>' +
+                        '</span>';
+                    newHTML += '<span class="fn__space5"></span>\n';
+                    break;
+                case 'Edge':
+                    newHTML += '<span class="tooltipped tooltipped-n" aria-label="' + client + '端 ' + version + '">' +
+                        '<svg style="vertical-align: -3px;"><use xlink:href="#ic-edge"></use></svg>' +
+                        '</span>';
+                    newHTML += '<span class="fn__space5"></span>\n';
+                    break;
+                case 'Other':
+                    newHTML += '<span class="tooltipped tooltipped-n" aria-label="' + client + '端 ' + version + '">' +
+                        '<svg style="vertical-align: -3px;"><use xlink:href="#ic-other"></use></svg>' +
+                        '</span>';
+                    newHTML += '<span class="fn__space5"></span>\n';
+                    break;
                 case 'PC':
                     newHTML += '<span class="tooltipped tooltipped-n" aria-label="' + client + '端 ' + version + '">' +
                         '<svg style="vertical-align: -3px;"><use xlink:href="#ic-pc"></use></svg>' +
