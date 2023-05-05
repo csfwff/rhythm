@@ -430,7 +430,7 @@ var ChatRoom = {
                 }
                 let requestJSONObject = {
                     content: "[redpacket]" + JSON.stringify(content) + "[/redpacket]",
-                    client: 'Web Latest'
+                    client: 'Web/Latest'
                 }
                 $.ajax({
                     url: Label.servePath + '/chat-room/send',
@@ -504,7 +504,7 @@ var ChatRoom = {
         };
         let requestJSONObject = {
             content: "[barrager]" + JSON.stringify(json) + "[/barrager]",
-            client: 'Web Latest'
+            client: 'Web/Latest'
         }
         $.ajax({
             url: Label.servePath + '/chat-room/send',
@@ -823,7 +823,7 @@ border-bottom: none;
     updateDiscussData: function (discuss) {
         let requestJSONObject = {
             content: "[setdiscuss]" + discuss + "[/setdiscuss]",
-            client: 'Web Latest'
+            client: 'Web/Latest'
         }
         $.ajax({
             url: Label.servePath + '/chat-room/send',
@@ -1072,7 +1072,7 @@ border-bottom: none;
         var content = ChatRoom.editor.getValue()
         var requestJSONObject = {
             content: content,
-            client: 'Web Latest'
+            client: 'Web/Latest'
         }
         ChatRoom.editor.setValue('')
         $.ajax({
