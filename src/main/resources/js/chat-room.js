@@ -1730,6 +1730,54 @@ ${result.info.msg}
                         '</span>';
                     newHTML += '<span class="fn__space5"></span>\n';
                     break;
+                case 'iOS':
+                    newHTML += '<span class="tooltipped tooltipped-n" aria-label="' + client + '端 ' + version + '">' +
+                        '<svg style="vertical-align: -3px;"><use xlink:href="#ic-apple"></use></svg>' +
+                        '</span>';
+                    newHTML += '<span class="fn__space5"></span>\n';
+                    break;
+                case 'macOS':
+                    newHTML += '<span class="tooltipped tooltipped-n" aria-label="' + client + '端 ' + version + '">' +
+                        '<svg style="vertical-align: -3px;"><use xlink:href="#ic-apple"></use></svg>' +
+                        '</span>';
+                    newHTML += '<span class="fn__space5"></span>\n';
+                    break;
+                case 'Android':
+                    newHTML += '<span class="tooltipped tooltipped-n" aria-label="' + client + '端 ' + version + '">' +
+                        '<svg style="vertical-align: -3px;"><use xlink:href="#ic-apk"></use></svg>' +
+                        '</span>';
+                    newHTML += '<span class="fn__space5"></span>\n';
+                    break;
+                case 'Chrome':
+                    newHTML += '<span class="tooltipped tooltipped-n" aria-label="' + client + '端 ' + version + '">' +
+                        '<svg style="vertical-align: -3px;"><use xlink:href="#ic-chrome"></use></svg>' +
+                        '</span>';
+                    newHTML += '<span class="fn__space5"></span>\n';
+                    break;
+                case 'VSCode':
+                    newHTML += '<span class="tooltipped tooltipped-n" aria-label="' + client + '端 ' + version + '">' +
+                        '<svg style="vertical-align: -3px;"><use xlink:href="#ic-vscode"></use></svg>' +
+                        '</span>';
+                    newHTML += '<span class="fn__space5"></span>\n';
+                    break;
+                case 'IDEA':
+                    newHTML += '<span class="tooltipped tooltipped-n" aria-label="' + client + '端 ' + version + '">' +
+                        '<svg style="vertical-align: -3px;"><use xlink:href="#ic-idea"></use></svg>' +
+                        '</span>';
+                    newHTML += '<span class="fn__space5"></span>\n';
+                    break;
+                case 'Python':
+                    newHTML += '<span class="tooltipped tooltipped-n" aria-label="' + client + '端 ' + version + '">' +
+                        '<svg style="vertical-align: -3px;"><use xlink:href="#ic-python"></use></svg>' +
+                        '</span>';
+                    newHTML += '<span class="fn__space5"></span>\n';
+                    break;
+                case 'Golang':
+                    newHTML += '<span class="tooltipped tooltipped-n" aria-label="' + client + '端 ' + version + '">' +
+                        '<svg style="vertical-align: -3px;"><use xlink:href="#ic-golang"></use></svg>' +
+                        '</span>';
+                    newHTML += '<span class="fn__space5"></span>\n';
+                    break;
             }
         }
         // === 客户端标识
