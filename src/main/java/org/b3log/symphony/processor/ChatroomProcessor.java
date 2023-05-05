@@ -652,6 +652,7 @@ public class ChatroomProcessor {
                 legalClient.add("Extension");
                 legalClient.add("IDEA");
                 legalClient.add("Chrome");
+                legalClient.add("Edge");
                 legalClient.add("VSCode");
                 legalClient.add("Python");
                 legalClient.add("Golang");
