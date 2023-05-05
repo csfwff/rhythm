@@ -70,6 +70,20 @@
                             <li>
                                 <div class='fn-flex'>
                                     <div class="avatar"
+                                         style="background-image:url('https://file.fishpi.cn/2023/05/icon-4d115aa0.png')"></div>
+                                    <div class="fn-flex-1">
+                                        <h2 class="ft-13">
+                                            <a target="_blank" href="https://maze.hancel.org/">《Maze》</a>
+                                        </h2>
+                                        <span class="ft-fade vditor-reset">
+                                                游戏规则十分简单，游戏开始会随机生成一个迷宫，但每次只显示你所在当下位置周围 3 × 3 的迷宫，你只需要凭直觉找到出口即可。<br>通过游戏右上角 Login 按钮使用摸鱼派账号登录后，每次通关将会<b>奖励关卡数 × 10的积分</b>。
+                                            </span>
+                                    </div>
+                                </div>
+                            </li>
+                            <li>
+                                <div class='fn-flex'>
+                                    <div class="avatar"
                                          style="background-image:url('https://file.fishpi.cn/2022/08/image-39430724.png')"></div>
                                     <div class="fn-flex-1">
                                         <h2 class="ft-13">
