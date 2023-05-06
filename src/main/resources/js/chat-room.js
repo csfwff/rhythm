@@ -1734,6 +1734,12 @@ ${result.info.msg}
                         '</span>';
                     newHTML += '<span class="fn__space5"></span>\n';
                     break;
+                case 'ElvesOnline':
+                    newHTML += '<span class="tooltipped tooltipped-n" aria-label="' + client + ' ' + version + '">' +
+                        '<svg style="vertical-align: -3px;"><use xlink:href="#ic-moon"></use></svg>' +
+                        '</span>';
+                    newHTML += '<span class="fn__space5"></span>\n';
+                    break;
                 case 'Mobile':
                     newHTML += '<span class="tooltipped tooltipped-n" aria-label="' + client + ' ' + version + '">' +
                         '<svg style="vertical-align: -3px;"><use xlink:href="#ic-mobile"></use></svg>' +

@@ -652,6 +652,7 @@ public class ChatroomProcessor {
                 legalClient.add("macOS");
                 legalClient.add("Linux");
                 legalClient.add("IceNet");
+                legalClient.add("ElvesOnline");
                 legalClient.add("iOS");
                 legalClient.add("Android");
                 legalClient.add("Extension");
