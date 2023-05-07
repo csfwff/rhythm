@@ -259,6 +259,7 @@ public class ChatroomChannel implements WebSocketChannel {
                                     "    \"type\": \"msg\",\n" +
                                     "    \"userAvatarURL210\": \"https://pwl.stackoverflow.wiki/2022/01/robot3-89631199.png\",\n" +
                                     "    \"content\": \"<p>由于您超过6小时未活跃，已将您断开连接，如要继续聊天请刷新页面，谢谢 :)</p>\",\n" +
+                                    "    \"client\": \"Other/Robot\",\n" +
                                     "    \"userAvatarURL48\": \"https://pwl.stackoverflow.wiki/2022/01/robot3-89631199.png\"\n" +
                                     "}");
                             removeSession(session);

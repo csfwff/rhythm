@@ -650,6 +650,8 @@ public class ChatroomProcessor {
                 legalClient.add("Mobile");
                 legalClient.add("Windows");
                 legalClient.add("macOS");
+                legalClient.add("Linux");
+                legalClient.add("IceNet");
                 legalClient.add("iOS");
                 legalClient.add("Android");
                 legalClient.add("Extension");

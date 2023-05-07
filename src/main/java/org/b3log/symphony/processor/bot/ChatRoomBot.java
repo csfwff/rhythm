@@ -586,6 +586,7 @@ public class ChatRoomBot {
             msg.put(UserExt.USER_NICKNAME, "人工智障");
             msg.put("sysMetal", "");
             msg.put("userOId", 0L);
+            msg.put("client", "Other/Robot");
             // 聊天室内容保存到数据库
             final BeanManager beanManager = BeanManager.getInstance();
             ChatRoomRepository chatRoomRepository = beanManager.getReference(ChatRoomRepository.class);

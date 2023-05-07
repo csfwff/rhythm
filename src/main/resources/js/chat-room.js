@@ -33,6 +33,7 @@ var isDrawing = false;
 var x = 0;
 var y = 0;
 var isClick = true;
+var thisClient = 'Web/PC网页端';
 var ChatRoom = {
     init: function () {
         // 聊天窗口高度设置
@@ -43,6 +44,10 @@ var ChatRoom = {
         } else {
           $('.list').height($(window).height() - 173)
         } */
+
+        if (ChatRoom.isMobile()) {
+            thisClient = 'Mobile/移动网页端';
+        }
 
         // 没有登录就不需要编辑器初始化了
         if ($('#chatContent').length === 0) {
@@ -430,7 +435,7 @@ var ChatRoom = {
                 }
                 let requestJSONObject = {
                     content: "[redpacket]" + JSON.stringify(content) + "[/redpacket]",
-                    client: 'Web/Latest'
+                    client: thisClient
                 }
                 $.ajax({
                     url: Label.servePath + '/chat-room/send',
@@ -504,7 +509,7 @@ var ChatRoom = {
         };
         let requestJSONObject = {
             content: "[barrager]" + JSON.stringify(json) + "[/barrager]",
-            client: 'Web/Latest'
+            client: thisClient
         }
         $.ajax({
             url: Label.servePath + '/chat-room/send',
@@ -823,7 +828,7 @@ border-bottom: none;
     updateDiscussData: function (discuss) {
         let requestJSONObject = {
             content: "[setdiscuss]" + discuss + "[/setdiscuss]",
-            client: 'Web/Latest'
+            client: thisClient
         }
         $.ajax({
             url: Label.servePath + '/chat-room/send',
@@ -1072,7 +1077,7 @@ border-bottom: none;
         var content = ChatRoom.editor.getValue()
         var requestJSONObject = {
             content: content,
-            client: 'Web/Latest'
+            client: thisClient
         }
         ChatRoom.editor.setValue('')
         $.ajax({
@@ -1724,91 +1729,103 @@ ${result.info.msg}
             let version = data.client.split('/')[1];
             switch (client) {
                 case 'Web':
-                    newHTML += '<span class="tooltipped tooltipped-n" aria-label="' + client + '端 ' + version + '">' +
-                        '<svg style="vertical-align: -3px;"><use xlink:href="#ic-web"></use></svg>' +
+                    newHTML += '<span class="tooltipped tooltipped-n" aria-label="' + client + ' ' + version + '">' +
+                        '<svg style="vertical-align: -3px;"><use xlink:href="#ic-fish"></use></svg>' +
                         '</span>';
                     newHTML += '<span class="fn__space5"></span>\n';
                     break;
                 case 'Mobile':
-                    newHTML += '<span class="tooltipped tooltipped-n" aria-label="' + client + '端 ' + version + '">' +
+                    newHTML += '<span class="tooltipped tooltipped-n" aria-label="' + client + ' ' + version + '">' +
                         '<svg style="vertical-align: -3px;"><use xlink:href="#ic-mobile"></use></svg>' +
                         '</span>';
                     newHTML += '<span class="fn__space5"></span>\n';
                     break;
                 case 'Windows':
-                    newHTML += '<span class="tooltipped tooltipped-n" aria-label="' + client + '端 ' + version + '">' +
+                    newHTML += '<span class="tooltipped tooltipped-n" aria-label="' + client + ' ' + version + '">' +
                         '<svg style="vertical-align: -3px;"><use xlink:href="#ic-windows"></use></svg>' +
                         '</span>';
                     newHTML += '<span class="fn__space5"></span>\n';
                     break;
+                case 'Linux':
+                    newHTML += '<span class="tooltipped tooltipped-n" aria-label="' + client + ' ' + version + '">' +
+                        '<svg style="vertical-align: -3px;"><use xlink:href="#ic-linux"></use></svg>' +
+                        '</span>';
+                    newHTML += '<span class="fn__space5"></span>\n';
+                    break;
+                case 'IceNet':
+                    newHTML += '<span class="tooltipped tooltipped-n" aria-label="' + client + ' ' + version + '">' +
+                        '<svg style="vertical-align: -3px;"><use xlink:href="#ic-icenet"></use></svg>' +
+                        '</span>';
+                    newHTML += '<span class="fn__space5"></span>\n';
+                    break;
                 case 'Extension':
-                    newHTML += '<span class="tooltipped tooltipped-n" aria-label="' + client + '端 ' + version + '">' +
+                    newHTML += '<span class="tooltipped tooltipped-n" aria-label="' + client + ' ' + version + '">' +
                         '<svg style="vertical-align: -3px;"><use xlink:href="#ic-extension"></use></svg>' +
                         '</span>';
                     newHTML += '<span class="fn__space5"></span>\n';
                     break;
                 case 'Edge':
-                    newHTML += '<span class="tooltipped tooltipped-n" aria-label="' + client + '端 ' + version + '">' +
+                    newHTML += '<span class="tooltipped tooltipped-n" aria-label="' + client + ' ' + version + '">' +
                         '<svg style="vertical-align: -3px;"><use xlink:href="#ic-edge"></use></svg>' +
                         '</span>';
                     newHTML += '<span class="fn__space5"></span>\n';
                     break;
                 case 'Other':
-                    newHTML += '<span class="tooltipped tooltipped-n" aria-label="' + client + '端 ' + version + '">' +
+                    newHTML += '<span class="tooltipped tooltipped-n" aria-label="' + client + ' ' + version + '">' +
                         '<svg style="vertical-align: -3px;"><use xlink:href="#ic-other"></use></svg>' +
                         '</span>';
                     newHTML += '<span class="fn__space5"></span>\n';
                     break;
                 case 'PC':
-                    newHTML += '<span class="tooltipped tooltipped-n" aria-label="' + client + '端 ' + version + '">' +
-                        '<svg style="vertical-align: -3px;"><use xlink:href="#ic-pc"></use></svg>' +
+                    newHTML += '<span class="tooltipped tooltipped-n" aria-label="' + client + ' ' + version + '">' +
+                        '<svg style="vertical-align: -3px;"><use xlink:href="#ic-pc2"></use></svg>' +
                         '</span>';
                     newHTML += '<span class="fn__space5"></span>\n';
                     break;
                 case 'iOS':
-                    newHTML += '<span class="tooltipped tooltipped-n" aria-label="' + client + '端 ' + version + '">' +
+                    newHTML += '<span class="tooltipped tooltipped-n" aria-label="' + client + ' ' + version + '">' +
                         '<svg style="vertical-align: -3px;"><use xlink:href="#ic-apple"></use></svg>' +
                         '</span>';
                     newHTML += '<span class="fn__space5"></span>\n';
                     break;
                 case 'macOS':
-                    newHTML += '<span class="tooltipped tooltipped-n" aria-label="' + client + '端 ' + version + '">' +
+                    newHTML += '<span class="tooltipped tooltipped-n" aria-label="' + client + ' ' + version + '">' +
                         '<svg style="vertical-align: -3px;"><use xlink:href="#ic-apple"></use></svg>' +
                         '</span>';
                     newHTML += '<span class="fn__space5"></span>\n';
                     break;
                 case 'Android':
-                    newHTML += '<span class="tooltipped tooltipped-n" aria-label="' + client + '端 ' + version + '">' +
+                    newHTML += '<span class="tooltipped tooltipped-n" aria-label="' + client + ' ' + version + '">' +
                         '<svg style="vertical-align: -3px;"><use xlink:href="#ic-apk"></use></svg>' +
                         '</span>';
                     newHTML += '<span class="fn__space5"></span>\n';
                     break;
                 case 'Chrome':
-                    newHTML += '<span class="tooltipped tooltipped-n" aria-label="' + client + '端 ' + version + '">' +
+                    newHTML += '<span class="tooltipped tooltipped-n" aria-label="' + client + ' ' + version + '">' +
                         '<svg style="vertical-align: -3px;"><use xlink:href="#ic-chrome"></use></svg>' +
                         '</span>';
                     newHTML += '<span class="fn__space5"></span>\n';
                     break;
                 case 'VSCode':
-                    newHTML += '<span class="tooltipped tooltipped-n" aria-label="' + client + '端 ' + version + '">' +
+                    newHTML += '<span class="tooltipped tooltipped-n" aria-label="' + client + ' ' + version + '">' +
                         '<svg style="vertical-align: -3px;"><use xlink:href="#ic-vscode"></use></svg>' +
                         '</span>';
                     newHTML += '<span class="fn__space5"></span>\n';
                     break;
                 case 'IDEA':
-                    newHTML += '<span class="tooltipped tooltipped-n" aria-label="' + client + '端 ' + version + '">' +
+                    newHTML += '<span class="tooltipped tooltipped-n" aria-label="' + client + ' ' + version + '">' +
                         '<svg style="vertical-align: -3px;"><use xlink:href="#ic-idea"></use></svg>' +
                         '</span>';
                     newHTML += '<span class="fn__space5"></span>\n';
                     break;
                 case 'Python':
-                    newHTML += '<span class="tooltipped tooltipped-n" aria-label="' + client + '端 ' + version + '">' +
+                    newHTML += '<span class="tooltipped tooltipped-n" aria-label="' + client + ' ' + version + '">' +
                         '<svg style="vertical-align: -3px;"><use xlink:href="#ic-python"></use></svg>' +
                         '</span>';
                     newHTML += '<span class="fn__space5"></span>\n';
                     break;
                 case 'Golang':
-                    newHTML += '<span class="tooltipped tooltipped-n" aria-label="' + client + '端 ' + version + '">' +
+                    newHTML += '<span class="tooltipped tooltipped-n" aria-label="' + client + ' ' + version + '">' +
                         '<svg style="vertical-align: -3px;"><use xlink:href="#ic-golang"></use></svg>' +
                         '</span>';
                     newHTML += '<span class="fn__space5"></span>\n';
@@ -2084,6 +2101,26 @@ ${result.info.msg}
         if (new Date(SpringFestivalDateList[year][0]).getTime() <= toDayTimes && new Date(SpringFestivalDateList[year][1]).getTime() >= toDayTimes) {
             chatRoom.classList.add('SpringFestival')
         }
+    },
+
+    isMobile: function () {
+        var userAgentInfo = navigator.userAgent;
+        var mobileAgents = ["Android", "iPhone", "SymbianOS", "Windows Phone", "iPad", "iPod"];
+        var mobile_flag = false;
+        //根据userAgent判断是否是手机
+        for (var v = 0; v < mobileAgents.length; v++) {
+            if (userAgentInfo.indexOf(mobileAgents[v]) > 0) {
+                mobile_flag = true;
+                break;
+            }
+        }
+        var screen_width = window.screen.width;
+        var screen_height = window.screen.height;
+        //根据屏幕分辨率判断是否是手机
+        if (screen_width > 325 && screen_height < 750) {
+            mobile_flag = true;
+        }
+        return mobile_flag;
     }
 }
 
