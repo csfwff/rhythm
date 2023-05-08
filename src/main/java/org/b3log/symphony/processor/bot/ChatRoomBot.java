@@ -457,6 +457,8 @@ public class ChatRoomBot {
                                             ChatroomChannel.addCustomMessage(user, msg);
                                             sendBotMsg("用户 **" + user + "** 的进出提示已设置完毕。");
                                         }
+                                    } else {
+                                        sendBotMsg("操作失败，权限不足。");
                                     }
                                 }
                             } catch (Exception e) {
