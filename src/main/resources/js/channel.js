@@ -380,7 +380,7 @@ var ChatRoomChannel = {
                     let whoChanged = data.whoChanged;
                     let newDiscuss = data.newDiscuss;
                     // 通知
-                    let discussHtml = "<div class='newDiscussNotice' style='color: rgb(50 50 50);margin-bottom: 8px;text-align: center;display: none;'>" +
+                    let discussHtml = "<div class='newDiscussNotice' style='color: rgb(50 50 50);margin-bottom: 12px;text-align: center;display: none;'>" +
                         "<svg><use xlink:href='#pound'></use></svg>&nbsp;" + '<a href="' + Label.servePath + '/member/' + whoChanged + '" target="_blank">' + whoChanged + "</a> 编辑了话题：<a href='javascript:void(0)' style='text-decoration: none'>" +
                         newDiscuss +
                         "</a></div>";
@@ -427,7 +427,7 @@ var ChatRoomChannel = {
                         spell += ' (' + got + '/' + count + ')';
                     }
                     // 通知
-                    let html = "<div class='redPacketNotice' style='color: rgb(50 50 50);margin-bottom: 8px;text-align: center;display: none;'>" +
+                    let html = "<div class='redPacketNotice' style='color: rgb(50 50 50);margin-bottom: 12px;text-align: center;display: none;'>" +
                         "<svg><use xlink:href='#redPacketIcon'></use></svg>&nbsp;" +
                         spell +
                         "</div>";
@@ -455,6 +455,13 @@ var ChatRoomChannel = {
                     break;
                 case 'refresh':
                     ChatRoom.flashScreen();
+                    break;
+                case 'customMessage':
+                    let message = "<div class='customNotice' style='color: rgb(118 118 118);margin-bottom: 12px;text-align: center;display: none;'>" +
+                        data.message +
+                        "</div>";
+                    $('#chats').prepend(message);
+                    $(".customNotice").slideDown(500);
                     break;
                 case 'refreshBarrager':
                     $('#barragerCost').text(data.cost);

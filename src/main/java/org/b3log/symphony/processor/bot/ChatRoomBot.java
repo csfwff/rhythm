@@ -165,6 +165,9 @@ public class ChatRoomBot {
                         case "dm":
                             cmd2 = "弹幕";
                             break;
+                        case "jcts":
+                            cmd2 = "进出提示";
+                            break;
                     }
                     switch (cmd2) {
                         case "禁言":
@@ -420,6 +423,34 @@ public class ChatRoomBot {
                                 sendBotMsg("弹幕价格设置为: **" + cost + "** " + unit + "/次。\n" +
                                         "弹幕价格将在下次重启服务器后自动恢复为默认值 (5积分/次)。\n" +
                                         "正在向成员推送新的弹幕价格，预计需要 **" + (ChatroomChannel.SESSIONS.size() / 2) + "** 秒。");
+                            } catch (Exception e) {
+                                sendBotMsg("参数错误。");
+                            }
+                            break;
+                        case "进出提示":
+                            try {
+                                String user = cmd1.split("\\s")[1].replaceAll("^(@)", "");
+                                if (user.equals("查询")) {
+                                    String uname = cmd1.split("\\s")[2];
+                                    String join = ChatroomChannel.getCustomMessage(1, uname);
+                                    String left = ChatroomChannel.getCustomMessage(0, uname);
+                                    sendBotMsg("用户 **" + uname + "** 的进出提示设定如下：\n" +
+                                            "进入：" + join + "\n" +
+                                            "离开：" + left + "\n");
+                                } else {
+                                    if (cmd1.split("\\s").length == 2) {
+                                        ChatroomChannel.removeCustomMessage(user);
+                                        sendBotMsg("用户 **" + user + "** 的进出提示已恢复默认。");
+                                    } else if (cmd1.split("\\s").length >= 4) {
+                                        String msg = content.replaceAll("执法 ", "")
+                                                .replaceAll("zf ", "")
+                                                .replaceAll("进出提示 ", "")
+                                                .replaceAll("jcts ", "")
+                                                .replaceAll(user + " ", "");
+                                        ChatroomChannel.addCustomMessage(user, msg);
+                                        sendBotMsg("用户 **" + user + "** 的进出提示已设置完毕。");
+                                    }
+                                }
                             } catch (Exception e) {
                                 sendBotMsg("参数错误。");
                             }

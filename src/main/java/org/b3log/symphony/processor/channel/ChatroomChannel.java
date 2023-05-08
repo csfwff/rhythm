@@ -18,6 +18,8 @@
  */
 package org.b3log.symphony.processor.channel;
 
+import org.apache.logging.log4j.Level;
+import org.b3log.latke.Keys;
 import org.b3log.latke.Latkes;
 import org.b3log.latke.http.WebSocketChannel;
 import org.b3log.latke.http.WebSocketSession;
@@ -25,10 +27,14 @@ import org.b3log.latke.ioc.BeanManager;
 import org.b3log.latke.ioc.Inject;
 import org.b3log.latke.ioc.Singleton;
 import org.b3log.latke.model.User;
+import org.b3log.latke.repository.*;
 import org.b3log.symphony.model.Common;
 import org.b3log.symphony.model.UserExt;
 import org.b3log.symphony.processor.ApiProcessor;
+import org.b3log.symphony.repository.CloudRepository;
 import org.b3log.symphony.service.AvatarQueryService;
+import org.b3log.symphony.service.CloudService;
+import org.b3log.symphony.service.UserQueryService;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -86,7 +92,7 @@ public class ChatroomChannel implements WebSocketChannel {
                 }
             }
             if (joined) {
-                System.out.println("join " + userName);
+                sendCustomMessage(getCustomMessage(1, userName));
             }
             onlineUsers.put(session, user);
             SESSIONS.add(session);
@@ -98,6 +104,118 @@ public class ChatroomChannel implements WebSocketChannel {
         } else {
             session.close();
         }
+    }
+
+    public static String getCustomMessage(int type, String userName) {
+        final BeanManager beanManager = BeanManager.getInstance();
+        UserQueryService userQueryService = beanManager.getReference(UserQueryService.class);
+        CloudRepository cloudRepository = beanManager.getReference(CloudRepository.class);
+        JSONObject user = userQueryService.getUserByName(userName);
+        String userId = user.optString(Keys.OBJECT_ID);
+        String msg = "";
+
+        try {
+            Query cloudQuery = new Query()
+                    .setFilter(CompositeFilterOperator.and(
+                            new PropertyFilter("userId", FilterOperator.EQUAL, userId),
+                            new PropertyFilter("gameId", FilterOperator.EQUAL, "sys-custom-message")
+                    ));
+            JSONObject result = cloudRepository.getFirst(cloudQuery);
+            String data = result.optString("data");
+            if (data.contains("&&&")) {
+                if (type == 1) {
+                    msg = data.split("&&&")[0];
+                } else if (type == 0) {
+                    msg = data.split("&&&")[1];
+                }
+            } else {
+                if (type == 1) {
+                    msg = "<b>{userName}</b> has joined the pi";
+                } else if (type == 0) {
+                    msg = "<b>{userName}</b> has left the pi";
+                }
+            }
+        } catch (Exception e) {
+            if (type == 1) {
+                msg = "<b>{userName}</b> has joined the pi";
+            } else if (type == 0) {
+                msg = "<b>{userName}</b> has left the pi";
+            }
+        }
+
+        msg = msg.replaceAll("\\{userName}", user.optString(User.USER_NAME));
+        msg = msg.replaceAll("\\{userNickName}", user.optString(UserExt.USER_NICKNAME));
+        msg = msg.replaceAll("\\{userPoint}", user.optString(UserExt.USER_POINT));
+        return msg;
+    }
+
+    public static boolean removeCustomMessage(String userName) {
+        final BeanManager beanManager = BeanManager.getInstance();
+        UserQueryService userQueryService = beanManager.getReference(UserQueryService.class);
+        CloudRepository cloudRepository = beanManager.getReference(CloudRepository.class);
+        String userId = userQueryService.getUserByName(userName).optString(Keys.OBJECT_ID);
+
+        try {
+            final Transaction transaction = cloudRepository.beginTransaction();
+            Query cloudDeleteQuery = new Query()
+                    .setFilter(CompositeFilterOperator.and(
+                            new PropertyFilter("userId", FilterOperator.EQUAL, userId),
+                            new PropertyFilter("gameId", FilterOperator.EQUAL, "sys-custom-message")
+                    ));
+            cloudRepository.remove(cloudDeleteQuery);
+            transaction.commit();
+
+            return true;
+        } catch (RepositoryException e) {
+            return false;
+        }
+    }
+
+    public static boolean addCustomMessage(String userName, String message) {
+        final BeanManager beanManager = BeanManager.getInstance();
+        UserQueryService userQueryService = beanManager.getReference(UserQueryService.class);
+        CloudRepository cloudRepository = beanManager.getReference(CloudRepository.class);
+        String userId = userQueryService.getUserByName(userName).optString(Keys.OBJECT_ID);
+
+        try {
+            final Transaction transaction = cloudRepository.beginTransaction();
+            Query cloudDeleteQuery = new Query()
+                    .setFilter(CompositeFilterOperator.and(
+                            new PropertyFilter("userId", FilterOperator.EQUAL, userId),
+                            new PropertyFilter("gameId", FilterOperator.EQUAL, "sys-custom-message")
+                    ));
+            cloudRepository.remove(cloudDeleteQuery);
+            JSONObject cloudJSON = new JSONObject();
+            cloudJSON.put("userId", userId)
+                    .put("gameId", "sys-custom-message")
+                    .put("data", message);
+            cloudRepository.add(cloudJSON);
+            transaction.commit();
+
+            return true;
+        } catch (RepositoryException e) {
+            return false;
+        }
+    }
+
+    public static void sendCustomMessage(String msg) {
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put(Common.TYPE, "customMessage");
+        jsonObject.put("message", msg);
+        String message = jsonObject.toString();
+        new Thread(() -> {
+            int i = 0;
+            for (WebSocketSession s : ChatroomChannel.SESSIONS) {
+                i++;
+                if (i % 50 == 0) {
+                    try {
+                        Thread.sleep(100);
+                    } catch (Exception ignored) {
+                    }
+                }
+                s.sendText(message);
+            }
+        }).start();
     }
 
     /**
@@ -234,7 +352,7 @@ public class ChatroomChannel implements WebSocketChannel {
                 }
             }
             if (left) {
-                System.out.println("left " + userName);
+                sendCustomMessage(getCustomMessage(0, userName));
             }
         } catch (NullPointerException ignored) {
         } catch (Exception e) {
