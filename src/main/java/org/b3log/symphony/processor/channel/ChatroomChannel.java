@@ -92,7 +92,10 @@ public class ChatroomChannel implements WebSocketChannel {
                 }
             }
             if (joined) {
-                sendCustomMessage(getCustomMessage(1, userName));
+                String msg = getCustomMessage(1, userName);
+                if (!msg.isEmpty()) {
+                    sendCustomMessage(msg);
+                }
             }
             onlineUsers.put(session, user);
             SESSIONS.add(session);
@@ -129,18 +132,20 @@ public class ChatroomChannel implements WebSocketChannel {
                     msg = data.split("&&&")[1];
                 }
             } else {
-                if (type == 1) {
+                /*if (type == 1) {
                     msg = "<b>{userName}</b> has joined the pi";
                 } else if (type == 0) {
                     msg = "<b>{userName}</b> has left the pi";
-                }
+                }*/
+                msg = "";
             }
         } catch (Exception e) {
-            if (type == 1) {
+            /*if (type == 1) {
                 msg = "<b>{userName}</b> has joined the pi";
             } else if (type == 0) {
                 msg = "<b>{userName}</b> has left the pi";
-            }
+            }*/
+            msg = "";
         }
 
         msg = msg.replaceAll("\\{userName}", user.optString(User.USER_NAME));
@@ -352,7 +357,10 @@ public class ChatroomChannel implements WebSocketChannel {
                 }
             }
             if (left) {
-                sendCustomMessage(getCustomMessage(0, userName));
+                String msg = getCustomMessage(0, userName);
+                if (!msg.isEmpty()) {
+                    sendCustomMessage(msg);
+                }
             }
         } catch (NullPointerException ignored) {
         } catch (Exception e) {

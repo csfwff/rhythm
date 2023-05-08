@@ -433,7 +433,13 @@ public class ChatRoomBot {
                                 if (user.equals("查询")) {
                                     String uname = cmd1.split("\\s")[2];
                                     String join = ChatroomChannel.getCustomMessage(1, uname);
+                                    if (join.isEmpty()) {
+                                        join = "未设定";
+                                    }
                                     String left = ChatroomChannel.getCustomMessage(0, uname);
+                                    if (left.isEmpty()) {
+                                        left = "未设定";
+                                    }
                                     sendBotMsg("用户 **" + uname + "** 的进出提示设定如下：\n" +
                                             "进入：" + join + "\n" +
                                             "离开：" + left + "\n");
