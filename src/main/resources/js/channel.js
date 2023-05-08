@@ -454,9 +454,7 @@ var ChatRoomChannel = {
                     $("#chatindex" + data.oId).remove();
                     break;
                 case 'refresh':
-                    $('#chats').empty();
-                    page = 0;
-                    ChatRoom.more();
+                    ChatRoom.flashScreen();
                     break;
                 case 'msg':
                     // Chatroom

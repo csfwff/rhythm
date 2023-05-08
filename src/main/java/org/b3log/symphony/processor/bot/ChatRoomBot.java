@@ -307,13 +307,12 @@ public class ChatRoomBot {
                                     "<details><summary>用户会话详情</summary>" + userSessionList + "</details>");
                             break;
                         case "刷新缓存":
-                            sendBotMsg("请稍等，执行中...");
                             ChatroomChannel.sendOnlineMsg();
-                            sendBotMsg("在线人数缓存已刷新。");
-                            // JSONObject jsonObject = new JSONObject();
-                            // jsonObject.put(Common.TYPE, "refresh");
-                            // ChatroomChannel.notifyChat(jsonObject);
-                            // sendBotMsg("已为在线用户清屏。");
+                            int online = ChatroomChannel.SESSIONS.size();
+                            int estimatedTime = online / 2;
+                            clearScreen();
+                            sendBotMsg("在线人数缓存刷新请求已提交，预计需要时间 **" + estimatedTime + "** 秒。\n" +
+                                    "在线用户全体清屏请求已提交，预计需要时间 **" + estimatedTime + "** 秒。");
                             break;
                         case "广播设置":
                             try {
@@ -568,12 +567,36 @@ public class ChatRoomBot {
         }
         return true;
     }
+
+    private static boolean clearScreenLock = false;
+    public static void clearScreen() {
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put(Common.TYPE, "refresh");
+        String message = jsonObject.toString();
+        if (!clearScreenLock) {
+            clearScreenLock = true;
+            new Thread(() -> {
+                int i = 0;
+                for (WebSocketSession s : ChatroomChannel.SESSIONS) {
+                    i++;
+                    if (i % 1 == 0) {
+                        try {
+                            Thread.sleep(500);
+                        } catch (Exception ignored) {
+                        }
+                    }
+                    s.sendText(message);
+                }
+                clearScreenLock = false;
+            }).start();
+        }
+    }
     
     // 以人工智障的身份发送消息
     public static void sendBotMsg(String content) {
         new Thread(() -> {
             try {
-                Thread.sleep(100);
+                Thread.sleep(500);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }

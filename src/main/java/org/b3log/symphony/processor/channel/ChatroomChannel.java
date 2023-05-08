@@ -317,20 +317,25 @@ public class ChatroomChannel implements WebSocketChannel {
     }
 
     // 发送在线信息
+    private static boolean onlineMsgLock = false;
     public static void sendOnlineMsg() {
-        final String msgStr = getOnline().toString();
-        new Thread(() -> {
-            int i = 0;
-            for (WebSocketSession s : SESSIONS) {
-                i++;
-                if (i % 5 == 0) {
-                    try {
-                        Thread.sleep(500);
-                    } catch (Exception ignored) {
+        if (!onlineMsgLock) {
+            onlineMsgLock = true;
+            final String msgStr = getOnline().toString();
+            new Thread(() -> {
+                int i = 0;
+                for (WebSocketSession s : SESSIONS) {
+                    i++;
+                    if (i % 1 == 0) {
+                        try {
+                            Thread.sleep(500);
+                        } catch (Exception ignored) {
+                        }
                     }
+                    s.sendText(msgStr);
                 }
-                s.sendText(msgStr);
-            }
-        }).start();
+                onlineMsgLock = false;
+            }).start();
+        }
     }
 }
