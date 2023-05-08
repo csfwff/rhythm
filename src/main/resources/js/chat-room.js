@@ -1635,6 +1635,7 @@ ${result.info.msg}
                         '    </svg>\n' +
                         '    <div>\n' +
                         '        <div>' + msgJSON.msg + '<br><b>' + type + '</b></div>\n' +
+                        '        <div><svg style="vertical-align: -2px; width: 13px; height: 13px"><use xlink:href="#coin"></use></svg> ' + msgJSON.money + '</div>\n' +
                         '        <div class="ft__smaller ft__fade redPacketDesc">\n' +
                         content + '\n' +
                         '        </div>\n' +
@@ -1648,6 +1649,7 @@ ${result.info.msg}
                         '    </svg>\n' +
                         '    <div>\n' +
                         '        <div>' + msgJSON.msg + '<br><b>' + type + '</b></div>\n' +
+                        '        <div><svg style="vertical-align: -2px; width: 13px; height: 13px"><use xlink:href="#coin"></use></svg> ' + msgJSON.money + '</div>\n' +
                         '        <div class="ft__smaller ft__fade redPacketDesc">\n' +
                         '        </div>\n' +
                         '    </div>\n' +
