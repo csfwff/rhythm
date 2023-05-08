@@ -416,9 +416,10 @@ public class ChatRoomBot {
                                 String unit = cmd1.split("\\s")[2];
                                 ChatroomProcessor.barragerCost = cost;
                                 ChatroomProcessor.barragerUnit = unit;
+                                refreshBarrager(cost, unit);
                                 sendBotMsg("弹幕价格设置为: **" + cost + "** " + unit + "/次。\n" +
                                         "弹幕价格将在下次重启服务器后自动恢复为默认值 (5积分/次)。\n" +
-                                        "刷新页面即可使用新价格发送弹幕。");
+                                        "正在向成员推送新的弹幕价格，预计需要 **" + (ChatroomChannel.SESSIONS.size() / 2) + "** 秒。");
                             } catch (Exception e) {
                                 sendBotMsg("参数错误。");
                             }
@@ -566,6 +567,32 @@ public class ChatRoomBot {
             return false;
         }
         return true;
+    }
+
+    private static boolean refreshBarragerLock = false;
+    public static void refreshBarrager(int cost, String unit) {
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put(Common.TYPE, "refreshBarrager");
+        jsonObject.put("cost", cost);
+        jsonObject.put("unit", unit);
+        String message = jsonObject.toString();
+        if (!refreshBarragerLock) {
+            refreshBarragerLock = true;
+            new Thread(() -> {
+                int i = 0;
+                for (WebSocketSession s : ChatroomChannel.SESSIONS) {
+                    i++;
+                    if (i % 1 == 0) {
+                        try {
+                            Thread.sleep(500);
+                        } catch (Exception ignored) {
+                        }
+                    }
+                    s.sendText(message);
+                }
+                refreshBarragerLock = false;
+            }).start();
+        }
     }
 
     private static boolean clearScreenLock = false;

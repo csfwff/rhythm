@@ -456,6 +456,10 @@ var ChatRoomChannel = {
                 case 'refresh':
                     ChatRoom.flashScreen();
                     break;
+                case 'refreshBarrager':
+                    $('#barragerCost').text(data.cost);
+                    $('#barragerUnit').text(data.unit);
+                    break;
                 case 'msg':
                     // Chatroom
                     if ($("#chatRoomIndex").length === 0 && $("#chatroom" + data.oId).length <= 0) {
