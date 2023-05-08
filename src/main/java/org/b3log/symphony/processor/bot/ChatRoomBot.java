@@ -444,17 +444,19 @@ public class ChatRoomBot {
                                             "进入：" + join + "\n" +
                                             "离开：" + left + "\n");
                                 } else {
-                                    if (cmd1.split("\\s").length == 2) {
-                                        ChatroomChannel.removeCustomMessage(user);
-                                        sendBotMsg("用户 **" + user + "** 的进出提示已恢复默认。");
-                                    } else if (cmd1.split("\\s").length >= 4) {
-                                        String msg = content.replaceAll("执法 ", "")
-                                                .replaceAll("zf ", "")
-                                                .replaceAll("进出提示 ", "")
-                                                .replaceAll("jcts ", "")
-                                                .replaceAll(user + " ", "");
-                                        ChatroomChannel.addCustomMessage(user, msg);
-                                        sendBotMsg("用户 **" + user + "** 的进出提示已设置完毕。");
+                                    if (userName.equals("adlered") || userName.equals("csfwff") || userName.equals("admin")) {
+                                        if (cmd1.split("\\s").length == 2) {
+                                            ChatroomChannel.removeCustomMessage(user);
+                                            sendBotMsg("用户 **" + user + "** 的进出提示已恢复默认。");
+                                        } else if (cmd1.split("\\s").length >= 4) {
+                                            String msg = content.replaceAll("执法 ", "")
+                                                    .replaceAll("zf ", "")
+                                                    .replaceAll("进出提示 ", "")
+                                                    .replaceAll("jcts ", "")
+                                                    .replaceAll(user + " ", "");
+                                            ChatroomChannel.addCustomMessage(user, msg);
+                                            sendBotMsg("用户 **" + user + "** 的进出提示已设置完毕。");
+                                        }
                                     }
                                 }
                             } catch (Exception e) {
