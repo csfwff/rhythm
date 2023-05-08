@@ -347,7 +347,7 @@ var ChatRoomChannel = {
         ChatRoomChannel.ws = new WebSocket(channelServer)
 
         ChatRoomChannel.ws.onopen = function () {
-            console.log("Connected to chat room channel websocket.")
+            console.log("Connected to chatroom channel websocket.")
         }
 
         ChatRoomChannel.ws.onmessage = function (evt) {
