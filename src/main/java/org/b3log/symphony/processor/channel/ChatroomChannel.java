@@ -77,6 +77,17 @@ public class ChatroomChannel implements WebSocketChannel {
         }
         if (null != userStr) {
             final JSONObject user = new JSONObject(userStr);
+            String userName = user.optString(User.USER_NAME);
+            boolean joined = true;
+            for (Map.Entry<WebSocketSession, JSONObject> entry : onlineUsers.entrySet()) {
+                String name = entry.getValue().optString(User.USER_NAME);
+                if (userName.equals(name)) {
+                    joined = false;
+                }
+            }
+            if (joined) {
+                System.out.println("join " + userName);
+            }
             onlineUsers.put(session, user);
             SESSIONS.add(session);
             // 单独发送在线信息
@@ -210,8 +221,21 @@ public class ChatroomChannel implements WebSocketChannel {
      * @param session the specified session
      */
     public static synchronized void removeSession(final WebSocketSession session) {
+        String userName = "";
         try {
+            JSONObject user = onlineUsers.get(session);
+            userName = user.optString(User.USER_NAME);
             onlineUsers.remove(session);
+            boolean left = true;
+            for (Map.Entry<WebSocketSession, JSONObject> entry : onlineUsers.entrySet()) {
+                String name = entry.getValue().optString(User.USER_NAME);
+                if (userName.equals(name)) {
+                    left = false;
+                }
+            }
+            if (left) {
+                System.out.println("left " + userName);
+            }
         } catch (NullPointerException ignored) {
         } catch (Exception e) {
             e.printStackTrace();
