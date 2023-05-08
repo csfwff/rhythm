@@ -41,7 +41,6 @@
             <a target="_blank" href="https://www.lundao.pub/">论道社区</a><br>
             <a target="_blank" href="https://xyears.cn/">十年之约论坛</a><br>
             <a target="_blank" href="https://www.tsyvps.com/aff/HEHTPGYL">蓝易云</a><br>
-            <a target="_blank" href="https://my.fishpi.cn/">摸鱼导航网</a><br>
             <a target="_blank" href="https://bbs.tampermonkey.net.cn/">油猴中文网</a>
         </div>
         <div class="fn-hr5"></div>

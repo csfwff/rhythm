@@ -1279,7 +1279,13 @@ public class ArticleQueryService {
     }
     public List<JSONObject> getHotArticles(final int fetchSize) {
         try {
-            List<JSONObject> ret = hotArticlesCache.subList(0, fetchSize);
+            List<JSONObject> ret;
+            if (hotArticlesCache.size() <= fetchSize) {
+                ret = hotArticlesCache;
+            } else {
+                ret = hotArticlesCache.subList(0, fetchSize);
+            }
+
             ret.sort((o1, o2) -> {
                 int o1Time = o1.optInt("total_score");
                 int o2Time = o2.optInt("total_score");
