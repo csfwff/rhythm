@@ -1017,6 +1017,11 @@ public class ArticleProcessor {
             return;
         }
 
+        if (article.optInt(Article.ARTICLE_STATUS)==Article.ARTICLE_STATUS_C_INVALID){
+            context.sendError(404);
+            return;
+        }
+
         dataModelService.fillHeaderAndFooter(context, dataModel);
 
         final String articleAuthorId = article.optString(Article.ARTICLE_AUTHOR_ID);
