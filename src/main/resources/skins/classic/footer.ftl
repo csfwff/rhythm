@@ -44,8 +44,6 @@
                 &nbsp;｜&nbsp;
                 <a style="margin-right: 0px; padding-right: 0px" target="_blank" href="https://www.tsyvps.com/aff/HEHTPGYL">蓝易云</a>
                 &nbsp;｜&nbsp;
-                <a style="margin-right: 0px; padding-right: 0px" target="_blank" href="https://my.fishpi.cn/">摸鱼导航网</a>
-                &nbsp;｜&nbsp;
                 <a style="margin-right: 0px; padding-right: 0px" target="_blank" href="https://bbs.tampermonkey.net.cn/">油猴中文网</a>
             </div>
             <div class="fn-clear ft-smaller">
