@@ -1251,7 +1251,7 @@ public class ArticleQueryService {
             List<JSONObject> ret = articleRepository.select("" +
                     "SELECT " +
                     "    *, " +
-                    "    (articleThankCnt + articleGoodCnt + articleCollectCnt + articleWatchCnt - articleBadCnt + articleCommentCount) AS total_score " +
+                    "    (articleThankCnt + articleGoodCnt + articleCollectCnt + articleWatchCnt - articleBadCnt) AS total_score " +
                     "FROM " +
                     "    symphony_article " +
                     "WHERE " +
