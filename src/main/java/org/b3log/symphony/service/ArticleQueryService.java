@@ -1258,7 +1258,7 @@ public class ArticleQueryService {
                     "    articleStatus <> 1 AND articleType <> 1 AND articleShowInList <> 0 " +
                     "ORDER BY " +
                     "    total_score DESC " +
-                    "limit 100");
+                    "limit 500");
             ret.sort((o1, o2) -> {
                 long o1Time = o1.optLong(Article.ARTICLE_UPDATE_TIME);
                 long o2Time = o2.optLong(Article.ARTICLE_UPDATE_TIME);
@@ -1271,6 +1271,7 @@ public class ArticleQueryService {
                 }
             });
             organizeArticles(ret);
+            Collections.shuffle(ret);
             hotArticlesCache = ret;
             LOGGER.log(Level.INFO, "Refreshed hot articles cache.");
         } catch (Exception e) {
