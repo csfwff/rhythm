@@ -115,7 +115,7 @@ public class ChatroomChannel implements WebSocketChannel {
         }
     }
 
-    private static SimpleCurrentLimiter customMessageCurrentLimit = new SimpleCurrentLimiter(60, 4);
+    private static SimpleCurrentLimiter customMessageCurrentLimit = new SimpleCurrentLimiter(60, 6);
     public static String getCustomMessage(int type, String userName) {
         if (customMessageCurrentLimit.access(userName)) {
             final BeanManager beanManager = BeanManager.getInstance();
