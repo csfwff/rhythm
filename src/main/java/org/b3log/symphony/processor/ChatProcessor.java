@@ -347,11 +347,6 @@ public class ChatProcessor {
         final String random = RandomStringUtils.randomAlphanumeric(16);
         cookieJSONObject.put(Keys.TOKEN, userPassword + ApiProcessor.COOKIE_ITEM_SEPARATOR + random);
         final String key = Crypts.encryptByAES(cookieJSONObject.toString(), Symphonys.COOKIE_SECRET);
-        if (null != ApiProcessor.keys.get(userName)) {
-            ApiProcessor.removeKeyByUsername(userName);
-        }
-        ApiProcessor.keys.put(key, currentUser);
-        ApiProcessor.keys.put(userName, new JSONObject().put("key", key));
         dataModel.put("apiKey", key);
 
         dataModelService.fillHeaderAndFooter(context, dataModel);

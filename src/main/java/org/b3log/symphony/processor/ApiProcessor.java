@@ -65,10 +65,6 @@ public class ApiProcessor {
      * Logger.
      */
     private static final Logger LOGGER = LogManager.getLogger(ApiProcessor.class);
-    /**
-     * Session cache.
-     */
-    public static final Cache keys = CacheFactory.getCache("keys");
 
     /**
      * 存储用户的Key
@@ -133,10 +129,7 @@ public class ApiProcessor {
      */
     public static JSONObject getUserByKey(String apiKey) {
         if (apiKey != null && apiKey.length() == 192) {
-            JSONObject user = ApiProcessor.keys.get(apiKey);
-            if (null == user) {
-                user = tryLogInWithApiKey(apiKey);
-            }
+            JSONObject user = tryLogInWithApiKey(apiKey);
             if (null != user) {
                 return user;
             }
@@ -171,28 +164,12 @@ public class ApiProcessor {
             final String token = cookieJSONObject.optString(Keys.TOKEN);
             final String password = StringUtils.substringBeforeLast(token, COOKIE_ITEM_SEPARATOR);
             if (userPassword.equals(password)) {
-                String userName = ret.optString(User.USER_NAME);
-                if (null != keys.get(userName)) {
-                    removeKeyByUsername(userName);
-                }
-                keys.put(apiKey, ret);
-                keys.put(userName, new JSONObject().put("key", apiKey));
-
                 return ret;
             }
         } catch (final Exception e) {
             LOGGER.log(Level.WARN, "Parses apikey failed, clears apikey");
         }
         return null;
-    }
-
-    public static void removeKeyByUsername(String userName) {
-        try {
-            String key = keys.get(userName).optString("key");
-            keys.remove(key);
-            keys.remove(userName);
-        } catch (Exception ignored) {
-        }
     }
 
     public void getKey(final RequestContext context) {
@@ -260,12 +237,6 @@ public class ApiProcessor {
 
                 context.renderCodeMsg(StatusCodes.SUCC, "");
                 context.renderJSONValue("Key", key);
-                String userName = user.optString(User.USER_NAME);
-                if (null != keys.get(userName)) {
-                    removeKeyByUsername(userName);
-                }
-                keys.put(key, user);
-                keys.put(userName, new JSONObject().put("key", key));
 
                 return;
             }
