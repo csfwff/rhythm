@@ -341,7 +341,6 @@ public class ChatProcessor {
         // 放 ApiKey
         final String userId = currentUser.optString(Keys.OBJECT_ID);
         final String userPassword = currentUser.optString(User.USER_PASSWORD);
-        final String userName = currentUser.optString(User.USER_NAME);
         final JSONObject cookieJSONObject = new JSONObject();
         cookieJSONObject.put(Keys.OBJECT_ID, userId);
         final String random = RandomStringUtils.randomAlphanumeric(16);
