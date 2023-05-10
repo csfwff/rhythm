@@ -37,6 +37,7 @@ import org.b3log.symphony.service.AvatarQueryService;
 import org.b3log.symphony.service.UserQueryService;
 import org.json.JSONArray;
 import org.json.JSONObject;
+import pers.adlered.simplecurrentlimiter.main.SimpleCurrentLimiter;
 
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -114,49 +115,46 @@ public class ChatroomChannel implements WebSocketChannel {
         }
     }
 
+    private static SimpleCurrentLimiter customMessageCurrentLimit = new SimpleCurrentLimiter(60, 1);
     public static String getCustomMessage(int type, String userName) {
-        final BeanManager beanManager = BeanManager.getInstance();
-        UserQueryService userQueryService = beanManager.getReference(UserQueryService.class);
-        CloudRepository cloudRepository = beanManager.getReference(CloudRepository.class);
-        JSONObject user = userQueryService.getUserByName(userName);
-        String userId = user.optString(Keys.OBJECT_ID);
-        String msg = "";
+        if (customMessageCurrentLimit.access(userName)) {
+            final BeanManager beanManager = BeanManager.getInstance();
+            UserQueryService userQueryService = beanManager.getReference(UserQueryService.class);
+            CloudRepository cloudRepository = beanManager.getReference(CloudRepository.class);
+            JSONObject user = userQueryService.getUserByName(userName);
+            String userId = user.optString(Keys.OBJECT_ID);
+            String msg = "";
 
-        try {
-            Query cloudQuery = new Query()
-                    .setFilter(CompositeFilterOperator.and(
-                            new PropertyFilter("userId", FilterOperator.EQUAL, userId),
-                            new PropertyFilter("gameId", FilterOperator.EQUAL, "sys-custom-message")
-                    ));
-            JSONObject result = cloudRepository.getFirst(cloudQuery);
-            String data = result.optString("data");
-            if (data.contains("&&&")) {
-                if (type == 1) {
-                    msg = data.split("&&&")[0];
-                } else if (type == 0) {
-                    msg = data.split("&&&")[1];
+            try {
+                Query cloudQuery = new Query()
+                        .setFilter(CompositeFilterOperator.and(
+                                new PropertyFilter("userId", FilterOperator.EQUAL, userId),
+                                new PropertyFilter("gameId", FilterOperator.EQUAL, "sys-custom-message")
+                        ));
+                JSONObject result = cloudRepository.getFirst(cloudQuery);
+                String data = result.optString("data");
+                if (data.contains("&&&")) {
+                    if (type == 1) {
+                        msg = data.split("&&&")[0];
+                    } else if (type == 0) {
+                        msg = data.split("&&&")[1];
+                    }
+                } else {
+                    msg = "";
                 }
-            } else {
-                /*if (type == 1) {
-                    msg = "<b>{userName}</b> has joined the pi";
-                } else if (type == 0) {
-                    msg = "<b>{userName}</b> has left the pi";
-                }*/
+            } catch (Exception e) {
                 msg = "";
             }
-        } catch (Exception e) {
-            /*if (type == 1) {
-                msg = "<b>{userName}</b> has joined the pi";
-            } else if (type == 0) {
-                msg = "<b>{userName}</b> has left the pi";
-            }*/
-            msg = "";
-        }
 
-        msg = msg.replaceAll("\\{userName}", user.optString(User.USER_NAME));
-        msg = msg.replaceAll("\\{userNickName}", user.optString(UserExt.USER_NICKNAME));
-        msg = msg.replaceAll("\\{userPoint}", user.optString(UserExt.USER_POINT));
-        return msg;
+            if (!msg.isEmpty()) {
+                msg = msg.replaceAll("\\{userName}", user.optString(User.USER_NAME));
+                msg = msg.replaceAll("\\{userNickName}", user.optString(UserExt.USER_NICKNAME));
+                msg = msg.replaceAll("\\{userPoint}", user.optString(UserExt.USER_POINT));
+            }
+            return msg;
+        } else {
+            return "";
+        }
     }
 
     public static boolean removeCustomMessage(String userName) {
