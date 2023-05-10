@@ -375,8 +375,8 @@ public class ChatroomProcessor {
 
             if ("heartbeat".equals(redPacket.getString("type")) || "rockPaperScissors".equals(redPacket.getString("type"))) {
                 // 如果要抢石头剪刀布红包，先看账户余额是否大于平均数
-                if (currentUser.optInt(UserExt.USER_POINT) < calcRedpacketMax()) {
-                    context.renderJSON(StatusCodes.ERR).renderMsg("抢红包失败！你的账户余额低于 " + calcRedpacketMax() + " 积分，不能抢心跳红包和猜拳红包。(积分下限算法：社区用户积分平均数)");
+                if (currentUser.optInt(UserExt.USER_POINT) < redPacket.optInt("money")) {
+                    context.renderJSON(StatusCodes.ERR).renderMsg("抢红包失败！你的账户余额低于该红包金额。");
                     return;
                 }
             }
