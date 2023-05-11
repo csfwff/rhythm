@@ -470,7 +470,6 @@ public class ActivityMgmtService {
         }
         final String msg = succ ? langPropsService.get("activityBetSuccLabel") : langPropsService.get("activityBetFailLabel");
         ret.put(Keys.MSG, msg);
-        livenessMgmtService.incLiveness(userId, Liveness.LIVENESS_ACTIVITY);
         return ret;
     }
 
@@ -576,12 +575,6 @@ public class ActivityMgmtService {
 
         boolean succ = null != pointtransferMgmtService.transfer(Pointtransfer.ID_C_SYS, userId,
                 Pointtransfer.TRANSFER_TYPE_C_ACTIVITY_YESTERDAY_LIVENESS_REWARD, sum, userId, System.currentTimeMillis(), "");
-        if (!succ) {
-            return;
-        }
-
-        // Today liveness (activity)
-        livenessMgmtService.incLiveness(userId, Liveness.LIVENESS_ACTIVITY);
     }
 
     /**
@@ -610,9 +603,6 @@ public class ActivityMgmtService {
         if (!succ) {
             return -1;
         }
-
-        // Today liveness (activity)
-        livenessMgmtService.incLiveness(userId, Liveness.LIVENESS_ACTIVITY);
 
         return sum;
     }
