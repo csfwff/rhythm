@@ -624,7 +624,7 @@ public class ChatroomProcessor {
      *
      * @param context the specified context
      */
-    final private static SimpleCurrentLimiter chatRoomLivenessLimiter = new SimpleCurrentLimiter(10 * 60, 10);
+    final private static SimpleCurrentLimiter chatRoomLivenessLimiter = new SimpleCurrentLimiter(60, 1);
     final private static SimpleCurrentLimiter risksControlMessageLimiter = new SimpleCurrentLimiter(15 * 60, 1);
     final private static SimpleCurrentLimiter openRedPacketLimiter = new SimpleCurrentLimiter(30 * 60, 1);
     /**
