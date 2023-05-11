@@ -111,7 +111,10 @@ public final class Liveness {
         if (article > 1) {
             article = 1;
         }
-        final int comment = liveness.optInt(Liveness.LIVENESS_COMMENT);
+        int comment = liveness.optInt(Liveness.LIVENESS_COMMENT);
+        if (comment > 5) {
+            comment = 5;
+        }
         int pv = liveness.optInt(Liveness.LIVENESS_PV);
         if (pv > 20) {
             pv = 20;
@@ -122,7 +125,10 @@ public final class Liveness {
         if (vote > 2) {
             vote = 2;
         }
-        final int acceptAnswer = liveness.optInt(Liveness.LIVENESS_ACCEPT_ANSWER);
+        int acceptAnswer = liveness.optInt(Liveness.LIVENESS_ACCEPT_ANSWER);
+        if (acceptAnswer > 1) {
+            acceptAnswer = 1;
+        }
 
         final int activityPoint = (int) (activity * activityPer);
         final int articlePoint = (int) (article * articlePer);
