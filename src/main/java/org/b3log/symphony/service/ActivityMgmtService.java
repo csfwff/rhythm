@@ -149,7 +149,6 @@ public class ActivityMgmtService {
         }
         final String msg = succ ? "started" : langPropsService.get("activityStartEatingSnakeFailLabel");
         ret.put(Keys.MSG, msg);
-        livenessMgmtService.incLiveness(userId, Liveness.LIVENESS_ACTIVITY);
         return ret;
     }
 
@@ -624,7 +623,6 @@ public class ActivityMgmtService {
         }
         final String msg = succ ? "started" : langPropsService.get("activityStartGobangFailLabel");
         ret.put(Keys.MSG, msg);
-        livenessMgmtService.incLiveness(userId, Liveness.LIVENESS_ACTIVITY);
         return ret;
     }
 

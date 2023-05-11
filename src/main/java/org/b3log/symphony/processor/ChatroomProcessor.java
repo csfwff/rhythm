@@ -1011,7 +1011,7 @@ public class ChatroomProcessor {
                 if (risksControlMessageLimiter.access(userId)) {
                     try {
                         if (chatRoomLivenessLimiter.access(userId)) {
-                            livenessMgmtService.incLiveness(userId, Liveness.LIVENESS_COMMENT);
+                            livenessMgmtService.incLiveness(userId, Liveness.LIVENESS_ACTIVITY);
                         }
                     } catch (Exception ignored) {
                     }
@@ -1019,7 +1019,7 @@ public class ChatroomProcessor {
             } else {
                 try {
                     if (chatRoomLivenessLimiter.access(userId)) {
-                        livenessMgmtService.incLiveness(userId, Liveness.LIVENESS_COMMENT);
+                        livenessMgmtService.incLiveness(userId, Liveness.LIVENESS_ACTIVITY);
                     }
                 } catch (Exception ignored) {
                 }
