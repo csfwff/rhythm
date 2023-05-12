@@ -242,7 +242,7 @@ public class SettingsProcessor {
         Dispatcher.post("/invitecode/state", settingsProcessor::queryInvitecode, loginCheck::handle, csrfMidware::check);
         Dispatcher.post("/point/buy-invitecode", settingsProcessor::pointBuy, loginCheck::handle, csrfMidware::check);
         Dispatcher.post("/export/posts", settingsProcessor::exportPosts, loginCheck::handle);
-        Dispatcher.post("/point/transfer", settingsProcessor::pointTransfer, loginCheck::handle, csrfMidware::check, pointTransferValidationMidware::handle);
+        Dispatcher.post("/point/transfer", settingsProcessor::pointTransfer, loginCheck::handle, pointTransferValidationMidware::handle);
         Dispatcher.get("/bag/1dayCheckin", settingsProcessor::use1dayCheckinCard, loginCheck::handle, csrfMidware::check);
         Dispatcher.get("/bag/2dayCheckin", settingsProcessor::use2dayCheckinCard, loginCheck::handle, csrfMidware::check);
         Dispatcher.get("/bag/patchCheckin", settingsProcessor::usePatchCheckinCard, loginCheck::handle, csrfMidware::check);
@@ -1114,7 +1114,11 @@ public class SettingsProcessor {
 
         final int amount = requestJSONObject.optInt(Common.AMOUNT);
         final JSONObject toUser = (JSONObject) context.attr(Common.TO_USER);
-        final JSONObject currentUser = Sessions.getUser();
+        JSONObject currentUser = Sessions.getUser();
+        try {
+            currentUser = ApiProcessor.getUserByKey(requestJSONObject.optString("apiKey"));
+        } catch (NullPointerException ignored) {
+        }
         String memo = (String) context.attr(Pointtransfer.MEMO);
         if (StringUtils.isBlank(memo)) {
             memo = "";
