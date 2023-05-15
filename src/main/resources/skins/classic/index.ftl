@@ -588,11 +588,13 @@
         $("#chatUsernameSelectedPanel").hide();
     }
 
+    var thisClient = 'Web/PC网页端 主页精简版';
     function sendChat() {
         <#if isLoggedIn>
         var content = $("#chatRoomInput").val();
         var requestJSONObject = {
             content: content,
+            client: thisClient
         };
         $.ajax({
             url: Label.servePath + '/chat-room/send',

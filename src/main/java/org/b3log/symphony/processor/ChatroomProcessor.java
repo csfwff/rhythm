@@ -640,7 +640,7 @@ public class ChatroomProcessor {
             String source = "";
             try {
                 String client = clientMark.split("/")[0];
-                String version = clientMark.split("/")[1].replaceAll("[^0-9a-zA-Z\\u4e00-\\u9fa5.-]", "");
+                String version = clientMark.split("/")[1].replaceAll("[^0-9a-zA-Z\\u4e00-\\u9fa5.\\s\\-]", "");
                 if (version.length() > 32) {
                     version = version.substring(0, 31);
                 }
