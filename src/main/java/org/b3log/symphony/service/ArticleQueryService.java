@@ -1248,6 +1248,8 @@ public class ArticleQueryService {
     private static List<JSONObject> hotArticlesCache = new ArrayList<>();
     public void refreshHotArticlesCache() {
         try {
+            final long thirtyDaysAgo = DateUtils.addDays(new Date(), -30).getTime();
+            System.out.println(thirtyDaysAgo);
             List<JSONObject> ret = articleRepository.select("" +
                     "SELECT " +
                     "    *, " +
@@ -1255,10 +1257,10 @@ public class ArticleQueryService {
                     "FROM " +
                     "    symphony_article " +
                     "WHERE " +
-                    "    articleStatus <> 1 AND articleType <> 1 AND articleShowInList <> 0 " +
+                    "    articleLatestCmtTime > " + thirtyDaysAgo + " AND articleStatus <> 1 AND articleType <> 1 AND articleShowInList <> 0 " +
                     "ORDER BY " +
                     "    total_score DESC " +
-                    "limit 200");
+                    "limit 100");
             ret.sort((o1, o2) -> {
                 long o1Time = o1.optLong(Article.ARTICLE_UPDATE_TIME);
                 long o2Time = o2.optLong(Article.ARTICLE_UPDATE_TIME);
@@ -1271,7 +1273,6 @@ public class ArticleQueryService {
                 }
             });
             organizeArticles(ret);
-            Collections.shuffle(ret);
             hotArticlesCache = ret;
             LOGGER.log(Level.INFO, "Refreshed hot articles cache.");
         } catch (Exception e) {
