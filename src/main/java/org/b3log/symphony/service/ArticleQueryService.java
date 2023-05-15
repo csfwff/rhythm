@@ -1249,7 +1249,6 @@ public class ArticleQueryService {
     public void refreshHotArticlesCache() {
         try {
             final long thirtyDaysAgo = DateUtils.addDays(new Date(), -30).getTime();
-            System.out.println(thirtyDaysAgo);
             List<JSONObject> ret = articleRepository.select("" +
                     "SELECT " +
                     "    *, " +
@@ -1273,6 +1272,7 @@ public class ArticleQueryService {
                 }
             });
             organizeArticles(ret);
+            Collections.shuffle(ret);
             hotArticlesCache = ret;
             LOGGER.log(Level.INFO, "Refreshed hot articles cache.");
         } catch (Exception e) {
