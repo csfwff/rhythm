@@ -471,11 +471,6 @@ public class UserProcessor {
                 try {
                     int point = requestJSONObject.optInt("point");
                     String memo = requestJSONObject.optString("memo");
-                    if (point > 100000 || point < -100000) {
-                        context.renderJSON(StatusCodes.ERR);
-                        context.renderMsg("转账失败：交易数额不得大于 100000 积分。");
-                        return;
-                    }
                     if (memo.isEmpty()) {
                         context.renderJSON(StatusCodes.ERR);
                         context.renderMsg("转账失败：交易备注不得为空。");
