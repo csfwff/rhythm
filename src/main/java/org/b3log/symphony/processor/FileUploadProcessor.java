@@ -185,11 +185,19 @@ public class FileUploadProcessor {
         boolean checkFailed = false;
         String suffix = "";
         final String[] allowedSuffixArray = Symphonys.UPLOAD_SUFFIX.split(",");
+        final String[] staticPictureSuffixArray = {"jpg", "jpeg", "png"};
+        final String[] animatePictureSuffixArray = {"gif"};
+        final String[] audioSuffixArray = {"mp3"};
+        final String[] videoSuffixArray = {"mp4"};
         for (final FileUpload file : allFiles) {
             suffix = Headers.getSuffix(file);
             if (!Strings.containsIgnoreCase(suffix, allowedSuffixArray)) {
                 checkFailed = true;
                 break;
+            }
+
+            if (Strings.contains(suffix, staticPictureSuffixArray)) {
+                System.out.println(file.getFilename());
             }
 
             if (maxSize < file.getData().length) {
