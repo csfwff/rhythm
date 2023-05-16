@@ -257,12 +257,12 @@ public class FileUploadProcessor {
 
             if (Strings.contains(suffix, audioSuffixArray)) {
                 // 音频处理
-                LOGGER.log(Level.INFO, "Compressed " + file.getFilename() + " as an audio, before: " + before / 1024 + "KB, after: " + bytes.length / 1024 + "KB");
+                // LOGGER.log(Level.INFO, "Compressed " + file.getFilename() + " as an audio, before: " + before / 1024 + "KB, after: " + bytes.length / 1024 + "KB");
             }
 
             if (Strings.contains(suffix, videoSuffixArray)) {
                 // 视频处理
-                LOGGER.log(Level.INFO, "Compressed " + file.getFilename() + " as a video, before: " + before / 1024 + "KB, after: " + bytes.length / 1024 + "KB");
+                // LOGGER.log(Level.INFO, "Compressed " + file.getFilename() + " as a video, before: " + before / 1024 + "KB, after: " + bytes.length / 1024 + "KB");
             }
             fileBytes.add(bytes);
         }
