@@ -289,6 +289,12 @@
             <artifactId>thumbnailator</artifactId>
             <version>0.4.19</version>
         </dependency>
+
+        <dependency>
+            <groupId>org.jpedal</groupId>
+            <artifactId>OpenViewerFX</artifactId>
+            <version>6.6.14</version>
+        </dependency>
     </dependencies>
 
     <build>
