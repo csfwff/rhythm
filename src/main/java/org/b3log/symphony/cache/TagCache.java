@@ -71,7 +71,7 @@ public class TagCache {
     private static final Map<String, String> TITLE_URIS = Collections.synchronizedMap(new LinkedHashMap<String, String>() {
         @Override
         protected boolean removeEldestEntry(Map.Entry eldest) {
-            return size() > 100;
+            return size() > 1000;
         }
     });
 
@@ -81,7 +81,7 @@ public class TagCache {
     private static final Map<String, JSONObject> CACHE = Collections.synchronizedMap(new LinkedHashMap<String, JSONObject>() {
         @Override
         protected boolean removeEldestEntry(Map.Entry eldest) {
-            return size() > 100;
+            return size() > 1000;
         }
     });
 

@@ -39,6 +39,7 @@ import org.b3log.symphony.repository.ChatInfoRepository;
 import org.b3log.symphony.repository.ChatUnreadRepository;
 import org.b3log.symphony.service.OptionQueryService;
 import org.b3log.symphony.service.UserQueryService;
+import org.b3log.symphony.util.ReservedWords;
 import org.b3log.symphony.util.Strings;
 import org.json.JSONObject;
 
@@ -166,18 +167,12 @@ public class ChatChannel implements WebSocketChannel {
         }
         String chatHex = Strings.uniqueId(new String[]{fromId, toId});
         String time = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date());
+        message.text = ReservedWords.processReservedWord(message.text);
         String content = message.text;
         content = StringUtils.trim(content);
         if (StringUtils.isBlank(content) || content.length() > 1024) {
             result.put("code", -1);
             result.put("msg", "内容为空或大于1024个字，发送失败");
-            message.session.sendText(result.toString());
-            return;
-        }
-
-        if (optionQueryService.containReservedWord(content)) {
-            result.put("code", -1);
-            result.put("msg", "内容包含敏感词，发送失败");
             message.session.sendText(result.toString());
             return;
         }

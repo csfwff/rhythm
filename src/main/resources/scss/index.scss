@@ -30,8 +30,8 @@
   --background-color: #fff;
   --background-secondary-color: #f6f8fa;
   --text-color: #000;
-  --text-gray-color: rgba(0, 0, 0, 0.54);
-  --text-fade-color: rgba(0, 0, 0, 0.38);
+  --text-gray-color: #787777;
+  --text-fade-color: #878787;
   --layer-color: #616161;
   --layer-background-color: #fff;
   --layer-border-color: #eee;
@@ -1675,14 +1675,14 @@ code .dec {
   font-size: 12px;
   line-height: 18px;
   text-align: center;
-  color: rgba(0, 0, 0, 0.38);
+  color: #8b8b8b;
   margin-right: 15px;
   float: left;
 }
 
 .article__view {
   line-height: 16px;
-  color: rgba(0, 0, 0, 0.38);
+  color: #8b8b8b;
   margin: 15px 0 15px 5px;
   text-align: right;
   border-top: 1px solid #eee;
@@ -1841,6 +1841,11 @@ code .dec {
   font-size: 12px;
 }
 
+.chats__content .ft__smaller {
+  font-weight: 500;
+  font-size: 13px;
+}
+
 .article__participant {
   float: left;
   cursor: pointer;
@@ -1989,10 +1994,6 @@ code .dec {
 
 .ft__fade {
   color: var(--text-fade-color);
-}
-
-.ft__smaller {
-  font-size: 12px;
 }
 
 .fn__right {
@@ -2487,7 +2488,7 @@ code .dec {
   background-color: var(--layer-background-color);
   color: var(--layer-color);
   cursor: pointer;
-  padding: 5px;
+  padding: 7px;
   border-radius: 3px;
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
   margin: 3px 5px 8px 3px;
@@ -2498,9 +2499,9 @@ code .dec {
 }
 
 .hongbao__icon {
-  height: 34px !important;
-  width: 34px !important;
-  margin-right: 5px;
+  height: 50px !important;
+  width: 50px !important;
+  margin-right: 7px;
 }
 
 .hongbao__count {

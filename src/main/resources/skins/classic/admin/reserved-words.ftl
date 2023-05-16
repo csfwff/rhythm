@@ -28,12 +28,38 @@
             <button type="button" class="btn red" onclick="window.location = '${servePath}/admin/add-reserved-word'">${allReservedWordLabel}</button>
         </div>
         </#if>
+        <script>
+            function removeReservedWord(word) {
+                $.ajax({
+                    url: Label.servePath + '/admin/remove-reserved-word',
+                    type: 'POST',
+                    data: {
+                        id: word
+                    },
+                    success: function (data) {
+                        try {
+                            $("#" + word)
+                        } catch (e) {
+                            location.reload();
+                        }
+                        let div = $("#" + word);
+                        if (div.length > 0) {
+                            div.remove();
+                        } else {
+                            location.reload();
+                        }
+                    },
+                    error: function (err) {
+                    }
+                })
+            }
+        </script>
         <ul>
             <#list words as item>
-            <li>
+            <li id="${item.oId}">
                 <div class="fn-clear">
                     ${item.optionValue}
-                    <a href="${servePath}/admin/reserved-word/${item.oId}" class="fn-right tooltipped tooltipped-w ft-a-title" aria-label="${editLabel}"><svg><use xlink:href="#edit"></use></svg></a>
+                    <a href="javascript:void(0);" onclick="removeReservedWord('${item.oId}')" class="fn-right tooltipped tooltipped-w ft-a-title" aria-label="${removeLabel}"><svg><use xlink:href="#remove"></use></svg></a>
                 </div>
             </li>
             </#list>

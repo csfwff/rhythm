@@ -88,9 +88,11 @@
         <label>手机号</label>
         <input id="phoneInput" type="text" value="${currentUser.userPhone}" />
 
+        <button style="margin-top: 10px" onclick="$('#change-phone-form').removeClass('fn-none');$('#change-phone-form img').click();$(this).remove()">修改绑定手机</button>
+        <span id="change-phone-form" class="fn-none">
         <div class="home-account__captch" id="phone_captch">
             <label>${imageCaptchaLabel}</label>
-            <img class="fn-pointer" height="20px" src="${servePath}/captcha?v=01" onclick="this.src = '${servePath}/captcha?' + (new Date()).getTime()" />
+            <img class="fn-pointer" height="20px" src="data:" onclick="this.src = '${servePath}/captcha?' + (new Date()).getTime()" />
             <input id="phoneVerify" type="text" />
         </div>
         <div class="fn-none" id="phoneCodePanel">
@@ -103,6 +105,7 @@
         <button id="phoneGetBtn"
                 class="fn-right"
                 onclick="Settings.getPhoneCaptcha('${csrfToken}')">获取短信验证码</button>
+        </span>
     </div>
 
     <div class="module-header" id="bind-email">
@@ -112,9 +115,11 @@
         <label>${emailLabel}</label>
         <input id="emailInput" type="text" value="<#if !currentUser.userEmail?ends_with("sym.b3log.org")>${currentUser.userEmail}</#if>" />
 
+        <button style="margin-top: 10px" onclick="$('#change-email-form').removeClass('fn-none');$('#change-email-form img').click();$(this).remove()">修改绑定邮箱</button>
+        <span id="change-email-form" class="fn-none">
         <div class="home-account__captch" id="email_captch">
             <label>${imageCaptchaLabel}</label>
-            <img class="fn-pointer" height="20px" src="${servePath}/captcha?v=02" onclick="this.src = '${servePath}/captcha?' + (new Date()).getTime()" />
+            <img class="fn-pointer" height="20px" src="data:" onclick="this.src = '${servePath}/captcha?' + (new Date()).getTime()" />
             <input id="emailVerify" type="text" />
         </div>
         <div class="fn-none" id="emailCodePanel">
@@ -127,6 +132,7 @@
         <button id="emailGetBtn"
                 class="fn-right"
                 onclick="Settings.getEmailCaptcha('${csrfToken}')">${getEmailCaptchaLabel}</button>
+        </span>
     </div>
 </div>
 

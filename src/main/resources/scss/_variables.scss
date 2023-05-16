@@ -48,14 +48,46 @@ $blue-lighter: #f1f7fe !default;
 $red: #d23f31 !default;
 $red-light: #ffdce0 !default;
 $green: #569e3d !default;
-$fade: rgba(0, 0, 0, .38)!default;
-$gray: rgba(0, 0, 0, .54) !default;
+$fade: #878787!default;
+$gray: #787777 !default;
 $black: #3b3e43 !default;
-$black-text: rgba(0, 0, 0, .87) !default;
+$black-text: #2c2c2c !default;
 $black-light: #616161 !default;
 
+@font-face {
+  font-family: HarmonyOS;
+  src: url(//resource.hellofont.cn/font/HarmonyOS_SansSC_Regular-J.woff2) format('woff2'),url(//resource.hellofont.cn/font/HarmonyOS_SansSC_Regular-J.woff) format('woff');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap
+}
+
+@font-face {
+  font-family: HarmonyOS;
+  src: url(//resource.hellofont.cn/font/HarmonyOS_SansSC_Medium-J.woff2) format('woff2'),url(//resource.hellofont.cn/font/HarmonyOS_SansSC_Medium-J.woff) format('woff');
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap
+}
+
+@font-face {
+  font-family: HarmonyOS;
+  src: url(//resource.hellofont.cn/font/HarmonyOS_SansSC_Bold-J.woff2) format('woff2'),url(//resource.hellofont.cn/font/HarmonyOS_SansSC_Bold-J.woff) format('woff');
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap
+}
+
+@font-face {
+  font-family: HarmonyOS;
+  src: url(//resource.hellofont.cn/font/HarmonyOS_SansSC_Black-J.woff2) format('woff2'),url(//resource.hellofont.cn/font/HarmonyOS_SansSC_Black-J.woff) format('woff');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap
+}
+
 // Fonts
-$font-family-base: "Helvetica Neue", "Luxi Sans", "DejaVu Sans", Tahoma, "Hiragino Sans GB", "Microsoft Yahei", sans-serif !default;
+$font-family-base: "HarmonyOS", "Helvetica Neue", "Luxi Sans", "DejaVu Sans", Tahoma, "Hiragino Sans GB", "Microsoft Yahei", sans-serif !default;
 $font-family-code: mononoki, Consolas, "Liberation Mono", Menlo, Courier, monospace !default;
 
 // shadow

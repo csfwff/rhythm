@@ -40,9 +40,11 @@ import org.b3log.symphony.model.UserExt;
 import org.b3log.symphony.processor.Router;
 import org.b3log.symphony.processor.channel.UserChannel;
 import org.b3log.symphony.repository.UserRepository;
+import org.b3log.symphony.service.ArticleQueryService;
 import org.b3log.symphony.service.CronMgmtService;
 import org.b3log.symphony.service.InitMgmtService;
 import org.b3log.symphony.util.Markdowns;
+import org.b3log.symphony.util.ReservedWords;
 import org.b3log.symphony.util.Symphonys;
 import org.json.JSONObject;
 
@@ -254,7 +256,7 @@ public final class Server extends BaseServer {
                 }
             }
             transaction.commit();
-            System.out.println("Users online status has been reset successfully.");
+            LOGGER.log(Level.INFO, "Users online status has been reset successfully.");
         } catch (Exception e) {
             if (transaction.isActive()) {
                 transaction.rollback();
@@ -262,6 +264,11 @@ public final class Server extends BaseServer {
 
             LOGGER.log(Level.ERROR, "Cannot offline all users forced", e);
         }
+
+        ReservedWords.init();
+
+        final ArticleQueryService articleQueryService = beanManager.getReference(ArticleQueryService.class);
+        articleQueryService.refreshHotArticlesCache();
 
         LOGGER.log(Level.INFO, "Everything is ready, Thank you for using Rhythm!");
 

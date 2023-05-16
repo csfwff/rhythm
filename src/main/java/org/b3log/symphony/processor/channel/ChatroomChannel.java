@@ -18,22 +18,30 @@
  */
 package org.b3log.symphony.processor.channel;
 
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.b3log.latke.Keys;
 import org.b3log.latke.Latkes;
 import org.b3log.latke.http.WebSocketChannel;
 import org.b3log.latke.http.WebSocketSession;
 import org.b3log.latke.ioc.BeanManager;
-import org.b3log.latke.ioc.Inject;
 import org.b3log.latke.ioc.Singleton;
 import org.b3log.latke.model.User;
+import org.b3log.latke.repository.*;
 import org.b3log.symphony.model.Common;
 import org.b3log.symphony.model.UserExt;
 import org.b3log.symphony.processor.ApiProcessor;
+import org.b3log.symphony.repository.CloudRepository;
 import org.b3log.symphony.service.AvatarQueryService;
+import org.b3log.symphony.service.UserQueryService;
 import org.json.JSONArray;
 import org.json.JSONObject;
+import pers.adlered.simplecurrentlimiter.main.SimpleCurrentLimiter;
 
+import java.text.SimpleDateFormat;
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.*;
 
 /**
  * Chatroom channel.
@@ -44,6 +52,11 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 @Singleton
 public class ChatroomChannel implements WebSocketChannel {
+
+    /**
+     * Logger.
+     */
+    private static final Logger LOGGER = LogManager.getLogger(ChatroomChannel.class);
 
     /**
      * Session set.
@@ -60,6 +73,8 @@ public class ChatroomChannel implements WebSocketChannel {
      */
     public static String discussing = "暂无";
 
+    public static final Map<String, Long> userActive = Collections.synchronizedMap(new HashMap<>());
+
     /**
      * Called when the socket connection with the browser is established.
      *
@@ -74,14 +89,141 @@ public class ChatroomChannel implements WebSocketChannel {
         }
         if (null != userStr) {
             final JSONObject user = new JSONObject(userStr);
+            String userName = user.optString(User.USER_NAME);
+            boolean joined = true;
+            for (Map.Entry<WebSocketSession, JSONObject> entry : onlineUsers.entrySet()) {
+                String name = entry.getValue().optString(User.USER_NAME);
+                if (userName.equals(name)) {
+                    joined = false;
+                }
+            }
+            if (joined) {
+                String msg = getCustomMessage(1, userName);
+                if (!msg.isEmpty()) {
+                    sendCustomMessage(msg);
+                }
+            }
             onlineUsers.put(session, user);
             SESSIONS.add(session);
             // 单独发送在线信息
             final String msgStr = getOnline().toString();
             session.sendText(msgStr);
+            // 保存 Active 信息
+            userActive.put(user.optString("userName"), System.currentTimeMillis());
         } else {
             session.close();
         }
+    }
+
+    private static SimpleCurrentLimiter customMessageCurrentLimit = new SimpleCurrentLimiter(60, 6);
+    public static String getCustomMessage(int type, String userName) {
+        if (customMessageCurrentLimit.access(userName)) {
+            final BeanManager beanManager = BeanManager.getInstance();
+            UserQueryService userQueryService = beanManager.getReference(UserQueryService.class);
+            CloudRepository cloudRepository = beanManager.getReference(CloudRepository.class);
+            JSONObject user = userQueryService.getUserByName(userName);
+            String userId = user.optString(Keys.OBJECT_ID);
+            String msg = "";
+
+            try {
+                Query cloudQuery = new Query()
+                        .setFilter(CompositeFilterOperator.and(
+                                new PropertyFilter("userId", FilterOperator.EQUAL, userId),
+                                new PropertyFilter("gameId", FilterOperator.EQUAL, "sys-custom-message")
+                        ));
+                JSONObject result = cloudRepository.getFirst(cloudQuery);
+                String data = result.optString("data");
+                if (data.contains("&&&")) {
+                    if (type == 1) {
+                        msg = data.split("&&&")[0];
+                    } else if (type == 0) {
+                        msg = data.split("&&&")[1];
+                    }
+                } else {
+                    msg = "";
+                }
+            } catch (Exception e) {
+                msg = "";
+            }
+
+            if (!msg.isEmpty()) {
+                msg = msg.replaceAll("\\{userName}", user.optString(User.USER_NAME));
+                msg = msg.replaceAll("\\{userNickName}", user.optString(UserExt.USER_NICKNAME));
+                msg = msg.replaceAll("\\{userPoint}", user.optString(UserExt.USER_POINT));
+            }
+            return msg;
+        } else {
+            return "";
+        }
+    }
+
+    public static boolean removeCustomMessage(String userName) {
+        final BeanManager beanManager = BeanManager.getInstance();
+        UserQueryService userQueryService = beanManager.getReference(UserQueryService.class);
+        CloudRepository cloudRepository = beanManager.getReference(CloudRepository.class);
+        String userId = userQueryService.getUserByName(userName).optString(Keys.OBJECT_ID);
+
+        try {
+            final Transaction transaction = cloudRepository.beginTransaction();
+            Query cloudDeleteQuery = new Query()
+                    .setFilter(CompositeFilterOperator.and(
+                            new PropertyFilter("userId", FilterOperator.EQUAL, userId),
+                            new PropertyFilter("gameId", FilterOperator.EQUAL, "sys-custom-message")
+                    ));
+            cloudRepository.remove(cloudDeleteQuery);
+            transaction.commit();
+
+            return true;
+        } catch (RepositoryException e) {
+            return false;
+        }
+    }
+
+    public static boolean addCustomMessage(String userName, String message) {
+        final BeanManager beanManager = BeanManager.getInstance();
+        UserQueryService userQueryService = beanManager.getReference(UserQueryService.class);
+        CloudRepository cloudRepository = beanManager.getReference(CloudRepository.class);
+        String userId = userQueryService.getUserByName(userName).optString(Keys.OBJECT_ID);
+
+        try {
+            final Transaction transaction = cloudRepository.beginTransaction();
+            Query cloudDeleteQuery = new Query()
+                    .setFilter(CompositeFilterOperator.and(
+                            new PropertyFilter("userId", FilterOperator.EQUAL, userId),
+                            new PropertyFilter("gameId", FilterOperator.EQUAL, "sys-custom-message")
+                    ));
+            cloudRepository.remove(cloudDeleteQuery);
+            JSONObject cloudJSON = new JSONObject();
+            cloudJSON.put("userId", userId)
+                    .put("gameId", "sys-custom-message")
+                    .put("data", message);
+            cloudRepository.add(cloudJSON);
+            transaction.commit();
+
+            return true;
+        } catch (RepositoryException e) {
+            return false;
+        }
+    }
+
+    public static void sendCustomMessage(String msg) {
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put(Common.TYPE, "customMessage");
+        jsonObject.put("message", msg);
+        String message = jsonObject.toString();
+        new Thread(() -> {
+            int i = 0;
+            for (WebSocketSession s : ChatroomChannel.SESSIONS) {
+                i++;
+                if (i % 50 == 0) {
+                    try {
+                        Thread.sleep(100);
+                    } catch (Exception ignored) {
+                    }
+                }
+                s.sendText(message);
+            }
+        }).start();
     }
 
     /**
@@ -123,9 +265,19 @@ public class ChatroomChannel implements WebSocketChannel {
      *                }
      */
     public static int notQuickCheck = 50;
-    public static int notQuickSleep = 200;
+    public static int notQuickSleep = 100;
     public static int quickCheck = 100;
-    public static int quickSleep = 200;
+    public static int quickSleep = 100;
+
+    //用于消息发送的线程池
+    private static final ThreadPoolExecutor MESSAGE_POOL = new ThreadPoolExecutor(
+            4,
+            4,
+            120L,
+            TimeUnit.SECONDS,
+            new LinkedBlockingQueue<>()
+            );
+
     public static void notifyChat(final JSONObject message) {
         final BeanManager beanManager = BeanManager.getInstance();
         final AvatarQueryService avatarQueryService = beanManager.getReference(AvatarQueryService.class);
@@ -159,32 +311,34 @@ public class ChatroomChannel implements WebSocketChannel {
                 session.sendText(msgStr);
             }
         }
-        int i = 0;
-        for (WebSocketSession session : SESSIONS) {
-            try {
-                i++;
-                if (!quick && i % notQuickCheck == 0) {
-                    try {
-                        Thread.sleep(notQuickSleep);
-                    } catch (Exception ignored) {
+        MESSAGE_POOL.submit(() -> {
+            int i = 0;
+            for (WebSocketSession session : SESSIONS) {
+                try {
+                    i++;
+                    if (!quick && i % notQuickCheck == 0) {
+                        try {
+                            Thread.sleep(notQuickSleep);
+                        } catch (Exception ignored) {
+                        }
+                    } else if (quick && i % quickCheck == 0) {
+                        try {
+                            Thread.sleep(quickSleep);
+                        } catch (Exception ignored) {
+                        }
                     }
-                } else if (quick && i % quickCheck == 0) {
-                    try {
-                        Thread.sleep(quickSleep);
-                    } catch (Exception ignored) {
-                    }
-                }
-                if (!quick) {
-                    String toUser = onlineUsers.get(session).optString(User.USER_NAME);
-                    if (!sender.equals(toUser)) {
+                    if (!quick) {
+                        String toUser = onlineUsers.get(session).optString(User.USER_NAME);
+                        if (!sender.equals(toUser)) {
+                            session.sendText(msgStr);
+                        }
+                    } else {
                         session.sendText(msgStr);
                     }
-                } else {
-                    session.sendText(msgStr);
+                } catch (Exception ignored) {
                 }
-            } catch (Exception ignored) {
             }
-        }
+        });
     }
 
     /**
@@ -193,14 +347,87 @@ public class ChatroomChannel implements WebSocketChannel {
      * @param session the specified session
      */
     public static synchronized void removeSession(final WebSocketSession session) {
+        String userName = "";
         try {
+            JSONObject user = onlineUsers.get(session);
+            userName = user.optString(User.USER_NAME);
             onlineUsers.remove(session);
+            boolean left = true;
+            for (Map.Entry<WebSocketSession, JSONObject> entry : onlineUsers.entrySet()) {
+                String name = entry.getValue().optString(User.USER_NAME);
+                if (userName.equals(name)) {
+                    left = false;
+                }
+            }
+            if (left) {
+                String msg = getCustomMessage(0, userName);
+                if (!msg.isEmpty()) {
+                    sendCustomMessage(msg);
+                }
+            }
         } catch (NullPointerException ignored) {
         } catch (Exception e) {
             e.printStackTrace();
         }
 
         SESSIONS.remove(session);
+    }
+
+    public static Map<String, Long> check() {
+        Map<String, JSONObject> filteredOnlineUsers = new HashMap<>();
+        for (JSONObject object : onlineUsers.values()) {
+            String name = object.optString(User.USER_NAME);
+            filteredOnlineUsers.put(name, object);
+        }
+        Long currentTime = System.currentTimeMillis();
+        int sixHours = 1000 * 60 * 60 * 6;
+        Map<String, Long> needKickUsers = new HashMap<>();
+        List<String> users = new ArrayList<>();
+        for (String user : filteredOnlineUsers.keySet()) {
+            try {
+                Long activeTime = userActive.get(user);
+                Long spareTime = currentTime - activeTime;
+                if (spareTime >= sixHours) {
+                    needKickUsers.put(user, (spareTime / (1000 * 60 * 60)));
+                    users.add(user);
+                }
+            } catch (Exception ignored) {
+            }
+        }
+
+        new Thread(() -> {
+            List<WebSocketSession> senderSessions = new ArrayList<>();
+            for (Map.Entry<WebSocketSession, JSONObject> entry : onlineUsers.entrySet()) {
+                try {
+                    String tempUserName = entry.getValue().optString(User.USER_NAME);
+                    if (users.contains(tempUserName)) {
+                        senderSessions.add(entry.getKey());
+                    }
+                } catch (Exception e) {
+                    LOGGER.log(Level.ERROR, "Failed to log user entry", e);
+                }
+            }
+            for (WebSocketSession session : senderSessions) {
+                session.sendText("{\n" +
+                        "    \"md\": \"由于您超过6小时未活跃，已将您断开连接，如要继续聊天请刷新页面，谢谢 :)\",\n" +
+                        "    \"userAvatarURL\": \"https://pwl.stackoverflow.wiki/2022/01/robot3-89631199.png\",\n" +
+                        "    \"userAvatarURL20\": \"https://pwl.stackoverflow.wiki/2022/01/robot3-89631199.png\",\n" +
+                        "    \"userNickname\": \"人工智障\",\n" +
+                        "    \"sysMetal\": \"\",\n" +
+                        "    \"time\": \"" + new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(System.currentTimeMillis()) + "\",\n" +
+                        "    \"oId\": \"" + System.currentTimeMillis() + "\",\n" +
+                        "    \"userName\": \"摸鱼派官方巡逻机器人\",\n" +
+                        "    \"type\": \"msg\",\n" +
+                        "    \"userAvatarURL210\": \"https://pwl.stackoverflow.wiki/2022/01/robot3-89631199.png\",\n" +
+                        "    \"content\": \"<p>由于您超过6小时未活跃，已将您断开连接，如要继续聊天请刷新页面，谢谢 :)</p>\",\n" +
+                        "    \"client\": \"Other/Robot\",\n" +
+                        "    \"userAvatarURL48\": \"https://pwl.stackoverflow.wiki/2022/01/robot3-89631199.png\"\n" +
+                        "}");
+                removeSession(session);
+            }
+        }).start();
+
+        return needKickUsers;
     }
 
     /**
@@ -247,21 +474,25 @@ public class ChatroomChannel implements WebSocketChannel {
     }
 
     // 发送在线信息
+    private static boolean onlineMsgLock = false;
     public static void sendOnlineMsg() {
-        final String msgStr = getOnline().toString();
-        try {
-            int i = 0;
-            for (WebSocketSession s : SESSIONS) {
-                i++;
-                if (i % 10 == 0) {
-                    try {
-                        Thread.sleep(500);
-                    } catch (Exception ignored) {
+        if (!onlineMsgLock) {
+            onlineMsgLock = true;
+            final String msgStr = getOnline().toString();
+            new Thread(() -> {
+                int i = 0;
+                for (WebSocketSession s : SESSIONS) {
+                    i++;
+                    if (i % 1 == 0) {
+                        try {
+                            Thread.sleep(500);
+                        } catch (Exception ignored) {
+                        }
                     }
+                    s.sendText(msgStr);
                 }
-                s.sendText(msgStr);
-            }
-        } catch (Exception ignored) {
+                onlineMsgLock = false;
+            }).start();
         }
     }
 }

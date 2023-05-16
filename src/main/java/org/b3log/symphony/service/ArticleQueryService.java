@@ -1065,18 +1065,6 @@ public class ArticleQueryService {
     }
 
     /**
-     * Makes article showing filters.
-     *
-     * @return filter the article showing to user
-     */
-    private CompositeFilter makeArticleShowingFilter() {
-        final List<Filter> filters = new ArrayList<>();
-        filters.add(new PropertyFilter(Article.ARTICLE_STATUS, FilterOperator.NOT_EQUAL, Article.ARTICLE_STATUS_C_INVALID));
-        filters.add(new PropertyFilter(Article.ARTICLE_TYPE, FilterOperator.NOT_EQUAL, Article.ARTICLE_TYPE_C_DISCUSSION));
-        return new CompositeFilter(CompositeFilterOperator.AND, filters);
-    }
-
-    /**
      * Makes recent articles showing filter.
      *
      * @return filter the article showing to user
@@ -1105,22 +1093,6 @@ public class ArticleQueryService {
         filters.add(new PropertyFilter(Article.ARTICLE_SHOW_IN_LIST, FilterOperator.NOT_EQUAL, Article.ARTICLE_SHOW_IN_LIST_C_NOT));
 
         return new CompositeFilter(CompositeFilterOperator.AND, filters);
-    }
-
-    /**
-     * Makes the top articles with the specified fetch size.
-     *
-     * @param currentPageNum the specified current page number
-     * @param pageSize       the specified page size
-     * @return top articles query
-     */
-    private Query makeTopQuery(final int currentPageNum, final int pageSize) {
-        final Query query = new Query().
-                addSort(Article.REDDIT_SCORE, SortDirection.DESCENDING).
-                addSort(Article.ARTICLE_LATEST_CMT_TIME, SortDirection.DESCENDING).
-                setPageCount(1).setPage(currentPageNum, pageSize);
-        query.setFilter(makeArticleShowingFilter());
-        return query;
     }
 
     /**
@@ -1223,12 +1195,11 @@ public class ArticleQueryService {
      *
      * @return recent articles, returns an empty list if not found
      */
-    public List<JSONObject> getIndexRecentArticles() {
+    public List<JSONObject> getIndexRecentArticles(int fetchSize) {
         List<JSONObject> ret;
         try {
             Stopwatchs.start("Query index recent articles");
             try {
-                final int fetchSize = 12;
                 Query query = new Query().
                         setFilter(CompositeFilterOperator.and(
                                 new PropertyFilter(Article.ARTICLE_TYPE, FilterOperator.NOT_EQUAL, Article.ARTICLE_TYPE_C_DISCUSSION),
@@ -1274,19 +1245,60 @@ public class ArticleQueryService {
      * @param fetchSize the specified fetch size
      * @return hot articles, returns an empty list if not found
      */
+    private static List<JSONObject> hotArticlesCache = new ArrayList<>();
+    public void refreshHotArticlesCache() {
+        try {
+            final long thirtyDaysAgo = DateUtils.addDays(new Date(), -30).getTime();
+            List<JSONObject> ret = articleRepository.select("" +
+                    "SELECT " +
+                    "    *, " +
+                    "    (articleThankCnt + articleGoodCnt + articleCollectCnt + articleWatchCnt - articleBadCnt) AS total_score " +
+                    "FROM " +
+                    "    symphony_article " +
+                    "WHERE " +
+                    "    articleLatestCmtTime > " + thirtyDaysAgo + " AND articleStatus <> 1 AND articleType <> 1 AND articleShowInList <> 0 " +
+                    "ORDER BY " +
+                    "    total_score DESC " +
+                    "limit 100");
+            ret.sort((o1, o2) -> {
+                long o1Time = o1.optLong(Article.ARTICLE_UPDATE_TIME);
+                long o2Time = o2.optLong(Article.ARTICLE_UPDATE_TIME);
+                if (o1Time > o2Time) {
+                    return -1;
+                } else if (o1Time == o2Time) {
+                    return 0;
+                } else {
+                    return 1;
+                }
+            });
+            organizeArticles(ret);
+            Collections.shuffle(ret);
+            hotArticlesCache = ret;
+            LOGGER.log(Level.INFO, "Refreshed hot articles cache.");
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, "Refresh hot articles cache failed", e);
+        }
+    }
     public List<JSONObject> getHotArticles(final int fetchSize) {
-        final Query query = makeTopQuery(1, fetchSize);
-
         try {
             List<JSONObject> ret;
-            Stopwatchs.start("Query hot articles");
-            try {
-                ret = articleRepository.getList(query);
-            } finally {
-                Stopwatchs.end();
+            if (hotArticlesCache.size() <= fetchSize) {
+                ret = hotArticlesCache;
+            } else {
+                ret = hotArticlesCache.subList(0, fetchSize);
             }
 
-            organizeArticles(ret);
+            ret.sort((o1, o2) -> {
+                int o1Time = o1.optInt("total_score");
+                int o2Time = o2.optInt("total_score");
+                if (o1Time > o2Time) {
+                    return -1;
+                } else if (o1Time == o2Time) {
+                    return 0;
+                } else {
+                    return 1;
+                }
+            });
 
             Stopwatchs.start("Checks author status");
             try {

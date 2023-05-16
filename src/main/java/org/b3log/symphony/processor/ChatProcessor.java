@@ -341,17 +341,11 @@ public class ChatProcessor {
         // 放 ApiKey
         final String userId = currentUser.optString(Keys.OBJECT_ID);
         final String userPassword = currentUser.optString(User.USER_PASSWORD);
-        final String userName = currentUser.optString(User.USER_NAME);
         final JSONObject cookieJSONObject = new JSONObject();
         cookieJSONObject.put(Keys.OBJECT_ID, userId);
         final String random = RandomStringUtils.randomAlphanumeric(16);
         cookieJSONObject.put(Keys.TOKEN, userPassword + ApiProcessor.COOKIE_ITEM_SEPARATOR + random);
         final String key = Crypts.encryptByAES(cookieJSONObject.toString(), Symphonys.COOKIE_SECRET);
-        if (null != ApiProcessor.keys.get(userName)) {
-            ApiProcessor.removeKeyByUsername(userName);
-        }
-        ApiProcessor.keys.put(key, currentUser);
-        ApiProcessor.keys.put(userName, new JSONObject().put("key", key));
         dataModel.put("apiKey", key);
 
         dataModelService.fillHeaderAndFooter(context, dataModel);

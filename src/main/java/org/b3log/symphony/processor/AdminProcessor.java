@@ -54,10 +54,7 @@ import org.b3log.symphony.processor.middleware.validate.UserRegister2ValidationM
 import org.b3log.symphony.processor.middleware.validate.UserRegisterValidationMidware;
 import org.b3log.symphony.repository.ReportRepository;
 import org.b3log.symphony.service.*;
-import org.b3log.symphony.util.Escapes;
-import org.b3log.symphony.util.Sessions;
-import org.b3log.symphony.util.StatusCodes;
-import org.b3log.symphony.util.Symphonys;
+import org.b3log.symphony.util.*;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -367,9 +364,7 @@ public class AdminProcessor {
         Dispatcher.post("/admin/add-article", adminProcessor::addArticle, middlewares);
         Dispatcher.post("/admin/add-reserved-word", adminProcessor::addReservedWord, middlewares);
         Dispatcher.get("/admin/add-reserved-word", adminProcessor::showAddReservedWord, middlewares);
-        Dispatcher.post("/admin/reserved-word/{id}", adminProcessor::updateReservedWord, middlewares);
         Dispatcher.get("/admin/reserved-words", adminProcessor::showReservedWords, middlewares);
-        Dispatcher.get("/admin/reserved-word/{id}", adminProcessor::showReservedWord, middlewares);
         Dispatcher.post("/admin/remove-reserved-word", adminProcessor::removeReservedWord, middlewares);
         Dispatcher.post("/admin/remove-comment", adminProcessor::removeComment, middlewares);
         Dispatcher.post("/admin/remove-article", adminProcessor::removeArticle, middlewares);
@@ -1278,18 +1273,23 @@ public class AdminProcessor {
             return;
         }
 
-        if (optionQueryService.isReservedWord(word)) {
+        if (ReservedWords.contains(word)) {
             context.sendRedirect(Latkes.getServePath() + "/admin/reserved-words");
             return;
         }
 
         try {
-            final JSONObject reservedWord = new JSONObject();
-            reservedWord.put(Option.OPTION_CATEGORY, Option.CATEGORY_C_RESERVED_WORDS);
-            reservedWord.put(Option.OPTION_VALUE, word);
-
-            optionMgmtService.addOption(reservedWord);
-            operationMgmtService.addOperation(Operation.newOperation(request, Operation.OPERATION_CODE_C_ADD_RESERVED_WORD, word));
+            if (word.contains("\r\n")) {
+                for (String i : word.split("\r\n")) {
+                    if (!i.replaceAll(" ", "").isEmpty()) {
+                        ReservedWords.add(i);
+                        operationMgmtService.addOperation(Operation.newOperation(request, Operation.OPERATION_CODE_C_ADD_RESERVED_WORD, i));
+                    }
+                }
+            } else {
+                ReservedWords.add(word);
+                operationMgmtService.addOperation(Operation.newOperation(request, Operation.OPERATION_CODE_C_ADD_RESERVED_WORD, word));
+            }
         } catch (final Exception e) {
             final AbstractFreeMarkerRenderer renderer = new SkinRenderer(context, "admin/error.ftl");
             final Map<String, Object> dataModel = renderer.getDataModel();
@@ -1313,35 +1313,6 @@ public class AdminProcessor {
     }
 
     /**
-     * Updates a reserved word.
-     *
-     * @param context the specified context
-     */
-    public void updateReservedWord(final RequestContext context) {
-        final String id = context.pathVar("id");
-        final Request request = context.getRequest();
-
-        final AbstractFreeMarkerRenderer renderer = new SkinRenderer(context, "admin/reserved-word.ftl");
-        final Map<String, Object> dataModel = renderer.getDataModel();
-
-        final JSONObject word = optionQueryService.getOption(id);
-        dataModel.put(Common.WORD, word);
-
-        final Iterator<String> parameterNames = request.getParameterNames().iterator();
-        while (parameterNames.hasNext()) {
-            final String name = parameterNames.next();
-            final String value = context.param(name);
-
-            word.put(name, value);
-        }
-
-        optionMgmtService.updateOption(id, word);
-        operationMgmtService.addOperation(Operation.newOperation(request, Operation.OPERATION_CODE_C_UPDATE_RESERVED_WORD, word.optString(Option.OPTION_VALUE)));
-
-        dataModelService.fillHeaderAndFooter(context, dataModel);
-    }
-
-    /**
      * Shows reserved words.
      *
      * @param context the specified context
@@ -1349,23 +1320,9 @@ public class AdminProcessor {
     public void showReservedWords(final RequestContext context) {
         final AbstractFreeMarkerRenderer renderer = new SkinRenderer(context, "admin/reserved-words.ftl");
         final Map<String, Object> dataModel = renderer.getDataModel();
-        final List<JSONObject> words = optionQueryService.getReservedWords();
+        final List<JSONObject> words = ReservedWords.getList();
         words.forEach(Escapes::escapeHTML);
         dataModel.put(Common.WORDS, words);
-        dataModelService.fillHeaderAndFooter(context, dataModel);
-    }
-
-    /**
-     * Shows a reserved word.
-     *
-     * @param context the specified context
-     */
-    public void showReservedWord(final RequestContext context) {
-        final String id = context.pathVar("id");
-        final AbstractFreeMarkerRenderer renderer = new SkinRenderer(context, "admin/reserved-word.ftl");
-        final Map<String, Object> dataModel = renderer.getDataModel();
-        final JSONObject word = optionQueryService.getOption(id);
-        dataModel.put(Common.WORD, word);
         dataModelService.fillHeaderAndFooter(context, dataModel);
     }
 
@@ -1378,12 +1335,10 @@ public class AdminProcessor {
         final Request request = context.getRequest();
 
         final String id = context.param("id");
-        final JSONObject option = optionQueryService.getOption(id);
-        final String word = option.optString(Option.OPTION_VALUE);
-        optionMgmtService.removeOption(id);
-        operationMgmtService.addOperation(Operation.newOperation(request, Operation.OPERATION_CODE_C_REMOVE_RESERVED_WORD, word));
+        ReservedWords.remove(id);
+        operationMgmtService.addOperation(Operation.newOperation(request, Operation.OPERATION_CODE_C_REMOVE_RESERVED_WORD, id));
 
-        context.sendRedirect(Latkes.getServePath() + "/admin/reserved-words");
+        context.renderJSON(StatusCodes.SUCC);
     }
 
     /**

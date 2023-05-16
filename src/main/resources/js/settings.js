@@ -949,12 +949,17 @@ var Settings = {
         if ($("#userCardSettings").attr("bgUrl") !== undefined) {
           cardBg = $("#userCardSettings").attr("bgUrl");
         }
+        let iconURL = "https://fishpi.cn/images/favicon.png";
+        if ($("#iconURL").data("imageurl") !== undefined && $("#iconURL").data("imageurl") !== '') {
+          iconURL = $("#iconURL").data("imageurl");
+        }
         requestJSONObject = {
           systemTitle: $('#newSystemTitle').val(),
           cardBg: cardBg,
           onlineTimeUnit: $('#onlineTimeUnit').val(),
           showSideAd: $("#showSideAd").prop("checked"),
           showTopAd: $("#showTopAd").prop("checked"),
+          iconURL: iconURL
         }
         break
       case 'deactivate':

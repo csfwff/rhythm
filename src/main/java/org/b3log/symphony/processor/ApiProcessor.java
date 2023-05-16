@@ -48,7 +48,9 @@ import org.b3log.symphony.util.Symphonys;
 import org.json.JSONObject;
 import pers.adlered.simplecurrentlimiter.main.SimpleCurrentLimiter;
 
+import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 /**
  * 专业团队，专业的 API 接口
@@ -63,10 +65,6 @@ public class ApiProcessor {
      * Logger.
      */
     private static final Logger LOGGER = LogManager.getLogger(ApiProcessor.class);
-    /**
-     * Session cache.
-     */
-    public static final Cache keys = CacheFactory.getCache("keys");
 
     /**
      * 存储用户的Key
@@ -118,6 +116,7 @@ public class ApiProcessor {
         Dispatcher.get("/api/user/exists/{user}", apiProcessor::userExists);
         Dispatcher.post("/api/getKey", apiProcessor::getKey);
         Dispatcher.get("/api/user", apiProcessor::getUser);
+        Dispatcher.get("/api/user/recentReg", apiProcessor::getRecentReg);
 
         final RewardQueryService rewardQueryService = beanManager.getReference(RewardQueryService.class);
         Dispatcher.get("/api/article/reward/senders/{aId}", rewardQueryService::rewardedSenders);
@@ -130,10 +129,7 @@ public class ApiProcessor {
      */
     public static JSONObject getUserByKey(String apiKey) {
         if (apiKey != null && apiKey.length() == 192) {
-            JSONObject user = ApiProcessor.keys.get(apiKey);
-            if (null == user) {
-                user = tryLogInWithApiKey(apiKey);
-            }
+            JSONObject user = tryLogInWithApiKey(apiKey);
             if (null != user) {
                 return user;
             }
@@ -168,28 +164,12 @@ public class ApiProcessor {
             final String token = cookieJSONObject.optString(Keys.TOKEN);
             final String password = StringUtils.substringBeforeLast(token, COOKIE_ITEM_SEPARATOR);
             if (userPassword.equals(password)) {
-                String userName = ret.optString(User.USER_NAME);
-                if (null != keys.get(userName)) {
-                    removeKeyByUsername(userName);
-                }
-                keys.put(apiKey, ret);
-                keys.put(userName, new JSONObject().put("key", apiKey));
-
                 return ret;
             }
         } catch (final Exception e) {
             LOGGER.log(Level.WARN, "Parses apikey failed, clears apikey");
         }
         return null;
-    }
-
-    public static void removeKeyByUsername(String userName) {
-        try {
-            String key = keys.get(userName).optString("key");
-            keys.remove(key);
-            keys.remove(userName);
-        } catch (Exception ignored) {
-        }
     }
 
     public void getKey(final RequestContext context) {
@@ -257,12 +237,6 @@ public class ApiProcessor {
 
                 context.renderCodeMsg(StatusCodes.SUCC, "");
                 context.renderJSONValue("Key", key);
-                String userName = user.optString(User.USER_NAME);
-                if (null != keys.get(userName)) {
-                    removeKeyByUsername(userName);
-                }
-                keys.put(key, user);
-                keys.put(userName, new JSONObject().put("key", key));
 
                 return;
             }
@@ -336,6 +310,31 @@ public class ApiProcessor {
         }
     }
 
+    /**
+     * 获取最近注册的20个鱼油  只需要用户名和昵称吧
+     * @param context
+     */
+    public void getRecentReg(final RequestContext context) {
+        JSONObject ret = new JSONObject();
+        try {
+            ret.put(Keys.CODE, StatusCodes.SUCC);
+            ret.put(Keys.MSG, "");
+            List<JSONObject> users = userQueryService.getRecentRegisteredUsers(20);
+            ret.put(Keys.DATA, users.stream().map(
+                    x -> {
+                        JSONObject user = new JSONObject();
+                        user.put(User.USER_NAME, x.optString(User.USER_NAME));
+                        user.put(UserExt.USER_NICKNAME, x.optString(UserExt.USER_NICKNAME));
+                        return user;
+                    }
+            ).collect(Collectors.toList()));
+            context.renderJSON(ret);
+        } catch (Exception e) {
+            ret.put(Keys.CODE, StatusCodes.ERR);
+            ret.put(Keys.MSG, "Invalid Api Key.");
+            context.renderJSON(ret);
+        }
+    }
     public void userExists(final RequestContext context) {
         String user = context.pathVar("user");
         JSONObject userJSON = userQueryService.getUserByName(user);

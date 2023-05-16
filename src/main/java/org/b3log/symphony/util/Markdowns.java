@@ -83,7 +83,7 @@ public final class Markdowns {
     private static final Map<String, JSONObject> MD_CACHE = Collections.synchronizedMap(new LinkedHashMap<String, JSONObject>() {
         @Override
         protected boolean removeEldestEntry(Map.Entry eldest) {
-            return size() > 500;
+            return size() > 1000;
         }
     });
 

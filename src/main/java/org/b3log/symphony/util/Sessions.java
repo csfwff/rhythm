@@ -366,11 +366,6 @@ public final class Sessions {
         final Session httpSession = request.getSession();
         httpSession.setAttribute(User.USER, null);
 
-        final BeanManager beanManager = BeanManager.getInstance();
-        final UserQueryService userQueryService = beanManager.getReference(UserQueryService.class);
-        final String userName = userQueryService.getUserName(userId);
-        ApiProcessor.removeKeyByUsername(userName);
-
         //final BeanManager beanManager = BeanManager.getInstance();
         //final UserMgmtService userMgmtService = beanManager.getReference(UserMgmtService.class);
         //userMgmtService.updateOnlineStatus(userId, "", false, true);

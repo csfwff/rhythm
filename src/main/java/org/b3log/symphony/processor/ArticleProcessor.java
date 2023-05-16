@@ -63,7 +63,6 @@ import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.util.List;
 import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * Article processor.
@@ -1018,6 +1017,11 @@ public class ArticleProcessor {
             return;
         }
 
+        if (article.optInt(Article.ARTICLE_STATUS)==Article.ARTICLE_STATUS_C_INVALID){
+            context.sendError(404);
+            return;
+        }
+
         dataModelService.fillHeaderAndFooter(context, dataModel);
 
         final String articleAuthorId = article.optString(Article.ARTICLE_AUTHOR_ID);
@@ -1761,19 +1765,12 @@ public class ArticleProcessor {
 
         Stopwatchs.start("Load random articles");
         try {
-            int tried = 0;
-            int arraySize = 0;
-            List<JSONObject> articles = null;
-            while (arraySize < size) {
-                articles = articleRepository.getRandomly(size * 5);
-                arraySize = articles.size();
-                tried++;
-                if (tried > 50) {
-                    return null;
-                }
-            }
+            List<JSONObject> articles = articleRepository.getRandomly(size);
             articleQueryService.organizeArticles(articles);
             Collections.shuffle(articles);
+            if (articles.size() <= size) {
+                return articles;
+            }
             return articles.subList(0, size);
         } catch (final RepositoryException e) {
             LOGGER.log(Level.ERROR, "Loads random articles failed", e);

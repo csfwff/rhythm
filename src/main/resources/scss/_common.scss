@@ -25,6 +25,51 @@
 
 @import "vditor/dist/index";
 
+.vditor-reset code:not(.hljs):not(.highlight-chroma) {
+  font-family: "HarmonyOS",mononoki,Consolas,"Liberation Mono",Menlo,Courier,monospace,"Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji","Segoe UI Symbol","Android Emoji","EmojiSymbols" !important;
+}
+
+.vditor-reset pre>code {
+  font-family: "HarmonyOS",mononoki,Consolas,"Liberation Mono",Menlo,Courier,monospace,"Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji","Segoe UI Symbol","Android Emoji","EmojiSymbols" !important;
+}
+
+.vditor-reset {
+  font-family: "HarmonyOS","Helvetica Neue","Luxi Sans","DejaVu Sans","Hiragino Sans GB","Microsoft Yahei",sans-serif,"Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji","Segoe UI Symbol","Android Emoji","EmojiSymbols" !important;
+}
+
+.vditor {
+  --border-color: #f1f1f1;
+  --second-color: rgba(88, 96, 105, 0.36);
+
+  --panel-background-color: #fff;
+  --panel-shadow: 0 1px 2px rgba(0, 0, 0, .2);
+
+  --toolbar-background-color: #fdfdfd;
+  --toolbar-icon-color: #586069;
+  --toolbar-icon-hover-color: #4285f4;
+  --toolbar-height: 35px;
+  --toolbar-divider-margin-top: 8px;
+
+  --textarea-background-color: #fafbfc;
+  --textarea-text-color: #24292e;
+
+  --resize-icon-color: var(--toolbar-icon-color);
+  --resize-background-color: var(--toolbar-background-color);
+  --resize-hover-icon-color: var(--panel-background-color);
+  --resize-hover-background-color: var(--toolbar-icon-hover-color);
+
+  --count-background-color:rgba(27, 31, 35, .05);
+  --heading-border-color: #eaecef;
+  --blockquote-color: #6a737d;
+
+  --ir-heading-color: #660e7a;
+  --ir-title-color: #808080;
+  --ir-bi-color: #0033b3;
+  --ir-link-color: #008000;
+  --ir-bracket-color: #0000ff;
+  --ir-paren-color: #008000;
+}
+
 /* start reset */
 html {
   -webkit-text-size-adjust: 100%;
@@ -473,18 +518,14 @@ blockquote {
 }
 
 .discuss_title {
-  cursor: pointer;
-  text-align: center;
+  vertical-align: 10px;
+  padding-left: 20px;
   text-decoration: none;
-  padding: 6px 2px;
-  margin: 9px 0;
   font-size: 13px;
   font-weight: 600;
   line-height: 1;
   color: $theme-secondary;
-  background-color: #f5f5f5;
-  border-radius: 3px;
-  display: block;
+  display: inline-block;
 }
 
 .count {

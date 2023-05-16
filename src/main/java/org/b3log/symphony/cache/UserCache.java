@@ -61,7 +61,7 @@ public class UserCache {
     private static final Map<String, JSONObject> ID_CACHE = Collections.synchronizedMap(new LinkedHashMap<String, JSONObject>() {
         @Override
         protected boolean removeEldestEntry(Map.Entry eldest) {
-            return size() > 100;
+            return size() > 2000;
         }
     });
 
@@ -71,7 +71,7 @@ public class UserCache {
     private static final Map<String, JSONObject> NAME_CACHE = Collections.synchronizedMap(new LinkedHashMap<String, JSONObject>() {
         @Override
         protected boolean removeEldestEntry(Map.Entry eldest) {
-            return size() > 100;
+            return size() > 2000;
         }
     });
 

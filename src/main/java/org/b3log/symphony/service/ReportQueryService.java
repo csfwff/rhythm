@@ -25,6 +25,7 @@ import org.b3log.latke.Keys;
 import org.b3log.latke.Latkes;
 import org.b3log.latke.ioc.Inject;
 import org.b3log.latke.model.Pagination;
+import org.b3log.latke.model.User;
 import org.b3log.latke.repository.Query;
 import org.b3log.latke.repository.RepositoryException;
 import org.b3log.latke.repository.SortDirection;
@@ -35,10 +36,7 @@ import org.b3log.symphony.model.Article;
 import org.b3log.symphony.model.Common;
 import org.b3log.symphony.model.Report;
 import org.b3log.symphony.model.UserExt;
-import org.b3log.symphony.repository.ArticleRepository;
-import org.b3log.symphony.repository.CommentRepository;
-import org.b3log.symphony.repository.ReportRepository;
-import org.b3log.symphony.repository.UserRepository;
+import org.b3log.symphony.repository.*;
 import org.b3log.symphony.util.Emotions;
 import org.b3log.symphony.util.Escapes;
 import org.b3log.symphony.util.Markdowns;
@@ -105,6 +103,9 @@ public class ReportQueryService {
      */
     @Inject
     private ChatRoomService chatRoomService;
+
+    @Inject
+    private LogsRepository logsRepository;
 
     /**
      * Gets report by the specified request json object.
@@ -204,8 +205,21 @@ public class ReportQueryService {
                     case Report.REPORT_DATA_TYPE_C_CHAT:
                         report.put(Report.REPORT_T_DATA_TYPE_STR, langPropsService.get("chatLabel"));
                         final JSONObject redPacket = chatRoomService.getChatMsg(dataId);
-                        final JSONObject content = new JSONObject(redPacket.optString(Common.CONTENT));
-                        chatContent = content.optString("content");
+                        if (redPacket == null) {
+                            try {
+                                JSONObject log = logsRepository.select("" +
+                                                "select * from " + logsRepository.getName() + " " +
+                                                "where data like '%\"oId\":\"" + dataId + "\"%' order by oId desc limit 1;")
+                                        .get(0);
+                                final JSONObject content = new JSONObject(new JSONObject(log.optString("data")).optString(Common.CONTENT));
+                                chatContent = "[该数据已被撤回或删除，此为快照记录] [" + content.optString(User.USER_NAME) + "] " + content.optString("content");
+                            } catch (Exception e) {
+                                chatContent = "内容已被撤回或删除，但日志中无记录，请联系管理员调取。原聊天数据oId为：" + dataId;
+                            }
+                        } else {
+                            final JSONObject content = new JSONObject(redPacket.optString(Common.CONTENT));
+                            chatContent = "[" + content.optString(User.USER_NAME) + "] " + content.optString("content");
+                        }
                         reportData = "<a href=\"" + Latkes.getServePath() + "/cr?oId=" + dataId +
                                 "\" target=\"_blank\">跳转至该消息</a>";
                         break;

@@ -29,10 +29,7 @@ import org.b3log.latke.ioc.BeanManager;
 import org.b3log.latke.model.User;
 import org.b3log.latke.repository.*;
 import org.b3log.latke.service.ServiceException;
-import org.b3log.symphony.model.Common;
-import org.b3log.symphony.model.Notification;
-import org.b3log.symphony.model.Pointtransfer;
-import org.b3log.symphony.model.UserExt;
+import org.b3log.symphony.model.*;
 import org.b3log.symphony.processor.ApiProcessor;
 import org.b3log.symphony.processor.ChatroomProcessor;
 import org.b3log.symphony.processor.channel.ChatroomChannel;
@@ -42,6 +39,7 @@ import org.b3log.symphony.service.*;
 import org.b3log.symphony.util.JSONs;
 import org.b3log.symphony.util.Sessions;
 import org.b3log.symphony.util.StatusCodes;
+import org.json.JSONArray;
 import org.json.JSONObject;
 import pers.adlered.simplecurrentlimiter.main.SimpleCurrentLimiter;
 
@@ -65,7 +63,9 @@ public class ChatRoomBot {
     private static final SimpleCurrentLimiter RECORD_POOL_2_IN_24H = new SimpleCurrentLimiter(24 * 60 * 60, 1);
     private static final SimpleCurrentLimiter RECORD_POOL_6_IN_15M = new SimpleCurrentLimiter(15 * 60, 5);
     private static final SimpleCurrentLimiter RECORD_POOL_5_IN_24H = new SimpleCurrentLimiter(24 * 60 * 60, 4);
-    private static final SimpleCurrentLimiter RECORD_POOL_2_IN_1M = new SimpleCurrentLimiter(60, 2);
+    private static final SimpleCurrentLimiter RECORD_POOL_10_IN_1M = new SimpleCurrentLimiter(60, 10);
+    private static final SimpleCurrentLimiter RECORD_POOL_BARRAGER = new SimpleCurrentLimiter(60, 5);
+
 
     /**
      * 对应关系池
@@ -73,7 +73,7 @@ public class ChatRoomBot {
     private static final Map<String, String> RECORD_MAP = Collections.synchronizedMap(new LinkedHashMap<String, String>() {
         @Override
         protected boolean removeEldestEntry(Map.Entry eldest) {
-            return size() > 100;
+            return size() > 2000;
         }
     });
 
@@ -115,12 +115,60 @@ public class ChatRoomBot {
         }
         // ==! 判断是否在 Channel 中 ==!
 
+        // ==? 发弹幕频率限制 ?==
+        if (!userName.equals("admin")) {
+            if (content.startsWith("[barrager]") && content.endsWith("[/barrager]")) {
+                if (!RECORD_POOL_BARRAGER.access(userName)) {
+                    context.renderJSON(StatusCodes.ERR).renderMsg("弹幕发的太快啦！休息一下吧（每分钟最多5个）");
+                    return false;
+                }
+
+                return true;
+            }
+        }
+        // ==! 发红包频率限制 !==
+
         // ==? 指令 ?==
         if (DataModelService.hasPermission(currentUser.optString(User.USER_ROLE), 3)) {
-            if (content.startsWith("执法")) {
+            if (content.startsWith("执法") || content.startsWith("zf")) {
                 try {
-                    String cmd1 = content.replaceAll("(执法)(\\s)+", "");
+                    String cmd1 = content.replaceAll("(执法)(\\s)+", "").replaceAll("(zf)(\\s)+", "");
                     String cmd2 = cmd1.split("\\s")[0];
+                    switch (cmd2) {
+                        case "jy":
+                            cmd2 = "禁言";
+                            break;
+                        case "qyjy":
+                            cmd2 = "全员禁言";
+                            break;
+                        case "fk":
+                            cmd2 = "风控";
+                            break;
+                        case "fwqzt":
+                            cmd2 = "服务器状态";
+                            break;
+                        case "sxhc":
+                            cmd2 = "刷新缓存";
+                            break;
+                        case "gbsz":
+                            cmd2 = "广播设置";
+                            break;
+                        case "wh":
+                            cmd2 = "维护";
+                            break;
+                        case "cf":
+                            cmd2 = "处罚";
+                            break;
+                        case "dkhh":
+                            cmd2 = "断开会话";
+                            break;
+                        case "dm":
+                            cmd2 = "弹幕";
+                            break;
+                        case "jcts":
+                            cmd2 = "进出提示";
+                            break;
+                    }
                     switch (cmd2) {
                         case "禁言":
                             try {
@@ -262,13 +310,12 @@ public class ChatRoomBot {
                                     "<details><summary>用户会话详情</summary>" + userSessionList + "</details>");
                             break;
                         case "刷新缓存":
-                            sendBotMsg("请稍等，执行中...");
                             ChatroomChannel.sendOnlineMsg();
-                            sendBotMsg("在线人数缓存已刷新。");
-                            // JSONObject jsonObject = new JSONObject();
-                            // jsonObject.put(Common.TYPE, "refresh");
-                            // ChatroomChannel.notifyChat(jsonObject);
-                            // sendBotMsg("已为在线用户清屏。");
+                            int online = ChatroomChannel.SESSIONS.size();
+                            int estimatedTime = online / 2;
+                            clearScreen();
+                            sendBotMsg("在线人数缓存刷新请求已提交，预计需要时间 **" + estimatedTime + "** 秒。\n" +
+                                    "在线用户全体清屏请求已提交，预计需要时间 **" + estimatedTime + "** 秒。");
                             break;
                         case "广播设置":
                             try {
@@ -313,16 +360,127 @@ public class ChatRoomBot {
                                 sendBotMsg("参数错误。");
                             }
                             break;
+                        case "维护":
+                            Map<String, Long> result = ChatroomChannel.check();
+                            StringBuilder stringBuilder = new StringBuilder();
+                            if (result.isEmpty()) {
+                                sendBotMsg("报告！没有超过6小时未活跃的成员，一切都很和谐~");
+                            } else {
+                                stringBuilder.append("报告！成功扫描超过6小时未活跃的成员，并已在通知后将他们断开连接：<br>");
+                                stringBuilder.append("<details><summary>不活跃用户列表</summary>");
+                                for (String i : result.keySet()) {
+                                    long time = result.get(i);
+                                    stringBuilder.append(i + " AFK " + time + "小时<br>");
+                                }
+                                stringBuilder.append("</details>");
+                                sendBotMsg(stringBuilder.toString());
+                            }
+                            break;
+                        case "处罚":
+                            try {
+                                String user = cmd1.split("\\s")[1].replaceAll("^(@)", "");
+                                int point = Integer.parseInt(cmd1.split("\\s")[2].replaceAll("[-.]", ""));
+                                String reas0n = cmd1.split("\\s")[3];
+                                final BeanManager beanManager = BeanManager.getInstance();
+                                UserQueryService userQueryService = beanManager.getReference(UserQueryService.class);
+                                JSONObject targetUser = userQueryService.getUserByName(user);
+                                if (null == targetUser) {
+                                    sendBotMsg("指令执行失败，用户不存在。");
+                                    break;
+                                }
+                                final int currentPoint = targetUser.optInt(UserExt.USER_POINT);
+                                if (currentPoint - point < 0) {
+                                    sendBotMsg("指令执行失败，他没有这么多分可以扣。");
+                                    break;
+                                }
+                                String targetUserId = targetUser.optString(Keys.OBJECT_ID);
+
+                                PointtransferMgmtService pointtransferMgmtService = beanManager.getReference(PointtransferMgmtService.class);
+                                OperationMgmtService operationMgmtService = beanManager.getReference(OperationMgmtService.class);
+                                NotificationMgmtService notificationMgmtService = beanManager.getReference(NotificationMgmtService.class);
+
+                                final String transferId = pointtransferMgmtService.transfer(targetUserId, Pointtransfer.ID_C_SYS,
+                                        Pointtransfer.TRANSFER_TYPE_C_ABUSE_DEDUCT, point, reas0n, System.currentTimeMillis(), "");
+                                operationMgmtService.addOperation(Operation.newOperation(context.getRequest(), Operation.OPERATION_CODE_C_DEDUCT_POINT, transferId));
+
+                                final JSONObject notification = new JSONObject();
+                                notification.put(Notification.NOTIFICATION_USER_ID, targetUserId);
+                                notification.put(Notification.NOTIFICATION_DATA_ID, transferId);
+                                notificationMgmtService.addAbusePointDeductNotification(notification);
+
+                                sendBotMsg("成功扣除成员 " + user + " 的 " + point + " 积分，原因：" + reas0n);
+                            } catch (Exception e) {
+                                sendBotMsg("参数错误。");
+                            }
+                            break;
+                        case "弹幕":
+                            try {
+                                int cost = Integer.parseInt(cmd1.split("\\s")[1]);
+                                String unit = cmd1.split("\\s")[2];
+                                ChatroomProcessor.barragerCost = cost;
+                                ChatroomProcessor.barragerUnit = unit;
+                                refreshBarrager(cost, unit);
+                                sendBotMsg("弹幕价格设置为: **" + cost + "** " + unit + "/次。\n" +
+                                        "弹幕价格将在下次重启服务器后自动恢复为默认值 (5积分/次)。\n" +
+                                        "正在向成员推送新的弹幕价格，预计需要 **" + (ChatroomChannel.SESSIONS.size() / 2) + "** 秒。");
+                            } catch (Exception e) {
+                                sendBotMsg("参数错误。");
+                            }
+                            break;
+                        case "进出提示":
+                            try {
+                                String user = cmd1.split("\\s")[1].replaceAll("^(@)", "");
+                                if (user.equals("查询")) {
+                                    String uname = cmd1.split("\\s")[2];
+                                    String join = ChatroomChannel.getCustomMessage(1, uname);
+                                    if (join.isEmpty()) {
+                                        join = "未设定";
+                                    }
+                                    String left = ChatroomChannel.getCustomMessage(0, uname);
+                                    if (left.isEmpty()) {
+                                        left = "未设定";
+                                    }
+                                    sendBotMsg("用户 **" + uname + "** 的进出提示设定如下：\n" +
+                                            "进入：" + join + "\n" +
+                                            "离开：" + left + "\n");
+                                } else {
+                                    if (userName.equals("adlered") || userName.equals("csfwff") || userName.equals("admin")) {
+                                        if (cmd1.split("\\s").length == 2) {
+                                            ChatroomChannel.removeCustomMessage(user);
+                                            sendBotMsg("用户 **" + user + "** 的进出提示已恢复默认。");
+                                        } else if (cmd1.split("\\s").length >= 3) {
+                                            String msg = content.replaceAll("执法 ", "")
+                                                    .replaceAll("zf ", "")
+                                                    .replaceAll("进出提示 ", "")
+                                                    .replaceAll("jcts ", "")
+                                                    .replaceAll(user + " ", "");
+                                            ChatroomChannel.addCustomMessage(user, msg);
+                                            sendBotMsg("用户 **" + user + "** 的进出提示已设置完毕。");
+                                        }
+                                    } else {
+                                        sendBotMsg("操作失败，权限不足。");
+                                    }
+                                }
+                            } catch (Exception e) {
+                                sendBotMsg("参数错误。");
+                            }
+                            break;
                         default:
                             sendBotMsg("<details><summary>执法帮助菜单</summary>\n" +
                                     "如无特殊备注，则需要纪律委员及以上分组才可执行\n\n" +
-                                    "* **禁言指定用户** 执法 禁言 @[用户名] [时间 `单位: 分钟` `如不填此项将查询剩余禁言时间` `设置为0将解除禁言`]\n" +
+                                    "* **禁言指定用户** 执法 禁言 [用户名] [时间 `单位: 分钟` `如不填此项将查询剩余禁言时间` `设置为0将解除禁言`]\n" +
                                     "* **全员禁言** 执法 全员禁言 [时间 `单位: 分钟` `如不填此项将查询剩余禁言时间` `设置为0将解除全员禁言`]\n" +
-                                    "* **风控模式** 执法 风控 @[用户名] [时间 `单位：分钟` `如不填此项将查询剩余风控时间` `设置为0将解除风控`]\n" +
+                                    "* **风控模式** 执法 风控 [用户名] [时间 `单位：分钟` `如不填此项将查询剩余风控时间` `设置为0将解除风控`]\n" +
                                     "* **查询服务器状态** 执法 服务器状态\n" +
                                     "* **刷新全体成员的聊天室缓存** 执法 刷新缓存\n" +
                                     "* **广播设置** 执法 广播设置 [普通消息数目检测阈值] [普通消息间隔毫秒] [特殊消息数目检测阈值] [特殊消息间隔毫秒]\n" +
-                                    "* **断开指定用户的全部聊天室会话** 执法 断开会话 [用户名]</details>\n" +
+                                    "* **检测聊天室内长时间不发言的成员，并将其移除** 执法 维护\n" +
+                                    "* **扣除指定成员的积分** 执法 处罚 [用户名] [扣除积分数量] [理由]\n" +
+                                    "* **断开指定用户的全部聊天室会话** 执法 断开会话 [用户名]\n" +
+                                    "* **进出提示恢复默认（未经管理员允许禁止使用）** 执法 进出提示 [用户名]\n" +
+                                    "* **设置进出提示（未经管理员允许禁止使用）** 执法 进出提示 [用户名] [内容及变量]\n" +
+                                    "* **查询进出提示** 执法 进出提示 查询 [用户名]\n" +
+                                    "* **设置弹幕价格(服务器重启后失效)** 执法 弹幕 [价格] [单位]</details>\n" +
                                     "<p></p>");
                     }
                     return true;
@@ -426,8 +584,8 @@ public class ChatRoomBot {
         // ==? 发红包频率限制 ?==
         if (!userName.equals("admin")) {
             if (content.startsWith("[redpacket]") && content.endsWith("[/redpacket]")) {
-                if (!RECORD_POOL_2_IN_1M.access(userName)) {
-                    context.renderJSON(StatusCodes.ERR).renderMsg("你的红包被机器人打回，原因：红包发送频率过快，每分钟仅允许发送2个红包，请稍候重试");
+                if (!RECORD_POOL_10_IN_1M.access(userName)) {
+                    context.renderJSON(StatusCodes.ERR).renderMsg("你的红包被机器人打回，原因：红包发送频率过快，每分钟仅允许发送10个红包，请稍候重试");
                     return false;
                 }
 
@@ -454,12 +612,62 @@ public class ChatRoomBot {
         }
         return true;
     }
+
+    private static boolean refreshBarragerLock = false;
+    public static void refreshBarrager(int cost, String unit) {
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put(Common.TYPE, "refreshBarrager");
+        jsonObject.put("cost", cost);
+        jsonObject.put("unit", unit);
+        String message = jsonObject.toString();
+        if (!refreshBarragerLock) {
+            refreshBarragerLock = true;
+            new Thread(() -> {
+                int i = 0;
+                for (WebSocketSession s : ChatroomChannel.SESSIONS) {
+                    i++;
+                    if (i % 1 == 0) {
+                        try {
+                            Thread.sleep(500);
+                        } catch (Exception ignored) {
+                        }
+                    }
+                    s.sendText(message);
+                }
+                refreshBarragerLock = false;
+            }).start();
+        }
+    }
+
+    private static boolean clearScreenLock = false;
+    public static void clearScreen() {
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put(Common.TYPE, "refresh");
+        String message = jsonObject.toString();
+        if (!clearScreenLock) {
+            clearScreenLock = true;
+            new Thread(() -> {
+                int i = 0;
+                for (WebSocketSession s : ChatroomChannel.SESSIONS) {
+                    i++;
+                    if (i % 1 == 0) {
+                        try {
+                            Thread.sleep(500);
+                        } catch (Exception ignored) {
+                        }
+                    }
+                    s.sendText(message);
+                }
+                clearScreenLock = false;
+            }).start();
+        }
+    }
     
     // 以人工智障的身份发送消息
     public static void sendBotMsg(String content) {
         new Thread(() -> {
             try {
-                Thread.sleep(100);
+                Thread.sleep(500);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
@@ -471,6 +679,8 @@ public class ChatRoomBot {
             msg.put(Common.TIME, time);
             msg.put(UserExt.USER_NICKNAME, "人工智障");
             msg.put("sysMetal", "");
+            msg.put("userOId", 0L);
+            msg.put("client", "Other/Robot");
             // 聊天室内容保存到数据库
             final BeanManager beanManager = BeanManager.getInstance();
             ChatRoomRepository chatRoomRepository = beanManager.getReference(ChatRoomRepository.class);
@@ -524,6 +734,105 @@ public class ChatRoomBot {
         }
     }
 
+    public static void refreshSiGuo() {
+        try {
+            final BeanManager beanManager = BeanManager.getInstance();
+            CloudRepository cloudRepository = beanManager.getReference(CloudRepository.class);
+            Query cloudQuery = new Query()
+                    .setFilter(CompositeFilterOperator.and(
+                            new PropertyFilter("userId", FilterOperator.EQUAL, "si:guo"),
+                            new PropertyFilter("gameId", FilterOperator.EQUAL, "record")
+                    ));
+            JSONObject result = cloudRepository.getFirst(cloudQuery);
+            JSONArray array = new JSONArray();
+            if (null != result) {
+                // 删除旧记录
+                Transaction transaction = cloudRepository.beginTransaction();
+                cloudRepository.remove(cloudQuery);
+                // 写入新记录
+                JSONArray jsonArray = new JSONArray(result.optString("data"));
+                for (int i = 0; i < jsonArray.length(); i++) {
+                    JSONObject jsonObject = jsonArray.optJSONObject(i);
+                    if (jsonObject.optLong("time") > System.currentTimeMillis()) {
+                        array.put(jsonObject);
+                    }
+                }
+                JSONObject cloudJSON = new JSONObject();
+                cloudJSON.put("userId", "si:guo")
+                        .put("gameId", "record")
+                        .put("data", array.toString());
+                cloudRepository.add(cloudJSON);
+                transaction.commit();
+            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, "Refresh SiGuo failed", e);
+        }
+    }
+
+    public static JSONArray getSiGuoList() {
+        try {
+            final BeanManager beanManager = BeanManager.getInstance();
+            CloudRepository cloudRepository = beanManager.getReference(CloudRepository.class);
+            Query cloudQuery = new Query()
+                    .setFilter(CompositeFilterOperator.and(
+                            new PropertyFilter("userId", FilterOperator.EQUAL, "si:guo"),
+                            new PropertyFilter("gameId", FilterOperator.EQUAL, "record")
+                    ));
+            JSONObject result = cloudRepository.getFirst(cloudQuery);
+            if (null != result) {
+                return new JSONArray(result.optString("data"));
+            } else {
+                return new JSONArray();
+            }
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, "Get SiGuo failed", e);
+            return new JSONArray();
+        }
+    }
+
+    public static void registerSiGuo(String userId, long time) {
+        try {
+            JSONArray oldJSON = new JSONArray();
+            final BeanManager beanManager = BeanManager.getInstance();
+            CloudRepository cloudRepository = beanManager.getReference(CloudRepository.class);
+            UserQueryService userQueryService = beanManager.getReference(UserQueryService.class);
+            Query cloudQuery = new Query()
+                    .setFilter(CompositeFilterOperator.and(
+                            new PropertyFilter("userId", FilterOperator.EQUAL, "si:guo"),
+                            new PropertyFilter("gameId", FilterOperator.EQUAL, "record")
+                    ));
+            JSONObject result = cloudRepository.getFirst(cloudQuery);
+            if (null != result) {
+                oldJSON = new JSONArray(result.optString("data"));
+                Transaction transaction = cloudRepository.beginTransaction();
+                cloudRepository.remove(cloudQuery);
+                transaction.commit();
+            }
+            JSONArray data = new JSONArray();
+            String userName = userQueryService.getUser(userId).optString(User.USER_NAME);
+            for (int i = 0; i < oldJSON.length(); i++) {
+                JSONObject json = oldJSON.optJSONObject(i);
+                if (json.optLong("time") > System.currentTimeMillis()) {
+                    if (!json.optString("userName").equals(userName)) {
+                        data.put(json);
+                    }
+                }
+            }
+            if (time > System.currentTimeMillis()) {
+                data.put(new JSONObject().put("userName", userName).put("time", time));
+            }
+            JSONObject cloudJSON = new JSONObject();
+            cloudJSON.put("userId", "si:guo")
+                    .put("gameId", "record")
+                    .put("data", data.toString());
+            Transaction transaction = cloudRepository.beginTransaction();
+            cloudRepository.add(cloudJSON);
+            transaction.commit();
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, "Register SiGuo failed", e);
+        }
+    }
+
     // 禁言
     public static void mute(String userId, int minute) {
         final BeanManager beanManager = BeanManager.getInstance();
@@ -538,11 +847,13 @@ public class ChatRoomBot {
                     ));
             cloudRepository.remove(cloudDeleteQuery);
             JSONObject cloudJSON = new JSONObject();
+            long time = System.currentTimeMillis() + muteTime;
             cloudJSON.put("userId", userId)
                     .put("gameId", CloudService.SYS_MUTE)
-                    .put("data", ("" + (System.currentTimeMillis() + muteTime)));
+                    .put("data", "" + time);
             cloudRepository.add(cloudJSON);
             transaction.commit();
+            registerSiGuo(userId, time);
         } catch (RepositoryException e) {
             LOGGER.log(Level.ERROR, "Unable to mute [userId={}]", userId);
         }
@@ -552,8 +863,8 @@ public class ChatRoomBot {
     public static void muteAndNotice(String username, String userId, int minute) {
         if (minute == 0){
             sendBotMsg("提醒：@" + username + "  被管理员 解除 禁言");
-        }else {
-            sendBotMsg("提醒：@" + username + "  被管理员 禁言 " + minute + " 分钟。");
+        } else {
+            sendBotMsg("提醒：@" + username + "  被管理员 禁言 " + minute + " 分钟。\n *被禁言了也能聊天？* 试试发送一个 **弹幕** 吧！");
         }
         mute(userId, minute);
     }
@@ -581,10 +892,12 @@ public class ChatRoomBot {
         // 检查是否在全员禁言中  优先级高于个人禁言
         String allMute = cloudService.getFromCloud("all:fish:mute", CloudService.SYS_MUTE);
         // 全员禁言存在 且 有效. 直接返回对象
-        if (allMute.isEmpty() || (System.currentTimeMillis() < Long.parseLong(allMute))){
-            long remainMinute = (Long.parseLong(allMute) - System.currentTimeMillis()) / 1000;
-            // 区别个人设置
-            return (- (int) remainMinute);
+        if (!allMute.isEmpty()) {
+            if ((System.currentTimeMillis() < Long.parseLong(allMute))){
+                long remainMinute = (Long.parseLong(allMute) - System.currentTimeMillis()) / 1000;
+                // 区别个人设置
+                return (- (int) remainMinute);
+            }
         }
         // 检查个人禁言
         String muteData = cloudService.getFromCloud(userId, CloudService.SYS_MUTE);

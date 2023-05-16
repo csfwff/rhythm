@@ -31,10 +31,10 @@
 </head>
 <body class="index">
 
+<#include "header.ftl">
 <#if showTopAd>
     ${HeaderBannerLabel}
 </#if>
-<#include "header.ftl">
 <div class="main">
     <div class="wrapper index-full-size-white" id="nightTips" style="display: none"></div>
     <div class="wrapper" style="padding-bottom: 20px">
@@ -73,7 +73,7 @@
                         }
 
                         .rank {
-                            padding: 7px 15px 8px 15px !important;
+                            padding: 7px 15px 7px 15px !important;
                         }
                     </style>
                     <#list recentArticles as article>
@@ -100,35 +100,31 @@
         </div>
         <div class="index-recent fn-flex-1">
             <div class="index-head-title">
-                <div style="float:left;font-size:13px;margin:5px 0 10px 0; font-weight:bold;">随便看看</div>
+                <div style="float:left;font-size:13px;margin:5px 0 10px 0; font-weight:bold;">热议</div>
                 <div style="float:right;font-size:13px;margin:5px 0 0 0;">
-                    <a onclick="randomArticles()" style="cursor: pointer; color: #c8383a; text-decoration: none;">
-                        <svg id="randomArticlesRefreshSvg">
-                            <use xlink:href="#refreshQ"></use>
-                        </svg>
-                        换点别的
-                    </a>
+                    <a href="${servePath}/hot">更多</a>
                 </div>
                 <div style="clear:both;"></div>
             </div>
             <div class="module-panel">
-                <ul class="module-list" id="randomArticles">
-                    <#if indexRandomArticles??>
-                        <#list indexRandomArticles as article>
-                            <li class="fn-flex">
-                                <a rel="nofollow" href="${servePath}/member/${article.articleAuthorName}">
-                                    <span class="avatar-small slogan"
-                                          aria-label="${article.articleAuthorName}"
-                                          style="background-image:url('${article.articleAuthorThumbnailURL48}')"></span>
-                                </a>
-                                <a rel="nofollow" class="title fn-ellipsis fn-flex-1"
-                                   href="${servePath}${article.articlePermalink}">${article.articleTitleEmoj}</a>
-                                <a class="fn-right count ft-gray ft-smaller"
-                                   href="${servePath}${article.articlePermalink}"><#if article.articleViewCount < 1000>
-                                        ${article.articleViewCount}<#else>${article.articleViewCntDisplayFormat}</#if></a>
-                            </li>
-                        </#list>
-                    </#if>
+                <ul class="module-list" id="hotArticles">
+                    <#list hot as article>
+                        <li class="fn-flex">
+                            <a rel="nofollow" href="${servePath}/member/${article.articleAuthorName}">
+                                <span class="avatar-small slogan"
+                                      aria-label="${article.articleAuthorName}"
+                                      style="background-image:url('${article.articleAuthorThumbnailURL48}')"></span>
+                            </a>
+                            <a rel="nofollow" class="title fn-ellipsis fn-flex-1"
+                               href="${servePath}${article.articlePermalink}">${article.articleTitleEmoj}</a>
+                            <a class="fn-right count ft-gray ft-smaller"
+                               href="${servePath}${article.articlePermalink}">
+                                <svg style="padding-top: 1px;vertical-align: -2px;">
+                                    <use xlink:href="#fire"></use>
+                                </svg> ${article.total_score}
+                            </a>
+                        </li>
+                    </#list>
                 </ul>
             </div>
         </div>
@@ -186,7 +182,7 @@
             <div class="module-panel">
                 <ul class="module-list">
                     <#list topCheckinUsers as user>
-                        <#if user_index < 6>
+                        <#if user_index < 7>
                             <li class="fn-flex rank topCheckInUsersElement">
                                 <#if user_index == 0 || user_index == 1 || user_index == 2>
                                 <span
@@ -227,7 +223,7 @@
             <div class="module-panel">
                 <ul class="module-list">
                     <#list onlineTopUsers as user>
-                        <#if user_index < 5>
+                        <#if user_index < 6>
                             <li class="fn-flex rank topCheckInUsersElement">
                                 <#if user_index == 0 || user_index == 1 || user_index == 2>
                                 <span
@@ -278,7 +274,7 @@
 
     <div class="wrapper index-full-size" id="goodNight" style="display: none"></div>
 
-    <div class="index-bottom">
+    <div class="index-bottom" style="border-top: 1px solid #f3f3f3;">
         <div class="wrapper">
             <div class="fn-flex-1">
                 <div class="metro-line fn-flex" style="align-items:center;">
@@ -354,15 +350,15 @@
                     <div style="clear:both;"></div>
                 </div>
                 <div class="module-panel">
-                    <div class="module-header form">
+                    <div class="module-header form" style="border: none;">
                         <input id="chatRoomInput"
                                type="text"
                                class="comment__text breezemoon__input"
-                               placeholder="简单聊聊 (高级功能请访问完整版聊天室哦)"/>
+                               placeholder="说点什么..."/>
                         <div id="chatUsernameSelectedPanel" class="completed-panel"
                              style="height:170px;display:none;left:auto;top:auto;cursor:pointer;"></div>
                         <span id="chatRoomPostBtn" class="btn breezemoon__btn" data-csrf="${csrfToken}"
-                              onclick="sendChat()">Biu~</span>
+                              onclick="sendChat()">发送</span>
                     </div>
                     <div class="module-panel">
                         <ul class="module-list" id="chatRoomIndex">
@@ -501,7 +497,7 @@
                     <div style="clear:both;"></div>
                 </div>
                 <div class="module-panel">
-                    <div class="module-header form">
+                    <div class="module-header form" style="border: none;">
                         <input id="breezemoonInput"
                                type="text"
                                class="comment__text breezemoon__input"
@@ -592,11 +588,13 @@
         $("#chatUsernameSelectedPanel").hide();
     }
 
+    var thisClient = 'Web/PC网页端 主页精简版';
     function sendChat() {
         <#if isLoggedIn>
         var content = $("#chatRoomInput").val();
         var requestJSONObject = {
             content: content,
+            client: thisClient
         };
         $.ajax({
             url: Label.servePath + '/chat-room/send',
@@ -744,39 +742,6 @@
 
     var loading = false;
     var rotate = new Rotate("randomArticlesRefreshSvg");
-
-    function randomArticles() {
-        if (!loading) {
-            loading = true;
-            rotate.submit();
-            $("#randomArticles").fadeOut(100);
-            $.ajax({
-                url: "${servePath}/article/random/12",
-                method: "GET",
-                cache: false,
-                async: true,
-                success: function (result) {
-                    rotate.stop();
-                    loading = false;
-                    $("#randomArticles").html('');
-                    for (let articleCur in result.articles) {
-                        let article = result.articles[articleCur];
-                        let viewCount = article.articleViewCount;
-                        if (viewCount >= 1000) {
-                            viewCount = article.articleViewCntDisplayFormat;
-                        }
-                        $("#randomArticles").append('<li class="fn-flex">' +
-                            '<a rel="nofollow" href="${servePath}/member/' + article.articleAuthorName + '">' +
-                            '<span class="avatar-small slogan" aria-label="' + article.articleAuthorName + '" style="background-image:url(\'' + article.articleAuthorThumbnailURL48 + '\')"></span></a>' +
-                            '<a rel="nofollow" class="title fn-ellipsis fn-flex-1" href="${servePath}' + article.articlePermalink + '">' + article.articleTitleEmoj + '</a>' +
-                            '<a class="fn-right count ft-gray ft-smaller" href="${servePath}' + article.articlePermalink + '">' + viewCount + '</a>' +
-                            '</li>');
-                    }
-                    $("#randomArticles").fadeIn(500);
-                }
-            });
-        }
-    }
 </script>
 <script>
     // 渐变输出

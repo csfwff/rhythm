@@ -210,7 +210,7 @@ public class UserProcessor {
     public static final Map<String, Float> livenessCache = Collections.synchronizedMap(new LinkedHashMap<String, Float>() {
         @Override
         protected boolean removeEldestEntry(Map.Entry eldest) {
-            return size() > 1000;
+            return size() > 2000;
         }
     });
 
@@ -240,6 +240,7 @@ public class UserProcessor {
         Dispatcher.get("/users/emotions", userProcessor::getFrequentEmotions);
         Dispatcher.get("/user/{userName}", userProcessor::getUserInfo);
         Dispatcher.get("/user/liveness", userProcessor::getLiveness, loginCheck::handle);
+        Dispatcher.post("/user/liveness", userProcessor::getUserLiveness);
         Dispatcher.get("/user/{userName}/metal", userProcessor::getUserMetal, userCheckMidware::handle);
         Dispatcher.post("/user/query/latest-login-ip", userProcessor::getLatestLoginIp);
         Dispatcher.post("/user/edit/give-metal", userProcessor::giveMetal);
@@ -251,6 +252,30 @@ public class UserProcessor {
         Dispatcher.post("/user/identify", userProcessor::submitIdentify, loginCheck::handle);
         Dispatcher.get("/api/user/{userName}/articles", userProcessor::userArticles,loginCheck::handle);
         Dispatcher.get("/api/user/{userName}/breezemoons", userProcessor::userBreezemoons, loginCheck::handle);
+    }
+    // 根据用户名获取用户活跃度
+    public void getUserLiveness(final RequestContext context) {
+        JSONObject requestJSONObject = context.requestJSON();
+        final String goldFingerKey = requestJSONObject.optString("goldFingerKey");
+        final String livenessKey = Symphonys.get("gold.finger.liveness");
+        if (goldFingerKey.equals(livenessKey)) {
+            final String userName = requestJSONObject.optString(User.USER_NAME);
+            final JSONObject user = userQueryService.getUserByName(userName);
+            if (null == user) {
+                context.renderJSON(new JSONObject()).renderCode(StatusCodes.ERR).renderMsg("用户不存在");
+                return;
+            }
+            final String userId = user.optString(Keys.OBJECT_ID);
+            final int livenessMax = Symphonys.ACTIVITY_YESTERDAY_REWARD_MAX;
+            final float currentLivenessPoint = livenessQueryService.getCurrentLivenessPoint(userId);
+            float liveness = (float) (Math.round((float) currentLivenessPoint / livenessMax * 100 * 100)) / 100;
+            final JSONObject ret = new JSONObject();
+            ret.put("liveness", liveness);
+            context.renderJSON(ret);
+        } else {
+            context.renderJSON(StatusCodes.ERR);
+            context.renderMsg("金手指(metal类型)不正确。");
+        }
     }
     /**
      * 获取用户清风明月列表
@@ -446,11 +471,6 @@ public class UserProcessor {
                 try {
                     int point = requestJSONObject.optInt("point");
                     String memo = requestJSONObject.optString("memo");
-                    if (point > 100000 || point < -100000) {
-                        context.renderJSON(StatusCodes.ERR);
-                        context.renderMsg("转账失败：交易数额不得大于 100000 积分。");
-                        return;
-                    }
                     if (memo.isEmpty()) {
                         context.renderJSON(StatusCodes.ERR);
                         context.renderMsg("转账失败：交易备注不得为空。");

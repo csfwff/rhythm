@@ -32,6 +32,7 @@ import org.b3log.symphony.model.UserExt;
 import org.b3log.symphony.processor.ApiProcessor;
 import org.b3log.symphony.service.OptionQueryService;
 import org.b3log.symphony.service.UserQueryService;
+import org.b3log.symphony.util.ReservedWords;
 import org.b3log.symphony.util.Sessions;
 import org.b3log.symphony.util.Symphonys;
 import org.json.JSONObject;
@@ -80,16 +81,11 @@ public class ChatMsgAddValidationMidware {
             return;
         }
 
+        requestJSONObject.put(Common.CONTENT, ReservedWords.processReservedWord(requestJSONObject.optString(Common.CONTENT)));
         String content = requestJSONObject.optString(Common.CONTENT);
         content = StringUtils.trim(content);
         if (StringUtils.isBlank(content) || content.length() > 4096) {
             context.renderJSON(new JSONObject().put(Keys.MSG, "聊天消息内容为空或过多（大于4096字符）"));
-            context.abort();
-            return;
-        }
-
-        if (optionQueryService.containReservedWord(content)) {
-            context.renderJSON(new JSONObject().put(Keys.MSG, langPropsService.get("contentContainReservedWordLabel")));
             context.abort();
             return;
         }

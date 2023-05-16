@@ -242,7 +242,7 @@ public class SettingsProcessor {
         Dispatcher.post("/invitecode/state", settingsProcessor::queryInvitecode, loginCheck::handle, csrfMidware::check);
         Dispatcher.post("/point/buy-invitecode", settingsProcessor::pointBuy, loginCheck::handle, csrfMidware::check);
         Dispatcher.post("/export/posts", settingsProcessor::exportPosts, loginCheck::handle);
-        Dispatcher.post("/point/transfer", settingsProcessor::pointTransfer, loginCheck::handle, csrfMidware::check, pointTransferValidationMidware::handle);
+        Dispatcher.post("/point/transfer", settingsProcessor::pointTransfer, loginCheck::handle, pointTransferValidationMidware::handle);
         Dispatcher.get("/bag/1dayCheckin", settingsProcessor::use1dayCheckinCard, loginCheck::handle, csrfMidware::check);
         Dispatcher.get("/bag/2dayCheckin", settingsProcessor::use2dayCheckinCard, loginCheck::handle, csrfMidware::check);
         Dispatcher.get("/bag/patchCheckin", settingsProcessor::usePatchCheckinCard, loginCheck::handle, csrfMidware::check);
@@ -387,9 +387,6 @@ public class SettingsProcessor {
             pointtransferMgmtService.transfer(userId, Pointtransfer.ID_C_SYS,
                     Pointtransfer.TRANSFER_TYPE_C_CHANGE_USERNAME, Pointtransfer.TRANSFER_SUM_C_CHANGE_USERNAME,
                     oldName + "-" + newName, System.currentTimeMillis(), "");
-
-            // 将该用户 API 无效化
-            ApiProcessor.removeKeyByUsername(oldName);
 
             context.renderJSON(StatusCodes.SUCC);
         } catch (final ServiceException e) {
@@ -870,12 +867,14 @@ public class SettingsProcessor {
         }
         String systemTitle = requestJSONObject.optString(SystemSettings.SYSTEM_TITLE);
         String cardBg = requestJSONObject.optString("cardBg");
+        String iconURL = requestJSONObject.optString("iconURL");
         String onlineTimeUnit = requestJSONObject.optString(SystemSettings.ONLINE_TIME_UNIT);
         boolean showSideAd = requestJSONObject.optBoolean("showSideAd");
         boolean showTopAd = requestJSONObject.optBoolean("showTopAd");
         final JSONObject settings = new JSONObject();
         settings.put(SystemSettings.SYSTEM_TITLE, systemTitle);
         settings.put("cardBg", cardBg);
+        settings.put("iconURL", iconURL);
         settings.put(SystemSettings.ONLINE_TIME_UNIT, onlineTimeUnit);
         settings.put("showSideAd", showSideAd);
         settings.put("showTopAd", showTopAd);
@@ -1115,7 +1114,11 @@ public class SettingsProcessor {
 
         final int amount = requestJSONObject.optInt(Common.AMOUNT);
         final JSONObject toUser = (JSONObject) context.attr(Common.TO_USER);
-        final JSONObject currentUser = Sessions.getUser();
+        JSONObject currentUser = Sessions.getUser();
+        try {
+            currentUser = ApiProcessor.getUserByKey(requestJSONObject.optString("apiKey"));
+        } catch (NullPointerException ignored) {
+        }
         String memo = (String) context.attr(Pointtransfer.MEMO);
         if (StringUtils.isBlank(memo)) {
             memo = "";

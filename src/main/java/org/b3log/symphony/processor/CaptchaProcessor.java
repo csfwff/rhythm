@@ -181,7 +181,7 @@ public class CaptchaProcessor {
                 response.setHeader("Cache-Control", "no-cache");
                 response.setHeader("Expires", "0");
 
-                URL url = new URL(Latkes.getStaticServePath() + "/images/wait.png");
+                URL url = new URL("http://localhost:8080/images/wait.png");
                 renderImg(renderer, ImageIO.read(url));
             } catch (Exception e) {
                 e.printStackTrace();
@@ -261,7 +261,7 @@ public class CaptchaProcessor {
                     response.setHeader("Cache-Control", "no-cache");
                     response.setHeader("Expires", "0");
 
-                    URL url = new URL(Latkes.getStaticServePath() + "/images/wait.png");
+                    URL url = new URL("http://localhost:8080/images/wait.png");
                     renderImg(renderer, ImageIO.read(url));
                 } catch (Exception e) {
                     e.printStackTrace();

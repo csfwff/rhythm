@@ -25,7 +25,6 @@ import org.b3log.symphony.model.UserExt;
 import org.b3log.symphony.processor.ApiProcessor;
 import org.b3log.symphony.util.Sessions;
 import org.json.JSONObject;
-
 /**
  * Login check. Gets user from request attribute named "user" if logged in.
  *
@@ -35,7 +34,6 @@ import org.json.JSONObject;
  */
 @Singleton
 public class LoginCheckMidware {
-
     public void handle(final RequestContext context) {
         JSONObject currentUser = Sessions.getUser();
         try {

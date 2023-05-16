@@ -347,18 +347,40 @@ var ChatRoomChannel = {
         ChatRoomChannel.ws = new WebSocket(channelServer)
 
         ChatRoomChannel.ws.onopen = function () {
-            console.log("Connected to chat room channel websocket.")
+            console.log("Connected to chatroom channel websocket.")
         }
 
         ChatRoomChannel.ws.onmessage = function (evt) {
             var data = JSON.parse(evt.data)
 
             switch (data.type) {
+                case 'barrager':
+                    let barragerContent = data.barragerContent;
+                    let barragerColor = data.barragerColor;
+                    let barragerUserName = data.userName;
+                    let barragerUserAvatarURL = data.userAvatarURL;
+                    let barragerUserNickname = data.userNickname;
+                    let barrager = '';
+                    if (barragerUserNickname != '' && barragerUserNickname != undefined) {
+                        barrager = barragerUserNickname + ': ' + barragerContent;
+                    } else {
+                        barrager = barragerUserName + ': ' + barragerContent;
+                    }
+                    let item = {
+                        img: barragerUserAvatarURL,
+                        info: barrager,
+                        href: Label.servePath + '/member/' + barragerUserName,
+                        close: false,
+                        speed: Math.round(Math.random()*10+10),
+                        color: barragerColor
+                    }
+                    $('body').barrager(item);
+                    break;
                 case 'discussChanged':
                     let whoChanged = data.whoChanged;
                     let newDiscuss = data.newDiscuss;
                     // 通知
-                    let discussHtml = "<div class='newDiscussNotice' style='color: rgb(50 50 50);margin-bottom: 8px;text-align: center;display: none;'>" +
+                    let discussHtml = "<div class='newDiscussNotice' style='color: rgb(50 50 50);margin-bottom: 12px;text-align: center;display: none;'>" +
                         "<svg><use xlink:href='#pound'></use></svg>&nbsp;" + '<a href="' + Label.servePath + '/member/' + whoChanged + '" target="_blank">' + whoChanged + "</a> 编辑了话题：<a href='javascript:void(0)' style='text-decoration: none'>" +
                         newDiscuss +
                         "</a></div>";
@@ -405,7 +427,7 @@ var ChatRoomChannel = {
                         spell += ' (' + got + '/' + count + ')';
                     }
                     // 通知
-                    let html = "<div class='redPacketNotice' style='color: rgb(50 50 50);margin-bottom: 8px;text-align: center;display: none;'>" +
+                    let html = "<div class='redPacketNotice' style='color: rgb(50 50 50);margin-bottom: 12px;text-align: center;display: none;'>" +
                         "<svg><use xlink:href='#redPacketIcon'></use></svg>&nbsp;" +
                         spell +
                         "</div>";
@@ -432,9 +454,18 @@ var ChatRoomChannel = {
                     $("#chatindex" + data.oId).remove();
                     break;
                 case 'refresh':
-                    $('#chats').empty();
-                    page = 0;
-                    ChatRoom.more();
+                    ChatRoom.flashScreen();
+                    break;
+                case 'customMessage':
+                    let message = "<div class='customNotice' style='color: rgb(118 118 118);margin-bottom: 12px;text-align: center;display: none;'>" +
+                        data.message +
+                        "</div>";
+                    $('#chats').prepend(message);
+                    $(".customNotice").slideDown(500);
+                    break;
+                case 'refreshBarrager':
+                    $('#barragerCost').text(data.cost);
+                    $('#barragerUnit').text(data.unit);
                     break;
                 case 'msg':
                     // Chatroom
@@ -477,7 +508,9 @@ var ChatRoomChannel = {
                         "    </div>\n" +
                         "</li>");
                     if ($("#chatRoomIndex li.fn-flex").length === 11) {
-                        $("#chatRoomIndex li.fn-flex:last").remove();
+                        $("#chatRoomIndex li.fn-flex:last").fadeOut(199, function () {
+                            $("#chatRoomIndex li.fn-flex:last").remove();
+                        });
                     }
                     $("#chatRoomIndex li:first").slideDown(200);
                     Util.listenUserCard();

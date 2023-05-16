@@ -29,6 +29,7 @@ import org.b3log.latke.service.LangPropsService;
 import org.b3log.symphony.model.Common;
 import org.b3log.symphony.model.Pointtransfer;
 import org.b3log.symphony.model.UserExt;
+import org.b3log.symphony.processor.ApiProcessor;
 import org.b3log.symphony.service.UserQueryService;
 import org.b3log.symphony.util.Sessions;
 import org.b3log.symphony.util.Symphonys;
@@ -60,9 +61,13 @@ public class PointTransferValidationMidware {
 
     public void handle(final RequestContext context) {
         final Request request = context.getRequest();
-        final JSONObject currentUser = Sessions.getUser();
-
         final JSONObject requestJSONObject = context.requestJSON();
+        JSONObject currentUser = Sessions.getUser();
+        try {
+            currentUser = ApiProcessor.getUserByKey(requestJSONObject.optString("apiKey"));
+        } catch (NullPointerException ignored) {
+        }
+
         final String userName = requestJSONObject.optString(User.USER_NAME);
         if (StringUtils.isBlank(userName) || UserExt.COM_BOT_NAME.equals(userName)) {
             context.renderJSON(new JSONObject().put(Keys.MSG, langPropsService.get("notFoundUserLabel")));
@@ -71,7 +76,7 @@ public class PointTransferValidationMidware {
         }
 
         final int amount = requestJSONObject.optInt(Common.AMOUNT);
-        if (amount < 1 || amount > 50000) {
+        if (amount < 1) {
             if (!currentUser.optString(User.USER_NAME).equals("admin")) {
                 context.renderJSON(new JSONObject().put(Keys.MSG, langPropsService.get("amountInvalidLabel")));
                 context.abort();

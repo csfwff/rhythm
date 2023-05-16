@@ -33,6 +33,7 @@ var isDrawing = false;
 var x = 0;
 var y = 0;
 var isClick = true;
+var thisClient = 'Web/PC网页端';
 var ChatRoom = {
     init: function () {
         // 聊天窗口高度设置
@@ -43,6 +44,10 @@ var ChatRoom = {
         } else {
           $('.list').height($(window).height() - 173)
         } */
+
+        if (ChatRoom.isMobile()) {
+            thisClient = 'Mobile/移动网页端';
+        }
 
         // 没有登录就不需要编辑器初始化了
         if ($('#chatContent').length === 0) {
@@ -430,6 +435,7 @@ var ChatRoom = {
                 }
                 let requestJSONObject = {
                     content: "[redpacket]" + JSON.stringify(content) + "[/redpacket]",
+                    client: thisClient
                 }
                 $.ajax({
                     url: Label.servePath + '/chat-room/send',
@@ -455,13 +461,32 @@ var ChatRoom = {
         ChatRoom.loadXiaoIceGame();
         // 加载画图
         ChatRoom.charInit('paintCanvas');
+        // 监听弹幕
+        $("#barragerBtn").on('click', function () {
+            if ($("#barragerContent").css("display") === 'none') {
+                $("#barragerContent").slideDown(1000);
+                $("#paintContent").slideUp(1000);
+            } else {
+                $("#barragerContent").slideUp(1000);
+            }
+        });
+        $("#barragerInput").keydown(function(event) {
+            if (event.keyCode == 13) {
+                ChatRoom.sendBarrager();
+            }
+        });
         // 监听画图按钮
         $("#paintBtn").on('click', function () {
             if ($("#paintContent").css("display") === 'none') {
                 $("#paintContent").slideDown(1000);
+                $("#barragerContent").slideUp(1000);
             } else {
                 $("#paintContent").slideUp(1000);
             }
+        });
+        // 监听弹幕颜色
+        $('#selectBarragerColor').cxColor({
+            color: '#ffffff'
         });
         // 监听修改颜色
         $('#selectColor').cxColor();
@@ -472,6 +497,143 @@ var ChatRoom = {
             let width = $("#selectWidth").val();
             ChatRoom.changeWidth(width);
         });
+
+        setInterval(ChatRoom.reloadMessages, 15 * 60 * 1000);
+    },
+    sendBarrager: function () {
+        let color = $("#selectBarragerColor")[0].value;
+        let content = $('#barragerInput').val();
+        let json = {
+            color: color,
+            content: content
+        };
+        let requestJSONObject = {
+            content: "[barrager]" + JSON.stringify(json) + "[/barrager]",
+            client: thisClient
+        }
+        $.ajax({
+            url: Label.servePath + '/chat-room/send',
+            type: 'POST',
+            cache: false,
+            data: JSON.stringify(requestJSONObject),
+            success: function (result) {
+                if (0 !== result.code) {
+                    $('#chatContentTip').addClass('error').html('<ul><li>' + result.msg + '</li></ul>')
+                } else {
+                    $('#barragerInput').val('');
+                }
+            },
+            error: function (result) {
+                $('#chatContentTip').addClass('error').html('<ul><li>' + result.statusText + '</li></ul>')
+            }
+        });
+    },
+    reloadMessages: function () {
+        if (document.documentElement.scrollTop <= 200) {
+            ChatRoom.flashScreen();
+        }
+    },
+    flashScreen: function () {
+        NProgress.start();
+        $('#chats').css("display", "none");
+        page = 1;
+        let chatLength = $(".chats__content").length;
+        if (chatLength > 25) {
+            for (let i = chatLength - 1; i > 24; i--) {
+                if ($($($($($(".chats__content")[i]).parent()).parent()).parent()).attr("id") == 'stacked') {
+                    $($($($($(".chats__content")[i]).parent()).parent()).parent()).remove();
+                } else {
+                    $($($($(".chats__content")[i]).parent()).parent()).remove();
+                }
+            }
+        }
+        setTimeout(function() {
+            $('#chats').css("display", "block");
+            NProgress.done();
+        }, 150);
+    },
+    /**
+     * 打开思过崖
+     */
+    showSiGuoYar: function () {
+        Util.alert(`
+<style>
+.dialog-panel {
+border-radius: 20px 20px 20px 20px;
+border: 0;
+box-shadow: none;
+}
+.dialog-header-bg {
+display: none;
+}
+.dialog-main {
+height: 456px;
+overflow: auto;
+padding: 10px 10px 20px !important;
+color: #e1e1e1;
+background: url(https://file.fishpi.cn/2023/04/面壁-5e5b04c3.jpg) no-repeat;
+background-size: 100% 100%;
+background-attachment: fixed;
+font-family: STKaiti;
+}
+.list>ul {
+margin-top: 15px;
+}
+.list>ul>li {
+padding: 6px 8px;
+border-bottom: none;
+}
+</style>
+<div class="fn-hr5"></div>
+<div class="ft__center">
+    <div>
+        <h2>思過崖</h2>
+        <div class="fn-hr5"></div>
+        <span>摸魚派倡導自由、友善的交流環境。<br>這裏收留了因不遵守摸魚法則而受到處罰的魚油。</span>
+    </div>
+    <div class="list">
+    <ul id="si-guo-list">
+    </ul>
+    </div>
+</div>`);
+        $.ajax({
+            url: Label.servePath + '/chat-room/si-guo-list',
+            type: 'GET',
+            cache: false,
+            async: false,
+            success: function (result) {
+                let list = result.data;
+                if (list.length == 0) {
+                    $("#si-guo-list").prepend('<li style="color: #3caf36; font-weight: bold;">目前沒有受到處罰的魚油，請繼續保持！</li>');
+                }
+                for (let i = 0; i < list.length; i++) {
+                    let j = list[i];
+                    let date = new Date(j.time);
+                    let userAvatarURL = j.userAvatarURL;
+                    let userName = j.userName;
+                    let userNickname = j.userNickname;
+                    let useName = userName;
+                    if (userNickname != '') {
+                        useName = userNickname;
+                    }
+                    $("#si-guo-list").prepend(`
+    <li class="fn__flex menu__item">
+        <img class="avatar avatar--mid" style="width: 24px; height: 24px; margin-right: 10px; background-image: none; background-color: transparent;" src="` + userAvatarURL + `">
+        <div class="fn__flex-1" style="text-align: left !important;">
+            <h2 class="list__user">
+                <a target="_blank" href="` + Label.servePath + `/member/` + userName + `" style="color: #c0c0c0; text-decoration: none;">` + useName + `</a>
+            </h2>
+            <span class="ft__fade ft__smaller"><a onclick="Util.closeAlert(this);ChatRoom.editor.setValue('合议破戒 ` + userName + `');ChatRoom.send();$(window).scrollTop(0);" style="cursor: pointer; font-weight: bold;" href="javascript:void(0);">爲他求情</a></span>
+        </div>
+        <div class="fn__flex-center" style="color: #ff1919; font-weight: bold">
+        將於 ` + date.getFullYear() + `年` + (date.getMonth()+1 < 10 ? '0'+(date.getMonth()+1) : date.getMonth()+1) + `月` + date.getDate() + `日 ` + date.getHours() + `時` + date.getMinutes() + `分 釋放
+        </div>
+  
+    </li>
+                `);
+                }
+            }
+        })
     },
     /**
      * 提交写好字的图片.
@@ -666,6 +828,7 @@ var ChatRoom = {
     updateDiscussData: function (discuss) {
         let requestJSONObject = {
             content: "[setdiscuss]" + discuss + "[/setdiscuss]",
+            client: thisClient
         }
         $.ajax({
             url: Label.servePath + '/chat-room/send',
@@ -911,25 +1074,10 @@ var ChatRoom = {
             return;
         }
         ChatRoom.isSend = true;
-        var content = ChatRoom.editor.getValue();
-        if(content.length > 1){
-          var withNSFW = false;
-          var theLastChar = content.charAt(content.length - 1);
-          content = content.substr(0, content.length - 1);
-          if($("#nsfwCheckbox").prop("checked") == true){
-            if(content.indexOf('##### 引用') == -1){
-              withNSFW = true;
-            }
-            else {
-              $("#nsfwCheckbox").prop("checked",false);
-            }
-          }
-        }
-        if(withNSFW) {
-          content = "#NSFW" + content + "NSFW#" + theLastChar;
-        }
+        var content = ChatRoom.editor.getValue()
         var requestJSONObject = {
             content: content,
+            client: thisClient
         }
         ChatRoom.editor.setValue('')
         $.ajax({
@@ -1045,8 +1193,7 @@ var ChatRoom = {
     groupRevokeProcess: false,
     startGroupRevoke: function () {
         $("#groupRevoke").attr("onclick", "ChatRoom.stopGroupRevoke()");
-        $("#groupRevoke").html("<svg style=\"vertical-align: -2px;\"><use xlink:href=\"#administration\"></use></svg>\n" +
-            "关闭批量撤回");
+        $("#groupRevoke").html("关闭批量撤回");
         Util.notice("warning", 6000, "批量撤回已启动，已在消息中添加便捷撤回按钮。<br>使用完成后请记得关闭此功能。");
         ChatRoom.groupRevokeProcess = true;
         let groupRevokeInterval = setInterval(function () {
@@ -1069,8 +1216,7 @@ var ChatRoom = {
      */
     stopGroupRevoke: function () {
         $("#groupRevoke").attr("onclick", "ChatRoom.startGroupRevoke()");
-        $("#groupRevoke").html("<svg style=\"vertical-align: -2px;\"><use xlink:href=\"#administration\"></use></svg>\n" +
-            "批量撤回");
+        $("#groupRevoke").html("批量撤回");
         Util.notice("success", 1500, "批量撤回已关闭。");
         ChatRoom.groupRevokeProcess = false;
     },
@@ -1489,6 +1635,7 @@ ${result.info.msg}
                         '    </svg>\n' +
                         '    <div>\n' +
                         '        <div>' + msgJSON.msg + '<br><b>' + type + '</b></div>\n' +
+                        '        <div><svg style="vertical-align: -2px; width: 13px; height: 13px"><use xlink:href="#coin"></use></svg> ' + msgJSON.money + '</div>\n' +
                         '        <div class="ft__smaller ft__fade redPacketDesc">\n' +
                         content + '\n' +
                         '        </div>\n' +
@@ -1502,6 +1649,7 @@ ${result.info.msg}
                         '    </svg>\n' +
                         '    <div>\n' +
                         '        <div>' + msgJSON.msg + '<br><b>' + type + '</b></div>\n' +
+                        '        <div><svg style="vertical-align: -2px; width: 13px; height: 13px"><use xlink:href="#coin"></use></svg> ' + msgJSON.money + '</div>\n' +
                         '        <div class="ft__smaller ft__fade redPacketDesc">\n' +
                         '        </div>\n' +
                         '    </div>\n' +
@@ -1556,7 +1704,8 @@ ${result.info.msg}
             '    <div class="chats__content">\n' +
             '        <div class="chats__arrow"></div>\n';
 
-        let display = Label.currentUser === data.userName && !isPlusOne ? 'display: none;' : ''
+        // let display = Label.currentUser === data.userName && !isPlusOne ? 'display: none;' : ''
+        let display = '';
         newHTML += '<div id="userName" class="ft__fade ft__smaller" style="' + display + 'padding-bottom: 3px;border-bottom: 1px solid #eee">\n' +
             '    <span class="ft-gray">' + data.userNickname + '</span>&nbsp;\n';
         if (data.sysMetal !== undefined && data.sysMetal !== "") {
@@ -1569,20 +1718,129 @@ ${result.info.msg}
             }
         }
         newHTML += '</div>';
-        var isNSFW = false;
-        if(data.content.indexOf('#NSFW') != -1 && data.content.indexOf('NSFW#' != -1)) {
-          data.content = data.content.replace('#NSFW', '<details><summary>可能引起不适的内容:</summary>');
-          data.content = data.content.replace('NSFW#', '</details>');
-          isNSFW = true;
-        }
-        newHTML += '        <div class="vditor-reset ft__smaller ' + Label.chatRoomPictureStatus + '">\n' +
-        '            ' + data.content + '\n' +
-        '        </div>\n' +
-        '        <div class="ft__smaller ft__fade fn__right date-bar">\n' +
-        '            ' + data.time + '\n' +
-        '                <span class="fn__space5"></span>\n';
-      
 
+        newHTML += '        <div class="vditor-reset ft__smaller ' + Label.chatRoomPictureStatus + '" style="margin-top: 3px">\n' +
+            '            ' + data.content + '\n' +
+            '        </div>\n' +
+            '        <div class="ft__smaller ft__fade fn__right date-bar">\n' +
+            '            ' + data.time + '\n' +
+            '                <span class="fn__space5"></span>\n';
+        // 客户端标识
+        if (data.client !== undefined && data.client !== '') {
+            let client = data.client.split('/')[0];
+            let version = data.client.split('/')[1];
+            switch (client) {
+                case 'Web':
+                    newHTML += '<span class="tooltipped tooltipped-n" aria-label="' + client + ' ' + version + '">' +
+                        '<svg style="vertical-align: -3px;"><use xlink:href="#ic-fish"></use></svg>' +
+                        '</span>';
+                    newHTML += '<span class="fn__space5"></span>\n';
+                    break;
+                case 'ElvesOnline':
+                    newHTML += '<span class="tooltipped tooltipped-n" aria-label="' + client + ' ' + version + '">' +
+                        '<svg style="vertical-align: -3px;"><use xlink:href="#ic-moon"></use></svg>' +
+                        '</span>';
+                    newHTML += '<span class="fn__space5"></span>\n';
+                    break;
+                case 'Mobile':
+                    newHTML += '<span class="tooltipped tooltipped-n" aria-label="' + client + ' ' + version + '">' +
+                        '<svg style="vertical-align: -3px;"><use xlink:href="#ic-mobile"></use></svg>' +
+                        '</span>';
+                    newHTML += '<span class="fn__space5"></span>\n';
+                    break;
+                case 'Windows':
+                    newHTML += '<span class="tooltipped tooltipped-n" aria-label="' + client + ' ' + version + '">' +
+                        '<svg style="vertical-align: -3px;"><use xlink:href="#ic-windows"></use></svg>' +
+                        '</span>';
+                    newHTML += '<span class="fn__space5"></span>\n';
+                    break;
+                case 'Linux':
+                    newHTML += '<span class="tooltipped tooltipped-n" aria-label="' + client + ' ' + version + '">' +
+                        '<svg style="vertical-align: -3px;"><use xlink:href="#ic-linux"></use></svg>' +
+                        '</span>';
+                    newHTML += '<span class="fn__space5"></span>\n';
+                    break;
+                case 'IceNet':
+                    newHTML += '<span class="tooltipped tooltipped-n" aria-label="' + client + ' ' + version + '">' +
+                        '<svg style="vertical-align: -3px;"><use xlink:href="#ic-icenet"></use></svg>' +
+                        '</span>';
+                    newHTML += '<span class="fn__space5"></span>\n';
+                    break;
+                case 'Extension':
+                    newHTML += '<span class="tooltipped tooltipped-n" aria-label="' + client + ' ' + version + '">' +
+                        '<svg style="vertical-align: -3px;"><use xlink:href="#ic-extension"></use></svg>' +
+                        '</span>';
+                    newHTML += '<span class="fn__space5"></span>\n';
+                    break;
+                case 'Edge':
+                    newHTML += '<span class="tooltipped tooltipped-n" aria-label="' + client + ' ' + version + '">' +
+                        '<svg style="vertical-align: -3px;"><use xlink:href="#ic-edge"></use></svg>' +
+                        '</span>';
+                    newHTML += '<span class="fn__space5"></span>\n';
+                    break;
+                case 'Other':
+                    newHTML += '<span class="tooltipped tooltipped-n" aria-label="' + client + ' ' + version + '">' +
+                        '<svg style="vertical-align: -3px;"><use xlink:href="#ic-other"></use></svg>' +
+                        '</span>';
+                    newHTML += '<span class="fn__space5"></span>\n';
+                    break;
+                case 'PC':
+                    newHTML += '<span class="tooltipped tooltipped-n" aria-label="' + client + ' ' + version + '">' +
+                        '<svg style="vertical-align: -3px;"><use xlink:href="#ic-pc2"></use></svg>' +
+                        '</span>';
+                    newHTML += '<span class="fn__space5"></span>\n';
+                    break;
+                case 'iOS':
+                    newHTML += '<span class="tooltipped tooltipped-n" aria-label="' + client + ' ' + version + '">' +
+                        '<svg style="vertical-align: -3px;"><use xlink:href="#ic-apple"></use></svg>' +
+                        '</span>';
+                    newHTML += '<span class="fn__space5"></span>\n';
+                    break;
+                case 'macOS':
+                    newHTML += '<span class="tooltipped tooltipped-n" aria-label="' + client + ' ' + version + '">' +
+                        '<svg style="vertical-align: -3px;"><use xlink:href="#ic-apple"></use></svg>' +
+                        '</span>';
+                    newHTML += '<span class="fn__space5"></span>\n';
+                    break;
+                case 'Android':
+                    newHTML += '<span class="tooltipped tooltipped-n" aria-label="' + client + ' ' + version + '">' +
+                        '<svg style="vertical-align: -3px;"><use xlink:href="#ic-apk"></use></svg>' +
+                        '</span>';
+                    newHTML += '<span class="fn__space5"></span>\n';
+                    break;
+                case 'Chrome':
+                    newHTML += '<span class="tooltipped tooltipped-n" aria-label="' + client + ' ' + version + '">' +
+                        '<svg style="vertical-align: -3px;"><use xlink:href="#ic-chrome"></use></svg>' +
+                        '</span>';
+                    newHTML += '<span class="fn__space5"></span>\n';
+                    break;
+                case 'VSCode':
+                    newHTML += '<span class="tooltipped tooltipped-n" aria-label="' + client + ' ' + version + '">' +
+                        '<svg style="vertical-align: -3px;"><use xlink:href="#ic-vscode"></use></svg>' +
+                        '</span>';
+                    newHTML += '<span class="fn__space5"></span>\n';
+                    break;
+                case 'IDEA':
+                    newHTML += '<span class="tooltipped tooltipped-n" aria-label="' + client + ' ' + version + '">' +
+                        '<svg style="vertical-align: -3px;"><use xlink:href="#ic-idea"></use></svg>' +
+                        '</span>';
+                    newHTML += '<span class="fn__space5"></span>\n';
+                    break;
+                case 'Python':
+                    newHTML += '<span class="tooltipped tooltipped-n" aria-label="' + client + ' ' + version + '">' +
+                        '<svg style="vertical-align: -3px;"><use xlink:href="#ic-python"></use></svg>' +
+                        '</span>';
+                    newHTML += '<span class="fn__space5"></span>\n';
+                    break;
+                case 'Golang':
+                    newHTML += '<span class="tooltipped tooltipped-n" aria-label="' + client + ' ' + version + '">' +
+                        '<svg style="vertical-align: -3px;"><use xlink:href="#ic-golang"></use></svg>' +
+                        '</span>';
+                    newHTML += '<span class="fn__space5"></span>\n';
+                    break;
+            }
+        }
+        // === 客户端标识
         if (!isRedPacket) {
             newHTML += '                <details class="details action__item fn__flex-center">\n' +
                 '                    <summary>\n' +
@@ -1851,6 +2109,26 @@ ${result.info.msg}
         if (new Date(SpringFestivalDateList[year][0]).getTime() <= toDayTimes && new Date(SpringFestivalDateList[year][1]).getTime() >= toDayTimes) {
             chatRoom.classList.add('SpringFestival')
         }
+    },
+
+    isMobile: function () {
+        var userAgentInfo = navigator.userAgent;
+        var mobileAgents = ["Android", "iPhone", "SymbianOS", "Windows Phone", "iPad", "iPod"];
+        var mobile_flag = false;
+        //根据userAgent判断是否是手机
+        for (var v = 0; v < mobileAgents.length; v++) {
+            if (userAgentInfo.indexOf(mobileAgents[v]) > 0) {
+                mobile_flag = true;
+                break;
+            }
+        }
+        var screen_width = window.screen.width;
+        var screen_height = window.screen.height;
+        //根据屏幕分辨率判断是否是手机
+        if (screen_width > 325 && screen_height < 750) {
+            mobile_flag = true;
+        }
+        return mobile_flag;
     }
 }
 

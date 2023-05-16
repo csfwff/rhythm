@@ -29,7 +29,7 @@
             <form action="${servePath}/admin/add-reserved-word" method="POST" class="fn__flex">
                 <label>
                     <div>${reservedWordLabel}</div>
-                    <input name="word" type="text"/>
+                    <textarea name="word" rows="20"></textarea>
                 </label>
                 <div>
                     &nbsp; &nbsp;

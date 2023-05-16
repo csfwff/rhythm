@@ -45,6 +45,8 @@ import org.b3log.symphony.util.Symphonys;
 import org.json.JSONObject;
 import pers.adlered.simplecurrentlimiter.main.SimpleCurrentLimiter;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
 
 /**
@@ -63,6 +65,12 @@ public class BeforeRequestHandler implements Handler {
 
     SimpleCurrentLimiter antiCCLimiter = new SimpleCurrentLimiter(15, 15);
 
+    private static final List<String> whiteList = new ArrayList<String>() {{
+            add("103.239.101.147");
+            add("127.0.0.1");
+            add("[0:0:0:0:0:0:0:1]");
+        }};
+
     @Override
     public void handle(final RequestContext context) {
         Stopwatchs.start("Request initialized [" + context.requestURI() + "]");
@@ -77,9 +85,11 @@ public class BeforeRequestHandler implements Handler {
             String uri = context.getRequest().getRequestURI();
             String ip = Requests.getRemoteAddr(context.getRequest());
             String union = ip + " " + method + " " + uri;
-            if (!antiCCLimiter.access(union)) {
-                context.sendStatus(503);
-                return;
+            if (!whiteList.contains(ip)) {
+                if (!antiCCLimiter.access(union)) {
+                    context.sendStatus(503);
+                    return;
+                }
             }
         } catch (Exception e) {
             e.printStackTrace();

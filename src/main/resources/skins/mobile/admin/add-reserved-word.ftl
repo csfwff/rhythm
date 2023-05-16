@@ -29,7 +29,7 @@
         <div class="module-panel form fn-clear">
             <form action="${servePath}/admin/add-reserved-word" method="POST">
                 <label>${reservedWordLabel}</label>
-                <input name="word" type="text" />
+                <textarea name="word" rows="20"></textarea>
 
                 <br/><br/><br/>
                 <button type="submit" class="green fn-right">${submitLabel}</button>
