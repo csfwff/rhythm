@@ -27,6 +27,7 @@ import jodd.http.HttpRequest;
 import jodd.http.HttpResponse;
 import jodd.io.FileUtil;
 import jodd.net.MimeTypes;
+import net.coobird.thumbnailator.Thumbnails;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
@@ -185,31 +186,11 @@ public class FileUploadProcessor {
         boolean checkFailed = false;
         String suffix = "";
         final String[] allowedSuffixArray = Symphonys.UPLOAD_SUFFIX.split(",");
-        final String[] staticPictureSuffixArray = {"jpg", "jpeg", "png"};
-        final String[] animatePictureSuffixArray = {"gif"};
-        final String[] audioSuffixArray = {"mp3"};
-        final String[] videoSuffixArray = {"mp4"};
         for (final FileUpload file : allFiles) {
             suffix = Headers.getSuffix(file);
             if (!Strings.containsIgnoreCase(suffix, allowedSuffixArray)) {
                 checkFailed = true;
                 break;
-            }
-
-            if (Strings.contains(suffix, staticPictureSuffixArray)) {
-                // 静态图片处理
-            }
-
-            if (Strings.contains(suffix, animatePictureSuffixArray)) {
-                // 动态图片处理
-            }
-
-            if (Strings.contains(suffix, audioSuffixArray)) {
-                // 音频处理
-            }
-
-            if (Strings.contains(suffix, videoSuffixArray)) {
-                // 视频处理
             }
 
             if (maxSize < file.getData().length) {
@@ -236,9 +217,35 @@ public class FileUploadProcessor {
         }
 
         final List<byte[]> fileBytes = new ArrayList<>();
+        final String[] staticPictureSuffixArray = {"jpg", "jpeg", "png"};
+        final String[] animatePictureSuffixArray = {"gif"};
+        final String[] audioSuffixArray = {"mp3"};
+        final String[] videoSuffixArray = {"mp4"};
         if (Symphonys.QN_ENABLED) { // 文件上传性能优化 https://github.com/b3log/symphony/issues/866
             for (final FileUpload file : files) {
                 final byte[] bytes = file.getData();
+                int before = bytes.length;
+                suffix = Headers.getSuffix(file);
+                if (Strings.contains(suffix, staticPictureSuffixArray)) {
+                    // 静态图片处理
+
+                    LOGGER.log(Level.INFO, "Compressed " + file.getFilename() + " as a static picture, before: " + before + ", after: " + bytes.length);
+                }
+
+                if (Strings.contains(suffix, animatePictureSuffixArray)) {
+                    // 动态图片处理
+                    LOGGER.log(Level.INFO, "Compressed " + file.getFilename() + " as an animate picture, before: " + before + ", after: " + bytes.length);
+                }
+
+                if (Strings.contains(suffix, audioSuffixArray)) {
+                    // 音频处理
+                    LOGGER.log(Level.INFO, "Compressed " + file.getFilename() + " as an audio, before: " + before + ", after: " + bytes.length);
+                }
+
+                if (Strings.contains(suffix, videoSuffixArray)) {
+                    // 视频处理
+                    LOGGER.log(Level.INFO, "Compressed " + file.getFilename() + " as a video, before: " + before + ", after: " + bytes.length);
+                }
                 fileBytes.add(bytes);
             }
         }
