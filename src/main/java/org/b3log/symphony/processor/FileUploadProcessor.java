@@ -197,7 +197,19 @@ public class FileUploadProcessor {
             }
 
             if (Strings.contains(suffix, staticPictureSuffixArray)) {
-                System.out.println(file.getFilename());
+                // 静态图片处理
+            }
+
+            if (Strings.contains(suffix, animatePictureSuffixArray)) {
+                // 动态图片处理
+            }
+
+            if (Strings.contains(suffix, audioSuffixArray)) {
+                // 音频处理
+            }
+
+            if (Strings.contains(suffix, videoSuffixArray)) {
+                // 视频处理
             }
 
             if (maxSize < file.getData().length) {
