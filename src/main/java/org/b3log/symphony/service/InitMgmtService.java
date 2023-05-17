@@ -135,6 +135,10 @@ public class InitMgmtService {
         LEADER_PERMISSIONS.add(Permission.PERMISSION_ID_C_MENU_ADMIN_COMMENTS);
         LEADER_PERMISSIONS.add(Permission.PERMISSION_ID_C_MENU_ADMIN_ICS);
         LEADER_PERMISSIONS.add(Permission.PERMISSION_ID_C_MENU_ADMIN_RWS);
+        LEADER_PERMISSIONS.add(Permission.PERMISSION_ID_C_USER_ADJUST_BAG);
+        LEADER_PERMISSIONS.add(Permission.PERMISSION_ID_C_USER_GIVE_METAL);
+        LEADER_PERMISSIONS.add(Permission.PERMISSION_ID_C_USER_REMOVE_METAL);
+        LEADER_PERMISSIONS.add(Permission.PERMISSION_ID_C_USER_REMOVE_MFA);
 
         // Admin
         ADMIN_PERMISSIONS.addAll(LEADER_PERMISSIONS);
@@ -506,6 +510,14 @@ public class InitMgmtService {
             permission.put(Keys.OBJECT_ID, Permission.PERMISSION_ID_C_USER_UPDATE_USER_ADVANCED);
             permissionRepository.add(permission);
             permission.put(Keys.OBJECT_ID, Permission.PERMISSION_ID_C_USER_UPDATE_USER_BASIC);
+            permissionRepository.add(permission);
+            permission.put(Keys.OBJECT_ID, Permission.PERMISSION_ID_C_USER_ADJUST_BAG);
+            permissionRepository.add(permission);
+            permission.put(Keys.OBJECT_ID, Permission.PERMISSION_ID_C_USER_GIVE_METAL);
+            permissionRepository.add(permission);
+            permission.put(Keys.OBJECT_ID, Permission.PERMISSION_ID_C_USER_REMOVE_METAL);
+            permissionRepository.add(permission);
+            permission.put(Keys.OBJECT_ID, Permission.PERMISSION_ID_C_USER_REMOVE_MFA);
             permissionRepository.add(permission);
 
             // menu permissions

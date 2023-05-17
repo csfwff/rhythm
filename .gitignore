@@ -13,3 +13,4 @@ symphony.iml
 ChatRoom.tmp
 delegated-apnic-latest.tmp
 *.lock
+.fleet/
