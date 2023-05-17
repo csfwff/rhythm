@@ -695,6 +695,12 @@ public class ArticleProcessor {
             return;
         }
 
+        final long dayAgo = DateUtils.addDays(new Date(), -1).getTime();
+        if (article.optLong(Article.ARTICLE_CREATE_TIME)  > dayAgo) {
+            context.renderMsg("文章发布 24 小时后才能删除！");
+            return;
+        }
+
         try {
             articleMgmtService.removeArticle(id);
 
