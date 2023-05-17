@@ -274,7 +274,7 @@ public class UserProcessor {
             context.renderJSON(ret);
         } else {
             context.renderJSON(StatusCodes.ERR);
-            context.renderMsg("金手指(metal类型)不正确。");
+            context.renderMsg("金手指(liveness类型)不正确。");
         }
     }
     /**

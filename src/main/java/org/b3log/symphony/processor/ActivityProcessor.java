@@ -161,6 +161,7 @@ public class ActivityProcessor {
         Dispatcher.get("/activities", activityProcessor::showActivities);
         // Dispatcher.get("/activity/daily-checkin-api", activityProcessor::dailyCheckinApi, loginCheck::handle);
         Dispatcher.get("/activity/yesterday-liveness-reward-api", activityProcessor::yesterdayLivenessRewardApi, loginCheck::handle);
+        Dispatcher.post("/activity/yesterday-liveness-reward-api", activityProcessor::yesterdayLivenessRewardApiGold);
         // Dispatcher.get("/activity/1A0001", activityProcessor::show1A0001, csrfMidware::fill);
         // Dispatcher.post("/activity/1A0001/bet", activityProcessor::bet1A0001, loginCheck::handle, csrfMidware::check, activity1A0001ValidationMidware::handle);
         // Dispatcher.post("/activity/1A0001/collect", activityProcessor::collect1A0001, loginCheck::handle, activity1A0001CollectValidationMidware::handle);
@@ -496,6 +497,27 @@ public class ActivityProcessor {
         activityMgmtService.yesterdayLivenessReward(userId);
 
         context.sendRedirect(Latkes.getServePath() + "/member/" + user.optString(User.USER_NAME) + "/points");
+    }
+
+    public void yesterdayLivenessRewardApiGold(final RequestContext context) {
+        JSONObject requestJSONObject = context.requestJSON();
+        final String goldFingerKey = requestJSONObject.optString("goldFingerKey");
+        final String livenessKey = Symphonys.get("gold.finger.liveness");
+        if (goldFingerKey.equals(livenessKey)) {
+            final String userName = requestJSONObject.optString(User.USER_NAME);
+            final JSONObject user = userQueryService.getUserByName(userName);
+            if (null == user) {
+                context.renderJSON(new JSONObject()).renderCode(StatusCodes.ERR).renderMsg("用户不存在");
+                return;
+            }
+            final String userId = user.optString(Keys.OBJECT_ID);
+            int sum = activityMgmtService.yesterdayLivenessRewardApi(userId);
+
+            context.renderJSON(new JSONObject().put("sum", sum));
+        } else {
+            context.renderJSON(StatusCodes.ERR);
+            context.renderMsg("金手指(liveness类型)不正确。");
+        }
     }
 
     /**

@@ -45,6 +45,7 @@ import org.b3log.latke.util.*;
 import org.b3log.latke.util.Strings;
 import org.b3log.symphony.cache.DomainCache;
 import org.b3log.symphony.model.*;
+import org.b3log.symphony.processor.channel.ArticleChannel;
 import org.b3log.symphony.processor.middleware.AnonymousViewCheckMidware;
 import org.b3log.symphony.processor.middleware.CSRFMidware;
 import org.b3log.symphony.processor.middleware.LoginCheckMidware;
@@ -249,6 +250,22 @@ public class ArticleProcessor {
         Dispatcher.group().middlewares(loginCheck::handle).router().get().uris(new String[]{"/api/articles/tag/{tagURI}", "/api/articles/tag/{tagURI}/hot", "/api/articles/tag/{tagURI}/good", "/api/articles/tag/{tagURI}/reply", "/api/articles/tag/{tagURI}/perfect"}).handler(articleProcessor::getTagArticles);
         Dispatcher.get("/api/articles/domain/{domainURI}", articleProcessor::getDomainArticles, loginCheck::handle);
         Dispatcher.get("/api/article/{id}", articleProcessor::showArticleApi, loginCheck::handle);
+        Dispatcher.get("/api/article/heat/{articleId}", articleProcessor::getArticleHeat);
+    }
+
+    public void getArticleHeat(final RequestContext context) {
+        String articleId = context.pathVar("articleId");
+        if (articleId != null) {
+            Integer viewingCnt = ArticleChannel.ARTICLE_VIEWS.get(articleId);
+            if (null == viewingCnt) {
+                viewingCnt = 0;
+            }
+
+            context.renderJSON(new JSONObject().put(Article.ARTICLE_T_HEAT, viewingCnt));
+        } else {
+            context.renderJSON(StatusCodes.ERR);
+            context.renderMsg("文章不存在");
+        }
     }
 
     private AbstractResponseRenderer buildJsonRenderer() {
