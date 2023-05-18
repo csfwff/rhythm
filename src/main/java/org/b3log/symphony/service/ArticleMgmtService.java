@@ -766,7 +766,11 @@ public class ArticleMgmtService {
                 }
 
                 // Liveness
-                livenessMgmtService.incLiveness(authorId, Liveness.LIVENESS_ARTICLE);
+                String isGoodArticle = requestJSONObject.optString("isGoodArticle");
+                if (isGoodArticle.equals("yes")) {
+                    livenessMgmtService.incLiveness(authorId, Liveness.LIVENESS_ARTICLE);
+                    LogsService.log("simple", LogsService.getTime(), "*", "发帖并标记为有奖励积分", "发布人：" + author.optString(User.USER_NAME) + "，点击跳转至帖子：<a target='_blank' href='" + ("/article/" + ret) + "'>" + articleTitle + "</a>", true);
+                }
             }
 
             final JSONObject eventData = new JSONObject();

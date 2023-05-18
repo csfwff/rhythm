@@ -131,25 +131,25 @@ var AddArticle = {
    */
   confirmAdd: function (csrfToken, it) {
     Swal.fire({
-      html: "根据 <a href='https://fishpi.cn/article/1684378758315' target='_blank'>摸鱼派发帖规范细则</a>，请对您的帖子进行自觉分类，自行选择是否获得积分奖励 (300积分和45%活跃度，每日仅第一次有效)<br><br>" +
+      html: "根据 <a href='https://fishpi.cn/article/1684378758315' target='_blank'>摸鱼派发帖规范细则</a>，请对您的帖子进行自觉分类，自行选择是否获得<a target='_blank' href='https://fishpi.cn/article/1683775497629'>好帖积分和活跃度奖励</a> (300积分和45%活跃度，每日仅第一次有效)<br><br>" +
           "<b>有积分奖励的帖子：</b>原创的技术文章 / 原创且用心的美食、旅游、生活内容 / 发自内心的分享 / 有营养的问答<br><br>" +
           "<b>没有积分奖励的帖子：</b>发牢骚、感慨 / 非原创的内容 / 无意义内容帖、单纯的水帖 / 新人报道帖 / 广告帖<br><br>" +
-          "<b>请注意：</b>如果不知道该选哪个，请选“我就随便写写”，选择积分奖励后，我们将对帖子进行检查，如不符合规则，您的积分奖励将会被扣除。",
-      icon: 'warning',
+          "<b>请注意：</b><b>帖子发布后24小时内无法删除！</b>如果不知道该选哪个，请选“我就随便写写”，选择积分奖励后，我们将对帖子进行检查，如不符合规则，您的积分奖励将会被扣除。",
+      icon: 'question',
       showCancelButton: true,
       confirmButtonColor: '#3085d6',
       cancelButtonColor: '#707070',
-      confirmButtonText: '这是好帖，给我奖励!',
+      confirmButtonText: '这是好帖，给我奖励！',
       cancelButtonText: '我就随便写写，不需要奖励',
     }).then((result) => {
       if (result.isConfirmed) {
-        console.log(1)
+        AddArticle.add(csrfToken, it, true)
       } else if (result.dismiss === Swal.DismissReason.cancel) {
-        console.log(2)
+        AddArticle.add(csrfToken, it)
       }
     })
   },
-  add: function (csrfToken, it) {
+  add: function (csrfToken, it, isGoodArticle) {
     if ($('.tags-input .tag .text').length === 0) {
       $('#addArticleTip').
       addClass('error').
@@ -193,6 +193,10 @@ var AddArticle = {
           articleShowInList: Boolean($('#articleShowInList').prop('checked'))
               ? 1
               : 0,
+        }
+
+        if (undefined !== isGoodArticle && isGoodArticle === true) {
+          requestJSONObject.isGoodArticle = 'yes';
         }
 
         if (articleType !== 5) {
