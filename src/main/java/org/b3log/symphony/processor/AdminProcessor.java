@@ -1797,15 +1797,6 @@ public class AdminProcessor {
             final int point = Integer.valueOf(pointStr);
 
             final JSONObject user = userQueryService.getUser(userId);
-            final int currentPoint = user.optInt(UserExt.USER_POINT);
-
-            if (currentPoint - point < 0) {
-                final AbstractFreeMarkerRenderer renderer = new SkinRenderer(context, "admin/error.ftl");
-                final Map<String, Object> dataModel = renderer.getDataModel();
-                dataModel.put(Keys.MSG, langPropsService.get("insufficientBalanceLabel"));
-                dataModelService.fillHeaderAndFooter(context, dataModel);
-                return;
-            }
 
             final String memo = context.param(Common.MEMO);
 

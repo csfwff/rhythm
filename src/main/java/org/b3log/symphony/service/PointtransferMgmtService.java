@@ -88,8 +88,10 @@ public class PointtransferMgmtService {
             if (!Pointtransfer.ID_C_SYS.equals(fromId)) {
                 final JSONObject fromUser = userRepository.get(fromId);
                 fromBalance = fromUser.optInt(UserExt.USER_POINT) - sum;
-                if (fromBalance < 0) {
-                    throw new Exception("Insufficient balance");
+                if (type != Pointtransfer.TRANSFER_TYPE_C_ABUSE_DEDUCT) {
+                    if (fromBalance < 0) {
+                        throw new Exception("Insufficient balance");
+                    }
                 }
 
                 List<Integer> canIncludeArray = new ArrayList<>();

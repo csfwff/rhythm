@@ -388,11 +388,6 @@ public class ChatRoomBot {
                                     sendBotMsg("指令执行失败，用户不存在。");
                                     break;
                                 }
-                                final int currentPoint = targetUser.optInt(UserExt.USER_POINT);
-                                if (currentPoint - point < 0) {
-                                    sendBotMsg("指令执行失败，他没有这么多分可以扣。");
-                                    break;
-                                }
                                 String targetUserId = targetUser.optString(Keys.OBJECT_ID);
 
                                 PointtransferMgmtService pointtransferMgmtService = beanManager.getReference(PointtransferMgmtService.class);
