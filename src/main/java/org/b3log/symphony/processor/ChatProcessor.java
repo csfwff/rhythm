@@ -313,7 +313,9 @@ public class ChatProcessor {
             if (!otherId.equals("1000000000086")) {
                 info.put("receiverUserName", otherUser.optString(User.USER_NAME));
                 info.put("receiverAvatar", otherUser.optString(UserExt.USER_AVATAR_URL));
+                info.put("receiverOnlineFlag", otherUser.optBoolean(UserExt.USER_ONLINE_FLAG));
             } else {
+                info.put("receiverOnlineFlag", true);
                 info.put("receiverUserName", "文件传输助手");
                 info.put("receiverAvatar", "https://file.fishpi.cn/2022/06/e1541bfe4138c144285f11ea858b6bf6-ba777366.jpeg");
             }

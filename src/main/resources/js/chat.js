@@ -57,11 +57,11 @@ var Chat = {
                             } else {
                                 if (userData.senderUserName != Label.currentUserName) {
                                     if ($("#chatTo" + userData.senderUserName).length <= 0) {
-                                        Chat.addToMessageList(userData.senderUserName, userData.senderAvatar, userData.preview);
+                                        Chat.addToMessageList(userData.senderUserName, userData.senderAvatar, userData.preview, userData.receiverOnlineFlag);
                                     }
                                 } else {
                                     if ($("#chatTo" + userData.receiverUserName).length <= 0) {
-                                        Chat.addToMessageList(userData.receiverUserName, userData.receiverAvatar, userData.preview);
+                                        Chat.addToMessageList(userData.receiverUserName, userData.receiverAvatar, userData.preview, userData.receiverOnlineFlag);
                                     }
                                 }
                             }
@@ -328,8 +328,9 @@ var Chat = {
         }
     },
 
-    addToMessageList(userName, avatarURL, preview) {
+    addToMessageList(userName, avatarURL, preview, isOnline) {
         let dot = preview.length > 10 ? "..." : "";
+        let status = isOnline ? '[在线]' : '[离线]';
         $("#chatMessageList").append('' +
             '<div class="module-panel" id="chatTo' + userName + '" style="padding: 10px 15px;cursor: pointer" onclick="Chat.init(\'' + userName + '\')"\n' +
             '    <nav class="home-menu">\n' +
@@ -340,6 +341,7 @@ var Chat = {
             '            ' + userName + '<br>\n' +
             '            <span style="color: #868888">' + preview.substring(0, 10) + dot + '</span>\n' +
             '        </div>\n' +
+            '        <div style="float: right;display: inline-block; color: #868888">'+ status + '</div>\n'+
             '    </nav>\n' +
             '</div>');
         if ($("#messageListPanel").css("display") === "none") {
