@@ -395,7 +395,7 @@ public class ShopProcessor {
                             if (cloudService.putBag(userId, realName, sum, Integer.MAX_VALUE) == 0) {
                                 // 扣积分
                                 final String transferId = pointtransferMgmtService.transfer(userId, Pointtransfer.ID_C_SYS,
-                                        Pointtransfer.TRANSFER_TYPE_C_TRADE, total, userId, System.currentTimeMillis(), "系统商店购买：" + sum + "件 " + name);
+                                        Pointtransfer.TRANSFER_TYPE_C_TRADE, total, "系统商店购买：" + sum + "件 " + name, System.currentTimeMillis(), "系统商店购买：" + sum + "件 " + name);
                                 final JSONObject notification = new JSONObject();
                                 notification.put(Notification.NOTIFICATION_USER_ID, userId);
                                 notification.put(Notification.NOTIFICATION_DATA_ID, transferId);
