@@ -31,6 +31,10 @@ import org.b3log.symphony.repository.PointtransferRepository;
 import org.b3log.symphony.repository.UserRepository;
 import org.json.JSONObject;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
 /**
  * Pointtransfer management service.
  *
@@ -84,12 +88,18 @@ public class PointtransferMgmtService {
             if (!Pointtransfer.ID_C_SYS.equals(fromId)) {
                 final JSONObject fromUser = userRepository.get(fromId);
                 fromBalance = fromUser.optInt(UserExt.USER_POINT) - sum;
-                if (fromBalance < 0) {
-                    throw new Exception("Insufficient balance");
+                if (type != Pointtransfer.TRANSFER_TYPE_C_ABUSE_DEDUCT) {
+                    if (fromBalance < 0) {
+                        throw new Exception("Insufficient balance");
+                    }
                 }
 
+                List<Integer> canIncludeArray = new ArrayList<>();
+                Collections.addAll(canIncludeArray, 1, 2, 3, 15, 19, 20, 22, 23, 24, 26, 30, 32, 34, 36, 37, 45, 48, 49, 50);
+                if (canIncludeArray.contains(type)) {
+                    fromUser.put(UserExt.USER_USED_POINT, fromUser.optInt(UserExt.USER_USED_POINT) + sum);
+                }
                 fromUser.put(UserExt.USER_POINT, fromBalance);
-                fromUser.put(UserExt.USER_USED_POINT, fromUser.optInt(UserExt.USER_USED_POINT) + sum);
                 userRepository.update(fromId, fromUser, UserExt.USER_POINT, UserExt.USER_USED_POINT);
             }
 

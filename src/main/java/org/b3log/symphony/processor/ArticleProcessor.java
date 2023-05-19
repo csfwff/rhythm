@@ -1350,6 +1350,7 @@ public class ArticleProcessor {
         final int articleAnonymous = isAnonymous ? Article.ARTICLE_ANONYMOUS_C_ANONYMOUS : Article.ARTICLE_ANONYMOUS_C_PUBLIC;
         final boolean articleNotifyFollowers = requestJSONObject.optBoolean(Article.ARTICLE_T_NOTIFY_FOLLOWERS);
         final Integer articleShowInList = requestJSONObject.optInt(Article.ARTICLE_SHOW_IN_LIST, Article.ARTICLE_SHOW_IN_LIST_C_YES);
+        final String isGoodArticle = requestJSONObject.optString("isGoodArticle");
 
         final JSONObject article = new JSONObject();
         article.put(Article.ARTICLE_TITLE, articleTitle);
@@ -1420,6 +1421,7 @@ public class ArticleProcessor {
                 }
             }
 
+            article.put("isGoodArticle", isGoodArticle);
             final String articleId = articleMgmtService.addArticle(article);
 
             context.renderJSONValue(Keys.CODE, StatusCodes.SUCC);

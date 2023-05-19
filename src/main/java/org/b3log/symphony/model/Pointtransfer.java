@@ -458,6 +458,11 @@ public final class Pointtransfer {
     public static final int TRANSFER_TYPE_C_CHAT_ROOM_SEND_BARRAGER = 49;
 
     /**
+     * Transfer type - trade
+     */
+    public static final int TRANSFER_TYPE_C_TRADE = 50;
+
+    /**
      * Transfer sum - 摆龙门阵.
      */
     public static final int TRANSFER_SUM_C_BLMZ = 5;
