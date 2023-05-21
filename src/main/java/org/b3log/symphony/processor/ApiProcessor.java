@@ -24,8 +24,6 @@ import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.b3log.latke.Keys;
-import org.b3log.latke.cache.Cache;
-import org.b3log.latke.cache.CacheFactory;
 import org.b3log.latke.http.Dispatcher;
 import org.b3log.latke.http.RequestContext;
 import org.b3log.latke.ioc.BeanManager;

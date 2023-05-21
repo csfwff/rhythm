@@ -19,7 +19,6 @@
 package org.b3log.symphony.event;
 
 import org.apache.commons.lang3.StringUtils;
-import org.b3log.latke.Keys;
 import org.b3log.latke.event.AbstractEventListener;
 import org.b3log.latke.event.Event;
 import org.b3log.latke.ioc.Inject;
@@ -27,7 +26,6 @@ import org.b3log.latke.ioc.Singleton;
 import org.b3log.latke.model.User;
 import org.b3log.latke.service.ServiceException;
 import org.b3log.symphony.model.Article;
-import org.b3log.symphony.model.Common;
 import org.b3log.symphony.model.Role;
 import org.b3log.symphony.service.UserMgmtService;
 import org.json.JSONObject;
