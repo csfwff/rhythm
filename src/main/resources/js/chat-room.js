@@ -1433,7 +1433,6 @@ border-bottom: none;
         }
 
         if (undefined !== recivers) {
-            // console.log(recivers)
             if (recivers.length > 0) {
                 index = recivers.indexOf(Label.currentUser);
                 // console.log(index)
@@ -1494,31 +1493,25 @@ border-bottom: none;
     selectGesture: function (oId) {
         Util.alert(`<div class="form fn__flex-column select-center">
 <div>
-<label class="gestureRadio">
-  <input type="radio" name="gesture" value="0" checked>石头
-</label>
-<label class="gestureRadio">
-  <input type="radio" name="gesture" value="1">剪刀
-</label>
-<label class="gestureRadio">
-  <input type="radio" name="gesture" value="2">布
-</label>
-</div>
-<div class="fn__flex" style="margin-top: 15px">
-  <button class="btn btn--confirm" onclick="ChatRoom.unpackRedPacket(${oId});Util.clearAlert()">出拳</button>
+   <img width="50" src="${Label.staticServePath}/images/redpacket/gesture/rock.png" onclick="ChatRoom.unpackRedPacket(${oId},'0');Util.clearAlert()"/>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+   <img width="50" src="${Label.staticServePath}/images/redpacket/gesture/scissors.png" onclick="ChatRoom.unpackRedPacket(${oId},'1');Util.clearAlert()"/>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+   <img width="50" src="${Label.staticServePath}/images/redpacket/gesture/paper.png" onclick="ChatRoom.unpackRedPacket(${oId},'2');Util.clearAlert()"/>
 </div>
 </div>`, '出拳');
     },
     /**
      * 拆开红包
      */
-    unpackRedPacket: function (oId) {
+    unpackRedPacket: function (oId,gesture) {
+        if (undefined === gesture || null === gesture) {
+            gesture = "0"
+        }
         $.ajax({
             url: Label.servePath + "/chat-room/red-packet/open",
             method: "POST",
             data: JSON.stringify({
                 oId: oId,
-                gesture: $(".gestureRadio>input[name=gesture]:checked").val(),
+                gesture: gesture,
                 dice: {
                     bet: $("#betRadio>input[name=bet]:checked").val(),
                     chips: $("#betRadio>input[name=chips]").val()
