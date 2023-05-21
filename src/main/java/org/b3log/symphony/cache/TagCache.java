@@ -33,7 +33,6 @@ import org.b3log.symphony.util.Symphonys;
 import org.json.JSONObject;
 
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Tag cache.

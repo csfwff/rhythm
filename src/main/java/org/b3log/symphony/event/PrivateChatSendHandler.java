@@ -18,23 +18,15 @@
  */
 package org.b3log.symphony.event;
 
-import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.b3log.latke.event.AbstractEventListener;
 import org.b3log.latke.event.Event;
 import org.b3log.latke.ioc.Inject;
 import org.b3log.latke.ioc.Singleton;
-import org.b3log.latke.model.User;
-import org.b3log.latke.service.ServiceException;
-import org.b3log.symphony.model.Article;
-import org.b3log.symphony.model.Role;
 import org.b3log.symphony.service.ChatListService;
-import org.b3log.symphony.service.UserMgmtService;
 import org.json.JSONObject;
 
-import java.util.Arrays;
-import java.util.List;
 
 /**
  * 私聊发送事件
