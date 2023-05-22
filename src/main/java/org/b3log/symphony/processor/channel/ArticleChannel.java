@@ -36,6 +36,7 @@ import org.b3log.latke.model.User;
 import org.b3log.latke.service.LangPropsService;
 import org.b3log.latke.util.Locales;
 import org.b3log.symphony.model.*;
+import org.b3log.symphony.processor.ApiProcessor;
 import org.b3log.symphony.service.CloudService;
 import org.b3log.symphony.service.RoleQueryService;
 import org.b3log.symphony.service.UserQueryService;
@@ -118,7 +119,18 @@ public class ArticleChannel implements WebSocketChannel {
 
             final int articleType = Integer.valueOf(session.getParameter(Article.ARTICLE_TYPE));
             final Session httpSession = session.getHttpSession();
-            final String userStr = httpSession.getAttribute(User.USER);
+            String userStr = null;
+            try {
+                userStr = httpSession.getAttribute(User.USER);
+            } catch (NullPointerException ignored) {
+            }
+            try {
+                userStr = ApiProcessor.getUserByKey(session.getParameter("apiKey")).toString();
+            } catch (NullPointerException ignored) {
+            }
+            if (null == userStr) {
+                continue;
+            }
             final boolean isLoggedIn = null != userStr;
             JSONObject user = null;
             if (isLoggedIn) {
@@ -210,7 +222,10 @@ public class ArticleChannel implements WebSocketChannel {
                 }
                 dataModel.put("comment", comment);
 
-                final String templateDirName = httpSession.getAttribute(Keys.TEMPLATE_DIR_NAME);
+                String templateDirName = httpSession.getAttribute(Keys.TEMPLATE_DIR_NAME);
+                if (templateDirName == null) {
+                    templateDirName = "classic";
+                }
                 final Template template = Templates.getTemplate(templateDirName + "/common/comment.ftl");
                 final StringWriter stringWriter = new StringWriter();
                 template.process(dataModel, stringWriter);
