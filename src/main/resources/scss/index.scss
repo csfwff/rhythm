@@ -2485,6 +2485,7 @@ code .dec {
 }
 
 .hongbao__item {
+  position: relative;
   background-color: var(--layer-background-color);
   color: var(--layer-color);
   cursor: pointer;
@@ -2496,6 +2497,45 @@ code .dec {
 
 .hongbao__item:hover {
   box-shadow: 0 0 3px rgba(0, 0, 0, 0.13), 0 3px 6px rgba(0, 0, 0, 0.26);
+
+}
+
+.hongbao__finger_guessing{
+  position: absolute;
+  z-index: 128;
+  top: 0;
+  left: 0;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+  padding: 5px;
+  opacity: 0;
+  transition: .5s;
+  box-sizing: border-box;
+}
+.hongbao__item:hover .hongbao__finger_guessing{
+  opacity: 1;
+  background: rgba(0,0,0,.3);
+}
+
+.hongbao__finger_guessing_icon{
+  width: 45px;
+  height: 45px;
+}
+
+.hongbao__finger_guessing_icon:nth-child(1){
+  background: url("../images/redpacket/gesture/rock.png") no-repeat center center;
+  background-size: contain;
+}
+.hongbao__finger_guessing_icon:nth-child(2){
+  background: url("../images/redpacket/gesture/scissors.png") no-repeat center center;
+  background-size: contain;
+}
+.hongbao__finger_guessing_icon:nth-child(3){
+  background: url("../images/redpacket/gesture/paper.png") no-repeat center center;
+  background-size: contain;
 }
 
 .hongbao__icon {
