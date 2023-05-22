@@ -68,7 +68,7 @@ public class ReservedWords {
                 } else {
                     StringBuilder output = new StringBuilder();
                     for (int j = 0; j < i.length(); j++) {
-                        output.append("*");
+                        output.append("❤️");
                     }
                     content = content.replaceAll(i, output.toString());
                 }
