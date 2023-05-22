@@ -1329,7 +1329,8 @@ border-bottom: none;
                     md = md.replace(/\n/g, "\n> ");
                 }
             });
-            ChatRoom.editor.insertValue("\n##### 引用 @" + userName + "  \n> " + md + "\n", !1);
+            let replyLink = location.href.replace(/#.*$/, "") + "#chatroom" + id;
+            ChatRoom.editor.insertValue(`\n##### <a class="chatroomReply" href="${replyLink}">引用 @"${userName}</a>"  \n> "${md}"</span>\n`, !1);
         }
         $(window).scrollTop(0);
     },
