@@ -1596,10 +1596,8 @@ ${result.info.msg}
                         break;
                     case "rockPaperScissors":
                         type = "石头剪刀布红包";
-                        onclick = ''
                         if (msgJSON.senderId != Label.currentUserId) {
-                           // onclick = 'ChatRoom.selectGesture(\'' + data.oId + '\')';
-                            onclick = ''
+                           onclick = '';
                         }
                         break;
                     case "dice":
@@ -1637,7 +1635,7 @@ ${result.info.msg}
                         '    </div>\n' +
                         '</div>';
                 } else {
-                    if(msgJSON.type === 'rockPaperScissors'){
+                    if(msgJSON.type === 'rockPaperScissors' && msgJSON.senderId != Label.currentUserId){
                         console.log("猜拳红包！")
                         data.content = '' +
                             '<div class="hongbao__item fn__flex-inline" onclick="' + onclick + '">\n' +
