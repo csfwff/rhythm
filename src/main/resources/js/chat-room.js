@@ -1329,7 +1329,7 @@ border-bottom: none;
                     md = md.replace(/\n/g, "\n> ");
                 }
             });
-            ChatRoom.editor.insertValue(`\n##### 引用 @"${userName} <a href="https://fishpi.cn/cr#chatroom${id}">↩</a>"  \n> "${md}"</span>\n`, !1);
+            ChatRoom.editor.insertValue(`\n##### 引用 @"${userName} <a href="${Label.servePath}/cr#chatroom${id}">↩</a>"  \n> "${md}"</span>\n`, !1);
         }
         $(window).scrollTop(0);
     },
