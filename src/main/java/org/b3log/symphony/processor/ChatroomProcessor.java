@@ -706,7 +706,7 @@ public class ChatroomProcessor {
                 // 是否收税
                 Boolean collectTaxes = false;
                 // 税率
-                BigDecimal taxRate = new BigDecimal("0.05");
+                BigDecimal taxRate = new BigDecimal("0.1");
                 try {
                     String redpacketString = content.replaceAll("^\\[redpacket\\]", "").replaceAll("\\[/redpacket\\]$", "");
                     JSONObject redpacket = new JSONObject(redpacketString);
@@ -832,6 +832,11 @@ public class ChatroomProcessor {
                     redPacketJSON.put("who", new JSONArray());
                     // 红包特殊标识，堵漏洞
                     redPacketJSON.put("msgType", "redPacket");
+
+                    // 税给admin
+                    int tax = money - (BigDecimal.valueOf(money).multiply(BigDecimal.ONE.subtract(taxRate)).intValue());
+                    pointtransferMgmtService.transfer(Pointtransfer.ID_C_SYS, userQueryService.getUserByName("admin").optString(Keys.OBJECT_ID),
+                            Pointtransfer.TRANSFER_TYPE_C_ACCOUNT2ACCOUNT, tax, userId, System.currentTimeMillis(), "猜拳红包税收，纳税人：" + userName);
 
                     // 写入数据库
                     final Transaction transaction = chatRoomRepository.beginTransaction();
