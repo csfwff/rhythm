@@ -1653,7 +1653,7 @@ ${result.info.msg}
                             '        </div>\n' +
                             '    </div>\n' +
                             '</div>';
-                    }else{
+                    } else {
                         data.content = '' +
                             '<div class="hongbao__item fn__flex-inline" onclick="' + onclick + '">\n' +
                             '    <svg class="ft__red hongbao__icon">\n' +
