@@ -1636,7 +1636,6 @@ ${result.info.msg}
                         '</div>';
                 } else {
                     if(msgJSON.type === 'rockPaperScissors' && msgJSON.senderId != Label.currentUserId){
-                        console.log("猜拳红包！")
                         data.content = '' +
                             '<div class="hongbao__item fn__flex-inline" onclick="' + onclick + '">\n' +
                             '    <div class="hongbao__finger_guessing">\n'+
@@ -1654,8 +1653,7 @@ ${result.info.msg}
                             '        </div>\n' +
                             '    </div>\n' +
                             '</div>';
-                    }else{
-                        console.log("不是猜拳红包！")
+                    } else {
                         data.content = '' +
                             '<div class="hongbao__item fn__flex-inline" onclick="' + onclick + '">\n' +
                             '    <svg class="ft__red hongbao__icon">\n' +
