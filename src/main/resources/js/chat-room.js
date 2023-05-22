@@ -1636,13 +1636,12 @@ ${result.info.msg}
                         '</div>';
                 } else {
                     if(msgJSON.type === 'rockPaperScissors' && msgJSON.senderId != Label.currentUserId){
-                        console.log("猜拳红包！")
                         data.content = '' +
-                            '<div class="hongbao__item fn__flex-inline" onclick="' + onclick + '">\n' +
+                            '<div class="hongbao__item fn__flex-inline" >\n' +
                             '    <div class="hongbao__finger_guessing">\n'+
-                            '        <div class="hongbao__finger_guessing_icon" onclick="ChatRoom.unpackRedPacket('+ data.oId +',\'0\');Util.clearAlert()"></div>\n' +
-                            '        <div class="hongbao__finger_guessing_icon" onclick="ChatRoom.unpackRedPacket('+ data.oId +',\'1\');Util.clearAlert()"></div>\n' +
-                            '        <div class="hongbao__finger_guessing_icon" onclick="ChatRoom.unpackRedPacket('+ data.oId +',\'2\');Util.clearAlert()"></div>\n' +
+                            '        <div class="hongbao__finger_guessing_icon" onclick="event.stopPropagation();Util.clearAlert();ChatRoom.unpackRedPacket('+ data.oId +',\'0\');"></div>\n' +
+                            '        <div class="hongbao__finger_guessing_icon" onclick="event.stopPropagation();Util.clearAlert();ChatRoom.unpackRedPacket('+ data.oId +',\'1\');"></div>\n' +
+                            '        <div class="hongbao__finger_guessing_icon" onclick="event.stopPropagation();Util.clearAlert();ChatRoom.unpackRedPacket('+ data.oId +',\'2\');"></div>\n' +
                             '    </div>\n' +
                             '    <svg class="ft__red hongbao__icon">\n' +
                             '        <use xlink:href="#redPacketIcon"></use>\n' +
@@ -1655,7 +1654,6 @@ ${result.info.msg}
                             '    </div>\n' +
                             '</div>';
                     }else{
-                        console.log("不是猜拳红包！")
                         data.content = '' +
                             '<div class="hongbao__item fn__flex-inline" onclick="' + onclick + '">\n' +
                             '    <svg class="ft__red hongbao__icon">\n' +
