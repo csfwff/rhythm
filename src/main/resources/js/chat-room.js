@@ -1597,7 +1597,7 @@ ${result.info.msg}
                     case "rockPaperScissors":
                         type = "石头剪刀布红包";
                         if (msgJSON.senderId != Label.currentUserId) {
-                            onclick = 'ChatRoom.selectGesture(\'' + data.oId + '\')';
+                           onclick = '';
                         }
                         break;
                     case "dice":
@@ -1635,18 +1635,40 @@ ${result.info.msg}
                         '    </div>\n' +
                         '</div>';
                 } else {
-                    data.content = '' +
-                        '<div class="hongbao__item fn__flex-inline" onclick="' + onclick + '">\n' +
-                        '    <svg class="ft__red hongbao__icon">\n' +
-                        '        <use xlink:href="#redPacketIcon"></use>\n' +
-                        '    </svg>\n' +
-                        '    <div>\n' +
-                        '        <div>' + msgJSON.msg + '<br><b>' + type + '</b></div>\n' +
-                        '        <div><svg style="vertical-align: -2px; width: 13px; height: 13px"><use xlink:href="#coin"></use></svg> ' + msgJSON.money + '</div>\n' +
-                        '        <div class="ft__smaller ft__fade redPacketDesc">\n' +
-                        '        </div>\n' +
-                        '    </div>\n' +
-                        '</div>';
+                    if(msgJSON.type === 'rockPaperScissors' && msgJSON.senderId != Label.currentUserId){
+                        console.log("猜拳红包！")
+                        data.content = '' +
+                            '<div class="hongbao__item fn__flex-inline" onclick="' + onclick + '">\n' +
+                            '    <div class="hongbao__finger_guessing">\n'+
+                            '        <div class="hongbao__finger_guessing_icon" onclick="ChatRoom.unpackRedPacket('+ data.oId +',\'0\');Util.clearAlert()"></div>\n' +
+                            '        <div class="hongbao__finger_guessing_icon" onclick="ChatRoom.unpackRedPacket('+ data.oId +',\'1\');Util.clearAlert()"></div>\n' +
+                            '        <div class="hongbao__finger_guessing_icon" onclick="ChatRoom.unpackRedPacket('+ data.oId +',\'2\');Util.clearAlert()"></div>\n' +
+                            '    </div>\n' +
+                            '    <svg class="ft__red hongbao__icon">\n' +
+                            '        <use xlink:href="#redPacketIcon"></use>\n' +
+                            '    </svg>\n' +
+                            '    <div>\n' +
+                            '        <div>' + msgJSON.msg + '<br><b>' + type + '</b></div>\n' +
+                            '        <div><svg style="vertical-align: -2px; width: 13px; height: 13px"><use xlink:href="#coin"></use></svg> ' + msgJSON.money + '</div>\n' +
+                            '        <div class="ft__smaller ft__fade redPacketDesc">\n' +
+                            '        </div>\n' +
+                            '    </div>\n' +
+                            '</div>';
+                    }else{
+                        console.log("不是猜拳红包！")
+                        data.content = '' +
+                            '<div class="hongbao__item fn__flex-inline" onclick="' + onclick + '">\n' +
+                            '    <svg class="ft__red hongbao__icon">\n' +
+                            '        <use xlink:href="#redPacketIcon"></use>\n' +
+                            '    </svg>\n' +
+                            '    <div>\n' +
+                            '        <div>' + msgJSON.msg + '<br><b>' + type + '</b></div>\n' +
+                            '        <div><svg style="vertical-align: -2px; width: 13px; height: 13px"><use xlink:href="#coin"></use></svg> ' + msgJSON.money + '</div>\n' +
+                            '        <div class="ft__smaller ft__fade redPacketDesc">\n' +
+                            '        </div>\n' +
+                            '    </div>\n' +
+                            '</div>';
+                    }
                 }
             }
         } catch (err) {
