@@ -590,12 +590,12 @@ public class ChatRoomBot {
                 JSONObject redpacket = new JSONObject(redpacketString);
                 String type = redpacket.optString("type");
                 int date = Integer.parseInt(DateFormatUtils.format(System.currentTimeMillis(), "HHmm"));
-                if (type.equals("heartbeat")) {
+                /*if (type.equals("heartbeat")) {
                     if (date > 1800 || date < 830) {
                         context.renderJSON(StatusCodes.ERR).renderMsg("这个时段无法发送心跳红包！允许时间：08:30-18:00");
                         return false;
                     }
-                }
+                }*/
 
                 // 猜拳红包限制
                 if (type.equals("rockPaperScissors")) {
