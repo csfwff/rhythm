@@ -34,6 +34,9 @@ var x = 0;
 var y = 0;
 var isClick = true;
 var thisClient = 'Web/PC网页端';
+// 弹幕颜色选择器
+var BarragerColorPicker = null;
+var DarwColorPicker = null;
 var ChatRoom = {
     init: function () {
         // 聊天窗口高度设置
@@ -484,15 +487,45 @@ var ChatRoom = {
                 $("#paintContent").slideUp(1000);
             }
         });
+        BarragerColorPicker = new XNColorPicker({
+            color: "#ffffff",
+            selector: "#selectBarragerColor",
+            showhistorycolor:false,
+            colorTypeOption:'single',
+            autoConfirm:true,
+            onError:function(e){},
+            onCancel:function(color){},
+            onChange:function(color){
+            },
+            onConfirm:function(color){
+            }
+        })
         // 监听弹幕颜色
-        $('#selectBarragerColor').cxColor({
-            color: '#ffffff'
-        });
+        // $('#selectBarragerColor').cxColor({
+        //     color: '#ffffff'
+        // });
         // 监听修改颜色
-        $('#selectColor').cxColor();
-        $("#selectColor").bind("change", function () {
-            ChatRoom.changeColor(this.value);
-        });
+        // $('#selectColor').cxColor();
+        DarwColorPicker =  new XNColorPicker({
+            color: "#000000",
+            selector: "#selectColor",
+            showhistorycolor:false,
+            colorTypeOption:'single',
+            autoConfirm:true,
+            onError:function(e){},
+            onCancel:function(color){},
+            onChange:function(color){
+                // console.log("change",color.color.rgba)
+                ChatRoom.changeColor(color.color.rgba);
+            },
+            onConfirm:function(color){
+                // console.log("change",color.color.rgba)
+                ChatRoom.changeColor(color.color.rgba);
+            }
+        })
+        // $("#selectColor").bind("change", function () {
+        //     ChatRoom.changeColor(this.value);
+        // });
         $("#selectWidth").bind("change", function () {
             let width = $("#selectWidth").val();
             ChatRoom.changeWidth(width);
@@ -501,7 +534,8 @@ var ChatRoom = {
         setInterval(ChatRoom.reloadMessages, 15 * 60 * 1000);
     },
     sendBarrager: function () {
-        let color = $("#selectBarragerColor")[0].value;
+        // let color = $("#selectBarragerColor")[0].value;
+        let color = BarragerColorPicker.color.rgba;
         let content = $('#barragerInput').val();
         let json = {
             color: color,
@@ -1543,6 +1577,9 @@ ${result.info.msg}
                     ChatRoom.renderRedPacket(result.who, result.info.count, result.info.got, result.recivers, result.diceRet, result.info.userName)
                     if (result.info.count === result.info.got) {
                         $("#chatroom" + oId).find(".hongbao__item").css("opacity", ".36").attr('onclick', "ChatRoom.unpackRedPacket(" + oId + ")");
+                        if(!$("#chatroom" + oId).find(".hongbao__item").hasClass('opened')){
+                            $("#chatroom" + oId).find(".hongbao__item").addClass('opened')
+                        }
                         if (result.dice === true) {
                             $("#chatroom" + oId).find(".redPacketDesc").html("已开盘");
                         } else {

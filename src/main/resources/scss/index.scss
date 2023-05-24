@@ -2484,6 +2484,9 @@ code .dec {
   margin: 5px 0;
 }
 
+.chats__content .vditor-reset{
+  overflow: visible;
+}
 .hongbao__item {
   position: relative;
   background-color: var(--layer-background-color);
@@ -2505,35 +2508,52 @@ code .dec {
   z-index: 128;
   top: 0;
   left: 0;
-  display: flex;
+  /*display: flex;
   justify-content: space-around;
-  align-items: center;
+  align-items: center;*/
   width: 100%;
   height: 100%;
   padding: 5px;
-  opacity: 0;
+  opacity: 1;
   transition: .5s;
   box-sizing: border-box;
 }
-.hongbao__item:hover .hongbao__finger_guessing{
+/*.hongbao__item:hover .hongbao__finger_guessing,
+.hongbao__item:active .hongbao__finger_guessing{
   opacity: 1;
   background: rgba(0,0,0,.3);
+}*/
+
+.opened .hongbao__finger_guessing{
+  display: none;
 }
 
 .hongbao__finger_guessing_icon{
+  position: absolute;
+  right: -25px;
   width: 45px;
   height: 45px;
+  border-radius: 50%;
+  border: 2px solid transparent;
+  transition: .2s;
+}
+.hongbao__finger_guessing_icon:hover{
+  border-color:#5c1151;
 }
 
 .hongbao__finger_guessing_icon:nth-child(1){
+  top: -25px;
   background: url("../images/redpacket/gesture/rock.png") no-repeat center center;
   background-size: contain;
 }
 .hongbao__finger_guessing_icon:nth-child(2){
+  top: 15px;
+  right: -50px;
   background: url("../images/redpacket/gesture/scissors.png") no-repeat center center;
   background-size: contain;
 }
 .hongbao__finger_guessing_icon:nth-child(3){
+  top: 55px;
   background: url("../images/redpacket/gesture/paper.png") no-repeat center center;
   background-size: contain;
 }
