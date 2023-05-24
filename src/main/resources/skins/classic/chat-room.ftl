@@ -208,7 +208,7 @@
 <script src="${staticServePath}/js/chat-room${miniPostfix}.js?${staticResourceVersion}"></script>
 <script src="${staticServePath}/js/lib/viewer.min.js"></script>
 <script src="${staticServePath}/js/lib/barrager/jquery.barrager.min.js"></script>
-<script src="${staticServePath}/js/xncolorpicker.min.js"></script>
+<script src="${staticServePath}/js/lib/xncolorpicker.min.js"></script>
 <script>
     Label.addBoldLabel = '${addBoldLabel}';
     Label.addItalicLabel = '${addItalicLabel}';
