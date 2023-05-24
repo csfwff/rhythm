@@ -1256,10 +1256,10 @@ public class ArticleQueryService {
                     "FROM " +
                     "    symphony_article " +
                     "WHERE " +
-                    "    articleLatestCmtTime > " + thirtyDaysAgo + " AND articleStatus <> 1 AND articleType <> 1 AND articleShowInList <> 0 " +
+                    "    articleCreateTime > " + thirtyDaysAgo + " AND articleStatus <> 1 AND articleType <> 1 AND articleShowInList <> 0 " +
                     "ORDER BY " +
                     "    total_score DESC " +
-                    "limit 100");
+                    "limit 50");
             ret.sort((o1, o2) -> {
                 long o1Time = o1.optLong(Article.ARTICLE_UPDATE_TIME);
                 long o2Time = o2.optLong(Article.ARTICLE_UPDATE_TIME);
