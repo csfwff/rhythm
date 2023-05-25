@@ -1322,7 +1322,7 @@ var Util = {
             let top = (20 - (percent / 2)) + "px";
             $("#activityProcessor .percent-wave-before").css("top",top);
             $("#activityProcessor .percent-wave-after").css("top",top);
-            $("#activityProcessor .percent").html(now + "%")
+            $("#activityProcessor .percent").html(parseInt(now) + "%")
 
         },10)
         // $("#activityProcessor .percent-wave-before").css("top",top);
