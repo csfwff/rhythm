@@ -628,6 +628,7 @@ blockquote {
   border-radius: 35%;
   transform: translate(-50%, -70%) rotate(0);
   animation: rotate 6s linear infinite;
+  transition: 1s;
   z-index: 10;
 }
 .percent-wave-after {
