@@ -598,3 +598,63 @@ blockquote {
   margin-right: 15px;
   margin-bottom: 15px;
 }
+
+/* 聊天室 活跃 展示 */
+.percent-container {
+  width: 50px;
+  height: 50px;
+  padding: 2px;
+  border: 2px solid rgb(118, 218, 255);
+  border-radius: 50%;
+  overflow: hidden;
+}
+.percent-wave {
+  position: relative;
+  width: 50px;
+  height: 50px;
+  color: #000;
+  background-color: rgb(118, 218, 255);
+  border-radius: 50%;
+}
+.percent-wave-before,
+.percent-wave-after{
+  content: "";
+  position: absolute;
+  width: 100px;
+  height: 100px;
+  top: 20px;
+  left: 50%;
+  background-color: rgba(255, 255, 255, .4);
+  border-radius: 45%;
+  transform: translate(-50%, -70%) rotate(0);
+  animation: rotate 6s linear infinite;
+  z-index: 10;
+}
+.percent-wave-after {
+  border-radius: 47%;
+  background-color: rgba(255, 255, 255, .9);
+  transform: translate(-50%, -70%) rotate(0);
+  animation: rotate 10s linear -5s infinite;
+  z-index: 20;
+}
+.percent-wave .percent{
+  position: relative;
+  width: 50px;
+  height: 50px;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  color: rgb(118, 218, 255);
+  font-size:16px;
+  text-shadow: 0 1px #fff, 1px 0 #fff, -1px 0 #fff, 0 -1px #fff;
+  z-index:30;
+}
+
+@keyframes rotate {
+  50% {
+    transform: translate(-50%, -73%) rotate(180deg);
+  }
+  100% {
+    transform: translate(-50%, -70%) rotate(360deg);
+  }
+}
