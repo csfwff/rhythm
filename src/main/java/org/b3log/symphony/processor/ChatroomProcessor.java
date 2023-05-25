@@ -1114,7 +1114,7 @@ public class ChatroomProcessor {
      *
      * @param context the specified context
      */
-    public void showChatRoom(final RequestContext context) {
+    public synchronized void showChatRoom(final RequestContext context) {
         final AbstractFreeMarkerRenderer renderer = new SkinRenderer(context, "chat-room.ftl");
         final Map<String, Object> dataModel = renderer.getDataModel();
         try {

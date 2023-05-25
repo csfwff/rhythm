@@ -22,6 +22,9 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.time.DateFormatUtils;
 import org.apache.commons.lang.time.DateUtils;
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.b3log.latke.Keys;
 import org.b3log.latke.Latkes;
 import org.b3log.latke.http.Dispatcher;
@@ -77,6 +80,11 @@ import java.util.stream.Collectors;
  */
 @Singleton
 public class IndexProcessor {
+
+    /**
+     * Logger.
+     */
+    private static final Logger LOGGER = LogManager.getLogger(IndexProcessor.class);
 
     /**
      * Article query service.
@@ -414,7 +422,7 @@ public class IndexProcessor {
         dataModel.put(Common.CURRENT, StringUtils.substringAfter(context.requestURI(), "/watch"));
     }
 
-    private static final Map<String, Object> indexModelCache = new HashMap<>();
+    private static final Map<String, Object> indexModelCache = Collections.synchronizedMap(new HashMap<>());
 
     public synchronized void loadIndexData() {
         Map<String, Object> dataModel = new HashMap<>();
@@ -458,16 +466,17 @@ public class IndexProcessor {
         // 假期信息
         dataModel.put("vocationData", Vocation.vocationData);
 
-        indexModelCache.clear();
+        //indexModelCache.clear();
         indexModelCache.putAll(dataModel);
+        LOGGER.log(Level.INFO, "Refreshed index model cache.");
     }
 
-    public void makeIndexData(Map<String, Object> dataModel) {
+    public synchronized void makeIndexData(Map<String, Object> dataModel) {
         if (indexModelCache.isEmpty()) {
             loadIndexData();
         }
 
-        dataModel.putAll(indexModelCache);
+        dataModel.putAll(new HashMap<>(indexModelCache));
     }
 
     /**
@@ -475,7 +484,7 @@ public class IndexProcessor {
      *
      * @param context the specified context
      */
-    public void showIndex(final RequestContext context) {
+    public synchronized void showIndex(final RequestContext context) {
         final AbstractFreeMarkerRenderer renderer = new SkinRenderer(context, "index.ftl");
         final Map<String, Object> dataModel = renderer.getDataModel();
         final JSONObject currentUser = Sessions.getUser();
