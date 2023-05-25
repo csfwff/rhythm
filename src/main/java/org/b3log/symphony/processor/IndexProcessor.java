@@ -484,7 +484,7 @@ public class IndexProcessor {
      *
      * @param context the specified context
      */
-    public void showIndex(final RequestContext context) {
+    public synchronized void showIndex(final RequestContext context) {
         final AbstractFreeMarkerRenderer renderer = new SkinRenderer(context, "index.ftl");
         final Map<String, Object> dataModel = renderer.getDataModel();
         final JSONObject currentUser = Sessions.getUser();
