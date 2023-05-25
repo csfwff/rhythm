@@ -625,13 +625,13 @@ blockquote {
   top: 20px;
   left: 50%;
   background-color: rgba(255, 255, 255, .4);
-  border-radius: 45%;
+  border-radius: 35%;
   transform: translate(-50%, -70%) rotate(0);
   animation: rotate 6s linear infinite;
   z-index: 10;
 }
 .percent-wave-after {
-  border-radius: 47%;
+  border-radius: 45%;
   background-color: rgba(255, 255, 255, .9);
   transform: translate(-50%, -70%) rotate(0);
   animation: rotate 10s linear -5s infinite;
