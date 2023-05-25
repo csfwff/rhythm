@@ -476,7 +476,7 @@ public class IndexProcessor {
             loadIndexData();
         }
 
-        dataModel.putAll(indexModelCache);
+        dataModel.putAll(new HashMap<>(indexModelCache));
     }
 
     /**
