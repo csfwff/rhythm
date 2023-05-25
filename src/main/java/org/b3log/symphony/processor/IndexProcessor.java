@@ -416,7 +416,7 @@ public class IndexProcessor {
 
     private static final Map<String, Object> indexModelCache = new HashMap<>();
 
-    public void loadIndexData() {
+    public synchronized void loadIndexData() {
         Map<String, Object> dataModel = new HashMap<>();
 
         // 签到排行
