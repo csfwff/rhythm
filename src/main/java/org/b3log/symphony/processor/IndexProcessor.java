@@ -471,7 +471,7 @@ public class IndexProcessor {
         LOGGER.log(Level.INFO, "Refreshed index model cache.");
     }
 
-    public void makeIndexData(Map<String, Object> dataModel) {
+    public synchronized void makeIndexData(Map<String, Object> dataModel) {
         if (indexModelCache.isEmpty()) {
             loadIndexData();
         }
