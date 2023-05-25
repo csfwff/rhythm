@@ -706,7 +706,7 @@ public class ChatroomProcessor {
                 // 是否收税
                 Boolean collectTaxes = false;
                 // 税率
-                BigDecimal taxRate = new BigDecimal("0.1");
+                BigDecimal taxRate = new BigDecimal("0.05");
                 try {
                     String redpacketString = content.replaceAll("^\\[redpacket\\]", "").replaceAll("\\[/redpacket\\]$", "");
                     JSONObject redpacket = new JSONObject(redpacketString);
@@ -1114,7 +1114,7 @@ public class ChatroomProcessor {
      *
      * @param context the specified context
      */
-    public void showChatRoom(final RequestContext context) {
+    public synchronized void showChatRoom(final RequestContext context) {
         final AbstractFreeMarkerRenderer renderer = new SkinRenderer(context, "chat-room.ftl");
         final Map<String, Object> dataModel = renderer.getDataModel();
         try {

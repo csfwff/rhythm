@@ -48,7 +48,15 @@
                 <span class="ft-gray">${followingArticlesLabel}</span>
             </li>
             <li class="fn-pointer">
-                <div id="activityProcessor" class="fn-right" style="margin-top: 6px"></div>
+                <div id="activityProcessor" class="fn-right" style="margin-top: 6px">
+                    <div class="percent-container">
+                        <div class="percent-wave">
+                            <div class="percent-wave-before"></div>
+                            <div class="percent-wave-after"></div>
+                            <div class="percent">0%</div>
+                        </div>
+                    </div>
+                </div>
             </li>
         </ul>
 
@@ -87,13 +95,13 @@
             });
         }
 
-        setTimeout(function () {
-            var ccref = document.createElement('script')
-            ccref.setAttribute("type", "text/javascript")
-            ccref.setAttribute("src", '${staticServePath}/js/lib/circleChart.min.js')
-            document.getElementsByTagName("head")[0].appendChild(ccref)
-            console.log("Circle Chart loaded.")
-        }, 1000);
+        <#--setTimeout(function () {-->
+        <#--    var ccref = document.createElement('script')-->
+        <#--    ccref.setAttribute("type", "text/javascript")-->
+        <#--    ccref.setAttribute("src", '${staticServePath}/js/lib/circleChart.min.js')-->
+        <#--    document.getElementsByTagName("head")[0].appendChild(ccref)-->
+        <#--    console.log("Circle Chart loaded.")-->
+        <#--}, 1000);-->
 
         setTimeout(function () {
             getActivityStatus();

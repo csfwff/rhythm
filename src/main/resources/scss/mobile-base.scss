@@ -2758,7 +2758,12 @@ only screen and (device-width: 414px) and (device-height: 896px) and (-webkit-de
   animation: swim 15s linear;
 }*/
 
+.chats__content .vditor-reset{
+  overflow: visible;
+}
+
 .hongbao__item {
+  position: relative;
   background-color: var(--layer-background-color);
   color: var(--layer-color);
   cursor: pointer;
@@ -2781,6 +2786,41 @@ only screen and (device-width: 414px) and (device-height: 896px) and (-webkit-de
 .hongbao__count {
   font-size: 24px;
   margin: 10px 0
+}
+
+
+.opened .hongbao__finger_guessing{
+  display: none;
+}
+
+.hongbao__finger_guessing_icon{
+  position: absolute;
+  right: -25px;
+  width: 45px;
+  height: 45px;
+  border-radius: 50%;
+  border: 2px solid transparent;
+  transition: .2s;
+}
+.hongbao__finger_guessing_icon:hover{
+  border-color:#5c1151;
+}
+
+.hongbao__finger_guessing_icon:nth-child(1){
+  top: -25px;
+  background: url("../images/redpacket/gesture/rock.png") no-repeat center center;
+  background-size: contain;
+}
+.hongbao__finger_guessing_icon:nth-child(2){
+  top: 15px;
+  right: -50px;
+  background: url("../images/redpacket/gesture/scissors.png") no-repeat center center;
+  background-size: contain;
+}
+.hongbao__finger_guessing_icon:nth-child(3){
+  top: 55px;
+  background: url("../images/redpacket/gesture/paper.png") no-repeat center center;
+  background-size: contain;
 }
 
 .hide-list {
