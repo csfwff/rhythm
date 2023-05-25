@@ -1344,7 +1344,7 @@ public class ChatroomProcessor {
      *
      * @return
      */
-    public synchronized static List<JSONObject> getMessages(int page, String type) {
+    public static List<JSONObject> getMessages(int page, String type) {
         try {
             final BeanManager beanManager = BeanManager.getInstance();
             final ChatRoomRepository chatRoomRepository = beanManager.getReference(ChatRoomRepository.class);
