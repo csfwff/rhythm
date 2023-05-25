@@ -414,7 +414,7 @@ public class IndexProcessor {
         dataModel.put(Common.CURRENT, StringUtils.substringAfter(context.requestURI(), "/watch"));
     }
 
-    private static final Map<String, Object> indexModelCache = new HashMap<>();
+    private static final Map<String, Object> indexModelCache = Collections.synchronizedMap(new HashMap<>());
 
     public synchronized void loadIndexData() {
         Map<String, Object> dataModel = new HashMap<>();
@@ -458,7 +458,7 @@ public class IndexProcessor {
         // 假期信息
         dataModel.put("vocationData", Vocation.vocationData);
 
-        indexModelCache.clear();
+        //indexModelCache.clear();
         indexModelCache.putAll(dataModel);
     }
 
