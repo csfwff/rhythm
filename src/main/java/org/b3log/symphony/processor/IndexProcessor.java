@@ -22,6 +22,9 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.time.DateFormatUtils;
 import org.apache.commons.lang.time.DateUtils;
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.b3log.latke.Keys;
 import org.b3log.latke.Latkes;
 import org.b3log.latke.http.Dispatcher;
@@ -77,6 +80,11 @@ import java.util.stream.Collectors;
  */
 @Singleton
 public class IndexProcessor {
+
+    /**
+     * Logger.
+     */
+    private static final Logger LOGGER = LogManager.getLogger(IndexProcessor.class);
 
     /**
      * Article query service.
@@ -460,6 +468,7 @@ public class IndexProcessor {
 
         //indexModelCache.clear();
         indexModelCache.putAll(dataModel);
+        LOGGER.log(Level.INFO, "Refreshed index model cache.");
     }
 
     public void makeIndexData(Map<String, Object> dataModel) {
