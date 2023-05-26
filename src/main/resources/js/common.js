@@ -1312,10 +1312,22 @@ var Util = {
         if (percent <= 0) {
             percent = 1;
         }
-        let top = (20 - (percent / 2)) + "px";
-        $("#activityProcessor .percent-wave-before").css("top",top);
-        $("#activityProcessor .percent-wave-after").css("top",top);
-        $("#activityProcessor .percent").html(percent + "%")
+        let now = 0;
+        let topAnimation = setInterval(()=>{
+            now++;
+            if(now >= percent){
+                now = percent;
+                clearInterval(topAnimation)
+            }
+            let top = (20 - (percent / 2)) + "px";
+            $("#activityProcessor .percent-wave-before").css("top",top);
+            $("#activityProcessor .percent-wave-after").css("top",top);
+            $("#activityProcessor .percent").html(parseInt(now) + "%")
+
+        },10)
+        // $("#activityProcessor .percent-wave-before").css("top",top);
+        // $("#activityProcessor .percent-wave-after").css("top",top);
+        // $("#activityProcessor .percent").html(percent + "%")
         // $("#activityProcessor").circleChart({
         //     value: percent,
         //     text: percent + '%',
