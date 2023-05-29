@@ -20,7 +20,6 @@ package org.b3log.symphony.processor;
 
 import org.apache.commons.lang.StringUtils;
 import org.b3log.latke.Keys;
-import org.b3log.latke.Latkes;
 import org.b3log.latke.event.Event;
 import org.b3log.latke.event.EventManager;
 import org.b3log.latke.http.Dispatcher;
@@ -1603,6 +1602,9 @@ public class UserProcessor {
         final String roleId = user.optString(User.USER_ROLE);
         final JSONObject role = roleQueryService.getRole(roleId);
         user.put(Role.ROLE_NAME, role.optString(Role.ROLE_NAME));
+        if (user.has(UserExt.USER_LATEST_LOGIN_TIME) && Objects.nonNull(user.get(UserExt.USER_LATEST_LOGIN_TIME))) {
+            user.put(UserExt.USER_LATEST_LOGIN_TIME, new Date(user.getLong(UserExt.USER_LATEST_LOGIN_TIME)));
+        }
         user.put(UserExt.USER_T_CREATE_TIME, new Date(user.optLong(Keys.OBJECT_ID)));
 
         // 获取用户个性化设定
