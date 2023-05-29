@@ -124,6 +124,9 @@
             <span class="ft-gray">${joinTimeLabel}</span> ${user.userCreateTime?string('yyyy-MM-dd HH:mm')}
         </div>
         <div class="user-info">
+            <span class="ft-gray">最后登录</span> ${user.userLatestLoginTime?string('yyyy-MM-dd HH:mm')}
+        </div>
+        <div class="user-info">
             <span class="ft-gray">${checkinStreakPart0Label}</span>
             ${user.userLongestCheckinStreak?c}
             <span class="ft-gray">${checkinStreakPart1Label}</span>
