@@ -584,6 +584,7 @@ public class UserQueryService {
             filters.add(new PropertyFilter(User.USER_NAME, FilterOperator.EQUAL, q));
             filters.add(new PropertyFilter(User.USER_EMAIL, FilterOperator.EQUAL, q));
             filters.add(new PropertyFilter(Keys.OBJECT_ID, FilterOperator.EQUAL, q));
+            filters.add(new PropertyFilter(UserExt.USER_NO, FilterOperator.EQUAL, q));
             query.setFilter(new CompositeFilter(CompositeFilterOperator.OR, filters));
         }
 
