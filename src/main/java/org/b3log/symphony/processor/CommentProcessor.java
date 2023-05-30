@@ -471,6 +471,11 @@ public class CommentProcessor {
                 currentUser = ApiProcessor.getUserByKey(requestJSONObject.optString("apiKey"));
             } catch (NullPointerException ignored) {
             }
+            final String userPhone = currentUser.optString("userPhone");
+            if (userPhone.isEmpty()) {
+                context.renderJSON(StatusCodes.ERR).renderMsg("未绑定手机号码，无法使用此功能。请至设置-账户中绑定手机号码。");
+                return;
+            }
             final String currentUserName = currentUser.optString(User.USER_NAME);
             final JSONObject article = articleQueryService.getArticle(articleId);
             final String articleContent = article.optString(Article.ARTICLE_CONTENT);

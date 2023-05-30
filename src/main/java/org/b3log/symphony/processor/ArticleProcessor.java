@@ -1375,6 +1375,11 @@ public class ArticleProcessor {
                 currentUser = ApiProcessor.getUserByKey(requestJSONObject.optString("apiKey"));
             } catch (NullPointerException ignored) {
             }
+            final String userPhone = currentUser.optString("userPhone");
+            if (userPhone.isEmpty()) {
+                context.renderJSON(StatusCodes.ERR).renderMsg("未绑定手机号码，无法使用此功能。请至设置-账户中绑定手机号码。");
+                return;
+            }
 
             article.put(Article.ARTICLE_AUTHOR_ID, currentUser.optString(Keys.OBJECT_ID));
 
