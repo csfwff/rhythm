@@ -65,7 +65,7 @@ public class ChatRoomBot {
     private static final SimpleCurrentLimiter RECORD_POOL_5_IN_24H = new SimpleCurrentLimiter(24 * 60 * 60, 4);
     private static final SimpleCurrentLimiter RECORD_POOL_5_IN_1M = new SimpleCurrentLimiter(60, 5);
     private static final SimpleCurrentLimiter RECORD_POOL_BARRAGER = new SimpleCurrentLimiter(60, 5);
-    private static final SimpleCurrentLimiter RECORD_POOL_1_IN_1M = new SimpleCurrentLimiter(60, 1);
+    private static final SimpleCurrentLimiter RECORD_POOL_05_IN_1M = new SimpleCurrentLimiter(30, 1);
 
 
     /**
@@ -603,9 +603,9 @@ public class ChatRoomBot {
                     boolean afternoon = date >= 1330 && date <= 1800;
                     // 判断是否在上午或下午时段
                     if (morning || afternoon) {
-                        // 每分钟全局锁只允许发送一条
-                        if (!RECORD_POOL_1_IN_1M.access("v")) {
-                            context.renderJSON(StatusCodes.ERR).renderMsg("现在是聊天高峰期，全局每分钟只允许发送一个猜拳红包，请稍候重试。高峰期时段为：08:30-11:30、13:30-18:00");
+                        // 每30秒全局锁只允许发送一条
+                        if (!RECORD_POOL_05_IN_1M.access("v")) {
+                            context.renderJSON(StatusCodes.ERR).renderMsg("现在是聊天高峰期，全局每30秒只允许发送一个猜拳红包，请稍候重试。高峰期时段为：08:30-11:30、13:30-18:00");
                             return false;
                         }
 
