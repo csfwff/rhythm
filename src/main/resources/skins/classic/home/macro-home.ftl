@@ -75,6 +75,7 @@
             </@head>
         </#if>
     <link rel="stylesheet" href="${staticServePath}/css/home.css?${staticResourceVersion}"/>
+    <link rel="stylesheet" href="${staticServePath}/css/index.css?${staticResourceVersion}"/>
 </head>
 <body class="fn__flex-column">
         <#include "../header.ftl">

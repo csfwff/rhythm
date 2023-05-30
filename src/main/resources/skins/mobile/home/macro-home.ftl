@@ -74,6 +74,7 @@
         <meta name="description" content="只与清风、明月为伴。清凉的风，明朗的月。"/>
             </@head>
         </#if>
+    <link rel="stylesheet" href="${staticServePath}/css/index.css?${staticResourceVersion}"/>
 </head>
 <body>
         <#include "../header.ftl">
