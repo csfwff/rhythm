@@ -23,7 +23,7 @@
         <div class="head-fn fn-left">
             <h1>
                 <a href="${servePath}" aria-label="${symphonyLabel}">
-                    <svg class="swimming"><use xlink:href="#logo-white"></use></svg>
+                    <svg class="swimming"><use xlink:href="#logo"></use></svg>
                 </a>
             </h1>
         </div>
