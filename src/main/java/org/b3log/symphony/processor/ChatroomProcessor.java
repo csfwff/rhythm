@@ -683,6 +683,11 @@ public class ChatroomProcessor {
                 currentUser = ApiProcessor.getUserByKey(requestJSONObject.optString("apiKey"));
             } catch (NullPointerException ignored) {
             }
+            final String userPhone = currentUser.optString("userPhone");
+            if (userPhone.isEmpty()) {
+                context.renderJSON(StatusCodes.ERR).renderMsg("未绑定手机号码，无法使用此功能。请至设置-账户中绑定手机号码。");
+                return;
+            }
             final String userName = currentUser.optString(User.USER_NAME);
             // 保存 Active 信息
             chatroomChannel.userActive.put(userName, System.currentTimeMillis());

@@ -605,6 +605,9 @@
                 $("#chatRoomInput").val("")
             },
             success: function (result) {
+                if (result.code !== 0) {
+                    Util.alert(result.msg)
+                }
             }
         });
         <#else>
