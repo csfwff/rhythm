@@ -21,7 +21,7 @@
 <#include "macro-notifications.ftl">
 <@notifications "sysAnnounce">
 <#if sysAnnounceNotifications?size != 0>
-<ul class="notification">
+<ul class="notification"  style="padding: 15px">
     <#list sysAnnounceNotifications as notification>
     <li class="<#if notification.hasRead>read</#if>">
         ${notification.description}

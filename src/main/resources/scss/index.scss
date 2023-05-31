@@ -79,9 +79,17 @@
 
 /* start article */
 .article {
+  padding-top: 60px;
   .nav {
     position: fixed;
     top: 0;
+  }
+
+  .article-container{
+    position: relative;
+    margin: 20px auto 20px;
+    max-width: 800px;
+    background: #fff;
   }
 
   .article-body .wrapper,
@@ -177,14 +185,13 @@
   }
 
   .share {
-    position: fixed;
-    top: 50%;
-    left: 120px;
+    position: absolute;
+    top: 100px;
+    left: -60px;
     width: 30px;
     font-size: 22px;
     color: $theme-secondary;
     text-align: center;
-    margin-top: -117px;
 
     .article-clipboard {
       position: absolute;
@@ -219,38 +226,46 @@
   }
 
   .article-header {
-    height: 48px;
-    width: 100%;
     position: fixed;
-    z-index: 83;
+    top: -60px;
     display: flex;
+    justify-content: space-around;
+    align-items: center;
+    width: 100%;
+    height: 58px;
+    z-index: 83;
     line-height: 38px;
     padding: 0 10px;
     background-color: #fff;
     box-sizing: border-box;
     box-shadow: $shadow-tip;
     font-size: 16px;
-    top: -50px;
+    transition: .5s;
 
     h1 svg {
       color: $black-text;
       vertical-align: baseline;
-      height: 48px;
-      width: 48px;
+      height: 38px;
+      width: 38px;
     }
 
     h2 {
       font-size: 24px;
       line-height: 48px;
       font-weight: normal;
-      flex: 1;
+      //flex: 1;
       margin: 0 20px;
       transition: margin 1s cubic-bezier(0, 0, 0.2, 1);
     }
-
+    .user-nav{
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: nowrap;
+    }
     .user-nav > span,
     .user-nav > a {
-      float: left;
+      white-space: nowrap;
       padding: 16px 10px;
       line-height: 16px;
       height: 16px;
@@ -2677,7 +2692,7 @@ code .dec {
 .showList {
   display: block;
   &#emojiList{
-    bottom: 60px;
+    top: 360px;
   }
 }
 

@@ -511,16 +511,21 @@ a[class*=" icon-"]:hover {
   background-color: $theme-primary;
 }
 
+.nav .wrapper{
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
 .nav .head-fn form {
   position: relative;
 }
 
 .nav .head-fn h1 a {
-
   svg {
     color: #fff;
-    height: 38px;
-    width: 38px;
+    height: 28px;
+    width: 28px;
     margin-top: -5px;
     float: left;
   }
@@ -528,6 +533,9 @@ a[class*=" icon-"]:hover {
 
 .nav .user-nav {
   position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 .nav .user-nav a.unlogin {
@@ -550,7 +558,7 @@ a[class*=" icon-"]:hover {
 }
 
 .nav div > a.current {
-  border-bottom: 2px solid #D26911;
+  border-bottom: 2px solid $theme-accent;
   padding-bottom: 7px;
 }
 
@@ -583,6 +591,11 @@ a[class*=" icon-"]:hover {
   animation: spaceboots 1s infinite;
   background-color: $theme-accent;
   color: #FFFFFF;
+}
+.nav .user-nav svg{
+  color: $theme-primary-text;
+  height: 20px;
+  width: 20px;
 }
 
 .nav .user-nav a.selected.no-msg,

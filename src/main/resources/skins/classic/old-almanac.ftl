@@ -49,7 +49,7 @@
     <div class="wrapper">
         <div class="content">
             <div class="module">
-                      <div class="wrapper" style="justify-content:center">
+                      <div class="wrapper" style="justify-content:center;padding: 15px;">
                           <div class="fn-flex old-almanac" >
                               <div class="tip metro-item" style="width: 100%;">
                                   <span class="date"></span>

@@ -21,7 +21,7 @@
 <#include "macro-notifications.ftl">
 <@notifications "following">
 <#if followingNotifications?size != 0>
-<ul class="notification">
+<ul class="notification" style="padding: 15px">
     <#list followingNotifications as notification>
     <li class="fn-flex<#if notification.hasRead> read</#if>">
         <a target="_blank" rel="nofollow" href="${servePath}/member/${notification.authorName}">

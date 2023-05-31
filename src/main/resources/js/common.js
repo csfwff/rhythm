@@ -1095,7 +1095,10 @@ var Util = {
                         '<div id="notificationsPanel" class="module person-list"><ul>' +
                         notiHTML + '</ul></div>')
 
-                    $('#aNotifications').click(function () {
+                    $('#aNotifications').click(function (e) {
+                        let posRight = window.innerWidth - e.pageX - $('#notificationsPanel').width();
+                        console.log(posRight)
+                        $('#notificationsPanel').css('right',posRight + 'px')
                         $('#notificationsPanel').show()
                     })
 
@@ -1783,14 +1786,10 @@ var Util = {
         addClass('msg');
         if (!Util.isBlinging) {
             Util.isBlinging = true;
-            $("#idleTalkIconContainer").html("<use xlink:href=\"#redIdleChat\"></use>");
-            setTimeout(function () {
-                $("#idleTalkIconContainer").html("<use xlink:href=\"#idleChat\"></use>");
-            }, 1000);
             bling = setInterval(function () {
-                $("#idleTalkIconContainer").html("<use xlink:href=\"#redIdleChat\"></use>");
+                $('#aChat').removeClass('msg').addClass('no-msg');
                 setTimeout(function () {
-                    $("#idleTalkIconContainer").html("<use xlink:href=\"#idleChat\"></use>");
+                    $('#aChat').removeClass('no-msg').addClass('msg');
                 }, 1000);
             }, 2000);
         }
@@ -1838,7 +1837,8 @@ var Util = {
             }
         })
 
-        // 导航过长处理
+        // 导航过长处理 导航栏跳舞?涛涛你打野-----Yui留
+        /*
         if ($('.nav-tabs a:last').length === 1 &&
             $('.nav-tabs a:last')[0].offsetTop > 0) {
             $('.nav-tabs').mouseover(function () {
@@ -1847,6 +1847,7 @@ var Util = {
                 $('.user-nav').show()
             })
         }
+         */
     },
     /**
      * @description 登出
