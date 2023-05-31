@@ -34,7 +34,7 @@
             <a href="${servePath}/admin" title="${adminLabel}" class="last"><svg><use xlink:href="#manage"></use></svg></a>
             </#if>
             <a href="${servePath}/member/${currentUser.userName}" title="Home" class="<#if 'adminRole' != userRole>last </#if>nav-avatar">
-                <span class="avatar-small" style="background-image:url('${currentUser.userAvatarURL20}')"></span>
+                <span class="avatar-small" style="background-image:url('${currentUser.userAvatarURL48}')"></span>
             </a>
             <a href="${servePath}/chat" title="私信"><svg id="idleTalkIconContainer"><use xlink:href="#idleChat"></use></svg></a>
             <#if unreadChat?? && unreadChat gt 0>

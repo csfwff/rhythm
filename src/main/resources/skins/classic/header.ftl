@@ -100,13 +100,13 @@
             <a id="aNotifications"
                class="tooltipped tooltipped-w <#if unreadNotificationCount == 0>no-msg<#else>msg</#if>"
                href="${servePath}/notifications" aria-label="${messageLabel}">
-                <svg style="height: 15px;padding-top: 2px;pointer-events: none;">
+                <svg style="height: 15px;pointer-events: none;">
                     <use xlink:href="#notification"></use>
                 </svg>
                 &nbsp;${unreadNotificationCount}
             </a>
             <a id="aChat" href="${servePath}/chat" class="tooltipped tooltipped-w no-msg" aria-label="私信">
-                <svg style="height: 15px;padding-top: 2px;">
+                <svg style="height: 15px;">
                     <use xlink:href="#idleChat"></use>
                 </svg>
                 &nbsp;<span id="aChatCount"><#if unreadChat?? && unreadChat gt 0>${unreadChat}<#else>0</#if></span>

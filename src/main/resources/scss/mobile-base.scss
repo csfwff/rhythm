@@ -494,10 +494,16 @@ a[class*=" icon-"]:hover {
 .wrapper {
   margin: 0 10px;
 }
-
 .main {
   //background-color: #FFF;
   //padding-bottom: 10px;
+
+  .article-main {
+    margin: 10px 10px;
+    background-color: var(--layer-background-color);
+    box-shadow: 0 1px 2px var(--layer-border-color);
+    padding: 10px 10px 20px 10px;
+  }
 }
 
 /* end framework */
@@ -543,7 +549,7 @@ a[class*=" icon-"]:hover {
 }
 
 .nav div > a {
-  color: #fff;
+  color: #3b3e43;
   text-decoration: none;
   margin: 0 3px;
   padding: 4px 5px;
@@ -642,14 +648,14 @@ a[class*=" icon-"]:hover {
 
 /* start footer */
 .footer {
-  color: #7d8186;
+  color: #434444;
   padding: 10px 0;
   text-align: center;
   font-size: 12px;
   background-color: $theme-primary;
 
   a {
-    color: #afb1b3;
+    color: #7e7e7e;
   }
 }
 
@@ -675,10 +681,11 @@ a[class*=" icon-"]:hover {
 
 .list > ul > li {
   border-bottom: 1px solid #eee;
-  padding: 10px;
+  padding: 10px 5px 0 5px;
   white-space: normal;
   word-wrap: break-word;
   position: relative;
+  margin-bottom: 10px;
 }
 
 .list li.last {
@@ -1069,7 +1076,7 @@ label.anonymous-check {
 
 .article-info {
   position: relative;
-  margin-bottom: 10px;
+  margin-bottom: 25px;
 }
 
 .article-info > div.article-params {
@@ -1092,7 +1099,7 @@ h1.article-title {
   word-break: break-all;
   font-size: 16px;
   font-weight: normal;
-  margin: 10px 0;
+  margin: 4px 0 20px 0;
 }
 
 h1.article-title > a {
@@ -1140,9 +1147,9 @@ label.cmt-anonymous {
 }
 
 .comments > .comments-header {
-  border-bottom: 1px solid #CCCCCC;
-  margin: 20px 0 0;
-  padding: 10px 5px 5px 10px;
+  border-bottom: 1px solid #dbdbdb;
+  margin: 20px 0 20px 0;
+  padding: 10px 5px 11px 10px;
 }
 
 .comments > div.comments-header svg {
@@ -1151,7 +1158,7 @@ label.cmt-anonymous {
 
 .comments > div.comments-header a {
   text-decoration: none;
-  color: $black-text;
+  color: #817e7e;
 }
 
 .comments li.shield {
@@ -1214,9 +1221,6 @@ label.cmt-anonymous {
 }
 
 .comment-login {
-  border: 1px solid #D9D9D9;
-  border-top-color: #C0C0C0;
-  border-left-color: #C0C0C0;
   box-sizing: border-box;
   margin: 10px;
   background-color: #fafafa;
@@ -1649,6 +1653,7 @@ label.cmt-anonymous {
   .form {
     font-size: 14px;
     line-height: 1.6;
+    margin: 20px 0;
 
     & > svg {
       margin: 0 auto;

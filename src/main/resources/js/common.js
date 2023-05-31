@@ -1066,7 +1066,7 @@ var Util = {
                 }
 
                 // browser
-                let icon = '<svg style="height: 15px;padding-top: 2px;pointer-events: none;">' +
+                let icon = '<svg style="height: 15px;pointer-events: none;">' +
                     '  <use xlink:href="#notification"></use>' +
                     '</svg>' +
                     '&nbsp;';

@@ -96,7 +96,7 @@
     <h2 class="module__title ft__fade fn__clear">
         <div class="module__title ft__fade fn__clear">
 
-            <a class="ft__gray" href="${servePath}/pre-post">${postArticleLabel}</a>
+            <a class="ft__gray" href="javascript:void(0);">功能</a>
         </div>
     </h2>
 </div>

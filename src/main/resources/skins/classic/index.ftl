@@ -891,7 +891,7 @@
     </#if>
 </script>
 <script>
-    let now = new Date().getHours();
+    /*let now = new Date().getHours();
     let day = new Date().getDay();
     if ((now >= 19 && now <= 23) || (now >= 0 && now <= 7)) {
         $("head").append('<link rel="stylesheet" href="https://fonts.font.im/css2?family=Ma+Shan+Zheng&display=swap">');
@@ -930,7 +930,7 @@
         setTimeout(function () {
             $("#nightTips").slideDown(1500);
         }, 500);
-    }
+    }*/
 </script>
 </body>
 </html>

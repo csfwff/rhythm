@@ -1352,6 +1352,7 @@ code .dec {
         align-items: center;
         border-radius: 20px 20px 5px 5px;
         box-shadow: 0 2px 4px rgb(0 0 0 / 50%);
+        transition: all .15s ease-in-out;
         .calendar-head {
           height: 33%;
           font-size: 13px;
@@ -2714,15 +2715,18 @@ code .dec {
   border-radius: 3px;
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
   margin: 0px 5px 10px 5px;
+  transition: all .15s ease-in-out;
+}
+
+.TGIF__item:hover {
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.2);
 }
 
 .index-full-size {
-  background-color: rgba(12, 0, 103, 0.7);
   height: 120px;
   border-radius: 10px;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
   margin-bottom: 30px;
-  color: #ffffff;
+  color: #000000;
   font-family: "Ma Shan Zheng", cursive;
   cursor: default;
 }
