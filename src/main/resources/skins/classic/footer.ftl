@@ -132,8 +132,9 @@
             currentUserName: '${currentUser.userName}',
         </#if>
         <#if csrfToken??>
-            csrfToken: '${csrfToken}'
+            csrfToken: '${csrfToken}',
         </#if>
+        staticResourceVersion: '${staticResourceVersion}',
     }
 
     <#if isLoggedIn>

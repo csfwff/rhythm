@@ -526,12 +526,16 @@ public class DataModelService {
         Stopwatchs.start("Fills system settings");
         try {
             final boolean loggedIn = Sessions.isLoggedIn();
+            String staticResourceVersion = Symphonys.get("staticResourceVersion");
+            if (null == staticResourceVersion || staticResourceVersion.isEmpty() || Latkes.getRuntimeMode().name().equals("DEVELOPMENT")) {
+                staticResourceVersion = Latkes.getStaticResourceVersion();
+            }
             if (loggedIn) {
                 final JSONObject currentUser = Sessions.getUser();
                 if (Objects.isNull(currentUser)) {
                     dataModel.put("hasSystemTitle", false);
                     dataModel.put("cardBg", "");
-                    dataModel.put("iconURL", "https://fishpi.cn/images/favicon.png");
+                    dataModel.put("iconURL", "https://fishpi.cn/images/favicon.png?" + staticResourceVersion);
                     dataModel.put(SystemSettings.ONLINE_TIME_UNIT, "m");
                     dataModel.put("showSideAd", true);
                     dataModel.put("showTopAd", true);
@@ -540,7 +544,7 @@ public class DataModelService {
                     if (Objects.isNull(systemSettings)) {
                         dataModel.put("hasSystemTitle", false);
                         dataModel.put("cardBg", "");
-                        dataModel.put("iconURL", "https://fishpi.cn/images/favicon.png");
+                        dataModel.put("iconURL", "https://fishpi.cn/images/favicon.png?" + staticResourceVersion);
                         dataModel.put(SystemSettings.ONLINE_TIME_UNIT, "m");
                         dataModel.put("showSideAd", true);
                         dataModel.put("showTopAd", true);
@@ -574,7 +578,7 @@ public class DataModelService {
                     }
                     final String iconURL = settings.optString("iconURL");
                     if (StringUtils.isBlank(iconURL)) {
-                        dataModel.put("iconURL", "https://fishpi.cn/images/favicon.png");
+                        dataModel.put("iconURL", "https://fishpi.cn/images/favicon.png?" + staticResourceVersion);
                     } else {
                         dataModel.put("iconURL", iconURL);
                     }
@@ -588,7 +592,7 @@ public class DataModelService {
             } else {
                 dataModel.put("hasSystemTitle", false);
                 dataModel.put("cardBg", "");
-                dataModel.put("iconURL", "https://fishpi.cn/images/favicon.png");
+                dataModel.put("iconURL", "https://fishpi.cn/images/favicon.png?" + staticResourceVersion);
                 dataModel.put("showSideAd", true);
                 dataModel.put("showTopAd", true);
             }

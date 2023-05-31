@@ -38,6 +38,9 @@
         </div>
         <div class="module-panel form fn-clear">
             <div class="avatar-big" id="iconURL" data-imageurl="${iconURL}" style="height: 128px; width: 128px; background-image:url('${iconURL}')"></div>
+            <label style="padding: 15px 0">
+                如果自定义网站图标后不生效，请使用 CTRL+F5 快捷键强行刷新页面；为确保浏览体验，建议使用128KB以下图片。
+            </label>
             <div class="fn__clear" id="iconUploadButtons" style="margin-top: 15px;">
                 <form id="iconUpload" method="POST" enctype="multipart/form-data">
                     <label class="btn green label__upload" style="height: 37px;margin: 0;">
@@ -47,9 +50,6 @@
                 <button class="fn-right" style="height: 37px;" onclick="$('#iconURL').data('imageurl', ''); Settings.update('system', '${csrfToken}');location.reload();">恢复默认</button>
             </div>
         </div>
-        <label style="padding-left: 15px">
-            如果自定义网站图标后不生效，请使用 CTRL+F5 快捷键强行刷新页面；为确保浏览体验，建议使用128KB以下图片。
-        </label>
     </div>
 
     <div class="module">
