@@ -725,7 +725,7 @@ a[class*=" icon-"]:hover {
 .pagination span.current,
 .tabs-sub a.current {
   background-color: $theme-primary;
-  color: #f0f0f0;
+  color: $theme-primary-text;
 }
 
 /* end pagination & tabs-sub */
@@ -1000,7 +1000,7 @@ a[class*=" icon-"]:hover {
   }
 
   input::-webkit-input-placeholder {
-    color: $theme-primary-text;
+    color: #999999;
   }
 
   input.search {
@@ -1009,9 +1009,9 @@ a[class*=" icon-"]:hover {
     border-radius: 3px 3px 3px 3px;
     padding: 5px 8px;
     width: 210px;
-    line-height: 30px;
-    height: 30px;
-    color: #121212;
+    line-height: 38px;
+    height: 38px;
+    color: $theme-primary-text;
     box-sizing: border-box;
     position: relative;
     vertical-align: top;

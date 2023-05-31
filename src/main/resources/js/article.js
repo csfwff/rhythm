@@ -1988,6 +1988,8 @@ $(document).ready(function () {
         clearTimeout(timeoutId)
         timeoutId=0
       }
+      $('#emojiList').css('top','auto')
+      $('#emojiList').css('bottom','60px')
       time_out=new Date().getTime()
       timeoutId=setTimeout(()=>{
         new Date().getTime()-time_out<=700&&$("#emojiList").removeClass("showList")

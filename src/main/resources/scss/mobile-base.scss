@@ -1922,6 +1922,10 @@ code .dec {
 /* end activity */
 
 /* start chatroom */
+.chat-room{
+  background: #ffffff;
+  padding: 0 10px;
+}
 .chat-room .online-cnt {
   line-height: 33px;
   margin-right: 10px;
