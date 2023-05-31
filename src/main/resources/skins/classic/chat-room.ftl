@@ -40,7 +40,7 @@
                 <div class="fn-content" style="padding-top: 0;">
                     <div class="reply">
                         <#if isLoggedIn>
-                            <div id="chatContent"></div>
+                            <div id="chatContent" style="margin: 0 -15px"> </div>
                             <br>
                             <div class="fn-clear" style="padding: 5px 0 7px 0;">
                                 <svg id="redPacketBtn" style="width: 30px; height: 30px; cursor:pointer;">
@@ -156,7 +156,7 @@
                     </div>
                 </div>
             </div>
-            <div class="list module pd__15" id="comments" style="height: 100%; margin-top: -15px">
+            <div class="list module pd__15" id="comments" style="height: auto; margin-top: -15px">
                 <div id="chats">
                 </div>
                 <#if !isLoggedIn><div style="color:rgba(0,0,0,0.54);">登录后查看更多</div></#if>

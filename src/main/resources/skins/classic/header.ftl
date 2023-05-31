@@ -82,19 +82,19 @@
         <#if isLoggedIn>
             <a href="${servePath}/pre-post" class="tooltipped tooltipped-w" aria-label="${postArticleLabel}">
                 <svg>
-                    <use xlink:href="#addfile"></use>
+                    <use xlink:href="#addpost"></use>
                 </svg>
             </a>
             <#if permissions["menuAdmin"].permissionGrant>
             <a href="${servePath}/admin" aria-label="${adminLabel}" class="tooltipped tooltipped-w">
                 <svg>
-                    <use xlink:href="#userrole"></use>
+                    <use xlink:href="#manage"></use>
                 </svg>
             </a>
             </#if>
             <a href="${servePath}/activities" aria-label="${activityLabel}" class="tooltipped tooltipped-w">
                 <svg>
-                    <use xlink:href="#flag"></use>
+                    <use xlink:href="#playgame"></use>
                 </svg>
             </a>
             <a id="aNotifications"
@@ -124,8 +124,9 @@
                aria-label="${viewHomeAndProfileLabel}"
                data-url="${servePath}/member/${currentUser.userName}">
                 <span class="avatar-small" style="background-image:url('${currentUser.userAvatarURL20}')"></span>
+
             </a>
-            <div class="module person-list" id="personListPanel" style="right: 13px">
+            <div class="module person-list" id="personListPanel">
                 <ul>
                     <li>
                         <a href="${servePath}/member/${currentUser.userName}">${goHomeLabel}</a>

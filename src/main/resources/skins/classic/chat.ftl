@@ -61,7 +61,7 @@
 <div class="main">
     <div class="wrapper">
         <div class="side" style="margin-bottom: 25px">
-            <div class="module person-info">
+            <div class="module person-info" style="padding: 0">
                 <div class="module-panel" id="chatToFileTransfer" style="padding: 10px 15px;cursor: pointer"
                      onclick="Chat.init('FileTransfer')">
                     <nav class="home-menu">
@@ -86,12 +86,12 @@
                     </details-menu>
                 </details>
             </div>
-            <div class="module person-info" id="chatMessageList">
+            <div class="module person-info" id="chatMessageList"  style="padding: 0">
             </div>
             </span>
         </div>
-        <div class="content chat-room" style="margin-left: 15px; padding: 20px 10px">
-            <div class="ft__gray ft__center" id="chatStatus">
+        <div class="content chat-room" style="margin-left: 15px; padding: 20px 10px;background-color: #fff">
+            <div class="ft__gray ft__center" id="chatStatus" style="padding-top: 10px">
             </div>
             <br>
             <div id="messageContent"></div>
@@ -122,7 +122,7 @@
                 </div>
             </div>
             <br>
-            <div class="module" style="min-height: 300px; margin-top: 20px;">
+            <div class="module" style="min-height: 300px; margin-top: 20px;box-shadow: none">
                 <div id="chats">
                 </div>
             </div>

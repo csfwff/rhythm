@@ -19,7 +19,7 @@
 
 -->
 <div class="nav">
-    <div class="wrapper fn-clear">
+    <div class="wrapper">
         <div class="head-fn fn-left">
             <h1>
                 <a href="${servePath}" aria-label="${symphonyLabel}">
@@ -28,10 +28,10 @@
             </h1>
         </div>
 
-        <div class="fn-right user-nav">
+        <div class="user-nav">
             <#if isLoggedIn>
             <#if permissions["menuAdmin"].permissionGrant>
-            <a href="${servePath}/admin" title="${adminLabel}" class="last"><svg><use xlink:href="#userrole"></use></svg></a>
+            <a href="${servePath}/admin" title="${adminLabel}" class="last"><svg><use xlink:href="#manage"></use></svg></a>
             </#if>
             <a href="${servePath}/member/${currentUser.userName}" title="Home" class="<#if 'adminRole' != userRole>last </#if>nav-avatar">
                 <span class="avatar-small" style="background-image:url('${currentUser.userAvatarURL20}')"></span>
@@ -46,9 +46,9 @@
                     }
                 </script>
             </#if>
-            <a href="${servePath}/activities" title="${activityLabel}"><svg><use xlink:href="#flag"></use></svg></a>
+            <a href="${servePath}/activities" title="${activityLabel}"><svg><use xlink:href="#playgame"></use></svg></a>
             <#if permissions["commonAddArticle"].permissionGrant>
-                <a href="${servePath}/pre-post" title="${addArticleLabel}"><svg><use xlink:href="#addfile"></use></svg></a>
+                <a href="${servePath}/pre-post" title="${addArticleLabel}"><svg><use xlink:href="#addpost"></use></svg></a>
             </#if>
             <a id="aNotifications" class="<#if unreadNotificationCount == 0>no-msg<#else>msg</#if>" href="${servePath}/notifications" title="${messageLabel}">${unreadNotificationCount}</a>
             <a href="${servePath}/qna"><svg><use xlink:href="#iconAsk"></use></svg></a>

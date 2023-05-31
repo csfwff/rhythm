@@ -21,7 +21,7 @@
 <#include "macro-notifications.ftl">
 <@notifications "point">
 <#if pointNotifications?size != 0>
-<ul class="notification">
+<ul class="notification" style="padding: 15px">
     <#list pointNotifications as notification>
     <li class="<#if notification.hasRead>read</#if>">
         ${notification.description}

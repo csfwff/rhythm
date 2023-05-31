@@ -83,7 +83,7 @@ body {
   font-family: $font-family-base;
   font-size: 14px;
   color: $black-text;
-  background-color: #fff;
+  background-color: $theme-background;
 }
 
 ::-moz-selection {

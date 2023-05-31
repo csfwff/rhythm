@@ -21,10 +21,10 @@
 <#include "macro-settings.ftl">
 <@home "system">
     <div id="systemTip" class="tip"></div>
-    <div class="module-header">
-        自定义社区标题
-    </div>
     <div class="module">
+        <div class="module-header">
+            自定义社区标题
+        </div>
         <div class="module-panel form fn-clear">
             <input id="newSystemTitle" type="text" value="<#if hasSystemTitle>${systemTitle}<#else>${symphonyLabel}</#if>"/><br/><br/>
 

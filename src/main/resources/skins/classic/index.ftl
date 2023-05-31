@@ -274,7 +274,7 @@
 
     <div class="wrapper index-full-size" id="goodNight" style="display: none"></div>
 
-    <div class="index-bottom" style="border-top: 1px solid #f3f3f3;">
+    <div class="index-bottom" style="margin-top: 20px">
         <div class="wrapper">
             <div class="fn-flex-1">
                 <div class="metro-line fn-flex" style="align-items:center;">
@@ -326,19 +326,19 @@
                     </div>
                 </div>
 
-                <div class="metro-border fn-flex">
-                    <div style="background:transparent;;flex:1.2;"></div>
-                    <div class="green"></div>
-                    <div class="yellow"></div>
-                    <div class="red"></div>
-                    <div class="purple"></div>
-                </div>
+<#--                <div class="metro-border fn-flex">-->
+<#--                    <div style="background:transparent;;flex:1.2;"></div>-->
+<#--                    <div class="green"></div>-->
+<#--                    <div class="yellow"></div>-->
+<#--                    <div class="red"></div>-->
+<#--                    <div class="purple"></div>-->
+<#--                </div>-->
             </div>
         </div>
     </div>
 
 
-    <div class="index-bottom" style="padding-top:40px;padding-bottom: 20px;">
+    <div class="index-bottom" style="padding-top:20px;padding-bottom: 20px;">
         <div class="wrapper">
             <div class="index-recent fn-flex-1">
                 <div class="index-head-title">
