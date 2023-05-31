@@ -1096,7 +1096,7 @@ var Util = {
                         notiHTML + '</ul></div>')
 
                     $('#aNotifications').click(function (e) {
-                        let posRight = window.innerWidth - e.pageX - $('#notificationsPanel').width();
+                        let posRight = window.innerWidth - e.pageX - ($('#notificationsPanel').width() /2);
                         console.log(posRight)
                         $('#notificationsPanel').css('right',posRight + 'px')
                         $('#notificationsPanel').show()
@@ -1787,9 +1787,9 @@ var Util = {
         if (!Util.isBlinging) {
             Util.isBlinging = true;
             bling = setInterval(function () {
-                $('#aChat').removeClass('msg').addClass('no-msg');
+                $('#aChat').removeClass('no-msg').addClass('msg');
                 setTimeout(function () {
-                    $('#aChat').removeClass('no-msg').addClass('msg');
+                    $('#aChat').removeClass('msg').addClass('no-msg');
                 }, 1000);
             }, 2000);
         }

@@ -138,7 +138,8 @@ var ChatRoom = {
                     new Date().getTime() - time_out <= 700 && $("#emojiList").removeClass("showList")
                 }, navigator.userAgent.match(/(phone|pad|pod|ios|Android|Mobile|BlackBerry|MQQBrowser|JUC|Fennec|wOSBrowser|BrowserNG|WebOS|Symbian)/i) !== null ? 0 : 600)
             }
-            $("#emojiBtn").hover(function () {
+            $("#emojiBtn").hover(function (e) {
+                $('#emojiList').css('top','290px')
                 if (timeoutId !== 0) {
                     clearTimeout(timeoutId)
                     timeoutId = 0
@@ -571,14 +572,10 @@ var ChatRoom = {
         NProgress.start();
         $('#chats').css("display", "none");
         page = 1;
-        let chatLength = $(".chats__content").length;
-        if (chatLength > 25) {
-            for (let i = chatLength - 1; i > 24; i--) {
-                if ($($($($($(".chats__content")[i]).parent()).parent()).parent()).attr("id") == 'stacked') {
-                    $($($($($(".chats__content")[i]).parent()).parent()).parent()).remove();
-                } else {
-                    $($($($(".chats__content")[i]).parent()).parent()).remove();
-                }
+        let chatLength = $("#chats>div");
+        if (chatLength.length > 25) {
+            for (let i = chatLength.length - 1; i > 24; i--) {
+                chatLength[i].remove();
             }
         }
         setTimeout(function() {

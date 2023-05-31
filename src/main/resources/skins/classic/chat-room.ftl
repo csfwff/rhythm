@@ -41,7 +41,6 @@
                     <div class="reply">
                         <#if isLoggedIn>
                             <div id="chatContent" style="margin: 0 -15px"> </div>
-                            <br>
                             <div class="fn-clear" style="padding: 5px 0 7px 0;">
                                 <svg id="redPacketBtn" style="width: 30px; height: 30px; cursor:pointer;">
                                     <use xlink:href="#redPacketIcon"></use>
@@ -137,6 +136,7 @@
                                     </div>
                                 </div>
                             </div>
+                            <div style="height: 20px;margin:0 -15px 10px;background-color: #f7f9fa;"></div>
                             <div class="fn-clear comment-submit">
                                 <div class="fn-left online-cnt">${onlineVisitorCountLabel} <span id="onlineCnt"></span>
                                 </div>

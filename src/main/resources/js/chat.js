@@ -729,6 +729,7 @@ $(document).ready(function () {
                 clearTimeout(timeoutId)
                 timeoutId=0
             }
+            $('#emojiList').css('top','350px')
             time_out=new Date().getTime()
             setTimeout(()=>0!==$("#emojiBtn:hover").length&&$("#emojiList").addClass("showList"),300)
         },closeEmoji)
