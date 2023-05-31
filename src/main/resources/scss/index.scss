@@ -290,12 +290,13 @@
 
   #articleToC {
     position: fixed;
-    top: 50px;
+    top: 80px;
     width: 20%;
     z-index: 0;
     right: 0;
     height: 100%;
     border-radius: 0;
+    background: none;
 
     .module-panel {
       overflow: auto;
