@@ -133,7 +133,7 @@ const Count = {
     },
 
     settings: function () {
-        Util.alert(`<div class="form fn__flex-column">
+        Util.alert(`<div class="form fn__flex-column" style="width: 100%;border:none;box-shadow:none;background:none;">
 <label>
   <div class="ft__smaller ft__fade" style="float: left">状态（关闭后可点击右上角头像找到下班倒计时设定）</div>
   <div class="fn-hr5 fn__5"></div>
