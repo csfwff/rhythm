@@ -42,12 +42,12 @@
     <#--            <@subNav 'community' ''/>-->
     <div class="wrapper">
         <div class="content chat-room">
-            <div class="reply">
+            <div class="reply" style="margin: 0 -12px 15px -12px;">
                 <br>
                 <#if isLoggedIn>
                     <div id="chatContent"></div>
                     <div id="liveliness"></div>
-                    <div class="fn-clear" style="padding: 15px 0px 12px 0px;margin-bottom: 5px;">
+                    <div class="fn-clear" style="padding: 15px 0px 12px 0px;">
                         <svg id="redPacketBtn" style="width: 30px; height: 30px; cursor:pointer;">
                             <use xlink:href="#redPacketIcon"></use>
                         </svg>
@@ -105,8 +105,8 @@
                                     <span style="color: #616161">💤 现在是聊天室宵禁时间 (19:30-08:00)，您发送的消息将不会产生活跃度，请早点下班休息 :)</span>
                                 </a>
                             </div>
+                            <br>
                         </#if>
-                        <br>
                         <div class="fn-right" style="margin-top: 6px">
                             <#if level3Permitted == true>
                                 <button id="groupRevoke" onclick="ChatRoom.startGroupRevoke()" class="button">
@@ -171,7 +171,7 @@
                     </div>
                 </#if>
             </div>
-            <div class="list" style="height: 100%">
+            <div class="list" style="height: 100%; margin: 0 -12px;">
                 <div id="chats">
                 </div>
                 <#if !isLoggedIn>
