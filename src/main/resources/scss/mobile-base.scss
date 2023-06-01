@@ -498,12 +498,12 @@ a[class*=" icon-"]:hover {
   //background-color: #FFF;
   //padding-bottom: 10px;
 
-  .article-main {
+  /*.article-main {
     margin: 10px 10px;
     background-color: var(--layer-background-color);
     box-shadow: 0 1px 2px var(--layer-border-color);
     padding: 10px 10px 20px 10px;
-  }
+  }*/
 }
 
 /* end framework */
@@ -514,7 +514,7 @@ a[class*=" icon-"]:hover {
   width: 100%;
   padding: 5px 0;
   z-index: 99;
-  background-color: $theme-primary;
+  background-color: rgba(217, 240, 255, 0.75);
 }
 
 .nav .wrapper{
@@ -564,8 +564,10 @@ a[class*=" icon-"]:hover {
 }
 
 .nav div > a.current {
+  /*
   border-bottom: 2px solid $theme-accent;
   padding-bottom: 7px;
+  */
 }
 
 .nav div > a.last {
@@ -580,13 +582,14 @@ a[class*=" icon-"]:hover {
 
 .nav .user-nav .no-msg,
 .nav .user-nav .msg {
-  background-color: #777;
+  background-color: rgba(203,202,202,.29);
   border-radius: 3px;
-  color: #FFFFFF;
+  color: #3b3e43;
   font-size: 14px;
   padding: 0px 6px;
-  margin: 5px 10px;
+  margin: 5px 4px;
   line-height: 20px;
+  transition: .5s;
 }
 
 .nav .user-nav .msg {
@@ -681,11 +684,10 @@ a[class*=" icon-"]:hover {
 
 .list > ul > li {
   border-bottom: 1px solid #eee;
-  padding: 10px 5px 0 5px;
+  padding: 10px 5px 10px 5px;
   white-space: normal;
   word-wrap: break-word;
   position: relative;
-  margin-bottom: 10px;
 }
 
 .list li.last {
@@ -1076,7 +1078,6 @@ label.anonymous-check {
 
 .article-info {
   position: relative;
-  margin-bottom: 25px;
 }
 
 .article-info > div.article-params {
@@ -2989,13 +2990,11 @@ only screen and (device-width: 414px) and (device-height: 896px) and (-webkit-de
 }
 
 .list__item{
-  background-color: var(--layer-background-color);
-  box-shadow: 0 1px 2px var(--layer-border-color);
   list-style: none;
   margin-bottom: 10px;
-  padding: 10px;
+  padding: 3px 5px 9px 5px;
   font-family: "HarmonyOS",Helvetica Neue,Luxi Sans,DejaVu Sans,Hiragino Sans GB,Microsoft Yahei,sans-serif,Apple Color Emoji,Segoe UI Emoji,Noto Color Emoji,Segoe UI Symbol,Android Emoji,EmojiSymbols;
-
+  border-bottom: 1px solid #eee;
 
   :last-child{
     margin-bottom: 0
@@ -3252,5 +3251,9 @@ only screen and (device-width: 414px) and (device-height: 896px) and (-webkit-de
   width: 0;
 }
 
-
-
+.main {
+  margin: 10px 5px 5px 5px;
+  background-color: var(--layer-background-color);
+  box-shadow: 0 1px 2px var(--layer-border-color);
+  padding: 5px 5px 20px 5px;
+}

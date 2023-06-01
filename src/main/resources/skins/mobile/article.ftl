@@ -38,12 +38,8 @@
         <p itemprop="description" class="fn-none">"${article.articlePreviewContent}"</p>
         <#include "header.ftl">
         <div class="main">
-            <div class="article-actions fn-clear" style="margin-top: 5px;">
+            <div class="article-actions fn-clear" style="margin-bottom: 10px;">
                     <span class="fn-right">
-                        <#if permissions["commonViewArticleHistory"].permissionGrant && article.articleRevisionCount &gt; 1>
-                            <span onclick="Article.revision('${article.oId}')" aria-label="${historyLabel}"
-                                  class="tooltipped tooltipped-w"><svg class="icon-history"><use xlink:href="#history"></use></svg></span>
-                        </#if>
                         <span id="thankArticle" aria-label="${thankLabel}"
                               class="tooltipped tooltipped-n has-cnt<#if article.thanked> ft-red</#if>"
                               <#if permissions["commonThankArticle"].permissionGrant>
@@ -99,19 +95,6 @@
                             <span class="tooltipped tooltipped-n has-cnt<#if article.rewarded> ft-red</#if>"
                                   <#if !article.rewarded>onclick="Article.reward(${article.oId})"</#if>
                         aria-label="${rewardLabel}"><svg class="icon-points"><use xlink:href="#points"></use></svg> ${article.rewardedCnt}</span>
-                        </#if>
-                        <span aria-label="${reportLabel}" class="tooltipped tooltipped-n"
-                              onclick="$('#reportDialog').data('type', 0).data('id', '${article.oId}').dialog('open')"
-                        ><svg><use xlink:href="#icon-report"></use></svg></span>
-                        <#if article.isMyArticle && 3 != article.articleType && permissions["commonUpdateArticle"].permissionGrant>
-                            <a href="${servePath}/update?id=${article.oId}"><svg><use xlink:href="#edit"></use></svg></a>
-                        </#if>
-                        <#if article.isMyArticle && permissions["commonStickArticle"].permissionGrant>
-                            <a class="tooltipped tooltipped-n" aria-label="${stickLabel}"
-                               href="javascript:Article.stick('${article.oId}')"><svg><use xlink:href="#chevron-up"></use></svg></a>
-                        </#if>
-                        <#if permissions["articleUpdateArticleBasic"].permissionGrant>
-                            <a class="tooltipped tooltipped-n" href="${servePath}/admin/article/${article.oId}" aria-label="${adminLabel}"><svg><use xlink:href="#setting"</svg></a>
                         </#if>
                     </span>
             </div>
@@ -174,6 +157,28 @@
                         <a rel="tag" class="tag" href="${servePath}/tag/${articleTag.tagURI}">${articleTag.tagTitle}</a>&nbsp;
                         </#list>
                         </div>
+                    </div>
+                    <div class="article-actions fn-clear" style="margin-top: 8px;">
+                        <span class="fn-right">
+                            <#if permissions["commonViewArticleHistory"].permissionGrant && article.articleRevisionCount &gt; 1>
+                                <span onclick="Article.revision('${article.oId}')" aria-label="${historyLabel}"
+                                      class="tooltipped tooltipped-w"><svg class="icon-history"><use xlink:href="#history"></use></svg></span>
+                            </#if>
+                            <span aria-label="${reportLabel}" class="tooltipped tooltipped-n"
+                                  onclick="$('#reportDialog').data('type', 0).data('id', '${article.oId}').dialog('open')">
+                                <svg><use xlink:href="#icon-report"></use></svg>
+                            </span>
+                            <#if article.isMyArticle && 3 != article.articleType && permissions["commonUpdateArticle"].permissionGrant>
+                                <a href="${servePath}/update?id=${article.oId}"><svg><use xlink:href="#edit"></use></svg></a>
+                            </#if>
+                            <#if article.isMyArticle && permissions["commonStickArticle"].permissionGrant>
+                                <a class="tooltipped tooltipped-n" aria-label="${stickLabel}"
+                                   href="javascript:Article.stick('${article.oId}')"><svg><use xlink:href="#chevron-up"></use></svg></a>
+                            </#if>
+                            <#if permissions["articleUpdateArticleBasic"].permissionGrant>
+                                <a class="tooltipped tooltipped-n" href="${servePath}/admin/article/${article.oId}" aria-label="${adminLabel}"><svg><use xlink:href="#setting"</svg></a>
+                            </#if>
+                        </span>
                     </div>
                 </div>
 
