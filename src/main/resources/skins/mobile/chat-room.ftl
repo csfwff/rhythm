@@ -38,7 +38,7 @@
 
 </div>
 <div style="height: 74px;width: 1px;"></div>
-<div class="main">
+<div class="main" style="padding: 0">
     <#--            <@subNav 'community' ''/>-->
     <div class="wrapper">
         <div class="content chat-room">
