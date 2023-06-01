@@ -171,13 +171,15 @@ public class CronMgmtService {
 
         Symphonys.SCHEDULED_EXECUTOR_SERVICE.scheduleAtFixedRate(() -> {
             try {
-                Vocation.refresh();
+                if (!Vocation.refresh()) {
+                    Vocation.refresh();
+                }
             } catch (final Exception e) {
                 LOGGER.log(Level.ERROR, "Get vocation data failed");
             } finally {
                 Stopwatchs.release();
             }
-        }, delay, 10 * 60 * 1000, TimeUnit.MILLISECONDS);
+        }, delay, 30 * 60 * 1000, TimeUnit.MILLISECONDS);
         delay += 2000;
 
         Symphonys.SCHEDULED_EXECUTOR_SERVICE.scheduleAtFixedRate(() -> {

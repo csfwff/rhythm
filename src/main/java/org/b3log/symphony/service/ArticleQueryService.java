@@ -1274,7 +1274,7 @@ public class ArticleQueryService {
             organizeArticles(ret);
             Collections.shuffle(ret);
             hotArticlesCache = Collections.synchronizedList(new ArrayList<>(ret));
-            LOGGER.log(Level.INFO, "Refreshed hot articles cache.");
+            System.out.println(">>> Refreshed hot articles cache.");
         } catch (Exception e) {
             LOGGER.log(Level.ERROR, "Refresh hot articles cache failed", e);
         }
