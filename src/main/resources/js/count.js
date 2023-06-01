@@ -96,28 +96,41 @@ const Count = {
         const nowDate = new Date();
         const lunch = Count.data.lunch.match(/\d{2}/g);
         const lunchDate = new Date(`${dateString} ${lunch[0]}:${lunch[1]}:00`);
-        if (nowDate.getTime() === lunchDate.getTime()) {
-            Util.notice("success", 15000, "中午咯，该订饭啦～");
+        let eatTime = lunchDate.getTime() - nowDate.getTime();
+        let eatHour = Math.floor(eatTime / (1000 * 60 * 60) % 24);
+        let eatMinute = Math.floor(eatTime / (1000 * 60) % 60);
+        let eatSecond = Math.floor(eatTime / 1000 % 60);
+        if (eatHour >= 0 && eatMinute >= 0 && eatSecond >= 0) {
+            eatHour = `0${eatHour}`.slice(-2)
+            eatMinute = `0${eatMinute}`.slice(-2)
+            eatSecond = `0${eatSecond}`.slice(-2)
+            eatTime = eatHour + ":" + eatMinute + ":" + eatSecond;
+            if (eatHour === "00" && eatMinute === "00" && eatSecond === "00") {
+                Util.notice("success", 30000, "中午咯，该订饭啦～");
+            }
+            document.getElementById("countRemainBox").innerHTML = "订饭🍲<br><span id='countRemain'>" + eatTime + "</span>";
         }
         let leftTime = setDate.getTime() - nowDate.getTime();
         let leftHour = Math.floor(leftTime / (1000 * 60 * 60) % 24);
         let leftMinute = Math.floor(leftTime / (1000 * 60) % 60);
         let leftSecond = Math.floor(leftTime / 1000 % 60);
-        if (leftHour >= 0 && leftMinute >= 0 && leftSecond >= 0) {
+        if (leftHour >= 0 && leftMinute >= 0 && leftSecond >= 0 && eatHour < 0 && eatMinute < 0 && eatSecond < 0) {
             leftHour = `0${leftHour}`.slice(-2)
             leftMinute = `0${leftMinute}`.slice(-2)
             leftSecond = `0${leftSecond}`.slice(-2)
             leftTime = leftHour + ":" + leftMinute + ":" + leftSecond;
             if (leftHour === "00" && leftMinute === "02" && leftSecond === "00") {
-                Util.notice("danger", 3000, "马上就要下班啦，赶快收拾收拾吧～");
+                Util.notice("danger", 30000, "马上就要下班啦，赶快收拾收拾吧～");
             }
             if (leftHour === "00" && leftMinute === "00" && leftSecond === "00") {
-                Util.notice("success", 3000, "下班了！下班了！下班了！！！");
+                Util.notice("success", 30000, "下班了！下班了！下班了！！！");
             }
-            document.getElementById("countRemain").innerText = leftTime;
+            document.getElementById("countRemainBox").innerHTML = "下班🏠<br><span id='countRemain'>" + leftTime + "</span>";
         } else {
-            document.getElementById("countRemainBox").innerText = "下班\n时间到 🎉";
-            clearInterval(Count.generateInterval);
+            if (eatHour < 0 && eatMinute < 0 && eatSecond < 0) {
+                document.getElementById("countRemainBox").innerText = "下班\n时间到 🎉";
+                clearInterval(Count.generateInterval);
+            }
         }
     },
 
