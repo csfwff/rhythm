@@ -1225,7 +1225,8 @@ var Article = {
 
     // his
     $('#revision').dialog({
-      'width': $(window).width() > 500 ? 500 : $(window).width() - 50,
+      'width': Math.min($(window).width() - 50, 1000, $(window).width() * 0.8),
+      // 'width': $(window).width() > 500 ? 500 : $(window).width() - 50,
       'height': $(window).height() - 50,
       'modal': true,
       'hideFooter': true,
