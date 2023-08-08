@@ -70,6 +70,20 @@
                             <li>
                                 <div class='fn-flex'>
                                     <div class="avatar"
+                                         style="background-image:url('https://file.fishpi.cn/2023/08/minecraft-71137c15.png')"></div>
+                                    <div class="fn-flex-1">
+                                        <h2 class="ft-13">
+                                            <a target="_blank" href="https://fishpi.cn/article/1689661528756">Minecraft 私服</a>
+                                        </h2>
+                                        <span class="ft-fade vditor-reset">
+                                            著名 Minecraft 方块放置与探险游戏，社区成员 <a href="https://fishpi.cn/member/Yui" target="_blank">Yui</a> 搭建的鱼油专属私服。可打怪，可挖矿，可田园，一起来耍吧~<i>♂♂</i>
+                                        </span>
+                                    </div>
+                                </div>
+                            </li>
+                            <li>
+                                <div class='fn-flex'>
+                                    <div class="avatar"
                                          style="background-image:url('https://file.fishpi.cn/2023/05/icon-4d115aa0.png')"></div>
                                     <div class="fn-flex-1">
                                         <h2 class="ft-13">
