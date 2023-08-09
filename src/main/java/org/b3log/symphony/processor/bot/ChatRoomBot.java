@@ -28,6 +28,7 @@ import org.b3log.latke.http.WebSocketSession;
 import org.b3log.latke.ioc.BeanManager;
 import org.b3log.latke.model.User;
 import org.b3log.latke.repository.*;
+import org.b3log.latke.repository.jdbc.JdbcRepository;
 import org.b3log.latke.service.ServiceException;
 import org.b3log.symphony.model.*;
 import org.b3log.symphony.processor.ApiProcessor;
@@ -356,6 +357,7 @@ public class ChatRoomBot {
                                     for (WebSocketSession session : senderSessions) {
                                         ChatroomChannel.removeSession(session);
                                     }
+                                    JdbcRepository.dispose();
                                 }).start();
                             } catch (Exception e) {
                                 sendBotMsg("参数错误。");

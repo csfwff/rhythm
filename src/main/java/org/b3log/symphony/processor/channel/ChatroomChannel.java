@@ -29,6 +29,7 @@ import org.b3log.latke.ioc.BeanManager;
 import org.b3log.latke.ioc.Singleton;
 import org.b3log.latke.model.User;
 import org.b3log.latke.repository.*;
+import org.b3log.latke.repository.jdbc.JdbcRepository;
 import org.b3log.symphony.model.Common;
 import org.b3log.symphony.model.UserExt;
 import org.b3log.symphony.processor.ApiProcessor;
@@ -425,6 +426,7 @@ public class ChatroomChannel implements WebSocketChannel {
                         "}");
                 removeSession(session);
             }
+            JdbcRepository.dispose();
         }).start();
 
         return needKickUsers;

@@ -233,6 +233,7 @@ public final class Server extends BaseServer {
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
             // 用户层
             UserChannel.settlement();
+            LOGGER.log(Level.INFO, "用户状态修改完成");
             // 框架
             cronMgmtService.stop();
             server.shutdown();
