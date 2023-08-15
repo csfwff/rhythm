@@ -440,7 +440,7 @@
                 <button class="btn" onclick="
                     $('#metal-name').val('Operator');
                     $('#metal-desc').val('摸鱼派管理组成员');
-                    $('#metal-attr').val('url=https://www.lingmx.com/52pj/images/op3.png&backcolor=b91c22&fontcolor=ffffff');
+                    $('#metal-attr').val('url=https://file.fishpi.cn/2023/08/op3-db4c5d4c.png&backcolor=b91c22&fontcolor=ffffff');
                 ">Operator</button>
                 <button class="btn" onclick="
                     $('#metal-name').val('超级会员');
