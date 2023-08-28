@@ -1400,8 +1400,8 @@ public class ArticleProcessor {
             // 用户帖子列表
             final List<JSONObject> userArticles = articleQueryService.getUserArticles(currentUser.optString(Keys.OBJECT_ID),Article.ARTICLE_ANONYMOUS_C_PUBLIC, 1, 1);
             // 没发过帖子
-            if (userArticles.isEmpty() && !articleTitle.startsWith("新人报道")) {
-                context.renderMsg("迈入社区第一步, 介绍下自己~ 请先发送一个新人报道帖吧!");
+            if (userArticles.isEmpty() && (!articleTags.contains("新人报道") || !articleTags.contains("新人报到"))) {
+                context.renderMsg("迈入社区第一步, 介绍下自己~ 请先发送一个新人报道(标签需要包含'新人报道')帖吧!");
                 return;
             }
             // 宵禁状态  TODO 多个地方用了, 阿达你要处理么?
