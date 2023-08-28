@@ -62,6 +62,7 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.File;
+import java.text.SimpleDateFormat;
 import java.util.List;
 import java.util.*;
 
@@ -1396,7 +1397,34 @@ public class ArticleProcessor {
             }
 
             article.put(Article.ARTICLE_TAGS, articleTags);
-
+            // 用户帖子列表
+            final List<JSONObject> userArticles = articleQueryService.getUserArticles(currentUser.optString(Keys.OBJECT_ID),Article.ARTICLE_ANONYMOUS_C_PUBLIC, 1, 1);
+            // 没发过帖子
+            if (userArticles.isEmpty() && (!articleTags.contains("新人报道") || !articleTags.contains("新人报到"))) {
+                context.renderMsg("迈入社区第一步, 介绍下自己~ 请先发送一个新人报道(标签需要包含'新人报道')帖吧!");
+                return;
+            }
+            // 宵禁状态  TODO 多个地方用了, 阿达你要处理么?
+            int start = 1930;
+            int end = 800;
+            int now = Integer.parseInt(new SimpleDateFormat("HHmm").format(new Date()));
+            //是宵禁状态, 设置发帖间隔 一小时一贴?
+            if (now < end || now > start) {
+                // 帖子列表 不为空
+                if (!userArticles.isEmpty()){
+                    // 当前时间
+                    long nowTime = System.currentTimeMillis();
+                    // 最后一篇文章
+                    JSONObject lastArticle = userArticles.get(0);
+                    // 更新时间 毫秒
+                    long articleCreateTime = lastArticle.getLong(Keys.OBJECT_ID);
+                    // 小于一小时间隔
+                    if (nowTime - articleCreateTime < 60 * 60 * 1000){
+                        context.renderMsg("摸鱼派已进入宵禁模式, 充足的睡眠是摸鱼的关键, 良性的思考一定不会促使你高频的发帖, 为了你的身心健康，我们将调整发帖间隔为 1h (一小时)...感谢你的陪伴，我们明天再见，早点休息，(¦3[▓▓] 晚安");
+                        return;
+                    }
+                }
+            }
             // TGIF  判断开头和长度
             if(articleTitle.startsWith("摸鱼周报")&&articleTitle.length()==13){
                 Calendar calendar = Calendar.getInstance();
