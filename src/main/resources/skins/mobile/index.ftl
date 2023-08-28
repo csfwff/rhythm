@@ -36,6 +36,7 @@
 <#if showTopAd>
     ${HeaderBannerLabel}
 </#if>
+
 <div class="main" >
     <ul>
         <#if recentArticlesMobile??>
@@ -45,6 +46,7 @@
         </#if>
     </ul>
 </div>
+
 <#if tags?size != 0>
     <div class="module_new">
         <h2 class="module__title ft__fade fn__clear">
@@ -68,8 +70,8 @@
 
     </div>
 </#if>
-<div class="fn-hr10"></div>
 
+<div class="fn-hr10"></div>
 <#if  niceUsers?size!=0>
     <div class="module_new">
         <h2 class="module__title ft__fade fn__clear">
@@ -84,29 +86,22 @@
             </a>
         </#list>
     </div>
-
     <div class="fn-hr10"></div>
 </#if>
-
-
-
-
 
 <div class="module_new">
     <h2 class="module__title ft__fade fn__clear">
         <div class="module__title ft__fade fn__clear">
-
-            <a class="ft__gray" href="${servePath}/pre-post">${postArticleLabel}</a>
+            <a class="ft__gray" href="javascript:void(0);">功能</a>
         </div>
     </h2>
 </div>
 
-
 <ul class="menu">
     <#if TGIF == '0'>
-        <li  class="menu__item">
+        <li class="menu__item">
             <a class="title" onclick="window.location.href=Label.servePath+'/post?type=0&tags=摸鱼周报&title=摸鱼周报 ${yyyyMMdd}'">
-                <b>每周五的摸鱼周报时间到了！</b>
+                🎉 <b>每周五的摸鱼周报时间到了！</b>
                 <br>
                 今天还没有人写摸鱼周报哦，抢在第一名写摸鱼周报，获得 <b style="color:orange">1000 积分</b> 奖励！
             </a>
@@ -115,7 +110,7 @@
     <#else>
         <li class="menu__item">
             <a class="title" href="${TGIF}">
-                <b>每周五的摸鱼周报时间到了！</b>
+                🎉 <b>每周五的摸鱼周报时间到了！</b>
                 <br>
                 今天已经有人写了摸鱼周报哦，快来看看吧~
             </a>
@@ -127,34 +122,42 @@
     <li class="menu__item"><a class="title" style="text-decoration: none" id="checkIn">
         </a>
     </li >
-    <li class="menu__item"><a class="title" style="text-decoration: none" id="yesterday" onclick="yesterday()">领取昨日活跃奖励</a>
+    <li class="menu__item"><a class="title" style="text-decoration: none" id="yesterday" onclick="yesterday()">✅ 领取昨日活跃奖励</a>
     </li>
-    <!--                    <li><a class="title" href="${servePath}/activity/1A0001">${activity1A0001Label}</a></li>-->
-    <li class="menu__item"><a class="title" href="${servePath}/cr">聊天室</a></li>
-    <li class="menu__item"><a class="title" href="${servePath}/activity/character">${characterLabel}</a></li>
-    <li class="menu__item"><a class="title" href="${servePath}/charge/point"><span
-                    class="ft-red">❤</span>️ ${chargePointLabel}</a></li>
-    <li class="menu__item"><a class="title" href="${servePath}/top">排行榜</a></li>
-    <li class="menu__item"><a class="title" href="${servePath}/shop">系统商店</a></li>
 </ul>
 
+<div class="fn-hr10"></div>
+<div class="module_new">
+    <h2 class="module__title ft__fade fn__clear">
+        <div class="module__title ft__fade fn__clear">
+            <a class="ft__gray" href="javascript:void(0);">导航</a>
+        </div>
+    </h2>
+</div>
 
+<ul class="menu">
+    <li class="menu__item"><a class="title" href="${servePath}/breezemoons">🌕 清风明月</a></li>
+    <li class="menu__item"><a class="title" href="${servePath}/cr">💬 聊天室</a></li>
+    <li class="menu__item"><a class="title" href="${servePath}/charge/point"><span
+                    class="ft-red">❤</span>️ ${chargePointLabel}</a></li>
+    <li class="menu__item"><a class="title" href="${servePath}/top">🔥 排行榜</a></li>
+    <li class="menu__item"><a class="title" href="${servePath}/shop">🏪 系统商店</a></li>
+</ul>
+
+<#if showSideAd && ADLabel != ''>
 <div class="main">
     <div class="wrapper">
-        <#if showSideAd>
-        <#if ADLabel != ''>
-            <div class="module">
-                <div class="module-header" style="background-color: #7ea5c8">
-                    ${sponsorLabel}
-                </div>
-                <div class="ad module-panel fn-clear">
-                    ${ADLabel}
-                </div>
+        <div class="module">
+            <div class="module-header" style="background-color: #f5f5f5">
+                ${sponsorLabel}
             </div>
-        </#if>
-        </#if>
+            <div class="ad module-panel fn-clear">
+                ${ADLabel}
+            </div>
+        </div>
     </div>
 </div>
+</#if>
 
 <div class="slogan">
     摸鱼派 - 鱼油专属摸鱼社区&nbsp;
@@ -262,17 +265,17 @@
         getCheckedInStatus();
         getActivityStatus();
         </#if>
-        $("#livenessToday").html("今日活跃度：" + liveness + "%");
+        $("#livenessToday").html("⭐ 今日活跃度：" + liveness + "%");
         if (liveness < 10 && !checkedIn) {
-            $("#checkIn").html("今日活跃度到达 10% 后<br>系统将自动签到");
+            $("#checkIn").html("🚀 今日活跃度到达 10% 后<br>系统将自动签到");
         } else if (liveness < 10 && checkedIn) {
-            $("#checkIn").html("您的免签卡今日已生效");
+            $("#checkIn").html("⭐ 您的免签卡今日已生效");
         } else if (liveness >= 10 && !checkedIn) {
-            $("#checkIn").html("已提交自动签到至系统<br>请稍候查看签到状态");
+            $("#checkIn").html("♾️ 已提交自动签到至系统<br>请稍候查看签到状态");
         } else if (liveness < 100) {
-            $("#checkIn").html("今日活跃度到达 100% 后<br>可获得神秘礼物及明日天降红包资格");
+            $("#checkIn").html("🎯 今日活跃度到达 100% 后<br>可获得神秘礼物及明日天降红包资格");
         } else {
-            $("#checkIn").html("礼物已放入背包，并获得明日天降红包资格！<br>明天在线时如有新人注册，将获得天降红包");
+            $("#checkIn").html("🎁 礼物已放入背包，并获得明日天降红包资格！<br>明天在线时如有新人注册，将获得天降红包");
         }
     }
     refreshActivities();
@@ -281,11 +284,11 @@
     </#if>
 
     <#if userPhone == "">
-    Util.alert("为了确保账号的安全及正常使用，依照相关法规政策要求：<br>您需要绑定手机号后方可正常访问摸鱼派。<br><br><button onclick='location.href=\"${servePath}/settings/account#bind-phone\"'>点击这里前往设置</button>")
+    Util.alert("⛔ 为了确保账号的安全及正常使用，依照相关法规政策要求：<br>您需要绑定手机号后方可正常访问摸鱼派。<br><br><button onclick='location.href=\"${servePath}/settings/account#bind-phone\"'>点击这里前往设置</button>")
     </#if>
 
     <#if need2fa == "yes">
-    Util.alert("摸鱼派管理组成员，您好！<br>作为管理组的成员，您的账号需要更高的安全性，以确保社区的稳定运行。<br>请您收到此通知后，立即在个人设置-账户中启用两步验证，感谢你对社区的贡献！<br><br><button onclick='location.href=\"${servePath}/settings/account#mfaCode\"'>点击这里前往设置</button>", "致管理组成员的重要通知️")
+    Util.alert("⛔ 摸鱼派管理组成员，您好！<br>作为管理组的成员，您的账号需要更高的安全性，以确保社区的稳定运行。<br>请您收到此通知后，立即在个人设置-账户中启用两步验证，感谢你对社区的贡献！<br><br><button onclick='location.href=\"${servePath}/settings/account#mfaCode\"'>点击这里前往设置</button>", "致管理组成员的重要通知️")
     </#if>
 </script>
 </html>

@@ -21,7 +21,7 @@
 <#include "macro-notifications.ftl">
 <@notifications "commented">
 <#if commentedNotifications?size != 0>
-<ul class="notification">
+<ul class="notification" style="padding: 15px">
     <#list commentedNotifications as notification>
     <li class="fn-flex comment-list-item<#if notification.hasRead> read</#if>">
         <a target="_blank" rel="nofollow" href="${servePath}/member/${notification.commentAuthorName}">

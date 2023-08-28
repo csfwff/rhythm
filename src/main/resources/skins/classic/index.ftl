@@ -274,7 +274,7 @@
 
     <div class="wrapper index-full-size" id="goodNight" style="display: none"></div>
 
-    <div class="index-bottom" style="border-top: 1px solid #f3f3f3;">
+    <div class="index-bottom" style="margin-top: 20px">
         <div class="wrapper">
             <div class="fn-flex-1">
                 <div class="metro-line fn-flex" style="align-items:center;">
@@ -326,19 +326,19 @@
                     </div>
                 </div>
 
-                <div class="metro-border fn-flex">
-                    <div style="background:transparent;;flex:1.2;"></div>
-                    <div class="green"></div>
-                    <div class="yellow"></div>
-                    <div class="red"></div>
-                    <div class="purple"></div>
-                </div>
+<#--                <div class="metro-border fn-flex">-->
+<#--                    <div style="background:transparent;;flex:1.2;"></div>-->
+<#--                    <div class="green"></div>-->
+<#--                    <div class="yellow"></div>-->
+<#--                    <div class="red"></div>-->
+<#--                    <div class="purple"></div>-->
+<#--                </div>-->
             </div>
         </div>
     </div>
 
 
-    <div class="index-bottom" style="padding-top:40px;padding-bottom: 20px;">
+    <div class="index-bottom" style="padding-top:20px;padding-bottom: 20px;">
         <div class="wrapper">
             <div class="index-recent fn-flex-1">
                 <div class="index-head-title">
@@ -605,6 +605,9 @@
                 $("#chatRoomInput").val("")
             },
             success: function (result) {
+                if (result.code !== 0) {
+                    Util.alert(result.msg)
+                }
             }
         });
         <#else>
@@ -880,15 +883,15 @@
     });
 
     <#if userPhone == "">
-        Util.alert("为了确保账号的安全及正常使用，依照相关法规政策要求：<br>您需要绑定手机号后方可正常访问摸鱼派。<br><br><button onclick='location.href=\"${servePath}/settings/account#bind-phone\"'>点击这里前往设置</button>")
+        Util.alert("⛔ 为了确保账号的安全及正常使用，依照相关法规政策要求：<br>您需要绑定手机号后方可正常访问摸鱼派。<br><br><button onclick='location.href=\"${servePath}/settings/account#bind-phone\"'>点击这里前往设置</button>")
     </#if>
 
     <#if need2fa == "yes">
-    Util.alert("摸鱼派管理组成员，您好！<br>作为管理组的成员，您的账号需要更高的安全性，以确保社区的稳定运行。<br>请您收到此通知后，立即在个人设置-账户中启用两步验证，感谢你对社区的贡献！<br><br><button onclick='location.href=\"${servePath}/settings/account#mfaCode\"'>点击这里前往设置</button>", "致管理组成员的重要通知️")
+    Util.alert("⛔ 摸鱼派管理组成员，您好！<br>作为管理组的成员，您的账号需要更高的安全性，以确保社区的稳定运行。<br>请您收到此通知后，立即在个人设置-账户中启用两步验证，感谢你对社区的贡献！<br><br><button onclick='location.href=\"${servePath}/settings/account#mfaCode\"'>点击这里前往设置</button>", "致管理组成员的重要通知️")
     </#if>
 </script>
 <script>
-    let now = new Date().getHours();
+    /*let now = new Date().getHours();
     let day = new Date().getDay();
     if ((now >= 19 && now <= 23) || (now >= 0 && now <= 7)) {
         $("head").append('<link rel="stylesheet" href="https://fonts.font.im/css2?family=Ma+Shan+Zheng&display=swap">');
@@ -927,7 +930,7 @@
         setTimeout(function () {
             $("#nightTips").slideDown(1500);
         }, 500);
-    }
+    }*/
 </script>
 </body>
 </html>

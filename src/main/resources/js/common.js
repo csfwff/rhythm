@@ -1066,7 +1066,7 @@ var Util = {
                 }
 
                 // browser
-                let icon = '<svg style="height: 15px;padding-top: 2px;pointer-events: none;">' +
+                let icon = '<svg style="height: 15px;pointer-events: none;">' +
                     '  <use xlink:href="#notification"></use>' +
                     '</svg>' +
                     '&nbsp;';
@@ -1095,7 +1095,10 @@ var Util = {
                         '<div id="notificationsPanel" class="module person-list"><ul>' +
                         notiHTML + '</ul></div>')
 
-                    $('#aNotifications').click(function () {
+                    $('#aNotifications').click(function (e) {
+                        let posRight = window.innerWidth - e.pageX - ($('#notificationsPanel').width() /2);
+                        console.log(posRight)
+                        $('#notificationsPanel').css('right',posRight + 'px')
                         $('#notificationsPanel').show()
                     })
 
@@ -1312,19 +1315,35 @@ var Util = {
         if (percent <= 0) {
             percent = 1;
         }
-        $("#activityProcessor").circleChart({
-            value: percent,
-            text: percent + '%',
-            color: color,
-            backgroundColor: "#e6e6e6",
-            size: 50,
-            widthRatio: 0.1,
-            background: false,
-            startAngle: 50,
-            onDraw: function(el, circle) {
-                circle.text(Math.round(circle.value) + "%");
+        let now = 0;
+        let topAnimation = setInterval(()=>{
+            now++;
+            if(now >= percent){
+                now = percent;
+                clearInterval(topAnimation)
             }
-        });
+            let top = (20 - (percent / 2)) + "px";
+            $("#activityProcessor .percent-wave-before").css("top",top);
+            $("#activityProcessor .percent-wave-after").css("top",top);
+            $("#activityProcessor .percent").html(parseInt(now) + "%")
+
+        },10)
+        // $("#activityProcessor .percent-wave-before").css("top",top);
+        // $("#activityProcessor .percent-wave-after").css("top",top);
+        // $("#activityProcessor .percent").html(percent + "%")
+        // $("#activityProcessor").circleChart({
+        //     value: percent,
+        //     text: percent + '%',
+        //     color: color,
+        //     backgroundColor: "#e6e6e6",
+        //     size: 50,
+        //     widthRatio: 0.1,
+        //     background: false,
+        //     startAngle: 50,
+        //     onDraw: function(el, circle) {
+        //         circle.text(Math.round(circle.value) + "%");
+        //     }
+        // });
     },
     /**
      * 初始化清风明月
@@ -1767,14 +1786,10 @@ var Util = {
         addClass('msg');
         if (!Util.isBlinging) {
             Util.isBlinging = true;
-            $("#idleTalkIconContainer").html("<use xlink:href=\"#redIdleChat\"></use>");
-            setTimeout(function () {
-                $("#idleTalkIconContainer").html("<use xlink:href=\"#idleChat\"></use>");
-            }, 1000);
             bling = setInterval(function () {
-                $("#idleTalkIconContainer").html("<use xlink:href=\"#redIdleChat\"></use>");
+                $('#aChat').removeClass('no-msg').addClass('msg');
                 setTimeout(function () {
-                    $("#idleTalkIconContainer").html("<use xlink:href=\"#idleChat\"></use>");
+                    $('#aChat').removeClass('msg').addClass('no-msg');
                 }, 1000);
             }, 2000);
         }
@@ -1822,7 +1837,8 @@ var Util = {
             }
         })
 
-        // 导航过长处理
+        // 导航过长处理 导航栏跳舞?涛涛你打野-----Yui留
+        /*
         if ($('.nav-tabs a:last').length === 1 &&
             $('.nav-tabs a:last')[0].offsetTop > 0) {
             $('.nav-tabs').mouseover(function () {
@@ -1831,6 +1847,7 @@ var Util = {
                 $('.user-nav').show()
             })
         }
+         */
     },
     /**
      * @description 登出

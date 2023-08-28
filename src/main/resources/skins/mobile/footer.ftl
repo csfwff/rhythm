@@ -69,12 +69,12 @@
         </div>
         <div class="fn-hr5"></div>
         <div class="ft-smaller" style="display: inline-block">
-            <div onclick="window.open('https://www.tsyvps.com/aff/HEHTPGYL')" style="text-align: center;padding: 8px 0px;color: #0f8cee;background-color: #282727;line-height: 20px;border-radius: 12px;width: 175px;margin-bottom: 15px;cursor: pointer;">
+            <div onclick="window.open('https://www.tsyvps.com/aff/HEHTPGYL')" style="text-align: center;padding: 8px 0px;color: #0f8cee;background-color: #e3f9fd;line-height: 20px;border-radius: 12px;width: 175px;margin-bottom: 15px;cursor: pointer;">
                 <div>
                     <svg style="vertical-align: -2px;">
                         <use xlink:href="#shield"></use>
                     </svg>&nbsp;&nbsp;防火墙由蓝易云支持<br>
-                    <span style="color: #cdcdcd;">性价比主机，高防 CDN</span>
+                    <span style="color: #323232;">性价比主机，高防 CDN</span>
                 </div>
             </div>
         </div>
@@ -125,8 +125,9 @@
     currentUserName: '${currentUser.userName}',
     </#if>
     <#if csrfToken??>
-    csrfToken: '${csrfToken}'
+    csrfToken: '${csrfToken}',
     </#if>
+    staticResourceVersion: '${staticResourceVersion}',
   }
   Util.init(${isLoggedIn?c})
 

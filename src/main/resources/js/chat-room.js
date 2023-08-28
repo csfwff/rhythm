@@ -34,6 +34,9 @@ var x = 0;
 var y = 0;
 var isClick = true;
 var thisClient = 'Web/PC网页端';
+// 弹幕颜色选择器
+var BarragerColorPicker = null;
+var DarwColorPicker = null;
 var ChatRoom = {
     init: function () {
         // 聊天窗口高度设置
@@ -135,7 +138,8 @@ var ChatRoom = {
                     new Date().getTime() - time_out <= 700 && $("#emojiList").removeClass("showList")
                 }, navigator.userAgent.match(/(phone|pad|pod|ios|Android|Mobile|BlackBerry|MQQBrowser|JUC|Fennec|wOSBrowser|BrowserNG|WebOS|Symbian)/i) !== null ? 0 : 600)
             }
-            $("#emojiBtn").hover(function () {
+            $("#emojiBtn").hover(function (e) {
+                $('#emojiList').css('top','290px')
                 if (timeoutId !== 0) {
                     clearTimeout(timeoutId)
                     timeoutId = 0
@@ -484,15 +488,45 @@ var ChatRoom = {
                 $("#paintContent").slideUp(1000);
             }
         });
+        BarragerColorPicker = new XNColorPicker({
+            color: "#ffffff",
+            selector: "#selectBarragerColor",
+            showhistorycolor:false,
+            colorTypeOption:'single',
+            autoConfirm:true,
+            onError:function(e){},
+            onCancel:function(color){},
+            onChange:function(color){
+            },
+            onConfirm:function(color){
+            }
+        })
         // 监听弹幕颜色
-        $('#selectBarragerColor').cxColor({
-            color: '#ffffff'
-        });
+        // $('#selectBarragerColor').cxColor({
+        //     color: '#ffffff'
+        // });
         // 监听修改颜色
-        $('#selectColor').cxColor();
-        $("#selectColor").bind("change", function () {
-            ChatRoom.changeColor(this.value);
-        });
+        // $('#selectColor').cxColor();
+        DarwColorPicker =  new XNColorPicker({
+            color: "#000000",
+            selector: "#selectColor",
+            showhistorycolor:false,
+            colorTypeOption:'single',
+            autoConfirm:true,
+            onError:function(e){},
+            onCancel:function(color){},
+            onChange:function(color){
+                // console.log("change",color.color.rgba)
+                ChatRoom.changeColor(color.color.rgba);
+            },
+            onConfirm:function(color){
+                // console.log("change",color.color.rgba)
+                ChatRoom.changeColor(color.color.rgba);
+            }
+        })
+        // $("#selectColor").bind("change", function () {
+        //     ChatRoom.changeColor(this.value);
+        // });
         $("#selectWidth").bind("change", function () {
             let width = $("#selectWidth").val();
             ChatRoom.changeWidth(width);
@@ -501,7 +535,8 @@ var ChatRoom = {
         setInterval(ChatRoom.reloadMessages, 15 * 60 * 1000);
     },
     sendBarrager: function () {
-        let color = $("#selectBarragerColor")[0].value;
+        // let color = $("#selectBarragerColor")[0].value;
+        let color = BarragerColorPicker.color.rgba;
         let content = $('#barragerInput').val();
         let json = {
             color: color,
@@ -537,14 +572,10 @@ var ChatRoom = {
         NProgress.start();
         $('#chats').css("display", "none");
         page = 1;
-        let chatLength = $(".chats__content").length;
-        if (chatLength > 25) {
-            for (let i = chatLength - 1; i > 24; i--) {
-                if ($($($($($(".chats__content")[i]).parent()).parent()).parent()).attr("id") == 'stacked') {
-                    $($($($($(".chats__content")[i]).parent()).parent()).parent()).remove();
-                } else {
-                    $($($($(".chats__content")[i]).parent()).parent()).remove();
-                }
+        let chatLength = $("#chats>div");
+        if (chatLength.length > 25) {
+            for (let i = chatLength.length - 1; i > 24; i--) {
+                chatLength[i].remove();
             }
         }
         setTimeout(function() {
@@ -1329,7 +1360,7 @@ border-bottom: none;
                     md = md.replace(/\n/g, "\n> ");
                 }
             });
-            ChatRoom.editor.insertValue("\n##### 引用 @" + userName + "  \n> " + md + "\n", !1);
+            ChatRoom.editor.insertValue(`\n##### 引用 @${userName} [↩](${Label.servePath}/cr#chatroom${id} "跳转至原消息")  \n> ${md}</span>\n`, !1);
         }
         $(window).scrollTop(0);
     },
@@ -1433,7 +1464,6 @@ border-bottom: none;
         }
 
         if (undefined !== recivers) {
-            // console.log(recivers)
             if (recivers.length > 0) {
                 index = recivers.indexOf(Label.currentUser);
                 // console.log(index)
@@ -1494,31 +1524,25 @@ border-bottom: none;
     selectGesture: function (oId) {
         Util.alert(`<div class="form fn__flex-column select-center">
 <div>
-<label class="gestureRadio">
-  <input type="radio" name="gesture" value="0" checked>石头
-</label>
-<label class="gestureRadio">
-  <input type="radio" name="gesture" value="1">剪刀
-</label>
-<label class="gestureRadio">
-  <input type="radio" name="gesture" value="2">布
-</label>
-</div>
-<div class="fn__flex" style="margin-top: 15px">
-  <button class="btn btn--confirm" onclick="ChatRoom.unpackRedPacket(${oId});Util.clearAlert()">出拳</button>
+   <img width="50" src="${Label.staticServePath}/images/redpacket/gesture/rock.png" onclick="ChatRoom.unpackRedPacket(${oId},'0');Util.clearAlert()"/>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+   <img width="50" src="${Label.staticServePath}/images/redpacket/gesture/scissors.png" onclick="ChatRoom.unpackRedPacket(${oId},'1');Util.clearAlert()"/>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+   <img width="50" src="${Label.staticServePath}/images/redpacket/gesture/paper.png" onclick="ChatRoom.unpackRedPacket(${oId},'2');Util.clearAlert()"/>
 </div>
 </div>`, '出拳');
     },
     /**
      * 拆开红包
      */
-    unpackRedPacket: function (oId) {
+    unpackRedPacket: function (oId,gesture) {
+        if (undefined === gesture || null === gesture) {
+            gesture = "0"
+        }
         $.ajax({
             url: Label.servePath + "/chat-room/red-packet/open",
             method: "POST",
             data: JSON.stringify({
                 oId: oId,
-                gesture: $(".gestureRadio>input[name=gesture]:checked").val(),
+                gesture: gesture,
                 dice: {
                     bet: $("#betRadio>input[name=bet]:checked").val(),
                     chips: $("#betRadio>input[name=chips]").val()
@@ -1550,6 +1574,9 @@ ${result.info.msg}
                     ChatRoom.renderRedPacket(result.who, result.info.count, result.info.got, result.recivers, result.diceRet, result.info.userName)
                     if (result.info.count === result.info.got) {
                         $("#chatroom" + oId).find(".hongbao__item").css("opacity", ".36").attr('onclick', "ChatRoom.unpackRedPacket(" + oId + ")");
+                        if(!$("#chatroom" + oId).find(".hongbao__item").hasClass('opened')){
+                            $("#chatroom" + oId).find(".hongbao__item").addClass('opened')
+                        }
                         if (result.dice === true) {
                             $("#chatroom" + oId).find(".redPacketDesc").html("已开盘");
                         } else {
@@ -1604,7 +1631,7 @@ ${result.info.msg}
                     case "rockPaperScissors":
                         type = "石头剪刀布红包";
                         if (msgJSON.senderId != Label.currentUserId) {
-                            onclick = 'ChatRoom.selectGesture(\'' + data.oId + '\')';
+                           onclick = '';
                         }
                         break;
                     case "dice":
@@ -1642,18 +1669,38 @@ ${result.info.msg}
                         '    </div>\n' +
                         '</div>';
                 } else {
-                    data.content = '' +
-                        '<div class="hongbao__item fn__flex-inline" onclick="' + onclick + '">\n' +
-                        '    <svg class="ft__red hongbao__icon">\n' +
-                        '        <use xlink:href="#redPacketIcon"></use>\n' +
-                        '    </svg>\n' +
-                        '    <div>\n' +
-                        '        <div>' + msgJSON.msg + '<br><b>' + type + '</b></div>\n' +
-                        '        <div><svg style="vertical-align: -2px; width: 13px; height: 13px"><use xlink:href="#coin"></use></svg> ' + msgJSON.money + '</div>\n' +
-                        '        <div class="ft__smaller ft__fade redPacketDesc">\n' +
-                        '        </div>\n' +
-                        '    </div>\n' +
-                        '</div>';
+                    if(msgJSON.type === 'rockPaperScissors' && msgJSON.senderId != Label.currentUserId){
+                        data.content = '' +
+                            '<div class="hongbao__item fn__flex-inline" >\n' +
+                            '    <div class="hongbao__finger_guessing">\n'+
+                            '        <div class="hongbao__finger_guessing_icon" onclick="event.stopPropagation();Util.clearAlert();ChatRoom.unpackRedPacket('+ data.oId +',\'0\');"></div>\n' +
+                            '        <div class="hongbao__finger_guessing_icon" onclick="event.stopPropagation();Util.clearAlert();ChatRoom.unpackRedPacket('+ data.oId +',\'1\');"></div>\n' +
+                            '        <div class="hongbao__finger_guessing_icon" onclick="event.stopPropagation();Util.clearAlert();ChatRoom.unpackRedPacket('+ data.oId +',\'2\');"></div>\n' +
+                            '    </div>\n' +
+                            '    <svg class="ft__red hongbao__icon">\n' +
+                            '        <use xlink:href="#redPacketIcon"></use>\n' +
+                            '    </svg>\n' +
+                            '    <div>\n' +
+                            '        <div>' + msgJSON.msg + '<br><b>' + type + '</b></div>\n' +
+                            '        <div><svg style="vertical-align: -2px; width: 13px; height: 13px"><use xlink:href="#coin"></use></svg> ' + msgJSON.money + '</div>\n' +
+                            '        <div class="ft__smaller ft__fade redPacketDesc">\n' +
+                            '        </div>\n' +
+                            '    </div>\n' +
+                            '</div>';
+                    } else {
+                        data.content = '' +
+                            '<div class="hongbao__item fn__flex-inline" onclick="' + onclick + '">\n' +
+                            '    <svg class="ft__red hongbao__icon">\n' +
+                            '        <use xlink:href="#redPacketIcon"></use>\n' +
+                            '    </svg>\n' +
+                            '    <div>\n' +
+                            '        <div>' + msgJSON.msg + '<br><b>' + type + '</b></div>\n' +
+                            '        <div><svg style="vertical-align: -2px; width: 13px; height: 13px"><use xlink:href="#coin"></use></svg> ' + msgJSON.money + '</div>\n' +
+                            '        <div class="ft__smaller ft__fade redPacketDesc">\n' +
+                            '        </div>\n' +
+                            '    </div>\n' +
+                            '</div>';
+                    }
                 }
             }
         } catch (err) {

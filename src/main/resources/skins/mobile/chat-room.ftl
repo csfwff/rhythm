@@ -38,16 +38,16 @@
 
 </div>
 <div style="height: 74px;width: 1px;"></div>
-<div class="main">
+<div class="main" style="padding: 0">
     <#--            <@subNav 'community' ''/>-->
     <div class="wrapper">
         <div class="content chat-room">
-            <div class="reply">
+            <div class="reply" style="margin: 0 -12px 15px -12px;">
                 <br>
                 <#if isLoggedIn>
                     <div id="chatContent"></div>
                     <div id="liveliness"></div>
-                    <div class="fn-clear" style="padding: 15px 0px 12px 0px;margin-bottom: 5px;">
+                    <div class="fn-clear" style="padding: 15px 0px 12px 0px;">
                         <svg id="redPacketBtn" style="width: 30px; height: 30px; cursor:pointer;">
                             <use xlink:href="#redPacketIcon"></use>
                         </svg>
@@ -105,8 +105,8 @@
                                     <span style="color: #616161">💤 现在是聊天室宵禁时间 (19:30-08:00)，您发送的消息将不会产生活跃度，请早点下班休息 :)</span>
                                 </a>
                             </div>
+                            <br>
                         </#if>
-                        <br>
                         <div class="fn-right" style="margin-top: 6px">
                             <#if level3Permitted == true>
                                 <button id="groupRevoke" onclick="ChatRoom.startGroupRevoke()" class="button">
@@ -119,8 +119,8 @@
                         </div>
                     </div>
                     <div id="paintContent" style="display: none">
-                        <div style="margin: 20px 0 0 0;">
-                            <input id="selectColor" name="mycolor" type="text" class="input_cxcolor" readonly="" style="background-color: rgb(0, 0, 0);">
+                        <div style="margin: 20px 0 0 0;display: flex">
+                            <div id="selectColor" style="margin:0 10px;border:1px solid #000"></div>
                             <input id="selectWidth" type="number" inputmode="decimal" pattern="[0-9]*" min="1" value="3" style="width: 50px">
                         </div>
                         <canvas id="paintCanvas" width="306" height="300"></canvas>
@@ -148,7 +148,7 @@
                                 </div>
                             </div>
                             <div style="margin-top: 10px;">
-                                弹幕颜色：<input id="selectBarragerColor" name="mycolor" type="text" class="input_cxcolor" readonly="">
+                                弹幕颜色：<div id="selectBarragerColor" style="display: inline-block;border:1px solid #000"></div>
                             </div>
                             <div class="ft__smaller ft__fade" style="margin-top: 10px; margin-bottom: 10px;">发送弹幕每次将花费 <b><span id="barragerCost">${barragerCost}</span></b> <span id="barragerUnit">${barragerUnit}</span></div>
                         </div>
@@ -171,7 +171,7 @@
                     </div>
                 </#if>
             </div>
-            <div class="list" style="height: 100%">
+            <div class="list" style="height: 100%; margin: 0 -12px;">
                 <div id="chats">
                 </div>
                 <#if !isLoggedIn>
@@ -195,6 +195,7 @@
 <script src="${staticServePath}/js/chat-room${miniPostfix}.js?${staticResourceVersion}"></script>
 <script src="${staticServePath}/js/lib/viewer.min.js"></script>
 <script src="${staticServePath}/js/lib/barrager/jquery.barrager.min.js"></script>
+<script src="${staticServePath}/js/lib/xncolorpicker.min.js"></script>
 <script>
     Label.addBoldLabel = '${addBoldLabel}';
     Label.addItalicLabel = '${addItalicLabel}';

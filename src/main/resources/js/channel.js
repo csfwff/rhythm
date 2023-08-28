@@ -417,6 +417,10 @@ var ChatRoomChannel = {
                     // 红包抢光了，修改状态
                     if (got === count) {
                         $("#chatroom" + data.oId).find(".hongbao__item").css("opacity", ".36");
+                        if(!$("#chatroom" + oId).find(".hongbao__item").hasClass('opened')){
+                            $("#chatroom" + oId).find(".hongbao__item").addClass('opened')
+                        }
+                        $("#chatroom" + data.oId +" .hongbao__item").removeAttr("onclick").attr("onclick","ChatRoom.unpackRedPacket(" + oId + ");")
                         $("#chatroom" + data.oId).find(".redPacketDesc").html("已经被抢光啦");
                         if (dice === null || dice === undefined) {
                             spell += '，红包已被领完 (' + got + '/' + count + ')';

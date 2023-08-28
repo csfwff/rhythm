@@ -140,7 +140,7 @@
                             </#if>
                         <#else>
                             <#if permissions["commonAddArticle"].permissionGrant>
-                                <button class="fn-right" tabindex="10" onclick="AddArticle.add('${csrfToken}', this)">${postLabel}</button>
+                                <button class="fn-right" tabindex="10" onclick="AddArticle.confirmAdd('${csrfToken}', this)">${postLabel}</button>
                             </#if>
                         </#if>
                         <span class="fn-right">&nbsp; &nbsp;</span>
@@ -212,5 +212,6 @@
             <script src="${staticServePath}/js/lib/diff2html/diff.min.js"></script>
         </#if>
         <script src="${staticServePath}/js/add-article${miniPostfix}.js?${staticResourceVersion}"></script>
+        <script src="${staticServePath}/js/lib/sweetalert2.all.min.js"></script>
     </body>
 </html>

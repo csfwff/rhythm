@@ -327,9 +327,11 @@ public class SettingsProcessor {
      *
      * @param context the specified context
      */
-    List<String> users = new ArrayList<>();
+    // List<String> users = new ArrayList<>();
     synchronized public void deactivateUser(final RequestContext context) {
         context.renderJSON(StatusCodes.ERR);
+        context.renderMsg("[Err Chk00013] 请求暂时无法处理，请稍候再试或联系管理员。");
+        /*
 
         final Response response = context.getResponse();
         JSONObject currentUser = Sessions.getUser();
@@ -358,7 +360,7 @@ public class SettingsProcessor {
         } else {
             users.add(userId);
             context.renderMsg("用户注销申请已记录，如确认要注销该用户，请再请求一次本接口，如果是测试用途，请不要再次请求本接口。");
-        }
+        }*/
     }
 
     /**

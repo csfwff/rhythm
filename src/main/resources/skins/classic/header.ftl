@@ -21,7 +21,7 @@
 <div class="nav">
     <h1 aria-label="${symphonyLabel}" class="tooltipped tooltipped-s">
         <a href="${servePath}">
-            <svg class="swimming"><use xlink:href="#logo-white"></use></svg>
+            <svg class="swimming"><use xlink:href="#logo"></use></svg>
         </a>
     </h1>
     <div class="nav-tabs">
@@ -82,31 +82,31 @@
         <#if isLoggedIn>
             <a href="${servePath}/pre-post" class="tooltipped tooltipped-w" aria-label="${postArticleLabel}">
                 <svg>
-                    <use xlink:href="#addfile"></use>
+                    <use xlink:href="#addpost"></use>
                 </svg>
             </a>
             <#if permissions["menuAdmin"].permissionGrant>
             <a href="${servePath}/admin" aria-label="${adminLabel}" class="tooltipped tooltipped-w">
                 <svg>
-                    <use xlink:href="#userrole"></use>
+                    <use xlink:href="#manage"></use>
                 </svg>
             </a>
             </#if>
             <a href="${servePath}/activities" aria-label="${activityLabel}" class="tooltipped tooltipped-w">
                 <svg>
-                    <use xlink:href="#flag"></use>
+                    <use xlink:href="#playgame"></use>
                 </svg>
             </a>
             <a id="aNotifications"
                class="tooltipped tooltipped-w <#if unreadNotificationCount == 0>no-msg<#else>msg</#if>"
                href="${servePath}/notifications" aria-label="${messageLabel}">
-                <svg style="height: 15px;padding-top: 2px;pointer-events: none;">
+                <svg style="height: 15px;pointer-events: none;">
                     <use xlink:href="#notification"></use>
                 </svg>
                 &nbsp;${unreadNotificationCount}
             </a>
             <a id="aChat" href="${servePath}/chat" class="tooltipped tooltipped-w no-msg" aria-label="私信">
-                <svg style="height: 15px;padding-top: 2px;">
+                <svg style="height: 15px;">
                     <use xlink:href="#idleChat"></use>
                 </svg>
                 &nbsp;<span id="aChatCount"><#if unreadChat?? && unreadChat gt 0>${unreadChat}<#else>0</#if></span>
@@ -123,9 +123,10 @@
             <a href="javascript:void(0)" id="aPersonListPanel" class="tooltipped tooltipped-w"
                aria-label="${viewHomeAndProfileLabel}"
                data-url="${servePath}/member/${currentUser.userName}">
-                <span class="avatar-small" style="background-image:url('${currentUser.userAvatarURL20}')"></span>
+                <span class="avatar-small" style="background-image:url('${currentUser.userAvatarURL48}')"></span>
+
             </a>
-            <div class="module person-list" id="personListPanel" style="right: 13px">
+            <div class="module person-list" id="personListPanel">
                 <ul>
                     <li>
                         <a href="${servePath}/member/${currentUser.userName}">${goHomeLabel}</a>

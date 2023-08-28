@@ -95,11 +95,11 @@ public class LogsService {
         }
     }
 
-    private static String getTime() {
+    public static String getTime() {
         return new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date());
     }
 
-    private static String getAddress(RequestContext context) {
+    public static String getAddress(RequestContext context) {
         String address = Requests.getRemoteAddr(context.getRequest());
         try {
             String[] splitAddress = address.split("\\.");

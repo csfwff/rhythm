@@ -30,21 +30,20 @@
         </@head>
     </head>
     <body>
-        <#include "header.ftl">
-        <div class="main">
             <div class="mobile-head">
                 <#include "header.ftl">
                 <@indexNav "hot"/>
             </div>
-            <div style="height: 40px;width: 1px;" ></div>
+            <div style="height: 74px;width: 1px;" ></div>
+            <div class="main">
             <div class="content fn-clear">
                 <@list listData=indexArticles/>
                 <a href="${servePath}/recent" class="ft-gray more-article">${moreRecentArticleLabel}</a>
             </div>
+            </div>
             <div class="side wrapper">
                 <#include "side.ftl">
             </div>
-        </div>
         <#include "footer.ftl">
         <@listScript/>
     </body>

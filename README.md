@@ -1,5 +1,5 @@
 <p align = "center">
-<img alt="rym" src="https://pic.stackoverflow.wiki/uploadImages/115/210/212/163/2021/09/03/16/20/9c44b224-1673-45b8-848a-a480f0a5aa95.png">
+<img alt="rym" src="https://tmx.fishpi.cn/image/rym.png">
 <br>
 Rhythm 社区系统，超丰富的社区功能，基于 Symphony 社区版深度定制。
 <br><br>

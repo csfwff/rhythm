@@ -65,6 +65,7 @@
 <img itemprop="image" class="fn-none" src="${article.articleAuthorThumbnailURL210}"/>
 <p itemprop="description" class="fn-none">"${article.articlePreviewContent}"</p>
 <#include "header.ftl">
+<div class="article-container">
 <div class="article-body">
     <#if showTopAd>
         ${HeaderBannerLabel}
@@ -524,8 +525,8 @@
         <button onclick="Comment.report(this)" class="fn-right green">${reportLabel}</button>
     </div>
 </div>
-<#include "footer.ftl">
-<div class="share fn-none">
+
+<div class="share">
             <span id="thankArticle" aria-label="${thankLabel}"
                   class="tooltipped tooltipped-e<#if article.thanked> ft-red<#else> ft-blue</#if>"
             <#if permissions["commonThankArticle"].permissionGrant>
@@ -536,21 +537,7 @@
                 onclick="Article.permissionTip(Label.noPermissionLabel)"
                     </#if>><svg><use xlink:href="#heart"></use></svg> <span
                         class="ft-13">${article.thankedCnt}</span></span>
-    <div id="qrCode" class="fn-none"
-         data-shareurl="${servePath}${article.articlePermalink}<#if isLoggedIn>?r=${currentUser.userName}</#if>"></div>
-    <span class="tooltipped tooltipped-e" aria-label="share to wechat" data-type="wechat"><svg class="icon-wechat"><use
-                    xlink:href="#wechat"></use></svg></span>
-    <span class="tooltipped tooltipped-e" aria-label="share to weibo" data-type="weibo"><svg class="icon-weibo"><use
-                    xlink:href="#weibo"></use></svg></span>
-    <span class="tooltipped tooltipped-e" aria-label="share to twitter" data-type="twitter"><svg class="icon-twitter"><use
-                    xlink:href="#twitter"></use></svg></span>
-    <span class="tooltipped tooltipped-e" aria-label="share to google" data-type="google"><svg class="icon-google"><use
-                    xlink:href="#google"></use></svg></span>
-    <span class="tooltipped tooltipped-e" data-type="copy"
-          aria-label="${copyLabel}"
-          id="shareClipboard"><svg class="icon-link"><use xlink:href="#link"></use></svg></span>
-    <input type="text" class="article-clipboard"
-           value="${servePath}${article.articlePermalink}<#if isLoggedIn>?r=${currentUser.userName}</#if>"/>
+</div>
 </div>
 <div class="article-header">
     <h1 aria-label="${symphonyLabel}" class="tooltipped tooltipped-s">
@@ -560,7 +547,7 @@
             </svg>
         </a>
     </h1>
-    <h2 class="fn-ellipsis fn-pointer" id="bigTitle" onclick="Util.goTop()">
+    <h2 class="fn-ellipsis fn-pointer" id="bigTitle" style="transition: .5s;max-width: 600px" onclick="Util.goTop()">
         ${article.articleTitleEmojUnicode}
     </h2>
     <div class="user-nav">
@@ -649,6 +636,7 @@
     </div>
 </div>
 
+<#include "footer.ftl">
 <#if "" != article.articleToC && 3 != article.articleType>
     <div class="module" id="articleToC">
         <div class="module-panel">
@@ -788,9 +776,9 @@
         $(window).scroll(function () {
             let title = "${article.articleTitleEmojUnicode}";
             if ($(document).scrollTop() > 500) {
-                $("#bigTitle").html("");
+                $("#bigTitle").css('opacity','0');
             } else {
-                $("#bigTitle").html(title);
+                $("#bigTitle").css('opacity','1');
             }
         });
         $(".editor-bg").click(Comment._toggleReply)

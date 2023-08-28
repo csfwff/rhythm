@@ -23,43 +23,46 @@
     <div class="module">
         <link rel="stylesheet" href="${staticServePath}/js/lib/cropper/index.css">
         <link rel="stylesheet" href="${staticServePath}/js/lib/cropper/cropper.min.css">
+
         <div class="module-header fn-clear">
             <h2>自由裁剪</h2>
         </div>
-        <div class="userInfo_box_uploadImg_content_top">
-            <input id="inputImage" type="file" name="photoFile">
-            <label class="userInfo_box_uploadImg_content_top_input curp" for="inputImage">选择头像</label>
-            <label class="userInfo_box_uploadImg_content_top_message">${updateAvatarTipLabel}</label>
-        </div>
-        <div class="userInfo_box_uploadImg_content_mian">
-            <div class="userInfo_box_uploadImg_content_mian_left fl">
-                <div class="userInfo_box_uploadImg_content_mian_left_imgBox">
-                    <script>
-                        var originalImageURL = '${currentUser.userAvatarURL}?${currentUser.userUpdateTime?c}';
-                    </script>
-                    <img src="" id="image">
-                </div>
-                <div class="userInfo_box_uploadImg_content_mian_left_btns_zooms">
-                    <label id="userImg_zoomOut" class="fl curp">-</label>
-                    <label id="userImg_zoomIn" class="fr curp">+</label>
-                </div>
-                <div class="userInfo_box_uploadImg_content_mian_left_btns_others">
-                    <label id="userImg_save" class="fl curp">确&nbsp;&nbsp;定</label>
-                </div>
+        <div class="module-panel form">
+            <div class="userInfo_box_uploadImg_content_top">
+                <input id="inputImage" type="file" name="photoFile">
+                <label class="userInfo_box_uploadImg_content_top_input curp" for="inputImage">选择头像</label>
+                <label class="userInfo_box_uploadImg_content_top_message">${updateAvatarTipLabel}</label>
             </div>
-            <div class="userInfo_box_uploadImg_content_mian_right fr tc">
-                <div class="userInfo_box_uploadImg_content_mian_right_preview100">
-                    <div class="userImg_preview"></div>
+            <div class="userInfo_box_uploadImg_content_mian">
+                <div class="userInfo_box_uploadImg_content_mian_left fl">
+                    <div class="userInfo_box_uploadImg_content_mian_left_imgBox">
+                        <script>
+                            var originalImageURL = '${currentUser.userAvatarURL}?${currentUser.userUpdateTime?c}';
+                        </script>
+                        <img src="" id="image">
+                    </div>
+                    <div class="userInfo_box_uploadImg_content_mian_left_btns_zooms">
+                        <label id="userImg_zoomOut" class="fl curp">-</label>
+                        <label id="userImg_zoomIn" class="fr curp">+</label>
+                    </div>
+                    <div class="userInfo_box_uploadImg_content_mian_left_btns_others">
+                        <label id="userImg_save" class="fl curp">确&nbsp;&nbsp;定</label>
+                    </div>
                 </div>
-                <label>100*100px</label>
-                <div class="userInfo_box_uploadImg_content_mian_right_preview50">
-                    <div class="userImg_preview"></div>
+                <div class="userInfo_box_uploadImg_content_mian_right fr tc">
+                    <div class="userInfo_box_uploadImg_content_mian_right_preview100">
+                        <div class="userImg_preview"></div>
+                    </div>
+                    <label>100*100px</label>
+                    <div class="userInfo_box_uploadImg_content_mian_right_preview50">
+                        <div class="userImg_preview"></div>
+                    </div>
+                    <label>50*50px</label>
+                    <div class="userInfo_box_uploadImg_content_mian_right_preview30">
+                        <div class="userImg_preview"></div>
+                    </div>
+                    <label>30*30px</label>
                 </div>
-                <label>50*50px</label>
-                <div class="userInfo_box_uploadImg_content_mian_right_preview30">
-                    <div class="userImg_preview"></div>
-                </div>
-                <label>30*30px</label>
             </div>
         </div>
 

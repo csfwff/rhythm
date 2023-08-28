@@ -1225,7 +1225,8 @@ var Article = {
 
     // his
     $('#revision').dialog({
-      'width': $(window).width() > 500 ? 500 : $(window).width() - 50,
+      'width': Math.min($(window).width() - 50, 1000, $(window).width() * 0.8),
+      // 'width': $(window).width() > 500 ? 500 : $(window).width() - 50,
       'height': $(window).height() - 50,
       'modal': true,
       'hideFooter': true,
@@ -1246,19 +1247,15 @@ var Article = {
       var currentScrollTop = $(window).scrollTop()
 
       // share
-      if (currentScrollTop > -1 &&
-        currentScrollTop < $('.article .article-body').outerHeight() - 48) {
-        $('.share').show()
-      } else {
-        $('.share').hide()
-      }
 
+      $('.share').css('top',currentScrollTop + 60 + 'px');
       if (currentScrollTop < $('.article-title').offset().top) {
-        $('.article-header').css('top', '-50px')
-        $('.nav').show()
+        $('.article-header').css('top', '-60px');
+        $('.nav').show();
+
       } else {
-        $('.article-header').css('top', '0')
-        $('.nav').hide()
+        $('.article-header').css('top', '0');
+        $('.nav').hide();
       }
     })
 
@@ -1297,13 +1294,13 @@ var Article = {
 //        }, false);
 
     $(window).resize(function () {
-      var shareL = parseInt($('.article-footer').css('margin-left')) / 2 - 15
-      $('.share').css('left', (shareL < 0 ? 0 : shareL) + 'px')
+      // var shareL = parseInt($('.article-footer').css('margin-left')) / 2 - 15
+      // $('.share').css('left', (shareL < 0 ? 0 : shareL) + 'px')
 
       $('#articleToC > .module-panel').height($(window).height() - 48)
 
       if ($(window).width() < 1024) {
-        $('.article-header > h2').removeAttr('style')
+        // $('.article-header > h2').removeAttr('style')
         if ($('#articleToC').length === 0) {
           return false
         }
@@ -1319,9 +1316,7 @@ var Article = {
         $('.article-body .wrapper, #articleCommentsPanel, .article-footer').
           css('margin-right', articleMR + 'px')
       }
-      $('.article-header > h2').
-        css('margin-left', Math.max(20,
-          ($('.article-footer').offset().left - 58)) + 'px')
+      // $('.article-header > h2').css('margin-left', Math.max(20,($('.article-footer').offset().left - 58)) + 'px')
     })
 
     // set session storage
@@ -1509,8 +1504,8 @@ var Article = {
    * @description 分享按钮
    */
   share: function () {
-    var shareL = parseInt($('.article-footer').css('margin-left')) / 2 - 15
-    $('.share').css('left', (shareL < 20 ? 20 : shareL) + 'px')
+    // var shareL = parseInt($('.article-footer').css('margin-left')) / 2 - 15
+    // $('.share').css('left', (shareL < 20 ? 20 : shareL) + 'px')
 
     var shareURL = $('#qrCode').data('shareurl')
     $('#qrCode').qrcode({
@@ -1840,9 +1835,9 @@ var Article = {
    */
   initToc: function () {
     if ($('#articleToC').length === 0) {
-      $('.article-header > h2').
-        css('margin-left', Math.max(20,
-          ($('.article-footer').offset().left - 58)) + 'px')
+      // $('.article-header > h2').
+      //   css('margin-left', Math.max(20,
+      //     ($('.article-footer').offset().left - 58)) + 'px')
       $('.article-body .wrapper, #articleCommentsPanel, .article-footer').
         css('margin-right', 'auto')
       return false
@@ -1854,9 +1849,9 @@ var Article = {
     $('.article-body .wrapper, #articleCommentsPanel, .article-footer').
       css('margin-right', articleMR + 'px')
 
-    $('.article-header > h2').
-      css('margin-left', Math.max(20,
-        ($('.article-footer').offset().left - 58)) + 'px')
+    // $('.article-header > h2').
+    //   css('margin-left', Math.max(20,
+    //     ($('.article-footer').offset().left - 58)) + 'px')
     $('#articleToC > .module-panel').height($(window).height() - 48)
 
     // 样式
@@ -1994,6 +1989,8 @@ $(document).ready(function () {
         clearTimeout(timeoutId)
         timeoutId=0
       }
+      $('#emojiList').css('top','auto')
+      $('#emojiList').css('bottom','60px')
       time_out=new Date().getTime()
       timeoutId=setTimeout(()=>{
         new Date().getTime()-time_out<=700&&$("#emojiList").removeClass("showList")

@@ -724,8 +724,8 @@ a[class*=" icon-"]:hover {
 
 .pagination span.current,
 .tabs-sub a.current {
-  background-color: $theme-primary;
-  color: #f0f0f0;
+  background-color: #f8f8f8;
+  color: $theme-primary-text;
 }
 
 /* end pagination & tabs-sub */
@@ -861,6 +861,11 @@ a[class*=" icon-"]:hover {
 /* end dialog */
 
 /* start framework */
+.index *:not(.footer) .wrapper{
+  padding: 15px;
+  background: #fff;
+  box-shadow: 0px 0px 2px rgba(98,124,153,.1);
+}
 .wrapper {
   width: 90%;
   margin: 0 auto;
@@ -874,7 +879,7 @@ a[class*=" icon-"]:hover {
 }
 
 .main {
-  padding: 25px 0 0 0;
+  padding: 25px 0  20px 0;
   background-attachment: fixed;
   min-height: 280px;
 }
@@ -904,17 +909,22 @@ a[class*=" icon-"]:hover {
 
 /* start header */
 .nav {
-  height: 48px;
-  width: 100%;
-  background-color: $theme-primary;
+  position: sticky;
+  top: 0;
   z-index: 83;
-  position: relative;
-  box-sizing: border-box;
   display: flex;
-  padding: 0 10px;
+  justify-content: space-around;
+  align-items: center;
+  width: 100%;
+  height: 58px;
+  padding: 5px 15px;
+  box-sizing: border-box;
+  background-color: $theme-primary;
+  box-shadow: 0px 5px 40px 0px rgba(17,58,93,.1);
+  font-weight: 500;
 
   h1 {
-    margin-right: 20px;
+    //margin-right: 20px;
   }
 
   h1 svg {
@@ -924,16 +934,23 @@ a[class*=" icon-"]:hover {
   }
 
   .nav-tabs {
-    flex: 1;
+    //flex: 1;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: nowrap;
     text-align: center;
     overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
     line-height: 20px;
   }
 
   .nav-tabs svg {
-    margin: 3px 2px 0 0;
+    margin-right: 2px;
+    width: 16px;
     visibility: hidden;
-    float: left;
+    //float: left;
   }
 
   .nav-tabs a:hover svg,
@@ -944,8 +961,11 @@ a[class*=" icon-"]:hover {
   .nav-tabs > a,
   .user-nav > a,
   .user-nav > span {
-    display: inline-block;
-    color: #fff;
+    white-space: nowrap;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: $theme-primary-text;
     text-decoration: none;
     text-align: center;
     padding: 14px 10px;
@@ -955,20 +975,33 @@ a[class*=" icon-"]:hover {
     border-bottom: 2px solid $theme-accent;
     padding-bottom: 12px;
   }
-
+  .user-nav{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
   .user-nav svg {
     height: 20px;
     width: 18px;
-    float: left;
+    //color: $theme-primary-text;
+    //float: left;
   }
 
   .user-nav > a,
   .user-nav > span {
-    float: left;
+    //float: left;
+  }
+
+  .responsive-show,
+  .responsive-hide{
+    border-radius: 5px;
+    background: rgb(204 204 204/21%);
+    border-radius: 5px;
+    margin: 0 !important;
   }
 
   input::-webkit-input-placeholder {
-    color: #ddd;
+    color: #999999;
   }
 
   input.search {
@@ -976,33 +1009,25 @@ a[class*=" icon-"]:hover {
     border: 0px;
     border-radius: 3px 3px 3px 3px;
     padding: 5px 8px;
-    width: 180px;
-    margin: 10px 10px 0 20px;
-    line-height: 28px;
-    height: 28px;
-    color: #eee;
+    width: 210px;
+    line-height: 38px;
+    height: 38px;
+    color: $theme-primary-text;
     box-sizing: border-box;
     position: relative;
     vertical-align: top;
-  }
-
-  input.search:hover {
-    background: rgba(255, 255, 255, 0.25);
-  }
-
-  input.search:focus {
-    background: #fff;
-    color: #222;
+    transition: .2s;
   }
 
   .user-nav .no-msg,
   .user-nav .msg {
-    background-color: $theme-secondary;
+    background-color: rgb(203 202 202 / 29%);
     border-radius: 3px;
-    color: #FFFFFF;
+    color: #3b3e43;
     padding: 0px 6px;
     margin: 14px 7px;
     line-height: 20px;
+    transition: .5s;
   }
 
   .user-nav .msg {
@@ -1019,8 +1044,8 @@ a[class*=" icon-"]:hover {
 
   .person-list {
     position: absolute;
-    top: 48px;
-    right: 47px;
+    top: 58px;
+    right: 30px;
     width: 154px;
     background-color: #fff;
     line-height: 21px;
@@ -1074,7 +1099,7 @@ a[class*=" icon-"]:hover {
 
 /* start footer */
 .footer {
-  color: #7d8186;
+  color: $theme-primary-text;
   line-height: 24px;
   padding: 10px 0;
   position: relative;
@@ -1082,10 +1107,10 @@ a[class*=" icon-"]:hover {
   background-color: $theme-primary;
 
   a {
-    color: #afb1b3;
+    color: $theme-primary-text;
 
     &:hover {
-      color: #888f91;
+      color: #333;
       text-decoration: none;
     }
   }
@@ -1102,7 +1127,7 @@ a[class*=" icon-"]:hover {
   .slogan {
     padding: 20px 0px 20px 0;
     margin: 0px 0 10px;
-    color: #f0f0f0;
+    color: $theme-primary-text;
     width: 100%;
 
     svg {
@@ -1184,10 +1209,6 @@ a[class*=" icon-"]:hover {
 /* end article */
 
 /* start side module */
-.side .module:last-child {
-  margin-bottom: 0;
-}
-
 .module {
   margin-bottom: 20px;
   border-radius: 3px;
@@ -1195,6 +1216,8 @@ a[class*=" icon-"]:hover {
   word-wrap: break-word;
   box-sizing: border-box;
   min-width: 1px;
+  background: $theme-primary;
+  box-shadow: 0px 0px 2px rgb(98 124 153 / 10%);
 }
 
 .module-header {
@@ -1254,7 +1277,7 @@ a[class*=" icon-"]:hover {
 }
 
 .module-list .title {
-  color: $theme-secondary;
+  color: #262626;
   margin: 0px 0 0px 30px;
   display: block;
   line-height: 20px;
@@ -1407,7 +1430,8 @@ a[class*=" icon-"]:hover {
 }
 
 .person-info {
-  border-radius: 20px;
+  //border-radius: 20px;
+  padding: 15px 0 5px;
   border: 1px solid #eee;
   position: relative;
 
@@ -1707,7 +1731,7 @@ a[class*=" icon-"]:hover {
 }
 
 .index-bottom{
-  background-color:#fdfdfd
+  background-color:$theme-background;
 }
 
 .index-chat{
@@ -1894,6 +1918,25 @@ a[class*=" icon-"]:hover {
   -ms-user-select: none;
   -webkit-user-select: none;
   user-select: none;
+}
+
+.chatroomReply {
+  color: inherit;
+
+
+  &:hover {
+    text-decoration: none;
+  }
+
+  &::after {
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    top: 2px;
+    content: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32' fill='%23878787'%3E%3Cpath d='M12.417 9.75q8.667 1.25 13.375 6.625t6.208 12.958q-6.417-9.083-19.583-9.083v7.25l-12.417-12.417 12.417-12.417v7.083z'%3E%3C/path%3E%3C/svg%3E");
+    position: relative;
+    left: 2px;
+  }
 }
 
 /*@keyframes swim {

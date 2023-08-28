@@ -494,10 +494,16 @@ a[class*=" icon-"]:hover {
 .wrapper {
   margin: 0 10px;
 }
-
 .main {
   //background-color: #FFF;
   //padding-bottom: 10px;
+
+  /*.article-main {
+    margin: 10px 10px;
+    background-color: var(--layer-background-color);
+    box-shadow: 0 1px 2px var(--layer-border-color);
+    padding: 10px 10px 20px 10px;
+  }*/
 }
 
 /* end framework */
@@ -508,7 +514,13 @@ a[class*=" icon-"]:hover {
   width: 100%;
   padding: 5px 0;
   z-index: 99;
-  background-color: $theme-primary;
+  background-color: rgba(217, 240, 255, 0.75);
+}
+
+.nav .wrapper{
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
 .nav .head-fn form {
@@ -516,11 +528,10 @@ a[class*=" icon-"]:hover {
 }
 
 .nav .head-fn h1 a {
-
   svg {
     color: #fff;
-    height: 38px;
-    width: 38px;
+    height: 28px;
+    width: 28px;
     margin-top: -5px;
     float: left;
   }
@@ -528,6 +539,9 @@ a[class*=" icon-"]:hover {
 
 .nav .user-nav {
   position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 .nav .user-nav a.unlogin {
@@ -535,7 +549,7 @@ a[class*=" icon-"]:hover {
 }
 
 .nav div > a {
-  color: #fff;
+  color: #3b3e43;
   text-decoration: none;
   margin: 0 3px;
   padding: 4px 5px;
@@ -550,8 +564,10 @@ a[class*=" icon-"]:hover {
 }
 
 .nav div > a.current {
-  border-bottom: 2px solid #D26911;
+  /*
+  border-bottom: 2px solid $theme-accent;
   padding-bottom: 7px;
+  */
 }
 
 .nav div > a.last {
@@ -566,13 +582,14 @@ a[class*=" icon-"]:hover {
 
 .nav .user-nav .no-msg,
 .nav .user-nav .msg {
-  background-color: #777;
+  background-color: rgba(203,202,202,.29);
   border-radius: 3px;
-  color: #FFFFFF;
+  color: #3b3e43;
   font-size: 14px;
   padding: 0px 6px;
-  margin: 5px 10px;
+  margin: 5px 4px;
   line-height: 20px;
+  transition: .5s;
 }
 
 .nav .user-nav .msg {
@@ -583,6 +600,11 @@ a[class*=" icon-"]:hover {
   animation: spaceboots 1s infinite;
   background-color: $theme-accent;
   color: #FFFFFF;
+}
+.nav .user-nav svg{
+  color: $theme-primary-text;
+  height: 20px;
+  width: 20px;
 }
 
 .nav .user-nav a.selected.no-msg,
@@ -629,14 +651,14 @@ a[class*=" icon-"]:hover {
 
 /* start footer */
 .footer {
-  color: #7d8186;
+  color: #434444;
   padding: 10px 0;
   text-align: center;
   font-size: 12px;
   background-color: $theme-primary;
 
   a {
-    color: #afb1b3;
+    color: #7e7e7e;
   }
 }
 
@@ -662,7 +684,7 @@ a[class*=" icon-"]:hover {
 
 .list > ul > li {
   border-bottom: 1px solid #eee;
-  padding: 10px;
+  padding: 10px 5px 10px 5px;
   white-space: normal;
   word-wrap: break-word;
   position: relative;
@@ -1056,7 +1078,6 @@ label.anonymous-check {
 
 .article-info {
   position: relative;
-  margin-bottom: 10px;
 }
 
 .article-info > div.article-params {
@@ -1079,7 +1100,7 @@ h1.article-title {
   word-break: break-all;
   font-size: 16px;
   font-weight: normal;
-  margin: 10px 0;
+  margin: 4px 0 20px 0;
 }
 
 h1.article-title > a {
@@ -1127,9 +1148,9 @@ label.cmt-anonymous {
 }
 
 .comments > .comments-header {
-  border-bottom: 1px solid #CCCCCC;
-  margin: 20px 0 0;
-  padding: 10px 5px 5px 10px;
+  border-bottom: 1px solid #dbdbdb;
+  margin: 20px 0 20px 0;
+  padding: 10px 5px 11px 10px;
 }
 
 .comments > div.comments-header svg {
@@ -1138,7 +1159,7 @@ label.cmt-anonymous {
 
 .comments > div.comments-header a {
   text-decoration: none;
-  color: $black-text;
+  color: #817e7e;
 }
 
 .comments li.shield {
@@ -1201,9 +1222,6 @@ label.cmt-anonymous {
 }
 
 .comment-login {
-  border: 1px solid #D9D9D9;
-  border-top-color: #C0C0C0;
-  border-left-color: #C0C0C0;
   box-sizing: border-box;
   margin: 10px;
   background-color: #fafafa;
@@ -1636,6 +1654,7 @@ label.cmt-anonymous {
   .form {
     font-size: 14px;
     line-height: 1.6;
+    margin: 20px 0;
 
     & > svg {
       margin: 0 auto;
@@ -1909,6 +1928,10 @@ code .dec {
 /* end activity */
 
 /* start chatroom */
+.chat-room{
+  background: #ffffff;
+  padding: 0 10px;
+}
 .chat-room .online-cnt {
   line-height: 33px;
   margin-right: 10px;
@@ -2758,7 +2781,12 @@ only screen and (device-width: 414px) and (device-height: 896px) and (-webkit-de
   animation: swim 15s linear;
 }*/
 
+.chats__content .vditor-reset{
+  overflow: visible;
+}
+
 .hongbao__item {
+  position: relative;
   background-color: var(--layer-background-color);
   color: var(--layer-color);
   cursor: pointer;
@@ -2781,6 +2809,41 @@ only screen and (device-width: 414px) and (device-height: 896px) and (-webkit-de
 .hongbao__count {
   font-size: 24px;
   margin: 10px 0
+}
+
+
+.opened .hongbao__finger_guessing{
+  display: none;
+}
+
+.hongbao__finger_guessing_icon{
+  position: absolute;
+  right: -25px;
+  width: 45px;
+  height: 45px;
+  border-radius: 50%;
+  border: 2px solid transparent;
+  transition: .2s;
+}
+.hongbao__finger_guessing_icon:hover{
+  border-color:#5c1151;
+}
+
+.hongbao__finger_guessing_icon:nth-child(1){
+  top: -25px;
+  background: url("../images/redpacket/gesture/rock.png") no-repeat center center;
+  background-size: contain;
+}
+.hongbao__finger_guessing_icon:nth-child(2){
+  top: 15px;
+  right: -50px;
+  background: url("../images/redpacket/gesture/scissors.png") no-repeat center center;
+  background-size: contain;
+}
+.hongbao__finger_guessing_icon:nth-child(3){
+  top: 55px;
+  background: url("../images/redpacket/gesture/paper.png") no-repeat center center;
+  background-size: contain;
 }
 
 .hide-list {
@@ -2927,13 +2990,11 @@ only screen and (device-width: 414px) and (device-height: 896px) and (-webkit-de
 }
 
 .list__item{
-  background-color: var(--layer-background-color);
-  box-shadow: 0 1px 2px var(--layer-border-color);
   list-style: none;
   margin-bottom: 10px;
-  padding: 10px;
+  padding: 3px 5px 9px 5px;
   font-family: "HarmonyOS",Helvetica Neue,Luxi Sans,DejaVu Sans,Hiragino Sans GB,Microsoft Yahei,sans-serif,Apple Color Emoji,Segoe UI Emoji,Noto Color Emoji,Segoe UI Symbol,Android Emoji,EmojiSymbols;
-
+  border-bottom: 1px solid #eee;
 
   :last-child{
     margin-bottom: 0
@@ -3190,5 +3251,9 @@ only screen and (device-width: 414px) and (device-height: 896px) and (-webkit-de
   width: 0;
 }
 
-
-
+.main {
+  margin: 10px 5px 5px 5px;
+  background-color: var(--layer-background-color);
+  box-shadow: 0 1px 2px var(--layer-border-color);
+  padding: 5px 5px 20px 5px;
+}

@@ -28,6 +28,7 @@ import org.b3log.latke.http.WebSocketSession;
 import org.b3log.latke.ioc.BeanManager;
 import org.b3log.latke.model.User;
 import org.b3log.latke.repository.*;
+import org.b3log.latke.repository.jdbc.JdbcRepository;
 import org.b3log.latke.service.ServiceException;
 import org.b3log.symphony.model.*;
 import org.b3log.symphony.processor.ApiProcessor;
@@ -63,8 +64,9 @@ public class ChatRoomBot {
     private static final SimpleCurrentLimiter RECORD_POOL_2_IN_24H = new SimpleCurrentLimiter(24 * 60 * 60, 1);
     private static final SimpleCurrentLimiter RECORD_POOL_6_IN_15M = new SimpleCurrentLimiter(15 * 60, 5);
     private static final SimpleCurrentLimiter RECORD_POOL_5_IN_24H = new SimpleCurrentLimiter(24 * 60 * 60, 4);
-    private static final SimpleCurrentLimiter RECORD_POOL_10_IN_1M = new SimpleCurrentLimiter(60, 10);
+    private static final SimpleCurrentLimiter RECORD_POOL_5_IN_1M = new SimpleCurrentLimiter(60, 5);
     private static final SimpleCurrentLimiter RECORD_POOL_BARRAGER = new SimpleCurrentLimiter(60, 5);
+    private static final SimpleCurrentLimiter RECORD_POOL_05_IN_1M = new SimpleCurrentLimiter(30, 1);
 
 
     /**
@@ -126,7 +128,7 @@ public class ChatRoomBot {
                 return true;
             }
         }
-        // ==! 发红包频率限制 !==
+        // ==! 发弹幕频率限制 !==
 
         // ==? 指令 ?==
         if (DataModelService.hasPermission(currentUser.optString(User.USER_ROLE), 3)) {
@@ -355,6 +357,7 @@ public class ChatRoomBot {
                                     for (WebSocketSession session : senderSessions) {
                                         ChatroomChannel.removeSession(session);
                                     }
+                                    JdbcRepository.dispose();
                                 }).start();
                             } catch (Exception e) {
                                 sendBotMsg("参数错误。");
@@ -386,11 +389,6 @@ public class ChatRoomBot {
                                 JSONObject targetUser = userQueryService.getUserByName(user);
                                 if (null == targetUser) {
                                     sendBotMsg("指令执行失败，用户不存在。");
-                                    break;
-                                }
-                                final int currentPoint = targetUser.optInt(UserExt.USER_POINT);
-                                if (currentPoint - point < 0) {
-                                    sendBotMsg("指令执行失败，他没有这么多分可以扣。");
                                     break;
                                 }
                                 String targetUserId = targetUser.optString(Keys.OBJECT_ID);
@@ -584,20 +582,35 @@ public class ChatRoomBot {
         // ==? 发红包频率限制 ?==
         if (!userName.equals("admin")) {
             if (content.startsWith("[redpacket]") && content.endsWith("[/redpacket]")) {
-                if (!RECORD_POOL_10_IN_1M.access(userName)) {
-                    context.renderJSON(StatusCodes.ERR).renderMsg("你的红包被机器人打回，原因：红包发送频率过快，每分钟仅允许发送10个红包，请稍候重试");
+                if (!RECORD_POOL_5_IN_1M.access(userName)) {
+                    context.renderJSON(StatusCodes.ERR).renderMsg("你的红包被机器人打回，原因：红包发送频率过快，每分钟仅允许发送5个红包，请稍候重试");
                     return false;
                 }
 
-                // 心跳红包和猜拳红包限制
+                // 心跳红包限制
                 String redpacketString = content.replaceAll("^\\[redpacket\\]", "").replaceAll("\\[/redpacket\\]$", "");
                 JSONObject redpacket = new JSONObject(redpacketString);
                 String type = redpacket.optString("type");
                 int date = Integer.parseInt(DateFormatUtils.format(System.currentTimeMillis(), "HHmm"));
-                if (type.equals("heartbeat")) {
+                /*if (type.equals("heartbeat")) {
                     if (date > 1800 || date < 830) {
                         context.renderJSON(StatusCodes.ERR).renderMsg("这个时段无法发送心跳红包！允许时间：08:30-18:00");
                         return false;
+                    }
+                }*/
+
+                // 猜拳红包限制
+                if (type.equals("rockPaperScissors")) {
+                    boolean morning = date >= 830 && date <= 1130;
+                    boolean afternoon = date >= 1330 && date <= 1800;
+                    // 判断是否在上午或下午时段
+                    if (morning || afternoon) {
+                        // 每30秒全局锁只允许发送一条
+                        if (!RECORD_POOL_05_IN_1M.access("v")) {
+                            context.renderJSON(StatusCodes.ERR).renderMsg("现在是聊天高峰期，全局每30秒只允许发送一个猜拳红包，请稍候重试。高峰期时段为：08:30-11:30、13:30-18:00");
+                            return false;
+                        }
+
                     }
                 }
             }

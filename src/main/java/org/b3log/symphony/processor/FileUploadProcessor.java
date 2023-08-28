@@ -18,6 +18,7 @@
  */
 package org.b3log.symphony.processor;
 
+import com.idrsolutions.image.png.PngCompressor;
 import com.qiniu.storage.Configuration;
 import com.qiniu.storage.Region;
 import com.qiniu.storage.UploadManager;
@@ -27,6 +28,7 @@ import jodd.http.HttpRequest;
 import jodd.http.HttpResponse;
 import jodd.io.FileUtil;
 import jodd.net.MimeTypes;
+import net.coobird.thumbnailator.Thumbnails;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
@@ -48,10 +50,7 @@ import org.b3log.symphony.model.Common;
 import org.b3log.symphony.util.*;
 import org.json.JSONObject;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.OutputStream;
+import java.io.*;
 import java.net.InetAddress;
 import java.net.URL;
 import java.nio.file.Path;
@@ -216,11 +215,56 @@ public class FileUploadProcessor {
         }
 
         final List<byte[]> fileBytes = new ArrayList<>();
-        if (Symphonys.QN_ENABLED) { // 文件上传性能优化 https://github.com/b3log/symphony/issues/866
-            for (final FileUpload file : files) {
-                final byte[] bytes = file.getData();
-                fileBytes.add(bytes);
+        final String[] staticPictureSuffixArray = {"jpg", "jpeg", "png"};
+        final String[] animatePictureSuffixArray = {"gif"};
+        final String[] audioSuffixArray = {"mp3"};
+        final String[] videoSuffixArray = {"mp4"};
+        for (final FileUpload file : files) {
+            byte[] bytes = file.getData();
+            int before = bytes.length;
+            suffix = Headers.getSuffix(file);
+            if (Strings.contains(suffix, staticPictureSuffixArray)) {
+                // 静态图片处理
+                long start = System.currentTimeMillis();
+                try {
+                    if (suffix.equals("png")) {
+                        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+                        PngCompressor.compress(new ByteArrayInputStream(bytes), byteArrayOutputStream);
+                        bytes = byteArrayOutputStream.toByteArray();
+                    } else {
+                        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+                        Thumbnails.of(new ByteArrayInputStream(bytes))
+                                .scale(1f)
+                                .outputQuality(0.35f)
+                                .toOutputStream(byteArrayOutputStream);
+                        bytes = byteArrayOutputStream.toByteArray();
+                    }
+                    LOGGER.log(Level.INFO, "Compressed " + file.getFilename() + " as a static picture, before: " + before / 1024 + "KB, after: " + bytes.length / 1024 + "KB, time: " + (System.currentTimeMillis() - start) + "ms");
+                } catch (Exception e) {
+                    LOGGER.log(Level.ERROR, "Unable to compress " + file.getFilename() + " as a static picture", e);
+                }
             }
+
+            if (Strings.contains(suffix, animatePictureSuffixArray)) {
+                // 动态图片处理
+                try {
+                    bytes = GifUtils.gifScale(bytes, 0.7, 0.7);
+                    LOGGER.log(Level.INFO, "Compressed " + file.getFilename() + " as an animate picture, before: " + before / 1024 + "KB, after: " + bytes.length / 1024 + "KB");
+                } catch (Exception e) {
+                    LOGGER.log(Level.ERROR, "Unable to compress " + file.getFilename() + " as an animate picture", e);
+                }
+            }
+
+            if (Strings.contains(suffix, audioSuffixArray)) {
+                // 音频处理
+                // LOGGER.log(Level.INFO, "Compressed " + file.getFilename() + " as an audio, before: " + before / 1024 + "KB, after: " + bytes.length / 1024 + "KB");
+            }
+
+            if (Strings.contains(suffix, videoSuffixArray)) {
+                // 视频处理
+                // LOGGER.log(Level.INFO, "Compressed " + file.getFilename() + " as a video, before: " + before / 1024 + "KB, after: " + bytes.length / 1024 + "KB");
+            }
+            fileBytes.add(bytes);
         }
 
         final CountDownLatch countDownLatch = new CountDownLatch(files.size());
@@ -252,10 +296,11 @@ public class FileUploadProcessor {
                     url = Symphonys.UPLOAD_QINIU_DOMAIN + "/" + putRet.optString("key");
                     succMap.put(originalName, url);
                 } else {
+                    bytes = fileBytes.get(i);
                     final Path path = Paths.get(Symphonys.UPLOAD_LOCAL_DIR, fileName);
                     path.getParent().toFile().mkdirs();
                     try (final OutputStream output = new FileOutputStream(path.toFile())) {
-                        IOUtils.write(file.getData(), output);
+                        IOUtils.write(bytes, output);
                         countDownLatch.countDown();
                     }
                     url = Latkes.getServePath() + "/upload/" + fileName;

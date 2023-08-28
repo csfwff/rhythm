@@ -40,9 +40,8 @@
                 <div class="fn-content" style="padding-top: 0;">
                     <div class="reply">
                         <#if isLoggedIn>
-                            <div id="chatContent"></div>
-                            <br>
-                            <div class="fn-clear" style="padding: 5px 0 7px 0;">
+                            <div id="chatContent" style="margin: 0 -15px"> </div>
+                            <div class="fn-clear" style="padding: 16px 0 8px 0;margin: 0 -4px;">
                                 <svg id="redPacketBtn" style="width: 30px; height: 30px; cursor:pointer;">
                                     <use xlink:href="#redPacketIcon"></use>
                                 </svg>
@@ -103,8 +102,8 @@
                                     <button class="green" onclick="ChatRoom.send()">发送</button>
                                 </div>
                                 <div id="paintContent" style="display: none;">
-                                    <div style="margin: 20px 0 0 0;">
-                                        <input id="selectColor" name="mycolor" type="text" class="input_cxcolor" readonly="" style="background-color: rgb(0, 0, 0);">
+                                    <div style="margin: 20px 0 0 0;display: flex">
+                                        <div id="selectColor" style="margin:0 10px;border:1px solid #000"></div>
                                         <input id="selectWidth" type="number" inputmode="decimal" pattern="[0-9]*" min="1" value="3" style="width: 50px">
                                     </div>
                                     <canvas id="paintCanvas" width="500" height="490"></canvas>
@@ -131,7 +130,7 @@
                                             </div>
                                         </div>
                                         <div style="margin-top: 10px;">
-                                            弹幕颜色：<input id="selectBarragerColor" name="mycolor" type="text" class="input_cxcolor" readonly="">
+                                            弹幕颜色：<div id="selectBarragerColor" style="display: inline-block;border:1px solid #000"></div>
                                         </div>
                                         <div class="ft__smaller ft__fade" style="margin-top: 10px; margin-bottom: 10px;">发送弹幕每次将花费 <b><span id="barragerCost">${barragerCost}</span></b> <span id="barragerUnit">${barragerUnit}</span></div>
                                     </div>
@@ -156,7 +155,7 @@
                     </div>
                 </div>
             </div>
-            <div class="list module pd__15" id="comments" style="height: 100%; margin-top: -15px">
+            <div class="list module" id="comments" style="height: auto; margin-top: -15px; padding: 20px 30px 5px 30px">
                 <div id="chats">
                 </div>
                 <#if !isLoggedIn><div style="color:rgba(0,0,0,0.54);">登录后查看更多</div></#if>
@@ -208,6 +207,7 @@
 <script src="${staticServePath}/js/chat-room${miniPostfix}.js?${staticResourceVersion}"></script>
 <script src="${staticServePath}/js/lib/viewer.min.js"></script>
 <script src="${staticServePath}/js/lib/barrager/jquery.barrager.min.js"></script>
+<script src="${staticServePath}/js/lib/xncolorpicker.min.js"></script>
 <script>
     Label.addBoldLabel = '${addBoldLabel}';
     Label.addItalicLabel = '${addItalicLabel}';

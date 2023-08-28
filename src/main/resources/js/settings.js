@@ -949,7 +949,7 @@ var Settings = {
         if ($("#userCardSettings").attr("bgUrl") !== undefined) {
           cardBg = $("#userCardSettings").attr("bgUrl");
         }
-        let iconURL = "https://fishpi.cn/images/favicon.png";
+        let iconURL = `https://fishpi.cn/images/favicon.png?` + Label.staticResourceVersion;
         if ($("#iconURL").data("imageurl") !== undefined && $("#iconURL").data("imageurl") !== '') {
           iconURL = $("#iconURL").data("imageurl");
         }

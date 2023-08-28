@@ -683,6 +683,11 @@ public class ChatroomProcessor {
                 currentUser = ApiProcessor.getUserByKey(requestJSONObject.optString("apiKey"));
             } catch (NullPointerException ignored) {
             }
+            final String userPhone = currentUser.optString("userPhone");
+            if (userPhone.isEmpty()) {
+                context.renderJSON(StatusCodes.ERR).renderMsg("未绑定手机号码，无法使用此功能。请至设置-账户中绑定手机号码。");
+                return;
+            }
             final String userName = currentUser.optString(User.USER_NAME);
             // 保存 Active 信息
             chatroomChannel.userActive.put(userName, System.currentTimeMillis());
@@ -832,6 +837,11 @@ public class ChatroomProcessor {
                     redPacketJSON.put("who", new JSONArray());
                     // 红包特殊标识，堵漏洞
                     redPacketJSON.put("msgType", "redPacket");
+
+                    // 税给admin
+                    int tax = money - (BigDecimal.valueOf(money).multiply(BigDecimal.ONE.subtract(taxRate)).intValue());
+                    pointtransferMgmtService.transfer(Pointtransfer.ID_C_SYS, userQueryService.getUserByName("admin").optString(Keys.OBJECT_ID),
+                            Pointtransfer.TRANSFER_TYPE_C_ACCOUNT2ACCOUNT, tax, userId, System.currentTimeMillis(), "猜拳红包税收，纳税人：" + userName);
 
                     // 写入数据库
                     final Transaction transaction = chatRoomRepository.beginTransaction();
@@ -1109,7 +1119,7 @@ public class ChatroomProcessor {
      *
      * @param context the specified context
      */
-    public void showChatRoom(final RequestContext context) {
+    public synchronized void showChatRoom(final RequestContext context) {
         final AbstractFreeMarkerRenderer renderer = new SkinRenderer(context, "chat-room.ftl");
         final Map<String, Object> dataModel = renderer.getDataModel();
         try {

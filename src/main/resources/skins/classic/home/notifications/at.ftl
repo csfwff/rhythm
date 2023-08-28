@@ -21,7 +21,7 @@
 <#include "macro-notifications.ftl">
 <@notifications "at">
 <#if atNotifications?size != 0>
-<ul class="notification">
+<ul class="notification" style="padding: 15px">
     <#list atNotifications as notification>
     <li class="comment-list-item fn-flex<#if notification.hasRead> read</#if>">
         <#if 2 == notification.dataType>

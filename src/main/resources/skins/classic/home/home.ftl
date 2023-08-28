@@ -34,7 +34,7 @@
     <#if userHomeArticles?size == 0>
         <p class="ft-center ft-gray home-invisible">${chickenEggLabel}</p>
     </#if>
-    <ul> 
+    <ul>
         <#list userHomeArticles as article>
         <li<#if !(paginationPageCount?? && paginationPageCount!=0 && paginationPageCount!=1) && article_index == userHomeArticles?size - 1>
             class="last"
@@ -48,8 +48,17 @@
                     <#list article.articleTagObjs as articleTag>
                     <a rel="tag" class="tag" href="${servePath}/tag/${articleTag.tagURI}">
                         ${articleTag.tagTitle}</a>
-                    </#list> •
-                    ${article.articleCreateTime?string('yyyy-MM-dd HH:mm')}
+                    </#list>
+                       <span class="ft-smaller ft__fade">
+                           <span class="fn__space5"></span>•<span class="fn__space5"></span>
+                               <a rel="nofollow" class="ft-a-title" href="${servePath}${article.articlePermalink}#comments">
+                                    <span class="article-level<#if article.articleCommentCount lt 40>${(article.articleCommentCount/10)?int}<#else>4</#if>">${article.articleCommentCount}</span> 回帖</a>
+                                    <span class="fn__space5"></span>•<span class="fn__space5"></span>
+                                    <span class="article-level<#if article.articleViewCount lt 400>${(article.articleViewCount/100)?int}<#else>4</#if>"><#if article.articleViewCount < 1000>${article.articleViewCount}<#else>${article.articleViewCntDisplayFormat}</#if></span>
+                                    浏览
+                                    <span class="fn__space5"></span>•<span class="fn__space5"></span>
+                                    ${article.articleCreateTime?string('yyyy-MM-dd HH:mm')}
+                      </span>
                 </span>
             </div>
             <#if isMyArticle && 3 != article.articleType && permissions["commonUpdateArticle"].permissionGrant>

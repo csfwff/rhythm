@@ -31,11 +31,9 @@
     </@head>
 </head>
 <body>
-<#include "header.ftl">
-<div class="main">
+
     <div class="mobile-head">
         <#include "header.ftl">
-        <@indexNav "breezemoons"/>
     </div>
     <div style="height: 30px;width: 1px;" ></div>
     <div class="content fn-clear">
@@ -78,7 +76,6 @@
     <div class="side">
         <#include "side.ftl">
     </div>
-</div>
 <#include "footer.ftl">
 <@listScript/>
 <script>

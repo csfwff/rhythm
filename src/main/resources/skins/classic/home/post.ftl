@@ -171,7 +171,7 @@
                         <#else>
                             <#if permissions["commonAddArticle"].permissionGrant>
                             <button class="green" id="addArticleBtn" tabindex="10"<#if requisite> readonly disabled</#if>
-                                    onclick="AddArticle.add('${csrfToken}', this)">${postLabel}</button>
+                                    onclick="AddArticle.confirmAdd('${csrfToken}', this)">${postLabel}</button>
                             </#if>
                         </#if>
                     </div>
@@ -215,5 +215,6 @@
         <script src="${staticServePath}/js/lib/diff2html/diff.min.js"></script>
         </#if>
         <script src="${staticServePath}/js/add-article${miniPostfix}.js?${staticResourceVersion}"></script>
+        <script src="${staticServePath}/js/lib/sweetalert2.all.min.js"></script>
     </body>
 </html>

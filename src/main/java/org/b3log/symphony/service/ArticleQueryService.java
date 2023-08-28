@@ -1245,8 +1245,8 @@ public class ArticleQueryService {
      * @param fetchSize the specified fetch size
      * @return hot articles, returns an empty list if not found
      */
-    private static List<JSONObject> hotArticlesCache = new ArrayList<>();
-    public void refreshHotArticlesCache() {
+    private static List<JSONObject> hotArticlesCache = Collections.synchronizedList(new ArrayList<>());
+    public synchronized void refreshHotArticlesCache() {
         try {
             final long thirtyDaysAgo = DateUtils.addDays(new Date(), -30).getTime();
             List<JSONObject> ret = articleRepository.select("" +
@@ -1256,10 +1256,10 @@ public class ArticleQueryService {
                     "FROM " +
                     "    symphony_article " +
                     "WHERE " +
-                    "    articleLatestCmtTime > " + thirtyDaysAgo + " AND articleStatus <> 1 AND articleType <> 1 AND articleShowInList <> 0 " +
+                    "    articleCreateTime > " + thirtyDaysAgo + " AND articleStatus <> 1 AND articleType <> 1 AND articleShowInList <> 0 " +
                     "ORDER BY " +
                     "    total_score DESC " +
-                    "limit 100");
+                    "limit 50");
             ret.sort((o1, o2) -> {
                 long o1Time = o1.optLong(Article.ARTICLE_UPDATE_TIME);
                 long o2Time = o2.optLong(Article.ARTICLE_UPDATE_TIME);
@@ -1273,19 +1273,17 @@ public class ArticleQueryService {
             });
             organizeArticles(ret);
             Collections.shuffle(ret);
-            hotArticlesCache = ret;
-            LOGGER.log(Level.INFO, "Refreshed hot articles cache.");
+            hotArticlesCache = Collections.synchronizedList(new ArrayList<>(ret));
+            System.out.println(">>> Refreshed hot articles cache.");
         } catch (Exception e) {
             LOGGER.log(Level.ERROR, "Refresh hot articles cache failed", e);
         }
     }
-    public List<JSONObject> getHotArticles(final int fetchSize) {
+    public synchronized List<JSONObject> getHotArticles(final int fetchSize) {
         try {
-            List<JSONObject> ret;
-            if (hotArticlesCache.size() <= fetchSize) {
-                ret = hotArticlesCache;
-            } else {
-                ret = hotArticlesCache.subList(0, fetchSize);
+            List<JSONObject> ret = Collections.synchronizedList(new ArrayList<>(hotArticlesCache));
+            if (hotArticlesCache.size() > fetchSize) {
+                ret = ret.subList(0, fetchSize);
             }
 
             ret.sort((o1, o2) -> {

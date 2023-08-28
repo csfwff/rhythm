@@ -43,7 +43,7 @@
 </#if>
 </#if>
 
-<div class="module">
+<div class="module" style="padding-top: 10px">
     <div class="module-header form" style="border: none;">
         <input id="breezemoonInput"
                type="text"

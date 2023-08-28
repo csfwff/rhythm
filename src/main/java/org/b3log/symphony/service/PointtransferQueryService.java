@@ -585,6 +585,29 @@ public class PointtransferQueryService {
                         break;
                     case Pointtransfer.TRANSFER_TYPE_C_CHAT_ROOM_SEND_BARRAGER:
                         break;
+                    case Pointtransfer.TRANSFER_TYPE_C_TRADE:
+                        JSONObject user10F = userRepository.get(fromId);
+                        JSONObject user10T = userRepository.get(toId);
+
+                        if (fromId.equals(Pointtransfer.ID_C_SYS)) {
+                            desTemplate = desTemplate.replace("{userF}", "系统");
+                        } else {
+                            final String userLink = UserExt.getUserLink(user10F);
+                            desTemplate = desTemplate.replace("{userF}", userLink);
+                        }
+                        if (toId.equals(Pointtransfer.ID_C_SYS)) {
+                            desTemplate = desTemplate.replace("{userT}", "系统");
+                        } else {
+                            final String userLink = UserExt.getUserLink(user10T);
+                            desTemplate = desTemplate.replace("{userT}", userLink);
+                        }
+                        final String memo2 = record.optString(Pointtransfer.MEMO);
+                        if (StringUtils.isNotBlank(memo2)) {
+                            desTemplate = desTemplate.replace("{memo}", memo2);
+                        } else {
+                            desTemplate = desTemplate.replace("{memo}", langPropsService.get("noMemoLabel"));
+                        }
+                        break;
                     default:
                         LOGGER.warn("Invalid point type [" + type + "]");
                 }
