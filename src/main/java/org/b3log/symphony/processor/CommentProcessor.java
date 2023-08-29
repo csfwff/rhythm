@@ -125,6 +125,9 @@ public class CommentProcessor {
     @Inject
     private FollowMgmtService followMgmtService;
 
+    @Inject
+    private PointtransferMgmtService pointtransferMgmtService;
+
     /**
      * Register request handlers.
      */
@@ -222,6 +225,18 @@ public class CommentProcessor {
 
         context.renderJSON(StatusCodes.ERR);
         try {
+            // 评论扣除100积分
+            final boolean succ = null != pointtransferMgmtService.transfer(currentUserId, Pointtransfer.ID_C_SYS,
+                    Pointtransfer.TRANSFER_TYPE_C_DEL_COMMENT,
+                    100, "", System.currentTimeMillis(), "");
+            if (!succ) {
+                context.renderJSON(StatusCodes.ERR).renderMsg("少年，你的积分不足！");
+                return;
+            }
+
+            // 日志记录
+            LogsService.commentLog(context, currentUser.optString(User.USER_NAME), comment);
+
             commentMgmtService.removeComment(id);
 
             context.renderJSONValue(Keys.CODE, StatusCodes.SUCC);

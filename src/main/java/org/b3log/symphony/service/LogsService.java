@@ -85,6 +85,13 @@ public class LogsService {
         }
     }
 
+    public static void commentLog(RequestContext context, String userName, JSONObject text) {
+        try {
+            log("comment-remove", getTime(), getAddress(context), userName, text.toString(), false);
+        } catch (Exception ignored) {
+        }
+    }
+
     public static void chatLog(RequestContext context, String oId, String userName) {
         final BeanManager beanManager = BeanManager.getInstance();
         final ChatInfoRepository chatInfoRepository = beanManager.getReference(ChatInfoRepository.class);

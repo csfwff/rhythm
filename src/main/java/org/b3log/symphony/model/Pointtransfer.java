@@ -462,6 +462,8 @@ public final class Pointtransfer {
      */
     public static final int TRANSFER_TYPE_C_TRADE = 50;
 
+    public static final int TRANSFER_TYPE_C_DEL_COMMENT = 51;
+
     /**
      * Transfer sum - 摆龙门阵.
      */
