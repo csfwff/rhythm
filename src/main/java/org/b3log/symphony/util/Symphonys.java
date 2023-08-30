@@ -397,6 +397,21 @@ public final class Symphonys {
     public static final int POINT_UPDATE_COMMENT = getInt("pointUpdateComment");
 
     /**
+     * 删除回帖所需积分值.
+     */
+    public static final int POINT_DELETE_COMMENT = getInt("pointDelComment");
+
+    /**
+     * 匿名回帖所需积分值.
+     */
+    public static final int POINT_COMMENT_ANONYMOUS = getInt("pointCommentAnonymous");
+
+    /**
+     * 仅楼主可见回帖所需积分值.
+     */
+    public static final int POINT_COMMENT_ONLY_AUTHOR = getInt("pointCommentOnlyAuthor");
+
+    /**
      * 回帖给自己的帖子所需积分值.
      */
     public static final int POINT_ADD_SELF_ARTICLE_COMMENT = getInt("pointAddSelfArticleComment");

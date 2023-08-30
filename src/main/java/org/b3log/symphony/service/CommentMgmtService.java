@@ -445,6 +445,14 @@ public class CommentMgmtService {
                 pointSum = Pointtransfer.TRANSFER_SUM_C_ADD_SELF_ARTICLE_COMMENT;
             }
 
+//            if(Comment.COMMENT_ANONYMOUS_C_ANONYMOUS == commentAnonymous){
+//                pointSum += Pointtransfer.TRANSFER_SUM_C_ADD_ANONYMOUS_ARTICLE_COMMENT
+//            }
+            //仅楼主可见需要额外积分
+            if(Comment.COMMENT_VISIBLE_C_AUTHOR == commentVisible){
+                pointSum += Pointtransfer.TRANSFER_SUM_C_ADD_ONLY_AUTHOR_VISIBLE_ARTICLE_COMMENT;
+            }
+
             if (balance - pointSum < 0) {
                 throw new ServiceException(langPropsService.get("insufficientBalanceLabel"));
             }
@@ -567,6 +575,13 @@ public class CommentMgmtService {
                 } else {
                     pointtransferMgmtService.transfer(commentAuthorId, articleAuthorId,
                             Pointtransfer.TRANSFER_TYPE_C_ADD_COMMENT, Pointtransfer.TRANSFER_SUM_C_ADD_COMMENT,
+                            commentId, System.currentTimeMillis(), "");
+                }
+
+                //如果是仅楼主，需要额外扣分
+                if(Comment.COMMENT_VISIBLE_C_AUTHOR == commentVisible){
+                    pointtransferMgmtService.transfer(commentAuthorId, Pointtransfer.ID_C_SYS,
+                            Pointtransfer.TRANSFER_TYPE_C_ONLY_AUTHOR_VISIBLE_COMMENT, Pointtransfer.TRANSFER_SUM_C_ADD_ONLY_AUTHOR_VISIBLE_ARTICLE_COMMENT,
                             commentId, System.currentTimeMillis(), "");
                 }
 

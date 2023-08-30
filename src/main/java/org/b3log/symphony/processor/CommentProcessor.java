@@ -228,7 +228,7 @@ public class CommentProcessor {
             // 评论扣除100积分
             final boolean succ = null != pointtransferMgmtService.transfer(currentUserId, Pointtransfer.ID_C_SYS,
                     Pointtransfer.TRANSFER_TYPE_C_DEL_COMMENT,
-                    100, "", System.currentTimeMillis(), "");
+                    Symphonys.POINT_DELETE_COMMENT, "", System.currentTimeMillis(), "");
             if (!succ) {
                 context.renderJSON(StatusCodes.ERR).renderMsg("少年，你的积分不足！");
                 return;

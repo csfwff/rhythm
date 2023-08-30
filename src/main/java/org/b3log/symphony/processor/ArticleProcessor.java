@@ -1061,7 +1061,7 @@ public class ArticleProcessor {
         article.put(Article.ARTICLE_T_AUTHOR_INTRO, author.optString(UserExt.USER_INTRO));
 
         String metal = cloudService.getEnabledMetal(articleAuthorId);
-        if (!metal.equals("{}")) {
+        if (!metal.equals("{}")&&Article.ARTICLE_ANONYMOUS_C_ANONYMOUS!=article.optInt(Article.ARTICLE_ANONYMOUS)) {
             List<Object> list = new JSONObject(metal).optJSONArray("list").toList();
             article.put("sysMetal", list);
         } else {
@@ -1278,6 +1278,7 @@ public class ArticleProcessor {
                     final String commentAuthorId = comment.optString(Comment.COMMENT_AUTHOR_ID);
                     if (!isLoggedIn || (!StringUtils.equals(currentUserId, commentAuthorId) && !StringUtils.equals(currentUserId, articleAuthorId))) {
                         comment.put(Comment.COMMENT_CONTENT, langPropsService.get("onlySelfAndArticleAuthorVisibleLabel"));
+
                     }
                 }
             }
