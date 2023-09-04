@@ -231,14 +231,14 @@ public final class Server extends BaseServer {
 
         final Server server = new Server();
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
-            // 用户层
-            UserChannel.settlement();
-            LOGGER.log(Level.INFO, "用户状态修改完成");
+            // 用户层 结算似乎不需要 暂时去掉
+//            UserChannel.settlement();
             // 框架
             cronMgmtService.stop();
             server.shutdown();
             Symphonys.EXECUTOR_SERVICE.shutdown();
             Latkes.shutdown();
+            LogManager.shutdown();
         }));
 
         LOGGER.log(Level.INFO, "Everything is ready, Thank you for using Rhythm!");

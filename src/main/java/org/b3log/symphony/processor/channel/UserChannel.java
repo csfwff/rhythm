@@ -259,5 +259,6 @@ public class UserChannel implements WebSocketChannel {
             final UserMgmtService userMgmtService = beanManager.getReference(UserMgmtService.class);
             userMgmtService.setOnlineMinute(key, onlineMinute);
         }
+        LOGGER.log(Level.INFO, "Settlement user online time end");
     }
 }
