@@ -92,7 +92,7 @@ var Comment = {
    * @param {integer} id 评论 id
    */
   remove: function (id) {
-    if (!confirm(Label.confirmRemoveLabel)) {
+    if (!confirm('删除评论需要100积分，' + Label.confirmRemoveLabel)) {
       return false
     }
     $.ajax({
