@@ -1611,7 +1611,7 @@ var Util = {
                         '</a>\n';
                 }
                 html += '' +
-                    '<a class="tooltipped-new tooltipped__n" rel="nofollow" onclick="javascript:void(0)" style="background-color:#eeeeeecc;border-radius:5px;padding:0 7px 0 4px;cursor:default;color:#6d6c6c;font-size:5px;"\n' +
+                    '<a class="tooltipped-new tooltipped__n" rel="nofollow" onclick="javascript:void(0)" style="background-color:#eeeeeecc;border-radius:5px;padding:0 7px 0 4px;cursor:default;color:#6d6c6c;font-size:12px;"\n' +
                     '   aria-label="' + userNo + ' 号成员">\n' +
                     '    <svg style="height: 12px; vertical-align: -4.5px">\n' +
                     '        <use xlink:href="#no"></use>\n' +
