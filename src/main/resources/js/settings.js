@@ -304,7 +304,7 @@ var Settings = {
         html += '<div class="fn__flex" style="justify-content: space-between; margin-bottom: 10px">' +
             '<div>' +
             ' <label style="margin: 0 0 0 0">' +
-            '   <div><img src="' + Util.genMetal(m.name, m.attr) + '"/><br><span style="font-size: 5px">' + m.name + ' (' + m.description + ')</span></div>' +
+            '   <div><img src="' + Util.genMetal(m.name, m.attr) + '"/><br><span style="font-size: 12px">' + m.name + ' (' + m.description + ')</span></div>' +
             ' </label>' +
             ' </div>' +
             ' <div>' + btn + "</div>" +
