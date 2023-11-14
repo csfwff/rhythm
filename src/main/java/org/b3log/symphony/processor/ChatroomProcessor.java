@@ -662,6 +662,8 @@ public class ChatroomProcessor {
                 legalClient.add("VSCode");
                 legalClient.add("Python");
                 legalClient.add("Golang");
+                legalClient.add("Bird");
+                legalClient.add("Dart");
                 legalClient.add("Other");
                 if (legalClient.contains(client)) {
                     source = client + "/" + version;
