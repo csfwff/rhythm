@@ -1515,6 +1515,7 @@ var Util = {
                         }
                     });
                 }
+                console.log(data)
                 let followerCount = data.followerCount;
                 let followingUserCount = data.followingUserCount;
                 let oId = data.oId;
@@ -1610,6 +1611,16 @@ var Util = {
                         '    </svg>\n' +
                         '</a>\n';
                 }
+                if (userURL !== "") {
+                    html += '' +
+                        '<a target="_blank" href="' +  Label.servePath + '/forward?goto=' + userURL + '" class="tooltipped-new tooltipped__n" rel="nofollow"\n' +
+                        '   aria-label="' + userURL + '">\n' +
+                        '    <svg>\n' +
+                        '        <use xlink:href="#ic-url"></use>\n' +
+                        '    </svg>\n' +
+                        '</a>\n';
+                }
+
                 html += '' +
                     '<a class="tooltipped-new tooltipped__n" rel="nofollow" onclick="javascript:void(0)" style="background-color:#eeeeeecc;border-radius:5px;padding:0 7px 0 4px;cursor:default;color:#6d6c6c;font-size:12px;"\n' +
                     '   aria-label="' + userNo + ' 号成员">\n' +
