@@ -73,7 +73,7 @@ var Logs = {
      */
     let result = "";
     switch (key3) {
-      case key3 === "增加积分":
+      case  "增加积分":
         result = '<div style="padding: 5px 0;font-size: 15px;">';
         result += '【 <span style="color: #696969">' + key1 + "</span> ";
         result += '<span style="color: #708090">' + key2 + "</span> 】<br>";
@@ -82,7 +82,7 @@ var Logs = {
         result += '<span style="color: #1E90FF">' + data + "</span> ";
         result += "</div>";
         break;
-      case key3 === "扣除积分":
+      case  "扣除积分":
         result = '<div style="padding: 5px 0;font-size: 15px;">';
         result += '【 <span style="color: #696969">' + key1 + "</span> ";
         result += '<span style="color: #708090">' + key2 + "</span> 】<br>";
@@ -91,7 +91,7 @@ var Logs = {
         result += '<span style="color: #1E90FF">' + data + "</span> ";
         result += "</div>";
         break;
-      case key3 === "发送弹幕":
+      case  "发送弹幕":
         result = '<div style="padding: 5px 0;font-size: 15px;">';
         result += '【 <span style="color: #696969">' + key1 + "</span> ";
         result += '<span style="color: #708090">' + key2 + "</span> 】<br>";
