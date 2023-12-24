@@ -766,6 +766,7 @@ public class UserProcessor {
         final JSONObject role = roleQueryService.getRole(userRoleId);
         final String roleName = role.optString(Role.ROLE_NAME);
         filteredUserProfile.put(User.USER_ROLE, roleName);
+        filteredUserProfile.put("mbti", user.optString("mbti"));
         // 获取用户个性化设定
         final JSONObject systemSettings = systemSettingsService.getByUsrId(user.optString(Keys.OBJECT_ID));
         if (Objects.isNull(systemSettings)) {

@@ -988,8 +988,30 @@ public class SettingsProcessor {
         userIntro = Escapes.escapeHTML(userIntro);
         String userNickname = StringUtils.trim(requestJSONObject.optString(UserExt.USER_NICKNAME));
         userNickname = Escapes.escapeHTML(userNickname);
+        List<String> mbtiLeftArray = Arrays.asList("INTJ", "INTP", "ENTJ", "ENTP", "INFJ", "INFP", "ENFJ", "ENFP", "ISTJ", "ISFJ", "ESTJ", "ESFJ", "ISTP", "ISFP", "ESTP", "ESFP");
+        List<String> mbtiRightArray = Arrays.asList("A", "T");
+        String new_mbti = "";
+        String mbti = requestJSONObject.optString("mbti");
+        try {
+            if (!mbti.isEmpty()) {
+                if (mbti.contains("-")) {
+                    String temp_left, temp_right = "";
+                    temp_left = mbti.split("-")[0];
+                    temp_right = mbti.split("-")[1];
+                    if (mbtiLeftArray.contains(temp_left) && mbtiRightArray.contains(temp_right)) {
+                        new_mbti = temp_left + "-" + temp_right;
+                    }
+                } else {
+                    if (mbtiLeftArray.contains(mbti)) {
+                        new_mbti = mbti;
+                    }
+                }
+            }
+        } catch (Exception ignored) {
+        }
 
         final JSONObject user = Sessions.getUser();
+        user.put("mbti", new_mbti);
         user.put(UserExt.USER_TAGS, userTags);
         user.put(User.USER_URL, userURL);
         user.put(UserExt.USER_QQ, userQQ);
