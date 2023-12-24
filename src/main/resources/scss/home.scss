@@ -103,6 +103,23 @@
     line-height: 30px;
   }
 
+  .mbti {
+    background-color: #b2b1ff;
+    color: #fff;
+    font-size: 12px;
+    line-height: 20px;
+    border-radius: 3px;
+    height: 20px;
+    display: inline-block;
+    padding: 0 5px;
+    vertical-align: middle;
+    box-sizing: border-box;
+
+    svg {
+      margin-top: 2px;
+    }
+  }
+
   .online,
   .offline,
   .color_admin,

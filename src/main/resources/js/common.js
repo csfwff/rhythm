@@ -1545,6 +1545,18 @@ var Util = {
                     '            <div class="fn__ellipsis">\n' +
                     '                <a class="user-card__name" href="' + Label.servePath + '/member/' + userName + '"><b>' + userNickname + '</b></a>\n' +
                     '                <a class="ft-gray ft-smaller" href="' + Label.servePath + '/member/' + userName + '"><b>' + userName + '</b></a>\n';
+                if (mbti !== "") {
+                    let leftMbti = mbti;
+                    if (mbti.indexOf('-') > 0) {
+                        leftMbti = mbti.split('-')[0];
+                    }
+                    html += '' +
+                        '<a target="_blank" href="https://www.16personalities.com/ch/' + leftMbti + '-%E4%BA%BA%E6%A0%BC" class="tooltipped-new tooltipped__n" rel="nofollow"\n' +
+                        '   aria-label="TA是 ' + mbti + '">\n' +
+                        '   <span style="background-color: #b2b1ff;color: #fff;font-size: 12px;line-height: 20px;border-radius: 3px;height: 20px;display: inline-block;padding: 0 5px;vertical-align: middle;box-sizing: border-box;svg {margin-top: 2px;}">' +
+                        '   <svg style="vertical-align: -3px"><use xlink:href="#mbti"></use></svg> ' + mbti + '</span>' +
+                        '</a>\n';
+                }
                 html += '            </div>\n';
                 if (userIntro !== "") {
                     html += '' +
@@ -1617,19 +1629,6 @@ var Util = {
                         '   aria-label="' + userURL + '">\n' +
                         '    <svg>\n' +
                         '        <use xlink:href="#card-link"></use>\n' +
-                        '    </svg>\n' +
-                        '</a>\n';
-                }
-                if (mbti !== "") {
-                    let leftMbti = mbti;
-                    if (mbti.indexOf('-') > 0) {
-                        leftMbti = mbti.split('-')[0];
-                    }
-                    html += '' +
-                        '<a target="_blank" href="https://www.16personalities.com/ch/' + leftMbti + '-%E4%BA%BA%E6%A0%BC" class="tooltipped-new tooltipped__n" rel="nofollow"\n' +
-                        '   aria-label="TA是 ' + mbti + '">\n' +
-                        '    <svg>\n' +
-                        '        <use xlink:href="#mbti"></use>\n' +
                         '    </svg>\n' +
                         '</a>\n';
                 }

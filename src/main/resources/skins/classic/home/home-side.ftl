@@ -34,6 +34,11 @@
                         ${privateMessageLabel}
                     </button>
                 </#if>
+                <#if user.mbti != "">
+                    <a target="_blank" style="text-decoration: none" href="https://www.16personalities.com/ch/${user.mbti[0..3]}-%E4%BA%BA%E6%A0%BC" class="tooltipped-new tooltipped__n" rel="nofollow" aria-label="TA是 ${user.mbti}">
+                        <span class="mbti"><svg style="vertical-align: -3px"><use xlink:href="#mbti"></use></svg> ${user.mbti}</span>
+                    </a>
+                </#if>
                 <#if (isLoggedIn && ("adminRole" == currentUser.userRole || currentUser.userName == user.userName)) || 0 == user.userOnlineStatus>
                     <span class="tooltipped tooltipped-n" aria-label="<#if user.userOnlineFlag>${onlineLabel}<#else>${offlineLabel}</#if>">
                         <span class="<#if user.userOnlineFlag>online<#else>offline</#if>"><#if user.userOnlineFlag>在线<#else>离线</#if></span>
