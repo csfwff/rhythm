@@ -988,10 +988,31 @@ public class SettingsProcessor {
         userIntro = Escapes.escapeHTML(userIntro);
         String userNickname = StringUtils.trim(requestJSONObject.optString(UserExt.USER_NICKNAME));
         userNickname = Escapes.escapeHTML(userNickname);
+        String mbti = checkMBTI(requestJSONObject.optString("mbti"));
+
+        final JSONObject user = Sessions.getUser();
+        user.put("mbti", mbti);
+        user.put(UserExt.USER_TAGS, userTags);
+        user.put(User.USER_URL, userURL);
+        user.put(UserExt.USER_QQ, userQQ);
+        user.put(UserExt.USER_INTRO, userIntro);
+        user.put(UserExt.USER_NICKNAME, userNickname);
+        user.put(UserExt.USER_AVATAR_TYPE, UserExt.USER_AVATAR_TYPE_C_UPLOAD);
+
+        try {
+            userMgmtService.updateProfiles(user);
+
+            context.renderJSON(StatusCodes.SUCC);
+        } catch (final ServiceException e) {
+            context.renderMsg(e.getMessage());
+        }
+    }
+
+    public static String checkMBTI(String mbti) {
         List<String> mbtiLeftArray = Arrays.asList("INTJ", "INTP", "ENTJ", "ENTP", "INFJ", "INFP", "ENFJ", "ENFP", "ISTJ", "ISFJ", "ESTJ", "ESFJ", "ISTP", "ISFP", "ESTP", "ESFP");
         List<String> mbtiRightArray = Arrays.asList("A", "T");
+        mbti = mbti.toUpperCase();
         String new_mbti = "";
-        String mbti = requestJSONObject.optString("mbti");
         try {
             if (!mbti.isEmpty()) {
                 if (mbti.contains("-")) {
@@ -1009,23 +1030,7 @@ public class SettingsProcessor {
             }
         } catch (Exception ignored) {
         }
-
-        final JSONObject user = Sessions.getUser();
-        user.put("mbti", new_mbti);
-        user.put(UserExt.USER_TAGS, userTags);
-        user.put(User.USER_URL, userURL);
-        user.put(UserExt.USER_QQ, userQQ);
-        user.put(UserExt.USER_INTRO, userIntro);
-        user.put(UserExt.USER_NICKNAME, userNickname);
-        user.put(UserExt.USER_AVATAR_TYPE, UserExt.USER_AVATAR_TYPE_C_UPLOAD);
-
-        try {
-            userMgmtService.updateProfiles(user);
-
-            context.renderJSON(StatusCodes.SUCC);
-        } catch (final ServiceException e) {
-            context.renderMsg(e.getMessage());
-        }
+        return new_mbti;
     }
 
     /**

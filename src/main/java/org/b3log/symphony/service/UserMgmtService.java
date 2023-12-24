@@ -43,6 +43,7 @@ import org.b3log.latke.util.Ids;
 import org.b3log.latke.util.URLs;
 import org.b3log.symphony.model.*;
 import org.b3log.symphony.processor.FileUploadProcessor;
+import org.b3log.symphony.processor.SettingsProcessor;
 import org.b3log.symphony.processor.middleware.validate.UserRegisterValidationMidware;
 import org.b3log.symphony.repository.*;
 import org.b3log.symphony.util.Geos;
@@ -285,6 +286,7 @@ public class UserMgmtService {
             oldUser.put(UserExt.USER_AVATAR_TYPE, requestJSONObject.optString(UserExt.USER_AVATAR_TYPE));
             oldUser.put(UserExt.USER_AVATAR_URL, requestJSONObject.optString(UserExt.USER_AVATAR_URL));
             oldUser.put(UserExt.USER_COMMENT_VIEW_MODE, requestJSONObject.optInt(UserExt.USER_COMMENT_VIEW_MODE));
+            oldUser.put("mbti", requestJSONObject.optString("mbti"));
 
             oldUser.put(UserExt.USER_UPDATE_TIME, System.currentTimeMillis());
 
@@ -359,6 +361,7 @@ public class UserMgmtService {
             final String userEmail = requestJSONObject.optString(User.USER_EMAIL).trim().toLowerCase();
             final String userPhone = requestJSONObject.optString("userPhone");
             final String userName = requestJSONObject.optString(User.USER_NAME);
+            final String mbti = SettingsProcessor.checkMBTI(requestJSONObject.optString("mbti"));
             JSONObject user = userRepository.getByName(userName);
             if (null != user && (UserExt.USER_STATUS_C_VALID == user.optInt(UserExt.USER_STATUS)
                     || UserExt.USER_STATUS_C_INVALID == user.optInt(UserExt.USER_STATUS)
@@ -460,6 +463,7 @@ public class UserMgmtService {
             user.put(UserExt.USER_INDEX_REDIRECT_URL, "");
             user.put(UserExt.ONLINE_MINUTE, 0);
             user.put("secret2fa", "");
+            user.put("mbti", mbti);
 
             final JSONObject optionLanguage = optionRepository.get(Option.ID_C_MISC_LANGUAGE);
             final String adminSpecifiedLang = optionLanguage.optString(Option.OPTION_VALUE);

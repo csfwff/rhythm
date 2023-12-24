@@ -429,7 +429,7 @@ var Settings = {
   getPhoneCaptcha: function (csrfToken) {
     $('#phoneGetBtn').attr('disabled', 'disabled').css('opacity', '0.3')
     $.ajax({
-      url: Label.servePath + '/settings/phone/vc',
+      url: Label.servePath + 'phone/vc',
       type: 'POST',
       headers: {'csrfToken': csrfToken},
       data: JSON.stringify({
@@ -1088,6 +1088,12 @@ var Settings = {
           'min': 0,
           'max': 255,
           'msg': Label.invalidUserIntroLabel,
+        }, {
+          'target': $('#userMbti'),
+          'type': 'string',
+          'min': 0,
+          'max': 255,
+          'msg': '错误的MBTI长度',
         }],
     })) {
       return {
@@ -1095,6 +1101,7 @@ var Settings = {
         userTags: $('#userTags').val().replace(/(^\s*)|(\s*$)/g, ''),
         userURL: $('#userURL').val().replace(/(^\s*)|(\s*$)/g, ''),
         userIntro: $('#userIntro').val().replace(/(^\s*)|(\s*$)/g, ''),
+        mbti: $('#userMbti').val().replace(/(^\s*)|(\s*$)/g, ''),
       }
     } else {
       return false

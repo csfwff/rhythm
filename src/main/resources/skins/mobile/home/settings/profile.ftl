@@ -39,6 +39,15 @@
 
         <label>${userIntroLabel}</label><br/>
         <textarea id="userIntro" placeholder="${selfIntroLabel}">${currentUser.userIntro}</textarea>
+
+        <label>MBTI</label><br/>
+        <textarea id="userMbti" placeholder="请输入你的MBTI">${currentUser.mbti}</textarea>
+        <label>填写格式错误会导致保存后无显示，请使用英文横杠（只写主要MBTI请忽略），不区分大小写<br>正确示例：<b>ENTP ENFP-A ENTP-T ISTJ ISFJ-A ISTJ-T</b><br>
+            如果不知道你的MBTI或者不知道MBTI是什么，请<a href="https://www.16personalities.com/ch" target="_blank">点击这里</a></label>
+        <div class="fn-hr5"></div>
+        <div class="fn-hr5"></div>
+        <div class="fn-hr5"></div>
+        <div class="fn-hr5"></div>
         <div class="fn-hr5"></div>
         <div class="fn-hr5"></div>
         <div class="tip" id="profilesTip"></div>

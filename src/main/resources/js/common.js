@@ -1515,7 +1515,6 @@ var Util = {
                         }
                     });
                 }
-                console.log(data)
                 let followerCount = data.followerCount;
                 let followingUserCount = data.followingUserCount;
                 let oId = data.oId;
@@ -1534,6 +1533,7 @@ var Util = {
                 let userNo = data.userNo;
                 let userAppRole = data.userAppRole;
                 let sysMetal = JSON.parse(data.sysMetal);
+                let mbti = data.mbti;
                 // 组合内容
                 let html = "" +
                     '<div class="user-card" id="userCardContent">\n' +
@@ -1616,7 +1616,20 @@ var Util = {
                         '<a target="_blank" href="' +  Label.servePath + '/forward?goto=' + userURL + '" class="tooltipped-new tooltipped__n" rel="nofollow"\n' +
                         '   aria-label="' + userURL + '">\n' +
                         '    <svg>\n' +
-                        '        <use xlink:href="#ic-url"></use>\n' +
+                        '        <use xlink:href="#card-link"></use>\n' +
+                        '    </svg>\n' +
+                        '</a>\n';
+                }
+                if (mbti !== "") {
+                    let leftMbti = mbti;
+                    if (mbti.indexOf('-') > 0) {
+                        leftMbti = mbti.split('-')[0];
+                    }
+                    html += '' +
+                        '<a target="_blank" href="https://www.16personalities.com/ch/' + leftMbti + '-%E4%BA%BA%E6%A0%BC" class="tooltipped-new tooltipped__n" rel="nofollow"\n' +
+                        '   aria-label="TA是 ' + mbti + '">\n' +
+                        '    <svg>\n' +
+                        '        <use xlink:href="#mbti"></use>\n' +
                         '    </svg>\n' +
                         '</a>\n';
                 }
