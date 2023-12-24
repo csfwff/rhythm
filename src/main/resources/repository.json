@@ -1664,6 +1664,12 @@
           "type": "String",
           "length": 255,
           "description": "两步验证 Secret"
+        },
+        {
+          "name": "mbti",
+          "type": "String",
+          "length": 255,
+          "description": "用户的 MBTI"
         }
       ]
     },
