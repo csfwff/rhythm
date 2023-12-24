@@ -780,6 +780,19 @@ public class UserQueryService {
         }
     }
 
+    public String getMBTI(final String userId) {
+        try {
+            final Query query = new Query()
+                    .setFilter(new PropertyFilter(Keys.OBJECT_ID, FilterOperator.EQUAL, userId))
+                    .select("mbti");
+            JSONObject result = userRepository.get(query);
+            final List<JSONObject> results = (List<JSONObject>) result.opt(Keys.RESULTS);
+            return results.get(0).optString("mbti");
+        } catch (final RepositoryException e) {
+            return "";
+        }
+    }
+
     public List<JSONObject> getRecentRegisteredUsers(int size) {
         try {
             Query query = new Query()
