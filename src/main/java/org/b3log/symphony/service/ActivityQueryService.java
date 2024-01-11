@@ -333,7 +333,9 @@ public class ActivityQueryService {
 
         try {
             Query query = new Query()
-                    .setFilter(new PropertyFilter("gameId", FilterOperator.EQUAL, 40));
+                    .setFilter(new PropertyFilter("gameId", FilterOperator.EQUAL, 40))
+                    .addSort(Keys.OBJECT_ID, SortDirection.DESCENDING)
+                    .setPage(1, 100);
             List<JSONObject> gameData = cloudRepository.getList(query);
 
             // 排序并剪切
@@ -372,7 +374,9 @@ public class ActivityQueryService {
 
         try {
             Query query = new Query()
-                    .setFilter(new PropertyFilter("gameId", FilterOperator.EQUAL, 39));
+                    .setFilter(new PropertyFilter("gameId", FilterOperator.EQUAL, 39))
+                    .addSort(Keys.OBJECT_ID, SortDirection.DESCENDING)
+                    .setPage(1, 100);
             final List<JSONObject> gameDataFirst = cloudRepository.getList(query);
 
             // 排序并剪切
