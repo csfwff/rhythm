@@ -39,7 +39,6 @@
         <div>
             <a target="_blank" href="https://www.cxy521.com/">程序员导航</a><br>
             <a target="_blank" href="https://www.lundao.pub/">论道社区</a><br>
-            <a target="_blank" href="https://xyears.cn/">十年之约论坛</a><br>
             <a target="_blank" href="https://www.tsyvps.com/aff/HEHTPGYL">蓝易云</a><br>
             <a target="_blank" href="https://bbs.tampermonkey.net.cn/">油猴中文网</a>
         </div>
@@ -80,7 +79,7 @@
         </div>
         <div class="fn-hr5"></div>
         <div class="ft-smaller" style="padding: 10px 15px 0 15px">
-            Copyright © 2021 - 2023 W&P Tech. All Rights Reserved. 北京白与画科技有限公司 版权所有
+            Copyright © 2021 - 2024 W&P Tech. All Rights Reserved. 北京白与画科技有限公司 版权所有
         </div>
         <br>
     </div>

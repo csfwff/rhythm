@@ -40,8 +40,6 @@
                 &nbsp;｜&nbsp;
                 <a style="margin-right: 0px; padding-right: 0px" target="_blank" href="https://www.lundao.pub/">论道社区</a>
                 &nbsp;｜&nbsp;
-                <a style="margin-right: 0px; padding-right: 0px" target="_blank" href="https://xyears.cn/">十年之约论坛</a>
-                &nbsp;｜&nbsp;
                 <a style="margin-right: 0px; padding-right: 0px" target="_blank" href="https://www.tsyvps.com/aff/HEHTPGYL">蓝易云</a>
                 &nbsp;｜&nbsp;
                 <a style="margin-right: 0px; padding-right: 0px" target="_blank" href="https://bbs.tampermonkey.net.cn/">油猴中文网</a>
@@ -70,7 +68,7 @@
             </div>
             <div class="footer-nav fn-clear" style="margin-top: 15px; margin-bottom: 15px">
                 <div class="ft-smaller">
-                    Copyright © 2021 - 2023 W&P Tech. All Rights Reserved. 北京白与画科技有限公司 版权所有
+                    Copyright © 2021 - 2024 W&P Tech. All Rights Reserved. 北京白与画科技有限公司 版权所有
                     <div class="ft-smaller fn-right">
                         <a href="https://beian.miit.gov.cn/" target="_blank" style="float: right">京ICP备2022000226号-1</a><br>
                         <a target="_blank" href="http://www.beian.gov.cn/portal/registerSystemInfo?recordcode=11011302003886" style="display:inline-block;text-decoration:none;height:20px;line-height:20px;"><img src="https://mbdp01.bdstatic.com/static/landing-pc/img/icon_police.7296bdfd.png" style="float:left;"/><p style="float:left;height:20px;line-height:20px;margin: 0px 0px 0px 5px;">京公网安备 11011302003886号</p></a>
