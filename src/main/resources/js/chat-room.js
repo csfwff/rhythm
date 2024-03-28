@@ -532,7 +532,7 @@ var ChatRoom = {
             ChatRoom.changeWidth(width);
         });
 
-        setInterval(ChatRoom.reloadMessages, 15 * 60 * 1000);
+        setInterval(ChatRoom.reloadMessages, 5 * 60 * 1000);
     },
     sendBarrager: function () {
         // let color = $("#selectBarragerColor")[0].value;
@@ -564,7 +564,7 @@ var ChatRoom = {
         });
     },
     reloadMessages: function () {
-        if (document.documentElement.scrollTop <= 200) {
+        if (document.documentElement.scrollTop <= 2000) {
             ChatRoom.flashScreen();
         }
     },
