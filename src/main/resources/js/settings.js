@@ -36,7 +36,7 @@ var Settings = {
     let pause = false;
     switch (info.type) {
       case 'LGBT 群体认证':
-        if (idCert === '' || idId === '') {
+        if (idCert === '') {
           alert('上传资料不完整，请重新上传');
           pause = true;
         }
@@ -106,16 +106,6 @@ var Settings = {
             '';
         break;
       case 'LGBT 群体认证':
-        html += '' +
-            '<div class="fn-clear" style="margin: 0 30px 20px 0; display: inline-block">\n' +
-            '    <div class="avatar-big" id="id-id"\n' +
-            '         onclick="$(\'#id-id-upload input\').click()"\n' +
-            '         style="background-image:url(https://file.fishpi.cn/id/%E6%89%8B%E6%8C%81%E8%BA%AB%E4%BB%BD%E8%AF%81%E8%87%AA%E6%8B%8D%E7%85%A7.png)"></div>\n' +
-            '</div>\n' +
-            '<form id="id-id-upload" style="display: none" method="POST" enctype="multipart/form-data">\n' +
-            '        <input type="file" name="file">\n' +
-            '</form>' +
-            '';
         html += '' +
             '<div class="fn-clear" style="margin: 0 30px 20px 0; display: inline-block">\n' +
             '    <div class="avatar-big" id="id-cert"\n' +
