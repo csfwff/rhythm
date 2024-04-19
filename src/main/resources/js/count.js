@@ -86,6 +86,29 @@ const Count = {
         }
     },
 
+    lastInvokeTime: 0,
+    alarm: function (type) {
+        const currentTime = Date.now();
+        const remainingTime = 1000 - (currentTime - Count.lastInvokeTime);
+        if (remainingTime <= 0 || Count.lastInvokeTime === 0) {
+            switch (type) {
+                case 1:
+                    Util.notice("success", 30000, "中午咯，该吃饭啦～");
+                    break;
+                case 2:
+                    Util.notice("danger", 30000, "马上就要下班啦，赶快收拾收拾吧～");
+                    break;
+                case 3:
+                    Util.notice("success", 30000, "下班了！下班了！下班了！！！");
+                    break;
+                case 4:
+                    Util.notice("success", 30000, "下班啦！今天你赚了￥" + Count.data.salary + "！");
+                    break;
+            }
+            Count.lastInvokeTime = currentTime;
+        }
+    },
+
     generate: function () {
         // 生成设定时间为Date
         const year = new Date().getFullYear();
@@ -109,7 +132,7 @@ const Count = {
             eatSecond = `0${eatSecond}`.slice(-2)
             eatTime = eatHour + ":" + eatMinute + ":" + eatSecond;
             if (eatHour === "00" && eatMinute === "00" && eatSecond === "00") {
-                Util.notice("success", 30000, "中午咯，该吃饭啦～");
+                Count.alarm(1);
             }
             document.getElementById("countRemainBox").innerHTML = "午饭🍲<br><span id='countRemain'>" + eatTime + "</span>";
             showEat = true;
@@ -124,10 +147,14 @@ const Count = {
             leftSecond = `0${leftSecond}`.slice(-2)
             leftTime = leftHour + ":" + leftMinute + ":" + leftSecond;
             if (leftHour === "00" && leftMinute === "02" && leftSecond === "00") {
-                Util.notice("danger", 30000, "马上就要下班啦，赶快收拾收拾吧～");
+                Count.alarm(2);
             }
             if (leftHour === "00" && leftMinute === "00" && leftSecond === "00") {
-                Util.notice("success", 30000, "下班啦！今天你赚了￥" + Count.data.salary + "！");
+                if (Count.data.salary <= 0) {
+                    Count.alarm(3);
+                } else {
+                    Count.alarm(4);
+                }
             }
             // 计算薪水
             let salary = Count.data.salary;
@@ -143,11 +170,18 @@ const Count = {
             let salaryPerMilliSec = (salary / allSecond) / 1000;
             let passedTime = new Date().getTime() - startDate.getTime();
             let passedSalary = (passedTime * salaryPerMilliSec).toFixed(3);
-            console.log(passedTime)
-            document.getElementById("countRemainBox").innerHTML = "<span id='countRemain'>" + leftTime + "</span><span id='countSalary'>￥" + passedSalary + "</span>";
+            if (salary <= 0) {
+                document.getElementById("countRemainBox").innerHTML = "下班🏠<br><span id='countRemain'>" + leftTime + "</span>";
+            } else {
+                document.getElementById("countRemainBox").innerHTML = "<span id='countRemain'>🧑‍💻💭<br>" + leftTime + "</span><span id='countSalary'>💰" + passedSalary + "</span>";
+            }
         } else {
             if (eatHour < 0 && eatMinute < 0 && eatSecond < 0) {
-                document.getElementById("countRemainBox").innerText = "下班🎉\n今日收入\n￥" + Count.data.salary;
+                if (Count.data.salary <= 0) {
+                    document.getElementById("countRemainBox").innerText = "下班\n时间到 🎉";
+                } else {
+                    document.getElementById("countRemainBox").innerText = "下班🎉\n今日收入\n￥" + Count.data.salary;
+                }
                 clearInterval(Count.generateInterval);
             }
         }
@@ -155,9 +189,7 @@ const Count = {
 
     start: function () {
         Count.generate();
-        Count.generateInterval = setInterval(function () {
-            Count.generate();
-        }, 100);
+        Count.generateInterval = setInterval(Count.generate, 100);
     },
 
     save: function () {
