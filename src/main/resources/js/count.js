@@ -25,6 +25,8 @@ const Count = {
         // 初始化时间，930代表早上9点半，1800代表下午6点
         data.time = data.time || "1800";
         data.lunch = data.lunch || "1130";
+        data.salary = data.salary || "365";
+        data.startTime = data.startTime || "0900";
         this.data = data
         this.save()
         if (data.status !== 'disabled') {
@@ -43,7 +45,7 @@ const Count = {
                 wrap.setAttribute("style", "left:" + data.left + "px;top:" + data.top + "px;");
             }
         }
-        wrap.innerHTML = "<a class='time_box' id='countRemainBox'>距离下班:<br><span id='countRemain'></span></a>";
+        wrap.innerHTML = "<a class='time_box' id='countRemainBox'><span id='countRemain'></span></a>";
         document.body.insertBefore(wrap, document.body.firstChild);
         // 获取拖拽实验对象
         let el = document.getElementById("timeContent");
@@ -100,21 +102,23 @@ const Count = {
         let eatHour = Math.floor(eatTime / (1000 * 60 * 60) % 24);
         let eatMinute = Math.floor(eatTime / (1000 * 60) % 60);
         let eatSecond = Math.floor(eatTime / 1000 % 60);
-        if (eatHour >= 0 && eatMinute >= 0 && eatSecond >= 0) {
+        let showEat = false;
+        if (eatHour === 0 && eatMinute >= 0 && eatSecond >= 0) {
             eatHour = `0${eatHour}`.slice(-2)
             eatMinute = `0${eatMinute}`.slice(-2)
             eatSecond = `0${eatSecond}`.slice(-2)
             eatTime = eatHour + ":" + eatMinute + ":" + eatSecond;
             if (eatHour === "00" && eatMinute === "00" && eatSecond === "00") {
-                Util.notice("success", 30000, "中午咯，该订饭啦～");
+                Util.notice("success", 30000, "中午咯，该吃饭啦～");
             }
-            document.getElementById("countRemainBox").innerHTML = "订饭🍲<br><span id='countRemain'>" + eatTime + "</span>";
+            document.getElementById("countRemainBox").innerHTML = "午饭🍲<br><span id='countRemain'>" + eatTime + "</span>";
+            showEat = true;
         }
         let leftTime = setDate.getTime() - nowDate.getTime();
         let leftHour = Math.floor(leftTime / (1000 * 60 * 60) % 24);
         let leftMinute = Math.floor(leftTime / (1000 * 60) % 60);
         let leftSecond = Math.floor(leftTime / 1000 % 60);
-        if (leftHour >= 0 && leftMinute >= 0 && leftSecond >= 0 && eatHour < 0 && eatMinute < 0 && eatSecond < 0) {
+        if (leftHour >= 0 && leftMinute >= 0 && leftSecond >= 0 && !showEat) {
             leftHour = `0${leftHour}`.slice(-2)
             leftMinute = `0${leftMinute}`.slice(-2)
             leftSecond = `0${leftSecond}`.slice(-2)
@@ -123,12 +127,27 @@ const Count = {
                 Util.notice("danger", 30000, "马上就要下班啦，赶快收拾收拾吧～");
             }
             if (leftHour === "00" && leftMinute === "00" && leftSecond === "00") {
-                Util.notice("success", 30000, "下班了！下班了！下班了！！！");
+                Util.notice("success", 30000, "下班啦！今天你赚了￥" + Count.data.salary + "！");
             }
-            document.getElementById("countRemainBox").innerHTML = "下班🏠<br><span id='countRemain'>" + leftTime + "</span>";
+            // 计算薪水
+            let salary = Count.data.salary;
+            let startTime = Count.data.startTime.match(/\d{2}/g);
+            let endTime = Count.data.time.match(/\d{2}/g);
+            const startDate = new Date(`${dateString} ${startTime[0]}:${startTime[1]}:00`);
+            const endDate = new Date(`${dateString} ${endTime[0]}:${endTime[1]}:00`);
+            let allTime = endDate.getTime() - startDate.getTime();
+            let salaryHour = Math.floor(allTime / (1000 * 60 * 60) % 24);
+            let salaryMinute = Math.floor(allTime / (1000 * 60) % 60);
+            let salarySecond = Math.floor(allTime / 1000 % 60);
+            let allSecond = (salaryHour * 60 * 60) + (salaryMinute * 60) + salarySecond;
+            let salaryPerMilliSec = (salary / allSecond) / 1000;
+            let passedTime = new Date().getTime() - startDate.getTime();
+            let passedSalary = (passedTime * salaryPerMilliSec).toFixed(3);
+            console.log(passedTime)
+            document.getElementById("countRemainBox").innerHTML = "<span id='countRemain'>" + leftTime + "</span><span id='countSalary'>￥" + passedSalary + "</span>";
         } else {
             if (eatHour < 0 && eatMinute < 0 && eatSecond < 0) {
-                document.getElementById("countRemainBox").innerText = "下班\n时间到 🎉";
+                document.getElementById("countRemainBox").innerText = "下班🎉\n今日收入\n￥" + Count.data.salary;
                 clearInterval(Count.generateInterval);
             }
         }
@@ -138,10 +157,13 @@ const Count = {
         Count.generate();
         Count.generateInterval = setInterval(function () {
             Count.generate();
-        }, 1000);
+        }, 100);
     },
 
     save: function () {
+        if (!/^\d+$/.test(this.data.salary)) {
+            this.data.salary = 365;
+        }
         localStorage.setItem("count", JSON.stringify(this.data));
     },
 
@@ -154,14 +176,24 @@ const Count = {
   <option value="enabled" selected>开启</option>  <option value="disabled">关闭</option>  </select>
 </label>
 <label>
-  <div class="ft__smaller ft__fade" style="float: left">下班时间</div>
+  <div class="ft__smaller ft__fade">上班时间 (用于计算日薪)</div>
+  <div class="fn-hr5 fn__5"></div>
+  <input id="countSettingsStartTime" type="time"/>
+</label>
+<label>
+  <div class="ft__smaller ft__fade">下班时间</div>
   <div class="fn-hr5 fn__5"></div>
   <input id="countSettingsTime" type="time"/>
 </label>
 <label>
-  <div class="ft__smaller ft__fade" style="float: left">订饭时间</div>
+  <div class="ft__smaller ft__fade">午饭时间</div>
   <div class="fn-hr5 fn__5"></div>
   <input id="lunchSettingsTime" type="time"/>
+</label>
+<label>
+  <div class="ft__smaller ft__fade">你的日薪 (设置0为则不显示)</div>
+  <div class="fn-hr5 fn__5"></div>
+  <input id="salarySetting" type="text"/>
 </label>
 <div class="fn-hr5"></div>
 <div class="fn__flex" style="margin-top: 15px">
@@ -173,8 +205,13 @@ const Count = {
             const time = Count.data.time.match(/\d{2}/g);
             document.getElementById("countSettingsTime").value = `${time[0]}:${time[1]}`;
 
+            const startTime = Count.data.startTime.match(/\d{2}/g);
+            document.getElementById("countSettingsStartTime").value = `${startTime[0]}:${startTime[1]}`;
+
             const lunch = Count.data.lunch.match(/\d{2}/g);
             document.getElementById("lunchSettingsTime").value = `${lunch[0]}:${lunch[1]}`;
+
+            document.getElementById("salarySetting").value = Count.data.salary;
 
             document.getElementById("countSettingStatus").value = Count.data.status === "disabled" ? "disabled" : "enabled";
         }, 500);
@@ -184,6 +221,8 @@ const Count = {
         // 保存时间
         Count.data.time = document.getElementById("countSettingsTime").value.replace(":", "");
         Count.data.lunch = document.getElementById("lunchSettingsTime").value.replace(":", "");
+        Count.data.startTime = document.getElementById("countSettingsStartTime").value.replace(":", "");
+        Count.data.salary =document.getElementById("salarySetting").value;
         // 保存状态
         Count.data.status = document.getElementById("countSettingStatus").value;
         Count.save();
