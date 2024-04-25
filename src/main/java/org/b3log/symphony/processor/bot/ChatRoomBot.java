@@ -686,11 +686,11 @@ public class ChatRoomBot {
             }
             final long time = System.currentTimeMillis();
             JSONObject msg = new JSONObject();
-            msg.put(User.USER_NAME, "摸鱼派官方巡逻机器人");
+            msg.put(User.USER_NAME, "马库斯");
             msg.put(UserExt.USER_AVATAR_URL, "https://pwl.stackoverflow.wiki/2022/01/robot3-89631199.png");
             msg.put(Common.CONTENT, content);
             msg.put(Common.TIME, time);
-            msg.put(UserExt.USER_NICKNAME, "人工智障");
+            msg.put(UserExt.USER_NICKNAME, "RK200");
             msg.put("sysMetal", "");
             msg.put("userOId", 0L);
             msg.put("client", "Other/Robot");

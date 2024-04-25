@@ -266,14 +266,14 @@ public class ChatroomChannel implements WebSocketChannel {
      *                }
      */
     public static int notQuickCheck = 50;
-    public static int notQuickSleep = 100;
+    public static int notQuickSleep = 50;
     public static int quickCheck = 100;
-    public static int quickSleep = 100;
+    public static int quickSleep = 50;
 
     //用于消息发送的线程池
     private static final ThreadPoolExecutor MESSAGE_POOL = new ThreadPoolExecutor(
-            4,
-            4,
+            1,
+            1,
             120L,
             TimeUnit.SECONDS,
             new LinkedBlockingQueue<>()
