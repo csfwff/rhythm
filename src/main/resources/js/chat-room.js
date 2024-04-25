@@ -37,6 +37,7 @@ var thisClient = 'Web/PC网页端';
 // 弹幕颜色选择器
 var BarragerColorPicker = null;
 var DarwColorPicker = null;
+var redPacketMap = new Map();
 var ChatRoom = {
     init: function () {
         // 聊天窗口高度设置
@@ -1537,8 +1538,12 @@ border-bottom: none;
         if (undefined === gesture || null === gesture) {
             gesture = "0"
         }
+        redPacketMap.set(oId, $($('#chatroom' + oId).find('.hongbao__item').find('div')[1]).html());
+        $($('#chatroom' + oId).find('.hongbao__item').find('div')[1]).html('红包在路上啦~<br><b>请稍等...</b>');
+        $('#chatroom' + oId).css("pointer-events", "none");
         $.ajax({
             url: Label.servePath + "/chat-room/red-packet/open",
+            async: true,
             method: "POST",
             data: JSON.stringify({
                 oId: oId,
@@ -1549,6 +1554,10 @@ border-bottom: none;
                 }
             }),
             success: function (result) {
+                setTimeout(function () {
+                    $($('#chatroom' + oId).find('.hongbao__item').find('div')[1]).html(redPacketMap.get(oId));
+                    $('#chatroom' + oId).css("pointer-events", "");
+                }, 300);
                 if (result.code !== -1) {
                     let iGot = "抢红包人数较多，加载中...";
                     let gesture = "";
