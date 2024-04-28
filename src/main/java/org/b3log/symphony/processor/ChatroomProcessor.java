@@ -250,7 +250,7 @@ public class ChatroomProcessor {
      */
     public synchronized void openRedPacket(final RequestContext context) {
         try {
-            Thread.sleep(500);
+            Thread.sleep(200);
             JSONObject currentUser = Sessions.getUser();
             try {
                 final JSONObject requestJSONObject = context.requestJSON();
