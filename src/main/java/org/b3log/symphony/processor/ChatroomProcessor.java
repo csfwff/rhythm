@@ -250,7 +250,6 @@ public class ChatroomProcessor {
      */
     public synchronized void openRedPacket(final RequestContext context) {
         try {
-            Thread.sleep(200);
             JSONObject currentUser = Sessions.getUser();
             try {
                 final JSONObject requestJSONObject = context.requestJSON();
@@ -575,7 +574,9 @@ public class ChatroomProcessor {
             } else if ("rockPaperScissors".equalsIgnoreCase(redPacket.getString("type"))) {
                 RED_PACKET_BUCKET.remove(oId);
             }
-            ChatroomChannel.notifyChat(redPacketStatus);
+            if (got == 0 || (got + 1) == count || (got + 1) % 5 == 0) {
+                ChatroomChannel.notifyChat(redPacketStatus);
+            }
         } catch (Exception e) {
             context.renderJSON(StatusCodes.ERR).renderMsg("红包非法");
             LOGGER.log(Level.ERROR, "Open Red Packet failed on ChatRoomProcessor.");
