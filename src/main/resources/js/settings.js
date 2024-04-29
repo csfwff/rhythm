@@ -419,7 +419,7 @@ var Settings = {
   getPhoneCaptcha: function (csrfToken) {
     $('#phoneGetBtn').attr('disabled', 'disabled').css('opacity', '0.3')
     $.ajax({
-      url: Label.servePath + 'phone/vc',
+      url: Label.servePath + '/settings/phone/vc',
       type: 'POST',
       headers: {'csrfToken': csrfToken},
       data: JSON.stringify({
@@ -438,6 +438,9 @@ var Settings = {
         Util.alert(result.msg)
         $('#phoneGetBtn').removeAttr('disabled').css('opacity', '1')
       },
+      error: function (result) {
+        Util.alert(result.statusText)
+      }
     })
   },
   /**
