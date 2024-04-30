@@ -97,6 +97,7 @@
                                             批量撤回
                                         </button>
                                     </#if>
+                                    <button class="button" onclick="ChatRoom.toggleSmoothMode()">流畅模式: <span id="smoothMode">关闭</span></button>
                                     <button class="button" onclick="ChatRoom.showSiGuoYar()">思过崖</button>
                                     <button class="button" onclick="ChatRoom.flashScreen()">清屏</button>
                                     <button class="green" onclick="ChatRoom.send()">发送</button>

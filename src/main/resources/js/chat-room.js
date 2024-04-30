@@ -533,7 +533,35 @@ var ChatRoom = {
             ChatRoom.changeWidth(width);
         });
 
-        setInterval(ChatRoom.reloadMessages, 5 * 60 * 1000);
+        // 流畅模式
+        let smoothMode = localStorage.getItem("smoothMode") || 'false';
+        if (smoothMode === 'true') {
+            ChatRoom.enableSmoothMode();
+        } else {
+            setInterval(ChatRoom.reloadMessages, 15 * 60 * 1000);
+        }
+    },
+    // 启用流畅模式
+    enableSmoothMode: function () {
+        console.log("Smooth mode enabling...");
+        $('#smoothMode').html('开启');
+        setInterval(ChatRoom.reloadMessages, 3 * 1000);
+    },
+    toggleSmoothMode: function () {
+        let status;
+        if ($('#smoothMode').html() === '开启') {
+            status = 'false';
+        } else {
+            status = 'true';
+        }
+
+        localStorage.setItem("smoothMode", status);
+        if (status === 'true') {
+            Util.notice("success", 5000, "流畅模式已开启，占用内存更小，体验更流畅。");
+            ChatRoom.enableSmoothMode();
+        } else {
+            location.reload();
+        }
     },
     sendBarrager: function () {
         // let color = $("#selectBarragerColor")[0].value;
@@ -566,7 +594,7 @@ var ChatRoom = {
     },
     reloadMessages: function () {
         if (document.documentElement.scrollTop <= 2000) {
-            ChatRoom.flashScreen();
+            ChatRoom.flashScreenQuiet();
         }
     },
     flashScreen: function () {
@@ -583,6 +611,15 @@ var ChatRoom = {
             $('#chats').css("display", "block");
             NProgress.done();
         }, 150);
+    },
+    flashScreenQuiet: function () {
+        page = 1;
+        let chatLength = $("#chats>div");
+        if (chatLength.length > 25) {
+            for (let i = chatLength.length - 1; i > 24; i--) {
+                chatLength[i].remove();
+            }
+        }
     },
     /**
      * 打开思过崖
