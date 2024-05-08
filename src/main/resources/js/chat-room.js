@@ -2241,7 +2241,11 @@ ${result.info.msg}
         // 读取浏览器缓存，获取捕获的用户    和是否捕获关键字
         var robotList = window.localStorage['robot_list'] ? window.localStorage['robot_list'] : '';
         ChatRoom.changeCatchUser(robotList);
-        $('#catch-word').prop('checked', window.localStorage['catch-word-flag'] ? window.localStorage['catch-word-flag'] : false);
+        let status = false;
+        if (window.localStorage['catch-word-flag'] === 'true') {
+            status = true;
+        }
+        $('#catch-word').prop('checked', status);
     },
 
     changeCatchUser: function (robotList) {
