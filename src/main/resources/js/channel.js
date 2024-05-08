@@ -483,7 +483,7 @@ var ChatRoomChannel = {
                     } else {
                         // Chatroom
                         // 判断指令消息
-                        if ($('#catch-word').prop('checked') && (newMd.startsWith("鸽 ") || newMd.startsWith("小冰 ") || newMd.startsWith("凌 ") || newMd.startsWith("ida "))) {
+                        if ($('#catch-word').prop('checked') && newContent.indexOf("\"msgType\":\"redPacket\"") == -1 && (newMd.startsWith("鸽 ") || newMd.startsWith("小冰 ") || newMd.startsWith("凌 ") || newMd.startsWith("ida "))) {
                             let robotDom = '<div class="robot-msg-item"><div class="avatar" style="background-image: url(' + robotAvatar + ')"></div><div class="robot-msg-content"> ' + newContent + ' </div></div>';
                             ChatRoom.addRobotMsg(robotDom);
                         } else {
