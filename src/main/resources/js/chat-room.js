@@ -2181,8 +2181,8 @@ ${result.info.msg}
         var needWidth = sideDom.offsetWidth + chatDom.offsetWidth + 300; // 最小宽度为300px
         if (needWidth > window.innerWidth) {
             // 删除用户捕获相关的组件和按钮
-            $("#robotBtn").remove();
-            $("#robotBox").remove();
+            //$("#robotBtn").remove();
+            //$("#robotBox").remove();
         } else {
             // 自动调整css样式
             var chatDomHeight = window.innerHeight - document.getElementsByClassName('nav')[0].offsetHeight;
