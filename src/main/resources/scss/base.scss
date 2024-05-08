@@ -1876,6 +1876,116 @@ a[class*=" icon-"]:hover {
   }
 }
 
+// 机器人捕获
+.robot-btn {
+  position: fixed;
+  bottom: 40vh;
+  left: 0;
+  z-index: 1024;
+  width: 75px;
+  height: 150px;
+  cursor: pointer;
+}
+#robotBox{
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  z-index: 1024;
+  width: 300px;
+  height: 30px;
+  transition: .4s;
+  background-color: #fff;
+  box-shadow: -2px -2px 5px rgba(0, 0, 0, .3);
+  &:not(.active){
+
+  }
+  &.active{
+    height: 360px;
+  }
+  .robot-tool-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    height: 30px;
+    padding: 0 5px;
+    box-sizing: border-box;
+    background-color: #3b3e43;
+    color: #fff;
+    .robot-toolbar-btn {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      cursor: pointer;
+      svg {
+        display: flex;
+      }
+    }
+  }
+
+  .robot-logo {
+    width: 25px;
+    height: 25px;
+    transform: rotateZ(-25deg);
+  }
+
+  #robotMsgList {
+    padding: 10px;
+    height: 650px;
+    box-sizing: border-box;
+    overflow-y: scroll;
+    overflow-x: hidden;
+    .robot-msg-item {
+      display: flex;
+      margin: 10px 0;
+      .robot-msg-content {
+        position: relative;
+        background-color: var(--background-secondary-color);
+        border-radius: 5px;
+        padding: 8px 15px;
+        overflow: initial;
+        max-width: 75%;
+        font-size: 12px;
+        box-sizing: border-box;
+      }
+    }
+  }
+  .robot-chat-box{
+    .robot-clear-btn {
+      position: absolute;
+      right: 3px;
+      top: 3px;
+      width: 50px;
+      height: 24px;
+      line-height: 24px;
+      text-align: center;
+      cursor: pointer;
+      background-color: #60b044;
+      color: #fff;
+      border-radius: 2px;
+    }
+    .robot-catch-input {
+      margin-left: 15px;
+      height: 30px;
+      padding: 5px 55px 5px 10px;
+      box-sizing: border-box;
+    }
+    .robot-change-btn {
+      position: absolute;
+      right: 60px;
+      top: 3px;
+      width: 100px;
+      height: 24px;
+      line-height: 24px;
+      text-align: center;
+      cursor: pointer;
+      background-color: #60b044;
+      color: #fff;
+      border-radius: 2px;
+    }
+  }
+}
+
 //下面是倒计时窗口
 #timeContent {
   position: fixed;

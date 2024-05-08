@@ -464,6 +464,8 @@ var ChatRoom = {
         ChatRoom.loadAvatarPendant();
         // 加载小冰游戏
         ChatRoom.loadXiaoIceGame();
+        // 初始化用户捕获
+        ChatRoom.initCatchUser();
         // 加载画图
         ChatRoom.charInit('paintCanvas');
         // 监听弹幕
@@ -1311,6 +1313,10 @@ border-bottom: none;
      * @param userName
      */
     shileds: ',',
+    /**
+     * 捕获聊天室 某人 消息
+     */
+    catchUsers: '',
     shiled: function (uName) {
         if (confirm("友好的交流是沟通的基础, 确定要屏蔽 Ta 吗？\n本次屏蔽仅针对当前页面有效, 刷新后需重新屏蔽！")) {
             ChatRoom.shileds += uName +",";
@@ -2166,6 +2172,101 @@ ${result.info.msg}
             ck: ChatRoom.IceGameCK,
             msg: msg
         }));
+    },
+
+    initCatchUser: function () {
+        // 判断页面是否满足用户开启捕获功能
+        var sideDom = document.getElementsByClassName('side')[0];
+        var chatDom = document.getElementsByClassName('chat-room')[0];
+        var needWidth = sideDom.offsetWidth + chatDom.offsetWidth + 300; // 最小宽度为300px
+        if (needWidth > window.innerWidth) {
+            // 删除用户捕获相关的组件和按钮
+            $("#robotBtn").remove();
+            $("#robotBox").remove();
+        } else {
+            // 自动调整css样式
+            var chatDomHeight = window.innerHeight - document.getElementsByClassName('nav')[0].offsetHeight;
+            $("#robotMsgList").attr("style", "height:" + (chatDomHeight - 55) + "px");
+            // $(".robot-active").eq(0).attr("style", "height:" + (chatDomHeight - 25) + "px");
+            // $("#robotBox").attr("style", "height:" + (chatDomHeight - 25) + "px");
+        }
+        // 点击事件
+        $("#robotBtn").click(function () {
+            $("#robotBox").show(200),
+                $("#robotBtn").hide(200),
+                setTimeout(() => {
+                        $("#robotBox").addClass("robot-active");
+                        var chatDomHeight = window.innerHeight - document.getElementsByClassName('nav')[0].offsetHeight;
+                        $("#robotBox").attr("style", "height:" + (chatDomHeight - 25) + "px");
+                    }
+                    , 220)
+        })
+        $("#robotClose").click(function () {
+            var e = $("#robotBox");
+            setTimeout(() => {
+                    $(".robot-chat-input").val(""),
+                        $("#robotBox").hide(200),
+                        $("#robotBtn").show(200)
+                }
+                , e.hasClass("robot-active") ? 420 : 1),
+                e.removeClass("robot-active")
+                e.css("height", "");
+        })
+        $("#robotMinimize").click(function () {
+            $("#robotBox").toggleClass("robot-active")
+        })
+        $("#clearRobotMsg").click(function () {
+            $(".robot-msg-item").remove();
+        })
+        $("#catch-word").click(function () {
+            window.localStorage['catch-word-flag'] = $('#catch-word').prop('checked');
+        })
+        $("#changeCatchUsers").click(function () {
+            Util.alert("" +
+                "<div class=\"form fn__flex-column\">\n" +
+                "<label>\n" +
+                "  <div class=\"ft__smaller\" style=\"float: left\">将捕获的用户id填写到下方输入框；<br>多个用户id的情况用英文逗号隔开。</div>\n" +
+                "  <div class=\"fn-hr5 fn__5\"></div>\n" +
+                "  <input type=\"text\" id=\"robot-catch-user\">\n" +
+                "</label>\n" +
+                "<div class=\"fn-hr5\"></div>\n" +
+                "<div class=\"fn__flex\" style=\"margin-top: 15px; justify-content: flex-end;\">\n" +
+                "  <button class=\"btn btn--confirm\" onclick='ChatRoom.changeCatchUser($(\"#robot-catch-user\").val());Util.closeAlert();'>确认</button>\n" +
+                "</div>\n" +
+                "</div>" +
+                "", "编辑捕获用户列表");
+            $("#robot-catch-user").val(window.localStorage['robot_list'] ? window.localStorage['robot_list'] : '');
+        })
+
+        // 读取浏览器缓存，获取捕获的用户    和是否捕获关键字
+        var robotList = window.localStorage['robot_list'] ? window.localStorage['robot_list'] : '';
+        ChatRoom.changeCatchUser(robotList);
+        $('#catch-word').prop('checked', window.localStorage['catch-word-flag'] ? window.localStorage['catch-word-flag'] : false);
+    },
+
+    changeCatchUser: function (robotList) {
+        if (robotList && robotList.length > 0) {
+            let changeCatch = '<div class="robot-msg-item">' +
+                '<div class="robot-msg-content">当前捕获用户:' + robotList + '</div>' +
+                '</div></div>';
+            $("#robotMsgList").prepend(changeCatch);
+        } else {
+            let changeCatch = '<div class="robot-msg-item">' +
+                '<div class="robot-msg-content">当前不存在需要捕获的用户</div>' +
+                '</div></div>';
+            $("#robotMsgList").prepend(changeCatch);
+        }
+        window.localStorage['robot_list'] = robotList;
+        ChatRoom.catchUsers = robotList.split(",");
+    },
+
+    addRobotMsg: function (t) {
+        $("#robotMsgList").prepend(t);
+        // 当dom元素数量达到一定程度时，只保留最近的n条数据
+        const n = 50;
+        if ($(".robot-msg-item") && $(".robot-msg-item").length > n) {
+            $('.robot-msg-item:gt(n-1)').remove();
+        }
     },
 
     /**

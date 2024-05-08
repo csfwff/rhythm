@@ -472,53 +472,69 @@ var ChatRoomChannel = {
                     $('#barragerUnit').text(data.unit);
                     break;
                 case 'msg':
-                    // Chatroom
-                    if ($("#chatRoomIndex").length === 0 && $("#chatroom" + data.oId).length <= 0) {
-                        ChatRoom.renderMsg(data);
-                        ChatRoom.resetMoreBtnListen();
-                    }
-
-                    // index
-                    if ($("#chatRoomIndex").has("#emptyChatRoom").length !== 0) {
-                        $("#emptyChatRoom").remove();
-                    }
-                    let userNickname = data.userNickname;
                     let userName = data.userName;
-                    if (userNickname !== undefined && userNickname !== "") {
-                        userNickname = userNickname + " ( " + userName + " )"
-                    } else {
-                        userNickname = userName;
-                    }
                     let newContent = data.content;
-                    if (newContent.indexOf("\"msgType\":\"redPacket\"") !== -1) {
-                        newContent = "[收到红包，请在完整版聊天室查看]";
+                    let newMd = data.md;
+                    let robotAvatar = data.userAvatarURL;
+                    // 判断为捕获用户，且不是红包消息的情况
+                    if (ChatRoom.catchUsers.includes(userName) && newContent.indexOf("\"msgType\":\"redPacket\"") == -1) {
+                        let robotDom = '<div class="robot-msg-item"><div class="avatar" style="background-image: url(' + robotAvatar + ')"></div><div class="robot-msg-content"> ' + newContent + ' </div></div>';
+                        ChatRoom.addRobotMsg(robotDom);
+                    } else {
+                        // Chatroom
+                        // 判断指令消息
+                        if ($('#catch-word').prop('checked') && (newMd.startsWith("鸽 ") || newMd.startsWith("小冰 ") || newMd.startsWith("凌 ") || newMd.startsWith("ida "))) {
+                            let robotDom = '<div class="robot-msg-item"><div class="avatar" style="background-image: url(' + robotAvatar + ')"></div><div class="robot-msg-content"> ' + newContent + ' </div></div>';
+                            ChatRoom.addRobotMsg(robotDom);
+                        } else {
+                            if ($("#chatRoomIndex").length === 0 && $("#chatroom" + data.oId).length <= 0) {
+                                ChatRoom.renderMsg(data);
+                                ChatRoom.resetMoreBtnListen();
+                            }
+
+                            // index
+                            if ($("#chatRoomIndex").has("#emptyChatRoom").length !== 0) {
+                                $("#emptyChatRoom").remove();
+                            }
+                            let userNickname = data.userNickname;
+
+                            if (userNickname !== undefined && userNickname !== "") {
+                                userNickname = userNickname + " ( " + userName + " )"
+                            } else {
+                                userNickname = userName;
+                            }
+
+                            if (newContent.indexOf("\"msgType\":\"redPacket\"") !== -1) {
+                                newContent = "[收到红包，请在完整版聊天室查看]";
+                            }
+                            $("#chatRoomIndex").prepend("" +
+                                "<li class=\"fn-flex\" id=\"chatindex" + data.oId + "\" style='display: none; border-bottom: 1px solid #eee;'>\n" +
+                                "    <a rel=\"nofollow\" href=\"/member/" + data.userName + "\">\n" +
+                                "        <div class=\"avatar tooltipped tooltipped-n\"\n" +
+                                "             aria-label=\"" + data.userName + "\"\n" +
+                                "             style=\"background-image:url('" + data.userAvatarURL48 + "')\"></div>\n" +
+                                "    </a>\n" +
+                                "    <div class=\"fn-flex-1\">\n" +
+                                "        <div class=\"ft-smaller\">\n" +
+                                "            <a rel=\"nofollow\" href=\"/member/" + data.userName + "\">\n" +
+                                "                <span class=\"ft-gray\">" + userNickname + "</span>\n" +
+                                "            </a>\n" +
+                                "        </div>\n" +
+                                "        <div class=\"vditor-reset comment " + Label.chatRoomPictureStatus + "\">\n" +
+                                "            " + newContent + "\n" +
+                                "        </div>\n" +
+                                "    </div>\n" +
+                                "</li>");
+                            if ($("#chatRoomIndex li.fn-flex").length === 11) {
+                                $("#chatRoomIndex li.fn-flex:last").fadeOut(199, function () {
+                                    $("#chatRoomIndex li.fn-flex:last").remove();
+                                });
+                            }
+                            $("#chatRoomIndex li:first").slideDown(200);
+                            Util.listenUserCard();
+                            typeof ChatRoom==="object"&&ChatRoom.imageViewer()
+                        }
                     }
-                    $("#chatRoomIndex").prepend("" +
-                        "<li class=\"fn-flex\" id=\"chatindex" + data.oId + "\" style='display: none; border-bottom: 1px solid #eee;'>\n" +
-                        "    <a rel=\"nofollow\" href=\"/member/" + data.userName + "\">\n" +
-                        "        <div class=\"avatar tooltipped tooltipped-n\"\n" +
-                        "             aria-label=\"" + data.userName + "\"\n" +
-                        "             style=\"background-image:url('" + data.userAvatarURL48 + "')\"></div>\n" +
-                        "    </a>\n" +
-                        "    <div class=\"fn-flex-1\">\n" +
-                        "        <div class=\"ft-smaller\">\n" +
-                        "            <a rel=\"nofollow\" href=\"/member/" + data.userName + "\">\n" +
-                        "                <span class=\"ft-gray\">" + userNickname + "</span>\n" +
-                        "            </a>\n" +
-                        "        </div>\n" +
-                        "        <div class=\"vditor-reset comment " + Label.chatRoomPictureStatus + "\">\n" +
-                        "            " + newContent + "\n" +
-                        "        </div>\n" +
-                        "    </div>\n" +
-                        "</li>");
-                    if ($("#chatRoomIndex li.fn-flex").length === 11) {
-                        $("#chatRoomIndex li.fn-flex:last").fadeOut(199, function () {
-                            $("#chatRoomIndex li.fn-flex:last").remove();
-                        });
-                    }
-                    $("#chatRoomIndex li:first").slideDown(200);
-                    Util.listenUserCard();
-                    typeof ChatRoom==="object"&&ChatRoom.imageViewer()
                     break;
             }
         }
