@@ -198,6 +198,25 @@
     </div>
     <div id="iceMsgList"></div>
 </div>
+<div id="robotBtn" class="robot-btn" style=""><img src="https://file.fishpi.cn/2024/05/chatbot-7857bb0c.gif" class="ice-game-icon" style="border-radius: 50%;" alt=""></div>
+<div id="robotBox" style="display: none;" class="">
+    <div class="robot-tool-bar">
+        <img src="https://www.iconninja.com/files/400/1008/1019/align-left-icon.png" class="robot-logo" alt="">
+        用户消息捕获
+        <div class="robot-toolbar-btn">
+            <svg id="robotClose" viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg" width="32" height="32">
+                <title>关闭</title>
+                <path d="M576 512l277.333333 277.333333-64 64-277.333333-277.333333L234.666667 853.333333 170.666667 789.333333l277.333333-277.333333L170.666667 234.666667 234.666667 170.666667l277.333333 277.333333L789.333333 170.666667 853.333333 234.666667 576 512z" fill="#ffffff"></path>' +
+            </svg>
+        </div>
+    </div>
+    <div class="robot-chat-box" style="position: relative; height: 30px">
+        <input id="catch-word" class="robot-catch-input" type="checkbox"> 捕获关键字
+        <div id="changeCatchUsers" class="robot-change-btn">修改捕获用户</div>
+        <div id="clearRobotMsg" class="robot-clear-btn">清屏</div>
+    </div>
+    <div id="robotMsgList"></div>
+</div>
 <#include "footer.ftl">
 <script>
     Label.uploadLabel = "${uploadLabel}";
