@@ -472,19 +472,20 @@ var ChatRoomChannel = {
                     $('#barragerUnit').text(data.unit);
                     break;
                 case 'msg':
+                    console.log(data);
                     let userName = data.userName;
                     let newContent = data.content;
                     let newMd = data.md;
                     let robotAvatar = data.userAvatarURL;
                     // 判断为捕获用户，且不是红包消息的情况
                     if (ChatRoom.catchUsers.includes(userName) && newContent.indexOf("\"msgType\":\"redPacket\"") == -1) {
-                        let robotDom = '<div class="robot-msg-item"><div class="avatar" style="background-image: url(' + robotAvatar + ')"></div><div class="robot-msg-content"> ' + newContent + ' </div></div>';
+                        let robotDom = '<div class="robot-msg-item"><div class="avatar" style="background-image: url(' + robotAvatar + ')"></div><div class="robot-msg-content"><div class="robot-username"><p>'+userName+'</p></div> ' + newContent + ' <div class="fn__right" style="margin-top: 5px; font-size: 10px;">'+data.time+'</div></div></div>';
                         ChatRoom.addRobotMsg(robotDom);
                     } else {
                         // Chatroom
                         // 判断指令消息
                         if ($('#catch-word').prop('checked') && newContent.indexOf("\"msgType\":\"redPacket\"") == -1 && (newMd.startsWith("鸽 ") || newMd.startsWith("小冰 ") || newMd.startsWith("凌 ") || newMd.startsWith("ida "))) {
-                            let robotDom = '<div class="robot-msg-item"><div class="avatar" style="background-image: url(' + robotAvatar + ')"></div><div class="robot-msg-content"> ' + newContent + ' </div></div>';
+                            let robotDom = '<div class="robot-msg-item"><div class="avatar" style="background-image: url(' + robotAvatar + ')"></div><div class="robot-msg-content"><div class="robot-username"><p>'+userName+'</p></div> ' + newContent + ' <div class="fn__right" style="margin-top: 5px; font-size: 10px;">'+data.time+'</div></div></div>';
                             ChatRoom.addRobotMsg(robotDom);
                         } else {
                             if ($("#chatRoomIndex").length === 0 && $("#chatroom" + data.oId).length <= 0) {

@@ -1947,6 +1947,12 @@ a[class*=" icon-"]:hover {
         max-width: 75%;
         font-size: 12px;
         box-sizing: border-box;
+        .robot-username {
+          font-size: 11px;
+          border-bottom: 1px solid #eee;
+          color: #787777;
+          margin-bottom: 5px;
+        }
       }
     }
   }
