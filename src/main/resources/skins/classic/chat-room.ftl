@@ -211,7 +211,7 @@
         </div>
     </div>
     <div class="robot-chat-box" style="position: relative; height: 30px">
-        <input id="catch-word" class="robot-catch-input" type="checkbox"> 捕获关键字
+        <input id="catch-word" class="robot-catch-input" type="checkbox"> 捕获机器人指令
         <div id="changeCatchUsers" class="robot-change-btn">修改捕获用户</div>
         <div id="clearRobotMsg" class="robot-clear-btn">清屏</div>
     </div>
