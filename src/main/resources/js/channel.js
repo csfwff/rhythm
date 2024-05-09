@@ -472,7 +472,6 @@ var ChatRoomChannel = {
                     $('#barragerUnit').text(data.unit);
                     break;
                 case 'msg':
-                    console.log(data);
                     let userName = data.userName;
                     let newContent = data.content;
                     let newMd = data.md;
