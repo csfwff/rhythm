@@ -41,7 +41,7 @@ var redPacketMap = new Map();
 var catchUserParam = window.localStorage['robot_list'] ? window.localStorage['robot_list'] : '';
 var catchUsers = catchUserParam.length > 0 ? catchUserParam.split(',') : [];
 var catchWordFlag = window.localStorage['catch-word-flag'] == true || window.localStorage['catch-word-flag'] == 'true'  ? true : false;
-$('#catch-word').prop('checked', status);
+$('#catch-word').prop('checked', catchWordFlag);
 var ChatRoom = {
     init: function () {
         // 聊天窗口高度设置
