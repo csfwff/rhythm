@@ -38,6 +38,10 @@ var thisClient = 'Web/PC网页端';
 var BarragerColorPicker = null;
 var DarwColorPicker = null;
 var redPacketMap = new Map();
+var catchUserParam = window.localStorage['robot_list'] ? window.localStorage['robot_list'] : '';
+var catchUsers = catchUserParam.length > 0 ? catchUserParam.split(',') : [];
+var catchWordFlag = window.localStorage['catch-word-flag'] == true || window.localStorage['catch-word-flag'] == 'true'  ? true : false;
+$('#catch-word').prop('checked', status);
 var ChatRoom = {
     init: function () {
         // 聊天窗口高度设置
@@ -464,6 +468,8 @@ var ChatRoom = {
         ChatRoom.loadAvatarPendant();
         // 加载小冰游戏
         ChatRoom.loadXiaoIceGame();
+        // 加载用户捕获
+        ChatRoom.initCatchUser();
         // 加载画图
         ChatRoom.charInit('paintCanvas');
         // 监听弹幕
@@ -1653,76 +1659,68 @@ ${result.info.msg}
             // 被屏蔽了,
             return;
         }
-        let isRedPacket = false;
-        let isPlusOne = Label.latestMessage === data.md;
-        try {
-            let msgJSON = $.parseJSON(data.content.replace("<p>", "").replace("</p>", ""));
-            if (msgJSON.msgType === "redPacket") {
-                isRedPacket = true;
-                let type = "未知类型红包";
-                let onclick = 'ChatRoom.unpackRedPacket(\'' + data.oId + '\')';
-                switch (msgJSON.type) {
-                    case "random":
-                        type = "拼手气红包";
-                        break;
-                    case "average":
-                        type = "普通红包";
-                        break;
-                    case "specify":
-                        type = "专属红包";
-                        break;
-                    case "heartbeat":
-                        type = "心跳红包 (慎抢)";
-                        break;
-                    case "rockPaperScissors":
-                        type = "石头剪刀布红包";
-                        if (msgJSON.senderId != Label.currentUserId) {
-                           onclick = '';
-                        }
-                        break;
-                    case "dice":
-                        type = "摇骰子";
-                        if (msgJSON.senderId !== Label.currentUserId) {
-                            let dup = false
-                            for (idx in msgJSON.who) {
-                                if (msgJSON.who[idx].userId === Label.currentUserId) {
-                                    dup = true
-                                    break
+        // 没屏蔽的情况，判断是否需要捕获
+        let userName = data.userName;
+        let newContent = data.content;
+        let newMd = data.md ? data.md : '';
+        let robotAvatar = data.userAvatarURL;
+        if ((!more) && catchUsers.includes(userName) && newContent.indexOf("\"msgType\":\"redPacket\"") == -1) {
+            let robotDom = '<div class="robot-msg-item"><div class="avatar" style="background-image: url(' + robotAvatar + ')"></div><div class="robot-msg-content"><div class="robot-username"><p>'+userName+'</p></div> ' + newContent + ' <div class="fn__right" style="margin-top: 5px; font-size: 10px;">'+data.time+'</div></div></div>';
+            ChatRoom.addRobotMsg(robotDom);
+        } else if ((!more) && $('#catch-word').prop('checked') && newContent.indexOf("\"msgType\":\"redPacket\"") == -1 && (newMd.startsWith("鸽 ") || newMd.startsWith("小冰 ") || newMd.startsWith("凌 ") || newMd.startsWith("ida "))) {
+            let robotDom = '<div class="robot-msg-item"><div class="avatar" style="background-image: url(' + robotAvatar + ')"></div><div class="robot-msg-content"><div class="robot-username"><p>'+userName+'</p></div> ' + newContent + ' <div class="fn__right" style="margin-top: 5px; font-size: 10px;">'+data.time+'</div></div></div>';
+            ChatRoom.addRobotMsg(robotDom);
+        } else {
+            let isRedPacket = false;
+            let isPlusOne = Label.latestMessage === data.md;
+            try {
+                let msgJSON = $.parseJSON(data.content.replace("<p>", "").replace("</p>", ""));
+                if (msgJSON.msgType === "redPacket") {
+                    isRedPacket = true;
+                    let type = "未知类型红包";
+                    let onclick = 'ChatRoom.unpackRedPacket(\'' + data.oId + '\')';
+                    switch (msgJSON.type) {
+                        case "random":
+                            type = "拼手气红包";
+                            break;
+                        case "average":
+                            type = "普通红包";
+                            break;
+                        case "specify":
+                            type = "专属红包";
+                            break;
+                        case "heartbeat":
+                            type = "心跳红包 (慎抢)";
+                            break;
+                        case "rockPaperScissors":
+                            type = "石头剪刀布红包";
+                            if (msgJSON.senderId != Label.currentUserId) {
+                                onclick = '';
+                            }
+                            break;
+                        case "dice":
+                            type = "摇骰子";
+                            if (msgJSON.senderId !== Label.currentUserId) {
+                                let dup = false
+                                for (idx in msgJSON.who) {
+                                    if (msgJSON.who[idx].userId === Label.currentUserId) {
+                                        dup = true
+                                        break
+                                    }
+                                }
+                                if (!dup) {
+                                    onclick = 'ChatRoom.bet(\'' + data.oId + '\')';
                                 }
                             }
-                            if (!dup) {
-                                onclick = 'ChatRoom.bet(\'' + data.oId + '\')';
-                            }
-                        }
-                        break
-                }
-                if (Number(msgJSON.count) === Number(msgJSON.got)) {
-                    let content = "已经被抢光啦"
-                    if (msgJSON.type === 'dice') {
-                        content = "已开盘"
+                            break
                     }
-                    data.content = '' +
-                        '<div style="opacity: .36;" class="hongbao__item fn__flex-inline" onclick="ChatRoom.unpackRedPacket(\'' + data.oId + '\')">\n' +
-                        '    <svg class="ft__red hongbao__icon">\n' +
-                        '        <use xlink:href="#redPacketIcon"></use>\n' +
-                        '    </svg>\n' +
-                        '    <div>\n' +
-                        '        <div>' + msgJSON.msg + '<br><b>' + type + '</b></div>\n' +
-                        '        <div><svg style="vertical-align: -2px; width: 13px; height: 13px"><use xlink:href="#coin"></use></svg> ' + msgJSON.money + '</div>\n' +
-                        '        <div class="ft__smaller ft__fade redPacketDesc">\n' +
-                        content + '\n' +
-                        '        </div>\n' +
-                        '    </div>\n' +
-                        '</div>';
-                } else {
-                    if(msgJSON.type === 'rockPaperScissors' && msgJSON.senderId != Label.currentUserId){
+                    if (Number(msgJSON.count) === Number(msgJSON.got)) {
+                        let content = "已经被抢光啦"
+                        if (msgJSON.type === 'dice') {
+                            content = "已开盘"
+                        }
                         data.content = '' +
-                            '<div class="hongbao__item fn__flex-inline" >\n' +
-                            '    <div class="hongbao__finger_guessing">\n'+
-                            '        <div class="hongbao__finger_guessing_icon" onclick="event.stopPropagation();Util.clearAlert();ChatRoom.unpackRedPacket('+ data.oId +',\'0\');"></div>\n' +
-                            '        <div class="hongbao__finger_guessing_icon" onclick="event.stopPropagation();Util.clearAlert();ChatRoom.unpackRedPacket('+ data.oId +',\'1\');"></div>\n' +
-                            '        <div class="hongbao__finger_guessing_icon" onclick="event.stopPropagation();Util.clearAlert();ChatRoom.unpackRedPacket('+ data.oId +',\'2\');"></div>\n' +
-                            '    </div>\n' +
+                            '<div style="opacity: .36;" class="hongbao__item fn__flex-inline" onclick="ChatRoom.unpackRedPacket(\'' + data.oId + '\')">\n' +
                             '    <svg class="ft__red hongbao__icon">\n' +
                             '        <use xlink:href="#redPacketIcon"></use>\n' +
                             '    </svg>\n' +
@@ -1730,299 +1728,320 @@ ${result.info.msg}
                             '        <div>' + msgJSON.msg + '<br><b>' + type + '</b></div>\n' +
                             '        <div><svg style="vertical-align: -2px; width: 13px; height: 13px"><use xlink:href="#coin"></use></svg> ' + msgJSON.money + '</div>\n' +
                             '        <div class="ft__smaller ft__fade redPacketDesc">\n' +
+                            content + '\n' +
                             '        </div>\n' +
                             '    </div>\n' +
                             '</div>';
                     } else {
-                        data.content = '' +
-                            '<div class="hongbao__item fn__flex-inline" onclick="' + onclick + '">\n' +
-                            '    <svg class="ft__red hongbao__icon">\n' +
-                            '        <use xlink:href="#redPacketIcon"></use>\n' +
-                            '    </svg>\n' +
-                            '    <div>\n' +
-                            '        <div>' + msgJSON.msg + '<br><b>' + type + '</b></div>\n' +
-                            '        <div><svg style="vertical-align: -2px; width: 13px; height: 13px"><use xlink:href="#coin"></use></svg> ' + msgJSON.money + '</div>\n' +
-                            '        <div class="ft__smaller ft__fade redPacketDesc">\n' +
-                            '        </div>\n' +
-                            '    </div>\n' +
-                            '</div>';
+                        if(msgJSON.type === 'rockPaperScissors' && msgJSON.senderId != Label.currentUserId){
+                            data.content = '' +
+                                '<div class="hongbao__item fn__flex-inline" >\n' +
+                                '    <div class="hongbao__finger_guessing">\n'+
+                                '        <div class="hongbao__finger_guessing_icon" onclick="event.stopPropagation();Util.clearAlert();ChatRoom.unpackRedPacket('+ data.oId +',\'0\');"></div>\n' +
+                                '        <div class="hongbao__finger_guessing_icon" onclick="event.stopPropagation();Util.clearAlert();ChatRoom.unpackRedPacket('+ data.oId +',\'1\');"></div>\n' +
+                                '        <div class="hongbao__finger_guessing_icon" onclick="event.stopPropagation();Util.clearAlert();ChatRoom.unpackRedPacket('+ data.oId +',\'2\');"></div>\n' +
+                                '    </div>\n' +
+                                '    <svg class="ft__red hongbao__icon">\n' +
+                                '        <use xlink:href="#redPacketIcon"></use>\n' +
+                                '    </svg>\n' +
+                                '    <div>\n' +
+                                '        <div>' + msgJSON.msg + '<br><b>' + type + '</b></div>\n' +
+                                '        <div><svg style="vertical-align: -2px; width: 13px; height: 13px"><use xlink:href="#coin"></use></svg> ' + msgJSON.money + '</div>\n' +
+                                '        <div class="ft__smaller ft__fade redPacketDesc">\n' +
+                                '        </div>\n' +
+                                '    </div>\n' +
+                                '</div>';
+                        } else {
+                            data.content = '' +
+                                '<div class="hongbao__item fn__flex-inline" onclick="' + onclick + '">\n' +
+                                '    <svg class="ft__red hongbao__icon">\n' +
+                                '        <use xlink:href="#redPacketIcon"></use>\n' +
+                                '    </svg>\n' +
+                                '    <div>\n' +
+                                '        <div>' + msgJSON.msg + '<br><b>' + type + '</b></div>\n' +
+                                '        <div><svg style="vertical-align: -2px; width: 13px; height: 13px"><use xlink:href="#coin"></use></svg> ' + msgJSON.money + '</div>\n' +
+                                '        <div class="ft__smaller ft__fade redPacketDesc">\n' +
+                                '        </div>\n' +
+                                '    </div>\n' +
+                                '</div>';
+                        }
+                    }
+                }
+            } catch (err) {
+            }
+            let meTag1 = "";
+            let meTag2 = "<a onclick=\"ChatRoom.shiled('" + data.userName + "')\" class=\"item\" style='color: red'>屏蔽Ta</a>\n";
+            if (data.userNickname !== undefined && data.userNickname !== "") {
+                data.userNickname = data.userNickname + " (" + data.userName + ")"
+            } else {
+                data.userNickname = data.userName;
+            }
+            if (Label.currentUser === data.userName) {
+                meTag1 = " chats__item--me";
+                meTag2 = "<a onclick=\"ChatRoom.revoke(" + data.oId + ")\" class=\"item\">撤回</a>\n";
+            }
+            // isAdmin
+            if (Label.level3Permitted) {
+                meTag2 = "<a onclick=\"ChatRoom.revoke(" + data.oId + ")\" class=\"item\"><svg><use xlink:href=\"#administration\"></use></svg> 撤回</a>\n";
+            }
+            try {
+                // 判断是否可以收藏为表情包
+                let emojiContent = data.content.replace("<p>", "").replace("</p>", "");
+                let emojiDom = Util.parseDom(emojiContent);
+                let canCollect = false;
+                let srcs = "";
+                let count = 0;
+                for (let i = 0; i < emojiDom.length; i++) {
+                    let cur = emojiDom.item(i);
+                    if (cur.src !== undefined) {
+                        canCollect = true;
+                        if (count !== 0) {
+                            srcs += ",";
+                        }
+                        srcs += "\'" + cur.src + "\'";
+                        count++;
+                    }
+                }
+                if (canCollect) {
+                    meTag2 += "<a onclick=\"ChatRoom.addEmoji(" + srcs + ")\" class=\"item\">一键收藏表情</a>";
+                }
+            } catch (err) {
+            }
+            let newHTML = '<div class="fn-none">';
+            newHTML += '<div id="chatroom' + data.oId + '" class="fn__flex chats__item' + meTag1 + '">\n' +
+                '    <a href="/member/' + data.userName + '" style="height: 38px">\n' +
+                '        <div class="avatar tooltipped__user" aria-label="' + data.userName + '" style="background-image: url(\'' + data.userAvatarURL + '\');"></div>\n' +
+                '    </a>\n' +
+                '    <div class="chats__content">\n' +
+                '        <div class="chats__arrow"></div>\n';
+
+            // let display = Label.currentUser === data.userName && !isPlusOne ? 'display: none;' : ''
+            let display = '';
+            newHTML += '<div id="userName" class="ft__fade ft__smaller" style="' + display + 'padding-bottom: 3px;border-bottom: 1px solid #eee">\n' +
+                '    <span class="ft-gray">' + data.userNickname + '</span>&nbsp;\n';
+            if (data.sysMetal !== undefined && data.sysMetal !== "") {
+                let list = JSON.parse(data.sysMetal).list;
+                if (list !== undefined) {
+                    for (let i = 0; i < list.length; i++) {
+                        let m = list[i];
+                        newHTML += "<img title='" + m.name + " - " + m.description + "' src='" + Util.genMiniMetal(m.attr) + "'/>";
                     }
                 }
             }
-        } catch (err) {
-        }
-        let meTag1 = "";
-        let meTag2 = "<a onclick=\"ChatRoom.shiled('" + data.userName + "')\" class=\"item\" style='color: red'>屏蔽Ta</a>\n";
-        if (data.userNickname !== undefined && data.userNickname !== "") {
-            data.userNickname = data.userNickname + " (" + data.userName + ")"
-        } else {
-            data.userNickname = data.userName;
-        }
-        if (Label.currentUser === data.userName) {
-            meTag1 = " chats__item--me";
-            meTag2 = "<a onclick=\"ChatRoom.revoke(" + data.oId + ")\" class=\"item\">撤回</a>\n";
-        }
-        // isAdmin
-        if (Label.level3Permitted) {
-            meTag2 = "<a onclick=\"ChatRoom.revoke(" + data.oId + ")\" class=\"item\"><svg><use xlink:href=\"#administration\"></use></svg> 撤回</a>\n";
-        }
-        try {
-            // 判断是否可以收藏为表情包
-            let emojiContent = data.content.replace("<p>", "").replace("</p>", "");
-            let emojiDom = Util.parseDom(emojiContent);
-            let canCollect = false;
-            let srcs = "";
-            let count = 0;
-            for (let i = 0; i < emojiDom.length; i++) {
-                let cur = emojiDom.item(i);
-                if (cur.src !== undefined) {
-                    canCollect = true;
-                    if (count !== 0) {
-                        srcs += ",";
-                    }
-                    srcs += "\'" + cur.src + "\'";
-                    count++;
+            newHTML += '</div>';
+
+            newHTML += '        <div class="vditor-reset ft__smaller ' + Label.chatRoomPictureStatus + '" style="margin-top: 3px">\n' +
+                '            ' + data.content + '\n' +
+                '        </div>\n' +
+                '        <div class="ft__smaller ft__fade fn__right date-bar">\n' +
+                '            ' + data.time + '\n' +
+                '                <span class="fn__space5"></span>\n';
+            // 客户端标识
+            if (data.client !== undefined && data.client !== '') {
+                let client = data.client.split('/')[0];
+                let version = data.client.split('/')[1];
+                switch (client) {
+                    case 'Web':
+                        newHTML += '<span class="tooltipped tooltipped-n" aria-label="' + client + ' ' + version + '">' +
+                            '<svg style="vertical-align: -3px;"><use xlink:href="#ic-fish"></use></svg>' +
+                            '</span>';
+                        newHTML += '<span class="fn__space5"></span>\n';
+                        break;
+                    case 'Bird':
+                        newHTML += '<span class="tooltipped tooltipped-n" aria-label="' + client + ' ' + version + '">' +
+                            '<svg style="vertical-align: -3px;"><use xlink:href="#ic-bird"></use></svg>' +
+                            '</span>';
+                        newHTML += '<span class="fn__space5"></span>\n';
+                        break;
+                    case 'Dart':
+                        newHTML += '<span class="tooltipped tooltipped-n" aria-label="' + client + ' ' + version + '">' +
+                            '<svg style="vertical-align: -3px;"><use xlink:href="#ic-dart"></use></svg>' +
+                            '</span>';
+                        newHTML += '<span class="fn__space5"></span>\n';
+                        break;
+                    case 'ElvesOnline':
+                        newHTML += '<span class="tooltipped tooltipped-n" aria-label="' + client + ' ' + version + '">' +
+                            '<svg style="vertical-align: -3px;"><use xlink:href="#ic-moon"></use></svg>' +
+                            '</span>';
+                        newHTML += '<span class="fn__space5"></span>\n';
+                        break;
+                    case 'Mobile':
+                        newHTML += '<span class="tooltipped tooltipped-n" aria-label="' + client + ' ' + version + '">' +
+                            '<svg style="vertical-align: -3px;"><use xlink:href="#ic-mobile"></use></svg>' +
+                            '</span>';
+                        newHTML += '<span class="fn__space5"></span>\n';
+                        break;
+                    case 'Windows':
+                        newHTML += '<span class="tooltipped tooltipped-n" aria-label="' + client + ' ' + version + '">' +
+                            '<svg style="vertical-align: -3px;"><use xlink:href="#ic-windows"></use></svg>' +
+                            '</span>';
+                        newHTML += '<span class="fn__space5"></span>\n';
+                        break;
+                    case 'Linux':
+                        newHTML += '<span class="tooltipped tooltipped-n" aria-label="' + client + ' ' + version + '">' +
+                            '<svg style="vertical-align: -3px;"><use xlink:href="#ic-linux"></use></svg>' +
+                            '</span>';
+                        newHTML += '<span class="fn__space5"></span>\n';
+                        break;
+                    case 'IceNet':
+                        newHTML += '<span class="tooltipped tooltipped-n" aria-label="' + client + ' ' + version + '">' +
+                            '<svg style="vertical-align: -3px;"><use xlink:href="#ic-icenet"></use></svg>' +
+                            '</span>';
+                        newHTML += '<span class="fn__space5"></span>\n';
+                        break;
+                    case 'Extension':
+                        newHTML += '<span class="tooltipped tooltipped-n" aria-label="' + client + ' ' + version + '">' +
+                            '<svg style="vertical-align: -3px;"><use xlink:href="#ic-extension"></use></svg>' +
+                            '</span>';
+                        newHTML += '<span class="fn__space5"></span>\n';
+                        break;
+                    case 'Edge':
+                        newHTML += '<span class="tooltipped tooltipped-n" aria-label="' + client + ' ' + version + '">' +
+                            '<svg style="vertical-align: -3px;"><use xlink:href="#ic-edge"></use></svg>' +
+                            '</span>';
+                        newHTML += '<span class="fn__space5"></span>\n';
+                        break;
+                    case 'Other':
+                        newHTML += '<span class="tooltipped tooltipped-n" aria-label="' + client + ' ' + version + '">' +
+                            '<svg style="vertical-align: -3px;"><use xlink:href="#ic-other"></use></svg>' +
+                            '</span>';
+                        newHTML += '<span class="fn__space5"></span>\n';
+                        break;
+                    case 'PC':
+                        newHTML += '<span class="tooltipped tooltipped-n" aria-label="' + client + ' ' + version + '">' +
+                            '<svg style="vertical-align: -3px;"><use xlink:href="#ic-pc2"></use></svg>' +
+                            '</span>';
+                        newHTML += '<span class="fn__space5"></span>\n';
+                        break;
+                    case 'iOS':
+                        newHTML += '<span class="tooltipped tooltipped-n" aria-label="' + client + ' ' + version + '">' +
+                            '<svg style="vertical-align: -3px;"><use xlink:href="#ic-apple"></use></svg>' +
+                            '</span>';
+                        newHTML += '<span class="fn__space5"></span>\n';
+                        break;
+                    case 'macOS':
+                        newHTML += '<span class="tooltipped tooltipped-n" aria-label="' + client + ' ' + version + '">' +
+                            '<svg style="vertical-align: -3px;"><use xlink:href="#ic-apple"></use></svg>' +
+                            '</span>';
+                        newHTML += '<span class="fn__space5"></span>\n';
+                        break;
+                    case 'Android':
+                        newHTML += '<span class="tooltipped tooltipped-n" aria-label="' + client + ' ' + version + '">' +
+                            '<svg style="vertical-align: -3px;"><use xlink:href="#ic-apk"></use></svg>' +
+                            '</span>';
+                        newHTML += '<span class="fn__space5"></span>\n';
+                        break;
+                    case 'Chrome':
+                        newHTML += '<span class="tooltipped tooltipped-n" aria-label="' + client + ' ' + version + '">' +
+                            '<svg style="vertical-align: -3px;"><use xlink:href="#ic-chrome"></use></svg>' +
+                            '</span>';
+                        newHTML += '<span class="fn__space5"></span>\n';
+                        break;
+                    case 'VSCode':
+                        newHTML += '<span class="tooltipped tooltipped-n" aria-label="' + client + ' ' + version + '">' +
+                            '<svg style="vertical-align: -3px;"><use xlink:href="#ic-vscode"></use></svg>' +
+                            '</span>';
+                        newHTML += '<span class="fn__space5"></span>\n';
+                        break;
+                    case 'IDEA':
+                        newHTML += '<span class="tooltipped tooltipped-n" aria-label="' + client + ' ' + version + '">' +
+                            '<svg style="vertical-align: -3px;"><use xlink:href="#ic-idea"></use></svg>' +
+                            '</span>';
+                        newHTML += '<span class="fn__space5"></span>\n';
+                        break;
+                    case 'Python':
+                        newHTML += '<span class="tooltipped tooltipped-n" aria-label="' + client + ' ' + version + '">' +
+                            '<svg style="vertical-align: -3px;"><use xlink:href="#ic-python"></use></svg>' +
+                            '</span>';
+                        newHTML += '<span class="fn__space5"></span>\n';
+                        break;
+                    case 'Golang':
+                        newHTML += '<span class="tooltipped tooltipped-n" aria-label="' + client + ' ' + version + '">' +
+                            '<svg style="vertical-align: -3px;"><use xlink:href="#ic-golang"></use></svg>' +
+                            '</span>';
+                        newHTML += '<span class="fn__space5"></span>\n';
+                        break;
                 }
             }
-            if (canCollect) {
-                meTag2 += "<a onclick=\"ChatRoom.addEmoji(" + srcs + ")\" class=\"item\">一键收藏表情</a>";
+            // === 客户端标识
+            if (!isRedPacket) {
+                newHTML += '                <details class="details action__item fn__flex-center">\n' +
+                    '                    <summary>\n' +
+                    '                        ···\n' +
+                    '                    </summary>\n' +
+                    '                    <details-menu class="fn__layer">\n' +
+                    '                        <a onclick=\"ChatRoom.at(\'' + data.userName + '\', \'' + data.oId + '\', true)\" class="item">@' + data.userName + '</a>\n' +
+                    '                        <a onclick=\"ChatRoom.at(\'' + data.userName + '\', \'' + data.oId + '\', false)\" class="item">引用</a>\n' +
+                    '                        <a onclick=\"ChatRoom.repeat(\'' + data.oId + '\')\" class="item">复读机</a>\n' +
+                    '                        <a onclick=\"ChatRoom.report(\'' + data.oId + '\')\" class="item"><svg><use xlink:href="#icon-report"></use></svg> 一键举报</a>\n' +
+                    meTag2 +
+                    '                    </details-menu>\n' +
+                    '                </details>\n';
+            } else {
+                newHTML += '                <details class="details action__item fn__flex-center">\n' +
+                    '                    <summary>\n' +
+                    '                        ···\n' +
+                    '                    </summary>\n' +
+                    '                    <details-menu class="fn__layer">\n' +
+                    '                        <a onclick=\"ChatRoom.at(\'' + data.userName + '\', \'' + data.oId + '\', true)\" class="item">@' + data.userName + '</a>\n' +
+                    '                        <a onclick=\"ChatRoom.report(\'' + data.oId + '\')\" class="item"><svg><use xlink:href="#icon-report"></use></svg> 一键举报</a>\n' +
+                    '                    </details-menu>\n' +
+                    '                </details>\n';
             }
-        } catch (err) {
-        }
-        let newHTML = '<div class="fn-none">';
-        newHTML += '<div id="chatroom' + data.oId + '" class="fn__flex chats__item' + meTag1 + '">\n' +
-            '    <a href="/member/' + data.userName + '" style="height: 38px">\n' +
-            '        <div class="avatar tooltipped__user" aria-label="' + data.userName + '" style="background-image: url(\'' + data.userAvatarURL + '\');"></div>\n' +
-            '    </a>\n' +
-            '    <div class="chats__content">\n' +
-            '        <div class="chats__arrow"></div>\n';
-
-        // let display = Label.currentUser === data.userName && !isPlusOne ? 'display: none;' : ''
-        let display = '';
-        newHTML += '<div id="userName" class="ft__fade ft__smaller" style="' + display + 'padding-bottom: 3px;border-bottom: 1px solid #eee">\n' +
-            '    <span class="ft-gray">' + data.userNickname + '</span>&nbsp;\n';
-        if (data.sysMetal !== undefined && data.sysMetal !== "") {
-            let list = JSON.parse(data.sysMetal).list;
-            if (list !== undefined) {
-                for (let i = 0; i < list.length; i++) {
-                    let m = list[i];
-                    newHTML += "<img title='" + m.name + " - " + m.description + "' src='" + Util.genMiniMetal(m.attr) + "'/>";
-                }
-            }
-        }
-        newHTML += '</div>';
-
-        newHTML += '        <div class="vditor-reset ft__smaller ' + Label.chatRoomPictureStatus + '" style="margin-top: 3px">\n' +
-            '            ' + data.content + '\n' +
-            '        </div>\n' +
-            '        <div class="ft__smaller ft__fade fn__right date-bar">\n' +
-            '            ' + data.time + '\n' +
-            '                <span class="fn__space5"></span>\n';
-        // 客户端标识
-        if (data.client !== undefined && data.client !== '') {
-            let client = data.client.split('/')[0];
-            let version = data.client.split('/')[1];
-            switch (client) {
-                case 'Web':
-                    newHTML += '<span class="tooltipped tooltipped-n" aria-label="' + client + ' ' + version + '">' +
-                        '<svg style="vertical-align: -3px;"><use xlink:href="#ic-fish"></use></svg>' +
-                        '</span>';
-                    newHTML += '<span class="fn__space5"></span>\n';
-                    break;
-                case 'Bird':
-                    newHTML += '<span class="tooltipped tooltipped-n" aria-label="' + client + ' ' + version + '">' +
-                        '<svg style="vertical-align: -3px;"><use xlink:href="#ic-bird"></use></svg>' +
-                        '</span>';
-                    newHTML += '<span class="fn__space5"></span>\n';
-                    break;
-                case 'Dart':
-                    newHTML += '<span class="tooltipped tooltipped-n" aria-label="' + client + ' ' + version + '">' +
-                        '<svg style="vertical-align: -3px;"><use xlink:href="#ic-dart"></use></svg>' +
-                        '</span>';
-                    newHTML += '<span class="fn__space5"></span>\n';
-                    break;
-                case 'ElvesOnline':
-                    newHTML += '<span class="tooltipped tooltipped-n" aria-label="' + client + ' ' + version + '">' +
-                        '<svg style="vertical-align: -3px;"><use xlink:href="#ic-moon"></use></svg>' +
-                        '</span>';
-                    newHTML += '<span class="fn__space5"></span>\n';
-                    break;
-                case 'Mobile':
-                    newHTML += '<span class="tooltipped tooltipped-n" aria-label="' + client + ' ' + version + '">' +
-                        '<svg style="vertical-align: -3px;"><use xlink:href="#ic-mobile"></use></svg>' +
-                        '</span>';
-                    newHTML += '<span class="fn__space5"></span>\n';
-                    break;
-                case 'Windows':
-                    newHTML += '<span class="tooltipped tooltipped-n" aria-label="' + client + ' ' + version + '">' +
-                        '<svg style="vertical-align: -3px;"><use xlink:href="#ic-windows"></use></svg>' +
-                        '</span>';
-                    newHTML += '<span class="fn__space5"></span>\n';
-                    break;
-                case 'Linux':
-                    newHTML += '<span class="tooltipped tooltipped-n" aria-label="' + client + ' ' + version + '">' +
-                        '<svg style="vertical-align: -3px;"><use xlink:href="#ic-linux"></use></svg>' +
-                        '</span>';
-                    newHTML += '<span class="fn__space5"></span>\n';
-                    break;
-                case 'IceNet':
-                    newHTML += '<span class="tooltipped tooltipped-n" aria-label="' + client + ' ' + version + '">' +
-                        '<svg style="vertical-align: -3px;"><use xlink:href="#ic-icenet"></use></svg>' +
-                        '</span>';
-                    newHTML += '<span class="fn__space5"></span>\n';
-                    break;
-                case 'Extension':
-                    newHTML += '<span class="tooltipped tooltipped-n" aria-label="' + client + ' ' + version + '">' +
-                        '<svg style="vertical-align: -3px;"><use xlink:href="#ic-extension"></use></svg>' +
-                        '</span>';
-                    newHTML += '<span class="fn__space5"></span>\n';
-                    break;
-                case 'Edge':
-                    newHTML += '<span class="tooltipped tooltipped-n" aria-label="' + client + ' ' + version + '">' +
-                        '<svg style="vertical-align: -3px;"><use xlink:href="#ic-edge"></use></svg>' +
-                        '</span>';
-                    newHTML += '<span class="fn__space5"></span>\n';
-                    break;
-                case 'Other':
-                    newHTML += '<span class="tooltipped tooltipped-n" aria-label="' + client + ' ' + version + '">' +
-                        '<svg style="vertical-align: -3px;"><use xlink:href="#ic-other"></use></svg>' +
-                        '</span>';
-                    newHTML += '<span class="fn__space5"></span>\n';
-                    break;
-                case 'PC':
-                    newHTML += '<span class="tooltipped tooltipped-n" aria-label="' + client + ' ' + version + '">' +
-                        '<svg style="vertical-align: -3px;"><use xlink:href="#ic-pc2"></use></svg>' +
-                        '</span>';
-                    newHTML += '<span class="fn__space5"></span>\n';
-                    break;
-                case 'iOS':
-                    newHTML += '<span class="tooltipped tooltipped-n" aria-label="' + client + ' ' + version + '">' +
-                        '<svg style="vertical-align: -3px;"><use xlink:href="#ic-apple"></use></svg>' +
-                        '</span>';
-                    newHTML += '<span class="fn__space5"></span>\n';
-                    break;
-                case 'macOS':
-                    newHTML += '<span class="tooltipped tooltipped-n" aria-label="' + client + ' ' + version + '">' +
-                        '<svg style="vertical-align: -3px;"><use xlink:href="#ic-apple"></use></svg>' +
-                        '</span>';
-                    newHTML += '<span class="fn__space5"></span>\n';
-                    break;
-                case 'Android':
-                    newHTML += '<span class="tooltipped tooltipped-n" aria-label="' + client + ' ' + version + '">' +
-                        '<svg style="vertical-align: -3px;"><use xlink:href="#ic-apk"></use></svg>' +
-                        '</span>';
-                    newHTML += '<span class="fn__space5"></span>\n';
-                    break;
-                case 'Chrome':
-                    newHTML += '<span class="tooltipped tooltipped-n" aria-label="' + client + ' ' + version + '">' +
-                        '<svg style="vertical-align: -3px;"><use xlink:href="#ic-chrome"></use></svg>' +
-                        '</span>';
-                    newHTML += '<span class="fn__space5"></span>\n';
-                    break;
-                case 'VSCode':
-                    newHTML += '<span class="tooltipped tooltipped-n" aria-label="' + client + ' ' + version + '">' +
-                        '<svg style="vertical-align: -3px;"><use xlink:href="#ic-vscode"></use></svg>' +
-                        '</span>';
-                    newHTML += '<span class="fn__space5"></span>\n';
-                    break;
-                case 'IDEA':
-                    newHTML += '<span class="tooltipped tooltipped-n" aria-label="' + client + ' ' + version + '">' +
-                        '<svg style="vertical-align: -3px;"><use xlink:href="#ic-idea"></use></svg>' +
-                        '</span>';
-                    newHTML += '<span class="fn__space5"></span>\n';
-                    break;
-                case 'Python':
-                    newHTML += '<span class="tooltipped tooltipped-n" aria-label="' + client + ' ' + version + '">' +
-                        '<svg style="vertical-align: -3px;"><use xlink:href="#ic-python"></use></svg>' +
-                        '</span>';
-                    newHTML += '<span class="fn__space5"></span>\n';
-                    break;
-                case 'Golang':
-                    newHTML += '<span class="tooltipped tooltipped-n" aria-label="' + client + ' ' + version + '">' +
-                        '<svg style="vertical-align: -3px;"><use xlink:href="#ic-golang"></use></svg>' +
-                        '</span>';
-                    newHTML += '<span class="fn__space5"></span>\n';
-                    break;
-            }
-        }
-        // === 客户端标识
-        if (!isRedPacket) {
-            newHTML += '                <details class="details action__item fn__flex-center">\n' +
-                '                    <summary>\n' +
-                '                        ···\n' +
-                '                    </summary>\n' +
-                '                    <details-menu class="fn__layer">\n' +
-                '                        <a onclick=\"ChatRoom.at(\'' + data.userName + '\', \'' + data.oId + '\', true)\" class="item">@' + data.userName + '</a>\n' +
-                '                        <a onclick=\"ChatRoom.at(\'' + data.userName + '\', \'' + data.oId + '\', false)\" class="item">引用</a>\n' +
-                '                        <a onclick=\"ChatRoom.repeat(\'' + data.oId + '\')\" class="item">复读机</a>\n' +
-                '                        <a onclick=\"ChatRoom.report(\'' + data.oId + '\')\" class="item"><svg><use xlink:href="#icon-report"></use></svg> 一键举报</a>\n' +
-                meTag2 +
-                '                    </details-menu>\n' +
-                '                </details>\n';
-        } else {
-            newHTML += '                <details class="details action__item fn__flex-center">\n' +
-                '                    <summary>\n' +
-                '                        ···\n' +
-                '                    </summary>\n' +
-                '                    <details-menu class="fn__layer">\n' +
-                '                        <a onclick=\"ChatRoom.at(\'' + data.userName + '\', \'' + data.oId + '\', true)\" class="item">@' + data.userName + '</a>\n' +
-                '                        <a onclick=\"ChatRoom.report(\'' + data.oId + '\')\" class="item"><svg><use xlink:href="#icon-report"></use></svg> 一键举报</a>\n' +
-                '                    </details-menu>\n' +
-                '                </details>\n';
-        }
-        newHTML += '        </div>\n' +
-            '    </div>\n' +
-            '</div></div>';
-        if (more) {
-            $('#chats').append(newHTML);
-            let $fn = $('#chats>div.fn-none');
-            $fn.show();
-            $fn.removeClass("fn-none");
-        }
-        // 堆叠复读机消息
-        else if (isPlusOne) {
-            let plusN = ++Label.plusN;
-            if (plusN === 1) {
-                let stackedHtml = "<div id='stacked' class='fn__flex' style='position:relative;display:none;'>" +
-                    "<span id='plusOne' onclick='ChatRoom.plusOne()' style='display:block;margin-left: 20px'><svg style='width: 30px; height: 20px; cursor: pointer;'><use xlink:href='#plusOneIcon'></use></svg></span>" +
-                    "</div>"
-                $('#chats').prepend(stackedHtml);
-                let latest = $('#chats>div.latest');
-                $('#stacked').prepend(latest);
-                latest.find('#userName').show();
-                latest.removeClass('latest');
-            }
-            let $stacked = $('#stacked');
-            if (plusN !== 1) {
-                $stacked.fadeOut(100);
-            }
-            setTimeout(function () {
-                $stacked.append(newHTML);
-                $stacked.height($stacked.height() + 27 + 'px')
-
-                let $fn = $('#stacked>div.fn-none');
+            newHTML += '        </div>\n' +
+                '    </div>\n' +
+                '</div></div>';
+            if (more) {
+                $('#chats').append(newHTML);
+                let $fn = $('#chats>div.fn-none');
                 $fn.show();
-                $fn.css('left', plusN * 9 + 'px');
-                $fn.css('top', plusN * 27 + 'px');
-                $fn.css('position', 'absolute');
-                $fn.find('.chats__content').css('background-color', plusN % 2 === 0 ? 'rgb(240 245 254)' : 'rgb(245 245 245)');
                 $fn.removeClass("fn-none");
-
-                $stacked.fadeIn(200);
-            }, 100);
-        } else {
-            $('#plusOne').remove();
-            if (data.md) {
-                Label.latestMessage = data.md;
-                Label.plusN = 0;
             }
-            let $chats = $('#chats');
-            $chats.find('.latest').removeClass('latest');
-            $chats.prepend(newHTML);
-            let $fn = $('#chats>div.fn-none');
-            $fn.slideDown(200);
-            $fn.addClass("latest");
-            $fn.removeClass("fn-none");
+            // 堆叠复读机消息
+            else if (isPlusOne) {
+                let plusN = ++Label.plusN;
+                if (plusN === 1) {
+                    let stackedHtml = "<div id='stacked' class='fn__flex' style='position:relative;display:none;'>" +
+                        "<span id='plusOne' onclick='ChatRoom.plusOne()' style='display:block;margin-left: 20px'><svg style='width: 30px; height: 20px; cursor: pointer;'><use xlink:href='#plusOneIcon'></use></svg></span>" +
+                        "</div>"
+                    $('#chats').prepend(stackedHtml);
+                    let latest = $('#chats>div.latest');
+                    $('#stacked').prepend(latest);
+                    latest.find('#userName').show();
+                    latest.removeClass('latest');
+                }
+                let $stacked = $('#stacked');
+                if (plusN !== 1) {
+                    $stacked.fadeOut(100);
+                }
+                setTimeout(function () {
+                    $stacked.append(newHTML);
+                    $stacked.height($stacked.height() + 27 + 'px')
+
+                    let $fn = $('#stacked>div.fn-none');
+                    $fn.show();
+                    $fn.css('left', plusN * 9 + 'px');
+                    $fn.css('top', plusN * 27 + 'px');
+                    $fn.css('position', 'absolute');
+                    $fn.find('.chats__content').css('background-color', plusN % 2 === 0 ? 'rgb(240 245 254)' : 'rgb(245 245 245)');
+                    $fn.removeClass("fn-none");
+
+                    $stacked.fadeIn(200);
+                }, 100);
+            } else {
+                $('#plusOne').remove();
+                if (data.md) {
+                    Label.latestMessage = data.md;
+                    Label.plusN = 0;
+                }
+                let $chats = $('#chats');
+                $chats.find('.latest').removeClass('latest');
+                $chats.prepend(newHTML);
+                let $fn = $('#chats>div.fn-none');
+                $fn.slideDown(200);
+                $fn.addClass("latest");
+                $fn.removeClass("fn-none");
+            }
         }
     },
     /**
@@ -2167,6 +2186,123 @@ ${result.info.msg}
             msg: msg
         }));
     },
+
+    /**
+     * 渲染捕获消息
+     * @param t
+     */
+    addRobotMsg: function (t, more) {
+        // if (more) {
+        //     $("#robotMsgList").append(t);
+        // } else {
+        //     $("#robotMsgList").prepend(t);
+        // }
+        $("#robotMsgList").prepend(t);
+        // 当dom元素数量达到一定程度时，只保留最近的n条数据
+        const n = 50;
+        if ($(".robot-msg-item") && $(".robot-msg-item").length > n) {
+            $('.robot-msg-item:gt(n-1)').remove();
+        }
+    },
+
+    /**
+     * 捕获用户被修改时
+     * @param robotList
+     */
+    changeCatchUser: function (robotList) {
+        if (robotList && robotList.length > 0) {
+            let changeCatch = '<div class="robot-msg-item">' +
+                '<div class="robot-msg-content">当前捕获用户:' + robotList + '</div>' +
+                '</div></div>';
+            $("#robotMsgList").prepend(changeCatch);
+        } else {
+            let changeCatch = '<div class="robot-msg-item">' +
+                '<div class="robot-msg-content">当前不存在需要捕获的用户</div>' +
+                '</div></div>';
+            $("#robotMsgList").prepend(changeCatch);
+        }
+        window.localStorage['robot_list'] = robotList;
+        catchUsers = robotList.split(",");
+    },
+
+    /**
+     * 初始化用户捕获功能
+     */
+    initCatchUser: function () {
+        // 判断页面是否满足用户开启捕获功能
+        // var sideDom = document.getElementsByClassName('side')[0];
+        // var chatDom = document.getElementsByClassName('chat-room')[0];
+        // var needWidth = sideDom.offsetWidth + chatDom.offsetWidth + 300; // 最小宽度为300px
+        // if (needWidth > window.innerWidth) {
+        //     // 删除用户捕获相关的组件和按钮
+        //     //$("#robotBtn").remove();
+        //     //$("#robotBox").remove();
+        // } else {
+        //     // 自动调整css样式
+        //     $("#robotMsgList").attr("style", "height:" + (window.innerHeight - 85 - 58) + "px");
+        //     // $("#robotBox").attr("style", "width:" + ((window.innerWidth - chatDom.offsetWidth - sideDom.offsetWidth) / 2) + "px");
+        //     // $(".robot-active").eq(0).attr("style", "height:" + (chatDomHeight - 25) + "px");
+        //     // $("#robotBox").attr("style", "height:" + (chatDomHeight - 25) + "px");
+        // }
+        // 点击事件
+        $("#robotBtn").click(function () {
+            $("#robotBox").show(200),
+                $("#robotBtn").hide(200),
+                setTimeout(() => {
+                    // 自动调整css样式，每次打开小窗，都要调整小窗高度，宽度目前固定300px;小窗用户概率性出现遮挡聊天室的情况
+                        $("#robotBox").addClass("robot-active");
+                        $("#robotBox").attr("style", "height:" + (window.innerHeight - 25 - 58) + "px");
+                        $("#robotMsgList").attr("style", "height:" + (window.innerHeight - 85 - 58) + "px");
+                    }
+                    , 220)
+        })
+        $("#robotClose").click(function () {
+            var e = $("#robotBox");
+            setTimeout(() => {
+                    $(".robot-chat-input").val(""),
+                        $("#robotBox").hide(200),
+                        $("#robotBtn").show(200)
+                }
+                , e.hasClass("robot-active") ? 420 : 1),
+                e.removeClass("robot-active")
+            e.css("height", "");
+        })
+        $("#robotMinimize").click(function () {
+            $("#robotBox").toggleClass("robot-active")
+        })
+        $("#clearRobotMsg").click(function () {
+            $(".robot-msg-item").remove();
+        })
+        $("#catch-word").click(function () {
+            window.localStorage['catch-word-flag'] = $('#catch-word').prop('checked');
+        })
+        $("#changeCatchUsers").click(function () {
+            Util.alert("" +
+                "<div class=\"form fn__flex-column\">\n" +
+                "<label>\n" +
+                "  <div class=\"ft__smaller\" style=\"float: left\">将捕获的用户id填写到下方输入框；<br>多个用户id的情况用英文逗号隔开。</div>\n" +
+                "  <div class=\"fn-hr5 fn__5\"></div>\n" +
+                "  <input type=\"text\" id=\"robot-catch-user\">\n" +
+                "</label>\n" +
+                "<div class=\"fn-hr5\"></div>\n" +
+                "<div class=\"fn__flex\" style=\"margin-top: 15px; justify-content: flex-end;\">\n" +
+                "  <button class=\"btn btn--confirm\" onclick='ChatRoom.changeCatchUser($(\"#robot-catch-user\").val());Util.closeAlert();'>确认</button>\n" +
+                "</div>\n" +
+                "</div>" +
+                "", "编辑捕获用户列表");
+            $("#robot-catch-user").val(window.localStorage['robot_list'] ? window.localStorage['robot_list'] : '');
+        })
+
+        // 读取浏览器缓存，获取捕获的用户    和是否捕获关键字
+        var robotList = window.localStorage['robot_list'] ? window.localStorage['robot_list'] : '';
+        ChatRoom.changeCatchUser(robotList);
+        let status = false;
+        if (window.localStorage['catch-word-flag'] === 'true') {
+            status = true;
+        }
+        $('#catch-word').prop('checked', status);
+    },
+
 
     /**
      * 按时间加载头像挂件
