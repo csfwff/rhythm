@@ -145,7 +145,7 @@ public final class Markdowns {
      * @return safe HTML content
      */
     public static String clean(final String content, final String baseURI) {
-        final Whitelist whitelist = Whitelist.relaxed().addAttributes(":all", "id", "target", "class", "data-src", "aria-name", "aria-label");
+        final Whitelist whitelist = Whitelist.relaxed().addAttributes(":all", "id", "target", "data-src", "aria-name", "aria-label");
         inputWhitelist(whitelist);
         final Document.OutputSettings outputSettings = new Document.OutputSettings();
         outputSettings.prettyPrint(false);
@@ -449,7 +449,7 @@ public final class Markdowns {
 
     private static void inputWhitelist(final Whitelist whitelist) {
         whitelist.addTags("span", "hr", "kbd", "samp", "tt", "del", "s", "strike", "u", "details", "summary").
-                addAttributes("sup", "class", "id").
+                addAttributes("sup", "id").
                 addAttributes("iframe", "src", "sandbox", "width", "height", "border", "marginwidth", "marginheight").
                 addAttributes("audio", "controls", "src").
                 addAttributes("video", "controls", "src", "width", "height").
@@ -458,15 +458,11 @@ public final class Markdowns {
                 addAttributes("param", "name", "value").
                 addAttributes("input", "type", "disabled", "checked").
                 addAttributes("embed", "src", "type", "width", "height", "wmode", "allowNetworking").
-                addAttributes("pre", "class").
-                addAttributes("code", "class").
-                addAttributes("li", "class", "id").
-                addAttributes("div", "class", "data-code").
-                addAttributes("span", "class").
-                addAttributes("img", "class").
+                addAttributes("li",  "id").
+                addAttributes("div", "data-code").
                 addAttributes("p", "align").
                 addAttributes("th", "align").
-                addAttributes("a", "class", "rel").
+                addAttributes("a", "rel").
                 addAttributes("td", "align");
         whitelist.addProtocols("a", "href", "#");
         whitelist.addProtocols("iframe", "src", "http", "https");
