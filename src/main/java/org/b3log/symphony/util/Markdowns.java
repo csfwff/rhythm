@@ -149,7 +149,7 @@ public final class Markdowns {
         inputWhitelist(whitelist);
         final Document.OutputSettings outputSettings = new Document.OutputSettings();
         outputSettings.prettyPrint(false);
-        final String tmp = Jsoup.clean(content, baseURI, whitelist, outputSettings);
+        final String tmp = Markdowns.clean(content, baseURI, whitelist, outputSettings);
         final Document doc = Jsoup.parseBodyFragment(tmp, baseURI);
         doc.outputSettings().prettyPrint(false);
 
@@ -229,6 +229,18 @@ public final class Markdowns {
         ret = ret.replaceAll("(</?br\\s*/?>\\s*)+", "<br>"); // patch for Jsoup issue
         return ret;
     }
+    
+    public static String clean(String bodyHtml, String baseUri, Whitelist whitelist, Document.OutputSettings outputSettings) {
+        boolean emoji = false;
+        if (bodyHtml.contains("class=\"emoji\"") && bodyHtml.contains("<img")) {
+            emoji = true;
+        }
+        bodyHtml = Jsoup.clean(bodyHtml, baseUri, whitelist, outputSettings);
+        if (emoji == true) {
+            bodyHtml = bodyHtml.replaceAll("<img alt=", "<img class=\"emoji\" alt=");
+        }
+        return bodyHtml;
+    }
 
     /**
      * Converts the specified markdown text to HTML.
@@ -277,7 +289,7 @@ public final class Markdowns {
             inputWhitelist(whitelist);
             Document.OutputSettings outputSettings = new Document.OutputSettings();
             outputSettings.prettyPrint(false);
-            html = Jsoup.clean(html, Latkes.getServePath(), whitelist, outputSettings);
+            html = Markdowns.clean(html, Latkes.getServePath(), whitelist, outputSettings);
             final Document doc = Jsoup.parseBodyFragment(html);
             final List<org.jsoup.nodes.Node> toRemove = new ArrayList<>();
             doc.traverse(new NodeVisitor() {
