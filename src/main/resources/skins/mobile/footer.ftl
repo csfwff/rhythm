@@ -27,19 +27,11 @@
         </div>
         <br>
         <div>
-            技术支持
-        </div>
-        <div>
-            <a href="mailto:chenhui@admin.fishpi.cn" target="_blank">chenhui@admin.fishpi.cn</a>
-        </div>
-        <br>
-        <div>
             摸鱼好站
         </div>
         <div>
             <a target="_blank" href="https://www.cxy521.com/">程序员导航</a><br>
             <a target="_blank" href="https://www.lundao.pub/">论道社区</a><br>
-            <a target="_blank" href="https://www.tsyvps.com/aff/HEHTPGYL">蓝易云</a><br>
             <a target="_blank" href="https://bbs.tampermonkey.net.cn/">油猴中文网</a>
         </div>
         <div class="fn-hr5"></div>
@@ -63,10 +55,7 @@
             </div>
         </div>
         <div class="fn-hr5"></div>
-        <div style="margin-top: 5px">
-            <a href="https://fishpi.cn/article/1655691776330" target="_blank"><svg style="vertical-align: -2px;"><use xlink:href="#ic-wechat"></use></svg> 官方微信群</a>
-        </div>
-        <div class="fn-hr5"></div>
+        <br>
         <div class="ft-smaller" style="display: inline-block">
             <div onclick="window.open('https://www.tsyvps.com/aff/HEHTPGYL')" style="text-align: center;padding: 8px 0px;color: #0f8cee;background-color: #e3f9fd;line-height: 20px;border-radius: 12px;width: 175px;margin-bottom: 15px;cursor: pointer;">
                 <div>

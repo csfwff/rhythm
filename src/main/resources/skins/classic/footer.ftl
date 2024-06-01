@@ -40,18 +40,12 @@
                 &nbsp;｜&nbsp;
                 <a style="margin-right: 0px; padding-right: 0px" target="_blank" href="https://www.lundao.pub/">论道社区</a>
                 &nbsp;｜&nbsp;
-                <a style="margin-right: 0px; padding-right: 0px" target="_blank" href="https://www.tsyvps.com/aff/HEHTPGYL">蓝易云</a>
-                &nbsp;｜&nbsp;
                 <a style="margin-right: 0px; padding-right: 0px" target="_blank" href="https://bbs.tampermonkey.net.cn/">油猴中文网</a>
             </div>
             <div class="fn-clear ft-smaller">
                 <div style="margin-top: 5px">探索</div>
                 <div>
                     <a href="https://github.com/csfwff/rhythm" target="_blank">Rhythm 社区引擎</a>
-                    &nbsp;|&nbsp;
-                    技术支持 <a href="mailto:chenhui@admin.fishpi.cn" target="_blank">chenhui@admin.fishpi.cn</a>
-                    &nbsp;|&nbsp;
-                    <a href="https://fishpi.cn/article/1655691776330" target="_blank"><svg style="vertical-align: -2px;"><use xlink:href="#ic-wechat"></use></svg> 官方微信群</a>
                     &nbsp;|&nbsp;
                     <a href="${servePath}/download">摸鱼派客户端</a>&nbsp;&nbsp;
                     <span>

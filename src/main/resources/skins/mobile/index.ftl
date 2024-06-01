@@ -60,7 +60,7 @@
     </div>
     <div class="tags fn__clear">
         <#list tags as tag>
-            <a class="fn__clear tag" href="${servePath}/tag/${tag.tagURI}">
+            <a class="tag" href="${servePath}/tag/${tag.tagURI}">
                 <#if tag.tagIconPath!="">
                     <img src="${tag.tagIconPath}" alt="${tag.tagTitle}"/>
                 </#if>

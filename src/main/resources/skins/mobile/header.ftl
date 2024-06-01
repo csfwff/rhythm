@@ -23,8 +23,7 @@
         <div class="head-fn fn-left">
             <h1>
                 <a href="${servePath}" aria-label="${symphonyLabel}">
-                    <svg class="swimming"><use xlink:href="#logo"></use></svg>
-                    <img style="position: absolute;top: 0;left: 0; visibility: hidden;width: 100%;" src="https://file.fishpi.cn/2023/09/%E6%9C%AA%E6%A0%87%E9%A2%981-d4d954df.png" alt="${symphonyLabel}">
+                    <svg><use xlink:href="#logo-white"></use></svg>
                 </a>
             </h1>
         </div>
