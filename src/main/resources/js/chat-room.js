@@ -2097,45 +2097,44 @@ ${result.info.msg}
     IceGameCK: localStorage.getItem("IceGameCK") || null,
     loadXiaoIceGame: function () {
         // 连接游戏服务器
-        iceWs = new WebSocket('wss://game.yuis.cc/wss');
-        let iceWsHeart = null;
-        iceWs.onopen = function () {
-            iceWs.send(JSON.stringify({
-                type: 'setUser',
-                user: Label.currentUser,
-                ck: ChatRoom.IceGameCK,
-                uid: Label.currentUserId
-            }))
-            iceWsHeart = setInterval(() => {
-                iceWs.send(JSON.stringify({type: 'hb'}))
-            }, 15000)
-        }
-        iceWs.onclose = function () {
-            let html = `<div class="ice-msg-item">
-                    <div class="ice-msg-content">小冰网络失去连接</div>
-                  </div>`
-            $('#iceMsgList').prepend(html);
-        }
-        iceWs.onerror = function (err) {
+        iceWs = io("wss://game-test.yuis.cc");
+        iceWs.on("hello", function (e) {
+            socket.emit(
+              "setUser",
+              JSON.stringify({
+                  user: Label.currentUser,
+                  ck: ChatRoom.IceGameCK,
+                  uid: Label.currentUserId
+              })
+            );
+        });
+        iceWs.on('connect_error', (error) => {
             let html = `<div class="ice-msg-item">
                     <div class="ice-msg-content">小冰网络维护中...</div>
                   </div>`
             $('#iceMsgList').prepend(html);
-        }
+        });
+        socket.on('disconnect', (timeout) => {
+            let html = `<div class="ice-msg-item">
+                    <div class="ice-msg-content">小冰网络失去连接</div>
+                  </div>`
+            $('#iceMsgList').prepend(html);
+        });
         // 收到消息
-        iceWs.onmessage = function (e) {
-            let data = JSON.parse(e.data);
+        socket.on('gameMsg', (e) => {
+            let data = JSON.parse(e);
             if (data.user === "all" || data.user === Label.currentUser) {
                 let html = `<div class="ice-msg-item">
                     <div class="ice-msg-content">${data.msg}</div>
                   </div>`
                 $('#iceMsgList').prepend(html);
             }
-            if (data.type === "setCK") {
-                ChatRoom.IceGameCK = data.ck;
-                localStorage.setItem("IceGameCK", data.ck);
-            }
-        }
+        });
+        socket.on('setCK', (e) => {
+            let data = JSON.parse(e);
+            ChatRoom.IceGameCK = data.ck;
+            localStorage.setItem("IceGameCK", data.ck);
+        });
         // 打开游戏界面
         $('#xiaoIceGameBtn').click(function () {
             $("#xiaoIceGameBox").show(200);
