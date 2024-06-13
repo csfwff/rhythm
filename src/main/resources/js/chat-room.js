@@ -2097,9 +2097,9 @@ ${result.info.msg}
     IceGameCK: localStorage.getItem("IceGameCK") || null,
     loadXiaoIceGame: function () {
         // 连接游戏服务器
-        iceWs = io("wss://game-test.yuis.cc");
+        iceWs = io("wss://game.yuis.cc");
         iceWs.on("hello", function (e) {
-            socket.emit(
+            iceWs.emit(
               "setUser",
               JSON.stringify({
                   user: Label.currentUser,
@@ -2114,14 +2114,14 @@ ${result.info.msg}
                   </div>`
             $('#iceMsgList').prepend(html);
         });
-        socket.on('disconnect', (timeout) => {
+        iceWs.on('disconnect', (timeout) => {
             let html = `<div class="ice-msg-item">
                     <div class="ice-msg-content">小冰网络失去连接</div>
                   </div>`
             $('#iceMsgList').prepend(html);
         });
         // 收到消息
-        socket.on('gameMsg', (e) => {
+        iceWs.on('gameMsg', (e) => {
             let data = JSON.parse(e);
             if (data.user === "all" || data.user === Label.currentUser) {
                 let html = `<div class="ice-msg-item">
@@ -2130,7 +2130,7 @@ ${result.info.msg}
                 $('#iceMsgList').prepend(html);
             }
         });
-        socket.on('setCK', (e) => {
+        iceWs.on('setCK', (e) => {
             let data = JSON.parse(e);
             ChatRoom.IceGameCK = data.ck;
             localStorage.setItem("IceGameCK", data.ck);
@@ -2175,15 +2175,17 @@ ${result.info.msg}
                   </div>`
         $('#iceMsgList').prepend(uMsg);
         let type = "gameMsg";
-        console.log(/(登录)/.test(msg))
         if (/(登录)/.test(msg)) {
             type = "login"
         }
-        iceWs.send(JSON.stringify({
-            type: type,
-            ck: ChatRoom.IceGameCK,
-            msg: msg
-        }));
+        iceWs.emit(
+            type,
+            JSON.stringify({
+                ck: ChatRoom.IceGameCK,
+                uid:Label.currentUserId,
+                msg: msg
+            })
+        );
     },
 
     /**
