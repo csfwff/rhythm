@@ -169,34 +169,7 @@
 </div>
 <div id="goToTop" style="position:fixed;bottom:20px;right:10%;display:none;"><a href="#"><svg style="width:30px;height:30px;color:#626262;"><use xlink:href="#toTopIcon"></use></svg></a></div>
 <div id="xiaoIceGameBtn" class="ice-game-btn">
-    <img src="${staticServePath}/images/xiaoIce/xiaoIce.gif" class="ice-game-icon" alt="">
-</div>
-<div id="xiaoIceGameBox" style="display: none">
-    <div class="ice-tool-bar">
-        <img src="${staticServePath}/images/xiaoIce/xiaoIce-icon.png" class="ice-logo" alt="">
-        xiaoIce Game
-        <div class="ice-toolbar-btn">
-            <div id="iceMinimize">
-                <svg class="ice-minimize-btn" viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg" width="32" height="32">
-                    <title>最小化</title>
-                    <path d="M128 448h768v128H128z" fill="#ffffff"></path>
-                </svg>
-                <svg class="ice-restore-btn" viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg" width="32" height="32">
-                    <title>还原窗口</title>
-                    <path d="M128.576377 895.420553 128.576377 128.578424l766.846222 0 0 766.842129L128.576377 895.420553zM799.567461 224.434585 224.432539 224.434585l0 575.134923 575.134923 0L799.567461 224.434585z" fill="#ffffff"></path>
-                </svg>
-            </div>
-            <svg id="iceClose" viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg" width="32" height="32">
-                <title>关闭</title>
-                <path d="M576 512l277.333333 277.333333-64 64-277.333333-277.333333L234.666667 853.333333 170.666667 789.333333l277.333333-277.333333L170.666667 234.666667 234.666667 170.666667l277.333333 277.333333L789.333333 170.666667 853.333333 234.666667 576 512z" fill="#ffffff"></path>
-            </svg>
-        </div>
-    </div>
-    <div class="ice-chat-box">
-        <input class="ice-chat-input" type="text" placeholder="开始游戏"/>
-        <div id="iceSendMsg" class="ice-send-btn">发送</div>
-    </div>
-    <div id="iceMsgList"></div>
+    <a href="https://game.yuis.cc" target="_blank"><img src="${staticServePath}/images/xiaoIce/xiaoIce.gif" class="ice-game-icon" alt=""></a>
 </div>
 <div id="robotBtn" class="robot-btn" style=""><img src="https://file.fishpi.cn/2024/05/chatbot-7857bb0c.gif" class="ice-game-icon" style="border-radius: 50%;" alt=""></div>
 <div id="robotBox" style="display: none;" class="">
