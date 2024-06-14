@@ -466,8 +466,6 @@ var ChatRoom = {
 
         // 加载挂件
         ChatRoom.loadAvatarPendant();
-        // 加载小冰游戏
-        ChatRoom.loadXiaoIceGame();
         // 加载用户捕获
         ChatRoom.initCatchUser();
         // 加载画图
@@ -2089,103 +2087,6 @@ ${result.info.msg}
         // console.log("前", this.imgWaitting)
         this.imgWaitting = this.imgWaitting || delayshow()
         // console.log("后", this.imgWaitting)
-    },
-    /**
-     * xiaoIce Game
-     * */
-    iceWs: "",
-    IceGameCK: localStorage.getItem("IceGameCK") || null,
-    loadXiaoIceGame: function () {
-        // 连接游戏服务器
-        iceWs = io("wss://game.yuis.cc");
-        iceWs.on("hello", function (e) {
-            iceWs.emit(
-              "setUser",
-              JSON.stringify({
-                  user: Label.currentUser,
-                  ck: ChatRoom.IceGameCK,
-                  uid: Label.currentUserId
-              })
-            );
-        });
-        iceWs.on('connect_error', (error) => {
-            let html = `<div class="ice-msg-item">
-                    <div class="ice-msg-content">小冰网络维护中...</div>
-                  </div>`
-            $('#iceMsgList').prepend(html);
-        });
-        iceWs.on('disconnect', (timeout) => {
-            let html = `<div class="ice-msg-item">
-                    <div class="ice-msg-content">小冰网络失去连接</div>
-                  </div>`
-            $('#iceMsgList').prepend(html);
-        });
-        // 收到消息
-        iceWs.on('gameMsg', (e) => {
-            let data = JSON.parse(e);
-            if (data.user === "all" || data.user === Label.currentUser) {
-                let html = `<div class="ice-msg-item">
-                    <div class="ice-msg-content">${data.msg}</div>
-                  </div>`
-                $('#iceMsgList').prepend(html);
-            }
-        });
-        iceWs.on('setCK', (e) => {
-            let data = JSON.parse(e);
-            ChatRoom.IceGameCK = data.ck;
-            localStorage.setItem("IceGameCK", data.ck);
-        });
-        // 打开游戏界面
-        $('#xiaoIceGameBtn').click(function () {
-            $("#xiaoIceGameBox").show(200);
-            $('#xiaoIceGameBtn').hide(200);
-            setTimeout(() => {
-                $("#xiaoIceGameBox").addClass('active');
-            }, 220)
-        })
-        // 关闭游戏界面
-        $('#iceClose').click(function () {
-            const gameBox = $("#xiaoIceGameBox")
-            setTimeout(() => {
-                $('.ice-chat-input').val("");
-                $("#xiaoIceGameBox").hide(200);
-                $('#xiaoIceGameBtn').show(200);
-            }, gameBox.hasClass('active') ? 420 : 1)
-            gameBox.removeClass('active');
-        })
-        // 最小化切换
-        $('#iceMinimize').click(function () {
-            $("#xiaoIceGameBox").toggleClass('active');
-        })
-        // 发送指令
-        $('#iceSendMsg').click(ChatRoom.sendIceMsg);
-        $('.ice-chat-input').bind('keypress', function (event) {
-            if (event.keyCode === 13) {
-                event.preventDefault();
-                ChatRoom.sendIceMsg();
-            }
-        });
-    },
-
-    sendIceMsg: function () {
-        let msg = $('.ice-chat-input').val();
-        $('.ice-chat-input').val("");
-        let uMsg = `<div class="ice-msg-item me">
-                    <div class="ice-msg-content">${msg}</div>
-                  </div>`
-        $('#iceMsgList').prepend(uMsg);
-        let type = "gameMsg";
-        if (/(登录)/.test(msg)) {
-            type = "login"
-        }
-        iceWs.emit(
-            type,
-            JSON.stringify({
-                ck: ChatRoom.IceGameCK,
-                uid:Label.currentUserId,
-                msg: msg
-            })
-        );
     },
 
     /**
