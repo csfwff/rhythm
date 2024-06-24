@@ -351,7 +351,10 @@ public class ActivityQueryService {
             // 渲染用户信息
             for (final JSONObject data : gameData) {
                 String userId = data.optString("userId");
-                data.put("profile", userRepository.get(userId));
+                JSONObject user = userRepository.get(userId);
+                removePrivateData(user);
+                data.put("profile", user);
+
                 data.put("data", new JSONObject(data.optString("data")));
             }
 
@@ -403,7 +406,9 @@ public class ActivityQueryService {
             // 渲染用户信息
             for (final JSONObject data : gameData) {
                 String userId = data.optString("userId");
-                data.put("profile", userRepository.get(userId));
+                JSONObject user = userRepository.get(userId);
+                removePrivateData(user);
+                data.put("profile", user);
                 data.put("data", new JSONObject(data.optString("data")));
                 try {
                     data.put("achievement", new JSONArray(data.optJSONObject("data").optString("ACHV")).length());
@@ -562,5 +567,16 @@ public class ActivityQueryService {
         }
 
         return ret;
+    }
+
+    private void removePrivateData(JSONObject user) {
+        user.remove("userPassword");
+        user.remove("userLatestLoginIP");
+        user.remove("userPhone");
+        user.remove("userQQ");
+        user.remove("userCity");
+        user.remove("userCountry");
+        user.remove("userEmail");
+        user.remove("secret2fa");
     }
 }
