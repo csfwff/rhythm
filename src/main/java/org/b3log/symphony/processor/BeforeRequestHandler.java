@@ -69,6 +69,7 @@ public class BeforeRequestHandler implements Handler {
             add("103.239.101.147");
             add("127.0.0.1");
             add("[0:0:0:0:0:0:0:1]");
+            add("43.155.63.117");
         }};
 
     @Override
