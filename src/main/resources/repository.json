@@ -2195,6 +2195,59 @@
           "description": "是否公开"
         }
       ]
+    },
+    {
+      "name": "upload",
+      "description": "上传文件信息",
+      "keys": [
+        {
+          "name": "oId",
+          "type": "String",
+          "length": 19,
+          "description": "主键"
+        },
+        {
+          "name": "type",
+          "type": "String",
+          "length": 20,
+          "description": "文件类型"
+        },
+        {
+          "name": "userName",
+          "type": "String",
+          "length": 50,
+          "description": "用户名"
+        },
+        {
+          "name": "ip",
+          "type": "String",
+          "length": 50,
+          "description": "上传IP"
+        },
+        {
+          "name": "time",
+          "type": "String",
+          "length": 50,
+          "description": "上传时间"
+        },
+        {
+          "name": "path",
+          "type": "String",
+          "length": 200,
+          "description": "上传路径"
+        },
+        {
+          "name": "md5",
+          "type": "String",
+          "length": 50,
+          "description": "文件md5"
+        },
+        {
+          "name": "public",
+          "type": "boolean",
+          "description": "是否公开"
+        }
+      ]
     }
   ]
 }
