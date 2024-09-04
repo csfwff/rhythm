@@ -198,7 +198,7 @@
 <script src="${staticServePath}/js/lib/jquery/file-upload-9.10.1/jquery.fileupload.min.js"></script>
 <script src="${staticServePath}/js/channel${miniPostfix}.js?${staticResourceVersion}"></script>
 <script src="${staticServePath}/js/chat-room${miniPostfix}.js?${staticResourceVersion}"></script>
-<script src="${staticServePath}/js/lib/viewer.min.js"></script>
+<script src="${staticServePath}/js/lib/viewer.min.js?${staticResourceVersion}"></script>
 <script src="${staticServePath}/js/lib/barrager/jquery.barrager.min.js"></script>
 <script src="${staticServePath}/js/lib/xncolorpicker.min.js"></script>
 <script>
