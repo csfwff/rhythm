@@ -61,7 +61,6 @@ var ChatRoom = {
         if ($('#chatContent').length === 0) {
             return false
         }
-
         ChatRoom.editor = Util.newVditor({
             id: 'chatContent',
             cache: true,
@@ -125,6 +124,11 @@ var ChatRoom = {
         //   window.open($(this).attr('src'));
         // });
 
+        // 加载备注
+        let userRemarkList = localStorage.getItem('user_remark');
+        if(userRemarkList){
+            ChatRoom.remarkList = JSON.parse(userRemarkList);
+        }
         // 表情包初始化
         // 加载表情
         ChatRoom.listenUploadEmojis();
@@ -1407,6 +1411,36 @@ border-bottom: none;
         $(window).scrollTop(0);
     },
     /**
+     * 给用户添加备注
+     */
+    remarkList:{},
+    remark: function(userId,userName){
+        console.log(userId,userName);
+        let userRemark = prompt(`要给 ${userName} 备注什么呢?`);
+        console.log(userRemark);
+        if(userRemark === null) return;
+        if(userRemark === ''){
+            delete ChatRoom.remarkList[userId];
+        }else{
+            ChatRoom.remarkList[userId] = userRemark;
+        }
+        localStorage.setItem('user_remark',JSON.stringify(ChatRoom.remarkList));
+    },
+    /**
+     * 过滤消息中的图片
+     * */
+    filterContent: function(content){
+        let dom = document.createElement("div");
+        dom.innerHTML = content;
+        let imgList = dom.querySelectorAll('img');
+        imgList.forEach(ele=>{
+            //if(ele.src.startsWith('https://file.fishpi.cn')){
+                ele.src = ele.src + '?imageView2/1/w/150/h/150/interlace/0/q/90'
+            //}
+        })
+        return dom.innerHTML;
+    },
+    /**
      * 渲染抢到红包的人的列表
      *
      * @param who
@@ -1662,6 +1696,8 @@ ${result.info.msg}
         let newContent = data.content;
         let newMd = data.md ? data.md : '';
         let robotAvatar = data.userAvatarURL;
+        // 看看是否有备注
+        let remark = ChatRoom.remarkList[data.userOId];
         if ((!more) && catchUsers.includes(userName) && newContent.indexOf("\"msgType\":\"redPacket\"") == -1) {
             let robotDom = '<div class="robot-msg-item"><div class="avatar" style="background-image: url(' + robotAvatar + ')"></div><div class="robot-msg-content"><div class="robot-username"><p>'+userName+'</p></div> ' + newContent + ' <div class="fn__right" style="margin-top: 5px; font-size: 10px;">'+data.time+'</div></div></div>';
             ChatRoom.addRobotMsg(robotDom);
@@ -1816,7 +1852,7 @@ ${result.info.msg}
             // let display = Label.currentUser === data.userName && !isPlusOne ? 'display: none;' : ''
             let display = '';
             newHTML += '<div id="userName" class="ft__fade ft__smaller" style="' + display + 'padding-bottom: 3px;border-bottom: 1px solid #eee">\n' +
-                '    <span class="ft-gray">' + data.userNickname + '</span>&nbsp;\n';
+                '    <span class="ft-gray">'+ (remark != null ? (remark+'-') : '') + data.userNickname + '</span>&nbsp;\n';
             if (data.sysMetal !== undefined && data.sysMetal !== "") {
                 let list = JSON.parse(data.sysMetal).list;
                 if (list !== undefined) {
@@ -1829,7 +1865,7 @@ ${result.info.msg}
             newHTML += '</div>';
 
             newHTML += '        <div class="vditor-reset ft__smaller ' + Label.chatRoomPictureStatus + '" style="margin-top: 3px">\n' +
-                '            ' + data.content + '\n' +
+                '            ' + ChatRoom.filterContent(data.content) + '\n' +
                 '        </div>\n' +
                 '        <div class="ft__smaller ft__fade fn__right date-bar">\n' +
                 '            ' + data.time + '\n' +
@@ -1971,6 +2007,7 @@ ${result.info.msg}
                     '                        <a onclick=\"ChatRoom.at(\'' + data.userName + '\', \'' + data.oId + '\', true)\" class="item">@' + data.userName + '</a>\n' +
                     '                        <a onclick=\"ChatRoom.at(\'' + data.userName + '\', \'' + data.oId + '\', false)\" class="item">引用</a>\n' +
                     '                        <a onclick=\"ChatRoom.repeat(\'' + data.oId + '\')\" class="item">复读机</a>\n' +
+                    '                        <a onclick=\"ChatRoom.remark(\'' + data.userOId + '\', \'' + data.userName + '\')\" class="item">备注</a>\n' +
                     '                        <a onclick=\"ChatRoom.report(\'' + data.oId + '\')\" class="item"><svg><use xlink:href="#icon-report"></use></svg> 一键举报</a>\n' +
                     meTag2 +
                     '                    </details-menu>\n' +
