@@ -712,6 +712,7 @@ public class ChatroomProcessor {
             String userId = currentUser.optString(Keys.OBJECT_ID);
 
             if (content.startsWith("[redpacket]") && content.endsWith("[/redpacket]")) {
+                LOGGER.log(Level.INFO, "Sent red packet [content={}], userName={}]", content, userName);
                 // 是否收税
                 Boolean collectTaxes = false;
                 // 税率
