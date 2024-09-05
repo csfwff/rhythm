@@ -546,8 +546,8 @@ public class IndexProcessor {
             Elements imgElements = doc.select("img");
             for (Element img : imgElements) {
                 String src = img.attr("src");
-                // 在 src 后面加上 ?imageView2/1/w/150/h/150/interlace/0/q/90
-                img.attr("src", src + "?imageView2/1/w/150/h/150/interlace/0/q/90");
+                // 在 src 后面加上 ?imageView2/0/w/150/h/150/interlace/0/q/90
+                img.attr("src", src + "?imageView2/0/w/150/h/150/interlace/0/q/90");
             }
 
             // 更新 message 中的 content 字段

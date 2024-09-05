@@ -559,7 +559,7 @@ var ChatRoomChannel = {
         let imgList = dom.querySelectorAll('img');
         imgList.forEach(ele=>{
             //if(ele.src.startsWith('https://file.fishpi.cn')){
-            ele.src = ele.src + '?imageView2/1/w/150/h/150/interlace/0/q/90'
+            ele.src = ele.src + '?imageView2/0/w/150/h/150/interlace/0/q/90'
             //}
         })
         return dom.innerHTML;
