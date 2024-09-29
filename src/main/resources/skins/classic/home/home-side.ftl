@@ -97,7 +97,7 @@
         </div>
         </#if>
         <div class="user-info">
-            <span class="ft-gray">${symphonyLabel}</span>
+            <span class="ft-gray">${symphonyLabelClear}</span>
             ${user.userNo?c}
             <span class="ft-gray">${numMemberLabel}</span>, <#if 0 == user.userAppRole>${hackerLabel}<#else>${painterLabel}</#if>
         <span class="ft-gray">${pointLabel}</span>
