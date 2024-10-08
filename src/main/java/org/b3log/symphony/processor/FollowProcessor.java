@@ -116,7 +116,11 @@ public class FollowProcessor {
 
         final JSONObject requestJSONObject = context.requestJSON();
         final String followingUserId = requestJSONObject.optString(Follow.FOLLOWING_ID);
-        final JSONObject currentUser = Sessions.getUser();
+        JSONObject currentUser = Sessions.getUser();
+        try {
+            currentUser = ApiProcessor.getUserByKey(requestJSONObject.optString("apiKey"));
+        } catch (NullPointerException ignored) {
+        }
         final String followerUserId = currentUser.optString(Keys.OBJECT_ID);
 
         followMgmtService.followUser(followerUserId, followingUserId);
@@ -149,7 +153,11 @@ public class FollowProcessor {
         context.renderJSON(StatusCodes.SUCC);
         final JSONObject requestJSONObject = context.requestJSON();
         final String followingUserId = requestJSONObject.optString(Follow.FOLLOWING_ID);
-        final JSONObject currentUser = Sessions.getUser();
+        JSONObject currentUser = Sessions.getUser();
+        try {
+            currentUser = ApiProcessor.getUserByKey(requestJSONObject.optString("apiKey"));
+        } catch (NullPointerException ignored) {
+        }
         final String followerUserId = currentUser.optString(Keys.OBJECT_ID);
         followMgmtService.unfollowUser(followerUserId, followingUserId);
     }
