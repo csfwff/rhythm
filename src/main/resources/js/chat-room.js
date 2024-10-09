@@ -1434,10 +1434,10 @@ border-bottom: none;
         dom.innerHTML = content;
         let imgList = dom.querySelectorAll('img');
         imgList.forEach(ele=>{
-            ele.setAttribute('originalsrc', ele.src);
-            //if(ele.src.startsWith('https://file.fishpi.cn')){
-                ele.src = ele.src + '?imageView2/0/w/150/h/150/interlace/0/q/90'
-            //}
+          ele.setAttribute('originalsrc', ele.src);
+            if(ele.src.startsWith('https://file.fishpi.cn')){
+                ele.src = ele.src.split('?')[0] + '?imageView2/0/w/150/h/150/interlace/0/q/90'
+            }
         })
         return dom.innerHTML;
     },
