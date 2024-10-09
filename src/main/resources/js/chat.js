@@ -46,7 +46,7 @@ var Chat = {
         reqRecentList = $.ajax({
             url: Label.servePath + '/chat/get-list?apiKey=' + apiKey,
             type: 'GET',
-            async: false,
+            async: true,
             success: function (result) {
                 if (0 === result.result) {
                     let data = result.data;
@@ -78,6 +78,7 @@ var Chat = {
                     var reqLoadUser = $.ajax({
                         url: Label.servePath + "/user/" + toUser,
                         type: "GET",
+                        async: true,
                         success: function (result) {
                             if (result.code === -1) {
                                 alert('指定的用户名不存在，请检查后重试！');
@@ -108,7 +109,7 @@ var Chat = {
                     $.ajax({
                         url: Label.servePath + '/chat/has-unread?apiKey=' + apiKey,
                         type: 'GET',
-                        async: false,
+                        async: true,
                         success: function (result) {
                             let count = result.result;
                             let list = result.data;
@@ -119,6 +120,8 @@ var Chat = {
                     });
                 } else {
                     // 已选定用户，获取第一页聊天信息
+                    // 选中用户
+                    $("#chatTo" + toUser).css("background-color", "#f1f1f1");
                     // 状态
                     $("#chatStatus").html('和 ' +
                         '<a href="' + Label.servePath + '/member/' + toUser + '">' + toUser + '</a> ' +
@@ -210,7 +213,8 @@ var Chat = {
                                     // 用户已读
                                     $.ajax({
                                         url: Label.servePath + "/chat/mark-as-read?apiKey=" + apiKey + "&fromUser=" + Chat.toUser,
-                                        type: "GET"
+                                        type: "GET",
+                                        async: true
                                     });
                                 }
                             }
@@ -239,13 +243,13 @@ var Chat = {
                     $.ajax({
                         url: Label.servePath + "/chat/mark-as-read?apiKey=" + apiKey + "&fromUser=" + Chat.toUser,
                         type: "GET",
-                        async: false
+                        async: true
                     });
                     // 加载未读消息
                     var loadUnread = $.ajax({
                         url: Label.servePath + '/chat/has-unread?apiKey=' + apiKey,
                         type: 'GET',
-                        async: false,
+                        async: true,
                         success: function (result) {
                             let count = result.result;
                             let list = result.data;
@@ -253,10 +257,6 @@ var Chat = {
                                 $("#chatTo" + data.senderUserName).css("background-color", "#fff4eb");
                             });
                         }
-                    });
-                    $.when(loadUnread).done(function () {
-                        // 选中用户
-                        $("#chatTo" + toUser).css("background-color", "#f1f1f1");
                     });
                 }
             });
@@ -279,7 +279,7 @@ var Chat = {
                 $.ajax({
                     url: Label.servePath + "/chat/get-message?apiKey=" + apiKey + "&toUser=" + Chat.toUser + "&page=" + Chat.page + "&pageSize=20",
                     type: "GET",
-                    async: false,
+                    async: true,
                     success: function (result) {
                         try {
                             result.data.length;
@@ -448,7 +448,8 @@ var Chat = {
     revoke(oId) {
         $.ajax({
             url: Label.servePath + "/chat/revoke?apiKey=" + apiKey + "&oId=" + oId,
-            type: "GET"
+            type: "GET",
+            async: true
         });
     },
 
@@ -456,6 +457,7 @@ var Chat = {
         $.ajax({
             url: Label.servePath + "/chat/mark-all-as-read?apiKey=" + apiKey,
             type: "GET",
+            async: true,
             success: function (result) {
                 result.users.forEach((user) => {
                     $("#chatTo" + user).css("background-color", "");

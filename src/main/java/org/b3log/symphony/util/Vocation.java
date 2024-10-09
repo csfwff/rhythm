@@ -96,7 +96,7 @@ public class Vocation {
                 return false;
             }
         } catch (Exception e) {
-            LOGGER.log(Level.ERROR, "Failed to refresh Vocation Date. [vocationData=\"" + vocationData + "\"]", e);
+            LOGGER.log(Level.ERROR, "Failed to refresh Vocation Date. [vocationData=\"" + vocationData + "\"]");
             return false;
         }
     }
