@@ -493,7 +493,7 @@ var ChatRoomChannel = {
                     if (newContent.indexOf("\"msgType\":\"redPacket\"") !== -1) {
                         newContent = "[收到红包，请在完整版聊天室查看]";
                     }
-                    if (newContent.indexOf("\"type\":\"weather\"") !== -1) {
+                    if (newContent.indexOf("\"msgType\":\"weather\"") !== -1) {
                         newContent = "[天气卡片，请在完整版聊天室查看]";
                     }
                     $("#chatRoomIndex").prepend("" +
