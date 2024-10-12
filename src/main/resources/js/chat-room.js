@@ -1800,7 +1800,7 @@ ${result.info.msg}
                                 '</div>';
                         }
                     }
-                }else if(msgJSON.type === "weather"){
+                }else if(msgJSON.msgType === "weather"){
                     isWeather = true;
                     data.content = '<div id="weather_'+ data.oId +'" style="width: 300px;height:280px;" data-date="'+msgJSON.date+'" data-code="'+msgJSON.weatherCode+'" data-max="'+msgJSON.max+'" data-min="'+msgJSON.min+'" data-t="'+msgJSON.t+'" data-st="'+msgJSON.st+'"></div>';
                 }

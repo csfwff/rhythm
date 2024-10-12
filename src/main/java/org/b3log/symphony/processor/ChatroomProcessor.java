@@ -907,13 +907,14 @@ public class ChatroomProcessor {
                 }
             }  else if (content.startsWith("[weather]") && content.endsWith("[/weather]")){
                 String weatherString = content.replaceAll("^\\[weather\\]", "").replaceAll("\\[/weather\\]$", "");
-
+                JSONObject weather = new JSONObject(weatherString);
+                weather.put("msgType","weather");
                 // 加活跃
                 incLiveness(userId);
                 // 聊天室内容保存到数据库
                 final Transaction transaction = chatRoomRepository.beginTransaction();
                 try {
-                    msg.put(Common.CONTENT, weatherString);
+                    msg.put(Common.CONTENT, weather.toString());
                     String oId = chatRoomRepository.add(new JSONObject().put("content", msg.toString()));
                     msg.put("oId", oId);
                 } catch (RepositoryException e) {
