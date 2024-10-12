@@ -556,7 +556,6 @@ var ChatRoomChannel = {
      * 过滤消息中的图片
      * */
     filterContent: function(content){
-        console.log(content);
         let dom = document.createElement("div");
         dom.innerHTML = content;
         let imgList = dom.querySelectorAll('img');
