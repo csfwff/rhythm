@@ -1707,6 +1707,7 @@ ${result.info.msg}
             ChatRoom.addRobotMsg(robotDom);
         } else {
             let isRedPacket = false;
+            let isWeather = false;
             let isPlusOne = Label.latestMessage === data.md;
             try {
                 let msgJSON = $.parseJSON(data.content.replace("<p>", "").replace("</p>", ""));
@@ -1801,6 +1802,9 @@ ${result.info.msg}
                                 '</div>';
                         }
                     }
+                }else if(msgJSON.type === "weather"){
+                    isWeather = true;
+                    data.content = '<div id="weather_'+ data.oId +'" style="width: 300px;height:280px;" data-date="'+msgJSON.date+'" data-code="'+msgJSON.weatherCode+'" data-max="'+msgJSON.max+'" data-min="'+msgJSON.min+'" data-t="'+msgJSON.t+'" data-st="'+msgJSON.st+'"></div>';
                 }
             } catch (err) {
             }
@@ -2078,7 +2082,236 @@ ${result.info.msg}
                 $fn.addClass("latest");
                 $fn.removeClass("fn-none");
             }
+            if(isWeather){
+                ChatRoom.initNewWeather(data.oId);
+            }
         }
+    },
+    /**
+     *
+     */
+    initNewWeather: function(oId){
+        let chartDom = document.getElementById('weather_'+ oId);
+        let myChart = echarts.init(chartDom, null, {
+            renderer: 'svg'
+        });
+        let option;
+        let CodeMap = {
+            CLEAR_DAY: "晴",
+            CLEAR_NIGHT: "晴",
+            PARTLY_CLOUDY_DAY: "多云 ",
+            PARTLY_CLOUDY_NIGHT: "多云",
+            CLOUDY: "阴",
+            LIGHT_HAZE: "轻度雾霾",
+            MODERATE_HAZE: "中度雾霾",
+            HEAVY_HAZE: "重度雾霾",
+            LIGHT_RAIN: "小雨",
+            MODERATE_RAIN: "中雨",
+            HEAVY_RAIN: "大雨",
+            STORM_RAIN: "暴雨",
+            FOG: "雾",
+            LIGHT_SNOW: "小雪",
+            MODERATE_SNOW: "中雪",
+            HEAVY_SNOW: "大雪",
+            STORM_SNOW: "暴雪",
+            DUST: "浮尘",
+            SAND: "沙尘",
+            WIND: "大风",
+        }
+        let searchObj = {}
+
+        searchObj.date = chartDom.dataset.date.split(",");
+        searchObj.max = chartDom.dataset.max.split(",");
+        searchObj.min = chartDom.dataset.min.split(",");
+        searchObj.weatherCode = chartDom.dataset.code.split(",");
+        searchObj.weatherName = [];
+        searchObj.t = chartDom.dataset.t;
+        searchObj.st = chartDom.dataset.st;
+        for (var i = 0; i < searchObj.weatherCode.length; i++) {
+            searchObj.weatherName.push(CodeMap[searchObj.weatherCode[i]])
+        }
+        option = {
+            title: {
+                text: searchObj.t,
+                subtext: searchObj.st,
+                left: "center",
+                top: "top",
+                textStyle: {
+                    fontSize: 24
+                },
+                subtextStyle: {
+                    fontSize: 14
+                }
+            },
+            grid: {
+                show: true,
+                backgroundColor: 'transparent',
+                opacity: 0.3,
+                borderWidth: '0',
+                top: '200',
+                bottom: '50'
+            },
+            tooltip: {
+                trigger: 'axis'
+            },
+            legend: {
+                show: false
+            },
+            xAxis: [
+                // 日期
+                {
+                    type: 'category',
+                    boundaryGap: false,
+                    position: 'top',
+                    offset: 100,
+                    zlevel: 100,
+                    axisLine: {
+                        show: false
+                    },
+                    axisTick: {
+                        show: false
+                    },
+                    axisLabel: {
+                        interval: 0,
+                        formatter: ['{a|{value}}'].join('\n'),
+                        rich: {
+                            a: {
+                                fontSize: 14
+                            }
+                        }
+                    },
+                    nameTextStyle: {},
+                    data: searchObj.date
+                },
+                // 天气图标
+                {
+                    type: 'category',
+                    boundaryGap: false,
+                    position: 'top',
+                    offset: 20,
+                    zlevel: 100,
+                    axisLine: {
+                        show: false
+                    },
+                    axisTick: {
+                        show: false
+                    },
+                    axisLabel: {
+                        interval: 0,
+                        formatter: function(value, index) {
+                            return '{' + index + '| }\n{b|' + value + '}';
+                        },
+                        rich: {
+                            0: {
+                                backgroundColor: {
+                                    image: Label.servePath+`/images/weather/svg/${searchObj.weatherCode[0]}.svg`
+                                },
+                                height: 40,
+                                width: 40
+                            },
+                            1: {
+                                backgroundColor: {
+                                    image: Label.servePath+`/images/weather/svg/${searchObj.weatherCode[1]}.svg`
+                                },
+                                height: 40,
+                                width: 40
+                            },
+                            2: {
+                                backgroundColor: {
+                                    image: Label.servePath+`/images/weather/svg/${searchObj.weatherCode[2]}.svg`
+                                },
+                                height: 40,
+                                width: 40
+                            },
+                            3: {
+                                backgroundColor: {
+                                    image: Label.servePath+`/images/weather/svg/${searchObj.weatherCode[3]}.svg`
+                                },
+                                height: 40,
+                                width: 40
+                            },
+                            4: {
+                                backgroundColor: {
+                                    image: Label.servePath+`/images/weather/svg/${searchObj.weatherCode[4]}.svg`
+                                },
+                                height: 40,
+                                width: 40
+                            },
+                            b: {
+                                fontSize: 12,
+                                lineHeight: 30,
+                                height: 20
+                            }
+                        }
+                    },
+                    nameTextStyle: {
+                        fontWeight: 'bold',
+                        fontSize: 19
+                    },
+                    data: searchObj.weatherName
+                }
+            ],
+            yAxis: {
+                type: 'value',
+                show: false,
+                axisLabel: {
+                    formatter: '{value} °C',
+                    color: 'white'
+                }
+            },
+            series: [{
+                name: '最高气温',
+                type: 'line',
+                data: searchObj.max,
+                symbol: 'emptyCircle',
+                symbolSize: 10,
+                showSymbol: true,
+                smooth: true,
+                itemStyle: {
+                    normal: {
+                        color: '#C95843'
+                    }
+                },
+                label: {
+                    show: true,
+                    position: 'top',
+                    formatter: '{c} °C'
+                },
+                lineStyle: {
+                    width: 1
+                },
+                areaStyle: {
+                    opacity: 1,
+                    color: 'transparent'
+                }
+            }, {
+                name: '最低气温',
+                type: 'line',
+                data: searchObj.min,
+                symbol: 'emptyCircle',
+                symbolSize: 10,
+                showSymbol: true,
+                smooth: true,
+                itemStyle: {
+                    normal: {
+                        color: 'blue'
+                    }
+                },
+                label: {
+                    show: true,
+                    position: 'bottom',
+                    formatter: '{c} °C'
+                },
+                lineStyle: {
+                    width: 1
+                },
+                areaStyle: {
+                    opacity: 1,
+                    color: 'transparent'
+                }
+            }]
+        };
+        option && myChart.setOption(option);
     },
     /**
      * 看图插件dom

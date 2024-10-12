@@ -385,6 +385,8 @@
                                                     <#assign text=msg.content>
                                                     <#if text?contains("\"msgType\":\"redPacket\"")>
                                                         [收到红包，请在完整版聊天室查看]
+                                                    <#elseif text?contains("\"type\":\"weather\"")>
+                                                        [天气卡片，请在完整版聊天室查看]
                                                     <#else>
                                                         ${text}
                                                     </#if>

@@ -30,6 +30,11 @@
     <link rel="stylesheet" href="${staticServePath}/css/viewer.min.css"/>
     <link rel="stylesheet" href="https://file.fishpi.cn/cxColor/css/jquery.cxcolor.css">
     <link rel="stylesheet" href="${staticServePath}/js/lib/barrager/barrager.css">
+    <style>
+        [id^="weather_"] svg{
+            stroke-width:0;
+        }
+    </style>
 </head>
 <body>
 <div class="mobile-head">
@@ -190,6 +195,7 @@
     Label.uploadLabel = "${uploadLabel}";
 </script>
 <script src="https://file.fishpi.cn/cxColor/js/jquery.cxcolor.min.js"></script>
+<script src="${staticServePath}/js/lib/echarts.min.js"></script>
 <script src="${staticServePath}/js/lib/jquery/file-upload-9.10.1/jquery.fileupload.min.js"></script>
 <script src="${staticServePath}/js/channel${miniPostfix}.js?${staticResourceVersion}"></script>
 <script src="${staticServePath}/js/chat-room${miniPostfix}.js?${staticResourceVersion}"></script>
