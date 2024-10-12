@@ -89,6 +89,35 @@ public class ChatProcessor {
         Dispatcher.get("/chat/mark-as-read", chatProcessor::markAsRead, apiCheck::handle);
         Dispatcher.get("/chat/mark-all-as-read", chatProcessor::markAllAsRead, apiCheck::handle);
         Dispatcher.get("/chat/revoke", chatProcessor::revoke, apiCheck::handle);
+        Dispatcher.get("/chat/raw/{id}", chatProcessor::getRaw, apiCheck::handle);
+    }
+
+    public void getRaw(final RequestContext context) {
+        JSONObject currentUser = ApiProcessor.getUserByKey(context.param("apiKey"));
+        String userId = currentUser.optString(Keys.OBJECT_ID);
+        final AbstractFreeMarkerRenderer renderer = new SkinRenderer(context, "raw.ftl");
+        final Map<String, Object> dataModel = renderer.getDataModel();
+        String id = context.pathVar("id");
+        Query query = new Query().setFilter(new PropertyFilter(Keys.OBJECT_ID, FilterOperator.EQUAL, id));
+        try {
+            JSONObject object = chatInfoRepository.getFirst(query);
+            if (object == null) {
+                context.renderJSON(new JSONObject()
+                        .put("result", -1)
+                        .put("msg", "消息不存在。"));
+                return;
+            }
+            if (userId.equals(object.optString("fromId")) || userId.equals(object.optString("toId"))) {
+                String content = object.optString("content");
+                dataModel.put("raw", content);
+            } else {
+                context.renderJSON(new JSONObject()
+                        .put("result", -1)
+                        .put("msg", "这不是你发的消息，你瞎看什么？记小本本了哦。"));
+            }
+        } catch (RepositoryException e) {
+            context.renderCodeMsg(StatusCodes.ERR, "Invalid chat id.");
+        }
     }
 
     public void revoke(final RequestContext context) {
