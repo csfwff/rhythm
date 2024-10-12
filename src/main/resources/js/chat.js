@@ -407,6 +407,44 @@ var Chat = {
     },
 
     addTargetMsg(oId, userName, avatarURL, content, time, reverse) {
+        let menu = false;
+        let addMenu = '<span class="fn__space5"></span>' +
+            '<details class="details action__item fn__flex-center">\n' +
+            '<summary>\n' +
+            '···\n' +
+            '</summary>\n' +
+            '<details-menu class="fn__layer">\n';
+        try {
+            // 判断是否可以收藏为表情包
+            let emojiContent = content.replace("<p>", "").replace("</p>", "");
+            let emojiDom = Util.parseDom(emojiContent);
+            let canCollect = false;
+            let srcs = "";
+            let count = 0;
+            for (let i = 0; i < emojiDom.length; i++) {
+                let cur = emojiDom.item(i);
+                if (cur.src !== undefined) {
+                    canCollect = true;
+                    if (count !== 0) {
+                        srcs += ",";
+                    }
+                    srcs += "\'" + cur.src + "\'";
+                    count++;
+                }
+            }
+            if (canCollect) {
+                menu = true;
+                addMenu += "<a onclick=\"Chat.addEmoji(" + srcs + ")\" class=\"item\">一键收藏表情</a>";
+            }
+        } catch (err) {
+        }
+        addMenu +=  '</details-menu>\n</details>';
+
+        let m = '';
+        if (menu) {
+            m = addMenu;
+        }
+
         if (reverse === true) {
             $("#chats").append('' +
                 '<div id="chat' + oId + '" class="fn__flex chats__item">\n' +
@@ -420,7 +458,7 @@ var Chat = {
                 '            ' + content + '\n' +
                 '        </div>\n' +
                 '        <div class="ft__smaller ft__fade fn__right date-bar">\n' +
-                '            ' + time + '\n' +
+                '            ' + time + '\n' + m +
                 '        </div>\n' +
                 '    </div>\n' +
                 '</div>');
@@ -437,7 +475,7 @@ var Chat = {
                 '            ' + content + '\n' +
                 '        </div>\n' +
                 '        <div class="ft__smaller ft__fade fn__right date-bar">\n' +
-                '            ' + time + '\n' +
+                '            ' + time + '\n' + m +
                 '        </div>\n' +
                 '    </div>\n' +
                 '</div>');
