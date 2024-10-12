@@ -908,7 +908,6 @@ public class ChatroomProcessor {
             }  else if (content.startsWith("[weather]") && content.endsWith("[/weather]")){
                 String weatherString = content.replaceAll("^\\[weather\\]", "").replaceAll("\\[/weather\\]$", "");
 
-                JSONObject weatherJSON = new JSONObject();
                 // 加活跃
                 incLiveness(userId);
                 // 聊天室内容保存到数据库
@@ -927,20 +926,6 @@ public class ChatroomProcessor {
                 ChatroomChannel.notifyChat(pushMsg);
 
                 context.renderJSON(StatusCodes.SUCC);
-
-                try {
-                    final List<JSONObject> atUsers = atUsers(msg.optString(Common.CONTENT), userName);
-                    if (Objects.nonNull(atUsers) && !atUsers.isEmpty()) {
-                        for (JSONObject user : atUsers) {
-                            final JSONObject notification = new JSONObject();
-                            notification.put(Notification.NOTIFICATION_USER_ID, user.optString("oId"));
-                            notification.put(Notification.NOTIFICATION_DATA_ID, msg.optString("oId"));
-                            notificationMgmtService.addChatRoomAtNotification(notification);
-                        }
-                    }
-                } catch (Exception e) {
-                    LOGGER.log(Level.ERROR, "notify user failed", e);
-                }
 
                 try {
                     final JSONObject user = userQueryService.getUser(userId);
