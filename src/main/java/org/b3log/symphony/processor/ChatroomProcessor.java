@@ -905,7 +905,52 @@ public class ChatroomProcessor {
                 } catch (Exception e) {
                     LOGGER.log(Level.INFO, "User " + userName + " failed to send a red packet.");
                 }
-            } else if (content.startsWith("[setdiscuss]") && content.endsWith("[/setdiscuss]")) {
+            }  else if (content.startsWith("[weather]") && content.endsWith("[/weather]")){
+                String weatherString = content.replaceAll("^\\[weather\\]", "").replaceAll("\\[/weather\\]$", "");
+
+                JSONObject weatherJSON = new JSONObject();
+                // 加活跃
+                incLiveness(userId);
+                // 聊天室内容保存到数据库
+                final Transaction transaction = chatRoomRepository.beginTransaction();
+                try {
+                    msg.put(Common.CONTENT, weatherString);
+                    String oId = chatRoomRepository.add(new JSONObject().put("content", msg.toString()));
+                    msg.put("oId", oId);
+                } catch (RepositoryException e) {
+                    LOGGER.log(Level.ERROR, "Cannot save ChatRoom message to the database.", e);
+                }
+                transaction.commit();
+                msg = msg.put("md", msg.optString(Common.CONTENT)).put(Common.CONTENT, processMarkdown(msg.optString(Common.CONTENT)));
+                final JSONObject pushMsg = JSONs.clone(msg);
+                pushMsg.put(Common.TIME, new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(msg.optLong(Common.TIME)));
+                ChatroomChannel.notifyChat(pushMsg);
+
+                context.renderJSON(StatusCodes.SUCC);
+
+                try {
+                    final List<JSONObject> atUsers = atUsers(msg.optString(Common.CONTENT), userName);
+                    if (Objects.nonNull(atUsers) && !atUsers.isEmpty()) {
+                        for (JSONObject user : atUsers) {
+                            final JSONObject notification = new JSONObject();
+                            notification.put(Notification.NOTIFICATION_USER_ID, user.optString("oId"));
+                            notification.put(Notification.NOTIFICATION_DATA_ID, msg.optString("oId"));
+                            notificationMgmtService.addChatRoomAtNotification(notification);
+                        }
+                    }
+                } catch (Exception e) {
+                    LOGGER.log(Level.ERROR, "notify user failed", e);
+                }
+
+                try {
+                    final JSONObject user = userQueryService.getUser(userId);
+                    user.put(UserExt.USER_LATEST_CMT_TIME, System.currentTimeMillis());
+                    userMgmtService.updateUser(userId, user);
+                } catch (final Exception e) {
+                    LOGGER.log(Level.ERROR, "Update user latest comment time failed", e);
+                }
+
+            }  else if (content.startsWith("[setdiscuss]") && content.endsWith("[/setdiscuss]")) {
                 // 扣钱
                 final boolean succ = null != pointtransferMgmtService.transfer(userId, Pointtransfer.ID_C_SYS,
                         Pointtransfer.TRANSFER_TYPE_C_ACTIVITY_SET_DISCUSS,
