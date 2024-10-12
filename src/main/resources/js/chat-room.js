@@ -1415,9 +1415,7 @@ border-bottom: none;
      */
     remarkList:{},
     remark: function(userId,userName){
-        console.log(userId,userName);
         let userRemark = prompt(`要给 ${userName} 备注什么呢?`);
-        console.log(userRemark);
         if(userRemark === null) return;
         if(userRemark === ''){
             delete ChatRoom.remarkList[userId];
