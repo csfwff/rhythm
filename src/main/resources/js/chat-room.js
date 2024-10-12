@@ -1709,6 +1709,9 @@ ${result.info.msg}
             let isPlusOne = Label.latestMessage === data.md;
             try {
                 let msgJSON = $.parseJSON(data.content.replace("<p>", "").replace("</p>", ""));
+                if (msgJSON.msgType === "weather") {
+                    isRedPacket = true;
+                }
                 if (msgJSON.msgType === "redPacket") {
                     isRedPacket = true;
                     let type = "未知类型红包";
