@@ -496,6 +496,9 @@ var ChatRoomChannel = {
                     if (newContent.indexOf("\"msgType\":\"weather\"") !== -1) {
                         newContent = "[天气卡片，请在完整版聊天室查看]";
                     }
+                    if (newContent.indexOf("\"msgType\":\"music\"") !== -1) {
+                        newContent = "[音乐卡片，请在完整版聊天室查看]";
+                    }
                     $("#chatRoomIndex").prepend("" +
                         "<li class=\"fn-flex\" id=\"chatindex" + data.oId + "\" style='display: none; border-bottom: 1px solid #eee;'>\n" +
                         "    <a rel=\"nofollow\" href=\"/member/" + data.userName + "\">\n" +

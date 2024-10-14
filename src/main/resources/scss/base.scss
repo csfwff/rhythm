@@ -1876,6 +1876,209 @@ a[class*=" icon-"]:hover {
   }
 }
 
+// 音乐播放器
+#musicBox{
+  position: fixed;
+  bottom: -50px;
+  left: 0;
+  width: 100%;
+  height: 50px;
+  background: #fff;
+  box-shadow: -1px -1px 4px 1px rgba(0,0,0,.3);
+  z-index: 9990;
+  transition: .3s;
+  .music-box{
+    position: relative;
+    margin: 0 auto;
+    width: 90%;
+    height: 50px;
+    min-width: 720px;
+    max-width: 1300px;
+    display: flex;
+    padding: 5px 0;
+    .music-img{
+      .music-img-item{
+        width: 40px;
+        height: 40px;
+        cursor: pointer;
+        border-radius: 50%;
+      }
+      margin: 0 10px;
+    }
+    &.playing .music-img-item{
+      animation: spin 2s linear infinite;
+    }
+    .music-detail{
+      flex: 1;
+      height: 40px;
+      background: #fff;
+      box-sizing: border-box;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-around;
+      .music-title{
+        font-weight: bold;
+      }
+    }
+    .music-close-btn{
+      position: absolute;
+      top: -20px;
+      right: 0;
+      width: 50px;
+      height: 20px;
+      background: #fff;
+      border-top-left-radius: 5px;
+      border-top-right-radius: 5px;
+      cursor:pointer;
+      text-align: center;
+      box-shadow: 0 -1px 0 1px rgba(0,0,0,.3);
+      padding-top: 2px;
+      box-sizing: border-box;
+      img{
+        width: 20px;
+        height: 20px;
+      }
+    }
+    .music-controller{
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      width: 120px;
+      height: 40px;
+      img{
+        cursor:pointer;
+      }
+      .music-prev,.music-next,.music-list,.music-voice,.music-mode{
+        width: 30px;
+        height: 30px;
+      }
+      .music-play{
+        width: 40px;
+        height: 40px;
+      }
+      .music-voice-box{
+        position: fixed;
+        bottom: 40px;
+        display: none;
+        padding: 10px;
+        background: #fff;
+        z-index: 9991;
+      }
+      .music-voice:hover{
+        .music-voice-box{
+          display: block;
+        }
+      }
+    }
+  }
+  &.show{
+    bottom: 0;
+  }
+  .music-core{
+    position: fixed;
+    bottom: -100px;
+    left: 0;
+    z-index: -1;
+  }
+}
+
+.music-list-box{
+  position: fixed;
+  bottom: -400px;
+  left: 50%;
+  transform: translateX(-50%);
+  transition: .3s;
+  width: 80%;
+  height: 400px;
+  min-width: 720px;
+  max-width: 800px;
+  padding: 20px;
+  background: #fff;
+  box-shadow: -1px -1px 4px 1px rgba(0,0,0,.3);
+  z-index: 9980;
+  border-top-right-radius: 5px;
+  border-top-left-radius: 5px;
+  box-sizing: border-box;
+  overflow-y: scroll;
+  &::-webkit-scrollbar{
+    width: 0;
+  }
+  &.show{
+    bottom: 50px;
+  }
+  .music-list-item{
+    display: flex;
+    align-items: center;
+    border-bottom: 1px solid rgba(0,0,0,.3);
+    padding: 5px;
+    background: #fff;
+    transition: .3s;
+    &:hover{
+      background: rgba(0,0,0,.1);
+    }
+    img{
+      width: 20px;
+      height: 20px;
+      margin-right: 10px;
+    }
+    .music-list-title{
+      flex: 1;
+    }
+    .music-list-controller{
+      span{
+        cursor: pointer;
+        &:hover{
+          text-decoration: underline;
+        }
+      }
+    }
+  }
+}
+
+.music-player{
+  margin: 10px;
+  padding: 10px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-sizing: border-box;
+  box-shadow: 0 0 10px #ccc;
+  background: #fff;
+  .music-player-img{
+    width: 50px;
+    height: 50px;
+    margin-right: 10px;
+  }
+  .music-player-box{
+    .music-player-title{
+      width: 200px;
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+      font-weight: bold;
+      font-size: 18px;
+    }
+    .music-player-controller{
+      span{
+        cursor: pointer;
+        &:hover{
+          text-decoration: underline;
+        }
+      }
+    }
+  }
+}
+
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
 //下面是倒计时窗口
 #timeContent {
   position: fixed;
