@@ -1712,8 +1712,6 @@ ${result.info.msg}
             let isPlusOne = Label.latestMessage === data.md;
             try {
                 let msgJSON = $.parseJSON(data.content.replace("<p>", "").replace("</p>", ""));
-                console.log(msgJSON.msgType);
-                console.log(msgJSON);
                 if (msgJSON.msgType === "redPacket") {
                     isRedPacket = true;
                     let type = "未知类型红包";
@@ -2356,7 +2354,7 @@ ${result.info.msg}
             let coverEle = document.querySelector('.music-img-item');
             this.ele = radioEle;
             radioEle.addEventListener('ended',()=>{
-                console.log('播放完成');
+                // console.log('播放完成');
                 this.playing = false;
                 clearInterval(this.timer);
                 playIcon.src = Label.servePath + '/images/music/circle_play.png';
@@ -2364,7 +2362,7 @@ ${result.info.msg}
                 this.autoNext();
             });
             radioEle.addEventListener('play',()=>{
-                console.log('播放');
+                // console.log('播放');
                 playIcon.src = Label.servePath + '/images/music/circle_pause.png';
                 playBox.classList.add('playing');
                 this.timer = setInterval(()=>{
@@ -2372,13 +2370,13 @@ ${result.info.msg}
                 });
             });
             radioEle.addEventListener('pause',()=>{
-                console.log('暂停');
+                // console.log('暂停');
                 clearInterval(this.timer);
                 playIcon.src = Label.servePath + '/images/music/circle_play.png';
                 playBox.classList.remove('playing');
             });
             radioEle.addEventListener('canplay',()=>{
-                console.log('加载完成');
+                // console.log('加载完成');
                 currentEle.innerHTML = this.secondsToTime(this.ele.currentTime);
                 durationEle.innerHTML = this.secondsToTime(this.ele.duration);
                 titleEle.innerHTML = this.list[this.index].title;
@@ -2515,7 +2513,7 @@ ${result.info.msg}
             }
         },
         changeVoice(voice){
-            console.log(voice.value);
+            // console.log(voice.value);
             let volume = voice.value;
             let volumeEle = document.querySelector('.music-voice-icon');
             if(volume > 80){
