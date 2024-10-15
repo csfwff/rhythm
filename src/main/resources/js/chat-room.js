@@ -472,6 +472,8 @@ var ChatRoom = {
         ChatRoom.loadAvatarPendant();
         // 加载用户捕获
         ChatRoom.initCatchUser();
+        // 加载播放器
+        ChatRoom.playSound.init();
         // 加载画图
         ChatRoom.charInit('paintCanvas');
         // 监听弹幕
@@ -1706,12 +1708,10 @@ ${result.info.msg}
         } else {
             let isRedPacket = false;
             let isWeather = false;
+            let isMusic = false;
             let isPlusOne = Label.latestMessage === data.md;
             try {
                 let msgJSON = $.parseJSON(data.content.replace("<p>", "").replace("</p>", ""));
-                if (msgJSON.msgType === "weather") {
-                    isRedPacket = true;
-                }
                 if (msgJSON.msgType === "redPacket") {
                     isRedPacket = true;
                     let type = "未知类型红包";
@@ -1806,6 +1806,18 @@ ${result.info.msg}
                 }else if(msgJSON.msgType === "weather"){
                     isWeather = true;
                     data.content = '<div id="weather_'+ data.oId +'" style="width: 300px;height:280px;" data-date="'+msgJSON.date+'" data-code="'+msgJSON.weatherCode+'" data-max="'+msgJSON.max+'" data-min="'+msgJSON.min+'" data-t="'+msgJSON.t+'" data-st="'+msgJSON.st+'"></div>';
+                }else if(msgJSON.msgType === 'music'){
+                    isMusic = true;
+                    data.content = '<div class="music-player">'+
+                        '<img class="music-player-img" src="'+ (msgJSON.coverURL === "" ? Label.servePath+"/images/music/cat.gif" : msgJSON.coverURL) +'" />'+
+                        '<div class="music-player-box"><div class="music-player-title">'+msgJSON.title+'</div>'+
+                        '<div class="music-player-controller"  data-source="'+msgJSON.source+'" data-cover="'+msgJSON.coverURL+
+                        '" data-title="'+msgJSON.title+'" data-from="'+msgJSON.from+'">'+
+                        '<span onclick="ChatRoom.playSound.add(this)">加入列表</span>'+
+                        ' | '+
+                        '<span onclick="ChatRoom.playSound.play(this)">立即播放</span>'+
+                        '</div></div>'+
+                        '</div>'
                 }
             } catch (err) {
             }
@@ -2004,7 +2016,7 @@ ${result.info.msg}
                 }
             }
             // === 客户端标识
-            if (!isRedPacket) {
+            if (!isRedPacket && !isWeather && !isMusic) {
                 newHTML += '                <details class="details action__item fn__flex-center">\n' +
                     '                    <summary>\n' +
                     '                        ···\n' +
@@ -2089,7 +2101,7 @@ ${result.info.msg}
         }
     },
     /**
-     *
+     * 天气卡片渲染
      */
     initNewWeather: function(oId){
         let chartDom = document.getElementById('weather_'+ oId);
@@ -2313,6 +2325,208 @@ ${result.info.msg}
             }]
         };
         option && myChart.setOption(option);
+    },
+    /**
+     * 音乐卡片
+     * [list] 播放列表
+     * [mode] 播放方式 0 列表循环 1 随机播放
+     * [playing] 当前是否在播放
+     * [isShow] 是否显示播放器
+     * [index] 当前播放的下标
+     * */
+    playSound: {
+        list:[],
+        mode:0,
+        playing:false,
+        isShow:false,
+        index:0,
+        ele:null,
+        timer:null,
+        isShowList:false,
+        isSHowVoice:false,
+        init(){
+            let radioEle = document.querySelector('#music-core-item');
+            let playIcon = document.querySelector('.music-play-icon');
+            let playBox = document.querySelector('.music-box');
+            let currentEle = document.querySelector('.music-current');
+            let durationEle = document.querySelector('.music-duration');
+            let titleEle = document.querySelector('.music-title');
+            let coverEle = document.querySelector('.music-img-item');
+            this.ele = radioEle;
+            radioEle.addEventListener('ended',()=>{
+                // console.log('播放完成');
+                this.playing = false;
+                clearInterval(this.timer);
+                playIcon.src = Label.servePath + '/images/music/circle_play.png';
+                playBox.classList.remove('playing');
+                this.autoNext();
+            });
+            radioEle.addEventListener('play',()=>{
+                // console.log('播放');
+                playIcon.src = Label.servePath + '/images/music/circle_pause.png';
+                playBox.classList.add('playing');
+                this.timer = setInterval(()=>{
+                    currentEle.innerHTML = this.secondsToTime(this.ele.currentTime);
+                });
+            });
+            radioEle.addEventListener('pause',()=>{
+                // console.log('暂停');
+                clearInterval(this.timer);
+                playIcon.src = Label.servePath + '/images/music/circle_play.png';
+                playBox.classList.remove('playing');
+            });
+            radioEle.addEventListener('canplay',()=>{
+                // console.log('加载完成');
+                currentEle.innerHTML = this.secondsToTime(this.ele.currentTime);
+                durationEle.innerHTML = this.secondsToTime(this.ele.duration);
+                titleEle.innerHTML = this.list[this.index].title;
+                let cover = this.list[this.index].cover;
+                coverEle.src = cover === '' ? Label.servePath + '/images/music/cat.gif' : cover;
+            });
+        },
+        secondsToTime(time){
+            time = parseInt(time);
+            let mm =0, ss = 0;
+            if(time>59){
+                mm = Math.floor(time/60);
+                ss = time%60;
+                return (mm>9?mm:'0'+mm)+":"+(ss>9?ss:'0'+ss);
+            }else{
+                ss = time;
+                return "00:"+(ss>9?ss:'0'+ss);
+            }
+        },
+        toggleMode(){
+            let modeIcon = document.querySelector('.music-mode-icon');
+            if(this.mode === 0){
+                this.mode = 1;
+                modeIcon.src = Label.servePath + '/images/music/shuffle.png';
+                modeIcon.setAttribute('alt','顺序播放');
+            }else{
+                this.mode = 0;
+                modeIcon.src = Label.servePath + '/images/music/repeat.png';
+                modeIcon.setAttribute('alt','随机播放');
+            }
+        },
+        add(e){
+            let music = e.parentElement.dataset;
+            let idx = this.list.findIndex(e=>e.source === music.source);
+            if(idx !== -1){
+                this.index = idx;
+                return;
+            }
+            this.list.push(music);
+            this.renderList();
+            Util.notice("success", 2000, "已加入播放列表。");
+        },
+        remove(idx){
+            this.list.splice(idx,1);
+            this.renderList();
+            Util.notice("success", 2000, "已移出播放列表。");
+        },
+        renderList(){
+            let listEle = document.querySelector('.music-list-box');
+            let list = "";
+            for(let i = 0;i<this.list.length;i++){
+                let item = this.list[i];
+                list += '<div class="music-list-item">' +
+                    '        <img src="'+item.cover+'" alt="">' +
+                    '        <div class="music-list-title">'+item.title+'</div>' +
+                    '        <div class="music-list-controller">' +
+                    '            <span style="color: #198cff" data-i="'+i+'" onclick="ChatRoom.playSound.playIndex('+i+')">播放</span>' +
+                    '            <span style="color: red" data-i="'+i+'" onclick="ChatRoom.playSound.remove('+i+')">移除</span>' +
+                    '        </div>' +
+                    '    </div>'
+            }
+            listEle.innerHTML = list;
+        },
+        next(){
+            if(this.list.length === 0) return;
+            this.index += 1;
+            if(this.index >= this.list.length){
+                this.index = 0;
+            }
+            this.playIndex(this.index);
+        },
+        prev(){
+            if(this.list.length === 0) return;
+            this.index -= 1;
+            if(this.index < 0){
+                this.index = this.list.length - 1;
+            }
+            this.playIndex(this.index);
+        },
+        play(e){
+            let music = e.parentElement.dataset;
+            this.add(e);
+            this.ele.src = music.source;
+            this.playing = false;
+            this.togglePlay();
+            !this.isShow && this.show();
+        },
+        playIndex(idx){
+            this.ele.src = this.list[idx].source;
+            this.playing = false;
+            this.index = idx;
+            this.togglePlay();
+        },
+        autoNext(){
+            if(this.mode === 0){
+                this.next();
+            }else{
+                this.playIndex(Math.floor(Math.random() * this.list.length));
+            }
+        },
+        togglePlay(){
+            this.playing = !this.playing;
+            if(this.playing){
+                this.ele.play();
+            }else{
+                this.ele.pause();
+            }
+        },
+        hide(){
+            this.isShow = false;
+            let playEle = document.querySelector('#musicBox');
+            let closeEle = document.querySelector('.music-close-icon');
+            closeEle.src = Label.servePath + '/images/music/arrow_up.png';
+            playEle.classList.remove('show');
+            this.isShowList && this.toggleList();
+        },
+        show(){
+            this.isShow = true;
+            let playEle = document.querySelector('#musicBox');
+            let closeEle = document.querySelector('.music-close-icon');
+            closeEle.src = Label.servePath + '/images/music/arrow_down.png';
+            playEle.classList.add('show');
+        },
+        toggleShow(){
+            this.isShow ? this.hide() : this.show();
+        },
+        toggleList(){
+            let listEle = document.querySelector('.music-list-box');
+            this.isShowList = !this.isShowList;
+            if(this.isShowList){
+                listEle.classList.add('show');
+            }else{
+                listEle.classList.remove('show');
+            }
+        },
+        changeVoice(voice){
+            // console.log(voice.value);
+            let volume = voice.value;
+            let volumeEle = document.querySelector('.music-voice-icon');
+            if(volume > 80){
+                volumeEle.src = Label.servePath + '/images/music/volume_3.png';
+            }else if(volume > 30){
+                volumeEle.src = Label.servePath + '/images/music/volume_2.png';
+            }else if(volume > 0){
+                volumeEle.src = Label.servePath + '/images/music/volume_1.png';
+            }else{
+                volumeEle.src = Label.servePath + '/images/music/volume_off.png';
+            }
+            this.ele.volume = volume / 100;
+        }
     },
     /**
      * 看图插件dom

@@ -548,12 +548,12 @@ public class ChatRoomBot {
         // ==? 判定恶意发送非法红包 ?==
         try {
             JSONObject checkContent = new JSONObject(content);
-            if (checkContent.optString("msgType").equals("redPacket") || checkContent.optString("msgType").equals("weather")) {
+            if (checkContent.optString("msgType").equals("redPacket") || checkContent.optString("msgType").equals("weather")|| checkContent.optString("msgType").equals("music")) {
                 if (RECORD_POOL_2_IN_24H.access(userName)) {
-                    sendBotMsg("监测到 @" + userName + "  伪造发送红包/天气数据包，警告一次。");
+                    sendBotMsg("监测到 @" + userName + "  伪造发送红包/天气/音乐数据包，警告一次。");
                 } else {
-                    sendBotMsg("由于 @" + userName + "  第二次伪造发送红包/天气数据包，现处以扣除积分 50 的处罚。");
-                    abusePoint(userId, 50, "机器人罚单-聊天室伪造发送红包/天气数据包");
+                    sendBotMsg("由于 @" + userName + "  第二次伪造发送红包/天气/音乐数据包，现处以扣除积分 50 的处罚。");
+                    abusePoint(userId, 50, "机器人罚单-聊天室伪造发送红包/天气/音乐数据包");
                     RECORD_POOL_2_IN_24H.remove(userName);
                 }
                 return false;
