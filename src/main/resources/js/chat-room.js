@@ -473,7 +473,7 @@ var ChatRoom = {
         // 加载用户捕获
         ChatRoom.initCatchUser();
         // 加载播放器
-        ChatRoom.playSound.init();
+        //ChatRoom.playSound.init();
         // 加载画图
         ChatRoom.charInit('paintCanvas');
         // 监听弹幕
