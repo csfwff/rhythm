@@ -3278,10 +3278,10 @@ only screen and (device-width: 414px) and (device-height: 896px) and (-webkit-de
 // 音乐播放器
 #musicBox{
   position: fixed;
-  bottom: -50px;
+  bottom: -106px;
   left: 0;
   width: 100%;
-  height: 50px;
+  height: 106px;
   background: #fff;
   box-shadow: -1px -1px 4px 1px rgba(0,0,0,.3);
   z-index: 9990;
@@ -3290,7 +3290,7 @@ only screen and (device-width: 414px) and (device-height: 896px) and (-webkit-de
     position: relative;
     margin: 0 auto;
     width: 90%;
-    height: 50px;
+    height: 106px;
     min-width: 430px;
     max-width: 1300px;
     display: flex;
@@ -3309,7 +3309,7 @@ only screen and (device-width: 414px) and (device-height: 896px) and (-webkit-de
     }
     .music-detail{
       width: 100px;
-      height: 40px;
+      height: 106px;
       background: #fff;
       box-sizing: border-box;
       display: flex;

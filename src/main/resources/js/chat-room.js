@@ -2408,8 +2408,12 @@ ${result.info.msg}
                 modeIcon.setAttribute('alt','随机播放');
             }
         },
-        add(e){
+        add(e,showToast = true){
             let music = e.parentElement.dataset;
+            if(music.source.startsWith('http://music.163.com/song') || music.source.startsWith('https://music.163.com/song')){
+                let sourceEle = music.source.split('=');
+                music.source = sourceEle[sourceEle.length - 1];
+            }
             let idx = this.list.findIndex(e=>e.source === music.source);
             if(idx !== -1){
                 this.index = idx;
@@ -2417,7 +2421,7 @@ ${result.info.msg}
             }
             this.list.push(music);
             this.renderList();
-            Util.notice("success", 2000, "已加入播放列表。");
+            showToast && Util.notice("success", 2000, "已加入播放列表。");
         },
         remove(idx){
             this.list.splice(idx,1);
@@ -2458,14 +2462,22 @@ ${result.info.msg}
         },
         play(e){
             let music = e.parentElement.dataset;
-            this.add(e);
-            this.ele.src = music.source;
+            this.add(e,false);
+            if(music.source.startsWith('http://music.163.com/song') || music.source.startsWith('https://music.163.com/song')){
+                let sourceEle = music.source.split('=');
+                music.source = sourceEle[sourceEle.length - 1];
+            }
+            //this.ele.src = music.source;
+            let iframeBox = document.querySelector('.music-detail');
+            iframeBox.innerHTML = '<iframe frameborder="no" border="0" marginwidth="0" marginheight="0" width="100%" height=86 src="//music.163.com/outchain/player?type=2&id='+music.source+'&auto=1&height=66"></iframe>';
             this.playing = false;
             this.togglePlay();
             !this.isShow && this.show();
         },
         playIndex(idx){
-            this.ele.src = this.list[idx].source;
+            //this.ele.src = this.list[idx].source;
+            let iframeBox = document.querySelector('.music-detail');
+            iframeBox.innerHTML = '<iframe frameborder="no" border="0" marginwidth="0" marginheight="0" width="100%" height=86 src="//music.163.com/outchain/player?type=2&id='+this.list[idx].source+'&auto=1&height=66"></iframe>';
             this.playing = false;
             this.index = idx;
             this.togglePlay();
@@ -2479,11 +2491,11 @@ ${result.info.msg}
         },
         togglePlay(){
             this.playing = !this.playing;
-            if(this.playing){
-                this.ele.play();
-            }else{
-                this.ele.pause();
-            }
+            // if(this.playing){
+            //     this.ele.play();
+            // }else{
+            //     this.ele.pause();
+            // }
         },
         hide(){
             this.isShow = false;

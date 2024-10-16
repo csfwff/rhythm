@@ -1879,10 +1879,10 @@ a[class*=" icon-"]:hover {
 // 音乐播放器
 #musicBox{
   position: fixed;
-  bottom: -50px;
+  bottom: -106px;
   left: 0;
   width: 100%;
-  height: 50px;
+  height: 106px;
   background: #fff;
   box-shadow: -1px -1px 4px 1px rgba(0,0,0,.3);
   z-index: 9990;
@@ -1891,11 +1891,12 @@ a[class*=" icon-"]:hover {
     position: relative;
     margin: 0 auto;
     width: 90%;
-    height: 50px;
+    height: 106px;
     min-width: 720px;
     max-width: 1300px;
     display: flex;
     padding: 5px 0;
+    align-items: center;
     .music-img{
       .music-img-item{
         width: 40px;
@@ -1910,7 +1911,7 @@ a[class*=" icon-"]:hover {
     }
     .music-detail{
       flex: 1;
-      height: 40px;
+      height: 106px;
       background: #fff;
       box-sizing: border-box;
       display: flex;
@@ -1943,7 +1944,7 @@ a[class*=" icon-"]:hover {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      width: 120px;
+      width: 70px;
       height: 40px;
       img{
         cursor:pointer;

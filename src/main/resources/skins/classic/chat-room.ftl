@@ -179,30 +179,32 @@
 <div id="musicBox">
     <div class="music-box">
         <div class="music-controller">
-            <div class="music-prev">
+            <div class="music-prev" onclick="ChatRoom.playSound.prev()">
                 <img src="${staticServePath}/images/music/circle_skip_previous.png" alt="">
             </div>
-            <div class="music-play" onclick="ChatRoom.playSound.togglePlay()">
-                <img class="music-play-icon" src="${staticServePath}/images/music/circle_play.png" alt="">
-            </div>
-            <div class="music-next">
+<#--            <div class="music-play" onclick="ChatRoom.playSound.togglePlay()">-->
+<#--                <img class="music-play-icon" src="${staticServePath}/images/music/circle_play.png" alt="">-->
+<#--            </div>-->
+            <div class="music-next" onclick="ChatRoom.playSound.next()">
                 <img src="${staticServePath}/images/music/circle_skip_next.png" alt="">
             </div>
         </div>
-        <div class="music-img">
-            <img src="${staticServePath}/images/music/cat.gif" class="music-img-item" alt="" />
-        </div>
+<#--        <div class="music-img">-->
+<#--            <img src="${staticServePath}/images/music/cat.gif" class="music-img-item" alt="" />-->
+<#--        </div>-->
         <div class="music-detail">
+<#--            <iframe frameborder="no" border="0" marginwidth="0" marginheight="0" width="100%" height="52" src="//music.163.com/outchain/player?type=2&id=2635209343&auto=0&height=32"></iframe>-->
+
             <div class="music-title">摸鱼播放器v1.0</div>
             <div class="music-time"><span class="music-current">00:00</span>-<span class="music-duration">00:00</span></div>
         </div>
         <div class="music-controller">
-            <div class="music-voice" style="padding: 2px;box-sizing: border-box">
-                <img class="music-voice-icon" src="${staticServePath}/images/music/volume_3.png" alt="">
-                <div class="music-voice-box">
-                    <input type="range" value="100" max="100" min="0" onchange="ChatRoom.playSound.changeVoice(this)">
-                </div>
-            </div>
+<#--            <div class="music-voice" style="padding: 2px;box-sizing: border-box">-->
+<#--                <img class="music-voice-icon" src="${staticServePath}/images/music/volume_3.png" alt="">-->
+<#--                <div class="music-voice-box">-->
+<#--                    <input type="range" value="100" max="100" min="0" onchange="ChatRoom.playSound.changeVoice(this)">-->
+<#--                </div>-->
+<#--            </div>-->
             <div class="music-mode" style="padding: 5px;box-sizing: border-box" onclick="ChatRoom.playSound.toggleMode()">
                 <img class="music-mode-icon" src="${staticServePath}/images/music/repeat.png" alt="">
             </div>
