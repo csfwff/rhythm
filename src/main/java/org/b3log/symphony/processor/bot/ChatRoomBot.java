@@ -606,9 +606,9 @@ public class ChatRoomBot {
                     boolean afternoon = date >= 1330 && date <= 1800;
                     // 判断是否在上午或下午时段
                     if (morning || afternoon) {
-                        // 每30秒全局锁只允许发送一条
-                        if (!RECORD_POOL_05_IN_1M.access("v")) {
-                            context.renderJSON(StatusCodes.ERR).renderMsg("现在是聊天高峰期，全局每30秒只允许发送一个猜拳红包，请稍候重试。高峰期时段为：08:30-11:30、13:30-18:00");
+                        // 每30秒每人只允许发送一条
+                        if (!RECORD_POOL_05_IN_1M.access("rps+" + userId)) {
+                            context.renderJSON(StatusCodes.ERR).renderMsg("现在是聊天高峰期，每人每30秒只允许发送一个猜拳红包，请稍候重试。高峰期时段为：08:30-11:30、13:30-18:00");
                             return false;
                         }
 
