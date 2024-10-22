@@ -42,6 +42,7 @@ import org.json.JSONObject;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 
+import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -225,6 +226,10 @@ public class ActivityMgmtService {
         }
 
         final String recognizedCharacter = Tesseracts.recognizeCharacter(imagePath);
+        File temp1 = new File(imagePath);
+        if (temp1.exists()) {
+            temp1.delete();
+        }
         LOGGER.info("Character [" + character + "], recognized [" + recognizedCharacter + "], image path [" + imagePath + "]");
         if (StringUtils.equals(character, recognizedCharacter)) {
             final Query query = new Query();

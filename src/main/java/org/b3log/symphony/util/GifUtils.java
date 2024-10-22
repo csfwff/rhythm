@@ -25,11 +25,19 @@ import java.io.*;
 
 public class GifUtils {
     public static byte[] gifScale(byte[] src, double wQuotiety, double hQuotiety) throws IOException {
-        GifImage srcImage = GifDecoder.decode(byteArrayToFile(src));
+        File temp1 = byteArrayToFile(src);
+        GifImage srcImage = GifDecoder.decode(temp1);
+        if (temp1.exists()) {
+            temp1.delete();
+        }
         GifImage scaleImg = GifTransformer.scale(srcImage, wQuotiety, hQuotiety, true);
         File dest = File.createTempFile("tempGifFile", null);
         GifEncoder.encode(scaleImg, dest);
-        return fileToByte(dest);
+        byte[] temp2 = fileToByte(dest);
+        if (dest.exists()) {
+            dest.delete();
+        }
+        return temp2;
     }
 
     public static byte[] fileToByte(File file) {
