@@ -134,7 +134,7 @@ public class ApiProcessor {
         JSONObject jsonObject = context.requestJSON();
         LOGGER.log(Level.INFO, jsonObject.toString());
 
-        String fileURL = "https://file.fishpi.cn/" + jsonObject.optString("inputKey");
+        String fileURL = Symphonys.get("callback.base.url") + jsonObject.optString("inputKey");
         String userName = "";
         final Query query = new Query().setFilter(new PropertyFilter("path", FilterOperator.EQUAL, fileURL));
         try {
@@ -145,7 +145,7 @@ public class ApiProcessor {
         }
 
         if (!userName.isEmpty()) {
-            String suggestion = jsonObject.optJSONObject("items").optJSONObject("result").optJSONObject("result").optString("suggestion");
+            String suggestion = jsonObject.optJSONArray("items").optJSONObject(0).optJSONObject("result").optJSONObject("result").optString("suggestion");
             String userId = userQueryService.getUserByName(userName).optString(Keys.OBJECT_ID);
             switch (suggestion) {
                 case "block":
