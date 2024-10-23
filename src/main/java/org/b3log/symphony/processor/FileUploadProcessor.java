@@ -312,6 +312,8 @@ public class FileUploadProcessor {
             // 检查上传次数
             if (!uploadLimiter.access(userName)) {
                 errFiles.add(originalName);
+                countDownLatch.countDown();
+                LOGGER.log(Level.INFO, "Out of upload limit " + originalName + " userName: " + userName);
                 continue;
             }
             try {
