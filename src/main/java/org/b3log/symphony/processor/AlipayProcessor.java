@@ -66,13 +66,13 @@ public class AlipayProcessor {
     // 勋章信息
     final static String L1_NAME = "摸鱼派粉丝";
     final static String L1_DESC = "捐助摸鱼派达16RMB; 编号No.";
-    final static String L1_ATTR = "url=https://pwl.stackoverflow.wiki/2021/12/ht1-d8149de4.jpg&backcolor=ffffff&fontcolor=ff3030";
+    final static String L1_ATTR = "url=https://file.fishpi.cn/2021/12/ht1-d8149de4.jpg&backcolor=ffffff&fontcolor=ff3030";
     final static String L2_NAME = "摸鱼派忠粉";
     final static String L2_DESC = "捐助摸鱼派达256RMB; 编号No.";
-    final static String L2_ATTR = "url=https://pwl.stackoverflow.wiki/2021/12/ht2-bea67b29.jpg&backcolor=87cefa&fontcolor=efffff";
+    final static String L2_ATTR = "url=https://file.fishpi.cn/2021/12/ht2-bea67b29.jpg&backcolor=87cefa&fontcolor=efffff";
     final static String L3_NAME = "摸鱼派铁粉";
     final static String L3_DESC = "捐助摸鱼派达1024RMB; 编号No.";
-    final static String L3_ATTR = "url=https://pwl.stackoverflow.wiki/2021/12/ht3-b97ea102.jpg&backcolor=ee3a8c&fontcolor=ffffff";
+    final static String L3_ATTR = "url=https://file.fishpi.cn/2021/12/ht3-b97ea102.jpg&backcolor=ee3a8c&fontcolor=ffffff";
 
     // 捐助相关
     /**

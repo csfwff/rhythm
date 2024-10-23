@@ -1589,22 +1589,22 @@ var Util = {
                     '                       aria-label="用户分组：' + userRole + '">\n';
                 switch (userRole) {
                     case '管理员':
-                        html += '<img style="height: 20px;margin: 0px;" src="https://pwl.stackoverflow.wiki/adminRole.png"/>';
+                        html += '<img style="height: 20px;margin: 0px;" src="https://file.fishpi.cn/adminRole.png"/>';
                         break;
                     case 'OP':
-                        html += '<img style="height: 20px;margin: 0px;" src="https://pwl.stackoverflow.wiki/opRole.png"/>';
+                        html += '<img style="height: 20px;margin: 0px;" src="https://file.fishpi.cn/opRole.png"/>';
                         break;
                     case '纪律委员':
-                        html += '<img style="height: 20px;margin: 0px;" src="https://pwl.stackoverflow.wiki/policeRole.png"/>';
+                        html += '<img style="height: 20px;margin: 0px;" src="https://file.fishpi.cn/policeRole.png"/>';
                         break;
                     case '超级会员':
-                        html += '<img style="height: 20px;margin: 0px;" src="https://pwl.stackoverflow.wiki/svipRole.png"/>';
+                        html += '<img style="height: 20px;margin: 0px;" src="https://file.fishpi.cn/svipRole.png"/>';
                         break;
                     case '成员':
-                        html += '<img style="height: 20px;margin: 0px;" src="https://pwl.stackoverflow.wiki/vipRole.png"/>';
+                        html += '<img style="height: 20px;margin: 0px;" src="https://file.fishpi.cn/vipRole.png"/>';
                         break;
                     default:
-                        html += '<img style="height: 20px;margin: 0px;" src="https://pwl.stackoverflow.wiki/newRole.png"/>';
+                        html += '<img style="height: 20px;margin: 0px;" src="https://file.fishpi.cn/newRole.png"/>';
                         break;
                 }
                 html += '                    </a>\n';

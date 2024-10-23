@@ -126,7 +126,7 @@
                                 </div>
                             </li>
                             <li class="fn__flex">
-                                <img class="avatar" src="https://pwl.stackoverflow.wiki/evolve/evolved.ico" />
+                                <img class="avatar" src="https://file.fishpi.cn/evolve/evolved.ico" />
                                 <div class="fn-flex-1">
                                     <h2>
                                         <a class="title"
@@ -136,7 +136,7 @@
                                 </div>
                             </li>
                             <li class="fn__flex">
-                                <img class="avatar" src="https://pwl.stackoverflow.wiki/adarkroom/img/adr.png" />
+                                <img class="avatar" src="https://file.fishpi.cn/adarkroom/img/adr.png" />
                                 <div class="fn-flex-1">
                                     <h2>
                                         <a class="title"

@@ -112,7 +112,7 @@
                             <div class="user-card__icons fn__flex">
                                 <div class="fn__flex-1">
                                     <a href="https://fishpi.cn/article/1630575841478">
-                                        <img style="height: 20px;margin: 0px;" src="https://pwl.stackoverflow.wiki/vipRole.png">
+                                        <img style="height: 20px;margin: 0px;" src="https://file.fishpi.cn/vipRole.png">
                                     </a>
                                     <a href="${servePath}/member/${currentUser.userName}/points" class="tooltipped-new tooltipped__n" aria-label="${currentUser.userPoint?c} 积分">
                                         <svg>

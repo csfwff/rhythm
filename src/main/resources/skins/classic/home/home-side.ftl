@@ -61,17 +61,17 @@
                 <a href="https://fishpi.cn/article/1630575841478" target="_blank">
                     <img style="height: 26px;margin-top: 5px;" src="
                     <#if user.roleName == '管理员'>
-                    https://pwl.stackoverflow.wiki/adminRole.png
+                    https://file.fishpi.cn/adminRole.png
                     <#elseif user.roleName == 'OP'>
-                    https://pwl.stackoverflow.wiki/opRole.png
+                    https://file.fishpi.cn/opRole.png
                     <#elseif user.roleName == '纪律委员'>
-                    https://pwl.stackoverflow.wiki/policeRole.png
+                    https://file.fishpi.cn/policeRole.png
                     <#elseif user.roleName == '超级会员'>
-                    https://pwl.stackoverflow.wiki/svipRole.png
+                    https://file.fishpi.cn/svipRole.png
                     <#elseif user.roleName == '成员'>
-                    https://pwl.stackoverflow.wiki/vipRole.png
+                    https://file.fishpi.cn/vipRole.png
                     <#else>
-                    https://pwl.stackoverflow.wiki/newRole.png
+                    https://file.fishpi.cn/newRole.png
                     </#if>
                     "/>
                 </a>

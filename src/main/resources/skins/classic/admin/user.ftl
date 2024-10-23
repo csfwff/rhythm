@@ -577,12 +577,12 @@
                 <button class="btn" onclick="
                     $('#metal-name').val('纪律委员');
                     $('#metal-desc').val('摸鱼派管理组成员');
-                    $('#metal-attr').val('url=https://pwl.stackoverflow.wiki/2021/12/011shield-46ce360b.jpg&backcolor=2568ff&fontcolor=ffffff');
+                    $('#metal-attr').val('url=https://file.fishpi.cn/2021/12/011shield-46ce360b.jpg&backcolor=2568ff&fontcolor=ffffff');
                 ">纪律委员</button>
                 <button class="btn" onclick="
                     $('#metal-name').val('开发');
                     $('#metal-desc').val('摸鱼派官方开发组成员');
-                    $('#metal-attr').val('url=https://pwl.stackoverflow.wiki/2021/12/metaldev-db507262.png&backcolor=483d8b&fontcolor=f8f8ff');
+                    $('#metal-attr').val('url=https://file.fishpi.cn/2021/12/metaldev-db507262.png&backcolor=483d8b&fontcolor=f8f8ff');
                 ">开发</button>
                 <button class="btn" onclick="
                     $('#metal-name').val('Operator');
@@ -592,7 +592,7 @@
                 <button class="btn" onclick="
                     $('#metal-name').val('超级会员');
                     $('#metal-desc').val('摸鱼派超级会籍成员');
-                    $('#metal-attr').val('url=https://pwl.stackoverflow.wiki/2021/12/vip-aff3ea5d.png&backcolor=696969&fontcolor=ffd700');
+                    $('#metal-attr').val('url=https://file.fishpi.cn/2021/12/vip-aff3ea5d.png&backcolor=696969&fontcolor=ffd700');
                 ">超级会员</button>
                 <button class="btn" onclick="
                     $('#metal-name').val('礼仪委员');

@@ -688,7 +688,7 @@ public class ChatRoomBot {
             final long time = System.currentTimeMillis();
             JSONObject msg = new JSONObject();
             msg.put(User.USER_NAME, "马库斯");
-            msg.put(UserExt.USER_AVATAR_URL, "https://pwl.stackoverflow.wiki/2022/01/robot3-89631199.png");
+            msg.put(UserExt.USER_AVATAR_URL, "https://file.fishpi.cn/2022/01/robot3-89631199.png");
             msg.put(Common.CONTENT, content);
             msg.put(Common.TIME, time);
             msg.put(UserExt.USER_NICKNAME, "RK200");

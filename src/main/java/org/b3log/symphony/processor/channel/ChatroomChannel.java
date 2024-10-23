@@ -410,18 +410,18 @@ public class ChatroomChannel implements WebSocketChannel {
             for (WebSocketSession session : senderSessions) {
                 session.sendText("{\n" +
                         "    \"md\": \"由于您超过6小时未活跃，已将您断开连接，如要继续聊天请刷新页面，谢谢 :)\",\n" +
-                        "    \"userAvatarURL\": \"https://pwl.stackoverflow.wiki/2022/01/robot3-89631199.png\",\n" +
-                        "    \"userAvatarURL20\": \"https://pwl.stackoverflow.wiki/2022/01/robot3-89631199.png\",\n" +
+                        "    \"userAvatarURL\": \"https://file.fishpi.cn/2022/01/robot3-89631199.png\",\n" +
+                        "    \"userAvatarURL20\": \"https://file.fishpi.cn/2022/01/robot3-89631199.png\",\n" +
                         "    \"userNickname\": \"人工智障\",\n" +
                         "    \"sysMetal\": \"\",\n" +
                         "    \"time\": \"" + new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(System.currentTimeMillis()) + "\",\n" +
                         "    \"oId\": \"" + System.currentTimeMillis() + "\",\n" +
                         "    \"userName\": \"摸鱼派官方巡逻机器人\",\n" +
                         "    \"type\": \"msg\",\n" +
-                        "    \"userAvatarURL210\": \"https://pwl.stackoverflow.wiki/2022/01/robot3-89631199.png\",\n" +
+                        "    \"userAvatarURL210\": \"https://file.fishpi.cn/2022/01/robot3-89631199.png\",\n" +
                         "    \"content\": \"<p>由于您超过6小时未活跃，已将您断开连接，如要继续聊天请刷新页面，谢谢 :)</p>\",\n" +
                         "    \"client\": \"Other/Robot\",\n" +
-                        "    \"userAvatarURL48\": \"https://pwl.stackoverflow.wiki/2022/01/robot3-89631199.png\"\n" +
+                        "    \"userAvatarURL48\": \"https://file.fishpi.cn/2022/01/robot3-89631199.png\"\n" +
                         "}");
                 removeSession(session);
             }

@@ -26,8 +26,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="やり直すんだ。そして、次はうまくやる。"/>
     <meta name="keywords" content="人生重开模拟器 liferestart life restart remake 人生重来"/>
-    <link id="themeLink" rel="stylesheet" href="https://pwl.stackoverflow.wiki/lifeRestart/view/light.css">
-    <link rel="manifest" href="https://pwl.stackoverflow.wiki/lifeRestart/view/manifest.json">
+    <link id="themeLink" rel="stylesheet" href="https://file.fishpi.cn/lifeRestart/view/light.css">
+    <link rel="manifest" href="https://file.fishpi.cn/lifeRestart/view/manifest.json">
     <title>Life Restart</title>
 </head>
 <body>
@@ -50,9 +50,9 @@
         </div>
     </div>
 </div>
-<script src="https://pwl.stackoverflow.wiki/lifeRestart/lib/jquery-3.6.0.min.js"></script>
-<script src="https://pwl.stackoverflow.wiki/lifeRestart/lib/dom-to-image.min.js"></script>
-<script src="https://pwl.stackoverflow.wiki/bundle.js"></script>
+<script src="https://file.fishpi.cn/lifeRestart/lib/jquery-3.6.0.min.js"></script>
+<script src="https://file.fishpi.cn/lifeRestart/lib/dom-to-image.min.js"></script>
+<script src="https://file.fishpi.cn/bundle.js"></script>
 <script>
     if ('serviceWorker' in navigator) {
         window.addEventListener('load', function () {
