@@ -118,6 +118,13 @@ public class ApiProcessor {
 
         final RewardQueryService rewardQueryService = beanManager.getReference(RewardQueryService.class);
         Dispatcher.get("/api/article/reward/senders/{aId}", rewardQueryService::rewardedSenders);
+        Dispatcher.post(Symphonys.get("callback.url"), apiProcessor::callbackFromQiNiu);
+    }
+
+    public void callbackFromQiNiu(final RequestContext context) {
+        JSONObject jsonObject = context.requestJSON();
+        LOGGER.log(Level.INFO, jsonObject.toString());
+        context.renderJSON(StatusCodes.SUCC);
     }
 
     /**
