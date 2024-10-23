@@ -41,6 +41,7 @@ import org.b3log.symphony.model.Follow;
 import org.b3log.symphony.model.Role;
 import org.b3log.symphony.model.SystemSettings;
 import org.b3log.symphony.model.UserExt;
+import org.b3log.symphony.processor.bot.ChatRoomBot;
 import org.b3log.symphony.processor.middleware.CSRFMidware;
 import org.b3log.symphony.processor.middleware.LoginCheckMidware;
 import org.b3log.symphony.repository.UploadRepository;
@@ -145,8 +146,21 @@ public class ApiProcessor {
 
         if (!userName.isEmpty()) {
             String suggestion = jsonObject.optJSONObject("items").optJSONObject("result").optJSONObject("result").optString("suggestion");
+            String userId = userQueryService.getUserByName(userName).optString(Keys.OBJECT_ID);
             switch (suggestion) {
-
+                case "block":
+                    LOGGER.log(Level.WARN, "Block file " + fileURL);
+                    ChatRoomBot.sendBotMsg("犯罪嫌疑人 @" + userName + "  由于上传违法文件/图片，被处以 500 积分的处罚，请引以为戒。\n@adlered  留档");
+                    ChatRoomBot.abusePoint(userId, 500, "机器人罚单-上传违法文件");
+                    break;
+                case "review":
+                    LOGGER.log(Level.WARN, "Review file " + fileURL);
+                    ChatRoomBot.sendBotMsg("用户 @" + userName + "  由于上传疑似违规文件/图片，被处以 200 积分的处罚，请引以为戒。\n@adlered  留档");
+                    ChatRoomBot.abusePoint(userId, 200, "机器人罚单-上传疑似违规文件");
+                    break;
+                 default:
+                    LOGGER.log(Level.INFO, "Normal file " + fileURL);
+                    break;
             }
         }
 
