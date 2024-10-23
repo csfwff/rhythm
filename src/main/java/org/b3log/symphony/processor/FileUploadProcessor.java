@@ -55,6 +55,7 @@ import org.b3log.symphony.repository.UploadRepository;
 import org.b3log.symphony.util.*;
 import org.b3log.symphony.util.Sessions;
 import org.json.JSONObject;
+import pers.adlered.simplecurrentlimiter.main.SimpleCurrentLimiter;
 
 import java.io.*;
 import java.net.InetAddress;
@@ -168,6 +169,7 @@ public class FileUploadProcessor {
      *
      * @param context the specified context
      */
+    final private static SimpleCurrentLimiter uploadLimiter = new SimpleCurrentLimiter(30 * 60, 40);
     public synchronized void uploadFile(final RequestContext context) {
         final JSONObject result = Results.newFail();
         context.renderJSONPretty(result);
@@ -298,9 +300,20 @@ public class FileUploadProcessor {
                 }
             } catch (RepositoryException ignored) {
             }
+            JSONObject user = Sessions.getUser();
+            try {
+                user = ApiProcessor.getUserByKey(context.param("apiKey"));
+            } catch (NullPointerException ignored) {
+            }
+            final String userName = user.optString(User.USER_NAME);
             // 没有重复文件，正常上传
             final FileUpload file = files.get(i);
             final String originalName = fileName = Escapes.sanitizeFilename(file.getFilename());
+            // 检查上传次数
+            if (!uploadLimiter.access(userName)) {
+                errFiles.add(originalName);
+                continue;
+            }
             try {
                 String url;
                 byte[] bytes;
@@ -337,12 +350,6 @@ public class FileUploadProcessor {
                     succMap.put(originalName, url);
                 }
                 // 记录到Upload表
-                JSONObject user = Sessions.getUser();
-                try {
-                    user = ApiProcessor.getUserByKey(context.param("apiKey"));
-                } catch (NullPointerException ignored) {
-                }
-                final String userName = user.optString(User.USER_NAME);
                 String ip = Requests.getRemoteAddr(request);
                 String time = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date());
                 // 写入数据库
