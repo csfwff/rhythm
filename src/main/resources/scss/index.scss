@@ -582,6 +582,11 @@ label.cmt-anonymous {
     margin: 5px 0;
   }
 
+  .comment img:not(.emoji) {
+    max-width: 150px;
+    max-height: 300px;
+  }
+
   .comment > p:last-child {
     margin-bottom: 0px;
   }
