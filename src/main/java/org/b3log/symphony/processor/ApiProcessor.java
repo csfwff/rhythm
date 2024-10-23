@@ -30,6 +30,10 @@ import org.b3log.latke.ioc.BeanManager;
 import org.b3log.latke.ioc.Inject;
 import org.b3log.latke.ioc.Singleton;
 import org.b3log.latke.model.User;
+import org.b3log.latke.repository.FilterOperator;
+import org.b3log.latke.repository.PropertyFilter;
+import org.b3log.latke.repository.Query;
+import org.b3log.latke.repository.RepositoryException;
 import org.b3log.latke.service.LangPropsService;
 import org.b3log.latke.service.ServiceException;
 import org.b3log.latke.util.Crypts;
@@ -39,6 +43,7 @@ import org.b3log.symphony.model.SystemSettings;
 import org.b3log.symphony.model.UserExt;
 import org.b3log.symphony.processor.middleware.CSRFMidware;
 import org.b3log.symphony.processor.middleware.LoginCheckMidware;
+import org.b3log.symphony.repository.UploadRepository;
 import org.b3log.symphony.repository.UserRepository;
 import org.b3log.symphony.service.*;
 import org.b3log.symphony.util.StatusCodes;
@@ -102,6 +107,9 @@ public class ApiProcessor {
     @Inject
     private CloudService cloudService;
 
+    @Inject
+    private UploadRepository uploadRepository;
+
     /**
      * Register request handlers.
      */
@@ -124,6 +132,24 @@ public class ApiProcessor {
     public void callbackFromQiNiu(final RequestContext context) {
         JSONObject jsonObject = context.requestJSON();
         LOGGER.log(Level.INFO, jsonObject.toString());
+
+        String fileURL = "https://file.fishpi.cn/" + jsonObject.optString("inputKey");
+        String userName = "";
+        final Query query = new Query().setFilter(new PropertyFilter("path", FilterOperator.EQUAL, fileURL));
+        try {
+            JSONObject uploadJSON = uploadRepository.getFirst(query);
+            userName = uploadJSON.optString("userName");
+        } catch (RepositoryException e) {
+            LOGGER.log(Level.ERROR, "Cannot find upload by path [" + fileURL + "]", e);
+        }
+
+        if (!userName.isEmpty()) {
+            String suggestion = jsonObject.optJSONObject("items").optJSONObject("result").optJSONObject("result").optString("suggestion");
+            switch (suggestion) {
+
+            }
+        }
+
         context.renderJSON(StatusCodes.SUCC);
     }
 
