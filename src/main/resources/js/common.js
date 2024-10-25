@@ -1401,7 +1401,7 @@ var Util = {
                         list.find("li:first").slideDown(200);
                         Util.listenUserCard();
                     } else {
-                        Util.alert(result.msg)
+                        Util.alert(result.msg);
                     }
                 },
                 complete: function () {
@@ -1727,6 +1727,61 @@ var Util = {
             var data = JSON.parse(evt.data)
 
             switch (data.command) {
+                case 'bz-update':
+                    if ($(".active-bz-list-big")[0] !== undefined) {
+                        let breezemoonAuthorName = data.bz.breezemoonAuthorName;
+                        let breezemoonAuthorThumbnailURL48 = data.bz.breezemoonAuthorThumbnailURL48;
+                        let breezemoonContent = data.bz.breezemoonContent;
+                        let breezemoonOId = data.bz.oId;
+                        let list = $($(".active-bz-list-big")[0]);
+                        list.prepend(
+                            "<li>" +
+                            "<div class=\"fn-flex\">" +
+                            "<div class=\"fn-flex-1\">" +
+                            "<div class=\"fn-flex\">" +
+                            "<a rel=\"nofollow\" href=\"" + Label.servePath + "/member/" + breezemoonAuthorName + "\">" +
+                            "<div class=\"avatar\" aria-label=\"" + breezemoonAuthorName + "\" style=\"background-image:url('" + breezemoonAuthorThumbnailURL48 + "')\"></div>" +
+                            "</a>" +
+                            "<div class=\"fn-ellipsis ft-fade ft-smaller list-info\">" +
+                            "<a rel=\"nofollow\" class=\"author\" href=\"" + Label.servePath + "/member/" + breezemoonAuthorName + "\">" +
+                            breezemoonAuthorName +
+                            "</a>" +
+                            "<br>" +
+                            "刚刚" +
+                            "<br>" +
+                            "</div>" +
+                            "</div>" +
+                            "<a style=\"color: #3b3b3b\" class=\"abstract\" href=\"" + Label.servePath + "/member/" + breezemoonAuthorName + "/breezemoons/" + breezemoonOId + "\">" +
+                            breezemoonContent +
+                            "</a>" +
+                            "</div>" +
+                            "</div>" +
+                            "</li>"
+                        );
+                    }
+                    if ($(".active-bz-list")[0] !== undefined) {
+                        let breezemoonAuthorName = data.bz.breezemoonAuthorName;
+                        if (breezemoonAuthorName != Label.currentUserName) {
+                            let breezemoonAuthorThumbnailURL48 = data.bz.breezemoonAuthorThumbnailURL48;
+                            let breezemoonContent = data.bz.breezemoonContent;
+                            let breezemoonOId = data.bz.oId;
+                            let list = $($(".active-bz-list")[0]);
+                            list.prepend(
+                                "<li style=\"display: none\">\n" +
+                                "<a href=\"" + Label.servePath + "/member/" + breezemoonAuthorName + "\">\n" +
+                                "<span class=\"avatar-small slogan\" aria-label=\"" + breezemoonAuthorName + "\" style=\"background-image: url(" + breezemoonAuthorThumbnailURL48 + ")\"></span>\n" +
+                                "</a>\n" +
+                                "<a href=\"" + Label.servePath + "/member/" + breezemoonAuthorName + "/breezemoons/" + breezemoonOId + "\" class=\"title\">" + breezemoonContent + "</a>\n" +
+                                "</li>"
+                            );
+
+                            list.find("li:last").fadeOut(199, function () {
+                                list.find("li:last").remove();
+                            });
+                            list.find("li:first").slideDown(200);
+                            Util.listenUserCard();
+                        }
+                    }
                 case 'refreshNotification':
                     if (window.location.pathname === '/cr') {
                         Util.makeNotificationRead('at');

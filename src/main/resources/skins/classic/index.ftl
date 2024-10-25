@@ -510,7 +510,7 @@
                               data-csrf="${csrfToken}">${postLabel}</span>
                     </div>
                     <div class="module-panel">
-                        <ul class="module-list">
+                        <ul class="module-list active-bz-list">
                             <#list sideBreezemoons as item>
                                 <#if item_index <= 10>
                                     <li>

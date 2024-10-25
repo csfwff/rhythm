@@ -52,7 +52,7 @@
         <span id="breezemoonPostBtn" class="btn breezemoon__btn" data-csrf="${csrfToken}">${postLabel}</span>
     </div>
     <div class="module-panel">
-        <ul class="module-list">
+        <ul class="module-list active-bz-list">
         <#list sideBreezemoons as item>
             <li>
                 <a href="${servePath}/member/${item.breezemoonAuthorName}">

@@ -39,7 +39,7 @@
                     <#if 0 < breezemoons?size>
                         <div class="module">
                             <div class="article-list list">
-                                <ul class="stick">
+                                <ul class="stick active-bz-list-big">
                                     <#list breezemoons as bm>
                                     <li>
                                         <div class="fn-flex">
