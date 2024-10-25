@@ -75,13 +75,13 @@ public class SearchQueryService {
             final JSONObject content = new JSONObject();
             content.put(Article.ARTICLE_CONTENT, keyword);
             final JSONObject matchContent = new JSONObject();
-            matchContent.put("match", content);
+            matchContent.put("match_phrase", content);
             orClause.put(matchContent);
 
             final JSONObject title = new JSONObject();
             title.put(Article.ARTICLE_TITLE, keyword);
             final JSONObject matchTitle = new JSONObject();
-            matchTitle.put("match", title);
+            matchTitle.put("match_phrase", title);
             orClause.put(matchTitle);
 
             reqData.put("query", q);
