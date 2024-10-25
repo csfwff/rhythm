@@ -197,7 +197,7 @@ public class BreezemoonProcessor {
      *
      * @param context the specified context
      */
-    final private static SimpleCurrentLimiter addBreezemoonLimiter = new SimpleCurrentLimiter(60 * 60, 60);
+    final private static SimpleCurrentLimiter addBreezemoonLimiter = new SimpleCurrentLimiter(60 * 60, 5);
     public void addBreezemoon(final RequestContext context) {
         context.renderJSON(StatusCodes.ERR);
 
@@ -214,7 +214,7 @@ public class BreezemoonProcessor {
         }
         final String authorId = user.optString(Keys.OBJECT_ID);
         if (!addBreezemoonLimiter.access(authorId)) {
-            context.renderJSON(StatusCodes.ERR).renderMsg("每小时只允许发送60个清风明月，稍安勿躁...");
+            context.renderJSON(StatusCodes.ERR).renderMsg("每小时只允许发送5个清风明月，稍安勿躁...");
             return;
         }
         final String userPhone = user.optString("userPhone");
