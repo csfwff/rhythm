@@ -820,7 +820,11 @@ public class ArticleQueryService {
             for (int i = 0; i < tagArticleRelations.size(); i++) {
                 articleIds.add(tagArticleRelations.get(i).optString(Keys.OBJECT_ID));
             }
-            Query query = new Query().setFilter(new PropertyFilter(Keys.OBJECT_ID, FilterOperator.IN, articleIds));
+            Query query = new Query();
+            query.setFilter(
+                    CompositeFilterOperator.and(
+                            new PropertyFilter(Keys.OBJECT_ID, FilterOperator.IN, articleIds),
+                            new PropertyFilter(Article.ARTICLE_STATUS, FilterOperator.EQUAL, 0)));
             addListProjections(query);
 
             final List<JSONObject> ret = articleRepository.getList(query);
