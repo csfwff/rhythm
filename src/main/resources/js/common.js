@@ -1782,6 +1782,7 @@ var Util = {
                             Util.listenUserCard();
                         }
                     }
+                    break;
                 case 'refreshNotification':
                     if (window.location.pathname === '/cr') {
                         Util.makeNotificationRead('at');
@@ -1792,7 +1793,7 @@ var Util = {
                             Util.notice("default", 3000, "你有新的通知！<a href='/notifications'>点击查看</a>");
                         }
                     }
-                    break
+                    break;
                 case 'chatUnreadCountRefresh':
                     if (data.count === 0) {
                         Util.pauseBling();
