@@ -128,7 +128,28 @@ public class ApiProcessor {
         final RewardQueryService rewardQueryService = beanManager.getReference(RewardQueryService.class);
         Dispatcher.get("/api/article/reward/senders/{aId}", rewardQueryService::rewardedSenders);
         Dispatcher.post(Symphonys.get("callback.url"), apiProcessor::callbackFromQiNiu);
+
         Dispatcher.get("/loginWebInApiKey", apiProcessor::loginWebInApiKey);
+        Dispatcher.get("/getApiKeyInWeb", apiProcessor::getApiKeyInWeb, loginCheck::handle);
+    }
+
+    public void getApiKeyInWeb(final RequestContext context) {
+        JSONObject currentUser = Sessions.getUser();
+        try {
+            currentUser = ApiProcessor.getUserByKey(context.param("apiKey"));
+        } catch (NullPointerException ignored) {
+        }
+        String userId = currentUser.optString(Keys.OBJECT_ID);
+        final String userPassword = currentUser.optString(User.USER_PASSWORD);
+
+        final JSONObject cookieJSONObject = new JSONObject();
+        cookieJSONObject.put(Keys.OBJECT_ID, userId);
+
+        final String random = RandomStringUtils.randomAlphanumeric(16);
+        cookieJSONObject.put(Keys.TOKEN, userPassword + COOKIE_ITEM_SEPARATOR + random);
+        final String key = Crypts.encryptByAES(cookieJSONObject.toString(), Symphonys.COOKIE_SECRET);
+
+        context.renderJSON(StatusCodes.SUCC).renderJSON(new JSONObject().put("apiKey", key));
     }
 
     public void loginWebInApiKey(final RequestContext context) {
