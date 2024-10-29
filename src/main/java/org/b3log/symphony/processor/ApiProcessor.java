@@ -24,8 +24,10 @@ import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.b3log.latke.Keys;
+import org.b3log.latke.Latkes;
 import org.b3log.latke.http.Dispatcher;
 import org.b3log.latke.http.RequestContext;
+import org.b3log.latke.http.Response;
 import org.b3log.latke.ioc.BeanManager;
 import org.b3log.latke.ioc.Inject;
 import org.b3log.latke.ioc.Singleton;
@@ -37,16 +39,14 @@ import org.b3log.latke.repository.RepositoryException;
 import org.b3log.latke.service.LangPropsService;
 import org.b3log.latke.service.ServiceException;
 import org.b3log.latke.util.Crypts;
-import org.b3log.symphony.model.Follow;
-import org.b3log.symphony.model.Role;
-import org.b3log.symphony.model.SystemSettings;
-import org.b3log.symphony.model.UserExt;
+import org.b3log.symphony.model.*;
 import org.b3log.symphony.processor.bot.ChatRoomBot;
 import org.b3log.symphony.processor.middleware.CSRFMidware;
 import org.b3log.symphony.processor.middleware.LoginCheckMidware;
 import org.b3log.symphony.repository.UploadRepository;
 import org.b3log.symphony.repository.UserRepository;
 import org.b3log.symphony.service.*;
+import org.b3log.symphony.util.Sessions;
 import org.b3log.symphony.util.StatusCodes;
 import org.b3log.symphony.util.Symphonys;
 import org.json.JSONObject;
@@ -128,6 +128,25 @@ public class ApiProcessor {
         final RewardQueryService rewardQueryService = beanManager.getReference(RewardQueryService.class);
         Dispatcher.get("/api/article/reward/senders/{aId}", rewardQueryService::rewardedSenders);
         Dispatcher.post(Symphonys.get("callback.url"), apiProcessor::callbackFromQiNiu);
+        Dispatcher.get("/loginWebInApiKey", apiProcessor::loginWebInApiKey);
+    }
+
+    public void loginWebInApiKey(final RequestContext context) {
+        JSONObject currentUser;
+        try {
+            currentUser = ApiProcessor.getUserByKey(context.param("apiKey"));
+        } catch (NullPointerException ignored) {
+            context.renderJSON(StatusCodes.ERR).renderMsg("ApiKey 错误。");
+            return;
+        }
+
+        if (null != currentUser) {
+            final Response response = context.getResponse();
+            response.sendRedirect(Latkes.getServePath());
+            Sessions.login(response, currentUser.optString(Keys.OBJECT_ID), true);
+        } else {
+            context.renderJSON(StatusCodes.ERR).renderMsg("ApiKey 错误。");
+        }
     }
 
     public void callbackFromQiNiu(final RequestContext context) {
