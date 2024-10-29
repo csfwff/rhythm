@@ -74,7 +74,7 @@ var Util = {
         } else {
             attr = '';
         }
-        return 'https://fishpi.cn/gen?scale=0.79&txt=' + name + attr;
+        return 'https://fishpi.cn/gen?ver=0.1&scale=0.79&txt=' + name + attr;
     },
 
     genMiniMetal(attr) {
@@ -83,7 +83,7 @@ var Util = {
         } else {
             attr = '';
         }
-        return 'https://fishpi.cn/gen?scale=0.79&txt=' + attr;
+        return 'https://fishpi.cn/gen?ver=0.1&scale=0.79&txt=' + attr;
     },
 
     parseDom(arg) {
