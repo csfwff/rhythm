@@ -142,7 +142,11 @@ public class ApiProcessor {
 
         if (null != currentUser) {
             final Response response = context.getResponse();
-            response.sendRedirect(Latkes.getServePath());
+            String r = context.param("r");
+            if (null == r) {
+                r = "/";
+            }
+            response.sendRedirect(Latkes.getServePath() + r);
             Sessions.login(response, currentUser.optString(Keys.OBJECT_ID), true);
         } else {
             context.renderJSON(StatusCodes.ERR).renderMsg("ApiKey 错误。");
