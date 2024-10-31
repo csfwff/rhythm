@@ -246,7 +246,29 @@ public class SettingsProcessor {
         Dispatcher.get("/bag/1dayCheckin", settingsProcessor::use1dayCheckinCard, loginCheck::handle, csrfMidware::check);
         Dispatcher.get("/bag/2dayCheckin", settingsProcessor::use2dayCheckinCard, loginCheck::handle, csrfMidware::check);
         Dispatcher.get("/bag/patchCheckin", settingsProcessor::usePatchCheckinCard, loginCheck::handle, csrfMidware::check);
+        Dispatcher.post("/bag/nameCard", settingsProcessor::useNameCard, loginCheck::handle, csrfMidware::check);
+    }
 
+    /**
+     * 使用改名卡
+     */
+    public void useNameCard(final RequestContext context) {
+        JSONObject user = Sessions.getUser();
+        final String userId = user.optString(Keys.OBJECT_ID);
+        JSONObject requestJSONObject = context.requestJSON();
+        String userName = requestJSONObject.optString(User.USER_NAME);
+        if (cloudService.putBag(userId, "nameCard", -1, Integer.MAX_VALUE) == 0) {
+            try {
+                user.put(User.USER_NAME, userName);
+                userMgmtService.updateUserName(userId, user);
+                context.renderJSON(StatusCodes.SUCC);
+                context.renderMsg("您的用户名已成功修改为：" + userName);
+            } catch (ServiceException e) {
+                context.renderJSON(StatusCodes.ERR);
+                context.renderMsg("您的用户名修改失败，请重试。原因：" + e.getLocalizedMessage());
+                cloudService.putBag(userId, "nameCard", 1, Integer.MAX_VALUE);
+            }
+        }
     }
 
     /**

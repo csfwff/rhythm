@@ -260,8 +260,8 @@ var Settings = {
     if (bag.checkin2days !== undefined && bag.checkin2days > 0) {
       html += '<button style="margin:0 5px 5px 0" onclick="Settings.use2dayCheckinCard(\'' + Label.csrfToken + '\')">两天免签卡 x' + bag.checkin2days + '</button>';
     }
-    if (bag.patchCheckinCard !== undefined && bag.patchCheckinCard > 0) {
-      html += '<button style="margin:0 5px 5px 0" onclick="Settings.usePatchCheckinCard(\'' + Label.csrfToken + '\', ' + bag.patchStart + ')">补签卡 x' + bag.patchCheckinCard + '</button>';
+    if (bag.nameCard !== undefined && bag.nameCard > 0) {
+      html += '<button style="margin:0 5px 5px 0" onclick="Settings.useNameCard(\'' + Label.csrfToken + '\')">改名卡 x' + bag.nameCard + '</button>';
     }
     if (bag.metalTicket !== undefined && bag.metalTicket > 0) {
       html += '<button style="margin:0 5px 5px 0" onclick="alert(\'您已取得摸鱼派一周年纪念勋章领取权限，请静待系统公告\')">摸鱼派一周年纪念勋章领取券 x' + bag.metalTicket + '</button>';
@@ -316,6 +316,30 @@ var Settings = {
         location.reload();
       }
     });
+  },
+  /**
+   * 使用改名卡
+   * @param csrfToken
+   */
+  useNameCard: function (csrfToken) {
+    var username = prompt("请输入要修改的用户名", "");
+    if (username === null || username === "") {
+      alert("您没有输入用户名，取消使用改名卡。");
+    } else {
+      $.ajax({
+        url: Label.servePath + '/bag/nameCard',
+        type: 'POST',
+        async: false,
+        headers: {'csrfToken': csrfToken},
+        data: JSON.stringify({
+          userName: username
+        }),
+        success: function (result) {
+          alert(result.msg);
+          location.reload();
+        }
+      })
+    }
   },
   /**
    * 使用补签卡
