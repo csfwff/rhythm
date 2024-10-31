@@ -90,7 +90,7 @@ public final class Markdowns {
     /**
      * Lute engine serve path. https://github.com/88250/lute
      */
-    private static final String LUTE_ENGINE_URL = "http://localhost:8249";
+    private static final String LUTE_ENGINE_URL = Symphonys.get("lute.engine.url");
 
     /**
      * Built-in MD engine options.
