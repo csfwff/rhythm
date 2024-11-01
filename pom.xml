@@ -135,7 +135,7 @@
         <dependency>
             <groupId>org.b3log</groupId>
             <artifactId>latke-repository-mysql</artifactId>
-            <version>${latke.version}</version>
+            <version>3.4.30</version>
         </dependency>
 
         <dependency>
