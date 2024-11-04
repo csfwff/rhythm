@@ -486,8 +486,9 @@ public class AdminProcessor {
                         Pointtransfer.TRANSFER_TYPE_C_ACCOUNT2ACCOUNT, 128, oId, System.currentTimeMillis(), "参与图片审核奖励：违规图片");
 
                 String picUserName = picture.optString("userName");
+                String picUserId = userQueryService.getUserByName(picUserName).optString(Keys.OBJECT_ID);
                 ChatRoomBot.sendBotMsg("犯罪嫌疑人 @" + picUserName + "  由于上传违法文件/图片，被处以 500 积分的处罚，请引以为戒。\n@adlered  留档");
-                ChatRoomBot.abusePoint(userId, 500, "机器人罚单-上传违法文件");
+                ChatRoomBot.abusePoint(picUserId, 500, "机器人罚单-上传违法文件");
             }
 
             operationMgmtService.addOperation(Operation.newOperation(request, Operation.OPERATION_CODE_C_DELETE_PICTURE, oId));
