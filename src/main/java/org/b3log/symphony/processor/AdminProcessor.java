@@ -468,6 +468,13 @@ public class AdminProcessor {
                 return;
             }
 
+            // 抹除MD5
+            status = new JSONObject();
+            status.put("md5", "deleted");
+            transaction = uploadRepository.beginTransaction();
+            uploadRepository.update(oId, status);
+            transaction.commit();
+
             // 删除图片
             if (QN_ENABLED) {
                 Auth auth = Auth.create(Symphonys.UPLOAD_QINIU_AK, Symphonys.UPLOAD_QINIU_SK);
