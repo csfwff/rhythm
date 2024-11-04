@@ -464,9 +464,10 @@ public class AdminProcessor {
                 Auth auth = Auth.create(Symphonys.UPLOAD_QINIU_AK, Symphonys.UPLOAD_QINIU_SK);
                 Configuration cfg = new Configuration(Region.autoRegion());
                 BucketManager bucketManager = new BucketManager(auth, cfg);
-                String filename = path.replaceAll(Symphonys.UPLOAD_QINIU_DOMAIN, "");
-                bucketManager.delete(Symphonys.UPLOAD_QINIU_BUCKET, filename);
-                LOGGER.log(Level.INFO, "Delete cdn file: " + filename);
+                String filename = path.replaceAll(Symphonys.UPLOAD_QINIU_DOMAIN + "/", "");
+                String fileKey = Symphonys.UPLOAD_QINIU_BUCKET + ":" + filename;
+                LOGGER.log(Level.INFO, "Delete cdn file: " + fileKey);
+                bucketManager.delete(Symphonys.UPLOAD_QINIU_BUCKET, fileKey);
                 String[] urls = new String[] { path };
                 CdnManager c = new CdnManager(auth);
                 CdnResult.RefreshResult result = c.refreshUrls(urls);

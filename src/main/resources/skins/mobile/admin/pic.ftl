@@ -23,6 +23,7 @@
 <@admin "pic">
     <div class="content">
         <div class="module">
+            <@pagination url="${servePath}/admin/pic"/>
             <div class="module-panel form fn-clear form--admin">
                 <div>
                     <h3>审前必读</h3>
@@ -31,7 +32,6 @@
                     <p>3. 违规图片：如涉及政治、色情、违法等违规图片，请及时删除，删除后您将获得128积分奖励，同时用户将被除以500积分的处罚，并通知用户</p>
                 </div>
                 <br>
-                <@pagination url="${servePath}/admin/pic"/>
                 <div class="file__items fn__clear">
                     <#list files as file>
                         <div class="item" id="${file.oId}">
@@ -66,8 +66,8 @@
                         </div>
                     </#list>
                 </div>
-                <@pagination url="${servePath}/admin/pic"/>
             </div>
+            <@pagination url="${servePath}/admin/pic"/>
         </div>
     </div>
     <script>
