@@ -18,6 +18,7 @@
  */
 package org.b3log.symphony.processor;
 
+import com.alibaba.fastjson.JSON;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.math.RandomUtils;
@@ -41,6 +42,7 @@ import org.b3log.latke.model.User;
 import org.b3log.latke.repository.Query;
 import org.b3log.latke.repository.RepositoryException;
 import org.b3log.latke.repository.SortDirection;
+import org.b3log.latke.repository.Transaction;
 import org.b3log.latke.service.LangPropsService;
 import org.b3log.latke.service.ServiceException;
 import org.b3log.latke.util.CollectionUtils;
@@ -426,11 +428,26 @@ public class AdminProcessor {
 
     public void markPic(final RequestContext context) {
         final Request request = context.getRequest();
+        final JSONObject user = Sessions.getUser();
+        String userId = user.optString(Keys.OBJECT_ID);
 
         try {
             String type = context.param("type");
             String oId = context.param("oId");
             JSONObject picture = uploadRepository.get(oId);
+
+            if (!picture.optBoolean("public")) {
+                context.renderJSON(StatusCodes.ERR);
+                context.renderMsg("此照片已被审核过，请勿重复审核！");
+                return;
+            }
+
+            // 修改审核状态
+            JSONObject status = new JSONObject();
+            status.put("public", false);
+            Transaction transaction = uploadRepository.beginTransaction();
+            uploadRepository.update(oId, status);
+            transaction.commit();
 
             // 删除图片
             if (QN_ENABLED) {
@@ -438,7 +455,21 @@ public class AdminProcessor {
             } else {
 
             }
-            operationMgmtService.addOperation(Operation.newOperation(request, Operation.OPERATION_CODE_C_DELETE_PICTURE, picture.optString("path")));
+
+            // 奖惩
+            if ("temp".equals(type)) {
+                final String transferId = pointtransferMgmtService.transfer(Pointtransfer.ID_C_SYS, userId,
+                        Pointtransfer.TRANSFER_TYPE_C_ACCOUNT2ACCOUNT, 8, oId, System.currentTimeMillis(), "参与图片审核奖励：临时图片");
+            } else if ("illegal".equals(type)) {
+                final String transferId = pointtransferMgmtService.transfer(Pointtransfer.ID_C_SYS, userId,
+                        Pointtransfer.TRANSFER_TYPE_C_ACCOUNT2ACCOUNT, 128, oId, System.currentTimeMillis(), "参与图片审核奖励：违规图片");
+
+                String picUserName = picture.optString("userName");
+                ChatRoomBot.sendBotMsg("犯罪嫌疑人 @" + picUserName + "  由于上传违法文件/图片，被处以 500 积分的处罚，请引以为戒。\n@adlered  留档");
+                ChatRoomBot.abusePoint(userId, 500, "机器人罚单-上传违法文件");
+            }
+
+            operationMgmtService.addOperation(Operation.newOperation(request, Operation.OPERATION_CODE_C_DELETE_PICTURE, oId));
 
             context.renderJSON(StatusCodes.SUCC);
             context.renderMsg("审核成功，奖励已发放！");

@@ -84,7 +84,7 @@
                 },
                 success: function (result) {
                     Util.notice("success", 1500, result.msg);
-                    $("#" + oId).remove();
+                    $("#" + oId).find("span")[0].innerHTML = '<button disabled class="btn" onclick="javascript:void(0)">该图片已被审核过</button><br>';
                 }
             });
         }
