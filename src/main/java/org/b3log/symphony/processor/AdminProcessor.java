@@ -460,6 +460,14 @@ public class AdminProcessor {
             uploadRepository.update(oId, status);
             transaction.commit();
 
+            if ("normal".equals(type)) {
+                final String transferId = pointtransferMgmtService.transfer(Pointtransfer.ID_C_SYS, userId,
+                        Pointtransfer.TRANSFER_TYPE_C_ACCOUNT2ACCOUNT, 8, oId, System.currentTimeMillis(), "参与图片审核奖励：正常图片");
+                context.renderJSON(StatusCodes.SUCC);
+                context.renderMsg("审核成功，奖励已发放！");
+                return;
+            }
+
             // 删除图片
             if (QN_ENABLED) {
                 Auth auth = Auth.create(Symphonys.UPLOAD_QINIU_AK, Symphonys.UPLOAD_QINIU_SK);
@@ -481,7 +489,7 @@ public class AdminProcessor {
             // 奖惩
             if ("temp".equals(type)) {
                 final String transferId = pointtransferMgmtService.transfer(Pointtransfer.ID_C_SYS, userId,
-                        Pointtransfer.TRANSFER_TYPE_C_ACCOUNT2ACCOUNT, 8, oId, System.currentTimeMillis(), "参与图片审核奖励：临时图片");
+                        Pointtransfer.TRANSFER_TYPE_C_ACCOUNT2ACCOUNT, 16, oId, System.currentTimeMillis(), "参与图片审核奖励：临时图片");
             } else if ("illegal".equals(type)) {
                 final String transferId = pointtransferMgmtService.transfer(Pointtransfer.ID_C_SYS, userId,
                         Pointtransfer.TRANSFER_TYPE_C_ACCOUNT2ACCOUNT, 128, oId, System.currentTimeMillis(), "参与图片审核奖励：违规图片");

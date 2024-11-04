@@ -28,8 +28,9 @@
                 <div>
                     <h3>审前必读</h3>
                     <p>1. 您的审核将被记录</p>
-                    <p>2. 临时图片：未出现在帖子、帖子回复下的临时图片：例如截图是最常见的。这一类图片可以从图床删除以节约摸鱼派的存储资源，删除此类图片您将获得8积分奖励，但不处罚、不通知用户</p>
+                    <p>2. 临时图片：未出现在帖子、帖子回复下的临时图片：例如截图是最常见的。这一类图片可以从图床删除以节约摸鱼派的存储资源，删除此类图片您将获得16积分奖励，但不处罚、不通知用户</p>
                     <p>3. 违规图片：如涉及政治、色情、违法等违规图片，请及时删除，删除后您将获得128积分奖励，同时用户将被除以500积分的处罚，并通知用户</p>
+                    <p>4. 正常图片：以后会被翻出来看，有用并且合法的图片，标记后您将获得8积分奖励</p>
                 </div>
                 <br>
                 <div class="file__items fn__clear">
@@ -52,7 +53,8 @@
                                 <#if file.public == true>
                                     <span style="position: absolute; left: 5px; bottom: 5px">
                                         <button class="btn red" onclick="mark('${file.oId}', 'temp')">标记为临时图片</button><br>
-                                        <button class="btn red" onclick="mark('${file.oId}', 'illegal')">标记为违规图片</button>
+                                        <button class="btn red" onclick="mark('${file.oId}', 'illegal')">标记为违规图片</button><br>
+                                        <button class="btn green" style="margin-top: 8px" onclick="mark('${file.oId}', 'normal')">标记为正常图片</button>
                                     </span>
                                 <#else>
                                     <span style="position: absolute; left: 5px; bottom: 5px">
@@ -72,18 +74,23 @@
     </div>
     <script>
         function mark(oId, type) {
-            $.ajax({
-                url: "${servePath}/admin/pic",
-                type: "POST",
-                data: {
-                    oId: oId,
-                    type: type
-                },
-                success: function (result) {
-                    Util.notice("success", 1500, result.msg);
-                    $("#" + oId).find("span")[0].innerHTML = '<button disabled class="btn" onclick="javascript:void(0)">该图片已被审核过</button><br>';
+            if (type == "temp") {
+                if (confirm("请确定这张图片不是表情包、没有引用在帖子或评论里\n如果它是聊天室里随意发送的一张截图，不会再有人看了，或者干脆就是无效内容，请删除它\n请再次确认！多次无效审核将会影响你的工资！")) {
+                    $.ajax({
+                        url: "${servePath}/admin/pic",
+                        type: "POST",
+                        async: true,
+                        data: {
+                            oId: oId,
+                            type: type
+                        },
+                        success: function (result) {
+                            Util.notice("success", 1500, result.msg);
+                            $("#" + oId).find("span")[0].innerHTML = '<button disabled class="btn" onclick="javascript:void(0)">该图片已被审核过</button><br>';
+                        }
+                    });
                 }
-            });
+            }
         }
     </script>
 </@admin>

@@ -285,7 +285,10 @@ public class FileUploadProcessor {
         for (int i = 0; i < files.size(); i++) {
             // 检查该文件是否已经上传过
             String md5 = MD5Calculator.calculateMd5(fileBytes.get(i));
-            final Query query = new Query().setFilter(new PropertyFilter("md5", FilterOperator.EQUAL, md5));
+            final List<Filter> filters = new ArrayList<>();
+            filters.add(new PropertyFilter("md5", FilterOperator.EQUAL, md5));
+            filters.add(new PropertyFilter("public", FilterOperator.EQUAL, true));
+            final Query query = new Query().setFilter(new CompositeFilter(CompositeFilterOperator.AND, filters));
             try {
                 final List<JSONObject> md5s = uploadRepository.getList(query);
                 if (!md5s.isEmpty()) {
