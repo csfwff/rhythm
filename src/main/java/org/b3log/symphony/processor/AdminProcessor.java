@@ -38,6 +38,9 @@ import org.b3log.latke.ioc.Inject;
 import org.b3log.latke.ioc.Singleton;
 import org.b3log.latke.model.Pagination;
 import org.b3log.latke.model.User;
+import org.b3log.latke.repository.Query;
+import org.b3log.latke.repository.RepositoryException;
+import org.b3log.latke.repository.SortDirection;
 import org.b3log.latke.service.LangPropsService;
 import org.b3log.latke.service.ServiceException;
 import org.b3log.latke.util.CollectionUtils;
@@ -53,13 +56,17 @@ import org.b3log.symphony.processor.middleware.PermissionMidware;
 import org.b3log.symphony.processor.middleware.validate.UserRegister2ValidationMidware;
 import org.b3log.symphony.processor.middleware.validate.UserRegisterValidationMidware;
 import org.b3log.symphony.repository.ReportRepository;
+import org.b3log.symphony.repository.UploadRepository;
 import org.b3log.symphony.service.*;
 import org.b3log.symphony.util.*;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import java.lang.reflect.Array;
 import java.text.ParseException;
 import java.util.*;
+
+import static org.b3log.symphony.util.Symphonys.QN_ENABLED;
 
 /**
  * Admin processor.
@@ -325,6 +332,9 @@ public class AdminProcessor {
     @Inject
     private SponsorService sponsorService;
 
+    @Inject
+    private UploadRepository uploadRepository;
+
     /**
      * Register request handlers.
      */
@@ -410,6 +420,66 @@ public class AdminProcessor {
         Dispatcher.post("/admin/broadcast/warn", adminProcessor::warnBroadcast, middlewares);
         Dispatcher.get("/admin/ip", adminProcessor::showIp, middlewares);
         Dispatcher.post("/admin/ip", adminProcessor::modifyIp, middlewares);
+        Dispatcher.get("/admin/pic", adminProcessor::showPic, middlewares);
+        Dispatcher.post("/admin/pic", adminProcessor::markPic, middlewares);
+    }
+
+    public void markPic(final RequestContext context) {
+        final Request request = context.getRequest();
+
+        try {
+            String type = context.param("type");
+            String oId = context.param("oId");
+            JSONObject picture = uploadRepository.get(oId);
+
+            // 删除图片
+            if (QN_ENABLED) {
+
+            } else {
+
+            }
+            operationMgmtService.addOperation(Operation.newOperation(request, Operation.OPERATION_CODE_C_DELETE_PICTURE, picture.optString("path")));
+
+            context.renderJSON(StatusCodes.SUCC);
+            context.renderMsg("审核成功，奖励已发放！");
+        } catch (Exception e) {
+            context.renderJSON(StatusCodes.ERR);
+            context.renderMsg("审核失败，原因：" + e.getCause());
+        }
+    }
+
+    public void showPic(final RequestContext context) {
+        final Request request = context.getRequest();
+
+        final AbstractFreeMarkerRenderer renderer = new SkinRenderer(context, "admin/pic.ftl");
+        final Map<String, Object> dataModel = renderer.getDataModel();
+        final int pageNum = Paginator.getPage(request);
+        final int pageSize = 9;
+        final int windowSize = WINDOW_SIZE;
+
+        final Query query = new Query().addSort(Keys.OBJECT_ID, SortDirection.DESCENDING).setPage(pageNum, pageSize);
+        JSONObject result = new JSONObject();
+        try {
+            result = uploadRepository.get(query);
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, "Gets uploads failed", e);
+        }
+
+        final int pageCount = result.optJSONObject(Pagination.PAGINATION).optInt(Pagination.PAGINATION_PAGE_COUNT);
+        final JSONObject pagination = new JSONObject();
+        final List<Integer> pageNums = Paginator.paginate(pageNum, pageSize, pageCount, windowSize);
+        pagination.put(Pagination.PAGINATION_PAGE_COUNT, pageCount);
+        pagination.put(Pagination.PAGINATION_PAGE_NUMS, pageNums);
+
+        dataModel.put(Pagination.PAGINATION_FIRST_PAGE_NUM, pageNums.get(0));
+        dataModel.put(Pagination.PAGINATION_LAST_PAGE_NUM, pageNums.get(pageNums.size() - 1));
+        dataModel.put(Pagination.PAGINATION_CURRENT_PAGE_NUM, pageNum);
+        dataModel.put(Pagination.PAGINATION_PAGE_COUNT, pageCount);
+        dataModel.put(Pagination.PAGINATION_PAGE_NUMS, pageNums);
+
+        dataModel.put("files", result.opt("rslts"));
+
+        dataModelService.fillHeaderAndFooter(context, dataModel);
     }
 
     public void modifyIp(final RequestContext context) {
