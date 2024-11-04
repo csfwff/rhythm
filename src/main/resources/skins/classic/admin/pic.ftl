@@ -46,7 +46,13 @@
                                     您的浏览器不支持 video 标签。
                                 </video>
                             <#else>
-                                <div class="item__img" style="background-image: url(${file.path});"></div>
+                                <#if file.public == true>
+                                    <div class="item__img" style="background-image: url(${file.path});"></div>
+                                <#else>
+                                    <div class="item__img" style="margin: 15px 0 0 15px;">
+                                        <svg class="icon-thumbs-up"><use xlink:href="#thumbs-up"></use></svg> 已审核
+                                    </div>
+                                </#if>
                             </#if>
                             <div class="item__info">
                                 上传时间：${file.time}
@@ -60,14 +66,10 @@
                                         <button class="btn red" onclick="mark('${file.oId}', 'illegal')">标记为违规图片</button><br>
                                         <button class="btn green" style="margin-top: 8px" onclick="mark('${file.oId}', 'normal')">标记为正常图片</button>
                                     </span>
-                                <#else>
-                                    <span style="position: absolute; left: 5px; bottom: 5px">
-                                        <button disabled class="btn" onclick="javascript:void(0)">该图片已被审核过</button><br>
+                                    <span style="position: absolute; right: 5px; bottom: 5px">
+                                        <button class="btn green" onclick="window.open('${file.path}')">查看原图</button>
                                     </span>
                                 </#if>
-                                <span style="position: absolute; right: 5px; bottom: 5px">
-                                <button class="btn green" onclick="window.open('${file.path}')">查看原图</button>
-                                </span>
                             </div>
                         </div>
                     </#list>
@@ -90,10 +92,26 @@
                         },
                         success: function (result) {
                             Util.notice("success", 1500, result.msg);
-                            $("#" + oId).find("span")[0].innerHTML = '<button disabled class="btn" onclick="javascript:void(0)">该图片已被审核过</button><br>';
+                            $("#" + oId).find("span")[0].innerHTML = '';
+                            $("#" + oId).find("span")[1].innerHTML = '';
                         }
                     });
                 }
+            } else {
+                $.ajax({
+                    url: "${servePath}/admin/pic",
+                    type: "POST",
+                    async: true,
+                    data: {
+                        oId: oId,
+                        type: type
+                    },
+                    success: function (result) {
+                        Util.notice("success", 1500, result.msg);
+                        $("#" + oId).find("span")[0].innerHTML = '';
+                        $("#" + oId).find("span")[1].innerHTML = '';
+                    }
+                });
             }
         }
     </script>
