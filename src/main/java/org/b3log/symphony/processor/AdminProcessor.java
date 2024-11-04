@@ -19,6 +19,13 @@
 package org.b3log.symphony.processor;
 
 import com.alibaba.fastjson.JSON;
+import com.qiniu.cdn.CdnManager;
+import com.qiniu.cdn.CdnResult;
+import com.qiniu.storage.BucketManager;
+import com.qiniu.storage.Configuration;
+import com.qiniu.storage.Region;
+import com.qiniu.storage.UploadManager;
+import com.qiniu.util.Auth;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.math.RandomUtils;
@@ -65,6 +72,8 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.lang.reflect.Array;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.text.ParseException;
 import java.util.*;
 
@@ -435,6 +444,7 @@ public class AdminProcessor {
             String type = context.param("type");
             String oId = context.param("oId");
             JSONObject picture = uploadRepository.get(oId);
+            String path = picture.optString("path");
 
             if (!picture.optBoolean("public")) {
                 context.renderJSON(StatusCodes.ERR);
@@ -451,9 +461,20 @@ public class AdminProcessor {
 
             // 删除图片
             if (QN_ENABLED) {
-
+                Auth auth = Auth.create(Symphonys.UPLOAD_QINIU_AK, Symphonys.UPLOAD_QINIU_SK);
+                Configuration cfg = new Configuration(Region.autoRegion());
+                BucketManager bucketManager = new BucketManager(auth, cfg);
+                String filename = path.replaceAll(Symphonys.UPLOAD_QINIU_DOMAIN, "");
+                bucketManager.delete(Symphonys.UPLOAD_QINIU_BUCKET, filename);
+                LOGGER.log(Level.INFO, "Delete cdn file: " + filename);
+                String[] urls = new String[] { path };
+                CdnManager c = new CdnManager(auth);
+                CdnResult.RefreshResult result = c.refreshUrls(urls);
+                LOGGER.log(Level.INFO, "CDN Refresh result: " + result.code);
             } else {
-
+                context.renderJSON(StatusCodes.ERR);
+                context.renderMsg("不支持操作本地图床！");
+                return;
             }
 
             // 奖惩
@@ -476,6 +497,7 @@ public class AdminProcessor {
         } catch (Exception e) {
             context.renderJSON(StatusCodes.ERR);
             context.renderMsg("审核失败，原因：" + e.getCause());
+            LOGGER.error(e.getMessage(), e);
         }
     }
 
