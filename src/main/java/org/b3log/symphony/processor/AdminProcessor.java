@@ -439,6 +439,7 @@ public class AdminProcessor {
         final Request request = context.getRequest();
         final JSONObject user = Sessions.getUser();
         String userId = user.optString(Keys.OBJECT_ID);
+        String uname = user.optString(User.USER_NAME);
 
         try {
             String type = context.param("type");
@@ -487,7 +488,7 @@ public class AdminProcessor {
 
                 String picUserName = picture.optString("userName");
                 String picUserId = userQueryService.getUserByName(picUserName).optString(Keys.OBJECT_ID);
-                ChatRoomBot.sendBotMsg("犯罪嫌疑人 @" + picUserName + "  由于上传违法文件/图片，被处以 500 积分的处罚，请引以为戒。\n@adlered  留档");
+                ChatRoomBot.sendBotMsg("犯罪嫌疑人 @" + picUserName + "  由于上传违法文件/图片，被处以 500 积分的处罚，请引以为戒。\n@" + uname + "  处理人\n@adlered  审批人");
                 ChatRoomBot.abusePoint(picUserId, 500, "机器人罚单-上传违法文件");
             }
 
