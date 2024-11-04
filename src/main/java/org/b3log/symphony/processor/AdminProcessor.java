@@ -507,7 +507,7 @@ public class AdminProcessor {
         final AbstractFreeMarkerRenderer renderer = new SkinRenderer(context, "admin/pic.ftl");
         final Map<String, Object> dataModel = renderer.getDataModel();
         final int pageNum = Paginator.getPage(request);
-        final int pageSize = 9;
+        final int pageSize = 27;
         final int windowSize = WINDOW_SIZE;
 
         final Query query = new Query().addSort(Keys.OBJECT_ID, SortDirection.DESCENDING).setPage(pageNum, pageSize);

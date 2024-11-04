@@ -70,6 +70,7 @@
                         </div>
                     </#list>
                 </div>
+                <@pagination url="${servePath}/admin/pic"/>
             </div>
         </div>
     </div>
