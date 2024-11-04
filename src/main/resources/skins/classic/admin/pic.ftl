@@ -41,10 +41,16 @@
                     <#list files as file>
                         <div class="item" id="${file.oId}">
                             <#if file.type == "mp4">
-                                <video class="item__img" autoplay muted loop playsinline>
-                                    <source src="${file.path}" type="video/mp4">
-                                    您的浏览器不支持 video 标签。
-                                </video>
+                                <#if file.public == true>
+                                    <video class="item__img" autoplay muted loop playsinline>
+                                        <source src="${file.path}" type="video/mp4">
+                                        您的浏览器不支持 video 标签。
+                                    </video>
+                                <#else>
+                                    <div class="item__img" style="margin: 15px 0 0 15px;">
+                                        <svg class="icon-thumbs-up"><use xlink:href="#thumbs-up"></use></svg> 已审核
+                                    </div>
+                                </#if>
                             <#else>
                                 <#if file.public == true>
                                     <div class="item__img" style="background-image: url(${file.path});"></div>
@@ -94,6 +100,10 @@
                             Util.notice("success", 1500, result.msg);
                             $("#" + oId).find("span")[0].innerHTML = '';
                             $("#" + oId).find("span")[1].innerHTML = '';
+                            $("#" + oId + " .item__img").remove();
+                            $("#" + oId).prepend('<div class="item__img" style="margin: 15px 0 0 15px;">' +
+                                '<svg class="icon-thumbs-up"><use xlink:href="#thumbs-up"></use></svg> 已审核' +
+                                '</div>');
                         }
                     });
                 }
@@ -110,6 +120,10 @@
                         Util.notice("success", 1500, result.msg);
                         $("#" + oId).find("span")[0].innerHTML = '';
                         $("#" + oId).find("span")[1].innerHTML = '';
+                        $("#" + oId + " .item__img").remove();
+                        $("#" + oId).prepend('<div class="item__img" style="margin: 15px 0 0 15px;">' +
+                            '<svg class="icon-thumbs-up"><use xlink:href="#thumbs-up"></use></svg> 已审核' +
+                            '</div>');
                     }
                 });
             }
