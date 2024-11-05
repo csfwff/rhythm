@@ -448,10 +448,16 @@ public class AdminProcessor {
         final String cardBg = context.param("cardBg");
         try {
             final JSONObject settings = settingsRepository.getByUsrId(userId);
-            final String settingsStr = settings.optString(SystemSettings.SETTINGS);
-            final JSONObject settingsJSON = new JSONObject(settingsStr);
-            settingsJSON.put("cardBg", cardBg);
-            settingsService.updateSettings(settings, settingsJSON);
+            if (Objects.isNull(settings)) {
+                final JSONObject settingsJSON = new JSONObject();
+                settingsJSON.put("cardBg", cardBg);
+                settingsService.initSettings(userId, settingsJSON);
+            } else {
+                final String settingsStr = settings.optString(SystemSettings.SETTINGS);
+                final JSONObject settingsJSON = new JSONObject(settingsStr);
+                settingsJSON.put("cardBg", cardBg);
+                settingsService.updateSettings(settings, settingsJSON);
+            }
         } catch (Exception ignored) {
         }
         context.sendRedirect(Latkes.getServePath() + "/admin/user/" + userId);
@@ -1636,13 +1642,17 @@ public class AdminProcessor {
         dataModel.put("sysMetal", cloudService.getMetal(userId));
 
         final JSONObject systemSettings = settingsService.getByUsrId(userId);
-        final String settingsJson = systemSettings.optString(SystemSettings.SETTINGS);
-        final JSONObject settings = new JSONObject(settingsJson);
-        final String cardBg = settings.optString("cardBg");
-        if (StringUtils.isBlank(cardBg)) {
+        if (Objects.isNull(systemSettings)) {
             dataModel.put("userCardBg", "");
         } else {
-            dataModel.put("userCardBg", cardBg);
+            final String settingsJson = systemSettings.optString(SystemSettings.SETTINGS);
+            final JSONObject settings = new JSONObject(settingsJson);
+            final String cardBg = settings.optString("cardBg");
+            if (StringUtils.isBlank(cardBg)) {
+                dataModel.put("userCardBg", "");
+            } else {
+                dataModel.put("userCardBg", cardBg);
+            }
         }
 
         dataModelService.fillHeaderAndFooter(context, dataModel);

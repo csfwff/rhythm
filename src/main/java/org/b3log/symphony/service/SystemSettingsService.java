@@ -106,7 +106,7 @@ public class SystemSettingsService {
     }
 
 
-    private void initSettings(final String userId, final JSONObject settings) {
+    public void initSettings(final String userId, final JSONObject settings) {
         final Transaction transaction = settingsRepository.beginTransaction();
         try {
             final JSONObject initSettings = new JSONObject();
