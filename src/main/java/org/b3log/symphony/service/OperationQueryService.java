@@ -134,7 +134,10 @@ public class OperationQueryService {
                 auditlog.put(Operation.OPERATION_IP, record.optString(Operation.OPERATION_IP));
                 auditlog.put(Operation.OPERATION_UA, record.optString(Operation.OPERATION_UA));
                 final int operationCode = record.optInt(Operation.OPERATION_CODE);
-                final String operationContent = langPropsService.get("auditlog" + operationCode + "Label");
+                String operationContent = langPropsService.get("auditlog" + operationCode + "Label");
+                if (operationCode == 46) {
+                    operationContent = "审核了一张照片，详细数据：" + record.optString(Operation.OPERATION_DATA_ID);
+                }
                 auditlog.put(Operation.OPERATION_T_CONTENT, operationContent);
                 auditlogs.add(auditlog);
             } catch (final Exception e) {

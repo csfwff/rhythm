@@ -560,7 +560,7 @@ public class AdminProcessor {
                 ChatRoomBot.abusePoint(picUserId, 500, "机器人罚单-上传违法文件");
             }
 
-            operationMgmtService.addOperation(Operation.newOperation(request, Operation.OPERATION_CODE_C_DELETE_PICTURE, oId));
+            operationMgmtService.addOperation(Operation.newOperation(request, Operation.OPERATION_CODE_C_DELETE_PICTURE, picture.toString().substring(0, 254)));
 
             context.renderJSON(StatusCodes.SUCC);
             context.renderMsg("审核成功，奖励已发放！");
