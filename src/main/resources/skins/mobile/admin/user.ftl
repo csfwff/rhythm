@@ -277,6 +277,14 @@
                 <br/><br/>
                 <button type="submit" class="green fn-right">${submitLabel}</button>
             </form>
+
+            <form action="${servePath}/admin/user/${user.oId}/cardBg" method="POST">
+                <label for="cardBg">卡片背景</label>
+                <input type="text" name="cardBg" value="${userCardBg}" />
+
+                <br/><br/>
+                <button type="submit" class="green fn-right">${submitLabel}</button>
+            </form>
         </div>
     </div>
     </#if>

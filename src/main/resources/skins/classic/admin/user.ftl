@@ -391,6 +391,16 @@
                     <button type="submit" class="green fn-right btn--admin">${submitLabel}</button>
                 </div>
             </form>
+            <form action="${servePath}/admin/user/${user.oId}/cardBg" method="POST" class="fn__flex">
+                <label>
+                    <div>卡片背景</div>
+                    <input type="text" name="cardBg" value="${userCardBg}"/>
+                </label>
+                <div>
+                    &nbsp; &nbsp;
+                    <button type="submit" class="green fn-right btn--admin">${submitLabel}</button>
+                </div>
+            </form>
         </div>
     </div>
     </#if>

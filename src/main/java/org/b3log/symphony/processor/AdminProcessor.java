@@ -65,6 +65,7 @@ import org.b3log.symphony.processor.middleware.PermissionMidware;
 import org.b3log.symphony.processor.middleware.validate.UserRegister2ValidationMidware;
 import org.b3log.symphony.processor.middleware.validate.UserRegisterValidationMidware;
 import org.b3log.symphony.repository.ReportRepository;
+import org.b3log.symphony.repository.SystemSettingsRepository;
 import org.b3log.symphony.repository.UploadRepository;
 import org.b3log.symphony.service.*;
 import org.b3log.symphony.util.*;
@@ -346,6 +347,12 @@ public class AdminProcessor {
     @Inject
     private UploadRepository uploadRepository;
 
+    @Inject
+    private SystemSettingsService settingsService;
+
+    @Inject
+    private SystemSettingsRepository settingsRepository;
+
     /**
      * Register request handlers.
      */
@@ -433,6 +440,21 @@ public class AdminProcessor {
         Dispatcher.post("/admin/ip", adminProcessor::modifyIp, middlewares);
         Dispatcher.get("/admin/pic", adminProcessor::showPic, middlewares);
         Dispatcher.post("/admin/pic", adminProcessor::markPic, middlewares);
+        Dispatcher.post("/admin/user/{userId}/cardBg", adminProcessor::setCardBg, middlewares);
+    }
+
+    public void setCardBg(final RequestContext context) {
+        final String userId = context.pathVar("userId");
+        final String cardBg = context.param("cardBg");
+        try {
+            final JSONObject settings = settingsRepository.getByUsrId(userId);
+            final String settingsStr = settings.optString(SystemSettings.SETTINGS);
+            final JSONObject settingsJSON = new JSONObject(settingsStr);
+            settingsJSON.put("cardBg", cardBg);
+            settingsService.updateSettings(settings, settingsJSON);
+        } catch (Exception ignored) {
+        }
+        context.sendRedirect(Latkes.getServePath() + "/admin/user/" + userId);
     }
 
     public void markPic(final RequestContext context) {
@@ -1612,6 +1634,16 @@ public class AdminProcessor {
 
         dataModel.put("sysBag", cloudService.getBag(userId));
         dataModel.put("sysMetal", cloudService.getMetal(userId));
+
+        final JSONObject systemSettings = settingsService.getByUsrId(userId);
+        final String settingsJson = systemSettings.optString(SystemSettings.SETTINGS);
+        final JSONObject settings = new JSONObject(settingsJson);
+        final String cardBg = settings.optString("cardBg");
+        if (StringUtils.isBlank(cardBg)) {
+            dataModel.put("userCardBg", "");
+        } else {
+            dataModel.put("userCardBg", cardBg);
+        }
 
         dataModelService.fillHeaderAndFooter(context, dataModel);
     }
