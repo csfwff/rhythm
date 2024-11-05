@@ -497,6 +497,25 @@ public class AdminProcessor {
                     context.renderMsg("不支持操作本地图床！");
                     return;
                 }
+            } else if ("temp".equals(type)) {
+                // 重命名图片
+                if (QN_ENABLED) {
+                    Auth auth = Auth.create(Symphonys.UPLOAD_QINIU_AK, Symphonys.UPLOAD_QINIU_SK);
+                    Configuration cfg = new Configuration(Region.autoRegion());
+                    BucketManager bucketManager = new BucketManager(auth, cfg);
+                    String filename = path.replaceAll(Symphonys.UPLOAD_QINIU_DOMAIN + "/", "");
+                    String renameTo = filename + ".fishtmp";
+                    LOGGER.log(Level.INFO, "Rename cdn file: " + filename + " + to: " + renameTo);
+                    bucketManager.rename(Symphonys.UPLOAD_QINIU_BUCKET, filename, renameTo);
+                    String[] urls = new String[]{path};
+                    CdnManager c = new CdnManager(auth);
+                    CdnResult.RefreshResult result = c.refreshUrls(urls);
+                    LOGGER.log(Level.INFO, "CDN Refresh result: " + result.code);
+                } else {
+                    context.renderJSON(StatusCodes.ERR);
+                    context.renderMsg("不支持操作本地图床！");
+                    return;
+                }
             }
 
             // 奖惩
