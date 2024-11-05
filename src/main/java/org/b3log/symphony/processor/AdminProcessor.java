@@ -532,7 +532,7 @@ public class AdminProcessor {
                     Configuration cfg = new Configuration(Region.autoRegion());
                     BucketManager bucketManager = new BucketManager(auth, cfg);
                     String filename = path.replaceAll(Symphonys.UPLOAD_QINIU_DOMAIN + "/", "");
-                    String renameTo = filename + ".fishtmp";
+                    String renameTo = "fishtmp_" + filename;
                     LOGGER.log(Level.INFO, "Rename cdn file: " + filename + " to: " + renameTo);
                     bucketManager.rename(Symphonys.UPLOAD_QINIU_BUCKET, filename, renameTo);
                     String[] urls = new String[]{path};
