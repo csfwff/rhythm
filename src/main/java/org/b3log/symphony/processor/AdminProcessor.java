@@ -470,27 +470,33 @@ public class AdminProcessor {
 
             // 抹除MD5
             status = new JSONObject();
-            status.put("md5", "deleted");
+            if ("temp".equals(type)) {
+                status.put("md5", "temp by " + uname);
+            } else if ("illegal".equals(type)) {
+                status.put("md5", "delete by " + uname);
+            }
             transaction = uploadRepository.beginTransaction();
             uploadRepository.update(oId, status);
             transaction.commit();
 
-            // 删除图片
-            if (QN_ENABLED) {
-                Auth auth = Auth.create(Symphonys.UPLOAD_QINIU_AK, Symphonys.UPLOAD_QINIU_SK);
-                Configuration cfg = new Configuration(Region.autoRegion());
-                BucketManager bucketManager = new BucketManager(auth, cfg);
-                String filename = path.replaceAll(Symphonys.UPLOAD_QINIU_DOMAIN + "/", "");
-                LOGGER.log(Level.INFO, "Delete cdn file: " + filename);
-                bucketManager.delete(Symphonys.UPLOAD_QINIU_BUCKET, filename);
-                String[] urls = new String[] { path };
-                CdnManager c = new CdnManager(auth);
-                CdnResult.RefreshResult result = c.refreshUrls(urls);
-                LOGGER.log(Level.INFO, "CDN Refresh result: " + result.code);
-            } else {
-                context.renderJSON(StatusCodes.ERR);
-                context.renderMsg("不支持操作本地图床！");
-                return;
+            if ("illegal".equals(type)) {
+                // 删除图片
+                if (QN_ENABLED) {
+                    Auth auth = Auth.create(Symphonys.UPLOAD_QINIU_AK, Symphonys.UPLOAD_QINIU_SK);
+                    Configuration cfg = new Configuration(Region.autoRegion());
+                    BucketManager bucketManager = new BucketManager(auth, cfg);
+                    String filename = path.replaceAll(Symphonys.UPLOAD_QINIU_DOMAIN + "/", "");
+                    LOGGER.log(Level.INFO, "Delete cdn file: " + filename);
+                    bucketManager.delete(Symphonys.UPLOAD_QINIU_BUCKET, filename);
+                    String[] urls = new String[]{path};
+                    CdnManager c = new CdnManager(auth);
+                    CdnResult.RefreshResult result = c.refreshUrls(urls);
+                    LOGGER.log(Level.INFO, "CDN Refresh result: " + result.code);
+                } else {
+                    context.renderJSON(StatusCodes.ERR);
+                    context.renderMsg("不支持操作本地图床！");
+                    return;
+                }
             }
 
             // 奖惩
