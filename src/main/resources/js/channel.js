@@ -485,7 +485,7 @@ var ChatRoomChannel = {
                     let userNickname = data.userNickname;
                     let userName = data.userName;
                     if (userNickname !== undefined && userNickname !== "") {
-                        userNickname = userNickname + " ( " + userName + " )"
+                        userNickname = userNickname + " (" + userName + ")"
                     } else {
                         userNickname = userName;
                     }

@@ -375,7 +375,7 @@
                                                 <div class="ft-smaller">
                                                     <a rel="nofollow" href="${servePath}/member/${msg.userName}">
                                                         <#if msg.userNickname?? && msg.userNickname?length gt 1>
-                                                            <span class="ft-gray">${msg.userNickname} ( ${msg.userName} )</span>
+                                                            <span class="ft-gray">${msg.userNickname} (${msg.userName})</span>
                                                         <#else>
                                                             <span class="ft-gray">${msg.userName}</span>
                                                         </#if>
