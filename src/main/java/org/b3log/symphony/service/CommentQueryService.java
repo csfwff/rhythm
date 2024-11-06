@@ -867,6 +867,7 @@ public class CommentQueryService {
             }
             comment.put(Comment.COMMENT_T_COMMENTER, author);
             comment.put(Comment.COMMENT_T_AUTHOR_NAME, author.optString(User.USER_NAME));
+            comment.put("commentAuthorNickName", author.optString(UserExt.USER_NICKNAME));
             comment.put(Comment.COMMENT_T_AUTHOR_URL, author.optString(User.USER_URL));
             final String thumbnailURL = avatarQueryService.getAvatarURLByUser(author, "48");
             comment.put(Comment.COMMENT_T_AUTHOR_THUMBNAIL_URL, thumbnailURL);

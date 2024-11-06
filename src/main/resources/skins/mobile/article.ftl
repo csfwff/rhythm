@@ -121,7 +121,7 @@
                        title="${article.articleAuthorName}"><div class="avatar" style="background-image:url('${article.articleAuthorThumbnailURL48}')"></div></a>
                     <div class="article-params">
                         <a rel="author" href="${servePath}/member/${article.articleAuthorName}" class="ft-gray"
-                           title="${article.articleAuthorName}"><strong>${article.articleAuthorName}</strong></a>
+                           title="${article.articleAuthorName}"><strong><#if article.articleAuthorNickName != "">${article.articleAuthorNickName}<#else>${article.articleAuthorName}</#if></strong></a>
                         <span class="ft-gray">
                         <#if article.articleCity != "">
                         &nbsp;•&nbsp;
@@ -270,7 +270,7 @@
                                         <div class="fn-flex-1">
                                             <div class="fn-clear comment-info ft-smaller">
                                                 <span class="fn-left">
-                                                    <a rel="nofollow" href="${servePath}/member/${comment.commentAuthorName}" class="ft-gray"><span class="ft-gray">${comment.commentAuthorName}</span></a>
+                                                    <a rel="nofollow" href="${servePath}/member/${comment.commentAuthorName}" class="ft-gray"><span class="ft-gray"><#if comment.commentAuthorNickName != "">${comment.commentAuthorNickName} (${comment.commentAuthorName})<#else>${comment.commentAuthorName}</#if></span></a>
                                                     <span class="ft-fade">• ${comment.timeAgo}</span>
 
                                                     <#if comment.rewardedCnt gt 0>

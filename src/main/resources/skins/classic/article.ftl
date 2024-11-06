@@ -191,7 +191,7 @@
                         <a rel="author" href="${servePath}/member/${article.articleAuthorName}"
                            class="article__stats article__stats--a tooltipped tooltipped-e"
                            aria-label="${article.oId?number?number_to_datetime}">
-                            <span class="article__cnt">${article.articleAuthorName}</span>
+                            <span class="article__cnt"><#if article.articleAuthorNickName != "">${article.articleAuthorNickName}<#else>${article.articleAuthorName}</#if></span>
                             <time>${article.timeAgo}</time>
                             <#if 0 == article.articleAuthor.userUAStatus>
                                 <span id="articltVia" class="via" data-ua="${article.articleUA}"></span>
@@ -355,7 +355,7 @@
                                                 <a rel="nofollow"
                                                    href="${servePath}/member/${comment.commentAuthorName}"
                                                    class="ft-gray"><span
-                                                            class="ft-gray">${comment.commentAuthorName}</span></a>
+                                                            class="ft-gray"><#if comment.commentAuthorNickName != "">${comment.commentAuthorNickName} (${comment.commentAuthorName})<#else>${comment.commentAuthorName}</#if></span></a>
                                                 <span class="ft-fade">• ${comment.timeAgo}</span>
 
                                                 <#if comment.rewardedCnt gt 0>

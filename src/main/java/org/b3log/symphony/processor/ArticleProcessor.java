@@ -305,6 +305,7 @@ public class ArticleProcessor {
         article.put(Article.ARTICLE_T_AUTHOR_NAME, author.optString(User.USER_NAME));
         article.put(Article.ARTICLE_T_AUTHOR_URL, author.optString(User.USER_URL));
         article.put(Article.ARTICLE_T_AUTHOR_INTRO, author.optString(UserExt.USER_INTRO));
+        article.put("articleAuthorNickName", author.optString(UserExt.USER_NICKNAME));
 
         String metal = cloudService.getEnabledMetal(articleAuthorId);
         if (!metal.equals("{}")) {
@@ -1059,6 +1060,7 @@ public class ArticleProcessor {
         article.put(Article.ARTICLE_T_AUTHOR_NAME, author.optString(User.USER_NAME));
         article.put(Article.ARTICLE_T_AUTHOR_URL, author.optString(User.USER_URL));
         article.put(Article.ARTICLE_T_AUTHOR_INTRO, author.optString(UserExt.USER_INTRO));
+        article.put("articleAuthorNickName", author.optString(UserExt.USER_NICKNAME));
 
         String metal = cloudService.getEnabledMetal(articleAuthorId);
         if (!metal.equals("{}")&&Article.ARTICLE_ANONYMOUS_C_ANONYMOUS!=article.optInt(Article.ARTICLE_ANONYMOUS)) {

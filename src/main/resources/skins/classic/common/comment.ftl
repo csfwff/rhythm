@@ -31,7 +31,7 @@
             <div class="comment-get-comment list"></div>
             <div class="fn-clear comment-info">
                 <span class="fn-left ft-smaller">
-                    <a rel="nofollow" href="${servePath}/member/${comment.commentAuthorName}" class="ft-gray"><span class="ft-gray">${comment.commentAuthorName}</span></a>
+                    <a rel="nofollow" href="${servePath}/member/${comment.commentAuthorName}" class="ft-gray"><span class="ft-gray"><#if comment.commentAuthorNickName != "">${comment.commentAuthorNickName} (${comment.commentAuthorName})<#else>${comment.commentAuthorName}</#if></span></a>
                     <#list comment.sysMetal?eval as metal>
                         <img title="${metal.description}" src="https://fishpi.cn/gen?ver=0.1&scale=0.79&txt=${metal.name}&${metal.attr}"/>
                     </#list>
