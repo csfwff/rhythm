@@ -32,6 +32,7 @@ import org.b3log.latke.ioc.Singleton;
 import org.b3log.latke.model.User;
 import org.b3log.symphony.model.Common;
 import org.b3log.symphony.model.UserExt;
+import org.b3log.symphony.processor.AdminProcessor;
 import org.b3log.symphony.processor.ApiProcessor;
 import org.b3log.symphony.service.UserMgmtService;
 import org.b3log.symphony.service.UserQueryService;
@@ -188,6 +189,7 @@ public class UserChannel implements WebSocketChannel {
                 final Set<WebSocketSession> sessions = SESSIONS.get(userId);
                 for (final WebSocketSession session : sessions) {
                     session.sendText(msgStr);
+                    AdminProcessor.manager.onMessageSent(8, msgStr.length());
                 }
             }
         }
@@ -216,6 +218,7 @@ public class UserChannel implements WebSocketChannel {
                     final Set<WebSocketSession> sessions = SESSIONS.get(userId);
                     for (final WebSocketSession session : sessions) {
                         session.sendText(msgStr);
+                        AdminProcessor.manager.onMessageSent(8, msgStr.length());
                     }
                 } catch (Exception ignored) {
                 }

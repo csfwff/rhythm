@@ -59,7 +59,7 @@ import org.b3log.latke.util.Strings;
 import org.b3log.symphony.event.ArticleBaiduSender;
 import org.b3log.symphony.model.*;
 import org.b3log.symphony.processor.bot.ChatRoomBot;
-import org.b3log.symphony.processor.channel.UserChannel;
+import org.b3log.symphony.processor.channel.*;
 import org.b3log.symphony.processor.middleware.LoginCheckMidware;
 import org.b3log.symphony.processor.middleware.PermissionMidware;
 import org.b3log.symphony.processor.middleware.validate.UserRegister2ValidationMidware;
@@ -441,6 +441,49 @@ public class AdminProcessor {
         Dispatcher.get("/admin/pic", adminProcessor::showPic, middlewares);
         Dispatcher.post("/admin/pic", adminProcessor::markPic, middlewares);
         Dispatcher.post("/admin/user/{userId}/cardBg", adminProcessor::setCardBg, middlewares);
+        Dispatcher.get("/admin/stats", adminProcessor::getStats, middlewares);
+    }
+
+    public static ChannelStatsManager manager = new ChannelStatsManager();
+    public void getStats(final RequestContext context) {
+        JSONObject json = new JSONObject();
+        int c1 = ArticleListChannel.SESSIONS.size();
+        int c2 = ArticleChannel.SESSIONS.size();
+        int c3 = ChatChannel.SESSIONS.size();
+        int c4 = ChatroomChannel.SESSIONS.size();
+        int c5 = GobangChannel.SESSIONS.size();
+        int c6 = LogsChannel.SESSIONS.size();
+        int c7 = ShopChannel.SESSIONS.size();
+        int c8 = UserChannel.SESSIONS.size();
+
+        json.put("c1", c1);
+        json.put("c2", c2);
+        json.put("c3", c3);
+        json.put("c4", c4);
+        json.put("c5", c5);
+        json.put("c6", c6);
+        json.put("c7", c7);
+        json.put("c8", c8);
+
+        json.put("c1c", manager.getMessageCount(1));
+        json.put("c2c", manager.getMessageCount(2));
+        json.put("c3c", manager.getMessageCount(3));
+        json.put("c4c", manager.getMessageCount(4));
+        json.put("c5c", manager.getMessageCount(5));
+        json.put("c6c", manager.getMessageCount(6));
+        json.put("c7c", manager.getMessageCount(7));
+        json.put("c8c", manager.getMessageCount(8));
+
+        json.put("c1b", manager.getAverageUploadBandwidth(1));
+        json.put("c2b", manager.getAverageUploadBandwidth(2));
+        json.put("c3b", manager.getAverageUploadBandwidth(3));
+        json.put("c4b", manager.getAverageUploadBandwidth(4));
+        json.put("c5b", manager.getAverageUploadBandwidth(5));
+        json.put("c6b", manager.getAverageUploadBandwidth(6));
+        json.put("c7b", manager.getAverageUploadBandwidth(7));
+        json.put("c8b", manager.getAverageUploadBandwidth(8));
+
+        context.renderJSON(json);
     }
 
     public void setCardBg(final RequestContext context) {

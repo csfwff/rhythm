@@ -32,6 +32,7 @@ import org.b3log.latke.repository.*;
 import org.b3log.latke.repository.jdbc.JdbcRepository;
 import org.b3log.symphony.model.Common;
 import org.b3log.symphony.model.UserExt;
+import org.b3log.symphony.processor.AdminProcessor;
 import org.b3log.symphony.processor.ApiProcessor;
 import org.b3log.symphony.repository.CloudRepository;
 import org.b3log.symphony.service.AvatarQueryService;
@@ -108,6 +109,7 @@ public class ChatroomChannel implements WebSocketChannel {
             // 单独发送在线信息
             final String msgStr = getOnline().toString();
             session.sendText(msgStr);
+            AdminProcessor.manager.onMessageSent(4, msgStr.length());
             // 保存 Active 信息
             userActive.put(user.optString("userName"), System.currentTimeMillis());
         } else {
@@ -222,6 +224,7 @@ public class ChatroomChannel implements WebSocketChannel {
                     }
                 }
                 s.sendText(message);
+                AdminProcessor.manager.onMessageSent(4, message.length());
             }
         }).start();
     }
@@ -309,6 +312,7 @@ public class ChatroomChannel implements WebSocketChannel {
             }
             for (WebSocketSession session : senderSessions) {
                 session.sendText(msgStr);
+                AdminProcessor.manager.onMessageSent(4, msgStr.length());
             }
         }
         MESSAGE_POOL.submit(() -> {
@@ -331,9 +335,11 @@ public class ChatroomChannel implements WebSocketChannel {
                         String toUser = onlineUsers.get(session).optString(User.USER_NAME);
                         if (!sender.equals(toUser)) {
                             session.sendText(msgStr);
+                            AdminProcessor.manager.onMessageSent(4, msgStr.length());
                         }
                     } else {
                         session.sendText(msgStr);
+                        AdminProcessor.manager.onMessageSent(4, msgStr.length());
                     }
                 } catch (Exception ignored) {
                 }
@@ -408,7 +414,7 @@ public class ChatroomChannel implements WebSocketChannel {
                 }
             }
             for (WebSocketSession session : senderSessions) {
-                session.sendText("{\n" +
+                String text = "{\n" +
                         "    \"md\": \"由于您超过6小时未活跃，已将您断开连接，如要继续聊天请刷新页面，谢谢 :)\",\n" +
                         "    \"userAvatarURL\": \"https://file.fishpi.cn/2022/01/robot3-89631199.png\",\n" +
                         "    \"userAvatarURL20\": \"https://file.fishpi.cn/2022/01/robot3-89631199.png\",\n" +
@@ -422,7 +428,9 @@ public class ChatroomChannel implements WebSocketChannel {
                         "    \"content\": \"<p>由于您超过6小时未活跃，已将您断开连接，如要继续聊天请刷新页面，谢谢 :)</p>\",\n" +
                         "    \"client\": \"Other/Robot\",\n" +
                         "    \"userAvatarURL48\": \"https://file.fishpi.cn/2022/01/robot3-89631199.png\"\n" +
-                        "}");
+                        "}";
+                session.sendText(text);
+                AdminProcessor.manager.onMessageSent(4, text.length());
                 removeSession(session);
             }
             JdbcRepository.dispose();
@@ -491,6 +499,7 @@ public class ChatroomChannel implements WebSocketChannel {
                         }
                     }
                     s.sendText(msgStr);
+                    AdminProcessor.manager.onMessageSent(4, msgStr.length());
                 }
                 onlineMsgLock = false;
             }).start();

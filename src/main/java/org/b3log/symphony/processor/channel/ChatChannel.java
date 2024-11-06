@@ -33,6 +33,7 @@ import org.b3log.latke.repository.Transaction;
 import org.b3log.symphony.event.EventTypes;
 import org.b3log.symphony.model.Common;
 import org.b3log.symphony.model.UserExt;
+import org.b3log.symphony.processor.AdminProcessor;
 import org.b3log.symphony.processor.ApiProcessor;
 import org.b3log.symphony.processor.ChatProcessor;
 import org.b3log.symphony.repository.ChatInfoRepository;
@@ -86,6 +87,7 @@ public class ChatChannel implements WebSocketChannel {
         final Set<WebSocketSession> sessions = SESSIONS.get(chatHex);
         for (final WebSocketSession session : sessions) {
             session.sendText(message.toString());
+            AdminProcessor.manager.onMessageSent(3, message.toString().length());
         }
     }
 
@@ -174,6 +176,7 @@ public class ChatChannel implements WebSocketChannel {
             result.put("code", -1);
             result.put("msg", "内容为空或大于1024个字，发送失败");
             message.session.sendText(result.toString());
+            AdminProcessor.manager.onMessageSent(3, result.toString().length());
             return;
         }
 
@@ -193,6 +196,7 @@ public class ChatChannel implements WebSocketChannel {
             result.put("code", -1);
             result.put("msg", "发送出错，" + e.getMessage());
             message.session.sendText(result.toString());
+            AdminProcessor.manager.onMessageSent(3, result.toString().length());
             return;
         }
         JSONObject chatUnread = new JSONObject();
@@ -207,6 +211,7 @@ public class ChatChannel implements WebSocketChannel {
             result.put("code", -1);
             result.put("msg", "发送出错，" + e.getMessage());
             message.session.sendText(result.toString());
+            AdminProcessor.manager.onMessageSent(3, result.toString().length());
             return;
         }
 
@@ -236,6 +241,7 @@ public class ChatChannel implements WebSocketChannel {
             if (senderSessions != null) {
                 for (final WebSocketSession session : senderSessions) {
                     session.sendText(info.toString());
+                    AdminProcessor.manager.onMessageSent(3, info.toString().length());
                 }
             }
             // 给接收者发送通知
@@ -250,6 +256,7 @@ public class ChatChannel implements WebSocketChannel {
             result.put("code", -1);
             result.put("msg", "发送出错，" + e.getMessage());
             message.session.sendText(result.toString());
+            AdminProcessor.manager.onMessageSent(3, result.toString().length());
             return;
         }
 

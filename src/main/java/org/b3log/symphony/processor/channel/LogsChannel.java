@@ -25,6 +25,7 @@ import org.b3log.latke.ioc.Singleton;
 import org.b3log.latke.model.User;
 import org.b3log.symphony.model.Common;
 import org.b3log.symphony.model.UserExt;
+import org.b3log.symphony.processor.AdminProcessor;
 import org.b3log.symphony.processor.ApiProcessor;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -102,6 +103,7 @@ public class LogsChannel implements WebSocketChannel {
         for (WebSocketSession s : SESSIONS) {
             try {
                 s.sendText(message);
+                AdminProcessor.manager.onMessageSent(6, message.length());
             } catch (Exception ignored) {
             }
         }

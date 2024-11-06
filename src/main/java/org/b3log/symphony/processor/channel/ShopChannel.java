@@ -26,6 +26,7 @@ import org.b3log.latke.http.WebSocketSession;
 import org.b3log.latke.ioc.Singleton;
 import org.b3log.latke.model.User;
 import org.b3log.symphony.model.UserExt;
+import org.b3log.symphony.processor.AdminProcessor;
 import org.b3log.symphony.processor.ApiProcessor;
 import org.json.JSONObject;
 
@@ -177,6 +178,7 @@ public class ShopChannel implements WebSocketChannel {
                 final Set<WebSocketSession> sessions = SESSIONS.get(userId);
                 for (final WebSocketSession session : sessions) {
                     session.sendText(msgStr);
+                    AdminProcessor.manager.onMessageSent(7, msgStr.length());
                 }
             }
         }
