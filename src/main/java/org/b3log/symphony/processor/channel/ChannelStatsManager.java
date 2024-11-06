@@ -1,5 +1,6 @@
 package org.b3log.symphony.processor.channel;
 
+import java.text.DecimalFormat;
 import java.util.concurrent.*;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -70,7 +71,10 @@ public class ChannelStatsManager {
         double getAverageBandwidth() {
             long elapsedMillis = System.currentTimeMillis() - startTime.get();
             if (elapsedMillis <= 0) return 0.0;
-            return (totalBytesSent.get() * 1000.0) / (elapsedMillis * 1024); // 转换为KB/s
+
+            double bandwidth = (totalBytesSent.get() * 1000.0) / (elapsedMillis * 1024); // 转换为KB/s
+            DecimalFormat df = new DecimalFormat("#.#####");
+            return Double.parseDouble(df.format(bandwidth));
         }
 
         long getMessageCount() {

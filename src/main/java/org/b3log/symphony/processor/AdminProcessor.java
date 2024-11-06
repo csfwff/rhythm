@@ -444,7 +444,7 @@ public class AdminProcessor {
         Dispatcher.get("/admin/stats", adminProcessor::getStats, middlewares);
     }
 
-    public static ChannelStatsManager manager = new ChannelStatsManager();
+    final public static ChannelStatsManager manager = new ChannelStatsManager();
     public void getStats(final RequestContext context) {
         JSONObject json = new JSONObject();
         int c1 = ArticleListChannel.SESSIONS.size();
