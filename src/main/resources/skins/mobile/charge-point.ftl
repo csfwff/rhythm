@@ -40,10 +40,34 @@
                     <input id="doNote" style="display: inline; width: 70%" type="text" placeholder="捐助附言，最多32字">
                 </div>
                 <div style="text-align: right; margin-top: 15px">
-                    <button onclick="doAlipay()"><svg style="vertical-align: -2px;"><use xlink:href="#alipay"></use></svg> 使用支付宝捐助</button>
+                    <button onclick="doWeChat()"><svg style="vertical-align: -2px;color: #44B549"><use xlink:href="#wechat"></use></svg> 使用微信捐助</button>
+                    <!--<button onclick="doAlipay()"><svg style="vertical-align: -2px;"><use xlink:href="#alipay"></use></svg> 使用支付宝捐助</button>-->
                 </div>
             </div>
             <script>
+                function doWeChat() {
+                    let doMoney = $("#doMoney").val();
+                    let doNote = $("#doNote").val();
+                    if (doMoney === "" || doNote === "") {
+                        Util.alert("请填写捐助金额和捐助附言 :)");
+                    } else if (isNaN(doMoney)) {
+                        Util.alert("金额不合法！");
+                    } else {
+                        $.ajax({
+                            url: "${servePath}/pay/wechat?total_amount=" + doMoney + "&note=" + doNote,
+                            type: "GET",
+                            async: false,
+                            success: function (data) {
+                                let url = data.QRcode_url;
+                                Util.alert("" +
+                                    "<div><img src='" + url + "' height='200' width='200'></div>" +
+                                    "<div style='padding-top: 10px'><svg style='vertical-align: -2px;color: #44B549'><use xlink:href='#wechat'></use></svg> 请使用微信扫码支付</div>" +
+                                    "<div style='padding-top: 30px'><button class='btn green' onclick='javascript:location.reload()'>我已完成支付</button></div>")
+                            }
+                        });
+                    }
+                }
+
                 function doAlipay() {
                     let doMoney = $("#doMoney").val();
                     let doNote = $("#doNote").val();

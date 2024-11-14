@@ -119,6 +119,8 @@ public final class Router {
         ChatProcessor.register();
         // 日志
         LogsProcessor.register();
+        // 微信
+        WeChatPayProcessor.register();
 
         final BeanManager beanManager = BeanManager.getInstance();
         final LoginCheckMidware loginCheck = beanManager.getReference(LoginCheckMidware.class);
