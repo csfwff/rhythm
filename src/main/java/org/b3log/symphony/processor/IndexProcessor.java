@@ -802,12 +802,12 @@ public class IndexProcessor {
      * @param context the specified context
      */
     public void showChargePoint(final RequestContext context) {
-        if (context.param("out_trade_no") != null) {
+        /*if (context.param("out_trade_no") != null) {
             // 触发交易检查
             AlipayProcessor.checkTrades();
             context.sendRedirect(Latkes.getServePath() + "/charge/point");
             return;
-        }
+        }*/
         final AbstractFreeMarkerRenderer renderer = new SkinRenderer(context, "charge-point.ftl");
         final Map<String, Object> dataModel = renderer.getDataModel();
         dataModelService.fillHeaderAndFooter(context, dataModel);
