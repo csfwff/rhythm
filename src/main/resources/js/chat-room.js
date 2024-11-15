@@ -40,7 +40,13 @@ var DarwColorPicker = null;
 var redPacketMap = new Map();
 var catchUserParam = window.localStorage['robot_list'] ? window.localStorage['robot_list'] : '';
 var catchUsers = catchUserParam.length > 0 ? catchUserParam.split(',') : [];
-var catchWordFlag = window.localStorage['catch-word-flag'] == true || window.localStorage['catch-word-flag'] == 'true'  ? true : false;
+var catchWordFlag;
+if (window.localStorage['catch-word-flag']) {
+    catchWordFlag = window.localStorage['catch-word-flag'] == true || window.localStorage['catch-word-flag'] == 'true'  ? true : false;
+} else {
+    window.localStorage['catch-word-flag'] = true;
+    catchWordFlag = true;
+}
 $('#catch-word').prop('checked', catchWordFlag);
 var ChatRoom = {
     init: function () {
@@ -1699,7 +1705,7 @@ ${result.info.msg}
         let robotAvatar = data.userAvatarURL;
         // 看看是否有备注
         let remark = ChatRoom.remarkList[data.userOId];
-        if ((!more) && catchUsers.includes(userName) && newContent.indexOf("\"msgType\":\"redPacket\"") == -1) {
+        if ((!more) && catchUsers.includes(userName) && newContent.indexOf("\"msgType\":\"redPacket\"") == -1 && newContent.indexOf("\"msgType\":\"music\"") == -1 && newContent.indexOf("\"msgType\":\"weather\"") == -1) {
             let robotDom = '<div class="robot-msg-item"><div class="avatar" style="background-image: url(' + robotAvatar + ')"></div><div class="robot-msg-content"><div class="robot-username"><p>'+userName+'</p></div> ' + newContent + ' <div class="fn__right" style="margin-top: 5px; font-size: 10px;">'+data.time+'</div></div></div>';
             ChatRoom.addRobotMsg(robotDom);
         } else if ((!more) && $('#catch-word').prop('checked') && newContent.indexOf("\"msgType\":\"redPacket\"") == -1 && (newMd.startsWith("鸽 ") || newMd.startsWith("小冰 ") || newMd.startsWith("凌 ") || newMd.startsWith("ida "))) {
