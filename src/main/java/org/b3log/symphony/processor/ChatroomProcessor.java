@@ -81,8 +81,7 @@ public class ChatroomProcessor {
      */
     private static final Logger LOGGER = LogManager.getLogger(ChatroomProcessor.class);
 
-    private static final Pattern AT_USER_PATTERN = Pattern.compile("(@)([a-zA-Z0-9 ]+)");
-
+    private static final Pattern AT_USER_PATTERN = Pattern.compile("(@)([a-zA-Z0-9- ]+)");
 
     private static final String PARTICIPANTS = "participants";
 
