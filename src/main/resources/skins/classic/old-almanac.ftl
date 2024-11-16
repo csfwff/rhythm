@@ -51,48 +51,9 @@
             <div class="module">
                       <div class="wrapper" style="justify-content:center;padding: 15px;">
                           <div class="fn-flex old-almanac" >
-                              <div class="tip metro-item" style="width: 100%;">
-                                  <span class="date"></span>
-                                  <div class="line-tip">
-                                      <strong>座位朝向：</strong>面向<span class="direction_value"></span>写程序，BUG 最少。
-                                  </div>
-                                  <div class="line-tip">
-                                      <strong>今日宜饮：</strong><span class="drink_value"></span>
-                                  </div>
-                                  <div class="line-tip">
-                                      <strong>女神亲近指数：</strong><span class="goddes_value"></span>
-                                  </div>
-                                  <br/>
-                              </div>
-                              <div class="good metro-item" style="width: 100%;">
-                                  <div class="title">
-                                      <table>
-                                          <tr>
-                                              <td>宜</td>
-                                          </tr>
-                                      </table>
-                                  </div>
-                                  <div class="content">
-                                      <ul></ul>
-                                  </div>
-                                  <div class="clear"></div>
-                              </div>
-                              <div class="bad metro-item" style="width: 100%;">
-                                  <div class="title">
-                                      <table>
-                                          <tr>
-                                              <td>不宜</td>
-                                          </tr>
-                                      </table>
-                                  </div>
-                                  <div class="content">
-                                      <ul></ul>
-                                  </div>
-                                  <div class="clear"></div>
-                              </div>
+                              <iframe src="https://rili.zhuayuya.com/"></iframe>
                           </div>
                       </div>
-
             </div>
         </div>
         <div class="side">
