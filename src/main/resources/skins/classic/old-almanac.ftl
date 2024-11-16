@@ -22,7 +22,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <@head title="老黄历 - ${activityLabel} - ${symphonyLabel}">
+    <@head title="摸鱼日历 - ${activityLabel} - ${symphonyLabel}">
     <meta charset="UTF-8">
     <style>
         * {
@@ -34,10 +34,20 @@
             background-color: #eeeeee;
         }
 
-        #catch-the-cat {
+        .iframe-container {
+            position: relative;
             width: 100%;
-            margin-top: 32px;
-            text-align: center;
+            overflow: hidden;
+            height: 950px;
+        }
+
+        .iframe-container iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border: none;
         }
     </style>
 </@head>
@@ -49,19 +59,16 @@
     <div class="wrapper">
         <div class="content">
             <div class="module">
-                      <div class="wrapper" style="justify-content:center;padding: 15px;">
-                          <div class="fn-flex old-almanac" >
-                              <iframe src="https://rili.zhuayuya.com/"></iframe>
-                          </div>
-                      </div>
+                <div class="module-header fn-clear">
+                    <h2>该页面由抓鱼鸭提供服务</h2>
+                </div>
+                <div class="iframe-container">
+                    <iframe id="dynamicIframe" src="https://rili.zhuayuya.com/" frameborder="0"></iframe>
+                </div>
             </div>
-        </div>
-        <div class="side">
-            <#include "side.ftl">
         </div>
     </div>
 </div>
 <#include "footer.ftl">
-<script src="${staticServePath}/js/old-almanac${miniPostfix}.js?${staticResourceVersion}"></script>
 </body>
 </html>
