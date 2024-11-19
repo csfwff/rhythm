@@ -2259,6 +2259,12 @@ a[class*=" icon-"]:hover {
   }
 }
 
+/* color userName */
+.ft-admin-user {
+  color: red;
+  font-weight: bold;
+}
+
 /*@keyframes swim {
   0% {
     transform: translate(0,0) rotateY(0deg);
