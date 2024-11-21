@@ -248,6 +248,24 @@ var Settings = {
     });
   },
   /**
+   * 加载扫码登录APP功能
+   */
+  initApiCode: function(){
+    $.ajax({
+      url: Label.servePath + '/getApiKeyInWeb',
+      type: 'GET',
+      cache: false,
+      success: function (result) {
+        if (result.apiKey !== "") {
+          $("#apiCode").append("<label><svg><use xlink:href=\"#safe\"></use></svg> 请使用官方APP扫码以登录APP </label><br><br><br>");
+          $("#apiCode").append("<p>为了保护账号安全,请勿将本二维码以任何方式分享给他人,请勿在任何地点分享此二维码内容</p>");
+          $("#apiCode").append("<br>");
+          $("#apiCode").append("<img src='https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=login:" + result.apiKey + "'/>");
+        }
+      },
+    });
+  },
+  /**
    * 初始化背包
    */
   remainCheckin: 0,

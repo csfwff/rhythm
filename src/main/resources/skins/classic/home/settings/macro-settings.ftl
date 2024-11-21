@@ -82,6 +82,7 @@
             <#if 'account' == type>Settings.initBag(${sysBag});</#if>
             <#if 'account' == type>Settings.initMetal(${sysMetal});</#if>
             <#if 'account' == type>Settings.initMFA();</#if>
+            <#if 'account' == type>Settings.initApiCode();</#if>
         </script>
     </body>
 </html>

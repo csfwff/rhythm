@@ -42,7 +42,7 @@ var catchUserParam = window.localStorage['robot_list'] ? window.localStorage['ro
 var catchUsers = catchUserParam.length > 0 ? catchUserParam.split(',') : [];
 var catchWordFlag;
 if (window.localStorage['catch-word-flag']) {
-    catchWordFlag = window.localStorage['catch-word-flag'] == true || window.localStorage['catch-word-flag'] == 'true'  ? true : false;
+    catchWordFlag = window.localStorage['catch-word-flag'] == true || window.localStorage['catch-word-flag'] == 'true' ? true : false;
 } else {
     window.localStorage['catch-word-flag'] = true;
     catchWordFlag = true;
@@ -132,7 +132,7 @@ var ChatRoom = {
 
         // 加载备注
         let userRemarkList = localStorage.getItem('user_remark');
-        if(userRemarkList){
+        if (userRemarkList) {
             ChatRoom.remarkList = JSON.parse(userRemarkList);
         }
         // 表情包初始化
@@ -154,7 +154,7 @@ var ChatRoom = {
                 }, navigator.userAgent.match(/(phone|pad|pod|ios|Android|Mobile|BlackBerry|MQQBrowser|JUC|Fennec|wOSBrowser|BrowserNG|WebOS|Symbian)/i) !== null ? 0 : 600)
             }
             $("#emojiBtn").hover(function (e) {
-                $('#emojiList').css('top','290px')
+                $('#emojiList').css('top', '290px')
                 if (timeoutId !== 0) {
                     clearTimeout(timeoutId)
                     timeoutId = 0
@@ -491,7 +491,7 @@ var ChatRoom = {
                 $("#barragerContent").slideUp(1000);
             }
         });
-        $("#barragerInput").keydown(function(event) {
+        $("#barragerInput").keydown(function (event) {
             if (event.keyCode == 13) {
                 ChatRoom.sendBarrager();
             }
@@ -508,14 +508,16 @@ var ChatRoom = {
         BarragerColorPicker = new XNColorPicker({
             color: "#ffffff",
             selector: "#selectBarragerColor",
-            showhistorycolor:false,
-            colorTypeOption:'single',
-            autoConfirm:true,
-            onError:function(e){},
-            onCancel:function(color){},
-            onChange:function(color){
+            showhistorycolor: false,
+            colorTypeOption: 'single',
+            autoConfirm: true,
+            onError: function (e) {
             },
-            onConfirm:function(color){
+            onCancel: function (color) {
+            },
+            onChange: function (color) {
+            },
+            onConfirm: function (color) {
             }
         })
         // 监听弹幕颜色
@@ -524,19 +526,21 @@ var ChatRoom = {
         // });
         // 监听修改颜色
         // $('#selectColor').cxColor();
-        DarwColorPicker =  new XNColorPicker({
+        DarwColorPicker = new XNColorPicker({
             color: "#000000",
             selector: "#selectColor",
-            showhistorycolor:false,
-            colorTypeOption:'single',
-            autoConfirm:true,
-            onError:function(e){},
-            onCancel:function(color){},
-            onChange:function(color){
+            showhistorycolor: false,
+            colorTypeOption: 'single',
+            autoConfirm: true,
+            onError: function (e) {
+            },
+            onCancel: function (color) {
+            },
+            onChange: function (color) {
                 // console.log("change",color.color.rgba)
                 ChatRoom.changeColor(color.color.rgba);
             },
-            onConfirm:function(color){
+            onConfirm: function (color) {
                 // console.log("change",color.color.rgba)
                 ChatRoom.changeColor(color.color.rgba);
             }
@@ -623,7 +627,7 @@ var ChatRoom = {
                 chatLength[i].remove();
             }
         }
-        setTimeout(function() {
+        setTimeout(function () {
             $('#chats').css("display", "block");
             NProgress.done();
         }, 150);
@@ -711,7 +715,7 @@ border-bottom: none;
             <span class="ft__fade ft__smaller"><a onclick="Util.closeAlert(this);ChatRoom.editor.setValue('合议破戒 ` + userName + `');ChatRoom.send();$(window).scrollTop(0);" style="cursor: pointer; font-weight: bold;" href="javascript:void(0);">爲他求情</a></span>
         </div>
         <div class="fn__flex-center" style="color: #ff1919; font-weight: bold">
-        將於 ` + date.getFullYear() + `年` + (date.getMonth()+1 < 10 ? '0'+(date.getMonth()+1) : date.getMonth()+1) + `月` + date.getDate() + `日 ` + date.getHours() + `時` + date.getMinutes() + `分 釋放
+        將於 ` + date.getFullYear() + `年` + (date.getMonth() + 1 < 10 ? '0' + (date.getMonth() + 1) : date.getMonth() + 1) + `月` + date.getDate() + `日 ` + date.getHours() + `時` + date.getMinutes() + `分 釋放
         </div>
   
     </li>
@@ -1329,7 +1333,7 @@ border-bottom: none;
     shileds: ',',
     shiled: function (uName) {
         if (confirm("友好的交流是沟通的基础, 确定要屏蔽 Ta 吗？\n本次屏蔽仅针对当前页面有效, 刷新后需重新屏蔽！")) {
-            ChatRoom.shileds += uName +",";
+            ChatRoom.shileds += uName + ",";
         }
     },
     /**
@@ -1421,30 +1425,39 @@ border-bottom: none;
     /**
      * 给用户添加备注
      */
-    remarkList:{},
-    remark: function(userId,userName){
+    remarkList: {},
+    remark: function (userId, userName) {
         let userRemark = prompt(`要给 ${userName} 备注什么呢?`);
-        if(userRemark === null) return;
-        if(userRemark === ''){
+        if (userRemark === null) return;
+        if (userRemark === '') {
             delete ChatRoom.remarkList[userId];
-        }else{
+        } else {
             ChatRoom.remarkList[userId] = userRemark;
         }
-        localStorage.setItem('user_remark',JSON.stringify(ChatRoom.remarkList));
+        localStorage.setItem('user_remark', JSON.stringify(ChatRoom.remarkList));
     },
     /**
-     * 过滤消息中的图片
+     * 处理消息
+     * 处理图片压缩 处理特殊颜色文字
      * */
-    filterContent: function(content){
+    filterContent: function (content, isAdmin) {
         let dom = document.createElement("div");
         dom.innerHTML = content;
         let imgList = dom.querySelectorAll('img');
-        imgList.forEach(ele=>{
-          ele.setAttribute('originalsrc', ele.src);
-            if(ele.src.startsWith('https://file.fishpi.cn')){
+        imgList.forEach(ele => {
+            ele.setAttribute('originalsrc', ele.src);
+            if (ele.src.startsWith('https://file.fishpi.cn')) {
                 ele.src = ele.src.split('?')[0] + '?imageView2/0/w/150/h/150/interlace/0/q/90'
             }
         })
+        if (isAdmin) {
+            let textList = dom.querySelectorAll('p,h1,h2,h3,h4,h5,h6,h7');
+            let reg = /\[color=([^\]]+)\](.*?)\[\/color\]/g;
+            textList.forEach(ele => {
+                console.log(ele.innerText);
+                ele.innerHTML = ele.innerText.replaceAll(reg, '<span style="color:$1">$2</span>')
+            })
+        }
         return dom.innerHTML;
     },
     /**
@@ -1616,7 +1629,7 @@ border-bottom: none;
     /**
      * 拆开红包
      */
-    unpackRedPacket: function (oId,gesture) {
+    unpackRedPacket: function (oId, gesture) {
         if (undefined === gesture || null === gesture) {
             gesture = "0"
         }
@@ -1665,7 +1678,7 @@ ${result.info.msg}
                     ChatRoom.renderRedPacket(result.who, result.info.count, result.info.got, result.recivers, result.diceRet, result.info.userName)
                     if (result.info.count === result.info.got) {
                         $("#chatroom" + oId).find(".hongbao__item").css("opacity", ".36").attr('onclick', "ChatRoom.unpackRedPacket(" + oId + ")");
-                        if(!$("#chatroom" + oId).find(".hongbao__item").hasClass('opened')){
+                        if (!$("#chatroom" + oId).find(".hongbao__item").hasClass('opened')) {
                             $("#chatroom" + oId).find(".hongbao__item").addClass('opened')
                         }
                         if (result.dice === true) {
@@ -1694,7 +1707,7 @@ ${result.info.msg}
      * 渲染聊天室消息
      */
     renderMsg: function (data, more) {
-        if (ChatRoom.shileds.indexOf(data.userName) > 0){
+        if (ChatRoom.shileds.indexOf(data.userName) > 0) {
             // 被屏蔽了,
             return;
         }
@@ -1706,10 +1719,10 @@ ${result.info.msg}
         // 看看是否有备注
         let remark = ChatRoom.remarkList[data.userOId];
         if ((!more) && catchUsers.includes(userName) && newContent.indexOf("\"msgType\":\"redPacket\"") == -1 && newContent.indexOf("\"msgType\":\"music\"") == -1 && newContent.indexOf("\"msgType\":\"weather\"") == -1) {
-            let robotDom = '<div class="robot-msg-item"><div class="avatar" style="background-image: url(' + robotAvatar + ')"></div><div class="robot-msg-content"><div class="robot-username"><p>'+userName+'</p></div> ' + newContent + ' <div class="fn__right" style="margin-top: 5px; font-size: 10px;">'+data.time+'</div></div></div>';
+            let robotDom = '<div class="robot-msg-item"><div class="avatar" style="background-image: url(' + robotAvatar + ')"></div><div class="robot-msg-content"><div class="robot-username"><p>' + userName + '</p></div> ' + newContent + ' <div class="fn__right" style="margin-top: 5px; font-size: 10px;">' + data.time + '</div></div></div>';
             ChatRoom.addRobotMsg(robotDom);
         } else if ((!more) && $('#catch-word').prop('checked') && newContent.indexOf("\"msgType\":\"redPacket\"") == -1 && (newMd.startsWith("鸽 ") || newMd.startsWith("小冰 ") || newMd.startsWith("凌 ") || newMd.startsWith("ida "))) {
-            let robotDom = '<div class="robot-msg-item"><div class="avatar" style="background-image: url(' + robotAvatar + ')"></div><div class="robot-msg-content"><div class="robot-username"><p>'+userName+'</p></div> ' + newContent + ' <div class="fn__right" style="margin-top: 5px; font-size: 10px;">'+data.time+'</div></div></div>';
+            let robotDom = '<div class="robot-msg-item"><div class="avatar" style="background-image: url(' + robotAvatar + ')"></div><div class="robot-msg-content"><div class="robot-username"><p>' + userName + '</p></div> ' + newContent + ' <div class="fn__right" style="margin-top: 5px; font-size: 10px;">' + data.time + '</div></div></div>';
             ChatRoom.addRobotMsg(robotDom);
         } else {
             let isRedPacket = false;
@@ -1776,13 +1789,13 @@ ${result.info.msg}
                             '    </div>\n' +
                             '</div>';
                     } else {
-                        if(msgJSON.type === 'rockPaperScissors' && msgJSON.senderId != Label.currentUserId){
+                        if (msgJSON.type === 'rockPaperScissors' && msgJSON.senderId != Label.currentUserId) {
                             data.content = '' +
                                 '<div class="hongbao__item fn__flex-inline" >\n' +
-                                '    <div class="hongbao__finger_guessing">\n'+
-                                '        <div class="hongbao__finger_guessing_icon" onclick="event.stopPropagation();Util.clearAlert();ChatRoom.unpackRedPacket('+ data.oId +',\'0\');"></div>\n' +
-                                '        <div class="hongbao__finger_guessing_icon" onclick="event.stopPropagation();Util.clearAlert();ChatRoom.unpackRedPacket('+ data.oId +',\'1\');"></div>\n' +
-                                '        <div class="hongbao__finger_guessing_icon" onclick="event.stopPropagation();Util.clearAlert();ChatRoom.unpackRedPacket('+ data.oId +',\'2\');"></div>\n' +
+                                '    <div class="hongbao__finger_guessing">\n' +
+                                '        <div class="hongbao__finger_guessing_icon" onclick="event.stopPropagation();Util.clearAlert();ChatRoom.unpackRedPacket(' + data.oId + ',\'0\');"></div>\n' +
+                                '        <div class="hongbao__finger_guessing_icon" onclick="event.stopPropagation();Util.clearAlert();ChatRoom.unpackRedPacket(' + data.oId + ',\'1\');"></div>\n' +
+                                '        <div class="hongbao__finger_guessing_icon" onclick="event.stopPropagation();Util.clearAlert();ChatRoom.unpackRedPacket(' + data.oId + ',\'2\');"></div>\n' +
                                 '    </div>\n' +
                                 '    <svg class="ft__red hongbao__icon">\n' +
                                 '        <use xlink:href="#redPacketIcon"></use>\n' +
@@ -1809,20 +1822,20 @@ ${result.info.msg}
                                 '</div>';
                         }
                     }
-                }else if(msgJSON.msgType === "weather"){
+                } else if (msgJSON.msgType === "weather") {
                     isWeather = true;
-                    data.content = '<div id="weather_'+ data.oId +'" style="width: 300px;height:280px;" data-date="'+msgJSON.date+'" data-code="'+msgJSON.weatherCode+'" data-max="'+msgJSON.max+'" data-min="'+msgJSON.min+'" data-t="'+msgJSON.t+'" data-st="'+msgJSON.st+'"></div>';
-                }else if(msgJSON.msgType === 'music'){
+                    data.content = '<div id="weather_' + data.oId + '" style="width: 300px;height:280px;" data-date="' + msgJSON.date + '" data-code="' + msgJSON.weatherCode + '" data-max="' + msgJSON.max + '" data-min="' + msgJSON.min + '" data-t="' + msgJSON.t + '" data-st="' + msgJSON.st + '"></div>';
+                } else if (msgJSON.msgType === 'music') {
                     isMusic = true;
-                    data.content = '<div class="music-player">'+
-                        '<img class="music-player-img" src="'+ (msgJSON.coverURL === "" ? Label.servePath+"/images/music/cat.gif" : msgJSON.coverURL) +'" />'+
-                        '<div class="music-player-box"><div class="music-player-title">'+msgJSON.title+'</div>'+
-                        '<div class="music-player-controller"  data-source="'+msgJSON.source+'" data-cover="'+msgJSON.coverURL+
-                        '" data-title="'+msgJSON.title+'" data-from="'+msgJSON.from+'">'+
-                        '<span onclick="ChatRoom.playSound.add(this)">加入列表</span>'+
-                        ' | '+
-                        '<span onclick="ChatRoom.playSound.play(this)">立即播放</span>'+
-                        '</div></div>'+
+                    data.content = '<div class="music-player">' +
+                        '<img class="music-player-img" src="' + (msgJSON.coverURL === "" ? Label.servePath + "/images/music/cat.gif" : msgJSON.coverURL) + '" />' +
+                        '<div class="music-player-box"><div class="music-player-title">' + msgJSON.title + '</div>' +
+                        '<div class="music-player-controller"  data-source="' + msgJSON.source + '" data-cover="' + msgJSON.coverURL +
+                        '" data-title="' + msgJSON.title + '" data-from="' + msgJSON.from + '">' +
+                        '<span onclick="ChatRoom.playSound.add(this)">加入列表</span>' +
+                        ' | ' +
+                        '<span onclick="ChatRoom.playSound.play(this)">立即播放</span>' +
+                        '</div></div>' +
                         '</div>'
                 }
             } catch (err) {
@@ -1865,6 +1878,8 @@ ${result.info.msg}
                 }
             } catch (err) {
             }
+            let isAdmin = ["1731984099743"].includes(data.userOId.toString()); // ⬅️是测试的admin的oId  ⬇️是现在鱼排的admin的oId 根据情况解开
+            // let isAdmin = ["1630398857287", "1630399192600", "1630399146910", "imlinhanchao", "1630586509670", "1630399218628", "1630488635229", "1637917131504"].includes(data.userOId.toString());
             let newHTML = '<div class="fn-none">';
             newHTML += '<div id="chatroom' + data.oId + '" class="fn__flex chats__item' + meTag1 + '">\n' +
                 '    <a href="/member/' + data.userName + '" style="height: 38px">\n' +
@@ -1876,7 +1891,7 @@ ${result.info.msg}
             // let display = Label.currentUser === data.userName && !isPlusOne ? 'display: none;' : ''
             let display = '';
             newHTML += '<div id="userName" class="ft__fade ft__smaller" style="' + display + 'padding-bottom: 3px;border-bottom: 1px solid #eee">\n' +
-                '    <span class="ft-gray">'+ (remark != null ? (remark+'-') : '') + data.userNickname + '</span>&nbsp;\n';
+                '    <span class="' + (isAdmin ? "ft-admin-user" : "ft-gray") + '">' + (remark != null ? (remark + '-') : '') + data.userNickname + '</span>&nbsp;\n';
             if (data.sysMetal !== undefined && data.sysMetal !== "") {
                 let list = JSON.parse(data.sysMetal).list;
                 if (list !== undefined) {
@@ -1889,7 +1904,7 @@ ${result.info.msg}
             newHTML += '</div>';
 
             newHTML += '        <div class="vditor-reset ft__smaller ' + Label.chatRoomPictureStatus + '" style="margin-top: 3px">\n' +
-                '            ' + ChatRoom.filterContent(data.content) + '\n' +
+                '            ' + ChatRoom.filterContent(data.content ,isAdmin) + '\n' +
                 '        </div>\n' +
                 '        <div class="ft__smaller ft__fade fn__right date-bar">\n' +
                 '            ' + data.time + '\n' +
@@ -2107,7 +2122,7 @@ ${result.info.msg}
                 $fn.addClass("latest");
                 $fn.removeClass("fn-none");
             }
-            if(isWeather){
+            if (isWeather) {
                 ChatRoom.initNewWeather(data.oId);
             }
         }
@@ -2115,8 +2130,8 @@ ${result.info.msg}
     /**
      * 天气卡片渲染
      */
-    initNewWeather: function(oId){
-        let chartDom = document.getElementById('weather_'+ oId);
+    initNewWeather: function (oId) {
+        let chartDom = document.getElementById('weather_' + oId);
         let myChart = echarts.init(chartDom, null, {
             renderer: 'svg'
         });
@@ -2223,41 +2238,41 @@ ${result.info.msg}
                     },
                     axisLabel: {
                         interval: 0,
-                        formatter: function(value, index) {
+                        formatter: function (value, index) {
                             return '{' + index + '| }\n{b|' + value + '}';
                         },
                         rich: {
                             0: {
                                 backgroundColor: {
-                                    image: Label.servePath+`/images/weather/svg/${searchObj.weatherCode[0]}.svg`
+                                    image: Label.servePath + `/images/weather/svg/${searchObj.weatherCode[0]}.svg`
                                 },
                                 height: 40,
                                 width: 40
                             },
                             1: {
                                 backgroundColor: {
-                                    image: Label.servePath+`/images/weather/svg/${searchObj.weatherCode[1]}.svg`
+                                    image: Label.servePath + `/images/weather/svg/${searchObj.weatherCode[1]}.svg`
                                 },
                                 height: 40,
                                 width: 40
                             },
                             2: {
                                 backgroundColor: {
-                                    image: Label.servePath+`/images/weather/svg/${searchObj.weatherCode[2]}.svg`
+                                    image: Label.servePath + `/images/weather/svg/${searchObj.weatherCode[2]}.svg`
                                 },
                                 height: 40,
                                 width: 40
                             },
                             3: {
                                 backgroundColor: {
-                                    image: Label.servePath+`/images/weather/svg/${searchObj.weatherCode[3]}.svg`
+                                    image: Label.servePath + `/images/weather/svg/${searchObj.weatherCode[3]}.svg`
                                 },
                                 height: 40,
                                 width: 40
                             },
                             4: {
                                 backgroundColor: {
-                                    image: Label.servePath+`/images/weather/svg/${searchObj.weatherCode[4]}.svg`
+                                    image: Label.servePath + `/images/weather/svg/${searchObj.weatherCode[4]}.svg`
                                 },
                                 height: 40,
                                 width: 40
@@ -2347,16 +2362,16 @@ ${result.info.msg}
      * [index] 当前播放的下标
      * */
     playSound: {
-        list:[],
-        mode:0,
-        playing:false,
-        isShow:false,
-        index:0,
-        ele:null,
-        timer:null,
-        isShowList:false,
-        isSHowVoice:false,
-        init(){
+        list: [],
+        mode: 0,
+        playing: false,
+        isShow: false,
+        index: 0,
+        ele: null,
+        timer: null,
+        isShowList: false,
+        isSHowVoice: false,
+        init() {
             let radioEle = document.querySelector('#music-core-item');
             let playIcon = document.querySelector('.music-play-icon');
             let playBox = document.querySelector('.music-box');
@@ -2365,7 +2380,7 @@ ${result.info.msg}
             let titleEle = document.querySelector('.music-title');
             let coverEle = document.querySelector('.music-img-item');
             this.ele = radioEle;
-            radioEle.addEventListener('ended',()=>{
+            radioEle.addEventListener('ended', () => {
                 // console.log('播放完成');
                 this.playing = false;
                 clearInterval(this.timer);
@@ -2373,21 +2388,21 @@ ${result.info.msg}
                 playBox.classList.remove('playing');
                 this.autoNext();
             });
-            radioEle.addEventListener('play',()=>{
+            radioEle.addEventListener('play', () => {
                 // console.log('播放');
                 playIcon.src = Label.servePath + '/images/music/circle_pause.png';
                 playBox.classList.add('playing');
-                this.timer = setInterval(()=>{
+                this.timer = setInterval(() => {
                     currentEle.innerHTML = this.secondsToTime(this.ele.currentTime);
                 });
             });
-            radioEle.addEventListener('pause',()=>{
+            radioEle.addEventListener('pause', () => {
                 // console.log('暂停');
                 clearInterval(this.timer);
                 playIcon.src = Label.servePath + '/images/music/circle_play.png';
                 playBox.classList.remove('playing');
             });
-            radioEle.addEventListener('canplay',()=>{
+            radioEle.addEventListener('canplay', () => {
                 // console.log('加载完成');
                 currentEle.innerHTML = this.secondsToTime(this.ele.currentTime);
                 durationEle.innerHTML = this.secondsToTime(this.ele.duration);
@@ -2396,38 +2411,38 @@ ${result.info.msg}
                 coverEle.src = cover === '' ? Label.servePath + '/images/music/cat.gif' : cover;
             });
         },
-        secondsToTime(time){
+        secondsToTime(time) {
             time = parseInt(time);
-            let mm =0, ss = 0;
-            if(time>59){
-                mm = Math.floor(time/60);
-                ss = time%60;
-                return (mm>9?mm:'0'+mm)+":"+(ss>9?ss:'0'+ss);
-            }else{
+            let mm = 0, ss = 0;
+            if (time > 59) {
+                mm = Math.floor(time / 60);
+                ss = time % 60;
+                return (mm > 9 ? mm : '0' + mm) + ":" + (ss > 9 ? ss : '0' + ss);
+            } else {
                 ss = time;
-                return "00:"+(ss>9?ss:'0'+ss);
+                return "00:" + (ss > 9 ? ss : '0' + ss);
             }
         },
-        toggleMode(){
+        toggleMode() {
             let modeIcon = document.querySelector('.music-mode-icon');
-            if(this.mode === 0){
+            if (this.mode === 0) {
                 this.mode = 1;
                 modeIcon.src = Label.servePath + '/images/music/shuffle.png';
-                modeIcon.setAttribute('alt','顺序播放');
-            }else{
+                modeIcon.setAttribute('alt', '顺序播放');
+            } else {
                 this.mode = 0;
                 modeIcon.src = Label.servePath + '/images/music/repeat.png';
-                modeIcon.setAttribute('alt','随机播放');
+                modeIcon.setAttribute('alt', '随机播放');
             }
         },
-        add(e,showToast = true){
+        add(e, showToast = true) {
             let music = e.parentElement.dataset;
-            if(music.source.startsWith('http://music.163.com/song') || music.source.startsWith('https://music.163.com/song')){
+            if (music.source.startsWith('http://music.163.com/song') || music.source.startsWith('https://music.163.com/song')) {
                 let sourceEle = music.source.split('=');
                 music.source = sourceEle[sourceEle.length - 1];
             }
-            let idx = this.list.findIndex(e=>e.source === music.source);
-            if(idx !== -1){
+            let idx = this.list.findIndex(e => e.source === music.source);
+            if (idx !== -1) {
                 this.index = idx;
                 return;
             }
@@ -2435,73 +2450,73 @@ ${result.info.msg}
             this.renderList();
             showToast && Util.notice("success", 2000, "已加入播放列表。");
         },
-        remove(idx){
-            this.list.splice(idx,1);
+        remove(idx) {
+            this.list.splice(idx, 1);
             this.renderList();
             Util.notice("success", 2000, "已移出播放列表。");
         },
-        renderList(){
+        renderList() {
             let listEle = document.querySelector('.music-list-box');
             let list = "";
-            for(let i = 0;i<this.list.length;i++){
+            for (let i = 0; i < this.list.length; i++) {
                 let item = this.list[i];
                 list += '<div class="music-list-item">' +
-                    '        <img src="'+item.cover+'" alt="">' +
-                    '        <div class="music-list-title">'+item.title+'</div>' +
+                    '        <img src="' + item.cover + '" alt="">' +
+                    '        <div class="music-list-title">' + item.title + '</div>' +
                     '        <div class="music-list-controller">' +
-                    '            <span style="color: #198cff" data-i="'+i+'" onclick="ChatRoom.playSound.playIndex('+i+')">播放</span>' +
-                    '            <span style="color: red" data-i="'+i+'" onclick="ChatRoom.playSound.remove('+i+')">移除</span>' +
+                    '            <span style="color: #198cff" data-i="' + i + '" onclick="ChatRoom.playSound.playIndex(' + i + ')">播放</span>' +
+                    '            <span style="color: red" data-i="' + i + '" onclick="ChatRoom.playSound.remove(' + i + ')">移除</span>' +
                     '        </div>' +
                     '    </div>'
             }
             listEle.innerHTML = list;
         },
-        next(){
-            if(this.list.length === 0) return;
+        next() {
+            if (this.list.length === 0) return;
             this.index += 1;
-            if(this.index >= this.list.length){
+            if (this.index >= this.list.length) {
                 this.index = 0;
             }
             this.playIndex(this.index);
         },
-        prev(){
-            if(this.list.length === 0) return;
+        prev() {
+            if (this.list.length === 0) return;
             this.index -= 1;
-            if(this.index < 0){
+            if (this.index < 0) {
                 this.index = this.list.length - 1;
             }
             this.playIndex(this.index);
         },
-        play(e){
+        play(e) {
             let music = e.parentElement.dataset;
-            this.add(e,false);
-            if(music.source.startsWith('http://music.163.com/song') || music.source.startsWith('https://music.163.com/song')){
+            this.add(e, false);
+            if (music.source.startsWith('http://music.163.com/song') || music.source.startsWith('https://music.163.com/song')) {
                 let sourceEle = music.source.split('=');
                 music.source = sourceEle[sourceEle.length - 1];
             }
             //this.ele.src = music.source;
             let iframeBox = document.querySelector('.music-detail');
-            iframeBox.innerHTML = '<iframe frameborder="no" border="0" marginwidth="0" marginheight="0" width="100%" height=86 src="//music.163.com/outchain/player?type=2&id='+music.source+'&auto=1&height=66"></iframe>';
+            iframeBox.innerHTML = '<iframe frameborder="no" border="0" marginwidth="0" marginheight="0" width="100%" height=86 src="//music.163.com/outchain/player?type=2&id=' + music.source + '&auto=1&height=66"></iframe>';
             this.playing = false;
             this.togglePlay();
             !this.isShow && this.show();
         },
-        playIndex(idx){
+        playIndex(idx) {
             //this.ele.src = this.list[idx].source;
             let iframeBox = document.querySelector('.music-detail');
-            iframeBox.innerHTML = '<iframe frameborder="no" border="0" marginwidth="0" marginheight="0" width="100%" height=86 src="//music.163.com/outchain/player?type=2&id='+this.list[idx].source+'&auto=1&height=66"></iframe>';
+            iframeBox.innerHTML = '<iframe frameborder="no" border="0" marginwidth="0" marginheight="0" width="100%" height=86 src="//music.163.com/outchain/player?type=2&id=' + this.list[idx].source + '&auto=1&height=66"></iframe>';
             this.playing = false;
             this.index = idx;
             this.togglePlay();
         },
-        autoNext(){
-            if(this.mode === 0){
+        autoNext() {
+            if (this.mode === 0) {
                 this.next();
-            }else{
+            } else {
                 this.playIndex(Math.floor(Math.random() * this.list.length));
             }
         },
-        togglePlay(){
+        togglePlay() {
             this.playing = !this.playing;
             // if(this.playing){
             //     this.ele.play();
@@ -2509,7 +2524,7 @@ ${result.info.msg}
             //     this.ele.pause();
             // }
         },
-        hide(){
+        hide() {
             this.isShow = false;
             let playEle = document.querySelector('#musicBox');
             let closeEle = document.querySelector('.music-close-icon');
@@ -2517,36 +2532,36 @@ ${result.info.msg}
             playEle.classList.remove('show');
             this.isShowList && this.toggleList();
         },
-        show(){
+        show() {
             this.isShow = true;
             let playEle = document.querySelector('#musicBox');
             let closeEle = document.querySelector('.music-close-icon');
             closeEle.src = Label.servePath + '/images/music/arrow_down.png';
             playEle.classList.add('show');
         },
-        toggleShow(){
+        toggleShow() {
             this.isShow ? this.hide() : this.show();
         },
-        toggleList(){
+        toggleList() {
             let listEle = document.querySelector('.music-list-box');
             this.isShowList = !this.isShowList;
-            if(this.isShowList){
+            if (this.isShowList) {
                 listEle.classList.add('show');
-            }else{
+            } else {
                 listEle.classList.remove('show');
             }
         },
-        changeVoice(voice){
+        changeVoice(voice) {
             // console.log(voice.value);
             let volume = voice.value;
             let volumeEle = document.querySelector('.music-voice-icon');
-            if(volume > 80){
+            if (volume > 80) {
                 volumeEle.src = Label.servePath + '/images/music/volume_3.png';
-            }else if(volume > 30){
+            } else if (volume > 30) {
                 volumeEle.src = Label.servePath + '/images/music/volume_2.png';
-            }else if(volume > 0){
+            } else if (volume > 0) {
                 volumeEle.src = Label.servePath + '/images/music/volume_1.png';
-            }else{
+            } else {
                 volumeEle.src = Label.servePath + '/images/music/volume_off.png';
             }
             this.ele.volume = volume / 100;
@@ -2661,7 +2676,7 @@ ${result.info.msg}
             $("#robotBox").show(200),
                 $("#robotBtn").hide(200),
                 setTimeout(() => {
-                    // 自动调整css样式，每次打开小窗，都要调整小窗高度，宽度目前固定300px;小窗用户概率性出现遮挡聊天室的情况
+                        // 自动调整css样式，每次打开小窗，都要调整小窗高度，宽度目前固定300px;小窗用户概率性出现遮挡聊天室的情况
                         $("#robotBox").addClass("robot-active");
                         $("#robotBox").attr("style", "height:" + (window.innerHeight - 25 - 58) + "px");
                         $("#robotMsgList").attr("style", "height:" + (window.innerHeight - 85 - 58) + "px");
