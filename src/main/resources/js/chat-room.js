@@ -1454,7 +1454,6 @@ border-bottom: none;
             let textList = dom.querySelectorAll('p,h1,h2,h3,h4,h5,h6,h7');
             let reg = /\[color=([^\]]+)\](.*?)\[\/color\]/g;
             textList.forEach(ele => {
-                console.log(ele.innerText);
                 ele.innerHTML = ele.innerText.replaceAll(reg, '<span style="color:$1">$2</span>')
             })
         }
@@ -1878,8 +1877,7 @@ ${result.info.msg}
                 }
             } catch (err) {
             }
-            let isAdmin = ["1731984099743"].includes(data.userOId.toString()); // ⬅️是测试的admin的oId  ⬇️是现在鱼排的admin的oId 根据情况解开
-            // let isAdmin = ["1630398857287", "1630399192600", "1630399146910", "imlinhanchao", "1630586509670", "1630399218628", "1630488635229", "1637917131504"].includes(data.userOId.toString());
+            let isAdmin = [""].includes(data.userOId.toString());
             let newHTML = '<div class="fn-none">';
             newHTML += '<div id="chatroom' + data.oId + '" class="fn__flex chats__item' + meTag1 + '">\n' +
                 '    <a href="/member/' + data.userName + '" style="height: 38px">\n' +
