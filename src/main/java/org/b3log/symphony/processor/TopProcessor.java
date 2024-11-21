@@ -929,7 +929,9 @@ public class TopProcessor {
                   JSONObject userData = userQueryService.getUser(user.optString("userId"));
                   avatarQueryService.fillUserAvatarURL(userData);
                   user.put("profile", userData);
-                  result.add(user);
+                  if (userData.optString("userName") != null && !userData.optString("userName").isEmpty() && !userData.optString("userName").equals("_")) {
+                      result.add(user);
+                  }
               } catch (Exception e) {
                   continue;
               }
