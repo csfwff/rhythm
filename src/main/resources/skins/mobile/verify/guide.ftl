@@ -110,8 +110,8 @@
                         </div>
                         <div class="fn-none ft-center">
                             <br/>
-                            <a href="https://github.com/csfwff/rhythm" target="_blank"><img src="${staticServePath}/images/sym-logo300.png" width="180px"></a> <br/> <br/><br/>
-                            <iframe src="https://ghbtns.com/github-btn.html?user=csfwff&repo=rhythm&type=star&count=true&size=large" frameborder="0" scrolling="0" width="130px" height="30px"></iframe>
+                            <a href="https://github.com/FishPiOffical/rhythm" target="_blank"><img src="${staticServePath}/images/sym-logo300.png" width="180px"></a> <br/> <br/><br/>
+                            <iframe src="https://ghbtns.com/github-btn.html?user=FishPiOffical&repo=rhythm&type=star&count=true&size=large" frameborder="0" scrolling="0" width="130px" height="30px"></iframe>
                         </div>
                         <div class="fn-none list">
                             <ul>

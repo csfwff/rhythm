@@ -43,7 +43,7 @@
             </div>
             <div style="display: inline-block; width: 5px"></div>
             <div class="ft-smaller" style="display: inline-block">
-                <div onclick="window.open('http://zhuayuya.com/')" style="text-align: center;padding: 8px 0px;color: #39b362;background-color: #d9ffcfc9;line-height: 20px;border-radius: 12px;width: 175px;margin-bottom: 15px;cursor: pointer;">
+                <div onclick="window.open('https://zhuayuya.com/')" style="text-align: center;padding: 8px 0px;color: #39b362;background-color: #d9ffcfc9;line-height: 20px;border-radius: 12px;width: 175px;margin-bottom: 15px;cursor: pointer;">
                     <div>
                         <svg style="vertical-align: -2px;">
                             <use xlink:href="#zyy"></use>

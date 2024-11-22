@@ -3,20 +3,20 @@
 <br>
 Rhythm 社区系统，超丰富的社区功能，基于 Symphony 社区版深度定制。
 <br><br>
-<img src="https://img.shields.io/github/languages/code-size/csfwff/rhythm.svg?style=flat-square">
+<img src="https://img.shields.io/github/languages/code-size/FishPiOffical/rhythm.svg?style=flat-square">
 <img src="http://img.shields.io/badge/license-AGPLv3-orange.svg?style=flat-square">
-<img src="https://img.shields.io/github/last-commit/csfwff/rhythm.svg?style=flat-square">
-<img src="https://img.shields.io/github/issues-pr-closed/csfwff/rhythm.svg?style=flat-square">
+<img src="https://img.shields.io/github/last-commit/FishPiOffical/rhythm.svg?style=flat-square">
+<img src="https://img.shields.io/github/issues-pr-closed/FishPiOffical/rhythm.svg?style=flat-square">
 <br>
-<img src="https://img.shields.io/github/repo-size/csfwff/rhythm?style=flat-square">
-<img src="https://img.shields.io/github/languages/count/csfwff/rhythm?style=flat-square">
-<img src="https://img.shields.io/github/languages/top/csfwff/rhythm?style=flat-square">
-<img src="https://img.shields.io/github/issues/csfwff/rhythm?style=flat-square">
-<img src="https://img.shields.io/github/issues-closed-raw/csfwff/rhythm?style=flat-square">
+<img src="https://img.shields.io/github/repo-size/FishPiOffical/rhythm?style=flat-square">
+<img src="https://img.shields.io/github/languages/count/FishPiOffical/rhythm?style=flat-square">
+<img src="https://img.shields.io/github/languages/top/FishPiOffical/rhythm?style=flat-square">
+<img src="https://img.shields.io/github/issues/FishPiOffical/rhythm?style=flat-square">
+<img src="https://img.shields.io/github/issues-closed-raw/FishPiOffical/rhythm?style=flat-square">
 <br>
-<img src="https://img.shields.io/github/forks/csfwff/rhythm?style=flat-square">
-<img src="https://img.shields.io/github/stars/csfwff/rhythm?style=flat-square">
-<img src="https://img.shields.io/github/watchers/csfwff/rhythm?style=flat-square">
+<img src="https://img.shields.io/github/forks/FishPiOffical/rhythm?style=flat-square">
+<img src="https://img.shields.io/github/stars/FishPiOffical/rhythm?style=flat-square">
+<img src="https://img.shields.io/github/watchers/FishPiOffical/rhythm?style=flat-square">
 </p>
 
 本仓库为摸鱼派社区全部源码，欢迎访问基于 Rhythm 的程序员社区：[摸鱼派](https://fishpi.cn)
@@ -27,6 +27,6 @@ Rhythm 社区系统，超丰富的社区功能，基于 Symphony 社区版深度
 
 ### 贡献者
 
-<a href="https://github.com/csfwff/rhythm/graphs/contributors">
-  <img src="https://contrib.rocks/image?repo=csfwff/rhythm" />
+<a href="https://github.com/FishPiOffical/rhythm/graphs/contributors">
+  <img src="https://contrib.rocks/image?repo=FishPiOffical/rhythm" />
 </a>
