@@ -73,24 +73,30 @@ public class SearchQueryService {
             or.put("or", orClause);
 
             final JSONObject content = new JSONObject();
-            content.put(Article.ARTICLE_CONTENT, keyword);
+            final JSONObject articleContent = new JSONObject();
+            articleContent.put("query", keyword);
+            articleContent.put("boost", 1.0);
+            content.put(Article.ARTICLE_CONTENT, articleContent);
             final JSONObject matchContent = new JSONObject();
-            matchContent.put("match", content);
+            matchContent.put("match_phrase", content);
             orClause.put(matchContent);
 
             final JSONObject title = new JSONObject();
-            title.put(Article.ARTICLE_TITLE, keyword);
+            final JSONObject articleTitle = new JSONObject();
+            articleTitle.put("query", keyword);
+            articleTitle.put("boost", 2.0);
+            title.put(Article.ARTICLE_TITLE, articleTitle);
             final JSONObject matchTitle = new JSONObject();
-            matchTitle.put("match", title);
+            matchTitle.put("match_phrase", title);
             orClause.put(matchTitle);
 
             reqData.put("query", q);
             reqData.put("from", currentPage);
             reqData.put("size", pageSize);
             final JSONArray sort = new JSONArray();
-            final JSONObject sortField = new JSONObject();
-            sort.put(sortField);
-            sortField.put(Article.ARTICLE_CREATE_TIME, "desc");
+            //final JSONObject sortField = new JSONObject();
+            //sort.put(sortField);
+            //sortField.put(Article.ARTICLE_CREATE_TIME, "desc");
             sort.put("_score");
             reqData.put("sort", sort);
 

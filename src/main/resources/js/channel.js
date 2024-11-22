@@ -485,13 +485,19 @@ var ChatRoomChannel = {
                     let userNickname = data.userNickname;
                     let userName = data.userName;
                     if (userNickname !== undefined && userNickname !== "") {
-                        userNickname = userNickname + " ( " + userName + " )"
+                        userNickname = userNickname + " (" + userName + ")"
                     } else {
                         userNickname = userName;
                     }
                     let newContent = data.content;
                     if (newContent.indexOf("\"msgType\":\"redPacket\"") !== -1) {
                         newContent = "[收到红包，请在完整版聊天室查看]";
+                    }
+                    if (newContent.indexOf("\"msgType\":\"weather\"") !== -1) {
+                        newContent = "[天气卡片，请在完整版聊天室查看]";
+                    }
+                    if (newContent.indexOf("\"msgType\":\"music\"") !== -1) {
+                        newContent = "[音乐卡片，请在完整版聊天室查看]";
                     }
                     $("#chatRoomIndex").prepend("" +
                         "<li class=\"fn-flex\" id=\"chatindex" + data.oId + "\" style='display: none; border-bottom: 1px solid #eee;'>\n" +
@@ -507,7 +513,7 @@ var ChatRoomChannel = {
                         "            </a>\n" +
                         "        </div>\n" +
                         "        <div class=\"vditor-reset comment " + Label.chatRoomPictureStatus + "\">\n" +
-                        "            " + newContent + "\n" +
+                        "            " + ChatRoomChannel.filterContent(newContent) + "\n" +
                         "        </div>\n" +
                         "    </div>\n" +
                         "</li>");
@@ -548,6 +554,20 @@ var ChatRoomChannel = {
                 })
             }, 10000);
         }
+    },
+    /**
+     * 过滤消息中的图片
+     * */
+    filterContent: function(content){
+        let dom = document.createElement("div");
+        dom.innerHTML = content;
+        let imgList = dom.querySelectorAll('img');
+        imgList.forEach(ele=>{
+            //if(ele.src.startsWith('https://file.fishpi.cn')){
+            ele.src = ele.src + '?imageView2/0/w/150/h/150/interlace/0/q/90'
+            //}
+        })
+        return dom.innerHTML;
     },
 }
 

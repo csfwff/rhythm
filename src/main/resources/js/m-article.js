@@ -597,7 +597,7 @@ var Comment = {
             + '<div class="comment-info ft-smaller">'
             template += '<a class="ft-gray" rel="nofollow" href="/member/' +
               data.commentAuthorName + '">'
-          template += data.commentAuthorName
+          template += data.commentAuthorNickName + ' (' + data.commentAuthorName + ')'
           template += '</a>'
 
           template += '<span class="ft-fade"> • ' + data.timeAgo

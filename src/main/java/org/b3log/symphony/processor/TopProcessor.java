@@ -36,6 +36,7 @@ import org.b3log.symphony.repository.ArticleRepository;
 import org.b3log.symphony.repository.PointtransferRepository;
 import org.b3log.symphony.repository.SponsorRepository;
 import org.b3log.symphony.service.*;
+import org.b3log.symphony.util.StatusCodes;
 import org.b3log.symphony.util.Symphonys;
 import org.b3log.symphony.util.Vocation;
 import org.json.JSONArray;
@@ -124,22 +125,186 @@ public class TopProcessor {
         final AnonymousViewCheckMidware anonymousViewCheckMidware = beanManager.getReference(AnonymousViewCheckMidware.class);
 
         final TopProcessor topProcessor = beanManager.getReference(TopProcessor.class);
+        Dispatcher.get("/api/top/any", topProcessor::getAnyTop, anonymousViewCheckMidware::handle);
         Dispatcher.get("/top", topProcessor::showTop, anonymousViewCheckMidware::handle);
         Dispatcher.get("/top/link", topProcessor::showLink, anonymousViewCheckMidware::handle);
+        Dispatcher.get("/api/top/link", topProcessor::getLink, anonymousViewCheckMidware::handle);
         Dispatcher.get("/top/balance", topProcessor::showBalance, anonymousViewCheckMidware::handle);
+        Dispatcher.get("/api/top/balance", topProcessor::getBalance, anonymousViewCheckMidware::handle);
         Dispatcher.get("/top/consumption", topProcessor::showConsumption, anonymousViewCheckMidware::handle);
+        Dispatcher.get("/api/top/consumption", topProcessor::getConsumption, anonymousViewCheckMidware::handle);
         Dispatcher.get("/top/checkin", topProcessor::showCheckin, anonymousViewCheckMidware::handle);
+        Dispatcher.get("/api/top/checkin", topProcessor::getCheckin, anonymousViewCheckMidware::handle);
         Dispatcher.get("/top/online", topProcessor::showOnline, anonymousViewCheckMidware::handle);
+        Dispatcher.get("/api/top/online", topProcessor::getOnline, anonymousViewCheckMidware::handle);
         Dispatcher.get("/top/adr", topProcessor::showADR, anonymousViewCheckMidware::handle);
+        Dispatcher.get("/api/top/adr", topProcessor::getADR, anonymousViewCheckMidware::handle);
         Dispatcher.get("/top/mofish", topProcessor::showMofish, anonymousViewCheckMidware::handle);
+        Dispatcher.get("/api/top/mofish", topProcessor::getMofish, anonymousViewCheckMidware::handle);
         Dispatcher.get("/top/smallmofish", topProcessor::showSmallMofish, anonymousViewCheckMidware::handle);
+        Dispatcher.get("/api/top/smallmofish", topProcessor::getSmallMofish, anonymousViewCheckMidware::handle);
         Dispatcher.get("/top/lifeRestart", topProcessor::showLifeRestart, anonymousViewCheckMidware::handle);
+        Dispatcher.get("/api/top/lifeRestart", topProcessor::getLifeRestart, anonymousViewCheckMidware::handle);
         Dispatcher.get("/top/evolve", topProcessor::showEvolve, anonymousViewCheckMidware::handle);
+        Dispatcher.get("/api/top/evolve", topProcessor::getEvolve, anonymousViewCheckMidware::handle);
         Dispatcher.get("/top/emoji", topProcessor::showEmoji, anonymousViewCheckMidware::handle);
+        Dispatcher.get("/api/top/emoji", topProcessor::getEmoji, anonymousViewCheckMidware::handle);
         Dispatcher.get("/top/xiaoice", topProcessor::showXiaoice, anonymousViewCheckMidware::handle);
+        Dispatcher.get("/api/top/xiaoice", topProcessor::getXiaoice, anonymousViewCheckMidware::handle);
         Dispatcher.get("/top/invite", topProcessor::showInvite, anonymousViewCheckMidware::handle);
+        Dispatcher.get("/api/top/invite", topProcessor::getInvite, anonymousViewCheckMidware::handle);
         Dispatcher.get("/top/donate", topProcessor::showDonate, anonymousViewCheckMidware::handle);
+        Dispatcher.get("/api/top/donate", topProcessor::getDonate, anonymousViewCheckMidware::handle);
         Dispatcher.get("/top/perfect", topProcessor::showPerfect, anonymousViewCheckMidware::handle);
+        Dispatcher.get("/api/top/perfect", topProcessor::getPerfect, anonymousViewCheckMidware::handle);
+    }
+
+    /**
+     * Gets any top list.
+     *
+     * @param context the specified context
+     */
+    public void getAnyTop(final RequestContext context) {
+      final JSONObject dataModel = new JSONObject();
+      List<JSONObject> rankList = new ArrayList<>();
+      final String types = context.param("types").toString();
+      String[] typeList = types.split(",");//以逗号分割
+        for (String type : typeList) {
+            if(type.contains("|")){
+              String[] subTypeList = type.split("\\|");
+              rankList.add(getTopByType(context,subTypeList[0],subTypeList[1]));
+            }
+            else{
+              rankList.add(getTopByType(context,type,null));
+            }
+        }
+        dataModel.put("data", rankList);
+        context.renderJSON(dataModel).renderCode(StatusCodes.SUCC);
+    }
+
+    /**
+     * remove private datas.
+     *
+     * @param result rank's list data
+     */
+    private void removePrivateDatas(List<JSONObject> result) {
+        for (int i = 0; i < result.size(); i++) {
+            removePrivateData(result.get(i));
+        }
+    }
+
+    /**
+     * remove private data.
+     *
+     * @param result rank's data
+     */
+    private void removePrivateData(JSONObject result){
+        result.remove("userPassword");
+        result.remove("userLatestLoginIP");
+        result.remove("userPhone");
+        result.remove("userQQ");
+        result.remove("userCity");
+        result.remove("userCountry");
+        result.remove("userEmail");
+        result.remove("secret2fa");
+    }
+
+    /**
+     * package rank list data.
+     *
+     * @param result rank's data
+     * @param type rank's type
+     */
+    private JSONObject packageListData(List<JSONObject> result,final String type){
+      JSONObject ret = new JSONObject();
+      removePrivateDatas(result);
+      ret.put("type",type);
+      ret.put("data", result);
+      return ret;
+    }
+
+    /**
+     * package rank list data, remove usless value.
+     *
+     * @param context the specified context
+     * @param type the rank's type //进化榜还是小冰榜
+     * @param type the rank's subType //进化榜的成就榜还是知识榜
+     */
+    private JSONObject getTopByType(final RequestContext context,final String type,final String subType){
+      JSONObject ret;
+      List<JSONObject> result;
+      switch (type){
+        case Common.TOP_LINKS:
+          result = linkQueryService.getTopLink(Symphonys.TOP_CNT);
+          ret = packageListData(result,type);
+          break;
+        case Common.TOP_BALANCE_USERS:
+          result = pointtransferQueryService.getTopBalanceUsers(Symphonys.TOP_CNT);
+          ret = packageListData(result,type);
+          break;
+        case Common.TOP_CONSUMPTION_USERS:
+          result = pointtransferQueryService.getTopConsumptionUsers(Symphonys.TOP_CNT);
+          ret = packageListData(result,type);
+          break;
+        case Common.TOP_CHECKIN_USERS:
+          result = activityQueryService.getTopCheckinUsers(Symphonys.TOP_CNT);
+          ret = packageListData(result,type);
+          break;
+        case "topOnlineUsers":
+          result = activityQueryService.getTopOnlineTimeUsers(Symphonys.TOP_CNT);
+          ret = packageListData(result,type);
+          break;
+        case "adr":
+          result = activityQueryService.getTopADR(Symphonys.TOP_CNT);
+          ret = packageListData(result,type);
+          break;
+        case "mofish":
+          result = activityQueryService.getTopMofish(Symphonys.TOP_CNT);
+          ret = packageListData(result,type);
+          break;
+        case "smallmofish":
+          result = activityQueryService.getTopSmallMofish(Symphonys.TOP_CNT);
+          ret = packageListData(result,type);
+          break;
+        case "lifeRestart":
+          result = activityQueryService.getTopLifeRestart(Symphonys.TOP_CNT);
+          ret = packageListData(result,type);
+          break;
+        case "evolve":
+          final String evoType = subType != null ?
+                  subType : "achievement";
+          result = activityQueryService.getEvolve(evoType, Symphonys.TOP_CNT);
+          ret = packageListData(result,type);
+          ret.put("subType", evoType);
+          break;
+        case "emoji":
+          result = activityQueryService.getTopEmoji(Symphonys.TOP_CNT);
+          ret = packageListData(result,type);
+          break;
+        case "xiaoice":
+          final String xiaoiceType = subType != null ?
+                  subType : "achievement";
+          result = getXiaoiceData(subType);
+          ret = packageListData(result,type);
+          ret.put("subType", xiaoiceType);
+          break;
+        case "invite":
+          result = getInviteData();
+          ret = packageListData(result,type);
+          break;
+        case "donate":
+          ret = getDonateData();
+          break;
+        case "perfect":
+          ret = getPerfectData();
+          break;
+        default:
+          ret = new JSONObject();
+          ret.put("type",type);
+          ret.put("data",new ArrayList<>());
+          break;
+      }
+      return ret;
     }
 
     /**
@@ -178,6 +343,19 @@ public class TopProcessor {
     }
 
     /**
+     * Get link ranking list
+     * @param context
+     */
+    public void getLink(final RequestContext context) {
+      try {
+          final List<JSONObject> result = linkQueryService.getTopLink(Symphonys.TOP_CNT);
+          context.renderJSON(new JSONObject().put("data", new JSONArray(result))).renderCode(StatusCodes.SUCC);
+          } catch (Exception e) {
+              context.renderJSON(new JSONObject()).renderCode(StatusCodes.ERR).renderMsg("请求非法");
+          }
+  }
+
+    /**
      * Shows balance ranking list.
      *
      * @param context the specified context
@@ -193,6 +371,21 @@ public class TopProcessor {
         dataModelService.fillSideHotArticles(dataModel);
         dataModelService.fillSideTags(dataModel);
         dataModelService.fillLatestCmts(dataModel);
+    }
+
+    /**
+     * get balance ranking list.
+     *
+     * @param context the specified context
+     */
+    public void getBalance(final RequestContext context) {
+      try {
+        final List<JSONObject> result = pointtransferQueryService.getTopBalanceUsers(Symphonys.TOP_CNT);
+        removePrivateDatas(result);
+        context.renderJSON(new JSONObject().put("data", new JSONArray(result))).renderCode(StatusCodes.SUCC);
+        } catch (Exception e) {
+            context.renderJSON(new JSONObject()).renderCode(StatusCodes.ERR).renderMsg("请求非法");
+        }
     }
 
     /**
@@ -214,6 +407,21 @@ public class TopProcessor {
     }
 
     /**
+     * Get consumption ranking list.
+     *
+     * @param context the specified context
+     */
+    public void getConsumption(final RequestContext context) {
+      try{
+          final List<JSONObject> result = pointtransferQueryService.getTopConsumptionUsers(Symphonys.TOP_CNT);
+          removePrivateDatas(result);
+            context.renderJSON(new JSONObject().put("data", new JSONArray(result))).renderCode(StatusCodes.SUCC);
+          } catch (Exception e) {
+              context.renderJSON(new JSONObject()).renderCode(StatusCodes.ERR).renderMsg("请求非法");
+          }
+  }
+
+    /**
      * Shows checkin ranking list.
      *
      * @param context the specified context
@@ -230,6 +438,21 @@ public class TopProcessor {
         dataModelService.fillSideTags(dataModel);
         dataModelService.fillLatestCmts(dataModel);
     }
+
+    /**
+     * Get checkin ranking list
+     * @param context
+     */
+    public void getCheckin(final RequestContext context) {
+      try {
+          final List<JSONObject> result = activityQueryService.getTopCheckinUsers(Symphonys.TOP_CNT);
+          // 结果去敏
+          removePrivateDatas(result);
+          context.renderJSON(new JSONObject().put("data", new JSONArray(result))).renderCode(StatusCodes.SUCC);
+          } catch (Exception e) {
+              context.renderJSON(new JSONObject()).renderCode(StatusCodes.ERR).renderMsg("请求非法");
+          }
+  }
 
     /**
      * Shows online ranking list.
@@ -250,6 +473,23 @@ public class TopProcessor {
     }
 
     /**
+     * Get online ranking list
+     * @param context
+     */
+    public void getOnline(final RequestContext context) {
+      try {
+          final List<JSONObject> result = activityQueryService.getTopOnlineTimeUsers(Symphonys.TOP_CNT);
+          // 结果去敏
+          removePrivateDatas(result);
+          JSONObject ret = new JSONObject();
+          ret.put("data", result);
+          context.renderJSON(ret).renderCode(StatusCodes.SUCC);
+          } catch (Exception e) {
+              context.renderJSON(new JSONObject()).renderCode(StatusCodes.ERR).renderMsg("请求非法");
+          }
+  }
+
+    /**
      * Shows ADR score ranking list.
      *
      * @param context
@@ -266,6 +506,21 @@ public class TopProcessor {
         dataModelService.fillSideTags(dataModel);
         dataModelService.fillLatestCmts(dataModel);
     }
+
+    /**
+     * Get ADR ranking list
+     * @param context
+     */
+    public void getADR(final RequestContext context) {
+      try {
+          final List<JSONObject> result = activityQueryService.getTopADR(Symphonys.TOP_CNT);
+          // 结果去敏
+          removePrivateDatas(result);
+          context.renderJSON(new JSONObject().put("data", new JSONArray(result))).renderCode(StatusCodes.SUCC);
+          } catch (Exception e) {
+              context.renderJSON(new JSONObject()).renderCode(StatusCodes.ERR).renderMsg("请求非法");
+          }
+  }
 
     /**
      * Shows emoji score ranking list.
@@ -286,6 +541,20 @@ public class TopProcessor {
     }
 
     /**
+     * Get emoji ranking list
+     * @param context
+     */
+    public void getEmoji(final RequestContext context) {
+      try {
+          final List<JSONObject> result = activityQueryService.getTopEmoji(Symphonys.TOP_CNT);
+          removePrivateDatas(result);
+          context.renderJSON(new JSONObject().put("data", new JSONArray(result))).renderCode(StatusCodes.SUCC);
+          } catch (Exception e) {
+              context.renderJSON(new JSONObject()).renderCode(StatusCodes.ERR).renderMsg("请求非法");
+          }
+  }
+
+    /**
      * Shows Mofish score ranking list.
      *
      * @param context
@@ -303,6 +572,21 @@ public class TopProcessor {
         dataModelService.fillLatestCmts(dataModel);
     }
 
+    /**
+     * Get Mofish ranking list
+     * @param context
+     */
+    public void getMofish(final RequestContext context) {
+      try {
+          final List<JSONObject> result = activityQueryService.getTopMofish(Symphonys.TOP_CNT);
+          // 结果去敏
+          removePrivateDatas(result);
+          context.renderJSON(new JSONObject().put("data", new JSONArray(result))).renderCode(StatusCodes.SUCC);
+          } catch (Exception e) {
+              context.renderJSON(new JSONObject()).renderCode(StatusCodes.ERR).renderMsg("请求非法");
+          }
+  }
+
      /**
      * Shows SmallMofish score ranking list.
      *
@@ -319,6 +603,21 @@ public class TopProcessor {
       dataModelService.fillSideHotArticles(dataModel);
       dataModelService.fillSideTags(dataModel);
       dataModelService.fillLatestCmts(dataModel);
+  }
+
+  /**
+     * Get Small Mofish ranking list
+     * @param context
+     */
+    public void getSmallMofish(final RequestContext context) {
+      try {
+          final List<JSONObject> result = activityQueryService.getTopSmallMofish(Symphonys.TOP_CNT);
+          // 结果去敏
+          removePrivateDatas(result);
+          context.renderJSON(new JSONObject().put("data", new JSONArray(result))).renderCode(StatusCodes.SUCC);
+          } catch (Exception e) {
+              context.renderJSON(new JSONObject()).renderCode(StatusCodes.ERR).renderMsg("请求非法");
+          }
   }
 
     /**
@@ -343,6 +642,21 @@ public class TopProcessor {
         dataModelService.fillSideTags(dataModel);
         dataModelService.fillLatestCmts(dataModel);
     }
+
+    /**
+     * Get Life Restart ranking list
+     * @param context
+     */
+    public void getLifeRestart(final RequestContext context) {
+      try {
+          final List<JSONObject> result = activityQueryService.getTopLifeRestart(Symphonys.TOP_CNT);
+          // 结果去敏
+          removePrivateDatas(result);
+          context.renderJSON(new JSONObject().put("data", new JSONArray(result))).renderCode(StatusCodes.SUCC);
+          } catch (Exception e) {
+              context.renderJSON(new JSONObject()).renderCode(StatusCodes.ERR).renderMsg("请求非法");
+          }
+  }
 
     /**
      * Shows Evolve ranking list.
@@ -370,6 +684,25 @@ public class TopProcessor {
         dataModelService.fillSideTags(dataModel);
         dataModelService.fillLatestCmts(dataModel);
     }
+
+    /**
+     * Get Evolve ranking list
+     * @param context
+     */
+    public void getEvolve(final RequestContext context) {
+      try {
+        final Request request = context.getRequest();
+        final String type = request.getParameter("type") != null ?
+                request.getParameter("type") : "achievement";
+          final List<JSONObject> result = activityQueryService.getEvolve(type, Symphonys.TOP_CNT);
+          JSONObject ret = new JSONObject();
+          ret.put("data", new JSONArray(result));
+          ret.put("type", type);
+          context.renderJSON(ret).renderCode(StatusCodes.SUCC);
+          } catch (Exception e) {
+              context.renderJSON(new JSONObject()).renderCode(StatusCodes.ERR).renderMsg("请求非法");
+          }
+  }
 
     /**
      * Shows Xiaoice ranking list.
@@ -426,6 +759,60 @@ public class TopProcessor {
         dataModelService.fillLatestCmts(dataModel);
     }
 
+    private List<JSONObject> getXiaoiceData(String type) {
+      final JSONObject dataModel = new JSONObject();
+      List<JSONObject> resultList = new ArrayList<>();
+      type = type != null ?
+              type : "0";
+      dataModel.put("type", type);
+      final HttpResponse response = HttpRequest.get("https://pwl.yuis.cc/GetXiaoIceGameRank?key=xiaoIceGame&type=" + type)
+              .connectionTimeout(3000).timeout(7000).header("User-Agent", Vocation.UA)
+              .send();
+      if (200 == response.statusCode()) {
+          response.charset("UTF-8");
+          final JSONObject result = new JSONObject(response.bodyText());
+          JSONArray dataList = result.optJSONArray("data");
+          for (int i = 0; i < dataList.length(); i++) {
+              JSONObject data = dataList.optJSONObject(i);
+              String uname = data.optString("uname");
+              JSONObject family = new JSONObject(data.optString("family"));
+
+              String[] lvFilter = new String[]{"黄阶低级", "黄阶中级", "黄阶高级", "玄阶低级", "玄阶中级", "玄阶高级", "地阶低级", "地阶中级", "地阶高级", "天阶低级", "天阶中级", "天阶高级"};
+              int ancestry = family.optInt("ancestry");
+              int gongfa = family.optInt("gongfa");
+              data.put("ancestry", lvFilter[ancestry]);
+              data.put("gongfa", lvFilter[gongfa]);
+              data.remove("family");
+              try {
+                  JSONObject user = userQueryService.getUserByName(uname);
+                  data.put("userAvatarURL", user.optString(UserExt.USER_AVATAR_URL));
+                  data.put("userIntro", user.optString(UserExt.USER_INTRO));
+                  data.put("userURL", user.optString(User.USER_URL));
+                  data.put("userNo", user.optInt(UserExt.USER_NO));
+                  data.put("userAppRole", user.optInt(UserExt.USER_APP_ROLE));
+                  avatarQueryService.fillUserAvatarURL(data);
+              } catch (Exception e) {
+                  continue;
+              }
+
+              resultList.add(data);
+          }
+        }
+        return resultList;
+    }
+
+    /**
+     * get Xiaoice ranking list.
+     *
+     * @param context
+     */
+    public void getXiaoice(final RequestContext context) {
+      final JSONObject dataModel = new JSONObject();
+      final String type = context.param("type");
+      dataModel.put("data", getXiaoiceData(type));
+      context.renderJSON(dataModel).renderCode(StatusCodes.SUCC);
+  }
+
     /**
      * Shows Invite ranking list.
      *
@@ -464,9 +851,55 @@ public class TopProcessor {
     }
 
     /**
+     * Get Invite ranking data.
+     *
+     */
+    private List<JSONObject> getInviteData() {
+      List<JSONObject> result = new ArrayList<>();
+      try{
+        List<JSONObject> list = pointtransferRepository.select("select toId,count(toId) as c " +
+                    "from " + pointtransferRepository.getName() + " " +
+                    "where type = 6 " +
+                    "group by toId " +
+                    "order by c desc " +
+                    "limit 64;");
+            for (JSONObject user : list) {
+                try {
+                    JSONObject userData = userQueryService.getUser(user.optString("toId"));
+                    avatarQueryService.fillUserAvatarURL(userData);
+                    removePrivateData(userData);
+                    user.put("profile", userData);
+                    result.add(user);
+                } catch (Exception e) {
+                    continue;
+                }
+            }
+            return result;
+        } catch (Exception ignored) {
+          return result;
+        }
+    }
+
+    /**
+     * Get Invite ranking list.
+     *
+     * @param context the specified context
+     */
+    public void getInvite(final RequestContext context) {
+      final JSONObject dataModel = new JSONObject();
+      try {
+        List<JSONObject> result = getInviteData();
+        dataModel.put("data", result);
+        context.renderJSON(dataModel).renderCode(StatusCodes.SUCC);
+      } catch (Exception ignored) {
+        context.renderJSON(dataModel).renderCode(StatusCodes.ERR);
+      }
+  }
+
+    /**
      * Shows Donate ranking list.
      *
-     * @param context
+     * @param context the specified context
      */
     public void showDonate(final RequestContext context) {
       final AbstractFreeMarkerRenderer renderer = new SkinRenderer(context, "top/donate.ftl");
@@ -496,7 +929,9 @@ public class TopProcessor {
                   JSONObject userData = userQueryService.getUser(user.optString("userId"));
                   avatarQueryService.fillUserAvatarURL(userData);
                   user.put("profile", userData);
-                  result.add(user);
+                  if (userData.optString("userName") != null && !userData.optString("userName").isEmpty() && !userData.optString("userName").equals("_")) {
+                      result.add(user);
+                  }
               } catch (Exception e) {
                   continue;
               }
@@ -512,8 +947,62 @@ public class TopProcessor {
       dataModelService.fillLatestCmts(dataModel);
   }
 
+  /**
+     * Get Donate ranking data.
+     *
+     */
+  private JSONObject getDonateData() {
+    JSONObject dataModel = new JSONObject();
+      try {
+        List<JSONObject> totalList = sponsorRepository.select("select sum(amount) as totalAmount " +
+                  "from " + sponsorRepository.getName() + " " +
+                  "limit 1;");
+        JSONObject totalJSON = totalList.get(0);
+        double totalAmount = totalJSON.optDouble("totalAmount");
+        BigDecimal donateMakeDaysBigDecimal = new BigDecimal(String.valueOf(totalAmount / 5));
+        double donateMakeDays = donateMakeDaysBigDecimal.setScale(0, BigDecimal.ROUND_HALF_UP).doubleValue();
+        totalJSON.put("donateMakeDays", donateMakeDays);
+        dataModel.put("totalData", totalJSON);
+      }
+      catch (Exception ignored) {
+      }
+      try {
+          List<JSONObject> list = sponsorRepository.select("select userId as userId,sum(amount) as total,count(*) as totalCount " +
+                  "from " + sponsorRepository.getName() + " " +
+                  "group by userId " +
+                  "order by total desc " +
+                  "limit 64;");
+          List<JSONObject> result = new ArrayList<>();
+          for (JSONObject user : list) {
+              try {
+                  JSONObject userData = userQueryService.getUser(user.optString("userId"));
+                  removePrivateData(userData);
+                  avatarQueryService.fillUserAvatarURL(userData);
+                  user.put("profile", userData);
+                  result.add(user);
+              } catch (Exception e) {
+                  continue;
+              }
+          }
+          dataModel.put("data", result);
+          dataModel.put("type", "donate");
+      } catch (Exception ignored) {
+      }
+    return dataModel;
+  }
+
+  /**
+     * get Donate ranking list.
+     *
+     * @param context the specified context
+     */
+    public void getDonate(final RequestContext context) {
+      final JSONObject dataModel = getDonateData();
+      context.renderJSON(dataModel).renderCode(StatusCodes.SUCC);
+    }
+
     /**
-     * Shows Donate ranking list.
+     * Shows Perfect ranking list.
      *
      * @param context
      */
@@ -548,5 +1037,48 @@ public class TopProcessor {
         dataModelService.fillSideHotArticles(dataModel);
         dataModelService.fillSideTags(dataModel);
         dataModelService.fillLatestCmts(dataModel);
+    }
+
+    /**
+     * Get Perfect ranking data.
+     *
+     */
+    private JSONObject getPerfectData() {
+      final JSONObject dataModel = new JSONObject();
+
+      try {
+        List<JSONObject> list = articleRepository.select("select "+ Article.ARTICLE_AUTHOR_ID +" as userId,count(*) as count " +
+                "from " + articleRepository.getName() + " " +
+                "where " + Article.ARTICLE_PERFECT + " = " + Article.ARTICLE_PERFECT_C_PERFECT+ " " +
+                "group by userId " +
+                "order by count desc " +
+                "limit 64;");
+        List<JSONObject> result = new ArrayList<>();
+        for (JSONObject user : list) {
+            try {
+                JSONObject userData = userQueryService.getUser(user.optString("userId"));
+                avatarQueryService.fillUserAvatarURL(userData);
+                user.put("profile", userData);
+                removePrivateData(userData);
+                result.add(user);
+            } catch (Exception e) {
+                continue;
+            }
+        }
+        dataModel.put("data", result);
+        dataModel.put("type", "perfect");
+    } catch (Exception ignored) {
+    }
+    return dataModel;
+    }
+
+    /**
+     * Get Perfect ranking list.
+     *
+     * @param context the specified context
+     */
+    public void getPerfect(final RequestContext context) {
+      final JSONObject dataModel = getPerfectData();
+      context.renderJSON(dataModel).renderCode(StatusCodes.SUCC);
     }
 }

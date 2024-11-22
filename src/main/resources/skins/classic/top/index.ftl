@@ -30,7 +30,7 @@
         <#include "../header.ftl">
         <div class="main">
             <div class="wrapper">
-                <div class="content activity">
+                <div class="content activity" style="background-color: #ffffff">
                     <h2 class="sub-head"><span>🏅</span> ${totalRankLabel}</h2>
                     <div class="list">
                         <ul>
@@ -127,7 +127,7 @@
                                 </div>
                             </li>
                             <li class="fn__flex">
-                                <img class="avatar" src="https://pwl.stackoverflow.wiki/evolve/evolved.ico" />
+                                <img class="avatar" src="https://file.fishpi.cn/evolve/evolved.ico" />
                                 <div class="fn-flex-1">
                                     <h2>
                                         <a class="title"
@@ -137,7 +137,7 @@
                                 </div>
                             </li>
                             <li class="fn__flex">
-                                <img class="avatar" src="https://pwl.stackoverflow.wiki/adarkroom/img/adr.png" />
+                                <img class="avatar" src="https://file.fishpi.cn/adarkroom/img/adr.png" />
                                 <div class="fn-flex-1">
                                     <h2>
                                         <a class="title"

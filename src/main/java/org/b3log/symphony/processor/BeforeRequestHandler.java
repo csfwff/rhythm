@@ -63,13 +63,14 @@ public class BeforeRequestHandler implements Handler {
      */
     private static final Logger LOGGER = LogManager.getLogger(BeforeRequestHandler.class);
 
-    SimpleCurrentLimiter antiCCLimiter = new SimpleCurrentLimiter(15, 15);
+    /*SimpleCurrentLimiter antiCCLimiter = new SimpleCurrentLimiter(15, 15);
 
     private static final List<String> whiteList = new ArrayList<String>() {{
             add("103.239.101.147");
             add("127.0.0.1");
             add("[0:0:0:0:0:0:0:1]");
-        }};
+            add("43.155.63.117");
+        }};*/
 
     @Override
     public void handle(final RequestContext context) {
@@ -80,7 +81,7 @@ public class BeforeRequestHandler implements Handler {
             return;
         }
 
-        try {
+        /*try {
             String method = context.getRequest().getMethod();
             String uri = context.getRequest().getRequestURI();
             String ip = Requests.getRemoteAddr(context.getRequest());
@@ -95,7 +96,7 @@ public class BeforeRequestHandler implements Handler {
             e.printStackTrace();
             context.sendStatus(503);
             return;
-        }
+        }*/
 
         Locales.setLocale(Latkes.getLocale());
 

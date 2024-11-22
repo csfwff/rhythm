@@ -38,7 +38,7 @@
                                 <li>
                                     <div class='fn-flex'>
                                         <div class="avatar"
-                                             style="background-image:url('https://pwl.stackoverflow.wiki/evolve/evolved.ico')"></div>
+                                             style="background-image:url('https://file.fishpi.cn/evolve/evolved.ico')"></div>
                                         <div class="fn-flex-1">
                                             <h2>
                                                 <a href="${servePath}/games/evolve/">《进化-Evolve》</a>
@@ -53,7 +53,7 @@
                                 <li>
                                     <div class='fn-flex'>
                                         <div class="avatar"
-                                             style="background-image:url('https://pwl.stackoverflow.wiki/adarkroom/img/adr.png')"></div>
+                                             style="background-image:url('https://file.fishpi.cn/adarkroom/img/adr.png')"></div>
                                         <div class="fn-flex-1">
                                             <h2>
                                                 <a href="${servePath}/games/adarkroom/?lang=zh_cn">《A Dark Room》</a>
@@ -61,6 +61,20 @@
                                             <span class="ft-fade vditor-reset">
                                                 极简主义的游戏杰作，有上世纪 ascii 游戏的遗风。<br>
                                                 支持存档云同步，参与 <a href="${servePath}/top/adr">${symphonyLabel} ADR 游戏总分排行榜</a>
+                                            </span>
+                                        </div>
+                                    </div>
+                                </li>
+                                <li>
+                                    <div class='fn-flex'>
+                                        <div class="avatar"
+                                             style="background-image:url('https://file.fishpi.cn/2023/08/minecraft-71137c15.png')"></div>
+                                        <div class="fn-flex-1">
+                                            <h2>
+                                                <a target="_blank" href="https://fishpi.cn/article/1689661528756">Minecraft 私服</a>
+                                            </h2>
+                                            <span class="ft-fade vditor-reset">
+                                                著名 Minecraft 方块放置与探险游戏，社区成员 <a href="https://fishpi.cn/member/Yui" target="_blank">Yui</a> 搭建的鱼油专属私服。可打怪，可挖矿，可田园，一起来耍吧~<i>♂♂</i>
                                             </span>
                                         </div>
                                     </div>

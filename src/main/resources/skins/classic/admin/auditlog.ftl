@@ -23,7 +23,7 @@
 <@admin "auditlog">
 <div class="content admin">
     <div class="module list">
-        <ul class="notification">
+        <ul class="notification" style="padding: 15px">
             <#list operations as item>
                 <li>
                     ${item.operationContent}

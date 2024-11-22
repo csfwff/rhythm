@@ -30,6 +30,11 @@
     <link rel="stylesheet" href="${staticServePath}/css/viewer.min.css"/>
     <link rel="stylesheet" href="https://file.fishpi.cn/cxColor/css/jquery.cxcolor.css">
     <link rel="stylesheet" href="${staticServePath}/js/lib/barrager/barrager.css">
+    <style>
+        [id^="weather_"] svg{
+            stroke-width:0;
+        }
+    </style>
 </head>
 <body>
 <#include "header.ftl">
@@ -40,9 +45,8 @@
                 <div class="fn-content" style="padding-top: 0;">
                     <div class="reply">
                         <#if isLoggedIn>
-                            <div id="chatContent"></div>
-                            <br>
-                            <div class="fn-clear" style="padding: 5px 0 7px 0;">
+                            <div id="chatContent" style="margin: 0 -15px"> </div>
+                            <div class="fn-clear" style="padding: 16px 0 8px 0;margin: 0 -4px;">
                                 <svg id="redPacketBtn" style="width: 30px; height: 30px; cursor:pointer;">
                                     <use xlink:href="#redPacketIcon"></use>
                                 </svg>
@@ -98,6 +102,7 @@
                                             批量撤回
                                         </button>
                                     </#if>
+                                    <button class="button" onclick="ChatRoom.toggleSmoothMode()">流畅模式: <span id="smoothMode">关闭</span></button>
                                     <button class="button" onclick="ChatRoom.showSiGuoYar()">思过崖</button>
                                     <button class="button" onclick="ChatRoom.flashScreen()">清屏</button>
                                     <button class="green" onclick="ChatRoom.send()">发送</button>
@@ -156,7 +161,7 @@
                     </div>
                 </div>
             </div>
-            <div class="list module pd__15" id="comments" style="height: 100%; margin-top: -15px">
+            <div class="list module" id="comments" style="height: auto; margin-top: -15px; padding: 20px 30px 5px 30px">
                 <div id="chats">
                 </div>
                 <#if !isLoggedIn><div style="color:rgba(0,0,0,0.54);">登录后查看更多</div></#if>
@@ -169,44 +174,82 @@
 </div>
 <div id="goToTop" style="position:fixed;bottom:20px;right:10%;display:none;"><a href="#"><svg style="width:30px;height:30px;color:#626262;"><use xlink:href="#toTopIcon"></use></svg></a></div>
 <div id="xiaoIceGameBtn" class="ice-game-btn">
-    <img src="${staticServePath}/images/xiaoIce/xiaoIce.gif" class="ice-game-icon" alt="">
+    <a href="https://game.yuis.cc" target="_blank"><img src="${staticServePath}/images/xiaoIce/xiaoIce.gif" class="ice-game-icon" alt=""></a>
 </div>
-<div id="xiaoIceGameBox" style="display: none">
-    <div class="ice-tool-bar">
-        <img src="${staticServePath}/images/xiaoIce/xiaoIce-icon.png" class="ice-logo" alt="">
-        xiaoIce Game
-        <div class="ice-toolbar-btn">
-            <div id="iceMinimize">
-                <svg class="ice-minimize-btn" viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg" width="32" height="32">
-                    <title>最小化</title>
-                    <path d="M128 448h768v128H128z" fill="#ffffff"></path>
-                </svg>
-                <svg class="ice-restore-btn" viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg" width="32" height="32">
-                    <title>还原窗口</title>
-                    <path d="M128.576377 895.420553 128.576377 128.578424l766.846222 0 0 766.842129L128.576377 895.420553zM799.567461 224.434585 224.432539 224.434585l0 575.134923 575.134923 0L799.567461 224.434585z" fill="#ffffff"></path>
-                </svg>
+<div id="musicBox">
+    <div class="music-box">
+        <div class="music-controller">
+            <div class="music-prev" onclick="ChatRoom.playSound.prev()">
+                <img src="${staticServePath}/images/music/circle_skip_previous.png" alt="">
             </div>
-            <svg id="iceClose" viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg" width="32" height="32">
+<#--            <div class="music-play" onclick="ChatRoom.playSound.togglePlay()">-->
+<#--                <img class="music-play-icon" src="${staticServePath}/images/music/circle_play.png" alt="">-->
+<#--            </div>-->
+            <div class="music-next" onclick="ChatRoom.playSound.next()">
+                <img src="${staticServePath}/images/music/circle_skip_next.png" alt="">
+            </div>
+        </div>
+<#--        <div class="music-img">-->
+<#--            <img src="${staticServePath}/images/music/cat.gif" class="music-img-item" alt="" />-->
+<#--        </div>-->
+        <div class="music-detail">
+<#--            <iframe frameborder="no" border="0" marginwidth="0" marginheight="0" width="100%" height="52" src="//music.163.com/outchain/player?type=2&id=2635209343&auto=0&height=32"></iframe>-->
+
+            <div class="music-title">摸鱼播放器v1.0</div>
+            <div class="music-time"><span class="music-current">00:00</span>-<span class="music-duration">00:00</span></div>
+        </div>
+        <div class="music-controller">
+<#--            <div class="music-voice" style="padding: 2px;box-sizing: border-box">-->
+<#--                <img class="music-voice-icon" src="${staticServePath}/images/music/volume_3.png" alt="">-->
+<#--                <div class="music-voice-box">-->
+<#--                    <input type="range" value="100" max="100" min="0" onchange="ChatRoom.playSound.changeVoice(this)">-->
+<#--                </div>-->
+<#--            </div>-->
+            <div class="music-mode" style="padding: 5px;box-sizing: border-box" onclick="ChatRoom.playSound.toggleMode()">
+                <img class="music-mode-icon" src="${staticServePath}/images/music/repeat.png" alt="">
+            </div>
+            <div class="music-list" style="padding: 5px;box-sizing: border-box" onclick="ChatRoom.playSound.toggleList()">
+                <img src="${staticServePath}/images/music/list.png" alt="">
+            </div>
+        </div>
+        <div class="music-close-btn" onclick="ChatRoom.playSound.toggleShow()">
+            <img class="music-close-icon" src="${staticServePath}/images/music/arrow_up.png" alt="" />
+        </div>
+    </div>
+    <div class="music-core">
+        <audio id="music-core-item" src=""></audio>
+    </div>
+</div>
+<div class="music-list-box"></div>
+<div id="robotBtn" class="robot-btn" style=""><img src="https://file.fishpi.cn/2024/05/chatbot-7857bb0c.gif" class="ice-game-icon" style="border-radius: 50%;" alt=""></div>
+<div id="robotBox" style="display: none;" class="">
+    <div class="robot-tool-bar">
+        <img src="https://www.iconninja.com/files/400/1008/1019/align-left-icon.png" class="robot-logo" alt="">
+        用户消息捕获
+        <div class="robot-toolbar-btn">
+            <svg id="robotClose" viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg" width="32" height="32">
                 <title>关闭</title>
-                <path d="M576 512l277.333333 277.333333-64 64-277.333333-277.333333L234.666667 853.333333 170.666667 789.333333l277.333333-277.333333L170.666667 234.666667 234.666667 170.666667l277.333333 277.333333L789.333333 170.666667 853.333333 234.666667 576 512z" fill="#ffffff"></path>
+                <path d="M576 512l277.333333 277.333333-64 64-277.333333-277.333333L234.666667 853.333333 170.666667 789.333333l277.333333-277.333333L170.666667 234.666667 234.666667 170.666667l277.333333 277.333333L789.333333 170.666667 853.333333 234.666667 576 512z" fill="#ffffff"></path>' +
             </svg>
         </div>
     </div>
-    <div class="ice-chat-box">
-        <input class="ice-chat-input" type="text" placeholder="开始游戏"/>
-        <div id="iceSendMsg" class="ice-send-btn">发送</div>
+    <div class="robot-chat-box" style="position: relative; height: 30px">
+        <input id="catch-word" class="robot-catch-input" type="checkbox"> 捕获机器人指令
+        <div id="changeCatchUsers" class="robot-change-btn">修改捕获用户</div>
+        <div id="clearRobotMsg" class="robot-clear-btn">清屏</div>
     </div>
-    <div id="iceMsgList"></div>
+    <div id="robotMsgList"></div>
 </div>
 <#include "footer.ftl">
 <script>
     Label.uploadLabel = "${uploadLabel}";
 </script>
 <script src="https://file.fishpi.cn/cxColor/js/jquery.cxcolor.min.js"></script>
+<script src="${staticServePath}/js/lib/echarts.min.js"></script>
 <script src="${staticServePath}/js/lib/jquery/file-upload-9.10.1/jquery.fileupload.min.js"></script>
 <script src="${staticServePath}/js/channel${miniPostfix}.js?${staticResourceVersion}"></script>
 <script src="${staticServePath}/js/chat-room${miniPostfix}.js?${staticResourceVersion}"></script>
-<script src="${staticServePath}/js/lib/viewer.min.js"></script>
+<script src="${staticServePath}/js/lib/viewer.min.js?${staticResourceVersion}"></script>
 <script src="${staticServePath}/js/lib/barrager/jquery.barrager.min.js"></script>
 <script src="${staticServePath}/js/lib/xncolorpicker.min.js"></script>
 <script>

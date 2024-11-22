@@ -40,10 +40,34 @@
                     <input id="doNote" style="display: inline; width: 70%" type="text" placeholder="捐助附言，最多32字">
                 </div>
                 <div style="text-align: right; margin-top: 15px">
-                    <button onclick="doAlipay()"><svg style="vertical-align: -2px;"><use xlink:href="#alipay"></use></svg> 使用支付宝捐助</button>
+                    <button onclick="doWeChat()"><svg style="vertical-align: -2px;color: #44B549"><use xlink:href="#wechat"></use></svg> 使用微信捐助</button>
+                    <!--<button onclick="doAlipay()"><svg style="vertical-align: -2px;"><use xlink:href="#alipay"></use></svg> 使用支付宝捐助</button>-->
                 </div>
             </div>
             <script>
+                function doWeChat() {
+                    let doMoney = $("#doMoney").val();
+                    let doNote = $("#doNote").val();
+                    if (doMoney === "" || doNote === "") {
+                        Util.alert("请填写捐助金额和捐助附言 :)");
+                    } else if (isNaN(doMoney)) {
+                        Util.alert("金额不合法！");
+                    } else {
+                        $.ajax({
+                            url: "${servePath}/pay/wechat?total_amount=" + doMoney + "&note=" + doNote,
+                            type: "GET",
+                            async: false,
+                            success: function (data) {
+                                let url = data.QRcode_url;
+                                Util.alert("" +
+                                    "<div><img src='" + url + "' height='200' width='200'></div>" +
+                                    "<div style='padding-top: 10px'><svg style='vertical-align: -2px;color: #44B549'><use xlink:href='#wechat'></use></svg> 请使用微信扫码支付</div>" +
+                                    "<div style='padding-top: 30px'><button class='btn green' onclick='javascript:location.reload()'>我已完成支付</button></div>")
+                            }
+                        });
+                    }
+                }
+
                 function doAlipay() {
                     let doMoney = $("#doMoney").val();
                     let doNote = $("#doNote").val();
@@ -80,15 +104,15 @@
                 <div style="padding-bottom: 15px"></div>
                 <div class="TGIF__item" style="display: flex; justify-content: center">
                     <div>
-                        <img src="https://fishpi.cn/gen?scale=0.79&txt=%E6%91%B8%E9%B1%BC%E6%B4%BE%E7%B2%89%E4%B8%9D&url=https://pwl.stackoverflow.wiki/2021/12/ht1-d8149de4.jpg&backcolor=ffffff&fontcolor=ff3030" />
+                        <img src="https://fishpi.cn/gen?ver=0.1&scale=0.79&txt=%E6%91%B8%E9%B1%BC%E6%B4%BE%E7%B2%89%E4%B8%9D&url=https://file.fishpi.cn/2021/12/ht1-d8149de4.jpg&backcolor=ffffff&fontcolor=ff3030" />
                         &nbsp;&nbsp;
                         <b style="line-height: 25px">16 ¥</b>
                         <br>
-                        <img src="https://fishpi.cn/gen?scale=0.79&txt=%E6%91%B8%E9%B1%BC%E6%B4%BE%E5%BF%A0%E7%B2%89&url=https://pwl.stackoverflow.wiki/2021/12/ht2-bea67b29.jpg&backcolor=87cefa&fontcolor=efffff" />
+                        <img src="https://fishpi.cn/gen?ver=0.1&scale=0.79&txt=%E6%91%B8%E9%B1%BC%E6%B4%BE%E5%BF%A0%E7%B2%89&url=https://file.fishpi.cn/2021/12/ht2-bea67b29.jpg&backcolor=87cefa&fontcolor=efffff" />
                         &nbsp;&nbsp;
                         <b style="line-height: 25px">256 ¥</b>
                         <br>
-                        <img src="https://fishpi.cn/gen?scale=0.79&txt=%E6%91%B8%E9%B1%BC%E6%B4%BE%E9%93%81%E7%B2%89&url=https://pwl.stackoverflow.wiki/2021/12/ht3-b97ea102.jpg&backcolor=ee3a8c&fontcolor=ffffff" />
+                        <img src="https://fishpi.cn/gen?ver=0.1&scale=0.79&txt=%E6%91%B8%E9%B1%BC%E6%B4%BE%E9%93%81%E7%B2%89&url=https://file.fishpi.cn/2021/12/ht3-b97ea102.jpg&backcolor=ee3a8c&fontcolor=ffffff" />
                         &nbsp;&nbsp;
                         <b style="line-height: 25px">1024 ¥</b>
                     </div>

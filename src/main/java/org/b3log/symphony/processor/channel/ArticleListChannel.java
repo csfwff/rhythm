@@ -23,6 +23,7 @@ import org.b3log.latke.http.WebSocketChannel;
 import org.b3log.latke.http.WebSocketSession;
 import org.b3log.latke.ioc.Singleton;
 import org.b3log.symphony.model.Article;
+import org.b3log.symphony.processor.AdminProcessor;
 import org.json.JSONObject;
 
 import java.util.Map;
@@ -64,6 +65,7 @@ public class ArticleListChannel implements WebSocketChannel {
             }
 
             session.sendText(msgStr);
+            AdminProcessor.manager.onMessageSent(1, msgStr.length());
         }
     }
 

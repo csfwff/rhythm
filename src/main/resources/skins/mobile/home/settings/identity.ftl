@@ -38,9 +38,9 @@
                 请选择您的认证类别<br>
                 <select id="id-type">
                     <option selected="selected">企业入驻认证</option>
-                    <option>小姐姐认证</option>
+                    <!--<option>小姐姐认证</option>
                     <option>LGBT 群体认证</option>
-                    <option>00 后认证</option>
+                    <option>00 后认证</option>-->
                 </select>
             </div>
             <div id="id-content"></div>

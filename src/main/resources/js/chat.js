@@ -46,7 +46,7 @@ var Chat = {
         reqRecentList = $.ajax({
             url: Label.servePath + '/chat/get-list?apiKey=' + apiKey,
             type: 'GET',
-            async: false,
+            async: true,
             success: function (result) {
                 if (0 === result.result) {
                     let data = result.data;
@@ -78,6 +78,7 @@ var Chat = {
                     var reqLoadUser = $.ajax({
                         url: Label.servePath + "/user/" + toUser,
                         type: "GET",
+                        async: true,
                         success: function (result) {
                             if (result.code === -1) {
                                 alert('指定的用户名不存在，请检查后重试！');
@@ -108,7 +109,7 @@ var Chat = {
                     $.ajax({
                         url: Label.servePath + '/chat/has-unread?apiKey=' + apiKey,
                         type: 'GET',
-                        async: false,
+                        async: true,
                         success: function (result) {
                             let count = result.result;
                             let list = result.data;
@@ -119,6 +120,8 @@ var Chat = {
                     });
                 } else {
                     // 已选定用户，获取第一页聊天信息
+                    // 选中用户
+                    $("#chatTo" + toUser).css("background-color", "#f1f1f1");
                     // 状态
                     $("#chatStatus").html('和 ' +
                         '<a href="' + Label.servePath + '/member/' + toUser + '">' + toUser + '</a> ' +
@@ -210,7 +213,8 @@ var Chat = {
                                     // 用户已读
                                     $.ajax({
                                         url: Label.servePath + "/chat/mark-as-read?apiKey=" + apiKey + "&fromUser=" + Chat.toUser,
-                                        type: "GET"
+                                        type: "GET",
+                                        async: true
                                     });
                                 }
                             }
@@ -239,13 +243,13 @@ var Chat = {
                     $.ajax({
                         url: Label.servePath + "/chat/mark-as-read?apiKey=" + apiKey + "&fromUser=" + Chat.toUser,
                         type: "GET",
-                        async: false
+                        async: true
                     });
                     // 加载未读消息
                     var loadUnread = $.ajax({
                         url: Label.servePath + '/chat/has-unread?apiKey=' + apiKey,
                         type: 'GET',
-                        async: false,
+                        async: true,
                         success: function (result) {
                             let count = result.result;
                             let list = result.data;
@@ -253,10 +257,6 @@ var Chat = {
                                 $("#chatTo" + data.senderUserName).css("background-color", "#fff4eb");
                             });
                         }
-                    });
-                    $.when(loadUnread).done(function () {
-                        // 选中用户
-                        $("#chatTo" + toUser).css("background-color", "#f1f1f1");
                     });
                 }
             });
@@ -279,7 +279,7 @@ var Chat = {
                 $.ajax({
                     url: Label.servePath + "/chat/get-message?apiKey=" + apiKey + "&toUser=" + Chat.toUser + "&page=" + Chat.page + "&pageSize=20",
                     type: "GET",
-                    async: false,
+                    async: true,
                     success: function (result) {
                         try {
                             result.data.length;
@@ -350,6 +350,32 @@ var Chat = {
     },
 
     addSelfMsg(oId, userName, avatarURL, content, time, reverse) {
+        let m = '';
+        try {
+            // 判断是否可以收藏为表情包
+            let emojiContent = content.replace("<p>", "").replace("</p>", "");
+            let emojiDom = Util.parseDom(emojiContent);
+            let canCollect = false;
+            let srcs = "";
+            let count = 0;
+            for (let i = 0; i < emojiDom.length; i++) {
+                let cur = emojiDom.item(i);
+                if (cur.src !== undefined) {
+                    canCollect = true;
+                    if (count !== 0) {
+                        srcs += ",";
+                    }
+                    srcs += "\'" + cur.src + "\'";
+                    count++;
+                }
+            }
+            if (canCollect) {
+                m += "<a onclick=\"Chat.addEmoji(" + srcs + ")\" class=\"item\">一键收藏表情</a>";
+            }
+        } catch (err) {
+        }
+        m += '<a onclick=\"Chat.at(\'' + userName + '\', \'' + oId + '\')\" class="item">引用</a>\n';
+
         if (reverse === true) {
             $("#chats").append('' +
                 '<div id="chat' + oId + '" class="fn__flex chats__item chats__item--me">\n' +
@@ -370,7 +396,7 @@ var Chat = {
                 '                    ···\n' +
                 '                </summary>\n' +
                 '                <details-menu class="fn__layer">\n' +
-                '                    <a onclick="Chat.revoke(\'' + oId + '\')" class="item">撤回</a>\n' +
+                '                    <a onclick="Chat.revoke(\'' + oId + '\')" class="item">撤回</a>\n' + m +
                 '                </details-menu>\n' +
                 '            </details>' +
                 '        </div>' +
@@ -396,7 +422,7 @@ var Chat = {
                 '                    ···\n' +
                 '                </summary>\n' +
                 '                <details-menu class="fn__layer">\n' +
-                '                    <a onclick="Chat.revoke(\'' + oId + '\')" class="item">撤回</a>\n' +
+                '                    <a onclick="Chat.revoke(\'' + oId + '\')" class="item">撤回</a>\n' + m +
                 '                </details-menu>\n' +
                 '            </details>' +
                 '        </div>' +
@@ -407,6 +433,45 @@ var Chat = {
     },
 
     addTargetMsg(oId, userName, avatarURL, content, time, reverse) {
+        let menu = true;
+        let addMenu = '<span class="fn__space5"></span>' +
+            '<details class="details action__item fn__flex-center">\n' +
+            '<summary>\n' +
+            '···\n' +
+            '</summary>\n' +
+            '<details-menu class="fn__layer">\n';
+        try {
+            // 判断是否可以收藏为表情包
+            let emojiContent = content.replace("<p>", "").replace("</p>", "");
+            let emojiDom = Util.parseDom(emojiContent);
+            let canCollect = false;
+            let srcs = "";
+            let count = 0;
+            for (let i = 0; i < emojiDom.length; i++) {
+                let cur = emojiDom.item(i);
+                if (cur.src !== undefined) {
+                    canCollect = true;
+                    if (count !== 0) {
+                        srcs += ",";
+                    }
+                    srcs += "\'" + cur.src + "\'";
+                    count++;
+                }
+            }
+            if (canCollect) {
+                menu = true;
+                addMenu += "<a onclick=\"Chat.addEmoji(" + srcs + ")\" class=\"item\">一键收藏表情</a>";
+            }
+        } catch (err) {
+        }
+        addMenu += '<a onclick=\"Chat.at(\'' + userName + '\', \'' + oId + '\')\" class="item">引用</a>\n';
+        addMenu +=  '</details-menu>\n</details>';
+
+        let m = '';
+        if (menu) {
+            m = addMenu;
+        }
+
         if (reverse === true) {
             $("#chats").append('' +
                 '<div id="chat' + oId + '" class="fn__flex chats__item">\n' +
@@ -420,7 +485,7 @@ var Chat = {
                 '            ' + content + '\n' +
                 '        </div>\n' +
                 '        <div class="ft__smaller ft__fade fn__right date-bar">\n' +
-                '            ' + time + '\n' +
+                '            ' + time + '\n' + m +
                 '        </div>\n' +
                 '    </div>\n' +
                 '</div>');
@@ -437,7 +502,7 @@ var Chat = {
                 '            ' + content + '\n' +
                 '        </div>\n' +
                 '        <div class="ft__smaller ft__fade fn__right date-bar">\n' +
-                '            ' + time + '\n' +
+                '            ' + time + '\n' + m +
                 '        </div>\n' +
                 '    </div>\n' +
                 '</div>');
@@ -448,7 +513,8 @@ var Chat = {
     revoke(oId) {
         $.ajax({
             url: Label.servePath + "/chat/revoke?apiKey=" + apiKey + "&oId=" + oId,
-            type: "GET"
+            type: "GET",
+            async: true
         });
     },
 
@@ -456,6 +522,7 @@ var Chat = {
         $.ajax({
             url: Label.servePath + "/chat/mark-all-as-read?apiKey=" + apiKey,
             type: "GET",
+            async: true,
             success: function (result) {
                 result.users.forEach((user) => {
                     $("#chatTo" + user).css("background-color", "");
@@ -464,6 +531,25 @@ var Chat = {
         });
     },
 
+    /**
+     * 艾特某个人
+     */
+    at: function (userName, id) {
+        Chat.editor.focus();
+        let md = '';
+        $.ajax({
+            url: Label.servePath + '/chat/raw/' + id + '?apiKey=' + apiKey,
+            method: 'get',
+            async: false,
+            success: function (result) {
+                md = result.replace(/(<!--).*/g, "");
+                md = md.replace(/\n/g, "\n> ");
+            }
+        });
+        Chat.editor.insertValue(`\n##### 引用 @${userName} [↩](${Label.servePath}/chat#chat${id} "跳转至原消息")  \n> ${md}</span>\n`, !1);
+        const element = document.getElementById('messageContent');
+        element.scrollIntoView({ behavior: 'smooth' });
+    },
     /**
      * 加载表情
      */
@@ -729,6 +815,7 @@ $(document).ready(function () {
                 clearTimeout(timeoutId)
                 timeoutId=0
             }
+            $('#emojiList').css('top','350px')
             time_out=new Date().getTime()
             setTimeout(()=>0!==$("#emojiBtn:hover").length&&$("#emojiList").addClass("showList"),300)
         },closeEmoji)

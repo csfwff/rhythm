@@ -36,6 +36,7 @@ import org.b3log.latke.model.User;
 import org.b3log.latke.service.LangPropsService;
 import org.b3log.latke.util.Locales;
 import org.b3log.symphony.model.*;
+import org.b3log.symphony.processor.AdminProcessor;
 import org.b3log.symphony.processor.ApiProcessor;
 import org.b3log.symphony.service.CloudService;
 import org.b3log.symphony.service.RoleQueryService;
@@ -93,6 +94,7 @@ public class ArticleChannel implements WebSocketChannel {
             }
 
             session.sendText(msgStr);
+            AdminProcessor.manager.onMessageSent(2, msgStr.length());
         }
     }
 
@@ -214,7 +216,7 @@ public class ArticleChannel implements WebSocketChannel {
                 final CloudService cloudService = beanManager.getReference(CloudService.class);
                 JSONObject comment = (JSONObject) dataModel.get("comment");
                 String metal = cloudService.getEnabledMetal(comment.optString("commentAuthorId"));
-                if (!metal.equals("{}")) {
+                if (!metal.equals("{}")&&Comment.COMMENT_ANONYMOUS_C_ANONYMOUS!=comment.optInt(Comment.COMMENT_ANONYMOUS)) {
                     List<Object> list = new JSONObject(metal).optJSONArray("list").toList();
                     comment.put("sysMetal", list);
                 } else {
@@ -234,6 +236,7 @@ public class ArticleChannel implements WebSocketChannel {
                 message.put("cmtTpl", stringWriter.toString());
                 final String msgStr = message.toString();
                 session.sendText(msgStr);
+                AdminProcessor.manager.onMessageSent(2, msgStr.length());
             } catch (final Exception e) {
                 LOGGER.log(Level.ERROR, "Notify comment failed", e);
             }

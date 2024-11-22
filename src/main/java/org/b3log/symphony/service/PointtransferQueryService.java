@@ -585,6 +585,12 @@ public class PointtransferQueryService {
                         break;
                     case Pointtransfer.TRANSFER_TYPE_C_CHAT_ROOM_SEND_BARRAGER:
                         break;
+                    case Pointtransfer.TRANSFER_TYPE_C_DEL_COMMENT:
+                        break;
+                    case Pointtransfer.TRANSFER_TYPE_C_ANONYMOUS_COMMENT:
+                        break;
+                    case Pointtransfer.TRANSFER_TYPE_C_ONLY_AUTHOR_VISIBLE_COMMENT:
+                        break;
                     case Pointtransfer.TRANSFER_TYPE_C_TRADE:
                         JSONObject user10F = userRepository.get(fromId);
                         JSONObject user10T = userRepository.get(toId);

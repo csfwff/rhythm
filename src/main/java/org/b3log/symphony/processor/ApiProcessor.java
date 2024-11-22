@@ -24,23 +24,29 @@ import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.b3log.latke.Keys;
+import org.b3log.latke.Latkes;
 import org.b3log.latke.http.Dispatcher;
 import org.b3log.latke.http.RequestContext;
+import org.b3log.latke.http.Response;
 import org.b3log.latke.ioc.BeanManager;
 import org.b3log.latke.ioc.Inject;
 import org.b3log.latke.ioc.Singleton;
 import org.b3log.latke.model.User;
+import org.b3log.latke.repository.FilterOperator;
+import org.b3log.latke.repository.PropertyFilter;
+import org.b3log.latke.repository.Query;
+import org.b3log.latke.repository.RepositoryException;
 import org.b3log.latke.service.LangPropsService;
 import org.b3log.latke.service.ServiceException;
 import org.b3log.latke.util.Crypts;
-import org.b3log.symphony.model.Follow;
-import org.b3log.symphony.model.Role;
-import org.b3log.symphony.model.SystemSettings;
-import org.b3log.symphony.model.UserExt;
+import org.b3log.symphony.model.*;
+import org.b3log.symphony.processor.bot.ChatRoomBot;
 import org.b3log.symphony.processor.middleware.CSRFMidware;
 import org.b3log.symphony.processor.middleware.LoginCheckMidware;
+import org.b3log.symphony.repository.UploadRepository;
 import org.b3log.symphony.repository.UserRepository;
 import org.b3log.symphony.service.*;
+import org.b3log.symphony.util.Sessions;
 import org.b3log.symphony.util.StatusCodes;
 import org.b3log.symphony.util.Symphonys;
 import org.json.JSONObject;
@@ -102,6 +108,9 @@ public class ApiProcessor {
     @Inject
     private CloudService cloudService;
 
+    @Inject
+    private UploadRepository uploadRepository;
+
     /**
      * Register request handlers.
      */
@@ -118,6 +127,88 @@ public class ApiProcessor {
 
         final RewardQueryService rewardQueryService = beanManager.getReference(RewardQueryService.class);
         Dispatcher.get("/api/article/reward/senders/{aId}", rewardQueryService::rewardedSenders);
+        Dispatcher.post(Symphonys.get("callback.url"), apiProcessor::callbackFromQiNiu);
+
+        Dispatcher.get("/loginWebInApiKey", apiProcessor::loginWebInApiKey);
+        Dispatcher.get("/getApiKeyInWeb", apiProcessor::getApiKeyInWeb, loginCheck::handle);
+    }
+
+    public void getApiKeyInWeb(final RequestContext context) {
+        JSONObject currentUser = Sessions.getUser();
+        try {
+            currentUser = ApiProcessor.getUserByKey(context.param("apiKey"));
+        } catch (NullPointerException ignored) {
+        }
+        String userId = currentUser.optString(Keys.OBJECT_ID);
+        final String userPassword = currentUser.optString(User.USER_PASSWORD);
+
+        final JSONObject cookieJSONObject = new JSONObject();
+        cookieJSONObject.put(Keys.OBJECT_ID, userId);
+
+        final String random = RandomStringUtils.randomAlphanumeric(16);
+        cookieJSONObject.put(Keys.TOKEN, userPassword + COOKIE_ITEM_SEPARATOR + random);
+        final String key = Crypts.encryptByAES(cookieJSONObject.toString(), Symphonys.COOKIE_SECRET);
+
+        context.renderJSON(StatusCodes.SUCC).renderJSON(new JSONObject().put("apiKey", key));
+    }
+
+    public void loginWebInApiKey(final RequestContext context) {
+        JSONObject currentUser;
+        try {
+            currentUser = ApiProcessor.getUserByKey(context.param("apiKey"));
+        } catch (NullPointerException ignored) {
+            context.renderJSON(StatusCodes.ERR).renderMsg("ApiKey 错误。");
+            return;
+        }
+
+        if (null != currentUser) {
+            final Response response = context.getResponse();
+            String r = context.param("r");
+            if (null == r) {
+                r = "/";
+            }
+            response.sendRedirect(Latkes.getServePath() + r);
+            Sessions.login(response, currentUser.optString(Keys.OBJECT_ID), true);
+        } else {
+            context.renderJSON(StatusCodes.ERR).renderMsg("ApiKey 错误。");
+        }
+    }
+
+    public void callbackFromQiNiu(final RequestContext context) {
+        JSONObject jsonObject = context.requestJSON();
+        LOGGER.log(Level.INFO, jsonObject.toString());
+
+        String fileURL = Symphonys.get("callback.base.url") + jsonObject.optString("inputKey");
+        String userName = "";
+        final Query query = new Query().setFilter(new PropertyFilter("path", FilterOperator.EQUAL, fileURL));
+        try {
+            JSONObject uploadJSON = uploadRepository.getFirst(query);
+            userName = uploadJSON.optString("userName");
+        } catch (RepositoryException e) {
+            LOGGER.log(Level.ERROR, "Cannot find upload by path [" + fileURL + "]", e);
+        }
+
+        if (!userName.isEmpty()) {
+            String suggestion = jsonObject.optJSONArray("items").optJSONObject(0).optJSONObject("result").optJSONObject("result").optString("suggestion");
+            String userId = userQueryService.getUserByName(userName).optString(Keys.OBJECT_ID);
+            switch (suggestion) {
+                case "block":
+                    LOGGER.log(Level.WARN, "Block file " + fileURL);
+                    ChatRoomBot.sendBotMsg("犯罪嫌疑人 @" + userName + "  由于上传违法文件/图片，被处以 500 积分的处罚，请引以为戒。\n@adlered  留档");
+                    ChatRoomBot.abusePoint(userId, 500, "机器人罚单-上传违法文件");
+                    break;
+                case "review":
+                    LOGGER.log(Level.WARN, "Review file " + fileURL);
+                    ChatRoomBot.sendBotMsg("用户 @" + userName + "  由于上传疑似违规文件/图片，被处以 200 积分的处罚，请引以为戒。\n@adlered  留档");
+                    ChatRoomBot.abusePoint(userId, 200, "机器人罚单-上传疑似违规文件");
+                    break;
+                 default:
+                    LOGGER.log(Level.INFO, "Normal file " + fileURL);
+                    break;
+            }
+        }
+
+        context.renderJSON(StatusCodes.SUCC);
     }
 
     /**

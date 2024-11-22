@@ -74,7 +74,7 @@ var Util = {
         } else {
             attr = '';
         }
-        return 'https://fishpi.cn/gen?scale=0.79&txt=' + name + attr;
+        return 'https://fishpi.cn/gen?ver=0.1&scale=0.79&txt=' + name + attr;
     },
 
     genMiniMetal(attr) {
@@ -83,7 +83,7 @@ var Util = {
         } else {
             attr = '';
         }
-        return 'https://fishpi.cn/gen?scale=0.79&txt=' + attr;
+        return 'https://fishpi.cn/gen?ver=0.1&scale=0.79&txt=' + attr;
     },
 
     parseDom(arg) {
@@ -1066,7 +1066,7 @@ var Util = {
                 }
 
                 // browser
-                let icon = '<svg style="height: 15px;padding-top: 2px;pointer-events: none;">' +
+                let icon = '<svg style="height: 15px;pointer-events: none;">' +
                     '  <use xlink:href="#notification"></use>' +
                     '</svg>' +
                     '&nbsp;';
@@ -1095,7 +1095,10 @@ var Util = {
                         '<div id="notificationsPanel" class="module person-list"><ul>' +
                         notiHTML + '</ul></div>')
 
-                    $('#aNotifications').click(function () {
+                    $('#aNotifications').click(function (e) {
+                        let posRight = window.innerWidth - e.pageX - ($('#notificationsPanel').width() /2);
+                        console.log(posRight)
+                        $('#notificationsPanel').css('right',posRight + 'px')
                         $('#notificationsPanel').show()
                     })
 
@@ -1398,7 +1401,7 @@ var Util = {
                         list.find("li:first").slideDown(200);
                         Util.listenUserCard();
                     } else {
-                        Util.alert(result.msg)
+                        Util.alert(result.msg);
                     }
                 },
                 complete: function () {
@@ -1530,6 +1533,7 @@ var Util = {
                 let userNo = data.userNo;
                 let userAppRole = data.userAppRole;
                 let sysMetal = JSON.parse(data.sysMetal);
+                let mbti = data.mbti;
                 // 组合内容
                 let html = "" +
                     '<div class="user-card" id="userCardContent">\n' +
@@ -1541,6 +1545,18 @@ var Util = {
                     '            <div class="fn__ellipsis">\n' +
                     '                <a class="user-card__name" href="' + Label.servePath + '/member/' + userName + '"><b>' + userNickname + '</b></a>\n' +
                     '                <a class="ft-gray ft-smaller" href="' + Label.servePath + '/member/' + userName + '"><b>' + userName + '</b></a>\n';
+                if (mbti !== "") {
+                    let leftMbti = mbti;
+                    if (mbti.indexOf('-') > 0) {
+                        leftMbti = mbti.split('-')[0];
+                    }
+                    html += '' +
+                        '<a target="_blank" href="https://www.16personalities.com/ch/' + leftMbti + '-%E4%BA%BA%E6%A0%BC" class="tooltipped-new tooltipped__n" rel="nofollow"\n' +
+                        '   aria-label="TA是 ' + mbti + '">\n' +
+                        '   <span style="background-color: #b2b1ff;color: #fff;font-size: 12px;line-height: 20px;border-radius: 3px;height: 20px;display: inline-block;padding: 0 5px;vertical-align: middle;box-sizing: border-box;svg {margin-top: 2px;}">' +
+                        '   <svg style="vertical-align: -3px"><use xlink:href="#mbti"></use></svg> ' + mbti + '</span>' +
+                        '</a>\n';
+                }
                 html += '            </div>\n';
                 if (userIntro !== "") {
                     html += '' +
@@ -1573,22 +1589,22 @@ var Util = {
                     '                       aria-label="用户分组：' + userRole + '">\n';
                 switch (userRole) {
                     case '管理员':
-                        html += '<img style="height: 20px;margin: 0px;" src="https://pwl.stackoverflow.wiki/adminRole.png"/>';
+                        html += '<img style="height: 20px;margin: 0px;" src="https://file.fishpi.cn/adminRole.png"/>';
                         break;
                     case 'OP':
-                        html += '<img style="height: 20px;margin: 0px;" src="https://pwl.stackoverflow.wiki/opRole.png"/>';
+                        html += '<img style="height: 20px;margin: 0px;" src="https://file.fishpi.cn/opRole.png"/>';
                         break;
                     case '纪律委员':
-                        html += '<img style="height: 20px;margin: 0px;" src="https://pwl.stackoverflow.wiki/policeRole.png"/>';
+                        html += '<img style="height: 20px;margin: 0px;" src="https://file.fishpi.cn/policeRole.png"/>';
                         break;
                     case '超级会员':
-                        html += '<img style="height: 20px;margin: 0px;" src="https://pwl.stackoverflow.wiki/svipRole.png"/>';
+                        html += '<img style="height: 20px;margin: 0px;" src="https://file.fishpi.cn/svipRole.png"/>';
                         break;
                     case '成员':
-                        html += '<img style="height: 20px;margin: 0px;" src="https://pwl.stackoverflow.wiki/vipRole.png"/>';
+                        html += '<img style="height: 20px;margin: 0px;" src="https://file.fishpi.cn/vipRole.png"/>';
                         break;
                     default:
-                        html += '<img style="height: 20px;margin: 0px;" src="https://pwl.stackoverflow.wiki/newRole.png"/>';
+                        html += '<img style="height: 20px;margin: 0px;" src="https://file.fishpi.cn/newRole.png"/>';
                         break;
                 }
                 html += '                    </a>\n';
@@ -1607,8 +1623,18 @@ var Util = {
                         '    </svg>\n' +
                         '</a>\n';
                 }
+                if (userURL !== "") {
+                    html += '' +
+                        '<a target="_blank" href="' +  Label.servePath + '/forward?goto=' + userURL + '" class="tooltipped-new tooltipped__n" rel="nofollow"\n' +
+                        '   aria-label="' + userURL + '">\n' +
+                        '    <svg>\n' +
+                        '        <use xlink:href="#card-link"></use>\n' +
+                        '    </svg>\n' +
+                        '</a>\n';
+                }
+
                 html += '' +
-                    '<a class="tooltipped-new tooltipped__n" rel="nofollow" onclick="javascript:void(0)" style="background-color:#eeeeeecc;border-radius:5px;padding:0 7px 0 4px;cursor:default;color:#6d6c6c;font-size:5px;"\n' +
+                    '<a class="tooltipped-new tooltipped__n" rel="nofollow" onclick="javascript:void(0)" style="background-color:#eeeeeecc;border-radius:5px;padding:0 7px 0 4px;cursor:default;color:#6d6c6c;font-size:12px;"\n' +
                     '   aria-label="' + userNo + ' 号成员">\n' +
                     '    <svg style="height: 12px; vertical-align: -4.5px">\n' +
                     '        <use xlink:href="#no"></use>\n' +
@@ -1701,6 +1727,62 @@ var Util = {
             var data = JSON.parse(evt.data)
 
             switch (data.command) {
+                case 'bz-update':
+                    if ($(".active-bz-list-big")[0] !== undefined) {
+                        let breezemoonAuthorName = data.bz.breezemoonAuthorName;
+                        let breezemoonAuthorThumbnailURL48 = data.bz.breezemoonAuthorThumbnailURL48;
+                        let breezemoonContent = data.bz.breezemoonContent;
+                        let breezemoonOId = data.bz.oId;
+                        let list = $($(".active-bz-list-big")[0]);
+                        list.prepend(
+                            "<li>" +
+                            "<div class=\"fn-flex\">" +
+                            "<div class=\"fn-flex-1\">" +
+                            "<div class=\"fn-flex\">" +
+                            "<a rel=\"nofollow\" href=\"" + Label.servePath + "/member/" + breezemoonAuthorName + "\">" +
+                            "<div class=\"avatar\" aria-label=\"" + breezemoonAuthorName + "\" style=\"background-image:url('" + breezemoonAuthorThumbnailURL48 + "')\"></div>" +
+                            "</a>" +
+                            "<div class=\"fn-ellipsis ft-fade ft-smaller list-info\">" +
+                            "<a rel=\"nofollow\" class=\"author\" href=\"" + Label.servePath + "/member/" + breezemoonAuthorName + "\">" +
+                            breezemoonAuthorName +
+                            "</a>" +
+                            "<br>" +
+                            "刚刚" +
+                            "<br>" +
+                            "</div>" +
+                            "</div>" +
+                            "<a style=\"color: #3b3b3b\" class=\"abstract\" href=\"" + Label.servePath + "/member/" + breezemoonAuthorName + "/breezemoons/" + breezemoonOId + "\">" +
+                            breezemoonContent +
+                            "</a>" +
+                            "</div>" +
+                            "</div>" +
+                            "</li>"
+                        );
+                    }
+                    if ($(".active-bz-list")[0] !== undefined) {
+                        let breezemoonAuthorName = data.bz.breezemoonAuthorName;
+                        if (breezemoonAuthorName != Label.currentUserName) {
+                            let breezemoonAuthorThumbnailURL48 = data.bz.breezemoonAuthorThumbnailURL48;
+                            let breezemoonContent = data.bz.breezemoonContent;
+                            let breezemoonOId = data.bz.oId;
+                            let list = $($(".active-bz-list")[0]);
+                            list.prepend(
+                                "<li style=\"display: none\">\n" +
+                                "<a href=\"" + Label.servePath + "/member/" + breezemoonAuthorName + "\">\n" +
+                                "<span class=\"avatar-small slogan\" aria-label=\"" + breezemoonAuthorName + "\" style=\"background-image: url(" + breezemoonAuthorThumbnailURL48 + ")\"></span>\n" +
+                                "</a>\n" +
+                                "<a href=\"" + Label.servePath + "/member/" + breezemoonAuthorName + "/breezemoons/" + breezemoonOId + "\" class=\"title\">" + breezemoonContent + "</a>\n" +
+                                "</li>"
+                            );
+
+                            list.find("li:last").fadeOut(199, function () {
+                                list.find("li:last").remove();
+                            });
+                            list.find("li:first").slideDown(200);
+                            Util.listenUserCard();
+                        }
+                    }
+                    break;
                 case 'refreshNotification':
                     if (window.location.pathname === '/cr') {
                         Util.makeNotificationRead('at');
@@ -1711,7 +1793,7 @@ var Util = {
                             Util.notice("default", 3000, "你有新的通知！<a href='/notifications'>点击查看</a>");
                         }
                     }
-                    break
+                    break;
                 case 'chatUnreadCountRefresh':
                     if (data.count === 0) {
                         Util.pauseBling();
@@ -1783,14 +1865,10 @@ var Util = {
         addClass('msg');
         if (!Util.isBlinging) {
             Util.isBlinging = true;
-            $("#idleTalkIconContainer").html("<use xlink:href=\"#redIdleChat\"></use>");
-            setTimeout(function () {
-                $("#idleTalkIconContainer").html("<use xlink:href=\"#idleChat\"></use>");
-            }, 1000);
             bling = setInterval(function () {
-                $("#idleTalkIconContainer").html("<use xlink:href=\"#redIdleChat\"></use>");
+                $('#aChat').removeClass('no-msg').addClass('msg');
                 setTimeout(function () {
-                    $("#idleTalkIconContainer").html("<use xlink:href=\"#idleChat\"></use>");
+                    $('#aChat').removeClass('msg').addClass('no-msg');
                 }, 1000);
             }, 2000);
         }
@@ -1838,7 +1916,8 @@ var Util = {
             }
         })
 
-        // 导航过长处理
+        // 导航过长处理 导航栏跳舞?涛涛你打野-----Yui留
+        /*
         if ($('.nav-tabs a:last').length === 1 &&
             $('.nav-tabs a:last')[0].offsetTop > 0) {
             $('.nav-tabs').mouseover(function () {
@@ -1847,6 +1926,7 @@ var Util = {
                 $('.user-nav').show()
             })
         }
+         */
     },
     /**
      * @description 登出

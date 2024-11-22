@@ -29,8 +29,10 @@ import org.b3log.latke.ioc.BeanManager;
 import org.b3log.latke.ioc.Singleton;
 import org.b3log.latke.model.User;
 import org.b3log.latke.repository.*;
+import org.b3log.latke.repository.jdbc.JdbcRepository;
 import org.b3log.symphony.model.Common;
 import org.b3log.symphony.model.UserExt;
+import org.b3log.symphony.processor.AdminProcessor;
 import org.b3log.symphony.processor.ApiProcessor;
 import org.b3log.symphony.repository.CloudRepository;
 import org.b3log.symphony.service.AvatarQueryService;
@@ -66,8 +68,7 @@ public class ChatroomChannel implements WebSocketChannel {
     /**
      * Online user information storage.
      */
-    public static final Map<WebSocketSession, JSONObject> onlineUsers = Collections.synchronizedMap(new HashMap<>());
-
+    public static final ConcurrentHashMap<WebSocketSession, JSONObject> onlineUsers = new ConcurrentHashMap<>();
     /**
      * 当前讨论话题
      */
@@ -108,6 +109,7 @@ public class ChatroomChannel implements WebSocketChannel {
             // 单独发送在线信息
             final String msgStr = getOnline().toString();
             session.sendText(msgStr);
+            AdminProcessor.manager.onMessageSent(4, msgStr.length());
             // 保存 Active 信息
             userActive.put(user.optString("userName"), System.currentTimeMillis());
         } else {
@@ -222,6 +224,7 @@ public class ChatroomChannel implements WebSocketChannel {
                     }
                 }
                 s.sendText(message);
+                AdminProcessor.manager.onMessageSent(4, message.length());
             }
         }).start();
     }
@@ -265,14 +268,14 @@ public class ChatroomChannel implements WebSocketChannel {
      *                }
      */
     public static int notQuickCheck = 50;
-    public static int notQuickSleep = 100;
+    public static int notQuickSleep = 50;
     public static int quickCheck = 100;
-    public static int quickSleep = 100;
+    public static int quickSleep = 50;
 
     //用于消息发送的线程池
     private static final ThreadPoolExecutor MESSAGE_POOL = new ThreadPoolExecutor(
-            4,
-            4,
+            1,
+            1,
             120L,
             TimeUnit.SECONDS,
             new LinkedBlockingQueue<>()
@@ -309,6 +312,7 @@ public class ChatroomChannel implements WebSocketChannel {
             }
             for (WebSocketSession session : senderSessions) {
                 session.sendText(msgStr);
+                AdminProcessor.manager.onMessageSent(4, msgStr.length());
             }
         }
         MESSAGE_POOL.submit(() -> {
@@ -331,9 +335,11 @@ public class ChatroomChannel implements WebSocketChannel {
                         String toUser = onlineUsers.get(session).optString(User.USER_NAME);
                         if (!sender.equals(toUser)) {
                             session.sendText(msgStr);
+                            AdminProcessor.manager.onMessageSent(4, msgStr.length());
                         }
                     } else {
                         session.sendText(msgStr);
+                        AdminProcessor.manager.onMessageSent(4, msgStr.length());
                     }
                 } catch (Exception ignored) {
                 }
@@ -408,23 +414,26 @@ public class ChatroomChannel implements WebSocketChannel {
                 }
             }
             for (WebSocketSession session : senderSessions) {
-                session.sendText("{\n" +
+                String text = "{\n" +
                         "    \"md\": \"由于您超过6小时未活跃，已将您断开连接，如要继续聊天请刷新页面，谢谢 :)\",\n" +
-                        "    \"userAvatarURL\": \"https://pwl.stackoverflow.wiki/2022/01/robot3-89631199.png\",\n" +
-                        "    \"userAvatarURL20\": \"https://pwl.stackoverflow.wiki/2022/01/robot3-89631199.png\",\n" +
+                        "    \"userAvatarURL\": \"https://file.fishpi.cn/2022/01/robot3-89631199.png\",\n" +
+                        "    \"userAvatarURL20\": \"https://file.fishpi.cn/2022/01/robot3-89631199.png\",\n" +
                         "    \"userNickname\": \"人工智障\",\n" +
                         "    \"sysMetal\": \"\",\n" +
                         "    \"time\": \"" + new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(System.currentTimeMillis()) + "\",\n" +
                         "    \"oId\": \"" + System.currentTimeMillis() + "\",\n" +
                         "    \"userName\": \"摸鱼派官方巡逻机器人\",\n" +
                         "    \"type\": \"msg\",\n" +
-                        "    \"userAvatarURL210\": \"https://pwl.stackoverflow.wiki/2022/01/robot3-89631199.png\",\n" +
+                        "    \"userAvatarURL210\": \"https://file.fishpi.cn/2022/01/robot3-89631199.png\",\n" +
                         "    \"content\": \"<p>由于您超过6小时未活跃，已将您断开连接，如要继续聊天请刷新页面，谢谢 :)</p>\",\n" +
                         "    \"client\": \"Other/Robot\",\n" +
-                        "    \"userAvatarURL48\": \"https://pwl.stackoverflow.wiki/2022/01/robot3-89631199.png\"\n" +
-                        "}");
+                        "    \"userAvatarURL48\": \"https://file.fishpi.cn/2022/01/robot3-89631199.png\"\n" +
+                        "}";
+                session.sendText(text);
+                AdminProcessor.manager.onMessageSent(4, text.length());
                 removeSession(session);
             }
+            JdbcRepository.dispose();
         }).start();
 
         return needKickUsers;
@@ -490,6 +499,7 @@ public class ChatroomChannel implements WebSocketChannel {
                         }
                     }
                     s.sendText(msgStr);
+                    AdminProcessor.manager.onMessageSent(4, msgStr.length());
                 }
                 onlineMsgLock = false;
             }).start();

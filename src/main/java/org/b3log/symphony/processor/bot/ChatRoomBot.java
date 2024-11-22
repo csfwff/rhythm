@@ -28,6 +28,7 @@ import org.b3log.latke.http.WebSocketSession;
 import org.b3log.latke.ioc.BeanManager;
 import org.b3log.latke.model.User;
 import org.b3log.latke.repository.*;
+import org.b3log.latke.repository.jdbc.JdbcRepository;
 import org.b3log.latke.service.ServiceException;
 import org.b3log.symphony.model.*;
 import org.b3log.symphony.processor.ApiProcessor;
@@ -356,6 +357,7 @@ public class ChatRoomBot {
                                     for (WebSocketSession session : senderSessions) {
                                         ChatroomChannel.removeSession(session);
                                     }
+                                    JdbcRepository.dispose();
                                 }).start();
                             } catch (Exception e) {
                                 sendBotMsg("参数错误。");
@@ -546,14 +548,15 @@ public class ChatRoomBot {
         // ==? 判定恶意发送非法红包 ?==
         try {
             JSONObject checkContent = new JSONObject(content);
-            if (checkContent.optString("msgType").equals("redPacket")) {
+            if (checkContent.optString("msgType").equals("redPacket") || checkContent.optString("msgType").equals("weather")|| checkContent.optString("msgType").equals("music")) {
                 if (RECORD_POOL_2_IN_24H.access(userName)) {
-                    sendBotMsg("监测到 @" + userName + "  伪造发送红包数据包，警告一次。");
+                    sendBotMsg("监测到 @" + userName + "  伪造发送红包/天气/音乐数据包，警告一次。");
                 } else {
-                    sendBotMsg("由于 @" + userName + "  第二次伪造发送红包数据包，现处以扣除积分 50 的处罚。");
-                    abusePoint(userId, 50, "机器人罚单-聊天室伪造发送红包数据包");
+                    sendBotMsg("由于 @" + userName + "  第二次伪造发送红包/天气/音乐数据包，现处以扣除积分 50 的处罚。");
+                    abusePoint(userId, 50, "机器人罚单-聊天室伪造发送红包/天气/音乐数据包");
                     RECORD_POOL_2_IN_24H.remove(userName);
                 }
+                return false;
             }
         } catch (Exception ignored) {
         }
@@ -603,9 +606,9 @@ public class ChatRoomBot {
                     boolean afternoon = date >= 1330 && date <= 1800;
                     // 判断是否在上午或下午时段
                     if (morning || afternoon) {
-                        // 每30秒全局锁只允许发送一条
-                        if (!RECORD_POOL_05_IN_1M.access("v")) {
-                            context.renderJSON(StatusCodes.ERR).renderMsg("现在是聊天高峰期，全局每30秒只允许发送一个猜拳红包，请稍候重试。高峰期时段为：08:30-11:30、13:30-18:00");
+                        // 每30秒每人只允许发送一条
+                        if (!RECORD_POOL_05_IN_1M.access("rps+" + userId)) {
+                            context.renderJSON(StatusCodes.ERR).renderMsg("现在是聊天高峰期，每人每30秒只允许发送一个猜拳红包，请稍候重试。高峰期时段为：08:30-11:30、13:30-18:00");
                             return false;
                         }
 
@@ -684,11 +687,11 @@ public class ChatRoomBot {
             }
             final long time = System.currentTimeMillis();
             JSONObject msg = new JSONObject();
-            msg.put(User.USER_NAME, "摸鱼派官方巡逻机器人");
-            msg.put(UserExt.USER_AVATAR_URL, "https://pwl.stackoverflow.wiki/2022/01/robot3-89631199.png");
+            msg.put(User.USER_NAME, "马库斯");
+            msg.put(UserExt.USER_AVATAR_URL, "https://file.fishpi.cn/2022/01/robot3-89631199.png");
             msg.put(Common.CONTENT, content);
             msg.put(Common.TIME, time);
-            msg.put(UserExt.USER_NICKNAME, "人工智障");
+            msg.put(UserExt.USER_NICKNAME, "RK200");
             msg.put("sysMetal", "");
             msg.put("userOId", 0L);
             msg.put("client", "Other/Robot");

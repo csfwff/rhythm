@@ -62,6 +62,7 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.File;
+import java.text.SimpleDateFormat;
 import java.util.List;
 import java.util.*;
 
@@ -251,6 +252,7 @@ public class ArticleProcessor {
         Dispatcher.get("/api/articles/domain/{domainURI}", articleProcessor::getDomainArticles, loginCheck::handle);
         Dispatcher.get("/api/article/{id}", articleProcessor::showArticleApi, loginCheck::handle);
         Dispatcher.get("/api/article/heat/{articleId}", articleProcessor::getArticleHeat);
+        Dispatcher.get("/api/comment/{id}", articleProcessor::showCommentApi, loginCheck::handle);
     }
 
     public void getArticleHeat(final RequestContext context) {
@@ -272,6 +274,136 @@ public class ArticleProcessor {
         JsonRenderer renderer = new JsonRenderer();
         renderer.setJSONObject(new JSONObject());
         return renderer;
+    }
+
+    public void showCommentApi(final RequestContext context) {
+        final AbstractResponseRenderer renderer = buildJsonRenderer();
+        context.setRenderer(renderer);
+
+        final Map<String, Object> dataModel = new HashMap<>();
+        final String articleId = context.pathVar("id");
+        final Request request = context.getRequest();
+
+        final JSONObject article = articleQueryService.getArticleById(articleId);
+        if (null == article) {
+            context.renderCodeMsg(404, "帖子不存在!");
+            return;
+        }
+
+        final int cmtViewMode = 0;
+        JSONObject currentUser = Sessions.getUser();
+        String currentUserId = currentUser.optString(Keys.OBJECT_ID);
+
+        int pageNum = Paginator.getPage(request);
+        final int pageSize = Symphonys.ARTICLE_COMMENTS_CNT;
+        final int windowSize = Symphonys.ARTICLE_COMMENTS_WIN_SIZE;
+        final int commentCnt = article.getInt(Article.ARTICLE_COMMENT_CNT);
+        final int pageCount = (int) Math.ceil((double) commentCnt / (double) pageSize);
+        // 回帖分页 SEO https://github.com/b3log/symphony/issues/813
+        if (UserExt.USER_COMMENT_VIEW_MODE_C_TRADITIONAL == cmtViewMode) {
+            if (0 < pageCount && pageNum > pageCount) {
+                pageNum = pageCount;
+            }
+        } else {
+            if (pageNum > pageCount) {
+                pageNum = 1;
+            }
+        }
+        final List<Integer> pageNums = Paginator.paginate(pageNum, pageSize, pageCount, windowSize);
+
+        JSONObject pagination = new JSONObject();
+        pagination.put(Pagination.PAGINATION_PAGE_COUNT, pageCount);
+        pagination.put(Pagination.PAGINATION_PAGE_NUMS, pageNums);
+        dataModel.put("pagination", pagination);
+
+        articleQueryService.processArticleContent(article);
+
+        JSONObject result = new JSONObject();
+
+        if (!article.optBoolean(Common.DISCUSSION_VIEWABLE)) {
+            result.put(Article.ARTICLE_T_COMMENTS, (Object) Collections.emptyList());
+            result.put(Article.ARTICLE_T_NICE_COMMENTS, (Object) Collections.emptyList());
+            return;
+        }
+
+        List<JSONObject> niceComments = new ArrayList<>();
+        if (pageNum == 1) {
+            niceComments = commentQueryService.getNiceComments(cmtViewMode, articleId, 3);
+            result.put(Article.ARTICLE_T_NICE_COMMENTS, (Object) niceComments);
+        }
+
+        // Load comments
+        final List<JSONObject> articleComments = commentQueryService.getArticleComments(articleId, pageNum, pageSize, cmtViewMode);
+        result.put(Article.ARTICLE_T_COMMENTS, (Object) articleComments);
+
+        final String articleAuthorId = article.optString(Article.ARTICLE_AUTHOR_ID);
+
+        for (final JSONObject comment : niceComments) {
+            comment.remove("commentUA");
+            comment.remove("commentIP");
+            final JSONObject commenter = comment.optJSONObject("commenter");
+            commenter.remove("userPassword");
+            commenter.remove("userLatestLoginIP");
+            commenter.remove("userPhone");
+            commenter.remove("userQQ");
+            commenter.remove("userCity");
+            commenter.remove("userCountry");
+            commenter.remove("userEmail");
+            commenter.remove("secret2fa");
+
+            String thankTemplate = langPropsService.get("thankConfirmLabel");
+            thankTemplate = thankTemplate.replace("{point}", String.valueOf(Symphonys.POINT_THANK_COMMENT))
+                    .replace("{user}", comment.optJSONObject(Comment.COMMENT_T_COMMENTER).optString(User.USER_NAME));
+            comment.put(Comment.COMMENT_T_THANK_LABEL, thankTemplate);
+
+            final String commentId = comment.optString(Keys.OBJECT_ID);
+
+            comment.put(Common.REWARDED, rewardQueryService.isRewarded(currentUserId, commentId, Reward.TYPE_C_COMMENT));
+            final int commentVote = voteQueryService.isVoted(currentUserId, commentId);
+            comment.put(Comment.COMMENT_T_VOTE, commentVote);
+
+            comment.put(Common.REWARED_COUNT, comment.optInt(Comment.COMMENT_THANK_CNT));
+
+            // https://github.com/b3log/symphony/issues/682
+            if (Comment.COMMENT_VISIBLE_C_AUTHOR == comment.optInt(Comment.COMMENT_VISIBLE)) {
+                final String commentAuthorId = comment.optString(Comment.COMMENT_AUTHOR_ID);
+                if ((!StringUtils.equals(currentUserId, commentAuthorId) && !StringUtils.equals(currentUserId, articleAuthorId))) {
+                    comment.put(Comment.COMMENT_CONTENT, langPropsService.get("onlySelfAndArticleAuthorVisibleLabel"));
+                }
+            }
+        }
+
+        for (final JSONObject comment : articleComments) {
+            comment.remove("commentUA");
+            comment.remove("commentIP");
+            final JSONObject commenter = comment.optJSONObject("commenter");
+            commenter.remove("userPassword");
+            commenter.remove("userLatestLoginIP");
+            commenter.remove("userPhone");
+            commenter.remove("userQQ");
+            commenter.remove("userCity");
+            commenter.remove("userCountry");
+            commenter.remove("userEmail");
+            commenter.remove("secret2fa");
+
+            final String commentId = comment.optString(Keys.OBJECT_ID);
+
+            comment.put(Common.REWARDED,
+                    rewardQueryService.isRewarded(currentUserId, commentId, Reward.TYPE_C_COMMENT));
+            final int commentVote = voteQueryService.isVoted(currentUserId, commentId);
+            comment.put(Comment.COMMENT_T_VOTE, commentVote);
+            comment.put(Common.REWARED_COUNT, comment.optInt(Comment.COMMENT_THANK_CNT));
+
+            // https://github.com/b3log/symphony/issues/682
+            if (Comment.COMMENT_VISIBLE_C_AUTHOR == comment.optInt(Comment.COMMENT_VISIBLE)) {
+                final String commentAuthorId = comment.optString(Comment.COMMENT_AUTHOR_ID);
+                if ((!StringUtils.equals(currentUserId, commentAuthorId) && !StringUtils.equals(currentUserId, articleAuthorId))) {
+                    comment.put(Comment.COMMENT_CONTENT, langPropsService.get("onlySelfAndArticleAuthorVisibleLabel"));
+                }
+            }
+        }
+
+        context.renderData(result).renderCode(StatusCodes.SUCC).renderMsg("");
     }
 
     /**
@@ -304,6 +436,7 @@ public class ArticleProcessor {
         article.put(Article.ARTICLE_T_AUTHOR_NAME, author.optString(User.USER_NAME));
         article.put(Article.ARTICLE_T_AUTHOR_URL, author.optString(User.USER_URL));
         article.put(Article.ARTICLE_T_AUTHOR_INTRO, author.optString(UserExt.USER_INTRO));
+        article.put("articleAuthorNickName", author.optString(UserExt.USER_NICKNAME));
 
         String metal = cloudService.getEnabledMetal(articleAuthorId);
         if (!metal.equals("{}")) {
@@ -1058,9 +1191,10 @@ public class ArticleProcessor {
         article.put(Article.ARTICLE_T_AUTHOR_NAME, author.optString(User.USER_NAME));
         article.put(Article.ARTICLE_T_AUTHOR_URL, author.optString(User.USER_URL));
         article.put(Article.ARTICLE_T_AUTHOR_INTRO, author.optString(UserExt.USER_INTRO));
+        article.put("articleAuthorNickName", author.optString(UserExt.USER_NICKNAME));
 
         String metal = cloudService.getEnabledMetal(articleAuthorId);
-        if (!metal.equals("{}")) {
+        if (!metal.equals("{}")&&Article.ARTICLE_ANONYMOUS_C_ANONYMOUS!=article.optInt(Article.ARTICLE_ANONYMOUS)) {
             List<Object> list = new JSONObject(metal).optJSONArray("list").toList();
             article.put("sysMetal", list);
         } else {
@@ -1277,6 +1411,7 @@ public class ArticleProcessor {
                     final String commentAuthorId = comment.optString(Comment.COMMENT_AUTHOR_ID);
                     if (!isLoggedIn || (!StringUtils.equals(currentUserId, commentAuthorId) && !StringUtils.equals(currentUserId, articleAuthorId))) {
                         comment.put(Comment.COMMENT_CONTENT, langPropsService.get("onlySelfAndArticleAuthorVisibleLabel"));
+
                     }
                 }
             }
@@ -1396,7 +1531,34 @@ public class ArticleProcessor {
             }
 
             article.put(Article.ARTICLE_TAGS, articleTags);
-
+            // 用户帖子列表
+            final List<JSONObject> userArticles = articleQueryService.getUserArticles(currentUser.optString(Keys.OBJECT_ID),Article.ARTICLE_ANONYMOUS_C_PUBLIC, 1, 1);
+            // 没发过帖子
+            if (userArticles.isEmpty() && !articleTags.contains("新人报道") && !articleTags.contains("新人报到")) {
+                context.renderMsg("迈入社区第一步, 介绍下自己~ 请先发送一个新人报道(标签需要包含'新人报道')帖吧!");
+                return;
+            }
+            // 宵禁状态  TODO 多个地方用了, 阿达你要处理么?
+            int start = 1930;
+            int end = 800;
+            int now = Integer.parseInt(new SimpleDateFormat("HHmm").format(new Date()));
+            //是宵禁状态, 设置发帖间隔 一小时一贴?
+            if (now < end || now > start) {
+                // 帖子列表 不为空
+                if (!userArticles.isEmpty()){
+                    // 当前时间
+                    long nowTime = System.currentTimeMillis();
+                    // 最后一篇文章
+                    JSONObject lastArticle = userArticles.get(0);
+                    // 更新时间 毫秒
+                    long articleCreateTime = lastArticle.getLong(Keys.OBJECT_ID);
+                    // 小于一小时间隔
+                    if (nowTime - articleCreateTime < 60 * 60 * 1000){
+                        context.renderMsg("摸鱼派已进入宵禁模式, 充足的睡眠是摸鱼的关键, 良性的思考一定不会促使你高频的发帖, 为了你的身心健康，我们将调整发帖间隔为 1h (一小时)...感谢你的陪伴，我们明天再见，早点休息，(¦3[▓▓] 晚安");
+                        return;
+                    }
+                }
+            }
             // TGIF  判断开头和长度
             if(articleTitle.startsWith("摸鱼周报")&&articleTitle.length()==13){
                 Calendar calendar = Calendar.getInstance();

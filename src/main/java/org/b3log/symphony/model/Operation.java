@@ -305,6 +305,12 @@ public final class Operation {
      */
     public static final int OPERATION_CODE_C_REBUILD_ARTICLE_SEARCH = 45;
 
+    /**
+     * Operation code - delete picture.
+     */
+    public static final int OPERATION_CODE_C_DELETE_PICTURE = 46;
+
+
     //// Transient ////
 
     /**

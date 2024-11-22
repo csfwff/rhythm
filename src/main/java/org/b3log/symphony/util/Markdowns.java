@@ -90,7 +90,7 @@ public final class Markdowns {
     /**
      * Lute engine serve path. https://github.com/88250/lute
      */
-    private static final String LUTE_ENGINE_URL = "http://localhost:8249";
+    private static final String LUTE_ENGINE_URL = Symphonys.get("lute.engine.url");
 
     /**
      * Built-in MD engine options.
@@ -145,11 +145,11 @@ public final class Markdowns {
      * @return safe HTML content
      */
     public static String clean(final String content, final String baseURI) {
-        final Whitelist whitelist = Whitelist.relaxed().addAttributes(":all", "id", "target", "class", "data-src", "aria-name", "aria-label");
+        final Whitelist whitelist = Whitelist.relaxed().addAttributes(":all", "id", "target", "data-src", "aria-name", "aria-label");
         inputWhitelist(whitelist);
         final Document.OutputSettings outputSettings = new Document.OutputSettings();
         outputSettings.prettyPrint(false);
-        final String tmp = Jsoup.clean(content, baseURI, whitelist, outputSettings);
+        final String tmp = Markdowns.clean(content, baseURI, whitelist, outputSettings);
         final Document doc = Jsoup.parseBodyFragment(tmp, baseURI);
         doc.outputSettings().prettyPrint(false);
 
@@ -229,6 +229,18 @@ public final class Markdowns {
         ret = ret.replaceAll("(</?br\\s*/?>\\s*)+", "<br>"); // patch for Jsoup issue
         return ret;
     }
+    
+    public static String clean(String bodyHtml, String baseUri, Whitelist whitelist, Document.OutputSettings outputSettings) {
+        boolean emoji = false;
+        if (bodyHtml.contains("class=\"emoji\"") && bodyHtml.contains("<img")) {
+            emoji = true;
+        }
+        bodyHtml = Jsoup.clean(bodyHtml, baseUri, whitelist, outputSettings);
+        if (emoji == true) {
+            bodyHtml = bodyHtml.replaceAll("<img alt=", "<img class=\"emoji\" alt=");
+        }
+        return bodyHtml;
+    }
 
     /**
      * Converts the specified markdown text to HTML.
@@ -277,7 +289,7 @@ public final class Markdowns {
             inputWhitelist(whitelist);
             Document.OutputSettings outputSettings = new Document.OutputSettings();
             outputSettings.prettyPrint(false);
-            html = Jsoup.clean(html, Latkes.getServePath(), whitelist, outputSettings);
+            html = Markdowns.clean(html, Latkes.getServePath(), whitelist, outputSettings);
             final Document doc = Jsoup.parseBodyFragment(html);
             final List<org.jsoup.nodes.Node> toRemove = new ArrayList<>();
             doc.traverse(new NodeVisitor() {
@@ -449,7 +461,7 @@ public final class Markdowns {
 
     private static void inputWhitelist(final Whitelist whitelist) {
         whitelist.addTags("span", "hr", "kbd", "samp", "tt", "del", "s", "strike", "u", "details", "summary").
-                addAttributes("sup", "class", "id").
+                addAttributes("sup", "id").
                 addAttributes("iframe", "src", "sandbox", "width", "height", "border", "marginwidth", "marginheight").
                 addAttributes("audio", "controls", "src").
                 addAttributes("video", "controls", "src", "width", "height").
@@ -458,15 +470,11 @@ public final class Markdowns {
                 addAttributes("param", "name", "value").
                 addAttributes("input", "type", "disabled", "checked").
                 addAttributes("embed", "src", "type", "width", "height", "wmode", "allowNetworking").
-                addAttributes("pre", "class").
-                addAttributes("code", "class").
-                addAttributes("li", "class", "id").
-                addAttributes("div", "class", "data-code").
-                addAttributes("span", "class").
-                addAttributes("img", "class").
+                addAttributes("li",  "id").
+                addAttributes("div", "data-code").
                 addAttributes("p", "align").
                 addAttributes("th", "align").
-                addAttributes("a", "class", "rel").
+                addAttributes("a", "rel").
                 addAttributes("td", "align");
         whitelist.addProtocols("a", "href", "#");
         whitelist.addProtocols("iframe", "src", "http", "https");

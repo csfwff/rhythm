@@ -274,7 +274,7 @@
 
     <div class="wrapper index-full-size" id="goodNight" style="display: none"></div>
 
-    <div class="index-bottom" style="border-top: 1px solid #f3f3f3;">
+    <div class="index-bottom" style="margin-top: 20px">
         <div class="wrapper">
             <div class="fn-flex-1">
                 <div class="metro-line fn-flex" style="align-items:center;">
@@ -307,38 +307,38 @@
                     <div class="metro-item" style="cursor: pointer">
                         <a class="preview" id="yesterday" onclick="yesterday()">
                             <img style="border-radius: 0" id="yesterdayImg"
-                                 src="https://pwl.stackoverflow.wiki/2021/10/coin-2-70217cc1.png"><b>领取昨日活跃奖励</b>
+                                 src="https://file.fishpi.cn/2021/10/coin-2-70217cc1.png"><b>领取昨日活跃奖励</b>
                         </a>
                     </div>
                     <div class="metro-item">
                         <a class="preview" href="${servePath}/activities">
                             <img style="border-radius: 10px"
-                                 src="https://pwl.stackoverflow.wiki/2021/10/psp-game-1a94ae64.png">
+                                 src="https://file.fishpi.cn/2021/10/psp-game-1a94ae64.png">
                             <b>摸鱼派在线游戏</b>
                         </a>
                     </div>
                     <div class="metro-item">
                         <a class="preview" href="${servePath}/shop">
                             <img style="border-radius: 0"
-                                 src="https://pwl.stackoverflow.wiki/2022/03/ss-61cf1b96.png">
+                                 src="https://file.fishpi.cn/2022/03/ss-61cf1b96.png">
                             <b>系统商店</b>
                         </a>
                     </div>
                 </div>
 
-                <div class="metro-border fn-flex">
-                    <div style="background:transparent;;flex:1.2;"></div>
-                    <div class="green"></div>
-                    <div class="yellow"></div>
-                    <div class="red"></div>
-                    <div class="purple"></div>
-                </div>
+<#--                <div class="metro-border fn-flex">-->
+<#--                    <div style="background:transparent;;flex:1.2;"></div>-->
+<#--                    <div class="green"></div>-->
+<#--                    <div class="yellow"></div>-->
+<#--                    <div class="red"></div>-->
+<#--                    <div class="purple"></div>-->
+<#--                </div>-->
             </div>
         </div>
     </div>
 
 
-    <div class="index-bottom" style="padding-top:40px;padding-bottom: 20px;">
+    <div class="index-bottom" style="padding-top:20px;padding-bottom: 20px;">
         <div class="wrapper">
             <div class="index-recent fn-flex-1">
                 <div class="index-head-title">
@@ -375,7 +375,7 @@
                                                 <div class="ft-smaller">
                                                     <a rel="nofollow" href="${servePath}/member/${msg.userName}">
                                                         <#if msg.userNickname?? && msg.userNickname?length gt 1>
-                                                            <span class="ft-gray">${msg.userNickname} ( ${msg.userName} )</span>
+                                                            <span class="ft-gray">${msg.userNickname} (${msg.userName})</span>
                                                         <#else>
                                                             <span class="ft-gray">${msg.userName}</span>
                                                         </#if>
@@ -385,6 +385,10 @@
                                                     <#assign text=msg.content>
                                                     <#if text?contains("\"msgType\":\"redPacket\"")>
                                                         [收到红包，请在完整版聊天室查看]
+                                                    <#elseif text?contains("\"msgType\":\"weather\"")>
+                                                        [天气卡片，请在完整版聊天室查看]
+                                                    <#elseif text?contains("\"msgType\":\"music\"")>
+                                                        [音乐卡片，请在完整版聊天室查看]
                                                     <#else>
                                                         ${text}
                                                     </#if>
@@ -506,7 +510,7 @@
                               data-csrf="${csrfToken}">${postLabel}</span>
                     </div>
                     <div class="module-panel">
-                        <ul class="module-list">
+                        <ul class="module-list active-bz-list">
                             <#list sideBreezemoons as item>
                                 <#if item_index <= 10>
                                     <li>
@@ -715,21 +719,21 @@
                 }
                 setTimeout(function () {
                     if (result.sum === -1) {
-                        $("#yesterday").html("<img style='border-radius: 0' src='https://pwl.stackoverflow.wiki/2021/09/embarrassed-4112bd37.png'><b>暂时没有昨日奖励可领取呦！明天再来试试吧</b>");
+                        $("#yesterday").html("<img style='border-radius: 0' src='https://file.fishpi.cn/2021/09/embarrassed-4112bd37.png'><b>暂时没有昨日奖励可领取呦！明天再来试试吧</b>");
                         Util.fadeIn(yesterdayBtn, function () {
                             setTimeout(function () {
                                 Util.fadeOut(yesterdayBtn, function () {
-                                    $("#yesterday").html('<img style="border-radius: 0" src="https://pwl.stackoverflow.wiki/2021/10/coin-2-70217cc1.png" alt="领取昨日活跃奖励"><b>领取昨日活跃奖励</b>');
+                                    $("#yesterday").html('<img style="border-radius: 0" src="https://file.fishpi.cn/2021/10/coin-2-70217cc1.png" alt="领取昨日活跃奖励"><b>领取昨日活跃奖励</b>');
                                     Util.fadeIn(yesterdayBtn);
                                 });
                             }, 2000);
                         });
                     } else {
-                        $("#yesterday").html("<img style='border-radius: 0' src='https://pwl.stackoverflow.wiki/2021/09/correct-1f5e3258.png'><b>昨日奖励已领取！积分 +" + result.sum + "</b>");
+                        $("#yesterday").html("<img style='border-radius: 0' src='https://file.fishpi.cn/2021/09/correct-1f5e3258.png'><b>昨日奖励已领取！积分 +" + result.sum + "</b>");
                         Util.fadeIn(yesterdayBtn, function () {
                             setTimeout(function () {
                                 Util.fadeOut(yesterdayBtn, function () {
-                                    $("#yesterday").html('<img style="border-radius: 0" src="https://pwl.stackoverflow.wiki/2021/10/coin-2-70217cc1.png" alt="领取昨日活跃奖励"><b>领取昨日活跃奖励</b>');
+                                    $("#yesterday").html('<img style="border-radius: 0" src="https://file.fishpi.cn/2021/10/coin-2-70217cc1.png" alt="领取昨日活跃奖励"><b>领取昨日活跃奖励</b>');
                                     Util.fadeIn(yesterdayBtn);
                                 });
                             }, 2000);
@@ -883,15 +887,15 @@
     });
 
     <#if userPhone == "">
-        Util.alert("为了确保账号的安全及正常使用，依照相关法规政策要求：<br>您需要绑定手机号后方可正常访问摸鱼派。<br><br><button onclick='location.href=\"${servePath}/settings/account#bind-phone\"'>点击这里前往设置</button>")
+        Util.alert("⛔ 为了确保账号的安全及正常使用，依照相关法规政策要求：<br>您需要绑定手机号后方可正常访问摸鱼派。<br><br><button onclick='location.href=\"${servePath}/settings/account#bind-phone\"'>点击这里前往设置</button>")
     </#if>
 
     <#if need2fa == "yes">
-    Util.alert("摸鱼派管理组成员，您好！<br>作为管理组的成员，您的账号需要更高的安全性，以确保社区的稳定运行。<br>请您收到此通知后，立即在个人设置-账户中启用两步验证，感谢你对社区的贡献！<br><br><button onclick='location.href=\"${servePath}/settings/account#mfaCode\"'>点击这里前往设置</button>", "致管理组成员的重要通知️")
+    Util.alert("⛔ 摸鱼派管理组成员，您好！<br>作为管理组的成员，您的账号需要更高的安全性，以确保社区的稳定运行。<br>请您收到此通知后，立即在个人设置-账户中启用两步验证，感谢你对社区的贡献！<br><br><button onclick='location.href=\"${servePath}/settings/account#mfaCode\"'>点击这里前往设置</button>", "致管理组成员的重要通知️")
     </#if>
 </script>
 <script>
-    let now = new Date().getHours();
+    /*let now = new Date().getHours();
     let day = new Date().getDay();
     if ((now >= 19 && now <= 23) || (now >= 0 && now <= 7)) {
         $("head").append('<link rel="stylesheet" href="https://fonts.font.im/css2?family=Ma+Shan+Zheng&display=swap">');
@@ -930,7 +934,7 @@
         setTimeout(function () {
             $("#nightTips").slideDown(1500);
         }, 500);
-    }
+    }*/
 </script>
 </body>
 </html>

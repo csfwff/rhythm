@@ -91,7 +91,7 @@ public class ReservedWords {
             addOption.put(Option.OPTION_CATEGORY, "reversed-word-list");
             addOption.put(Option.OPTION_VALUE, "[]");
             optionMgmtService.addOption(addOption);
-            LOGGER.log(Level.INFO, "Reserved word list is empty and generated.");
+            System.out.println(">>> Reserved word list is empty and generated.");
         } else {
             JSONArray array = new JSONArray(option.optString(Option.OPTION_VALUE));
             for (int i = 0; i < array.length(); i++) {
@@ -99,7 +99,7 @@ public class ReservedWords {
                 CACHE.add(word);
             }
         }
-        LOGGER.log(Level.INFO, "Reserved words system is ready.");
+        System.out.println(">>> Reserved words system is ready.");
     }
 
     public static void add(String word) {

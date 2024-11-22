@@ -637,6 +637,7 @@ public class LoginProcessor {
                 user.put(UserExt.USER_APP_ROLE, appRole);
                 user.put(User.USER_PASSWORD, password);
                 user.put(UserExt.USER_STATUS, UserExt.USER_STATUS_C_VALID);
+                user.put("mbti", requestJSONObject.optString("mbti"));
 
                 userMgmtService.addUser(user);
 

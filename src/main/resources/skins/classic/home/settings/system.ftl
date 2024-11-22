@@ -21,10 +21,10 @@
 <#include "macro-settings.ftl">
 <@home "system">
     <div id="systemTip" class="tip"></div>
-    <div class="module-header">
-        自定义社区标题
-    </div>
     <div class="module">
+        <div class="module-header">
+            自定义社区标题
+        </div>
         <div class="module-panel form fn-clear">
             <input id="newSystemTitle" type="text" value="<#if hasSystemTitle>${systemTitle}<#else>${symphonyLabel}</#if>"/><br/><br/>
 
@@ -46,10 +46,10 @@
                 </form>
                 <button class="fn-right" style="height: 37px;" onclick="$('#iconURL').data('imageurl', ''); Settings.update('system', '${csrfToken}');location.reload();">恢复默认</button>
             </div>
+            <label style="padding: 3px 0">
+                如果自定义网站图标后不生效，请使用 CTRL+F5 快捷键强行刷新页面；为确保浏览体验，建议使用128KB以下图片。
+            </label>
         </div>
-        <label style="padding-left: 15px">
-            如果自定义网站图标后不生效，请使用 CTRL+F5 快捷键强行刷新页面；为确保浏览体验，建议使用128KB以下图片。
-        </label>
     </div>
 
     <div class="module">
@@ -112,7 +112,7 @@
                             <div class="user-card__icons fn__flex">
                                 <div class="fn__flex-1">
                                     <a href="https://fishpi.cn/article/1630575841478">
-                                        <img style="height: 20px;margin: 0px;" src="https://pwl.stackoverflow.wiki/vipRole.png">
+                                        <img style="height: 20px;margin: 0px;" src="https://file.fishpi.cn/vipRole.png">
                                     </a>
                                     <a href="${servePath}/member/${currentUser.userName}/points" class="tooltipped-new tooltipped__n" aria-label="${currentUser.userPoint?c} 积分">
                                         <svg>

@@ -21,6 +21,7 @@
 <#include "macro-settings.ftl">
 <@home "system">
     <div id="systemTip" class="tip"></div><br/>
+
     <div class="module">
         <div class="module-header">
             自定义社区标题

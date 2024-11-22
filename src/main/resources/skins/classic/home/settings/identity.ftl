@@ -24,7 +24,7 @@
         <div class="module-header fn-clear">
             <h2>官方身份认证</h2>
         </div>
-        <div class="module-panel form" style="margin: 0 0 50px 0">
+        <div class="module-panel form fn-clear" style="margin: 0 0 50px 0">
             <div class="fn-clear" style="margin: 0 0 20px 0">
                 摸鱼派是一个多元化、包容的社区，我们为在摸鱼派社区中的鱼油们提供官方身份认证服务。<br>
                 一旦你通过了官方身份认证，我们将为你发放相对应的勋章（可自行选择显示/隐藏），除此以外，它还能帮助你：<br>
@@ -38,9 +38,9 @@
                 请选择您的认证类别<br>
                 <select id="id-type">
                     <option selected="selected">企业入驻认证</option>
-                    <option>小姐姐认证</option>
+                    <!--<option>小姐姐认证</option>
                     <option>LGBT 群体认证</option>
-                    <option>00 后认证</option>
+                    <option>00 后认证</option>-->
                 </select>
             </div>
             <div id="id-content"></div>

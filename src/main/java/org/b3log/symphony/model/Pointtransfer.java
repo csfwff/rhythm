@@ -138,6 +138,16 @@ public final class Pointtransfer {
     public static final int TRANSFER_SUM_C_ADD_SELF_ARTICLE_COMMENT = Symphonys.POINT_ADD_SELF_ARTICLE_COMMENT;
 
     /**
+     * Transfer sum - Add Anonymous Article Comment.
+     */
+    public static final int TRANSFER_SUM_C_ADD_ANONYMOUS_ARTICLE_COMMENT = Symphonys.POINT_COMMENT_ANONYMOUS;
+
+    /**
+     * Transfer sum - Add Only Author Visable Article Comment.
+     */
+    public static final int TRANSFER_SUM_C_ADD_ONLY_AUTHOR_VISIBLE_ARTICLE_COMMENT = Symphonys.POINT_COMMENT_ONLY_AUTHOR;
+
+    /**
      * Transfer type - Add Article Reward Outcome.
      */
     public static final int TRANSFER_TYPE_C_ADD_ARTICLE_REWARD = 4;
@@ -461,6 +471,12 @@ public final class Pointtransfer {
      * Transfer type - trade
      */
     public static final int TRANSFER_TYPE_C_TRADE = 50;
+
+    public static final int TRANSFER_TYPE_C_DEL_COMMENT = 51;
+
+    public static final int TRANSFER_TYPE_C_ANONYMOUS_COMMENT = 52;
+
+    public static final int TRANSFER_TYPE_C_ONLY_AUTHOR_VISIBLE_COMMENT = 53;
 
     /**
      * Transfer sum - 摆龙门阵.

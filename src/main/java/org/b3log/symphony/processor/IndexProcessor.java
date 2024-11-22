@@ -52,6 +52,10 @@ import org.b3log.symphony.service.*;
 import org.b3log.symphony.util.*;
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
 
 import java.io.InputStream;
 import java.math.BigDecimal;
@@ -533,7 +537,23 @@ public class IndexProcessor {
             dataModel.put("need2fa", "no");
         }
 
-        dataModel.put(Common.MESSAGES, ChatroomProcessor.getMessages(1,"html"));
+        List<JSONObject> messages = ChatroomProcessor.getMessages(1,"html");
+        for (JSONObject message : messages) {
+            String content = message.optString("content");
+            Document doc = Jsoup.parse(content);
+
+            // 获取所有的 img 标签
+            Elements imgElements = doc.select("img");
+            for (Element img : imgElements) {
+                String src = img.attr("src");
+                // 在 src 后面加上 ?imageView2/0/w/150/h/150/interlace/0/q/90
+                img.attr("src", src + "?imageView2/0/w/150/h/150/interlace/0/q/90");
+            }
+
+            // 更新 message 中的 content 字段
+            message.put("content", doc.html());
+        }
+        dataModel.put(Common.MESSAGES, messages);
 
         makeIndexData(dataModel);
 
@@ -782,12 +802,12 @@ public class IndexProcessor {
      * @param context the specified context
      */
     public void showChargePoint(final RequestContext context) {
-        if (context.param("out_trade_no") != null) {
+        /*if (context.param("out_trade_no") != null) {
             // 触发交易检查
             AlipayProcessor.checkTrades();
             context.sendRedirect(Latkes.getServePath() + "/charge/point");
             return;
-        }
+        }*/
         final AbstractFreeMarkerRenderer renderer = new SkinRenderer(context, "charge-point.ftl");
         final Map<String, Object> dataModel = renderer.getDataModel();
         dataModelService.fillHeaderAndFooter(context, dataModel);

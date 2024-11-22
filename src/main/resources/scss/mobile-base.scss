@@ -494,10 +494,16 @@ a[class*=" icon-"]:hover {
 .wrapper {
   margin: 0 10px;
 }
-
 .main {
   //background-color: #FFF;
   //padding-bottom: 10px;
+
+  /*.article-main {
+    margin: 10px 10px;
+    background-color: var(--layer-background-color);
+    box-shadow: 0 1px 2px var(--layer-border-color);
+    padding: 10px 10px 20px 10px;
+  }*/
 }
 
 /* end framework */
@@ -508,7 +514,13 @@ a[class*=" icon-"]:hover {
   width: 100%;
   padding: 5px 0;
   z-index: 99;
-  background-color: $theme-primary;
+  background-color: rgba(217, 240, 255, 0.75);
+}
+
+.nav .wrapper{
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
 .nav .head-fn form {
@@ -516,11 +528,10 @@ a[class*=" icon-"]:hover {
 }
 
 .nav .head-fn h1 a {
-
   svg {
     color: #fff;
-    height: 38px;
-    width: 38px;
+    height: 28px;
+    width: 28px;
     margin-top: -5px;
     float: left;
   }
@@ -528,6 +539,9 @@ a[class*=" icon-"]:hover {
 
 .nav .user-nav {
   position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 .nav .user-nav a.unlogin {
@@ -535,7 +549,7 @@ a[class*=" icon-"]:hover {
 }
 
 .nav div > a {
-  color: #fff;
+  color: #3b3e43;
   text-decoration: none;
   margin: 0 3px;
   padding: 4px 5px;
@@ -550,8 +564,10 @@ a[class*=" icon-"]:hover {
 }
 
 .nav div > a.current {
-  border-bottom: 2px solid #D26911;
+  /*
+  border-bottom: 2px solid $theme-accent;
   padding-bottom: 7px;
+  */
 }
 
 .nav div > a.last {
@@ -566,13 +582,14 @@ a[class*=" icon-"]:hover {
 
 .nav .user-nav .no-msg,
 .nav .user-nav .msg {
-  background-color: #777;
+  background-color: rgba(203,202,202,.29);
   border-radius: 3px;
-  color: #FFFFFF;
+  color: #3b3e43;
   font-size: 14px;
   padding: 0px 6px;
-  margin: 5px 10px;
+  margin: 5px 4px;
   line-height: 20px;
+  transition: .5s;
 }
 
 .nav .user-nav .msg {
@@ -583,6 +600,11 @@ a[class*=" icon-"]:hover {
   animation: spaceboots 1s infinite;
   background-color: $theme-accent;
   color: #FFFFFF;
+}
+.nav .user-nav svg{
+  color: $theme-primary-text;
+  height: 20px;
+  width: 20px;
 }
 
 .nav .user-nav a.selected.no-msg,
@@ -629,14 +651,14 @@ a[class*=" icon-"]:hover {
 
 /* start footer */
 .footer {
-  color: #7d8186;
+  color: #434444;
   padding: 10px 0;
   text-align: center;
   font-size: 12px;
   background-color: $theme-primary;
 
   a {
-    color: #afb1b3;
+    color: #7e7e7e;
   }
 }
 
@@ -662,7 +684,7 @@ a[class*=" icon-"]:hover {
 
 .list > ul > li {
   border-bottom: 1px solid #eee;
-  padding: 10px;
+  padding: 10px 5px 10px 5px;
   white-space: normal;
   word-wrap: break-word;
   position: relative;
@@ -1056,7 +1078,6 @@ label.anonymous-check {
 
 .article-info {
   position: relative;
-  margin-bottom: 10px;
 }
 
 .article-info > div.article-params {
@@ -1079,7 +1100,7 @@ h1.article-title {
   word-break: break-all;
   font-size: 16px;
   font-weight: normal;
-  margin: 10px 0;
+  margin: 4px 0 20px 0;
 }
 
 h1.article-title > a {
@@ -1127,9 +1148,9 @@ label.cmt-anonymous {
 }
 
 .comments > .comments-header {
-  border-bottom: 1px solid #CCCCCC;
-  margin: 20px 0 0;
-  padding: 10px 5px 5px 10px;
+  border-bottom: 1px solid #dbdbdb;
+  margin: 20px 0 20px 0;
+  padding: 10px 5px 11px 10px;
 }
 
 .comments > div.comments-header svg {
@@ -1138,7 +1159,7 @@ label.cmt-anonymous {
 
 .comments > div.comments-header a {
   text-decoration: none;
-  color: $black-text;
+  color: #817e7e;
 }
 
 .comments li.shield {
@@ -1201,9 +1222,6 @@ label.cmt-anonymous {
 }
 
 .comment-login {
-  border: 1px solid #D9D9D9;
-  border-top-color: #C0C0C0;
-  border-left-color: #C0C0C0;
   box-sizing: border-box;
   margin: 10px;
   background-color: #fafafa;
@@ -1636,6 +1654,7 @@ label.cmt-anonymous {
   .form {
     font-size: 14px;
     line-height: 1.6;
+    margin: 20px 0;
 
     & > svg {
       margin: 0 auto;
@@ -1909,6 +1928,10 @@ code .dec {
 /* end activity */
 
 /* start chatroom */
+.chat-room{
+  background: #ffffff;
+  padding: 0 10px;
+}
 .chat-room .online-cnt {
   line-height: 33px;
   margin-right: 10px;
@@ -1987,6 +2010,23 @@ code .dec {
   #userNicknameDom {
     font-size: 26px;
     line-height: 30px;
+  }
+
+  .mbti {
+    background-color: #b2b1ff;
+    color: #fff;
+    font-size: 12px;
+    line-height: 20px;
+    border-radius: 3px;
+    height: 20px;
+    display: inline-block;
+    padding: 0 5px;
+    vertical-align: middle;
+    box-sizing: border-box;
+
+    svg {
+      margin-top: 2px;
+    }
   }
 
   .online,
@@ -2967,13 +3007,11 @@ only screen and (device-width: 414px) and (device-height: 896px) and (-webkit-de
 }
 
 .list__item{
-  background-color: var(--layer-background-color);
-  box-shadow: 0 1px 2px var(--layer-border-color);
   list-style: none;
   margin-bottom: 10px;
-  padding: 10px;
+  padding: 3px 5px 9px 5px;
   font-family: "HarmonyOS",Helvetica Neue,Luxi Sans,DejaVu Sans,Hiragino Sans GB,Microsoft Yahei,sans-serif,Apple Color Emoji,Segoe UI Emoji,Noto Color Emoji,Segoe UI Symbol,Android Emoji,EmojiSymbols;
-
+  border-bottom: 1px solid #eee;
 
   :last-child{
     margin-bottom: 0
@@ -3230,5 +3268,277 @@ only screen and (device-width: 414px) and (device-height: 896px) and (-webkit-de
   width: 0;
 }
 
+.main {
+  margin: 10px 5px 5px 5px;
+  background-color: var(--layer-background-color);
+  box-shadow: 0 1px 2px var(--layer-border-color);
+  padding: 5px 5px 20px 5px;
+}
 
+// 音乐播放器
+#musicBox{
+  position: fixed;
+  bottom: -106px;
+  left: 0;
+  width: 100%;
+  height: 106px;
+  background: #fff;
+  box-shadow: -1px -1px 4px 1px rgba(0,0,0,.3);
+  z-index: 9990;
+  transition: .3s;
+  .music-box{
+    position: relative;
+    margin: 0 auto;
+    width: 90%;
+    height: 106px;
+    min-width: 430px;
+    max-width: 1300px;
+    display: flex;
+    padding: 5px 0;
+    .music-img{
+      .music-img-item{
+        width: 40px;
+        height: 40px;
+        cursor: pointer;
+        border-radius: 50%;
+      }
+      margin: 0 10px;
+    }
+    &.playing .music-img-item{
+      animation: spin 2s linear infinite;
+    }
+    .music-detail{
+      width: 100px;
+      height: 106px;
+      background: #fff;
+      box-sizing: border-box;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-around;
+      .music-title{
+        overflow: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+        font-weight: bold;
+      }
+    }
+    .music-close-btn{
+      position: absolute;
+      top: -20px;
+      right: 0;
+      width: 50px;
+      height: 20px;
+      background: #fff;
+      border-top-left-radius: 5px;
+      border-top-right-radius: 5px;
+      cursor:pointer;
+      text-align: center;
+      box-shadow: 0 -1px 0 1px rgba(0,0,0,.3);
+      padding-top: 2px;
+      box-sizing: border-box;
+      img{
+        width: 20px;
+        height: 20px;
+      }
+    }
+    .music-controller{
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      width: 120px;
+      height: 40px;
+      img{
+        cursor:pointer;
+      }
+      .music-prev,.music-next,.music-list,.music-voice,.music-mode{
+        width: 30px;
+        height: 30px;
+      }
+      .music-play{
+        width: 40px;
+        height: 40px;
+      }
+      .music-voice-box{
+        position: fixed;
+        bottom: 40px;
+        display: none;
+        padding: 10px;
+        background: #fff;
+        z-index: 9991;
+      }
+      .music-voice:hover{
+        .music-voice-box{
+          display: block;
+        }
+      }
+    }
+  }
+  &.show{
+    bottom: 0;
+  }
+  .music-core{
+    position: fixed;
+    bottom: -100px;
+    left: 0;
+    z-index: -1;
+  }
+}
 
+.music-list-box{
+  position: fixed;
+  bottom: -200px;
+  left: 0;
+  transition: .3s;
+  width: 80%;
+  height: 200px;
+  min-width: 430px;
+  max-width: 800px;
+  padding: 20px;
+  background: #fff;
+  box-shadow: -1px -1px 4px 1px rgba(0,0,0,.3);
+  z-index: 9980;
+  border-top-right-radius: 5px;
+  border-top-left-radius: 5px;
+  box-sizing: border-box;
+  overflow-y: scroll;
+  &::-webkit-scrollbar{
+    width: 0;
+  }
+  &.show{
+    bottom: 50px;
+  }
+  .music-list-item{
+    display: flex;
+    align-items: center;
+    border-bottom: 1px solid rgba(0,0,0,.3);
+    padding: 5px;
+    background: #fff;
+    transition: .3s;
+    &:hover{
+      background: rgba(0,0,0,.1);
+    }
+    img{
+      width: 20px;
+      height: 20px;
+      margin-right: 10px;
+    }
+    .music-list-title{
+      flex: 1;
+    }
+    .music-list-controller{
+      span{
+        cursor: pointer;
+        &:hover{
+          text-decoration: underline;
+        }
+      }
+    }
+  }
+}
+
+.music-player{
+  margin: 10px;
+  padding: 10px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-sizing: border-box;
+  box-shadow: 0 0 10px #ccc;
+  background: #fff;
+  .music-player-img{
+    width: 50px;
+    height: 50px;
+    margin-right: 10px;
+  }
+  .music-player-box{
+    .music-player-title{
+      width: 200px;
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+      font-weight: bold;
+      font-size: 18px;
+    }
+    .music-player-controller{
+      span{
+        cursor: pointer;
+        &:hover{
+          text-decoration: underline;
+        }
+      }
+    }
+  }
+}
+
+.file__items {
+  margin-bottom: 8px
+}
+
+.file__items .item {
+  border-radius: 4px;
+  box-shadow: 0 1px 2px rgba(0,0,0,.2);
+  box-sizing: border-box;
+  color: var(--text-gray-color);
+  float: left;
+  height: 222px;
+  margin: 8px 0 0 8px;
+  overflow: hidden;
+  position: relative;
+  width: 259px
+}
+
+.file__items .item__img {
+  background-position: 50%;
+  background-size: contain;
+  background-repeat: no-repeat;
+  height: 100%;
+  width: 100%;
+}
+
+.file__items .item--selected,.file__items .item:hover {
+  box-shadow: var(--shadow-layer)
+}
+
+.file__items .item--selected .item__info,.file__items .item:hover .item__info {
+  top: 0
+}
+
+.file__items .item--selected .item__info {
+  background-color: var(--layer-hover-background-color)
+}
+
+.file__items .item--file {
+  align-items: center;
+  padding: 8px
+}
+
+.file__items .item--file svg {
+  color: var(--text-fade-color);
+  height: 100px;
+  width: 100px
+}
+
+.file__items .item__info {
+  background-color: rgba(0,0,0,.86);
+  box-sizing: border-box;
+  color: #fff;
+  height: 100%;
+  overflow: hidden;
+  padding: 10px;
+  position: absolute;
+  top: 100%;
+  transition: all .15s ease-in-out;
+  width: 100%;
+  word-break: break-all
+}
+
+.file__items .item__info .red {
+  margin-top: 8px;
+  width: 100%
+}
+
+/* color userName */
+.ft-admin-user {
+  color: red;
+  font-weight: bold;
+}

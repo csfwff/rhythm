@@ -43,7 +43,7 @@
 </#if>
 </#if>
 
-<div class="module">
+<div class="module" style="padding-top: 10px">
     <div class="module-header form" style="border: none;">
         <input id="breezemoonInput"
                type="text"
@@ -52,7 +52,7 @@
         <span id="breezemoonPostBtn" class="btn breezemoon__btn" data-csrf="${csrfToken}">${postLabel}</span>
     </div>
     <div class="module-panel">
-        <ul class="module-list">
+        <ul class="module-list active-bz-list">
         <#list sideBreezemoons as item>
             <li>
                 <a href="${servePath}/member/${item.breezemoonAuthorName}">

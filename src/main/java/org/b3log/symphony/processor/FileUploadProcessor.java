@@ -42,19 +42,27 @@ import org.b3log.latke.http.*;
 import org.b3log.latke.ioc.BeanManager;
 import org.b3log.latke.ioc.Inject;
 import org.b3log.latke.ioc.Singleton;
+import org.b3log.latke.model.User;
+import org.b3log.latke.repository.*;
 import org.b3log.latke.service.LangPropsService;
+import org.b3log.latke.util.Requests;
 import org.b3log.latke.util.Strings;
 import org.b3log.latke.util.URLs;
 import org.b3log.symphony.Server;
 import org.b3log.symphony.model.Common;
+import org.b3log.symphony.processor.middleware.LoginCheckMidware;
+import org.b3log.symphony.repository.UploadRepository;
 import org.b3log.symphony.util.*;
+import org.b3log.symphony.util.Sessions;
 import org.json.JSONObject;
+import pers.adlered.simplecurrentlimiter.main.SimpleCurrentLimiter;
 
 import java.io.*;
 import java.net.InetAddress;
 import java.net.URL;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
@@ -85,6 +93,9 @@ public class FileUploadProcessor {
     @Inject
     private LangPropsService langPropsService;
 
+    @Inject
+    private UploadRepository uploadRepository;
+
     /**
      * Register request handlers.
      */
@@ -92,8 +103,10 @@ public class FileUploadProcessor {
         final BeanManager beanManager = BeanManager.getInstance();
 
         final FileUploadProcessor fileUploadProcessor = beanManager.getReference(FileUploadProcessor.class);
+        final LoginCheckMidware loginCheck = beanManager.getReference(LoginCheckMidware.class);
+
         Dispatcher.get("/upload/{yyyy}/{MM}/{file}", fileUploadProcessor::getFile);
-        Dispatcher.post("/upload", fileUploadProcessor::uploadFile);
+        Dispatcher.post("/upload", fileUploadProcessor::uploadFile, loginCheck::handle);
         // Dispatcher.post("/fetch-upload", fileUploadProcessor::fetchUpload);
     }
 
@@ -156,6 +169,7 @@ public class FileUploadProcessor {
      *
      * @param context the specified context
      */
+    final private static SimpleCurrentLimiter uploadLimiter = new SimpleCurrentLimiter(30 * 60, 40);
     public synchronized void uploadFile(final RequestContext context) {
         final JSONObject result = Results.newFail();
         context.renderJSONPretty(result);
@@ -269,8 +283,39 @@ public class FileUploadProcessor {
 
         final CountDownLatch countDownLatch = new CountDownLatch(files.size());
         for (int i = 0; i < files.size(); i++) {
+            // 检查该文件是否已经上传过
+            String md5 = MD5Calculator.calculateMd5(fileBytes.get(i));
+            final Query query = new Query().setFilter(new PropertyFilter("md5", FilterOperator.EQUAL, md5));
+            try {
+                final List<JSONObject> md5s = uploadRepository.getList(query);
+                if (!md5s.isEmpty()) {
+                    JSONObject md5in1 = md5s.get(0);
+                    String url = md5in1.optString("path");
+                    String[] filename = url.split("/");
+                    String originalName = url.split("/")[filename.length - 1];
+                    succMap.put(originalName, url);
+                    countDownLatch.countDown();
+                    LOGGER.log(Level.INFO, "Same MD5 " + originalName + " gives: " + url);
+                    continue;
+                }
+            } catch (RepositoryException ignored) {
+            }
+            JSONObject user = Sessions.getUser();
+            try {
+                user = ApiProcessor.getUserByKey(context.param("apiKey"));
+            } catch (NullPointerException ignored) {
+            }
+            final String userName = user.optString(User.USER_NAME);
+            // 没有重复文件，正常上传
             final FileUpload file = files.get(i);
             final String originalName = fileName = Escapes.sanitizeFilename(file.getFilename());
+            // 检查上传次数
+            if (!uploadLimiter.access(userName)) {
+                errFiles.add(originalName);
+                countDownLatch.countDown();
+                LOGGER.log(Level.INFO, "Out of upload limit " + originalName + " userName: " + userName);
+                continue;
+            }
             try {
                 String url;
                 byte[] bytes;
@@ -290,7 +335,7 @@ public class FileUploadProcessor {
                     bytes = fileBytes.get(i);
                     final String contentType = file.getContentType();
                     com.qiniu.http.Response response = uploadManager.put(bytes, fileName, uploadToken, null, contentType, false);
-                    //解析上传成功的结果
+                    // 解析上传成功的结果
                     JSONObject putRet = new JSONObject(response.bodyString());
                     countDownLatch.countDown();
                     url = Symphonys.UPLOAD_QINIU_DOMAIN + "/" + putRet.optString("key");
@@ -306,6 +351,13 @@ public class FileUploadProcessor {
                     url = Latkes.getServePath() + "/upload/" + fileName;
                     succMap.put(originalName, url);
                 }
+                // 记录到Upload表
+                String ip = Requests.getRemoteAddr(request);
+                String time = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date());
+                // 写入数据库
+                final Transaction transaction = uploadRepository.beginTransaction();
+                uploadRepository.add(suffix, userName, ip, time, url, md5, true);
+                transaction.commit();
             } catch (final Exception e) {
                 LOGGER.log(Level.ERROR, "Uploads file failed", e);
 

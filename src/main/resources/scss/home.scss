@@ -103,6 +103,23 @@
     line-height: 30px;
   }
 
+  .mbti {
+    background-color: #b2b1ff;
+    color: #fff;
+    font-size: 12px;
+    line-height: 20px;
+    border-radius: 3px;
+    height: 20px;
+    display: inline-block;
+    padding: 0 5px;
+    vertical-align: middle;
+    box-sizing: border-box;
+
+    svg {
+      margin-top: 2px;
+    }
+  }
+
   .online,
   .offline,
   .color_admin,
@@ -176,7 +193,7 @@
 
 /* start add article */
 .pre-post-wrap {
-  background-color: #fff;
+  //background-color: #fff;
 }
 
 .pre-post > div {
@@ -626,6 +643,73 @@
 
 #pointBuyInvitecode {
   padding: 0;
+}
+
+.file__items {
+  margin-bottom: 8px
+}
+
+.file__items .item {
+  border-radius: 4px;
+  box-shadow: 0 1px 2px rgba(0,0,0,.2);
+  box-sizing: border-box;
+  color: var(--text-gray-color);
+  float: left;
+  height: 222px;
+  margin: 8px 0 0 8px;
+  overflow: hidden;
+  position: relative;
+  width: 259px
+}
+
+.file__items .item__img {
+  background-position: 50%;
+  background-size: contain;
+  background-repeat: no-repeat;
+  height: 100%;
+  width: 100%;
+}
+
+.file__items .item--selected,.file__items .item:hover {
+  box-shadow: var(--shadow-layer)
+}
+
+.file__items .item--selected .item__info,.file__items .item:hover .item__info {
+  top: 0
+}
+
+.file__items .item--selected .item__info {
+  background-color: var(--layer-hover-background-color)
+}
+
+.file__items .item--file {
+  align-items: center;
+  padding: 8px
+}
+
+.file__items .item--file svg {
+  color: var(--text-fade-color);
+  height: 100px;
+  width: 100px
+}
+
+.file__items .item__info {
+  background-color: rgba(0,0,0,.86);
+  box-sizing: border-box;
+  color: #fff;
+  height: 100%;
+  overflow: hidden;
+  padding: 10px;
+  position: absolute;
+  top: 100%;
+  transition: all .15s ease-in-out;
+  width: 100%;
+  word-break: break-all
+}
+
+.file__items .item__info .red {
+  margin-top: 8px;
+  width: 100%
 }
 
 /* end settings */

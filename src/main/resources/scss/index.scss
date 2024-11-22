@@ -51,14 +51,14 @@
   padding: 10px 18px;
   font-size: 18px;
   line-height: 26px;
-  color: #246;
+  color: $theme-primary-text;
   text-align: center;
-  background-color: #e2eef9;
-  border: 1px solid #bac6d3;
-  border-radius: 3px;
+  border: 1px solid #eee;
+  background-color: $theme-primary;
   width: 100%;
   box-sizing: border-box;
   margin-bottom: 20px;
+  box-shadow: 0px 0px 2px rgba(98,124,153,.1);
 }
 
 .domains-module {
@@ -79,9 +79,17 @@
 
 /* start article */
 .article {
+  padding-top: 60px;
   .nav {
     position: fixed;
     top: 0;
+  }
+
+  .article-container{
+    position: relative;
+    margin: 20px auto 20px;
+    max-width: 800px;
+    background: #fff;
   }
 
   .article-body .wrapper,
@@ -95,7 +103,7 @@
   }
 
   .article-body {
-    padding: 68px 0 20px;
+    padding: 20px 0;
   }
 
   .article-info {
@@ -177,14 +185,13 @@
   }
 
   .share {
-    position: fixed;
-    top: 50%;
-    left: 120px;
+    position: absolute;
+    top: 100px;
+    left: -60px;
     width: 30px;
     font-size: 22px;
     color: $theme-secondary;
     text-align: center;
-    margin-top: -117px;
 
     .article-clipboard {
       position: absolute;
@@ -219,38 +226,46 @@
   }
 
   .article-header {
-    height: 48px;
-    width: 100%;
     position: fixed;
-    z-index: 83;
+    top: -60px;
     display: flex;
+    justify-content: space-around;
+    align-items: center;
+    width: 100%;
+    height: 58px;
+    z-index: 83;
     line-height: 38px;
     padding: 0 10px;
     background-color: #fff;
     box-sizing: border-box;
     box-shadow: $shadow-tip;
     font-size: 16px;
-    top: -50px;
+    transition: .5s;
 
     h1 svg {
       color: $black-text;
       vertical-align: baseline;
-      height: 48px;
-      width: 48px;
+      height: 38px;
+      width: 38px;
     }
 
     h2 {
       font-size: 24px;
       line-height: 48px;
       font-weight: normal;
-      flex: 1;
+      //flex: 1;
       margin: 0 20px;
       transition: margin 1s cubic-bezier(0, 0, 0.2, 1);
     }
-
+    .user-nav{
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: nowrap;
+    }
     .user-nav > span,
     .user-nav > a {
-      float: left;
+      white-space: nowrap;
       padding: 16px 10px;
       line-height: 16px;
       height: 16px;
@@ -275,12 +290,13 @@
 
   #articleToC {
     position: fixed;
-    top: 50px;
+    top: 80px;
     width: 20%;
     z-index: 0;
     right: 0;
     height: 100%;
     border-radius: 0;
+    background: none;
 
     .module-panel {
       overflow: auto;
@@ -564,6 +580,11 @@ label.cmt-anonymous {
 
   .comment {
     margin: 5px 0;
+  }
+
+  .comment img:not(.emoji) {
+    max-width: 150px;
+    max-height: 300px;
   }
 
   .comment > p:last-child {
@@ -1337,6 +1358,7 @@ code .dec {
         align-items: center;
         border-radius: 20px 20px 5px 5px;
         box-shadow: 0 2px 4px rgb(0 0 0 / 50%);
+        transition: all .15s ease-in-out;
         .calendar-head {
           height: 33%;
           font-size: 13px;
@@ -2133,7 +2155,7 @@ code .dec {
   animation-name: scale-in;
   -webkit-animation-timing-function: cubic-bezier(0.2, 0, 0.13, 1.5);
   animation-timing-function: cubic-bezier(0.2, 0, 0.13, 1.5);
-  width: 360px;
+  width: 400px;
   box-shadow: 0 3px 12px rgba(27, 31, 35, 0.15);
   background-color: var(--layer-background-color);
   min-height: 50px;
@@ -2677,7 +2699,7 @@ code .dec {
 .showList {
   display: block;
   &#emojiList{
-    bottom: 60px;
+    top: 360px;
   }
 }
 
@@ -2699,15 +2721,18 @@ code .dec {
   border-radius: 3px;
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
   margin: 0px 5px 10px 5px;
+  transition: all .15s ease-in-out;
+}
+
+.TGIF__item:hover {
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.2);
 }
 
 .index-full-size {
-  background-color: rgba(12, 0, 103, 0.7);
   height: 120px;
   border-radius: 10px;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
   margin-bottom: 30px;
-  color: #ffffff;
+  color: #000000;
   font-family: "Ma Shan Zheng", cursive;
   cursor: default;
 }

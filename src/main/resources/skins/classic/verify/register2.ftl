@@ -51,6 +51,12 @@
                              <svg><use xlink:href="#locked"></use></svg>
                              <input type="password" id="registerConfirmPassword2" placeholder="${userPasswordLabel2}" />
                         </div>
+                        <div class="input-wrap">
+                            <svg><use xlink:href="#mbti"></use></svg>
+                            <input type="text" id="mbtiReg" placeholder="(选填) MBTI" />
+                            <label>MBTI填写示例：<b>ENTP ENFP-A ENTP-T ISTJ ISFJ-A ISTJ-T</b><br>
+                                <a href="https://www.16personalities.com/ch" target="_blank">什么是MBTI？</a></label>
+                        </div>
                         <div class="fn-clear">
                             <label>${roleLabel}</label>
                             <label>&nbsp;&nbsp;&nbsp;&nbsp;<input name="userAppRole" type="radio" value="0" checked="checked" />&nbsp;&nbsp;${programmerLabel}</label>

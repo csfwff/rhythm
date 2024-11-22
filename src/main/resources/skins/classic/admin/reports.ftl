@@ -23,7 +23,7 @@
 <@admin "reports">
 <div class="content admin">
     <div class="module list">
-        <ul class="notification">
+        <ul class="notification" style="padding: 15px">
             <#list reports as item>
                 <li class="<#if item.reportHandled != 0>read</#if>">
                     <div class="fn-flex">

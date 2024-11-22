@@ -27,26 +27,17 @@
         </div>
         <br>
         <div>
-            技术支持
-        </div>
-        <div>
-            <a href="mailto:chenhui@admin.fishpi.cn" target="_blank">chenhui@admin.fishpi.cn</a>
-        </div>
-        <br>
-        <div>
             摸鱼好站
         </div>
         <div>
             <a target="_blank" href="https://www.cxy521.com/">程序员导航</a><br>
             <a target="_blank" href="https://www.lundao.pub/">论道社区</a><br>
-            <a target="_blank" href="https://xyears.cn/">十年之约论坛</a><br>
-            <a target="_blank" href="https://www.tsyvps.com/aff/HEHTPGYL">蓝易云</a><br>
             <a target="_blank" href="https://bbs.tampermonkey.net.cn/">油猴中文网</a>
         </div>
         <div class="fn-hr5"></div>
         <div style="margin-top: 5px">
             <div>探索</div>
-            <a href="https://github.com/csfwff/rhythm" target="_blank">Rhythm 社区引擎</a><br>
+            <a href="https://github.com/orgs/FishPiOffical/repositories" target="_blank">摸鱼派开源项目</a><br>
             <a href="${servePath}/logs" target="_blank">日志公开</a>
         </div>
         <div class="fn-hr5"></div>
@@ -64,23 +55,38 @@
             </div>
         </div>
         <div class="fn-hr5"></div>
-        <div style="margin-top: 5px">
-            <a href="https://fishpi.cn/article/1655691776330" target="_blank"><svg style="vertical-align: -2px;"><use xlink:href="#ic-wechat"></use></svg> 官方微信群</a>
-        </div>
-        <div class="fn-hr5"></div>
+        <br>
         <div class="ft-smaller" style="display: inline-block">
-            <div onclick="window.open('https://www.tsyvps.com/aff/HEHTPGYL')" style="text-align: center;padding: 8px 0px;color: #0f8cee;background-color: #282727;line-height: 20px;border-radius: 12px;width: 175px;margin-bottom: 15px;cursor: pointer;">
+            <div onclick="window.open('https://www.tsyvps.com/')" style="text-align: center;padding: 8px 0px;color: #0f8cee;background-color: #e3f9fd;line-height: 20px;border-radius: 12px;width: 175px;margin-bottom: 15px;cursor: pointer;">
+                <div>
+                    <img style="vertical-align:-3px;width: 14px;height: 14px;" src="https://file.fishpi.cn/2024/11/lanyiyun-e749f98f.png">&nbsp;&nbsp;<span style="font-weight: 600">CDN由蓝易云支持</span><br>
+                    <span style="color: #323232;">性价比主机，高防 CDN</span>
+                </div>
+            </div>
+        </div>
+        <br>
+        <div class="ft-smaller" style="display: inline-block">
+            <div onclick="window.open('https://www.asiayun.com/')" style="text-align: center;padding: 8px 0px;color: #ff6000;background-color: #ffefc3c9;line-height: 20px;border-radius: 12px;width: 175px;margin-bottom: 15px;cursor: pointer;">
+                <div>
+                    <img style="vertical-align:-3px;width: 14px;height: 14px;" src="https://file.fishpi.cn/2024/11/asiayun-d4fdb0f6.png">&nbsp;&nbsp;<span style="font-weight: 600">云集群由亚洲云支持</span><br>
+                    <span style="color: #323232;">亚洲云，安全可靠的云服务</span>
+                </div>
+            </div>
+        </div>
+        <br>
+        <div class="ft-smaller" style="display: inline-block">
+            <div onclick="window.open('http://zhuayuya.com/')" style="text-align: center;padding: 8px 0px;color: #39b362;background-color: #d9ffcfc9;line-height: 20px;border-radius: 12px;width: 175px;margin-bottom: 15px;cursor: pointer;">
                 <div>
                     <svg style="vertical-align: -2px;">
-                        <use xlink:href="#shield"></use>
-                    </svg>&nbsp;&nbsp;防火墙由蓝易云支持<br>
-                    <span style="color: #cdcdcd;">性价比主机，高防 CDN</span>
+                        <use xlink:href="#zyy"></use>
+                    </svg>&nbsp;&nbsp;<span style="font-weight: 600">抓鱼鸭 - 新标签页</span><br>
+                    <span style="color: #323232;">是一个有趣的新标签页</span>
                 </div>
             </div>
         </div>
         <div class="fn-hr5"></div>
         <div class="ft-smaller" style="padding: 10px 15px 0 15px">
-            Copyright © 2021 - 2023 W&P Tech. All Rights Reserved. 北京白与画科技有限公司 版权所有
+            Copyright © 2021 - 2024 W&P Tech. All Rights Reserved. 北京白与画科技有限公司 版权所有
         </div>
         <br>
     </div>
@@ -125,8 +131,9 @@
     currentUserName: '${currentUser.userName}',
     </#if>
     <#if csrfToken??>
-    csrfToken: '${csrfToken}'
+    csrfToken: '${csrfToken}',
     </#if>
+    staticResourceVersion: '${staticResourceVersion}',
   }
   Util.init(${isLoggedIn?c})
 

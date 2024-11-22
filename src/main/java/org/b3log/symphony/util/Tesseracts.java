@@ -22,6 +22,7 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.b3log.latke.util.Execs;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -44,7 +45,12 @@ public final class Tesseracts {
     public static String recognizeCharacter(final String imagePath) {
         try {
             Execs.exec(new String[]{"sh", "-c", "tesseract " + imagePath + " " + imagePath + " -l chi_sim --psm 8"}, 1000 * 3);
-            return StringUtils.trim(IOUtils.toString(new FileInputStream(imagePath + ".txt"), StandardCharsets.UTF_8));
+            String result = StringUtils.trim(IOUtils.toString(new FileInputStream(imagePath + ".txt"), StandardCharsets.UTF_8));
+            File temp1 = new File(imagePath + ".txt");
+            if (temp1.exists()) {
+                temp1.delete();
+            }
+            return result;
         } catch (final IOException e) {
             return "";
         }

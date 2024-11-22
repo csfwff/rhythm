@@ -155,6 +155,7 @@ public class CommentNotifier extends AbstractEventListener<JSONObject> {
                 commenter = userQueryService.getAnonymousUser();
             }
             final String commenterName = commenter.optString(User.USER_NAME);
+            final String commenterNickName = commenter.optString(UserExt.USER_NICKNAME);
 
             // 0. Data channel (WebSocket)
             final JSONObject chData = JSONs.clone(originalComment);
@@ -203,6 +204,7 @@ public class CommentNotifier extends AbstractEventListener<JSONObject> {
 
 
             chData.put(Comment.COMMENT_T_AUTHOR_NAME, commenterName);
+            chData.put("commentAuthorNickName", commenterNickName);
             chData.put(Comment.COMMENT_T_AUTHOR_THUMBNAIL_URL, avatarQueryService.getAvatarURLByUser(commenter, "48"));
 
 

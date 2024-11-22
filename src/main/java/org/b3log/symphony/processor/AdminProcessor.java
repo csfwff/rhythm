@@ -18,6 +18,14 @@
  */
 package org.b3log.symphony.processor;
 
+import com.alibaba.fastjson.JSON;
+import com.qiniu.cdn.CdnManager;
+import com.qiniu.cdn.CdnResult;
+import com.qiniu.storage.BucketManager;
+import com.qiniu.storage.Configuration;
+import com.qiniu.storage.Region;
+import com.qiniu.storage.UploadManager;
+import com.qiniu.util.Auth;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.math.RandomUtils;
@@ -38,6 +46,10 @@ import org.b3log.latke.ioc.Inject;
 import org.b3log.latke.ioc.Singleton;
 import org.b3log.latke.model.Pagination;
 import org.b3log.latke.model.User;
+import org.b3log.latke.repository.Query;
+import org.b3log.latke.repository.RepositoryException;
+import org.b3log.latke.repository.SortDirection;
+import org.b3log.latke.repository.Transaction;
 import org.b3log.latke.service.LangPropsService;
 import org.b3log.latke.service.ServiceException;
 import org.b3log.latke.util.CollectionUtils;
@@ -47,19 +59,26 @@ import org.b3log.latke.util.Strings;
 import org.b3log.symphony.event.ArticleBaiduSender;
 import org.b3log.symphony.model.*;
 import org.b3log.symphony.processor.bot.ChatRoomBot;
-import org.b3log.symphony.processor.channel.UserChannel;
+import org.b3log.symphony.processor.channel.*;
 import org.b3log.symphony.processor.middleware.LoginCheckMidware;
 import org.b3log.symphony.processor.middleware.PermissionMidware;
 import org.b3log.symphony.processor.middleware.validate.UserRegister2ValidationMidware;
 import org.b3log.symphony.processor.middleware.validate.UserRegisterValidationMidware;
 import org.b3log.symphony.repository.ReportRepository;
+import org.b3log.symphony.repository.SystemSettingsRepository;
+import org.b3log.symphony.repository.UploadRepository;
 import org.b3log.symphony.service.*;
 import org.b3log.symphony.util.*;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import java.lang.reflect.Array;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.text.ParseException;
 import java.util.*;
+
+import static org.b3log.symphony.util.Symphonys.QN_ENABLED;
 
 /**
  * Admin processor.
@@ -325,6 +344,15 @@ public class AdminProcessor {
     @Inject
     private SponsorService sponsorService;
 
+    @Inject
+    private UploadRepository uploadRepository;
+
+    @Inject
+    private SystemSettingsService settingsService;
+
+    @Inject
+    private SystemSettingsRepository settingsRepository;
+
     /**
      * Register request handlers.
      */
@@ -410,6 +438,217 @@ public class AdminProcessor {
         Dispatcher.post("/admin/broadcast/warn", adminProcessor::warnBroadcast, middlewares);
         Dispatcher.get("/admin/ip", adminProcessor::showIp, middlewares);
         Dispatcher.post("/admin/ip", adminProcessor::modifyIp, middlewares);
+        Dispatcher.get("/admin/pic", adminProcessor::showPic, middlewares);
+        Dispatcher.post("/admin/pic", adminProcessor::markPic, middlewares);
+        Dispatcher.post("/admin/user/{userId}/cardBg", adminProcessor::setCardBg, middlewares);
+        Dispatcher.get("/admin/stats", adminProcessor::getStats, middlewares);
+    }
+
+    final public static ChannelStatsManager manager = new ChannelStatsManager();
+    public void getStats(final RequestContext context) {
+        JSONObject json = new JSONObject();
+        int c1 = ArticleListChannel.SESSIONS.size();
+        int c2 = ArticleChannel.SESSIONS.size();
+        int c3 = ChatChannel.SESSIONS.size();
+        int c4 = ChatroomChannel.SESSIONS.size();
+        int c5 = GobangChannel.SESSIONS.size();
+        int c6 = LogsChannel.SESSIONS.size();
+        int c7 = ShopChannel.SESSIONS.size();
+        int c8 = UserChannel.SESSIONS.size();
+
+        json.put("c1", c1);
+        json.put("c2", c2);
+        json.put("c3", c3);
+        json.put("c4", c4);
+        json.put("c5", c5);
+        json.put("c6", c6);
+        json.put("c7", c7);
+        json.put("c8", c8);
+
+        json.put("c1c", manager.getMessageCount(1));
+        json.put("c2c", manager.getMessageCount(2));
+        json.put("c3c", manager.getMessageCount(3));
+        json.put("c4c", manager.getMessageCount(4));
+        json.put("c5c", manager.getMessageCount(5));
+        json.put("c6c", manager.getMessageCount(6));
+        json.put("c7c", manager.getMessageCount(7));
+        json.put("c8c", manager.getMessageCount(8));
+
+        json.put("c1b", manager.getAverageUploadBandwidth(1));
+        json.put("c2b", manager.getAverageUploadBandwidth(2));
+        json.put("c3b", manager.getAverageUploadBandwidth(3));
+        json.put("c4b", manager.getAverageUploadBandwidth(4));
+        json.put("c5b", manager.getAverageUploadBandwidth(5));
+        json.put("c6b", manager.getAverageUploadBandwidth(6));
+        json.put("c7b", manager.getAverageUploadBandwidth(7));
+        json.put("c8b", manager.getAverageUploadBandwidth(8));
+
+        context.renderJSON(json);
+    }
+
+    public void setCardBg(final RequestContext context) {
+        final String userId = context.pathVar("userId");
+        final String cardBg = context.param("cardBg");
+        try {
+            final JSONObject settings = settingsRepository.getByUsrId(userId);
+            if (Objects.isNull(settings)) {
+                final JSONObject settingsJSON = new JSONObject();
+                settingsJSON.put("cardBg", cardBg);
+                settingsService.initSettings(userId, settingsJSON);
+            } else {
+                final String settingsStr = settings.optString(SystemSettings.SETTINGS);
+                final JSONObject settingsJSON = new JSONObject(settingsStr);
+                settingsJSON.put("cardBg", cardBg);
+                settingsService.updateSettings(settings, settingsJSON);
+            }
+        } catch (Exception ignored) {
+        }
+        context.sendRedirect(Latkes.getServePath() + "/admin/user/" + userId);
+    }
+
+    public void markPic(final RequestContext context) {
+        final Request request = context.getRequest();
+        final JSONObject user = Sessions.getUser();
+        String userId = user.optString(Keys.OBJECT_ID);
+        String uname = user.optString(User.USER_NAME);
+
+        try {
+            String type = context.param("type");
+            String oId = context.param("oId");
+            JSONObject picture = uploadRepository.get(oId);
+            String path = picture.optString("path");
+
+            if (!picture.optBoolean("public")) {
+                context.renderJSON(StatusCodes.ERR);
+                context.renderMsg("此照片已被审核过，请勿重复审核！");
+                return;
+            }
+
+            // 修改审核状态
+            JSONObject status = new JSONObject();
+            status.put("public", false);
+            Transaction transaction = uploadRepository.beginTransaction();
+            uploadRepository.update(oId, status);
+            transaction.commit();
+
+            if ("normal".equals(type)) {
+                final String transferId = pointtransferMgmtService.transfer(Pointtransfer.ID_C_SYS, userId,
+                        Pointtransfer.TRANSFER_TYPE_C_ACCOUNT2ACCOUNT, 8, oId, System.currentTimeMillis(), "参与图片审核奖励：正常图片");
+                context.renderJSON(StatusCodes.SUCC);
+                context.renderMsg("审核成功，奖励已发放！");
+                return;
+            }
+
+            // 抹除MD5
+            status = new JSONObject();
+            if ("temp".equals(type)) {
+                status.put("md5", "temp by " + uname);
+            } else if ("illegal".equals(type)) {
+                status.put("md5", "delete by " + uname);
+            }
+            transaction = uploadRepository.beginTransaction();
+            uploadRepository.update(oId, status);
+            transaction.commit();
+
+            if ("illegal".equals(type)) {
+                // 删除图片
+                if (QN_ENABLED) {
+                    Auth auth = Auth.create(Symphonys.UPLOAD_QINIU_AK, Symphonys.UPLOAD_QINIU_SK);
+                    Configuration cfg = new Configuration(Region.autoRegion());
+                    BucketManager bucketManager = new BucketManager(auth, cfg);
+                    String filename = path.replaceAll(Symphonys.UPLOAD_QINIU_DOMAIN + "/", "");
+                    LOGGER.log(Level.INFO, "Delete cdn file: " + filename);
+                    bucketManager.delete(Symphonys.UPLOAD_QINIU_BUCKET, filename);
+                    String[] urls = new String[]{path};
+                    CdnManager c = new CdnManager(auth);
+                    CdnResult.RefreshResult result = c.refreshUrls(urls);
+                    LOGGER.log(Level.INFO, "CDN Refresh result: " + result.code);
+                } else {
+                    context.renderJSON(StatusCodes.ERR);
+                    context.renderMsg("不支持操作本地图床！");
+                    return;
+                }
+            } else if ("temp".equals(type)) {
+                // 重命名图片
+                if (QN_ENABLED) {
+                    Auth auth = Auth.create(Symphonys.UPLOAD_QINIU_AK, Symphonys.UPLOAD_QINIU_SK);
+                    Configuration cfg = new Configuration(Region.autoRegion());
+                    BucketManager bucketManager = new BucketManager(auth, cfg);
+                    String filename = path.replaceAll(Symphonys.UPLOAD_QINIU_DOMAIN + "/", "");
+                    String renameTo = "fishtmp_" + filename;
+                    LOGGER.log(Level.INFO, "Rename cdn file: " + filename + " to: " + renameTo);
+                    bucketManager.rename(Symphonys.UPLOAD_QINIU_BUCKET, filename, renameTo);
+                    String[] urls = new String[]{path};
+                    CdnManager c = new CdnManager(auth);
+                    CdnResult.RefreshResult result = c.refreshUrls(urls);
+                    LOGGER.log(Level.INFO, "CDN Refresh result: " + result.code);
+                } else {
+                    context.renderJSON(StatusCodes.ERR);
+                    context.renderMsg("不支持操作本地图床！");
+                    return;
+                }
+            }
+
+            // 奖惩
+            if ("temp".equals(type)) {
+                final String transferId = pointtransferMgmtService.transfer(Pointtransfer.ID_C_SYS, userId,
+                        Pointtransfer.TRANSFER_TYPE_C_ACCOUNT2ACCOUNT, 16, oId, System.currentTimeMillis(), "参与图片审核奖励：临时图片");
+            } else if ("illegal".equals(type)) {
+                final String transferId = pointtransferMgmtService.transfer(Pointtransfer.ID_C_SYS, userId,
+                        Pointtransfer.TRANSFER_TYPE_C_ACCOUNT2ACCOUNT, 128, oId, System.currentTimeMillis(), "参与图片审核奖励：违规图片");
+
+                String picUserName = picture.optString("userName");
+                String picUserId = userQueryService.getUserByName(picUserName).optString(Keys.OBJECT_ID);
+                ChatRoomBot.sendBotMsg("犯罪嫌疑人 @" + picUserName + "  由于上传违法文件/图片，被处以 500 积分的处罚，请引以为戒。\n@" + uname + "  处理人\n@adlered  审批人");
+                ChatRoomBot.abusePoint(picUserId, 500, "机器人罚单-上传违法文件");
+            }
+            String picData = picture.toString();
+            if (picData.length() > 254) {
+                picData = picData.substring(0, 254);
+            }
+            operationMgmtService.addOperation(Operation.newOperation(request, Operation.OPERATION_CODE_C_DELETE_PICTURE, picData));
+
+            context.renderJSON(StatusCodes.SUCC);
+            context.renderMsg("审核成功，奖励已发放！");
+        } catch (Exception e) {
+            context.renderJSON(StatusCodes.ERR);
+            context.renderMsg("审核失败，原因：" + e.getCause());
+            LOGGER.error(e.getMessage(), e);
+        }
+    }
+
+    public void showPic(final RequestContext context) {
+        final Request request = context.getRequest();
+
+        final AbstractFreeMarkerRenderer renderer = new SkinRenderer(context, "admin/pic.ftl");
+        final Map<String, Object> dataModel = renderer.getDataModel();
+        final int pageNum = Paginator.getPage(request);
+        final int pageSize = 27;
+        final int windowSize = WINDOW_SIZE;
+
+        final Query query = new Query().addSort(Keys.OBJECT_ID, SortDirection.DESCENDING).setPage(pageNum, pageSize);
+        JSONObject result = new JSONObject();
+        try {
+            result = uploadRepository.get(query);
+        } catch (Exception e) {
+            LOGGER.log(Level.ERROR, "Gets uploads failed", e);
+        }
+
+        final int pageCount = result.optJSONObject(Pagination.PAGINATION).optInt(Pagination.PAGINATION_PAGE_COUNT);
+        final JSONObject pagination = new JSONObject();
+        final List<Integer> pageNums = Paginator.paginate(pageNum, pageSize, pageCount, windowSize);
+        pagination.put(Pagination.PAGINATION_PAGE_COUNT, pageCount);
+        pagination.put(Pagination.PAGINATION_PAGE_NUMS, pageNums);
+
+        dataModel.put(Pagination.PAGINATION_FIRST_PAGE_NUM, pageNums.get(0));
+        dataModel.put(Pagination.PAGINATION_LAST_PAGE_NUM, pageNums.get(pageNums.size() - 1));
+        dataModel.put(Pagination.PAGINATION_CURRENT_PAGE_NUM, pageNum);
+        dataModel.put(Pagination.PAGINATION_PAGE_COUNT, pageCount);
+        dataModel.put(Pagination.PAGINATION_PAGE_NUMS, pageNums);
+
+        dataModel.put("files", result.opt("rslts"));
+
+        dataModelService.fillHeaderAndFooter(context, dataModel);
     }
 
     public void modifyIp(final RequestContext context) {
@@ -1447,6 +1686,20 @@ public class AdminProcessor {
 
         dataModel.put("sysBag", cloudService.getBag(userId));
         dataModel.put("sysMetal", cloudService.getMetal(userId));
+
+        final JSONObject systemSettings = settingsService.getByUsrId(userId);
+        if (Objects.isNull(systemSettings)) {
+            dataModel.put("userCardBg", "");
+        } else {
+            final String settingsJson = systemSettings.optString(SystemSettings.SETTINGS);
+            final JSONObject settings = new JSONObject(settingsJson);
+            final String cardBg = settings.optString("cardBg");
+            if (StringUtils.isBlank(cardBg)) {
+                dataModel.put("userCardBg", "");
+            } else {
+                dataModel.put("userCardBg", cardBg);
+            }
+        }
 
         dataModelService.fillHeaderAndFooter(context, dataModel);
     }

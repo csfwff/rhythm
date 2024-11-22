@@ -35,6 +35,7 @@ import org.b3log.latke.util.Requests;
 import org.b3log.symphony.model.Breezemoon;
 import org.b3log.symphony.model.Common;
 import org.b3log.symphony.model.UserExt;
+import org.b3log.symphony.processor.channel.UserChannel;
 import org.b3log.symphony.processor.middleware.AnonymousViewCheckMidware;
 import org.b3log.symphony.processor.middleware.CSRFMidware;
 import org.b3log.symphony.processor.middleware.LoginCheckMidware;
@@ -48,6 +49,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 import org.jsoup.Jsoup;
 import org.jsoup.safety.Whitelist;
+import pers.adlered.simplecurrentlimiter.main.SimpleCurrentLimiter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -195,6 +197,7 @@ public class BreezemoonProcessor {
      *
      * @param context the specified context
      */
+    final private static SimpleCurrentLimiter addBreezemoonLimiter = new SimpleCurrentLimiter(60 * 60, 5);
     public void addBreezemoon(final RequestContext context) {
         context.renderJSON(StatusCodes.ERR);
 
@@ -208,6 +211,11 @@ public class BreezemoonProcessor {
         try {
             user = ApiProcessor.getUserByKey(requestJSONObject.optString("apiKey"));
         } catch (NullPointerException ignored) {
+        }
+        final String authorId = user.optString(Keys.OBJECT_ID);
+        if (!addBreezemoonLimiter.access(authorId)) {
+            context.renderJSON(StatusCodes.ERR).renderMsg("每小时只允许发送5个清风明月，稍安勿躁...");
+            return;
         }
         final String userPhone = user.optString("userPhone");
         if (userPhone.isEmpty()) {
@@ -225,7 +233,6 @@ public class BreezemoonProcessor {
             return;
         }
         breezemoon.put(Breezemoon.BREEZEMOON_CONTENT, breezemoonContent);
-        final String authorId = user.optString(Keys.OBJECT_ID);
         breezemoon.put(Breezemoon.BREEZEMOON_AUTHOR_ID, authorId);
         final String ip = Requests.getRemoteAddr(request);
         breezemoon.put(Breezemoon.BREEZEMOON_IP, ip);
@@ -241,7 +248,17 @@ public class BreezemoonProcessor {
             List<JSONObject> list = new ArrayList<>();
             list.add(breezemoonQueryService.getBreezemoon(oId));
             breezemoonQueryService.organizeBreezemoons(authorId, list);
-            context.renderData(list.get(0));
+            JSONObject data = new JSONObject();
+            data.put("breezemoonAuthorName", list.get(0).optString("breezemoonAuthorName"));
+            data.put("breezemoonAuthorThumbnailURL48", list.get(0).optString("breezemoonAuthorThumbnailURL48"));
+            data.put("breezemoonContent", list.get(0).optString("breezemoonContent"));
+            data.put("oId", list.get(0).optString("oId"));
+
+            if (UserExt.USER_XXX_STATUS_C_ENABLED == user.optInt(UserExt.USER_BREEZEMOON_STATUS)) {
+                UserChannel.sendCmdToAll(new JSONObject().put("bz", data).put("command", "bz-update"));
+            }
+
+            context.renderData(data);
             context.renderJSONValue(Keys.CODE, StatusCodes.SUCC);
         } catch (final Exception e) {
             context.renderMsg(e.getMessage());

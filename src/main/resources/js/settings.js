@@ -36,7 +36,7 @@ var Settings = {
     let pause = false;
     switch (info.type) {
       case 'LGBT 群体认证':
-        if (idCert === '' || idId === '') {
+        if (idCert === '') {
           alert('上传资料不完整，请重新上传');
           pause = true;
         }
@@ -106,16 +106,6 @@ var Settings = {
             '';
         break;
       case 'LGBT 群体认证':
-        html += '' +
-            '<div class="fn-clear" style="margin: 0 30px 20px 0; display: inline-block">\n' +
-            '    <div class="avatar-big" id="id-id"\n' +
-            '         onclick="$(\'#id-id-upload input\').click()"\n' +
-            '         style="background-image:url(https://file.fishpi.cn/id/%E6%89%8B%E6%8C%81%E8%BA%AB%E4%BB%BD%E8%AF%81%E8%87%AA%E6%8B%8D%E7%85%A7.png)"></div>\n' +
-            '</div>\n' +
-            '<form id="id-id-upload" style="display: none" method="POST" enctype="multipart/form-data">\n' +
-            '        <input type="file" name="file">\n' +
-            '</form>' +
-            '';
         html += '' +
             '<div class="fn-clear" style="margin: 0 30px 20px 0; display: inline-block">\n' +
             '    <div class="avatar-big" id="id-cert"\n' +
@@ -258,6 +248,24 @@ var Settings = {
     });
   },
   /**
+   * 加载扫码登录APP功能
+   */
+  initApiCode: function(){
+    $.ajax({
+      url: Label.servePath + '/getApiKeyInWeb',
+      type: 'GET',
+      cache: false,
+      success: function (result) {
+        if (result.apiKey !== "") {
+          $("#apiCode").append("<label><svg><use xlink:href=\"#safe\"></use></svg> 请使用官方APP扫码以登录APP </label><br><br><br>");
+          $("#apiCode").append("<p>为了保护账号安全,请勿将本二维码以任何方式分享给他人,请勿在任何地点分享此二维码内容</p>");
+          $("#apiCode").append("<br>");
+          $("#apiCode").append("<img src='https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=login:" + result.apiKey + "'/>");
+        }
+      },
+    });
+  },
+  /**
    * 初始化背包
    */
   remainCheckin: 0,
@@ -270,11 +278,14 @@ var Settings = {
     if (bag.checkin2days !== undefined && bag.checkin2days > 0) {
       html += '<button style="margin:0 5px 5px 0" onclick="Settings.use2dayCheckinCard(\'' + Label.csrfToken + '\')">两天免签卡 x' + bag.checkin2days + '</button>';
     }
-    if (bag.patchCheckinCard !== undefined && bag.patchCheckinCard > 0) {
-      html += '<button style="margin:0 5px 5px 0" onclick="Settings.usePatchCheckinCard(\'' + Label.csrfToken + '\', ' + bag.patchStart + ')">补签卡 x' + bag.patchCheckinCard + '</button>';
+    if (bag.nameCard !== undefined && bag.nameCard > 0) {
+      html += '<button style="margin:0 5px 5px 0" onclick="Settings.useNameCard(\'' + Label.csrfToken + '\')">改名卡 x' + bag.nameCard + '</button>';
     }
     if (bag.metalTicket !== undefined && bag.metalTicket > 0) {
       html += '<button style="margin:0 5px 5px 0" onclick="alert(\'您已取得摸鱼派一周年纪念勋章领取权限，请静待系统公告\')">摸鱼派一周年纪念勋章领取券 x' + bag.metalTicket + '</button>';
+    }
+    if (bag.patchCheckinCard !== undefined && bag.patchCheckinCard > 0) {
+      html += '<button style="margin:0 5px 5px 0" onclick="Settings.usePatchCheckinCard(\'' + Label.csrfToken + '\', ' + bag.patchStart + ')">补签卡 x' + bag.patchCheckinCard + '</button>';
     }
 
     // 下面内容不要变更顺序
@@ -304,7 +315,7 @@ var Settings = {
         html += '<div class="fn__flex" style="justify-content: space-between; margin-bottom: 10px">' +
             '<div>' +
             ' <label style="margin: 0 0 0 0">' +
-            '   <div><img src="' + Util.genMetal(m.name, m.attr) + '"/><br><span style="font-size: 5px">' + m.name + ' (' + m.description + ')</span></div>' +
+            '   <div><img src="' + Util.genMetal(m.name, m.attr) + '"/><br><span style="font-size: 12px">' + m.name + ' (' + m.description + ')</span></div>' +
             ' </label>' +
             ' </div>' +
             ' <div>' + btn + "</div>" +
@@ -326,6 +337,30 @@ var Settings = {
         location.reload();
       }
     });
+  },
+  /**
+   * 使用改名卡
+   * @param csrfToken
+   */
+  useNameCard: function (csrfToken) {
+    var username = prompt("请输入要修改的用户名", "");
+    if (username === null || username === "") {
+      alert("您没有输入用户名，取消使用改名卡。");
+    } else {
+      $.ajax({
+        url: Label.servePath + '/bag/nameCard',
+        type: 'POST',
+        async: false,
+        headers: {'csrfToken': csrfToken},
+        data: JSON.stringify({
+          userName: username
+        }),
+        success: function (result) {
+          alert(result.msg);
+          location.reload();
+        }
+      })
+    }
   },
   /**
    * 使用补签卡
@@ -448,6 +483,9 @@ var Settings = {
         Util.alert(result.msg)
         $('#phoneGetBtn').removeAttr('disabled').css('opacity', '1')
       },
+      error: function (result) {
+        Util.alert(result.statusText)
+      }
     })
   },
   /**
@@ -949,7 +987,7 @@ var Settings = {
         if ($("#userCardSettings").attr("bgUrl") !== undefined) {
           cardBg = $("#userCardSettings").attr("bgUrl");
         }
-        let iconURL = "https://fishpi.cn/images/favicon.png";
+        let iconURL = `https://fishpi.cn/images/favicon.png?` + Label.staticResourceVersion;
         if ($("#iconURL").data("imageurl") !== undefined && $("#iconURL").data("imageurl") !== '') {
           iconURL = $("#iconURL").data("imageurl");
         }
@@ -1088,6 +1126,12 @@ var Settings = {
           'min': 0,
           'max': 255,
           'msg': Label.invalidUserIntroLabel,
+        }, {
+          'target': $('#userMbti'),
+          'type': 'string',
+          'min': 0,
+          'max': 255,
+          'msg': '错误的MBTI长度',
         }],
     })) {
       return {
@@ -1095,6 +1139,7 @@ var Settings = {
         userTags: $('#userTags').val().replace(/(^\s*)|(\s*$)/g, ''),
         userURL: $('#userURL').val().replace(/(^\s*)|(\s*$)/g, ''),
         userIntro: $('#userIntro').val().replace(/(^\s*)|(\s*$)/g, ''),
+        mbti: $('#userMbti').val().replace(/(^\s*)|(\s*$)/g, ''),
       }
     } else {
       return false

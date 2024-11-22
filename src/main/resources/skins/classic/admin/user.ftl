@@ -391,6 +391,16 @@
                     <button type="submit" class="green fn-right btn--admin">${submitLabel}</button>
                 </div>
             </form>
+            <form action="${servePath}/admin/user/${user.oId}/cardBg" method="POST" class="fn__flex">
+                <label>
+                    <div>卡片背景</div>
+                    <input type="text" name="cardBg" value="${userCardBg}"/>
+                </label>
+                <div>
+                    &nbsp; &nbsp;
+                    <button type="submit" class="green fn-right btn--admin">${submitLabel}</button>
+                </div>
+            </form>
         </div>
     </div>
     </#if>
@@ -517,13 +527,14 @@
                 <br/>
                 <button type="submit" class="green fn-right">${submitLabel}</button>
             </form>
-            <div style="float: left;font-size: 12px;color: rgba(0,0,0,0.38);">
+            <div style="float: left;font-size: 12px;color: rgba(0,0,0,0.38);word-break: break-all">
                 当前用户背包数据：<br>
                 ${sysBag}<br>
                 可用物品名称：<br>
                 checkin1day (1日免签卡)<br>
                 checkin2days (2日免签卡)<br>
                 patchCheckinCard (补签卡)<br>
+                nameCard（改名卡）<br>
                 数量为正数时，增加；数量为负数时，减少。
             </div>
         </div>
@@ -577,22 +588,22 @@
                 <button class="btn" onclick="
                     $('#metal-name').val('纪律委员');
                     $('#metal-desc').val('摸鱼派管理组成员');
-                    $('#metal-attr').val('url=https://pwl.stackoverflow.wiki/2021/12/011shield-46ce360b.jpg&backcolor=2568ff&fontcolor=ffffff');
+                    $('#metal-attr').val('url=https://file.fishpi.cn/2021/12/011shield-46ce360b.jpg&backcolor=2568ff&fontcolor=ffffff');
                 ">纪律委员</button>
                 <button class="btn" onclick="
                     $('#metal-name').val('开发');
                     $('#metal-desc').val('摸鱼派官方开发组成员');
-                    $('#metal-attr').val('url=https://pwl.stackoverflow.wiki/2021/12/metaldev-db507262.png&backcolor=483d8b&fontcolor=f8f8ff');
+                    $('#metal-attr').val('url=https://file.fishpi.cn/2021/12/metaldev-db507262.png&backcolor=483d8b&fontcolor=f8f8ff');
                 ">开发</button>
                 <button class="btn" onclick="
                     $('#metal-name').val('Operator');
                     $('#metal-desc').val('摸鱼派管理组成员');
-                    $('#metal-attr').val('url=https://www.lingmx.com/52pj/images/op3.png&backcolor=b91c22&fontcolor=ffffff');
+                    $('#metal-attr').val('url=https://file.fishpi.cn/2023/08/op3-db4c5d4c.png&backcolor=b91c22&fontcolor=ffffff');
                 ">Operator</button>
                 <button class="btn" onclick="
                     $('#metal-name').val('超级会员');
                     $('#metal-desc').val('摸鱼派超级会籍成员');
-                    $('#metal-attr').val('url=https://pwl.stackoverflow.wiki/2021/12/vip-aff3ea5d.png&backcolor=696969&fontcolor=ffd700');
+                    $('#metal-attr').val('url=https://file.fishpi.cn/2021/12/vip-aff3ea5d.png&backcolor=696969&fontcolor=ffd700');
                 ">超级会员</button>
                 <button class="btn" onclick="
                     $('#metal-name').val('礼仪委员');

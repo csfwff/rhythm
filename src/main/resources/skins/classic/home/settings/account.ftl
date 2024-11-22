@@ -48,6 +48,16 @@
 
 <div class="module">
     <div class="module-header">
+        <h2>APP扫码登录</h2>
+    </div>
+    <div class="module-panel form fn-clear">
+        <div id="apiCode">
+        </div>
+    </div>
+</div>
+
+<div class="module">
+    <div class="module-header">
         <h2>${userNameLabel} ${updateNameTipLabel}</h2>
     </div>
     <div class="module-panel form fn-clear">
@@ -107,7 +117,9 @@
                 onclick="Settings.getPhoneCaptcha('${csrfToken}')">获取短信验证码</button>
         </span>
     </div>
+</div>
 
+<div class="module">
     <div class="module-header" id="bind-email">
         <h2>${emailLabel}</h2>
     </div>

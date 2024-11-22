@@ -246,7 +246,29 @@ public class SettingsProcessor {
         Dispatcher.get("/bag/1dayCheckin", settingsProcessor::use1dayCheckinCard, loginCheck::handle, csrfMidware::check);
         Dispatcher.get("/bag/2dayCheckin", settingsProcessor::use2dayCheckinCard, loginCheck::handle, csrfMidware::check);
         Dispatcher.get("/bag/patchCheckin", settingsProcessor::usePatchCheckinCard, loginCheck::handle, csrfMidware::check);
+        Dispatcher.post("/bag/nameCard", settingsProcessor::useNameCard, loginCheck::handle, csrfMidware::check);
+    }
 
+    /**
+     * 使用改名卡
+     */
+    public void useNameCard(final RequestContext context) {
+        JSONObject user = Sessions.getUser();
+        final String userId = user.optString(Keys.OBJECT_ID);
+        JSONObject requestJSONObject = context.requestJSON();
+        String userName = requestJSONObject.optString(User.USER_NAME);
+        if (cloudService.putBag(userId, "nameCard", -1, Integer.MAX_VALUE) == 0) {
+            try {
+                user.put(User.USER_NAME, userName);
+                userMgmtService.updateUserName(userId, user);
+                context.renderJSON(StatusCodes.SUCC);
+                context.renderMsg("您的用户名已成功修改为：" + userName);
+            } catch (ServiceException e) {
+                context.renderJSON(StatusCodes.ERR);
+                context.renderMsg("您的用户名修改失败，请重试。原因：" + e.getLocalizedMessage());
+                cloudService.putBag(userId, "nameCard", 1, Integer.MAX_VALUE);
+            }
+        }
     }
 
     /**
@@ -327,9 +349,11 @@ public class SettingsProcessor {
      *
      * @param context the specified context
      */
-    List<String> users = new ArrayList<>();
+    // List<String> users = new ArrayList<>();
     synchronized public void deactivateUser(final RequestContext context) {
         context.renderJSON(StatusCodes.ERR);
+        context.renderMsg("[Err Chk00013] 请求暂时无法处理，请稍候再试或联系管理员。");
+        /*
 
         final Response response = context.getResponse();
         JSONObject currentUser = Sessions.getUser();
@@ -358,7 +382,7 @@ public class SettingsProcessor {
         } else {
             users.add(userId);
             context.renderMsg("用户注销申请已记录，如确认要注销该用户，请再请求一次本接口，如果是测试用途，请不要再次请求本接口。");
-        }
+        }*/
     }
 
     /**
@@ -986,8 +1010,10 @@ public class SettingsProcessor {
         userIntro = Escapes.escapeHTML(userIntro);
         String userNickname = StringUtils.trim(requestJSONObject.optString(UserExt.USER_NICKNAME));
         userNickname = Escapes.escapeHTML(userNickname);
+        String mbti = checkMBTI(requestJSONObject.optString("mbti"));
 
         final JSONObject user = Sessions.getUser();
+        user.put("mbti", mbti);
         user.put(UserExt.USER_TAGS, userTags);
         user.put(User.USER_URL, userURL);
         user.put(UserExt.USER_QQ, userQQ);
@@ -1002,6 +1028,31 @@ public class SettingsProcessor {
         } catch (final ServiceException e) {
             context.renderMsg(e.getMessage());
         }
+    }
+
+    public static String checkMBTI(String mbti) {
+        List<String> mbtiLeftArray = Arrays.asList("INTJ", "INTP", "ENTJ", "ENTP", "INFJ", "INFP", "ENFJ", "ENFP", "ISTJ", "ISFJ", "ESTJ", "ESFJ", "ISTP", "ISFP", "ESTP", "ESFP");
+        List<String> mbtiRightArray = Arrays.asList("A", "T");
+        mbti = mbti.toUpperCase();
+        String new_mbti = "";
+        try {
+            if (!mbti.isEmpty()) {
+                if (mbti.contains("-")) {
+                    String temp_left, temp_right = "";
+                    temp_left = mbti.split("-")[0];
+                    temp_right = mbti.split("-")[1];
+                    if (mbtiLeftArray.contains(temp_left) && mbtiRightArray.contains(temp_right)) {
+                        new_mbti = temp_left + "-" + temp_right;
+                    }
+                } else {
+                    if (mbtiLeftArray.contains(mbti)) {
+                        new_mbti = mbti;
+                    }
+                }
+            }
+        } catch (Exception ignored) {
+        }
+        return new_mbti;
     }
 
     /**

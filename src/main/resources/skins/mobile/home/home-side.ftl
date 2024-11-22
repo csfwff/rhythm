@@ -34,6 +34,11 @@
                         ${privateMessageLabel}
                     </button>
                 </#if>
+                <#if user.mbti != "">
+                    <a target="_blank" style="text-decoration: none" href="https://www.16personalities.com/ch/${user.mbti[0..3]}-%E4%BA%BA%E6%A0%BC" class="tooltipped-new tooltipped__n" rel="nofollow" aria-label="TA是 ${user.mbti}">
+                        <span class="mbti"><svg style="vertical-align: -3px"><use xlink:href="#mbti"></use></svg> ${user.mbti}</span>
+                    </a>
+                </#if>
                 <#if (isLoggedIn && ("adminRole" == currentUser.userRole || currentUser.userName == user.userName)) || 0 == user.userOnlineStatus>
                     <span class="tooltipped tooltipped-n" aria-label="<#if user.userOnlineFlag>${onlineLabel}<#else>${offlineLabel}</#if>">
                         <span class="<#if user.userOnlineFlag>online<#else>offline</#if>"><#if user.userOnlineFlag>在线<#else>离线</#if></span>
@@ -56,17 +61,17 @@
                 <a href="https://fishpi.cn/article/1630575841478" target="_blank">
                     <img style="height: 26px;margin-top: 5px;" src="
                     <#if user.roleName == '管理员'>
-                    https://pwl.stackoverflow.wiki/adminRole.png
+                    https://file.fishpi.cn/adminRole.png
                     <#elseif user.roleName == 'OP'>
-                    https://pwl.stackoverflow.wiki/opRole.png
+                    https://file.fishpi.cn/opRole.png
                     <#elseif user.roleName == '纪律委员'>
-                    https://pwl.stackoverflow.wiki/policeRole.png
+                    https://file.fishpi.cn/policeRole.png
                     <#elseif user.roleName == '超级会员'>
-                    https://pwl.stackoverflow.wiki/svipRole.png
+                    https://file.fishpi.cn/svipRole.png
                     <#elseif user.roleName == '成员'>
-                    https://pwl.stackoverflow.wiki/vipRole.png
+                    https://file.fishpi.cn/vipRole.png
                     <#else>
-                    https://pwl.stackoverflow.wiki/newRole.png
+                    https://file.fishpi.cn/newRole.png
                     </#if>
                     "/>
                 </a>
@@ -91,7 +96,7 @@
         </div>
         </#if>
         <div class="user-info">
-            <span class="ft-gray">${symphonyLabel}</span>
+            <span class="ft-gray">${symphonyLabelClear}</span>
             ${user.userNo?c}
             <span class="ft-gray">${numMemberLabel}</span>, <#if 0 == user.userAppRole>${hackerLabel}<#else>${painterLabel}</#if>
         </div>

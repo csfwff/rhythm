@@ -150,7 +150,8 @@ var Verify = {
                 userAppRole: $("input[name=userAppRole]:checked").val(),
                 userPassword: calcMD5($("#registerUserPassword2").val()),
                 referral: $("#referral2").val(),
-                userId: $("#userId2").val()
+                userId: $("#userId2").val(),
+                mbti: $("#mbtiReg").val()
             };
 
             let args = "";

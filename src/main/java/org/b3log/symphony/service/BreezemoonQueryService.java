@@ -359,6 +359,12 @@ public class BreezemoonQueryService {
 
                 final String authorId = bm.optString(Breezemoon.BREEZEMOON_AUTHOR_ID);
                 final JSONObject author = userRepository.get(authorId);
+                try {
+                    if (author.optInt(UserExt.USER_GEO_STATUS) == UserExt.USER_GEO_STATUS_C_PRIVATE) {
+                        bm.put(Breezemoon.BREEZEMOON_CITY, "");
+                    }
+                } catch (Exception ignored) {
+                }
                 if (UserExt.USER_XXX_STATUS_C_DISABLED == author.optInt(UserExt.USER_BREEZEMOON_STATUS)
                         && !StringUtils.equals(currentUserId, authorId) && !"admin".equals(currentUserId)) {
                     iterator.remove();

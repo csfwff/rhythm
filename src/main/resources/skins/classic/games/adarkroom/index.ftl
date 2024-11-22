@@ -36,21 +36,21 @@
 		<title>A Dark Room</title>
 	</#if>
 	<meta itemprop="description" name="description" property="og:description" content="A minimalist text adventure">
-	<meta itemprop="image" property="og:image" content="https://pwl.stackoverflow.wiki/adarkroom/img/adr.png" />
+	<meta itemprop="image" property="og:image" content="https://file.fishpi.cn/adarkroom/img/adr.png" />
 	<meta itemprop="name" property="og:title" content="A Dark Room" />
-	<link rel="shortcut icon" href="https://pwl.stackoverflow.wiki/adarkroom/favicon.ico" />
-	<link rel="image_src" href="https://pwl.stackoverflow.wiki/adarkroom/img/adr.png" />
+	<link rel="shortcut icon" href="https://file.fishpi.cn/adarkroom/favicon.ico" />
+	<link rel="image_src" href="https://file.fishpi.cn/adarkroom/img/adr.png" />
 	<script>
 		var servePath = "${servePath}";
 	</script>
-	<script src="https://pwl.stackoverflow.wiki/adarkroom/lib/jquery.min.js"></script>
-	<script src="https://pwl.stackoverflow.wiki/adarkroom/lib/jquery.color-2.1.2.min.js"></script>
-	<script src="https://pwl.stackoverflow.wiki/adarkroom/lib/jquery.event.move.js"></script>
-	<script src="https://pwl.stackoverflow.wiki/adarkroom/lib/jquery.event.swipe.js"></script>
-	<script src="https://pwl.stackoverflow.wiki/adarkroom/lib/base64.js"></script>
-	<script src="https://pwl.stackoverflow.wiki/adarkroom/lib/translate.js"></script>
+	<script src="https://file.fishpi.cn/adarkroom/lib/jquery.min.js"></script>
+	<script src="https://file.fishpi.cn/adarkroom/lib/jquery.color-2.1.2.min.js"></script>
+	<script src="https://file.fishpi.cn/adarkroom/lib/jquery.event.move.js"></script>
+	<script src="https://file.fishpi.cn/adarkroom/lib/jquery.event.swipe.js"></script>
+	<script src="https://file.fishpi.cn/adarkroom/lib/base64.js"></script>
+	<script src="https://file.fishpi.cn/adarkroom/lib/translate.js"></script>
 
-	<script src="https://pwl.stackoverflow.wiki/adarkroom/lang/langs.js"></script>
+	<script src="https://file.fishpi.cn/adarkroom/lang/langs.js"></script>
 
 	<script>
 		// try to read "lang" param's from url
@@ -63,34 +63,34 @@
 		}
 		// if a language different than english requested, load all translations
 		if(lang && lang != 'en'){
-			document.write('<script src="https://pwl.stackoverflow.wiki/adarkroom/lang/'+lang+'/strings.js"><\/script>');
-			document.write('<link rel="stylesheet" type="text/css" href="https://pwl.stackoverflow.wiki/adarkroom/lang/'+lang+'/main.css" \/>');
+			document.write('<script src="https://file.fishpi.cn/adarkroom/lang/'+lang+'/strings.js"><\/script>');
+			document.write('<link rel="stylesheet" type="text/css" href="https://file.fishpi.cn/adarkroom/lang/'+lang+'/main.css" \/>');
 		}
 	</script>
 
-	<script src="https://pwl.stackoverflow.wiki/adarkroom/script/Button.js"></script>
-	<script src="https://pwl.stackoverflow.wiki/adarkroom/script/audioLibrary.js"></script>
-	<script src="https://pwl.stackoverflow.wiki/adarkroom/script/audio.js"></script>
-	<script src="https://pwl.stackoverflow.wiki/adarkroom/script/engine.js"></script>
-	<script src="https://pwl.stackoverflow.wiki/adarkroom/script/state_manager.js"></script>
-	<script src="https://pwl.stackoverflow.wiki/adarkroom/script/header.js"></script>
-	<script src="https://pwl.stackoverflow.wiki/adarkroom/script/notifications.js"></script>
-	<script src="https://pwl.stackoverflow.wiki/adarkroom/script/events.js"></script>
-	<script src="https://pwl.stackoverflow.wiki/adarkroom/script/room.js"></script>
-	<script src="https://pwl.stackoverflow.wiki/adarkroom/script/outside.js"></script>
-	<script src="https://pwl.stackoverflow.wiki/adarkroom/script/world.js"></script>
-	<script src="https://pwl.stackoverflow.wiki/adarkroom/script/path.js"></script>
-	<script src="https://pwl.stackoverflow.wiki/adarkroom/script/ship.js"></script>
-	<script src="https://pwl.stackoverflow.wiki/adarkroom/script/space.js"></script>
-	<script src="https://pwl.stackoverflow.wiki/adarkroom/script/prestige.js"></script>
-	<script src="https://pwl.stackoverflow.wiki/adarkroom/script/scoring.js"></script>
+	<script src="https://file.fishpi.cn/adarkroom/script/Button.js"></script>
+	<script src="https://file.fishpi.cn/adarkroom/script/audioLibrary.js"></script>
+	<script src="https://file.fishpi.cn/adarkroom/script/audio.js"></script>
+	<script src="https://file.fishpi.cn/adarkroom/script/engine.js"></script>
+	<script src="https://file.fishpi.cn/adarkroom/script/state_manager.js"></script>
+	<script src="https://file.fishpi.cn/adarkroom/script/header.js"></script>
+	<script src="https://file.fishpi.cn/adarkroom/script/notifications.js"></script>
+	<script src="https://file.fishpi.cn/adarkroom/script/events.js"></script>
+	<script src="https://file.fishpi.cn/adarkroom/script/room.js"></script>
+	<script src="https://file.fishpi.cn/adarkroom/script/outside.js"></script>
+	<script src="https://file.fishpi.cn/adarkroom/script/world.js"></script>
+	<script src="https://file.fishpi.cn/adarkroom/script/path.js"></script>
+	<script src="https://file.fishpi.cn/adarkroom/script/ship.js"></script>
+	<script src="https://file.fishpi.cn/adarkroom/script/space.js"></script>
+	<script src="https://file.fishpi.cn/adarkroom/script/prestige.js"></script>
+	<script src="https://file.fishpi.cn/adarkroom/script/scoring.js"></script>
 	<!-- Event modules -->
-	<script src="https://pwl.stackoverflow.wiki/adarkroom/script/events/global.js"></script>
-	<script src="https://pwl.stackoverflow.wiki/adarkroom/script/events/room.js"></script>
-	<script src="https://pwl.stackoverflow.wiki/adarkroom/script/events/outside.js"></script>
-	<script src="https://pwl.stackoverflow.wiki/adarkroom/script/events/encounters.js"></script>
-  <script src="https://pwl.stackoverflow.wiki/adarkroom/script/events/setpieces.js"></script>
-  <script src="https://pwl.stackoverflow.wiki/adarkroom/script/events/marketing.js"></script>
+	<script src="https://file.fishpi.cn/adarkroom/script/events/global.js"></script>
+	<script src="https://file.fishpi.cn/adarkroom/script/events/room.js"></script>
+	<script src="https://file.fishpi.cn/adarkroom/script/events/outside.js"></script>
+	<script src="https://file.fishpi.cn/adarkroom/script/events/encounters.js"></script>
+  <script src="https://file.fishpi.cn/adarkroom/script/events/setpieces.js"></script>
+  <script src="https://file.fishpi.cn/adarkroom/script/events/marketing.js"></script>
 
 	<script type='text/javascript'>
 		var oldIE = false;
@@ -99,15 +99,15 @@
 		<script type="text/javascript">oldIE = true;</script>
 	<![endif]-->
 
-	<link rel="stylesheet" type="text/css" href="https://pwl.stackoverflow.wiki/adarkroom/css/main.css" />
-	<link rel="stylesheet" type="text/css" href="https://pwl.stackoverflow.wiki/adarkroom/css/room.css" />
-	<link rel="stylesheet" type="text/css" href="https://pwl.stackoverflow.wiki/adarkroom/css/outside.css" />
-	<link rel="stylesheet" type="text/css" href="https://pwl.stackoverflow.wiki/adarkroom/css/path.css" />
-	<link rel="stylesheet" type="text/css" href="https://pwl.stackoverflow.wiki/adarkroom/css/world.css" />
-	<link rel="stylesheet" type="text/css" href="https://pwl.stackoverflow.wiki/adarkroom/css/ship.css" />
-	<link rel="stylesheet" type="text/css" href="https://pwl.stackoverflow.wiki/adarkroom/css/space.css" />
+	<link rel="stylesheet" type="text/css" href="https://file.fishpi.cn/adarkroom/css/main.css" />
+	<link rel="stylesheet" type="text/css" href="https://file.fishpi.cn/adarkroom/css/room.css" />
+	<link rel="stylesheet" type="text/css" href="https://file.fishpi.cn/adarkroom/css/outside.css" />
+	<link rel="stylesheet" type="text/css" href="https://file.fishpi.cn/adarkroom/css/path.css" />
+	<link rel="stylesheet" type="text/css" href="https://file.fishpi.cn/adarkroom/css/world.css" />
+	<link rel="stylesheet" type="text/css" href="https://file.fishpi.cn/adarkroom/css/ship.css" />
+	<link rel="stylesheet" type="text/css" href="https://file.fishpi.cn/adarkroom/css/space.css" />
 
-	<script src="https://pwl.stackoverflow.wiki/adarkroom/script/localization.js"></script>
+	<script src="https://file.fishpi.cn/adarkroom/script/localization.js"></script>
 </head>
 <body>
 	<div id="wrapper">
@@ -122,7 +122,7 @@
   </div>
   <a class="logo" href="https://fishpi.cn" alt="摸鱼派社区小游戏-作者DoubleSpeakGames.com" target="_blank" style="text-decoration: none; color: #3c4148;">
     <svg xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:cc="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:svg="http://www.w3.org/2000/svg" xmlns="http://www.w3.org/2000/svg" version="1.1" viewBox="0 0 32 32" class="logo-icon">
-		<image id="image0" width="32" height="32" x="0" y="0" href="https://pwl.stackoverflow.wiki/mplogo_128.png"/>
+		<image id="image0" width="32" height="32" x="0" y="0" href="https://file.fishpi.cn/mplogo_128.png"/>
 	</svg>
 	  <p>反作弊已启动，将记录您的游戏时间<br>摸鱼派<span style="color: #3caf36; font-weight: bold;">实时在线</span>，用户名：${currentUser.userName}</p>
   </a>

@@ -65,6 +65,7 @@
 <img itemprop="image" class="fn-none" src="${article.articleAuthorThumbnailURL210}"/>
 <p itemprop="description" class="fn-none">"${article.articlePreviewContent}"</p>
 <#include "header.ftl">
+<div class="article-container">
 <div class="article-body">
     <#if showTopAd>
         ${HeaderBannerLabel}
@@ -190,7 +191,7 @@
                         <a rel="author" href="${servePath}/member/${article.articleAuthorName}"
                            class="article__stats article__stats--a tooltipped tooltipped-e"
                            aria-label="${article.oId?number?number_to_datetime}">
-                            <span class="article__cnt">${article.articleAuthorName}</span>
+                            <span class="article__cnt"><#if article.articleAuthorNickName != "">${article.articleAuthorNickName}<#else>${article.articleAuthorName}</#if></span>
                             <time>${article.timeAgo}</time>
                             <#if 0 == article.articleAuthor.userUAStatus>
                                 <span id="articltVia" class="via" data-ua="${article.articleUA}"></span>
@@ -225,14 +226,15 @@
                                 <#if article.sysMetal != "[]">
                                     <span class="article__cnt">作者勋章</span>
                                     <#list article.sysMetal?eval as metal>
-                                        <img title="${metal.description}" src="https://fishpi.cn/gen?scale=0.79&txt=${metal.name}&${metal.attr}"/>
+                                        <img title="${metal.description}" src="https://fishpi.cn/gen?ver=0.1&scale=0.79&txt=${metal.name}&${metal.attr}"/>
                                     </#list>
                                 </#if>
                             </div>
                         </div>
                         <br>
                         <#if article.thankedCnt != 0>
-                            <br><br><br>
+                            <div class="fn-clear"></div>
+                            <br>
                             <div id="articleThanksCnt" class="article__stats usersInteracts article__stats--a">
                                 <span class="article__cnt">${article.thankedCnt}</span>
                                 <span class="fn__flex-inline">感谢&nbsp;<svg><use xlink:href="#iconHeart"></use></svg></span>
@@ -240,7 +242,8 @@
                             <br>
                         </#if>
                         <#if article.articleCommentCount != 0>
-                            <br><br><br>
+                            <div class="fn-clear"></div>
+                            <br>
                             <div class="article__stats usersInteracts article__stats--a">
                                 <span class="article__cnt">${article.articleCommentCount}</span>
                                 <span class="fn__flex-inline">${cmtLabel}&nbsp;<svg><use xlink:href="#replyIcon"></use></svg></span>
@@ -352,7 +355,7 @@
                                                 <a rel="nofollow"
                                                    href="${servePath}/member/${comment.commentAuthorName}"
                                                    class="ft-gray"><span
-                                                            class="ft-gray">${comment.commentAuthorName}</span></a>
+                                                            class="ft-gray"><#if comment.commentAuthorNickName != "">${comment.commentAuthorNickName} (${comment.commentAuthorName})<#else>${comment.commentAuthorName}</#if></span></a>
                                                 <span class="ft-fade">• ${comment.timeAgo}</span>
 
                                                 <#if comment.rewardedCnt gt 0>
@@ -367,7 +370,7 @@
                                                                                                data-ua="${comment.commentUA}"></span></#if>
                                             </span>
                                             &nbsp;<#list comment.sysMetal?eval as metal>
-                                                <img title="${metal.description}" src="https://fishpi.cn/gen?scale=0.79&txt=${metal.name}&${metal.attr}"/>
+                                                <img title="${metal.description}" src="https://fishpi.cn/gen?ver=0.1&scale=0.79&txt=${metal.name}&${metal.attr}"/>
                                             </#list>
                                             <a class="ft-a-title fn-right tooltipped tooltipped-nw"
                                                aria-label="${goCommentLabel}"
@@ -524,8 +527,8 @@
         <button onclick="Comment.report(this)" class="fn-right green">${reportLabel}</button>
     </div>
 </div>
-<#include "footer.ftl">
-<div class="share fn-none">
+
+<div class="share">
             <span id="thankArticle" aria-label="${thankLabel}"
                   class="tooltipped tooltipped-e<#if article.thanked> ft-red<#else> ft-blue</#if>"
             <#if permissions["commonThankArticle"].permissionGrant>
@@ -536,21 +539,7 @@
                 onclick="Article.permissionTip(Label.noPermissionLabel)"
                     </#if>><svg><use xlink:href="#heart"></use></svg> <span
                         class="ft-13">${article.thankedCnt}</span></span>
-    <div id="qrCode" class="fn-none"
-         data-shareurl="${servePath}${article.articlePermalink}<#if isLoggedIn>?r=${currentUser.userName}</#if>"></div>
-    <span class="tooltipped tooltipped-e" aria-label="share to wechat" data-type="wechat"><svg class="icon-wechat"><use
-                    xlink:href="#wechat"></use></svg></span>
-    <span class="tooltipped tooltipped-e" aria-label="share to weibo" data-type="weibo"><svg class="icon-weibo"><use
-                    xlink:href="#weibo"></use></svg></span>
-    <span class="tooltipped tooltipped-e" aria-label="share to twitter" data-type="twitter"><svg class="icon-twitter"><use
-                    xlink:href="#twitter"></use></svg></span>
-    <span class="tooltipped tooltipped-e" aria-label="share to google" data-type="google"><svg class="icon-google"><use
-                    xlink:href="#google"></use></svg></span>
-    <span class="tooltipped tooltipped-e" data-type="copy"
-          aria-label="${copyLabel}"
-          id="shareClipboard"><svg class="icon-link"><use xlink:href="#link"></use></svg></span>
-    <input type="text" class="article-clipboard"
-           value="${servePath}${article.articlePermalink}<#if isLoggedIn>?r=${currentUser.userName}</#if>"/>
+</div>
 </div>
 <div class="article-header">
     <h1 aria-label="${symphonyLabel}" class="tooltipped tooltipped-s">
@@ -560,7 +549,7 @@
             </svg>
         </a>
     </h1>
-    <h2 class="fn-ellipsis fn-pointer" id="bigTitle" onclick="Util.goTop()">
+    <h2 class="fn-ellipsis fn-pointer" id="bigTitle" style="transition: .5s;max-width: 600px" onclick="Util.goTop()">
         ${article.articleTitleEmojUnicode}
     </h2>
     <div class="user-nav">
@@ -649,6 +638,7 @@
     </div>
 </div>
 
+<#include "footer.ftl">
 <#if "" != article.articleToC && 3 != article.articleType>
     <div class="module" id="articleToC">
         <div class="module-panel">
@@ -788,9 +778,9 @@
         $(window).scroll(function () {
             let title = "${article.articleTitleEmojUnicode}";
             if ($(document).scrollTop() > 500) {
-                $("#bigTitle").html("");
+                $("#bigTitle").css('opacity','0');
             } else {
-                $("#bigTitle").html(title);
+                $("#bigTitle").css('opacity','1');
             }
         });
         $(".editor-bg").click(Comment._toggleReply)

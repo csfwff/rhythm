@@ -53,8 +53,8 @@
                 </div>
                 <div class="side">
                     <div class='domains-count'>
-                        Domains: <b>${domainCnt}</b><br/>
-                        Tags: <b>${tagCnt}</b>
+                        领域: <b>${domainCnt}</b><br/>
+                        标签: <b>${tagCnt}</b>
                     </div>
                     <#include "common/person-info.ftl">
                     <#if showSideAd>

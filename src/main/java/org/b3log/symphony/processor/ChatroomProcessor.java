@@ -81,8 +81,7 @@ public class ChatroomProcessor {
      */
     private static final Logger LOGGER = LogManager.getLogger(ChatroomProcessor.class);
 
-    private static final Pattern AT_USER_PATTERN = Pattern.compile("(@)([a-zA-Z0-9 ]+)");
-
+    private static final Pattern AT_USER_PATTERN = Pattern.compile("(@)([a-zA-Z0-9- ]+)");
 
     private static final String PARTICIPANTS = "participants";
 
@@ -574,7 +573,9 @@ public class ChatroomProcessor {
             } else if ("rockPaperScissors".equalsIgnoreCase(redPacket.getString("type"))) {
                 RED_PACKET_BUCKET.remove(oId);
             }
-            ChatroomChannel.notifyChat(redPacketStatus);
+            if (got == 0 || (got + 1) == count || (got + 1) % 5 == 0) {
+                ChatroomChannel.notifyChat(redPacketStatus);
+            }
         } catch (Exception e) {
             context.renderJSON(StatusCodes.ERR).renderMsg("红包非法");
             LOGGER.log(Level.ERROR, "Open Red Packet failed on ChatRoomProcessor.");
@@ -662,6 +663,9 @@ public class ChatroomProcessor {
                 legalClient.add("VSCode");
                 legalClient.add("Python");
                 legalClient.add("Golang");
+                legalClient.add("Bird");
+                legalClient.add("Dart");
+                legalClient.add("Harmony");
                 legalClient.add("Other");
                 if (legalClient.contains(client)) {
                     source = client + "/" + version;
@@ -708,6 +712,7 @@ public class ChatroomProcessor {
             String userId = currentUser.optString(Keys.OBJECT_ID);
 
             if (content.startsWith("[redpacket]") && content.endsWith("[/redpacket]")) {
+                LOGGER.log(Level.INFO, "Sent red packet [content={}], userName={}]", content, userName);
                 // 是否收税
                 Boolean collectTaxes = false;
                 // 税率
@@ -900,7 +905,69 @@ public class ChatroomProcessor {
                 } catch (Exception e) {
                     LOGGER.log(Level.INFO, "User " + userName + " failed to send a red packet.");
                 }
-            } else if (content.startsWith("[setdiscuss]") && content.endsWith("[/setdiscuss]")) {
+            }  else if (content.startsWith("[weather]") && content.endsWith("[/weather]")){
+                String weatherString = content.replaceAll("^\\[weather\\]", "").replaceAll("\\[/weather\\]$", "");
+                JSONObject weather = new JSONObject(weatherString);
+                weather.put("msgType","weather");
+                // 加活跃
+                incLiveness(userId);
+                // 聊天室内容保存到数据库
+                final Transaction transaction = chatRoomRepository.beginTransaction();
+                try {
+                    msg.put(Common.CONTENT, weather.toString());
+                    String oId = chatRoomRepository.add(new JSONObject().put("content", msg.toString()));
+                    msg.put("oId", oId);
+                } catch (RepositoryException e) {
+                    LOGGER.log(Level.ERROR, "Cannot save ChatRoom message to the database.", e);
+                }
+                transaction.commit();
+                msg = msg.put("md", msg.optString(Common.CONTENT)).put(Common.CONTENT, processMarkdown(msg.optString(Common.CONTENT)));
+                final JSONObject pushMsg = JSONs.clone(msg);
+                pushMsg.put(Common.TIME, new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(msg.optLong(Common.TIME)));
+                ChatroomChannel.notifyChat(pushMsg);
+
+                context.renderJSON(StatusCodes.SUCC);
+
+                try {
+                    final JSONObject user = userQueryService.getUser(userId);
+                    user.put(UserExt.USER_LATEST_CMT_TIME, System.currentTimeMillis());
+                    userMgmtService.updateUser(userId, user);
+                } catch (final Exception e) {
+                    LOGGER.log(Level.ERROR, "Update user latest comment time failed", e);
+                }
+
+            }  else if (content.startsWith("[music]") && content.endsWith("[/music]")){
+                String musicString = content.replaceAll("^\\[music\\]", "").replaceAll("\\[/music\\]$", "");
+                JSONObject music = new JSONObject(musicString);
+                music.put("msgType","music");
+                // 加活跃
+                incLiveness(userId);
+                // 聊天室内容保存到数据库
+                final Transaction transaction = chatRoomRepository.beginTransaction();
+                try {
+                    msg.put(Common.CONTENT, music.toString());
+                    String oId = chatRoomRepository.add(new JSONObject().put("content", msg.toString()));
+                    msg.put("oId", oId);
+                } catch (RepositoryException e) {
+                    LOGGER.log(Level.ERROR, "Cannot save ChatRoom message to the database.", e);
+                }
+                transaction.commit();
+                msg = msg.put("md", msg.optString(Common.CONTENT)).put(Common.CONTENT, processMarkdown(msg.optString(Common.CONTENT)));
+                final JSONObject pushMsg = JSONs.clone(msg);
+                pushMsg.put(Common.TIME, new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(msg.optLong(Common.TIME)));
+                ChatroomChannel.notifyChat(pushMsg);
+
+                context.renderJSON(StatusCodes.SUCC);
+
+                try {
+                    final JSONObject user = userQueryService.getUser(userId);
+                    user.put(UserExt.USER_LATEST_CMT_TIME, System.currentTimeMillis());
+                    userMgmtService.updateUser(userId, user);
+                } catch (final Exception e) {
+                    LOGGER.log(Level.ERROR, "Update user latest comment time failed", e);
+                }
+
+            }  else if (content.startsWith("[setdiscuss]") && content.endsWith("[/setdiscuss]")) {
                 // 扣钱
                 final boolean succ = null != pointtransferMgmtService.transfer(userId, Pointtransfer.ID_C_SYS,
                         Pointtransfer.TRANSFER_TYPE_C_ACTIVITY_SET_DISCUSS,
@@ -1180,7 +1247,7 @@ public class ChatroomProcessor {
                 JSONObject jsonObject = new JSONObject(content);
                 String msgType = jsonObject.optString("msgType");
                 if (!msgType.isEmpty()) {
-                    dataModel.put("raw", "{\"msg\":\"想看红包金额，想得美 :)\",\"recivers\":\"[]\",\"senderId\":\"1380013800000\",\"msgType\":\"redPacket\",\"money\":14250,\"count\":250,\"type\":\"random\",\"got\":0,\"who\":[]}");
+                    dataModel.put("raw", "{\"msg\":\"6\",\"recivers\":\"[]\",\"senderId\":\"1380013800000\",\"msgType\":\"redPacket\",\"money\":14250,\"count\":250,\"type\":\"random\",\"got\":0,\"who\":[]}");
                     return;
                 }
             } catch (Exception ignored) {
@@ -1423,7 +1490,7 @@ public class ChatroomProcessor {
     public static String processMarkdown(String content) {
         try {
             JSONObject checkContent = new JSONObject(content);
-            if (checkContent.optString("msgType").equals("redPacket")) {
+            if (checkContent.optString("msgType").equals("redPacket") || checkContent.optString("msgType").equals("weather") || checkContent.optString("msgType").equals("music")) {
                 return content;
             }
         } catch (Exception ignored) {

@@ -32,9 +32,9 @@
   <meta name="twitter:image" content="https://handle.antfu.me/og.png"/>
   <meta name="twitter:card" content="summary_large_image"/>
   <meta name="twitter:creator" content="antfu7"/>
-  <script type="module" crossorigin src="https://pwl.stackoverflow.wiki/handle/assets/index.bf23f960.js"></script>
-  <link rel="modulepreload" href="https://pwl.stackoverflow.wiki/handle/assets/vendor.1d256264.js">
-  <link rel="stylesheet" href="https://pwl.stackoverflow.wiki/handle/assets/index.84457388.css">
+  <script type="module" crossorigin src="https://file.fishpi.cn/handle/assets/index.bf23f960.js"></script>
+  <link rel="modulepreload" href="https://file.fishpi.cn/handle/assets/vendor.1d256264.js">
+  <link rel="stylesheet" href="https://file.fishpi.cn/handle/assets/index.84457388.css">
 </head>
 <body>
   <div id="app"></div>

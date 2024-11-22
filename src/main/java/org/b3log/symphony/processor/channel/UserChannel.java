@@ -32,6 +32,7 @@ import org.b3log.latke.ioc.Singleton;
 import org.b3log.latke.model.User;
 import org.b3log.symphony.model.Common;
 import org.b3log.symphony.model.UserExt;
+import org.b3log.symphony.processor.AdminProcessor;
 import org.b3log.symphony.processor.ApiProcessor;
 import org.b3log.symphony.service.UserMgmtService;
 import org.b3log.symphony.service.UserQueryService;
@@ -42,6 +43,9 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 /**
  * User channel.
@@ -185,20 +189,41 @@ public class UserChannel implements WebSocketChannel {
                 final Set<WebSocketSession> sessions = SESSIONS.get(userId);
                 for (final WebSocketSession session : sessions) {
                     session.sendText(msgStr);
+                    AdminProcessor.manager.onMessageSent(8, msgStr.length());
                 }
             }
         }
     }
 
+    private static final ThreadPoolExecutor MESSAGE_POOL = new ThreadPoolExecutor(
+            1,
+            1,
+            120L,
+            TimeUnit.SECONDS,
+            new LinkedBlockingQueue<>()
+    );
     public static void sendCmdToAll(final JSONObject message) {
         final String msgStr = message.toString();
-
-        for (final String userId : SESSIONS.keySet()) {
-            final Set<WebSocketSession> sessions = SESSIONS.get(userId);
-            for (final WebSocketSession session : sessions) {
-                session.sendText(msgStr);
+        MESSAGE_POOL.submit(() -> {
+            int i = 0;
+            for (final String userId : SESSIONS.keySet()) {
+                i++;
+                if (i % 1 == 0) {
+                    try {
+                        Thread.sleep(15);
+                    } catch (Exception ignored) {
+                    }
+                }
+                try {
+                    final Set<WebSocketSession> sessions = SESSIONS.get(userId);
+                    for (final WebSocketSession session : sessions) {
+                        session.sendText(msgStr);
+                        AdminProcessor.manager.onMessageSent(8, msgStr.length());
+                    }
+                } catch (Exception ignored) {
+                }
             }
-        }
+        });
     }
 
     /**
@@ -259,5 +284,6 @@ public class UserChannel implements WebSocketChannel {
             final UserMgmtService userMgmtService = beanManager.getReference(UserMgmtService.class);
             userMgmtService.setOnlineMinute(key, onlineMinute);
         }
+        LOGGER.log(Level.INFO, "Settlement user online time end");
     }
 }

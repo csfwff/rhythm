@@ -24,7 +24,7 @@
     Version: 1.0.0.0, Jan 16, 2020
     Author: Liang Ding
 -->
-<Configuration status="WARN">
+<Configuration status="WARN" shutdownHook="disable">
     <Appenders>
         <Console name="Console" target="SYSTEM_OUT">
             <PatternLayout>
