@@ -19,6 +19,16 @@
 var Chat = {
     page: 1,
     toUser: '',
+    throttle (func, delay) {
+        let lastRun = 0; // 上一次触发的时间戳
+        return function (...args) {
+            const now = Date.now();
+            if (now - lastRun >= delay) {
+                lastRun = now;
+                func.apply(this, args);
+            }
+        };
+    },
     init: function (to) {
         let reqRecentList;
         let toUser;
@@ -230,14 +240,15 @@ var Chat = {
                     Chat.loadMore();
                     // 监听滑动
                     $(window).scroll(
-                        function () {
-                            var scrollTop = $(this).scrollTop();
-                            var scrollHeight = $(document).height();
-                            var windowHeight = $(this).height();
+                        Chat.throttle(function () {
+                            const scrollTop = $(this).scrollTop();
+                            const scrollHeight = $(document).height();
+                            const windowHeight = $(this).height();
+
                             if (scrollTop + windowHeight + 500 >= scrollHeight) {
                                 Chat.loadMore();
                             }
-                        }
+                        }, 200) // 每 200ms 执行一次
                     );
                     // 用户已读
                     $.ajax({
@@ -263,7 +274,8 @@ var Chat = {
         });
     },
 
-    startAChat() {
+
+    startAChat () {
         let input = $("#chatWithInput").val();
         if (input !== '') {
             Chat.init(input);
@@ -272,7 +284,7 @@ var Chat = {
 
     noMore: false,
     moreLock: false,
-    loadMore() {
+    loadMore () {
         if (!Chat.moreLock) {
             Chat.moreLock = true;
             if (!Chat.noMore) {
@@ -318,7 +330,7 @@ var Chat = {
         }
     },
 
-    send() {
+    send () {
         let content = Chat.editor.getValue();
         if (content.length > 1024) {
             $('#chatContentTip').addClass('error').html('<ul><li>发送失败：超过 1024 字符，请修改后重试。</li></ul>');
@@ -328,7 +340,7 @@ var Chat = {
         }
     },
 
-    addToMessageList(userName, avatarURL, preview, isOnline) {
+    addToMessageList (userName, avatarURL, preview, isOnline) {
         let dot = preview.length > 10 ? "..." : "";
         let status = isOnline ? '[在线]' : '[离线]';
         $("#chatMessageList").append('' +
@@ -341,7 +353,7 @@ var Chat = {
             '            ' + userName + '<br>\n' +
             '            <span style="color: #868888">' + preview.substring(0, 10) + dot + '</span>\n' +
             '        </div>\n' +
-            '        <div style="float: right;display: inline-block; color: #868888">'+ status + '</div>\n'+
+            '        <div style="float: right;display: inline-block; color: #868888">' + status + '</div>\n' +
             '    </nav>\n' +
             '</div>');
         if ($("#messageListPanel").css("display") === "none") {
@@ -349,7 +361,7 @@ var Chat = {
         }
     },
 
-    addSelfMsg(oId, userName, avatarURL, content, time, reverse) {
+    addSelfMsg (oId, userName, avatarURL, content, time, reverse) {
         let m = '';
         try {
             // 判断是否可以收藏为表情包
@@ -432,7 +444,7 @@ var Chat = {
         Util.listenUserCard();
     },
 
-    addTargetMsg(oId, userName, avatarURL, content, time, reverse) {
+    addTargetMsg (oId, userName, avatarURL, content, time, reverse) {
         let menu = true;
         let addMenu = '<span class="fn__space5"></span>' +
             '<details class="details action__item fn__flex-center">\n' +
@@ -465,7 +477,7 @@ var Chat = {
         } catch (err) {
         }
         addMenu += '<a onclick=\"Chat.at(\'' + userName + '\', \'' + oId + '\')\" class="item">引用</a>\n';
-        addMenu +=  '</details-menu>\n</details>';
+        addMenu += '</details-menu>\n</details>';
 
         let m = '';
         if (menu) {
@@ -510,7 +522,7 @@ var Chat = {
         Util.listenUserCard();
     },
 
-    revoke(oId) {
+    revoke (oId) {
         $.ajax({
             url: Label.servePath + "/chat/revoke?apiKey=" + apiKey + "&oId=" + oId,
             type: "GET",
@@ -518,7 +530,7 @@ var Chat = {
         });
     },
 
-    markAllAsRead() {
+    markAllAsRead () {
         $.ajax({
             url: Label.servePath + "/chat/mark-all-as-read?apiKey=" + apiKey,
             type: "GET",
@@ -554,9 +566,9 @@ var Chat = {
      * 加载表情
      */
     loadEmojis: function () {
-        let emojis = Chat.getEmojis(),html="";
+        let emojis = Chat.getEmojis(), html = "";
         for (let i = 0; i < emojis.length; i++) {
-            html+=`<button onclick="Chat.editor.setValue(Chat.editor.getValue() + '![图片表情](${emojis[i]})')">
+            html += `<button onclick="Chat.editor.setValue(Chat.editor.getValue() + '![图片表情](${emojis[i]})')">
     <div class="divX"><svg onclick='Chat.delEmoji("${emojis[i]}");event.cancelBubble =true;' style="width: 15px; height: 15px;"><use xlink:href="#delIcon"></use></svg></div>
     <img style='max-height: 50px' class="vditor-emojis__icon" src="${emojis[i]}">
 </button>`;
@@ -585,7 +597,7 @@ var Chat = {
                     gameId: "emojis",
                     data: emojis
                 }),
-                headers: {'csrfToken': Label.csrfToken},
+                headers: { 'csrfToken': Label.csrfToken },
                 async: false,
                 success: function (result) {
                     if (result.code === 0) {
@@ -678,7 +690,7 @@ var Chat = {
             "", "从URL导入表情包");
         $("#fromURL").focus();
         $("#fromURL").unbind();
-        $("#fromURL").bind('keypress',function(event){
+        $("#fromURL").bind('keypress', function (event) {
             if (event.keyCode == "13") {
                 Chat.addEmoji($("#fromURL").val());
                 Util.closeAlert();
@@ -703,7 +715,7 @@ var Chat = {
                     gameId: "emojis",
                     data: emojis
                 }),
-                headers: {'csrfToken': Label.csrfToken},
+                headers: { 'csrfToken': Label.csrfToken },
                 async: false,
                 success: function (result) {
                     if (result.code !== 0) {
@@ -727,7 +739,7 @@ var Chat = {
             data: JSON.stringify({
                 gameId: "emojis",
             }),
-            headers: {'csrfToken': Label.csrfToken},
+            headers: { 'csrfToken': Label.csrfToken },
             async: false,
             success: function (result) {
                 if (result.code === 0 && result.data !== "") {
@@ -742,7 +754,7 @@ var Chat = {
     }
 }
 
-function getQueryVariable(variable) {
+function getQueryVariable (variable) {
     var query = window.location.search.substring(1);
     var vars = query.split("&");
     for (var i = 0; i < vars.length; i++) {
@@ -786,7 +798,7 @@ $(document).ready(function () {
         }
     });
     $("#goToTop a").click(function () {
-        $("html,body").animate({scrollTop: 0}, 800);
+        $("html,body").animate({ scrollTop: 0 }, 800);
         return false;
     });
     $("body").click(function () {
@@ -798,33 +810,33 @@ $(document).ready(function () {
     Chat.loadEmojis();
     // 监听表情包按钮
 
-    (()=>{
-        let time_out=new Date().getTime(),timeoutId=0
-        const closeEmoji=function () {
-            if(timeoutId!==0){
+    (() => {
+        let time_out = new Date().getTime(), timeoutId = 0
+        const closeEmoji = function () {
+            if (timeoutId !== 0) {
                 clearTimeout(timeoutId)
-                timeoutId=0
+                timeoutId = 0
             }
-            time_out=new Date().getTime()
-            timeoutId=setTimeout(()=>{
-                new Date().getTime()-time_out<=700&&$("#emojiList").removeClass("showList")
-            },navigator.userAgent.match(/(phone|pad|pod|ios|Android|Mobile|BlackBerry|MQQBrowser|JUC|Fennec|wOSBrowser|BrowserNG|WebOS|Symbian)/i)!==null?0:600)
+            time_out = new Date().getTime()
+            timeoutId = setTimeout(() => {
+                new Date().getTime() - time_out <= 700 && $("#emojiList").removeClass("showList")
+            }, navigator.userAgent.match(/(phone|pad|pod|ios|Android|Mobile|BlackBerry|MQQBrowser|JUC|Fennec|wOSBrowser|BrowserNG|WebOS|Symbian)/i) !== null ? 0 : 600)
         }
-        $("#emojiBtn").hover(function (){
-            if(timeoutId!==0){
+        $("#emojiBtn").hover(function () {
+            if (timeoutId !== 0) {
                 clearTimeout(timeoutId)
-                timeoutId=0
+                timeoutId = 0
             }
-            $('#emojiList').css('top','350px')
-            time_out=new Date().getTime()
-            setTimeout(()=>0!==$("#emojiBtn:hover").length&&$("#emojiList").addClass("showList"),300)
-        },closeEmoji)
+            $('#emojiList').css('top', '350px')
+            time_out = new Date().getTime()
+            setTimeout(() => 0 !== $("#emojiBtn:hover").length && $("#emojiList").addClass("showList"), 300)
+        }, closeEmoji)
         $("#emojiList").hover(function () {
-            if(timeoutId!==0){
+            if (timeoutId !== 0) {
                 clearTimeout(timeoutId)
-                timeoutId=0
+                timeoutId = 0
             }
-            time_out=new Date().getTime()
-        },closeEmoji)
+            time_out = new Date().getTime()
+        }, closeEmoji)
     })()
 });
