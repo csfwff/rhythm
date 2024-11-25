@@ -109,7 +109,7 @@
     <button onclick="window.location.replace('${forwardURL}')">确定</button>
 </div>
 <div>
-    <a href="https://github.com/csfwff/rhythm">GitHub</a> &nbsp;
+    <a href="https://github.com/FishPiOffical/rhythm">GitHub</a> &nbsp;
     <a href="https://programmingwithlove.stackoverflow.wiki" target="_blank" rel="noopener">用爱发电</a>
 </div>
 <script>
