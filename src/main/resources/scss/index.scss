@@ -58,7 +58,7 @@
   width: 100%;
   box-sizing: border-box;
   margin-bottom: 20px;
-  box-shadow: 0px 0px 2px rgba(98,124,153,.1);
+  box-shadow: 0px 0px 2px rgba(98, 124, 153, .1);
 }
 
 .domains-module {
@@ -80,12 +80,13 @@
 /* start article */
 .article {
   padding-top: 60px;
+
   .nav {
     position: fixed;
     top: 0;
   }
 
-  .article-container{
+  .article-container {
     position: relative;
     margin: 20px auto 20px;
     max-width: 800px;
@@ -137,36 +138,36 @@
   #articleRewardContent {
     padding: 15px 15px 41px 15px;
     background-image: -webkit-gradient(
-      linear,
-      0 0,
-      100% 100%,
-      color-stop(0.25, rgba(255, 255, 255, 0.9)),
-      color-stop(0.25, transparent),
-      color-stop(0.5, transparent),
-      color-stop(0.5, rgba(255, 255, 255, 0.9)),
-      color-stop(0.75, rgba(255, 255, 255, 0.9)),
-      color-stop(0.75, transparent),
-      to(transparent)
+                    linear,
+                    0 0,
+                    100% 100%,
+                    color-stop(0.25, rgba(255, 255, 255, 0.9)),
+                    color-stop(0.25, transparent),
+                    color-stop(0.5, transparent),
+                    color-stop(0.5, rgba(255, 255, 255, 0.9)),
+                    color-stop(0.75, rgba(255, 255, 255, 0.9)),
+                    color-stop(0.75, transparent),
+                    to(transparent)
     );
     background-image: -o-linear-gradient(
-      -45deg,
-      rgba(255, 255, 255, 0.9) 25%,
-      transparent 25%,
-      transparent 50%,
-      rgba(255, 255, 255, 0.9) 50%,
-      rgba(255, 255, 255, 0.9) 75%,
-      transparent 75%,
-      transparent
+                    -45deg,
+                    rgba(255, 255, 255, 0.9) 25%,
+                    transparent 25%,
+                    transparent 50%,
+                    rgba(255, 255, 255, 0.9) 50%,
+                    rgba(255, 255, 255, 0.9) 75%,
+                    transparent 75%,
+                    transparent
     );
     background-image: linear-gradient(
-      -45deg,
-      rgba(255, 255, 255, 0.9) 25%,
-      transparent 25%,
-      transparent 50%,
-      rgba(255, 255, 255, 0.9) 50%,
-      rgba(255, 255, 255, 0.9) 75%,
-      transparent 75%,
-      transparent
+                    -45deg,
+                    rgba(255, 255, 255, 0.9) 25%,
+                    transparent 25%,
+                    transparent 50%,
+                    rgba(255, 255, 255, 0.9) 50%,
+                    rgba(255, 255, 255, 0.9) 75%,
+                    transparent 75%,
+                    transparent
     );
     background-color: #f7f7f7;
     background-size: 45px 45px;
@@ -257,12 +258,14 @@
       margin: 0 20px;
       transition: margin 1s cubic-bezier(0, 0, 0.2, 1);
     }
-    .user-nav{
+
+    .user-nav {
       display: flex;
       justify-content: space-between;
       align-items: center;
       flex-wrap: nowrap;
     }
+
     .user-nav > span,
     .user-nav > a {
       white-space: nowrap;
@@ -418,9 +421,11 @@
       box-sizing: border-box;
       width: 100%;
       max-width: initial;
-      #commentContent{
+
+      #commentContent {
         max-height: 600px;
       }
+
       .comment-submit {
         display: flex;
         align-items: center;
@@ -476,7 +481,8 @@
 
 label.cmt-anonymous {
   margin: 0 9px;
-  input{
+
+  input {
     margin-left: 4px;
   }
 }
@@ -529,36 +535,36 @@ label.cmt-anonymous {
 
   .list > ul > li.cmt-shield-shield {
     background-image: -webkit-gradient(
-      linear,
-      0 0,
-      100% 100%,
-      color-stop(0.25, rgba(255, 255, 255, 0.9)),
-      color-stop(0.25, transparent),
-      color-stop(0.5, transparent),
-      color-stop(0.5, rgba(255, 255, 255, 0.9)),
-      color-stop(0.75, rgba(255, 255, 255, 0.9)),
-      color-stop(0.75, transparent),
-      to(transparent)
+                    linear,
+                    0 0,
+                    100% 100%,
+                    color-stop(0.25, rgba(255, 255, 255, 0.9)),
+                    color-stop(0.25, transparent),
+                    color-stop(0.5, transparent),
+                    color-stop(0.5, rgba(255, 255, 255, 0.9)),
+                    color-stop(0.75, rgba(255, 255, 255, 0.9)),
+                    color-stop(0.75, transparent),
+                    to(transparent)
     );
     background-image: -o-linear-gradient(
-      -45deg,
-      rgba(255, 255, 255, 0.9) 25%,
-      transparent 25%,
-      transparent 50%,
-      rgba(255, 255, 255, 0.9) 50%,
-      rgba(255, 255, 255, 0.9) 75%,
-      transparent 75%,
-      transparent
+                    -45deg,
+                    rgba(255, 255, 255, 0.9) 25%,
+                    transparent 25%,
+                    transparent 50%,
+                    rgba(255, 255, 255, 0.9) 50%,
+                    rgba(255, 255, 255, 0.9) 75%,
+                    transparent 75%,
+                    transparent
     );
     background-image: linear-gradient(
-      -45deg,
-      rgba(255, 255, 255, 0.9) 25%,
-      transparent 25%,
-      transparent 50%,
-      rgba(255, 255, 255, 0.9) 50%,
-      rgba(255, 255, 255, 0.9) 75%,
-      transparent 75%,
-      transparent
+                    -45deg,
+                    rgba(255, 255, 255, 0.9) 25%,
+                    transparent 25%,
+                    transparent 50%,
+                    rgba(255, 255, 255, 0.9) 50%,
+                    rgba(255, 255, 255, 0.9) 75%,
+                    transparent 75%,
+                    transparent
     );
     background-color: #f7f7f7;
     background-size: 45px 45px;
@@ -1349,6 +1355,7 @@ code .dec {
       flex-direction: column;
       justify-content: center;
       align-items: center;
+
       .canendar-body {
         height: 75%;
         width: 60%;
@@ -1359,6 +1366,7 @@ code .dec {
         border-radius: 20px 20px 5px 5px;
         box-shadow: 0 2px 4px rgb(0 0 0 / 50%);
         transition: all .15s ease-in-out;
+
         .calendar-head {
           height: 33%;
           font-size: 13px;
@@ -1371,6 +1379,7 @@ code .dec {
           justify-content: center;
           align-items: center;
         }
+
         .calendar-content {
           height: 67%;
           font-size: 80px;
@@ -1381,6 +1390,7 @@ code .dec {
           border-radius: 0 0 5px 5px;
         }
       }
+
       .canendar-body:hover {
         box-shadow: 0 5px 10px rgb(0 0 0 / 50%);
       }
@@ -1902,6 +1912,7 @@ code .dec {
 .ft-a-title:hover {
   color: var(--text-color) !important;
 }
+
 .ft-a-title {
   color: var(--layer-color) !important;
   text-decoration: none;
@@ -1910,15 +1921,19 @@ code .dec {
 .chats__users {
   overflow: auto;
 }
+
 .chats__users::-webkit-scrollbar {
   display: none;
 }
+
 .chats__input {
   margin-bottom: 15px;
 }
+
 .chats__editor {
   min-height: 160px;
 }
+
 .chats__content {
   background-color: var(--background-secondary-color);
   border-radius: 5px;
@@ -1928,9 +1943,11 @@ code .dec {
   max-width: 85%;
   box-sizing: border-box;
 }
+
 .chats__content .vditor-reset::-webkit-scrollbar {
   display: none;
 }
+
 .chats__content .language-echarts,
 .chats__content .language-mermaid,
 .chats__content .language-mindmap,
@@ -1938,13 +1955,16 @@ code .dec {
   max-width: 510px;
   border: none !important;
 }
+
 .chats__content .vditor-reset img:not(.emoji) {
   max-width: 150px;
   max-height: 300px;
 }
+
 .chats__arrow {
   position: relative;
 }
+
 .chats__arrow:after {
   position: absolute;
   width: 0;
@@ -1955,6 +1975,7 @@ code .dec {
   border: 5px solid transparent;
   border-right: 5px solid var(--background-secondary-color);
 }
+
 .chats__item .avatar {
   position: relative;
   margin-right: 0;
@@ -1987,26 +2008,26 @@ code .dec {
   top: -7px;
   width: 52px;
   height: 52px;
-  background: url("../images/festival/MidAutumnFestival.png") no-repeat center
-    center;
+  background: url("../images/festival/MidAutumnFestival.png") no-repeat center center;
   background-size: cover;
 }
 
 .SpringFestival .avatar::after {
   right: 0;
   top: 0;
-  background: url("../images/festival/SpringFestival.png") no-repeat center
-    center;
+  background: url("../images/festival/SpringFestival.png") no-repeat center center;
   background-size: cover;
 }
 
 .chats__item--me {
   flex-direction: row-reverse;
 }
+
 .chats__item--me .chats__content {
   margin: 0 15px 15px 53px;
   background-color: rgba(98, 162, 240, 0.1);
 }
+
 .chats__item--me .chats__content .chats__arrow:after {
   right: -25px;
   border-left-color: rgba(98, 162, 240, 0.1);
@@ -2252,6 +2273,7 @@ code .dec {
   background-color: hsla(0, 0%, 100%, 0.8);
   background-size: 100% 100%;
 }
+
 .user-card .avatar-mid-card::after {
   content: "";
   position: absolute;
@@ -2284,10 +2306,10 @@ code .dec {
   top: -14px;
   width: 100px;
   height: 100px;
-  background: url("../images/festival/MidAutumnFestival.png") no-repeat center
-    center;
+  background: url("../images/festival/MidAutumnFestival.png") no-repeat center center;
   background-size: cover;
 }
+
 .MidAutumnFestival .user-card.user-card--bg .avatar-mid-card::after {
   right: -14px;
   top: -14px;
@@ -2298,8 +2320,7 @@ code .dec {
 .SpringFestival .avatar-mid-card::after {
   right: 0;
   top: 0;
-  background: url("../images/festival/SpringFestival.png") no-repeat center
-    center;
+  background: url("../images/festival/SpringFestival.png") no-repeat center center;
   background-size: cover;
 }
 
@@ -2506,9 +2527,10 @@ code .dec {
   margin: 5px 0;
 }
 
-.chats__content .vditor-reset{
+.chats__content .vditor-reset {
   overflow: visible;
 }
+
 .hongbao__item {
   position: relative;
   background-color: var(--layer-background-color);
@@ -2525,7 +2547,7 @@ code .dec {
 
 }
 
-.hongbao__finger_guessing{
+.hongbao__finger_guessing {
   position: absolute;
   z-index: 128;
   top: 0;
@@ -2540,17 +2562,18 @@ code .dec {
   transition: .5s;
   box-sizing: border-box;
 }
+
 /*.hongbao__item:hover .hongbao__finger_guessing,
 .hongbao__item:active .hongbao__finger_guessing{
   opacity: 1;
   background: rgba(0,0,0,.3);
 }*/
 
-.opened .hongbao__finger_guessing{
+.opened .hongbao__finger_guessing {
   display: none;
 }
 
-.hongbao__finger_guessing_icon{
+.hongbao__finger_guessing_icon {
   position: absolute;
   right: -25px;
   width: 45px;
@@ -2559,22 +2582,25 @@ code .dec {
   border: 2px solid transparent;
   transition: .2s;
 }
-.hongbao__finger_guessing_icon:hover{
-  border-color:#5c1151;
+
+.hongbao__finger_guessing_icon:hover {
+  border-color: #5c1151;
 }
 
-.hongbao__finger_guessing_icon:nth-child(1){
+.hongbao__finger_guessing_icon:nth-child(1) {
   top: -25px;
   background: url("../images/redpacket/gesture/rock.png") no-repeat center center;
   background-size: contain;
 }
-.hongbao__finger_guessing_icon:nth-child(2){
+
+.hongbao__finger_guessing_icon:nth-child(2) {
   top: 15px;
   right: -50px;
   background: url("../images/redpacket/gesture/scissors.png") no-repeat center center;
   background-size: contain;
 }
-.hongbao__finger_guessing_icon:nth-child(3){
+
+.hongbao__finger_guessing_icon:nth-child(3) {
   top: 55px;
   background: url("../images/redpacket/gesture/paper.png") no-repeat center center;
   background-size: contain;
@@ -2698,7 +2724,8 @@ code .dec {
 
 .showList {
   display: block;
-  &#emojiList{
+
+  &#emojiList {
     top: 360px;
   }
 }
@@ -2707,6 +2734,7 @@ code .dec {
   text-align: right;
   cursor: pointer;
   height: 15px;
+
   > svg:hover {
     border: dashed red 1px;
     border-bottom-left-radius: 100px;
@@ -2746,4 +2774,31 @@ code .dec {
   color: #303049;
   font-family: "Ma Shan Zheng", cursive;
   cursor: default;
+}
+
+
+/* 扫码登录 */
+.hide-me {
+  display: none;
+}
+
+.login-qrcode-box {
+  position: relative;
+  margin: 10px;
+  text-align: center;
+
+  &.scan-ing::after {
+    content: "处理中...";
+    position: absolute;
+    top: 0;
+    left: 50%;
+    width: 150px;
+    height: 150px;
+    background: rgba(0, 0, 0, .7);
+    line-height: 150px;
+    text-align: center;
+    font-size: 16px;
+    color: #fff;
+    transform: translateX(-50%);
+  }
 }

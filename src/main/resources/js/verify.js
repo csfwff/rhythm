@@ -34,13 +34,15 @@ var Verify = {
      */
     login: function (goto) {
         goto = decodeURIComponent(goto)
-        if (Validate.goValidate({target: $('#loginTip'),
+        if (Validate.goValidate({
+            target: $('#loginTip'),
             data: [{
-                    "target": $("#nameOrEmail"),
-                    "type": "string",
-                    "max": 256,
-                    "msg": Label.loginNameErrorLabel
-                }]})) {
+                "target": $("#nameOrEmail"),
+                "type": "string",
+                "max": 256,
+                "msg": Label.loginNameErrorLabel
+            }]
+        })) {
             var requestJSONObject = {
                 nameOrEmail: $("#nameOrEmail").val().replace(/(^\s*)|(\s*$)/g, ""),
                 userPassword: calcMD5($("#loginPassword").val()),
@@ -63,11 +65,11 @@ var Verify = {
                         if (result.needCaptcha && "" !== result.needCaptcha) {
                             $('#captchaImg').parent().show();
                             $("#captchaImg").attr("src", Label.servePath + "/captcha/login?needCaptcha="
-                                    + result.needCaptcha + "&t=" + Math.random())
-                                    .click(function () {
-                                        $(this).attr('src', Label.servePath + "/captcha/login?needCaptcha="
-                                                + result.needCaptcha + "&t=" + Math.random())
-                                    });
+                                + result.needCaptcha + "&t=" + Math.random())
+                                .click(function () {
+                                    $(this).attr('src', Label.servePath + "/captcha/login?needCaptcha="
+                                        + result.needCaptcha + "&t=" + Math.random())
+                                });
                         }
                     }
                 }
@@ -78,17 +80,19 @@ var Verify = {
      * @description Register Step 1
      */
     register: function () {
-        if (Validate.goValidate({target: $("#registerTip"),
+        if (Validate.goValidate({
+            target: $("#registerTip"),
             data: [{
-                    "target": $("#registerUserName"),
-                    "msg": Label.invalidUserNameLabel,
-                    "type": 'string',
-                    'max': 20
-                }, {
-                    "target": $("#registerUserPhone"),
-                    "msg": "手机号码不合法",
-                    "type": "phone"
-                }]})) {
+                "target": $("#registerUserName"),
+                "msg": Label.invalidUserNameLabel,
+                "type": 'string',
+                'max': 20
+            }, {
+                "target": $("#registerUserPhone"),
+                "msg": "手机号码不合法",
+                "type": "phone"
+            }]
+        })) {
             var requestJSONObject = {
                 userName: $("#registerUserName").val().replace(/(^\s*)|(\s*$)/g, ""),
                 userPhone: $("#registerUserPhone").val().replace(/(^\s*)|(\s*$)/g, ""),
@@ -134,18 +138,20 @@ var Verify = {
      * @description Register Step 2
      */
     register2: function () {
-        if (Validate.goValidate({target: $("#registerTip2"),
+        if (Validate.goValidate({
+            target: $("#registerTip2"),
             data: [{
-                    "target": $("#registerUserPassword2"),
-                    "msg": Label.invalidPasswordLabel,
-                    "type": 'password',
-                    'max': 20
-                }, {
-                    "target": $("#registerConfirmPassword2"),
-                    "original": $("#registerUserPassword2"),
-                    "msg": Label.confirmPwdErrorLabel,
-                    "type": "confirmPassword"
-                }]})) {
+                "target": $("#registerUserPassword2"),
+                "msg": Label.invalidPasswordLabel,
+                "type": 'password',
+                'max': 20
+            }, {
+                "target": $("#registerConfirmPassword2"),
+                "original": $("#registerUserPassword2"),
+                "msg": Label.confirmPwdErrorLabel,
+                "type": "confirmPassword"
+            }]
+        })) {
             var requestJSONObject = {
                 userAppRole: $("input[name=userAppRole]:checked").val(),
                 userPassword: calcMD5($("#registerUserPassword2").val()),
@@ -178,17 +184,19 @@ var Verify = {
      * @description Forget password
      */
     forgetPwd: function () {
-        if (Validate.goValidate({target: $("#fpwdTip"),
+        if (Validate.goValidate({
+            target: $("#fpwdTip"),
             data: [{
-                    "target": $("#fpwdPhone"),
-                    "msg": "手机号码不合法",
-                    "type": "phone"
-                }, {
-                    "target": $("#fpwdSecurityCode"),
-                    "msg": Label.captchaErrorLabel,
-                    "type": 'string',
-                    'max': 4
-                }]})) {
+                "target": $("#fpwdPhone"),
+                "msg": "手机号码不合法",
+                "type": "phone"
+            }, {
+                "target": $("#fpwdSecurityCode"),
+                "msg": Label.captchaErrorLabel,
+                "type": 'string',
+                'max': 4
+            }]
+        })) {
             var requestJSONObject = {
                 userPhone: $("#fpwdPhone").val(),
                 captcha: $("#fpwdSecurityCode").val()
@@ -224,18 +232,20 @@ var Verify = {
      * @description Reset password
      */
     resetPwd: function () {
-        if (Validate.goValidate({target: $("#rpwdTip"),
+        if (Validate.goValidate({
+            target: $("#rpwdTip"),
             data: [{
-                    "target": $("#rpwdUserPassword"),
-                    "msg": Label.invalidPasswordLabel,
-                    "type": 'password',
-                    'max': 20
-                }, {
-                    "target": $("#rpwdConfirmPassword"),
-                    "original": $("#rpwdUserPassword"),
-                    "msg": Label.confirmPwdErrorLabel,
-                    "type": "confirmPassword"
-                }]})) {
+                "target": $("#rpwdUserPassword"),
+                "msg": Label.invalidPasswordLabel,
+                "type": 'password',
+                'max': 20
+            }, {
+                "target": $("#rpwdConfirmPassword"),
+                "original": $("#rpwdUserPassword"),
+                "msg": Label.confirmPwdErrorLabel,
+                "type": "confirmPassword"
+            }]
+        })) {
             var requestJSONObject = {
                 userPassword: calcMD5($("#rpwdUserPassword").val()),
                 userId: $("#rpwdUserId").val(),
@@ -346,7 +356,7 @@ var Verify = {
                         sortBy: step2Sort
                     });
                     step2Sort = (step2Sort === 'random' ? 'original-order' : 'random');
-                    $('.tag-desc').on( 'arrangeComplete', function () {
+                    $('.tag-desc').on('arrangeComplete', function () {
                         $('.step-btn .green, .step-btn .red').prop('disabled', false);
                     });
                     if ($('.tag-desc li').length < 2) {
@@ -362,11 +372,11 @@ var Verify = {
                     $('.guide-tab > div:eq(3)').show();
                     $('.intro dt:eq(3)').addClass('current');
 
-                     $('.step-btn .red').show();
-                     $('.step-btn .green').text(Label.nextStepLabel);
+                    $('.step-btn .red').show();
+                    $('.step-btn .green').text(Label.nextStepLabel);
 
-                     $('.intro > div').hide();
-                     $('.intro > dl').show();
+                    $('.intro > div').hide();
+                    $('.intro > dl').show();
                     break;
                 case 5:
                     $('.guide-tab > div:eq(4)').show();
@@ -425,5 +435,49 @@ var Verify = {
         $('.tag-desc li:eq(' + random + ')').addClass('current');
         Util.follow(window, $('.tag-desc li:eq(' + random + ')').data('id'), 'tag');
 
+    },
+    /**
+     * 初始化二维码登录
+     *
+     * */
+    loginSocket: null,
+    initQrCodeLogin: function () {
+        this.loginSocket = new WebSocket('ws://localhost:8080/login-channel');
+        this.loginSocket.onopen = (event) => {
+            console.log('连接打开');
+            this.loginSocket.send(JSON.stringify({
+                type: 1,
+            }))
+        };
+
+        this.loginSocket.onmessage = function (event) {
+            console.log('收到消息:', event.data);
+            let msg = event.data;
+            try {
+                let imgObj = document.querySelector("#qrcode_img");
+                if (msg.indexOf("targetId") === 0) {
+                    imgObj.src = "https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=web:" + msg.split(':')[1];
+                } else if (msg.indexOf("apiKey") === 0) {
+                    window.location.href = Label.servePath + "/loginWebInApiKey?apiKey=" + msg.split(':')[1];
+                }else if(msg.indexOf("scan") === 0){
+                    let boxObj = document.querySelector("#login-qrcode-div");
+                    boxObj.classList.add("scan-ing")
+                }
+            } catch (e) {
+
+            }
+        }
+
+        this.loginSocket.onclose =  (event)=> {
+            console.log('WebSocket 连接已关闭');
+        };
+
+        this.loginSocket.onerror = (error) =>{
+            console.log('WebSocket 出现错误:', error);
+            this.loginSocket.close();
+        };
+    },
+    closeQrCodeLogin: function () {
+        this.loginSocket.close();
     }
 };
