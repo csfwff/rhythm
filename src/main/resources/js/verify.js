@@ -442,7 +442,8 @@ var Verify = {
      * */
     loginSocket: null,
     initQrCodeLogin: function () {
-        this.loginSocket = new WebSocket('ws://localhost:8080/login-channel');
+
+        this.loginSocket = new WebSocket(Label.loginChannelURL);
         this.loginSocket.onopen = (event) => {
             console.log('连接打开');
             this.loginSocket.send(JSON.stringify({

@@ -101,7 +101,7 @@
     Label.invalidEmailLabel = "${invalidEmailLabel}";
     Label.confirmPwdErrorLabel = "${confirmPwdErrorLabel}";
     Label.captchaErrorLabel = "${captchaErrorLabel}";
-
+    Label.loginChannelURL = "${wsScheme}://${serverHost}:${serverPort}${contextPath}/login-channel";
     function toggleLoginType(type) {
         let accObj = document.querySelector("#account_login");
         let qrObj = document.querySelector("#qrcode_login");
