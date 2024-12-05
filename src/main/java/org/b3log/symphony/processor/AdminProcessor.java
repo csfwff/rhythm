@@ -1877,6 +1877,20 @@ public class AdminProcessor {
         dataModel.put("sysBag", cloudService.getBag(userId));
         dataModel.put("sysMetal", cloudService.getMetal(userId));
 
+        final JSONObject systemSettings = settingsService.getByUsrId(userId);
+        if (Objects.isNull(systemSettings)) {
+            dataModel.put("userCardBg", "");
+        } else {
+            final String settingsJson = systemSettings.optString(SystemSettings.SETTINGS);
+            final JSONObject settings = new JSONObject(settingsJson);
+            final String cardBg = settings.optString("cardBg");
+            if (StringUtils.isBlank(cardBg)) {
+                dataModel.put("userCardBg", "");
+            } else {
+                dataModel.put("userCardBg", cardBg);
+            }
+        }
+
         dataModelService.fillHeaderAndFooter(context, dataModel);
     }
 
