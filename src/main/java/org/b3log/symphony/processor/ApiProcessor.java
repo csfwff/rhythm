@@ -167,8 +167,8 @@ public class ApiProcessor {
             if (null == r) {
                 r = "/";
             }
-            response.sendRedirect(Latkes.getServePath() + r);
             Sessions.login(response, currentUser.optString(Keys.OBJECT_ID), true);
+            response.sendRedirect(Latkes.getServePath() + r);
         } else {
             context.renderJSON(StatusCodes.ERR).renderMsg("ApiKey 错误。");
         }
