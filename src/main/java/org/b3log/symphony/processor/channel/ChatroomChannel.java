@@ -37,6 +37,7 @@ import org.b3log.symphony.processor.ApiProcessor;
 import org.b3log.symphony.repository.CloudRepository;
 import org.b3log.symphony.service.AvatarQueryService;
 import org.b3log.symphony.service.UserQueryService;
+import org.b3log.symphony.util.NodeUtil;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import pers.adlered.simplecurrentlimiter.main.SimpleCurrentLimiter;
@@ -108,7 +109,8 @@ public class ChatroomChannel implements WebSocketChannel {
             SESSIONS.add(session);
             // 单独发送在线信息
             final String msgStr = getOnline().toString();
-            session.sendText(msgStr);
+            sendText(session, msgStr);
+            NodeUtil.sendTell(userName, msgStr);
             AdminProcessor.manager.onMessageSent(4, msgStr.length());
             // 保存 Active 信息
             userActive.put(user.optString("userName"), System.currentTimeMillis());
@@ -213,6 +215,7 @@ public class ChatroomChannel implements WebSocketChannel {
         jsonObject.put(Common.TYPE, "customMessage");
         jsonObject.put("message", msg);
         String message = jsonObject.toString();
+        NodeUtil.sendAll(message);
         new Thread(() -> {
             int i = 0;
             for (WebSocketSession s : ChatroomChannel.SESSIONS) {
@@ -223,7 +226,7 @@ public class ChatroomChannel implements WebSocketChannel {
                     } catch (Exception ignored) {
                     }
                 }
-                s.sendText(message);
+                sendText(s, message);
                 AdminProcessor.manager.onMessageSent(4, message.length());
             }
         }).start();
@@ -301,6 +304,11 @@ public class ChatroomChannel implements WebSocketChannel {
         boolean quick = sender.isEmpty() || isRedPacket || type.equals("redPacketStatus") || type.equals("revoke") || type.equals("discussChanged");
         avatarQueryService.fillUserAvatarURL(message);
         final String msgStr = message.toString();
+        if (quick) {
+            NodeUtil.sendAll(msgStr);
+        } else {
+            NodeUtil.sendMsg(sender, msgStr);
+        }
         // 先给发送人反馈
         if (!quick) {
             List<WebSocketSession> senderSessions = new ArrayList<>();
@@ -311,7 +319,7 @@ public class ChatroomChannel implements WebSocketChannel {
                 }
             }
             for (WebSocketSession session : senderSessions) {
-                session.sendText(msgStr);
+                sendText(session, msgStr);
                 AdminProcessor.manager.onMessageSent(4, msgStr.length());
             }
         }
@@ -334,11 +342,11 @@ public class ChatroomChannel implements WebSocketChannel {
                     if (!quick) {
                         String toUser = onlineUsers.get(session).optString(User.USER_NAME);
                         if (!sender.equals(toUser)) {
-                            session.sendText(msgStr);
+                            sendText(session, msgStr);
                             AdminProcessor.manager.onMessageSent(4, msgStr.length());
                         }
                     } else {
-                        session.sendText(msgStr);
+                        sendText(session, msgStr);
                         AdminProcessor.manager.onMessageSent(4, msgStr.length());
                     }
                 } catch (Exception ignored) {
@@ -429,7 +437,8 @@ public class ChatroomChannel implements WebSocketChannel {
                         "    \"client\": \"Other/Robot\",\n" +
                         "    \"userAvatarURL48\": \"https://file.fishpi.cn/2022/01/robot3-89631199.png\"\n" +
                         "}";
-                session.sendText(text);
+                sendText(session, text);
+                NodeUtil.sendAll(text);
                 AdminProcessor.manager.onMessageSent(4, text.length());
                 removeSession(session);
             }
@@ -488,6 +497,7 @@ public class ChatroomChannel implements WebSocketChannel {
         if (!onlineMsgLock) {
             onlineMsgLock = true;
             final String msgStr = getOnline().toString();
+            NodeUtil.sendSlow(msgStr);
             new Thread(() -> {
                 int i = 0;
                 for (WebSocketSession s : SESSIONS) {
@@ -498,11 +508,15 @@ public class ChatroomChannel implements WebSocketChannel {
                         } catch (Exception ignored) {
                         }
                     }
-                    s.sendText(msgStr);
+                    sendText(s, msgStr);
                     AdminProcessor.manager.onMessageSent(4, msgStr.length());
                 }
                 onlineMsgLock = false;
             }).start();
         }
+    }
+
+    public static void sendText(WebSocketSession wss, String text) {
+        wss.sendText(text);
     }
 }

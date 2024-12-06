@@ -43,10 +43,7 @@ import org.b3log.symphony.repository.UserRepository;
 import org.b3log.symphony.service.ArticleQueryService;
 import org.b3log.symphony.service.CronMgmtService;
 import org.b3log.symphony.service.InitMgmtService;
-import org.b3log.symphony.util.Markdowns;
-import org.b3log.symphony.util.ReservedWords;
-import org.b3log.symphony.util.Symphonys;
-import org.b3log.symphony.util.Vocation;
+import org.b3log.symphony.util.*;
 import org.json.JSONObject;
 
 import java.util.List;
@@ -280,6 +277,8 @@ public final class Server extends BaseServer {
             }
         }).start();
         System.out.println(">>> Quick boot mode requirements is ready!");
+
+        NodeUtil.init();
 
         final String unixDomainSocketPath = commandLine.getOptionValue("unix_domain_socket_path");
         if (StringUtils.isNotBlank(unixDomainSocketPath)) {

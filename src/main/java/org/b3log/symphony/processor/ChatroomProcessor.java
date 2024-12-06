@@ -187,6 +187,8 @@ public class ChatroomProcessor {
 
     public static String barragerUnit = "积分";
 
+
+
     /**
      * Register request handlers.
      */
@@ -207,6 +209,16 @@ public class ChatroomProcessor {
         Dispatcher.post("/chat-room/red-packet/open", chatroomProcessor::openRedPacket, loginCheck::handle);
         Dispatcher.get("/chat-room/si-guo-list", chatroomProcessor::getSiGuoList);
 
+        Dispatcher.get("/chat-room/node/get", chatroomProcessor::getNode, loginCheck::handle);
+    }
+
+    public void getNode(final RequestContext context) {
+        String[] nodes = Symphonys.get("chatroom.node.url").split(",");
+        JSONObject ret = new JSONObject();
+        ret.put(Keys.CODE, StatusCodes.SUCC);
+        ret.put(Keys.MSG, "");
+        ret.put(Keys.DATA, nodes[0]);
+        context.renderJSON(ret);
     }
 
     /**

@@ -233,12 +233,12 @@ public class ApiProcessor {
      * @return returns user if logged in, returns {@code null} otherwise
      */
     private static JSONObject tryLogInWithApiKey(String apiKey) {
-        final String value = Crypts.decryptByAES(apiKey, Symphonys.COOKIE_SECRET);
-        final JSONObject cookieJSONObject = new JSONObject(value);
-        final BeanManager beanManager = BeanManager.getInstance();
-        final UserRepository userRepository = beanManager.getReference(UserRepository.class);
-
         try {
+            final String value = Crypts.decryptByAES(apiKey, Symphonys.COOKIE_SECRET);
+            final JSONObject cookieJSONObject = new JSONObject(value);
+            final BeanManager beanManager = BeanManager.getInstance();
+            final UserRepository userRepository = beanManager.getReference(UserRepository.class);
+
             final String userId = cookieJSONObject.optString(Keys.OBJECT_ID);
             if (StringUtils.isBlank(userId)) {
                 return null;
