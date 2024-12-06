@@ -276,9 +276,11 @@ public final class Server extends BaseServer {
                 Vocation.refresh();
             }
         }).start();
-        System.out.println(">>> Quick boot mode requirements is ready!");
 
         NodeUtil.init();
+        NodeUtil.initOnline();
+
+        System.out.println(">>> Quick boot mode requirements is ready!");
 
         final String unixDomainSocketPath = commandLine.getOptionValue("unix_domain_socket_path");
         if (StringUtils.isNotBlank(unixDomainSocketPath)) {

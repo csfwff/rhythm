@@ -27,6 +27,7 @@ import org.b3log.latke.util.Stopwatchs;
 import org.b3log.symphony.processor.AlipayProcessor;
 import org.b3log.symphony.processor.bot.ChatRoomBot;
 import org.b3log.symphony.processor.channel.ChatroomChannel;
+import org.b3log.symphony.util.NodeUtil;
 import org.b3log.symphony.util.Symphonys;
 import org.b3log.symphony.util.Vocation;
 
@@ -287,6 +288,7 @@ public class CronMgmtService {
         Symphonys.SCHEDULED_EXECUTOR_SERVICE.scheduleAtFixedRate(() -> {
             try {
                 ChatRoomBot.refreshSiGuo();
+                NodeUtil.init();
             } catch (final Exception e) {
                 LOGGER.log(Level.ERROR, "Executes cron failed", e);
             } finally {
