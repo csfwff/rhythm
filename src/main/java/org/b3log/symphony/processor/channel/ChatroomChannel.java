@@ -463,6 +463,14 @@ public class ChatroomChannel implements WebSocketChannel {
                 filteredOnlineUsers.put(name, object);
             }
 
+            for (int i = 0; i < NodeUtil.remoteUsers.length(); i++) {
+                try {
+                    JSONObject temp = NodeUtil.remoteUsers.getJSONObject(i);
+                    filteredOnlineUsers.put(temp.optString(User.USER_NAME), temp);
+                } catch (Exception ignored) {
+                }
+            }
+
             JSONArray onlineArray = new JSONArray();
             for (String user : filteredOnlineUsers.keySet()) {
                 JSONObject object = filteredOnlineUsers.get(user);

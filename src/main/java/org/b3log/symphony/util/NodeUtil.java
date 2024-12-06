@@ -3,6 +3,7 @@ package org.b3log.symphony.util;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 import javax.net.ssl.SSLContext;
@@ -24,7 +25,7 @@ public class NodeUtil {
 
     private static final Logger LOGGER = LogManager.getLogger(NodeUtil.class);
 
-    private List<JSONObject> remoteUsers = new ArrayList<>();
+    public static JSONArray remoteUsers = new JSONArray();
 
     public static void init() {
         LOGGER.log(Level.INFO, "Loading nodes");
@@ -69,8 +70,8 @@ public class NodeUtil {
     }
 
     public static void initOnline() {
-        wsNodes = new ArrayList<>();
         String[] nodes = Symphonys.get("chatroom.node.url").split(",");
+        JSONArray onlineList = new JSONArray();
         for (String i : nodes) {
             try {
                 String serverUri = i + "?apiKey=" + Symphonys.get("chatroom.node.adminKey");
@@ -84,18 +85,19 @@ public class NodeUtil {
                         .join();
                 webSocket.sendText(Symphonys.get("chatroom.node.adminKey") + ":::online", true);
                 try {
-                    String response = responseFuture.get(5, TimeUnit.SECONDS);
-                    System.out.println("Received response: " + response);
+                    String response = responseFuture.get(10, TimeUnit.SECONDS);
+                    JSONArray jsonArray = new JSONArray(response);
+                    for (int j = 0; j < jsonArray.length(); j++) {
+                        onlineList.put(jsonArray.get(j));
+                    }
                 } catch (Exception e) {
-                    System.out.println("No response within 5 seconds.");
+                    System.out.println(serverUri + " No response within 10 seconds. giveup.");
                 }
             } catch (Exception ignored) {
             }
         }
-    }
-
-    public static void getOnline() {
-
+        remoteUsers = onlineList;
+        LOGGER.log(Level.INFO, "Remote online list updated. count=" + remoteUsers.length());
     }
 
     // 创建忽略 SSL 证书的 SSLContext
