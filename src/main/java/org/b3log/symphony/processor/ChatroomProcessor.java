@@ -25,6 +25,7 @@ import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.b3log.latke.Keys;
+import org.b3log.latke.Latkes;
 import org.b3log.latke.http.Dispatcher;
 import org.b3log.latke.http.RequestContext;
 import org.b3log.latke.http.WebSocketSession;
@@ -243,6 +244,15 @@ public class ChatroomProcessor {
         ret.put(Keys.MSG, "");
         if (NodeUtil.wsOnline == null || NodeUtil.wsOnline.isEmpty()) {
             ret.put(Keys.DATA, "wss://fishpi.cn/chat-room-channel?apiKey=" + key);
+            final String serverScheme = Latkes.getServerScheme();
+            String wsScheme = StringUtils.containsIgnoreCase(serverScheme, "https") ? "wss" : "ws";
+            String wsHost = Latkes.getServerHost();
+            String port1 = Latkes.getServerPort();
+            String port2 = "";
+            if (StringUtils.isNotBlank(port1) && !"80".equals(port1) && !"443".equals(port1)) {
+                port2 = ":" + port1;
+            }
+            ret.put(Keys.DATA, wsScheme + "://" + wsHost + port2 + "/chat-room-channel?apiKey=" + key);
         } else {
             Map.Entry<String, Integer> minEntry = null;
             for (Map.Entry<String, Integer> entry : NodeUtil.wsOnline.entrySet()) {

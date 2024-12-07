@@ -294,6 +294,7 @@ public class CronMgmtService {
                 Stopwatchs.release();
             }
         }, delay, 60 * 1000, TimeUnit.MILLISECONDS);
+        delay += 2000;
 
         Symphonys.SCHEDULED_EXECUTOR_SERVICE.scheduleAtFixedRate(() -> {
             try {
@@ -303,7 +304,8 @@ public class CronMgmtService {
             } finally {
                 Stopwatchs.release();
             }
-        }, delay, 10 * 60 * 1000, TimeUnit.MILLISECONDS);
+        }, delay, 1 * 60 * 1000, TimeUnit.MILLISECONDS);
+        delay += 2000;
 
         Symphonys.SCHEDULED_EXECUTOR_SERVICE.scheduleAtFixedRate(() -> {
             try {
@@ -313,7 +315,7 @@ public class CronMgmtService {
             } finally {
                 Stopwatchs.release();
             }
-        }, delay, 5 * 60 * 1000, TimeUnit.MILLISECONDS);
+        }, delay, 3 * 60 * 1000, TimeUnit.MILLISECONDS);
         delay += 2000;
     }
 

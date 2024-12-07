@@ -100,7 +100,7 @@ public class ChatRoomBot {
         // ==! 前置参数 !==
 
         // ==? 判断是否在 Channel 中 ==?
-        boolean atChannel = false;
+        /*boolean atChannel = false;
         for (Map.Entry<WebSocketSession, JSONObject> onlineUser : ChatroomChannel.onlineUsers.entrySet()) {
             try {
                 String uName = onlineUser.getValue().optString(User.USER_NAME);
@@ -114,7 +114,7 @@ public class ChatRoomBot {
         if (!atChannel) {
             context.renderJSON(StatusCodes.ERR).renderMsg("发送失败：当前未在聊天室中，请刷新页面。");
             return false;
-        }
+        }*/
         // ==! 判断是否在 Channel 中 ==!
 
         // ==? 发弹幕频率限制 ?==

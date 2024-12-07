@@ -275,7 +275,14 @@
     Label.hasMore = true;
     ChatRoom.init();
     // Init [ChatRoom] channel
-    ChatRoomChannel.init("${wsScheme}://${serverHost}:${serverPort}${contextPath}/chat-room-channel");
+    $.ajax({
+        url: Label.servePath + '/chat-room/node/get',
+        type: 'GET',
+        cache: false,
+        success: function (result) {
+            ChatRoomChannel.init(result.data);
+        }
+    });
     var page = 0;
     var pointsArray = [];
     var linesArray = [];

@@ -619,7 +619,15 @@
         </#if>
     }
 
-    ChatRoomChannel.init("${wsScheme}://${serverHost}:${serverPort}${contextPath}/chat-room-channel?type=index");
+    // Init [ChatRoom] channel
+    $.ajax({
+        url: Label.servePath + '/chat-room/node/get',
+        type: 'GET',
+        cache: false,
+        success: function (result) {
+            ChatRoomChannel.init(result.data);
+        }
+    });
 
     var chatRoomPictureStatus = "<#if 0 == chatRoomPictureStatus> blur</#if>";
 </script>
