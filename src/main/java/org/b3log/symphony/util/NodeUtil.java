@@ -4,7 +4,6 @@ import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.json.JSONArray;
-import org.json.JSONObject;
 
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManager;
@@ -21,6 +20,8 @@ import java.util.concurrent.TimeUnit;
 
 public class NodeUtil {
 
+    public static List<String> uriNodes = new ArrayList<>();
+
     public static List<WebSocket> wsNodes = new ArrayList<>();
 
     private static final Logger LOGGER = LogManager.getLogger(NodeUtil.class);
@@ -30,19 +31,28 @@ public class NodeUtil {
     public static void init() {
         LOGGER.log(Level.INFO, "Loading nodes");
         wsNodes = new ArrayList<>();
+        uriNodes = new ArrayList<>();
         String[] nodes = Symphonys.get("chatroom.node.url").split(",");
         for (String i : nodes) {
+            String serverUri = i + "?apiKey=" + Symphonys.get("chatroom.node.adminKey");
             try {
-                String serverUri = i + "?apiKey=" + Symphonys.get("chatroom.node.adminKey");
                 SSLContext sslContext = createInsecureSSLContext();
                 HttpClient client = HttpClient.newBuilder()
                         .sslContext(sslContext)
                         .build();
+
+                CompletableFuture<String> future = new CompletableFuture<>();
                 WebSocket webSocket = client.newWebSocketBuilder()
-                        .buildAsync(URI.create(serverUri), new WebSocketListenerNoFuture())
+                        .buildAsync(URI.create(serverUri), new WebSocketListener(future))
                         .join();
+
+                webSocket.sendText(Symphonys.get("chatroom.node.adminKey") + ":::hello", true);
+                future.get(10, TimeUnit.SECONDS);
                 wsNodes.add(webSocket);
-            } catch (Exception ignored) {
+                uriNodes.add(i);
+                LOGGER.log(Level.INFO, "Connected to node: " + serverUri);
+            } catch (Exception e) {
+                LOGGER.log(Level.ERROR, "Failed to connect to node: " + serverUri, e);
             }
         }
     }
@@ -70,9 +80,8 @@ public class NodeUtil {
     }
 
     public static void initOnline() {
-        String[] nodes = Symphonys.get("chatroom.node.url").split(",");
         JSONArray onlineList = new JSONArray();
-        for (String i : nodes) {
+        for (String i : uriNodes) {
             try {
                 String serverUri = i + "?apiKey=" + Symphonys.get("chatroom.node.adminKey");
                 SSLContext sslContext = createInsecureSSLContext();
