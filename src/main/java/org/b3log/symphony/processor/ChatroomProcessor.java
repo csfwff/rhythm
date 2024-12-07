@@ -18,6 +18,7 @@
  */
 package org.b3log.symphony.processor;
 
+import org.apache.commons.lang.RandomStringUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.time.DateFormatUtils;
 import org.apache.logging.log4j.Level;
@@ -33,6 +34,7 @@ import org.b3log.latke.ioc.Inject;
 import org.b3log.latke.ioc.Singleton;
 import org.b3log.latke.model.User;
 import org.b3log.latke.repository.*;
+import org.b3log.latke.util.Crypts;
 import org.b3log.symphony.model.*;
 import org.b3log.symphony.processor.bot.ChatRoomBot;
 import org.b3log.symphony.processor.channel.ChatroomChannel;
@@ -213,11 +215,43 @@ public class ChatroomProcessor {
     }
 
     public void getNode(final RequestContext context) {
-        String[] nodes = Symphonys.get("chatroom.node.url").split(",");
+        JSONObject currentUser = Sessions.getUser();
+        try {
+            currentUser = ApiProcessor.getUserByKey(context.param("apiKey"));
+        } catch (NullPointerException ignored) {
+        }
+        try {
+            final JSONObject requestJSONObject = context.requestJSON();
+            currentUser = ApiProcessor.getUserByKey(requestJSONObject.optString("apiKey"));
+        } catch (NullPointerException ignored) {
+        }
+        if (null == currentUser) {
+            context.sendError(401);
+            context.abort();
+            return;
+        }
+        final String userId = currentUser.optString(Keys.OBJECT_ID);
+        final String userPassword = currentUser.optString(User.USER_PASSWORD);
+        final JSONObject cookieJSONObject = new JSONObject();
+        cookieJSONObject.put(Keys.OBJECT_ID, userId);
+        final String random = RandomStringUtils.randomAlphanumeric(16);
+        cookieJSONObject.put(Keys.TOKEN, userPassword + ApiProcessor.COOKIE_ITEM_SEPARATOR + random);
+        final String key = Crypts.encryptByAES(cookieJSONObject.toString(), Symphonys.COOKIE_SECRET);
+
         JSONObject ret = new JSONObject();
         ret.put(Keys.CODE, StatusCodes.SUCC);
         ret.put(Keys.MSG, "");
-        ret.put(Keys.DATA, nodes[0]);
+        if (NodeUtil.wsOnline == null || NodeUtil.wsOnline.isEmpty()) {
+            ret.put(Keys.DATA, "wss://fishpi.cn/chat-room-channel?apiKey=" + key);
+        } else {
+            Map.Entry<String, Integer> minEntry = null;
+            for (Map.Entry<String, Integer> entry : NodeUtil.wsOnline.entrySet()) {
+                if (minEntry == null || entry.getValue() < minEntry.getValue()) {
+                    minEntry = entry;
+                }
+            }
+            ret.put(Keys.DATA, minEntry.getKey() + "?apiKey=" + key);
+        }
         context.renderJSON(ret);
     }
 

@@ -13,7 +13,9 @@ import java.net.http.HttpClient;
 import java.net.http.WebSocket;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
 import java.util.concurrent.TimeUnit;
@@ -23,6 +25,8 @@ public class NodeUtil {
     public static List<String> uriNodes = new ArrayList<>();
 
     public static List<WebSocket> wsNodes = new ArrayList<>();
+
+    public static Map<String, Integer> wsOnline = new HashMap<>();
 
     private static final Logger LOGGER = LogManager.getLogger(NodeUtil.class);
 
@@ -81,6 +85,7 @@ public class NodeUtil {
 
     public static void initOnline() {
         JSONArray onlineList = new JSONArray();
+        wsOnline = new HashMap<>();
         for (String i : uriNodes) {
             try {
                 String serverUri = i + "?apiKey=" + Symphonys.get("chatroom.node.adminKey");
@@ -99,6 +104,8 @@ public class NodeUtil {
                     for (int j = 0; j < jsonArray.length(); j++) {
                         onlineList.put(jsonArray.get(j));
                     }
+                    wsOnline.put(i, jsonArray.length());
+                    LOGGER.log(Level.INFO, "Remote " + i + " online list updated. count=" + jsonArray.length());
                 } catch (Exception e) {
                     System.out.println(serverUri + " No response within 10 seconds. giveup.");
                 }
@@ -106,7 +113,6 @@ public class NodeUtil {
             }
         }
         remoteUsers = onlineList;
-        LOGGER.log(Level.INFO, "Remote online list updated. count=" + remoteUsers.length());
     }
 
     // 创建忽略 SSL 证书的 SSLContext
