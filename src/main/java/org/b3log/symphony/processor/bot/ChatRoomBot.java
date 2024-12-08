@@ -312,6 +312,9 @@ public class ChatRoomBot {
                             for (String key : NodeUtil.nodeNickNames.keySet()) {
                                 String nickName = NodeUtil.nodeNickNames.get(key);
                                 HashMap<String, Integer> map = NodeUtil.remoteUserPerNode.get(key);
+                                if (null == map) {
+                                    continue;
+                                }
                                 int count = 0;
                                 for (String i : map.keySet()) {
                                     count += map.get(i);
