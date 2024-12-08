@@ -300,7 +300,13 @@
                             <option value="1"<#if 1 == user.userGeoStatus> selected</#if>>${privateLabel}</option>
                         </select>
                     </label>
-                    <label></label>
+                    <label>
+                        <div>${userBreezemoonStatusLabel}</div>
+                        <select id="userBreezemoonStatus" name="userBreezemoonStatus">
+                            <option value="0"<#if 0 == user.userBreezemoonStatus> selected</#if>>${publicLabel}</option>
+                            <option value="1"<#if 1 == user.userBreezemoonStatus> selected</#if>>${privateLabel}</option>
+                        </select>
+                    </label>
                 </div>
                 <div class="fn__flex">
                     <label>

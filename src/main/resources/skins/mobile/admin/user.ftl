@@ -217,6 +217,12 @@
                     <option value="1"<#if 1 == user.userJoinUsedPointRank> selected</#if>>${privateLabel}</option>
                 </select>
 
+                <label>${userBreezemoonStatusLabel}</label>
+                <select id="userBreezemoonStatus" name="userBreezemoonStatus">
+                    <option value="0"<#if 0 == user.userBreezemoonStatus> selected</#if>>${publicLabel}</option>
+                    <option value="1"<#if 1 == user.userBreezemoonStatus> selected</#if>>${privateLabel}</option>
+                </select>
+
                 <label>${roleLabel}</label>
                 <select id="userRole" name="userRole">
                     <#list roles as role>
