@@ -2795,6 +2795,28 @@ ${result.info.msg}
             mobile_flag = true;
         }
         return mobile_flag;
+    },
+
+    switchNode: function () {
+        let text = "        <h3 style=\"margin: 0 0 10px; font-size: 18px; color: #333;\">请选择区服</h3>" +
+            "        <div style=\"margin-bottom: 15px;\">";
+        Label.node.avaliable.forEach(function (node) {
+            text += "<button onclick='ChatRoom.connectNewNode(\"" + node.node + "?apiKey=" + Label.node.apiKey + "\", \"" + node.name + "\")' style=\"background-color: #fff; color: #007bff; border: 1px solid #007bff; padding: 10px 20px; border-radius: 4px; cursor: pointer; margin: 5px; font-size: 14px; font-weight: bold;\">" + node.name + "</button>";
+        })
+        text += "        </div>" +
+            "        <p style=\"margin: 0; font-size: 14px; color: #666; line-height: 1.5;\">" +
+            "            您切换的区服仅为本次生效，系统会自动将您分配至最流畅的区服。" +
+            "        </p>" +
+            "        <p style=\"margin: 10px 0 0; font-size: 14px; color: #666; line-height: 1.5;\">" +
+            "            所有区服之间消息同步，完全互通。" +
+            "        </p>"
+        Util.alert(text);
+    },
+
+    connectNewNode: function (node, name) {
+        Util.clearAlert();
+        $('#nodeButton').html(name);
+        ChatRoomChannel.init(node);
     }
 }
 

@@ -113,6 +113,7 @@
                             <br>
                         </#if>
                         <div class="fn-right" style="margin-top: 6px">
+                            <button class="button" id="nodeButton" onclick="ChatRoom.switchNode()">选择大区</button>
                             <#if level3Permitted == true>
                                 <button id="groupRevoke" onclick="ChatRoom.startGroupRevoke()" class="button">
                                     批量撤回
@@ -266,6 +267,7 @@
     Label.latestMessage = "";
     Label.plusN = 0;
     Label.hasMore = true;
+    Label.node;
     ChatRoom.init();
     // Init [ChatRoom] channel
     $.ajax({
@@ -273,6 +275,8 @@
         type: 'GET',
         cache: false,
         success: function (result) {
+            $('#nodeButton').html(result.msg);
+            Label.node = result;
             ChatRoomChannel.init(result.data);
         }
     });

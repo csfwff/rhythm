@@ -310,7 +310,17 @@ public class ChatroomProcessor {
                 }
             }
             ret.put(Keys.DATA, minEntry.getKey() + "?apiKey=" + key);
+            ret.put(Keys.MSG, NodeUtil.nodeNickNames.get(minEntry.getKey()));
         }
+        JSONArray data = new JSONArray();
+        for (Map.Entry<String, Integer> entry : NodeUtil.wsOnline.entrySet()) {
+            JSONObject node = new JSONObject();
+            node.put("node", entry.getKey());
+            node.put("name", NodeUtil.nodeNickNames.get(entry.getKey()));
+            data.put(node);
+        }
+        ret.put("avaliable", data);
+        ret.put("apiKey", key);
         context.renderJSON(ret);
     }
 
