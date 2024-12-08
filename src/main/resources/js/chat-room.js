@@ -2801,7 +2801,7 @@ ${result.info.msg}
         let text = "        <h3 style=\"margin: 0 0 10px; font-size: 18px; color: #333;\">请选择区服</h3>" +
             "        <div style=\"margin-bottom: 15px;\">";
         Label.node.avaliable.forEach(function (node) {
-            text += "<button onclick='ChatRoom.connectNewNode(\"" + node.node + "?apiKey=" + Label.node.apiKey + "\", \"" + node.name + "\")' style=\"background-color: #fff; color: #007bff; border: 1px solid #007bff; padding: 10px 20px; border-radius: 4px; cursor: pointer; margin: 5px; font-size: 14px; font-weight: bold;\">" + node.name + "</button>";
+            text += "<button onclick='ChatRoom.connectNewNode(\"" + node.node + "?apiKey=" + Label.node.apiKey + "\", \"" + node.name + "\")' style=\"background-color: #fff; color: #007bff; border: 1px solid #007bff; padding: 10px 20px; border-radius: 4px; cursor: pointer; margin: 5px; font-size: 14px; font-weight: bold;\">" + node.name + " " + node.online + "人</button>";
         })
         text += "        </div>" +
             "        <p style=\"margin: 0; font-size: 14px; color: #666; line-height: 1.5;\">" +
