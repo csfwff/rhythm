@@ -97,7 +97,7 @@
                                     </div>
                                 </#if>
                                 <div class="fn-right">
-                                    <button class="button" id="nodeButton" onclick="ChatRoom.switchNode()">选择大区</button>
+                                    <button class="button" id="nodeButton" onclick="ChatRoom.switchNode()"><svg style='vertical-align: -2px;'><use xlink:href="#server"></use></svg> 选择大区</button>
                                     <#if level3Permitted == true>
                                         <button id="groupRevoke" onclick="ChatRoom.startGroupRevoke()" class="button">
                                             批量撤回
@@ -282,7 +282,7 @@
         type: 'GET',
         cache: false,
         success: function (result) {
-            $('#nodeButton').html(result.msg);
+            $('#nodeButton').html(`<svg style='vertical-align: -2px;'><use xlink:href="#server"></use></svg> ` + result.msg);
             Label.node = result;
             ChatRoomChannel.init(result.data);
         }

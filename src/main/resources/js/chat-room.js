@@ -2815,7 +2815,8 @@ ${result.info.msg}
 
     connectNewNode: function (node, name) {
         Util.clearAlert();
-        $('#nodeButton').html(name);
+        $('#nodeButton').html(`<svg style='vertical-align: -2px;'><use xlink:href="#server"></use></svg> ` + name);
+        ChatRoomChannel.ws.close();
         ChatRoomChannel.init(node);
     }
 }
