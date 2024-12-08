@@ -2818,6 +2818,9 @@ ${result.info.msg}
         $('#nodeButton').html(`<svg style='vertical-align: -2px;'><use xlink:href="#server"></use></svg> ` + name);
         ChatRoomChannel.ws.close();
         ChatRoomChannel.init(node);
+        setTimeout(function () {
+            clearInterval(ChatRoomChannel.manual);
+        }, 1000);
     }
 }
 

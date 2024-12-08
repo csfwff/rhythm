@@ -340,6 +340,7 @@ var ChatRoomChannel = {
      * @type WebSocket
      */
     ws: undefined,
+    manual: undefined,
     /**
      * @description Initializes message channel
      */
@@ -531,7 +532,7 @@ var ChatRoomChannel = {
 
         ChatRoomChannel.ws.onclose = function () {
             console.log("Disconnected to chat room channel websocket.")
-            setInterval(function () {
+            ChatRoomChannel.manual = setInterval(function () {
                 $.ajax({
                     url: Label.servePath + "/shop",
                     method: "get",
