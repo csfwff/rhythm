@@ -38,6 +38,7 @@ import org.b3log.symphony.repository.ChatRoomRepository;
 import org.b3log.symphony.repository.CloudRepository;
 import org.b3log.symphony.service.*;
 import org.b3log.symphony.util.JSONs;
+import org.b3log.symphony.util.NodeUtil;
 import org.b3log.symphony.util.Sessions;
 import org.b3log.symphony.util.StatusCodes;
 import org.json.JSONArray;
@@ -303,13 +304,29 @@ public class ChatRoomBot {
                                 }
                             }
                             StringBuilder userSessionList = new StringBuilder();
+                            userSessionList.append("<details><summary>北京一区（" + ChatroomChannel.SESSIONS.size() + "人）</summary>");
                             for (Map.Entry<String, Integer> s : sessionList.entrySet()) {
                                 userSessionList.append(s.getKey() + " " + s.getValue() + "<br>");
                             }
-                            int sessions = ChatroomChannel.SESSIONS.size();
+                            userSessionList.append("</details>");
+                            for (String key : NodeUtil.nodeNickNames.keySet()) {
+                                String nickName = NodeUtil.nodeNickNames.get(key);
+                                HashMap<String, Integer> map = NodeUtil.remoteUserPerNode.get(key);
+                                int count = 0;
+                                for (String i : map.keySet()) {
+                                    count += map.get(i);
+                                }
+                                userSessionList.append("<details><summary>" + nickName + "（" + count + "人）</summary>");
+                                for (String i : map.keySet()) {
+                                    int onlineNum = map.get(i);
+                                    userSessionList.append(i + " " + onlineNum + "<br>");
+                                }
+                                userSessionList.append("</details>");
+                            }
+                            int sessions = ChatroomChannel.SESSIONS.size() + NodeUtil.remoteUsers.length();
                             sendBotMsg("" +
                                     "当前聊天室会话数：" + sessions + "\n" +
-                                    "<details><summary>用户会话详情</summary>" + userSessionList + "</details>");
+                                    userSessionList);
                             break;
                         case "刷新缓存":
                             ChatroomChannel.sendOnlineMsg();
@@ -344,6 +361,7 @@ public class ChatRoomBot {
                                     } catch (InterruptedException e) {
                                         e.printStackTrace();
                                     }
+                                    NodeUtil.sendKick(disconnectUser);
                                     List<WebSocketSession> senderSessions = new ArrayList<>();
                                     for (Map.Entry<WebSocketSession, JSONObject> entry : ChatroomChannel.onlineUsers.entrySet()) {
                                         try {
@@ -367,9 +385,9 @@ public class ChatRoomBot {
                             Map<String, Long> result = ChatroomChannel.check();
                             StringBuilder stringBuilder = new StringBuilder();
                             if (result.isEmpty()) {
-                                sendBotMsg("报告！没有超过6小时未活跃的成员，一切都很和谐~");
+                                sendBotMsg("北京一区：报告！没有超过6小时未活跃的成员，一切都很和谐~");
                             } else {
-                                stringBuilder.append("报告！成功扫描超过6小时未活跃的成员，并已在通知后将他们断开连接：<br>");
+                                stringBuilder.append("北京一区：报告！成功扫描超过6小时未活跃的成员，并已在通知后将他们断开连接：<br>");
                                 stringBuilder.append("<details><summary>不活跃用户列表</summary>");
                                 for (String i : result.keySet()) {
                                     long time = result.get(i);
@@ -378,6 +396,7 @@ public class ChatRoomBot {
                                 stringBuilder.append("</details>");
                                 sendBotMsg(stringBuilder.toString());
                             }
+                            NodeUtil.sendClear();
                             break;
                         case "处罚":
                             try {

@@ -438,7 +438,6 @@ public class ChatroomChannel implements WebSocketChannel {
                         "    \"userAvatarURL48\": \"https://file.fishpi.cn/2022/01/robot3-89631199.png\"\n" +
                         "}";
                 sendText(session, text);
-                NodeUtil.sendAll(text);
                 AdminProcessor.manager.onMessageSent(4, text.length());
                 removeSession(session);
             }

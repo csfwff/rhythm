@@ -26,6 +26,7 @@ import org.b3log.latke.ioc.BeanManager;
 import org.b3log.latke.model.User;
 import org.b3log.symphony.model.Common;
 import org.b3log.symphony.model.UserExt;
+import org.b3log.symphony.processor.bot.ChatRoomBot;
 import org.b3log.symphony.processor.channel.ChatroomChannel;
 import org.b3log.symphony.service.AvatarQueryService;
 import org.json.JSONArray;
@@ -59,12 +60,23 @@ public class NodeUtil {
 
     public static JSONArray remoteUsers = new JSONArray();
 
+    public static HashMap<String, HashMap<String, Integer>> remoteUserPerNode = new HashMap<>();
+
+    public static HashMap<String, String> nodeNickNames = new HashMap<>();
+
     public static void init() {
         LOGGER.log(Level.INFO, "Loading nodes");
+        for (WebSocket i : wsNodes) {
+            i.sendClose(1000, "Nornal Closure");
+
+        }
         wsNodes = new ArrayList<>();
         uriNodes = new ArrayList<>();
-        String[] nodes = Symphonys.get("chatroom.node.url").split(",");
+        nodeNickNames.clear();
+        String[] nodes = Symphonys.get("chatroom.node.url").split(";");
         for (String i : nodes) {
+            nodeNickNames.put(i.split(",")[0], i.split(",")[1]);
+            i = i.split(",")[0];
             String serverUri = i + "?apiKey=" + Symphonys.get("chatroom.node.adminKey");
             try {
                 SSLContext sslContext = createInsecureSSLContext();
@@ -110,10 +122,86 @@ public class NodeUtil {
         notice("slow " + text);
     }
 
+    public static void sendKick(String userName) {
+        notice("kick " + userName);
+    }
+
+    public static void sendClear() {
+        for (String i : uriNodes) {
+            try {
+                String serverUri = i + "?apiKey=" + Symphonys.get("chatroom.node.adminKey");
+                SSLContext sslContext = createInsecureSSLContext();
+                HttpClient client = HttpClient.newBuilder()
+                        .sslContext(sslContext)
+                        .build();
+                CompletableFuture<String> responseFuture = new CompletableFuture<>();
+                WebSocket webSocket = client.newWebSocketBuilder()
+                        .buildAsync(URI.create(serverUri), new WebSocketListener(responseFuture))
+                        .join();
+                webSocket.sendText(Symphonys.get("chatroom.node.adminKey") + ":::clear", true);
+                try {
+                    String response = responseFuture.get(10, TimeUnit.SECONDS);
+                    String nickName = NodeUtil.nodeNickNames.get(i);
+                    if (response.equals("{}")) {
+                        ChatRoomBot.sendBotMsg(nickName + "：报告！没有超过6小时未活跃的成员，一切都很和谐~");
+                    } else {
+                        HashMap<String, Long> result = parseStringToHashMap(response);
+                        StringBuilder stringBuilder = new StringBuilder();
+                        stringBuilder.append(nickName + "：报告！成功扫描超过6小时未活跃的成员，并已将他们断开连接：<br>");
+                        stringBuilder.append("<details><summary>不活跃用户列表</summary>");
+                        for (String j : result.keySet()) {
+                            long time = result.get(j);
+                            stringBuilder.append(j + " AFK " + time + "小时<br>");
+                        }
+                        stringBuilder.append("</details>");
+                        ChatRoomBot.sendBotMsg(stringBuilder.toString());
+                    }
+                    webSocket.sendClose(1000, "Nornal Closure");
+                } catch (Exception e) {
+                    webSocket.sendClose(1000, "Nornal Closure");
+                    LOGGER.log(Level.ERROR, "Send clear command to " + serverUri + " has no response within 10 seconds. giveup.", e);
+                }
+            } catch (Exception ignored) {
+            }
+        }
+    }
+
+    public static HashMap<String, Long> parseStringToHashMap(String input) {
+        HashMap<String, Long> map = new HashMap<>();
+
+        // 去掉前后的大括号
+        if (input.startsWith("{") && input.endsWith("}")) {
+            input = input.substring(1, input.length() - 1).trim();
+        } else {
+            throw new IllegalArgumentException("Invalid input format");
+        }
+
+        // 分割键值对
+        String[] pairs = input.split(", ");
+        for (String pair : pairs) {
+            String[] keyValue = pair.split("=");
+            if (keyValue.length != 2) {
+                throw new IllegalArgumentException("Invalid key-value pair: " + pair);
+            }
+            String key = keyValue[0].trim();
+            Long value;
+            try {
+                value = Long.parseLong(keyValue[1].trim());
+            } catch (NumberFormatException e) {
+                throw new IllegalArgumentException("Invalid value for key: " + key);
+            }
+            map.put(key, value);
+        }
+
+        return map;
+    }
+
     public static void initOnline() {
         JSONArray onlineList = new JSONArray();
         wsOnline = new HashMap<>();
+        remoteUserPerNode.clear();
         for (String i : uriNodes) {
+            remoteUserPerNode.put(i, new HashMap<>());
             try {
                 String serverUri = i + "?apiKey=" + Symphonys.get("chatroom.node.adminKey");
                 SSLContext sslContext = createInsecureSSLContext();
@@ -130,6 +218,13 @@ public class NodeUtil {
                     JSONArray jsonArray = new JSONArray(response);
                     for (int j = 0; j < jsonArray.length(); j++) {
                         onlineList.put(jsonArray.get(j));
+                        JSONObject jsonObject = jsonArray.getJSONObject(j);
+                        String userName = jsonObject.optString("userName");
+                        if (remoteUserPerNode.get(i).containsKey(userName)) {
+                            remoteUserPerNode.get(i).put(userName, remoteUserPerNode.get(i).get(userName) + 1);
+                        } else {
+                            remoteUserPerNode.get(i).put(userName, 1);
+                        }
                     }
                     wsOnline.put(i, jsonArray.length());
                     webSocket.sendClose(1000, "Nornal Closure");

@@ -64,6 +64,8 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
+import static org.b3log.symphony.processor.channel.ChatroomChannel.sendCustomMessage;
+
 
 /**
  * Chatroom processor.
@@ -213,6 +215,54 @@ public class ChatroomProcessor {
         Dispatcher.get("/chat-room/si-guo-list", chatroomProcessor::getSiGuoList);
 
         Dispatcher.get("/chat-room/node/get", chatroomProcessor::getNode, loginCheck::handle);
+        Dispatcher.post("/chat-room/node/push", chatroomProcessor::nodePush);
+    }
+
+    public void nodePush(final RequestContext context) {
+        final JSONObject requestJSONObject = context.requestJSON();
+        String adminKey = requestJSONObject.optString("adminKey");
+        if (!Symphonys.get("chatroom.node.adminKey").equals(adminKey)) {
+            context.sendError(403);
+            context.abort();
+            return;
+        }
+
+        String msg = requestJSONObject.optString("msg");
+        String data = requestJSONObject.optString("data");
+        switch (msg) {
+            case "join":
+                String userName = data;
+                boolean joined = true;
+                for (Map.Entry<WebSocketSession, JSONObject> entry : ChatroomChannel.onlineUsers.entrySet()) {
+                    String name = entry.getValue().optString(User.USER_NAME);
+                    if (userName.equals(name)) {
+                        joined = false;
+                    }
+                }
+                if (joined) {
+                    String customMessage = ChatroomChannel.getCustomMessage(1, userName);
+                    if (!customMessage.isEmpty()) {
+                        sendCustomMessage(customMessage);
+                    }
+                }
+                break;
+            case "leave":
+                String userName2 = data;
+                boolean left = true;
+                for (Map.Entry<WebSocketSession, JSONObject> entry : ChatroomChannel.onlineUsers.entrySet()) {
+                    String name = entry.getValue().optString(User.USER_NAME);
+                    if (userName2.equals(name)) {
+                        left = false;
+                    }
+                }
+                if (left) {
+                    String customMessage2 = ChatroomChannel.getCustomMessage(0, userName2);
+                    if (!customMessage2.isEmpty()) {
+                        sendCustomMessage(customMessage2);
+                    }
+                }
+                break;
+        }
     }
 
     public void getNode(final RequestContext context) {
@@ -243,7 +293,6 @@ public class ChatroomProcessor {
         ret.put(Keys.CODE, StatusCodes.SUCC);
         ret.put(Keys.MSG, "");
         if (NodeUtil.wsOnline == null || NodeUtil.wsOnline.isEmpty()) {
-            ret.put(Keys.DATA, "wss://fishpi.cn/chat-room-channel?apiKey=" + key);
             final String serverScheme = Latkes.getServerScheme();
             String wsScheme = StringUtils.containsIgnoreCase(serverScheme, "https") ? "wss" : "ws";
             String wsHost = Latkes.getServerHost();
