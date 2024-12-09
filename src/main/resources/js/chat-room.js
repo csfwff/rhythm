@@ -1374,6 +1374,21 @@ border-bottom: none;
         $(window).scrollTop(0);
     },
     /**
+     * 屏蔽用户发言，收纳到小机器人里
+     * @param userName
+     */
+    block: function (userName) {
+        var robotList = window.localStorage['robot_list'] ? window.localStorage['robot_list'] : '';
+        if (robotList && robotList.length > 0) {
+            robotList = robotList + "," + userName;
+        } else {
+            robotList = userName;
+        }
+        window.localStorage['robot_list'] = robotList;
+        catchUsers = robotList.split(",");
+        Util.notice("success", 30000, "屏蔽 " + userName + " 成功，您可以在左侧小机器人图标中找到 TA 发送的消息，也可以在 “修改捕获用户” 中解除对 TA 的屏蔽。");
+    },
+    /**
      * 一键举报
      * @param id
      */
@@ -2052,6 +2067,7 @@ ${result.info.msg}
                     '                        <a onclick=\"ChatRoom.repeat(\'' + data.oId + '\')\" class="item">复读机</a>\n' +
                     '                        <a onclick=\"ChatRoom.remark(\'' + data.userOId + '\', \'' + data.userName + '\')\" class="item">备注</a>\n' +
                     '                        <a onclick=\"ChatRoom.report(\'' + data.oId + '\')\" class="item"><svg><use xlink:href="#icon-report"></use></svg> 一键举报</a>\n' +
+                    '                        <a onclick=\"ChatRoom.block(\'' + data.userName + '\')\" class="item">屏蔽该用户发言</a>\n' +
                     meTag2 +
                     '                    </details-menu>\n' +
                     '                </details>\n';
