@@ -390,7 +390,7 @@ public class ChatRoomBot {
                             if (result.isEmpty()) {
                                 sendBotMsg("北京一区：报告！没有超过6小时未活跃的成员，一切都很和谐~");
                             } else {
-                                stringBuilder.append("北京一区：报告！成功扫描超过6小时未活跃的成员，并已在通知后将他们断开连接：<br>");
+                                stringBuilder.append("北京一区：报告！成功扫描超过6小时未活跃的成员，并已将他们断开连接：<br>");
                                 stringBuilder.append("<details><summary>不活跃用户列表</summary>");
                                 for (String i : result.keySet()) {
                                     long time = result.get(i);

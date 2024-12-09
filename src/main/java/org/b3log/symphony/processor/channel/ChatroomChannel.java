@@ -114,6 +114,9 @@ public class ChatroomChannel implements WebSocketChannel {
             AdminProcessor.manager.onMessageSent(4, msgStr.length());
             // 保存 Active 信息
             userActive.put(user.optString("userName"), System.currentTimeMillis());
+            // 发送过期客户端消息
+            String text = "{\"userOId\":1630399192600,\"userAvatarURL\":\"https://file.fishpi.cn/2023/12/blob-1d3b18ec.png\",\"userNickname\":\"阿达\",\"oId\":\"" + System.currentTimeMillis() + "\",\"userName\":\"adlered\",\"type\":\"msg\",\"content\":\"<p><\\/p><h3>您正在使用过期的客户端<\\/h3>\\n<p>您的客户端正在使用过期的协议连接到摸鱼派聊天室，该协议将于 2025 年 3 月 1 日 被停用。<\\/p>\\n<p>请将客户端更新到最新版本以享受更快的聊天室服务，如已是最新版本，请联系客户端开发者更新客户端。<\\/p>\\n<p>新版摸鱼派聊天室协议开发指南：<a href=\\\"http://localhost:8080/forward?goto=https%3A%2F%2Ffishpi.cn%2Farticle%2F1733591297543\\\" target=\\\"_blank\\\" rel=\\\"nofollow\\\">https://fishpi.cn/article/1733591297543<\\/a><\\/p>\\n<p><\\/p>\",\"md\":\"### 您正在使用过期的客户端\\n\\n您的客户端正在使用过期的协议连接到摸鱼派聊天室，该协议将于 2025年3月1日 被停用。\\n\\n请将客户端更新到最新版本以享受更快的聊天室服务，如已是最新版本，请联系客户端开发者更新客户端。\\n\\n新版摸鱼派聊天室协议开发指南：https://fishpi.cn/article/1733591297543\",\"userAvatarURL20\":\"https://file.fishpi.cn/2023/12/blob-1d3b18ec.png\",\"sysMetal\":\"{\\\"list\\\":[{\\\"data\\\":\\\"\\\",\\\"name\\\":\\\"摸鱼派铁粉\\\",\\\"description\\\":\\\"捐助摸鱼派达1024RMB; 编号No.9\\\",\\\"attr\\\":\\\"url=https://file.fishpi.cn/2021/12/ht3-b97ea102.jpg&backcolor=ee3a8c&fontcolor=ffffff\\\",\\\"enabled\\\":true},{\\\"data\\\":\\\"\\\",\\\"name\\\":\\\"摸鱼派忠粉\\\",\\\"description\\\":\\\"捐助摸鱼派达256RMB; 编号No.20\\\",\\\"attr\\\":\\\"url=https://file.fishpi.cn/2021/12/ht2-bea67b29.jpg&backcolor=87cefa&fontcolor=efffff\\\",\\\"enabled\\\":true},{\\\"data\\\":\\\"\\\",\\\"name\\\":\\\"摸鱼派粉丝\\\",\\\"description\\\":\\\"捐助摸鱼派达16RMB; 编号No.38\\\",\\\"attr\\\":\\\"url=https://file.fishpi.cn/2021/12/ht1-d8149de4.jpg&backcolor=ffffff&fontcolor=ff3030\\\",\\\"enabled\\\":true}]}\",\"client\":\"Web/PC网页端\",\"time\":\"" + new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(System.currentTimeMillis()) + "\",\"userAvatarURL210\":\"https://file.fishpi.cn/2023/12/blob-1d3b18ec.png\",\"userAvatarURL48\":\"https://file.fishpi.cn/2023/12/blob-1d3b18ec.png\"}";
+            sendText(session, text);
         } else {
             session.close();
         }
@@ -422,23 +425,6 @@ public class ChatroomChannel implements WebSocketChannel {
                 }
             }
             for (WebSocketSession session : senderSessions) {
-                String text = "{\n" +
-                        "    \"md\": \"由于您超过6小时未活跃，已将您断开连接，如要继续聊天请刷新页面，谢谢 :)\",\n" +
-                        "    \"userAvatarURL\": \"https://file.fishpi.cn/2022/01/robot3-89631199.png\",\n" +
-                        "    \"userAvatarURL20\": \"https://file.fishpi.cn/2022/01/robot3-89631199.png\",\n" +
-                        "    \"userNickname\": \"人工智障\",\n" +
-                        "    \"sysMetal\": \"\",\n" +
-                        "    \"time\": \"" + new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(System.currentTimeMillis()) + "\",\n" +
-                        "    \"oId\": \"" + System.currentTimeMillis() + "\",\n" +
-                        "    \"userName\": \"摸鱼派官方巡逻机器人\",\n" +
-                        "    \"type\": \"msg\",\n" +
-                        "    \"userAvatarURL210\": \"https://file.fishpi.cn/2022/01/robot3-89631199.png\",\n" +
-                        "    \"content\": \"<p>由于您超过6小时未活跃，已将您断开连接，如要继续聊天请刷新页面，谢谢 :)</p>\",\n" +
-                        "    \"client\": \"Other/Robot\",\n" +
-                        "    \"userAvatarURL48\": \"https://file.fishpi.cn/2022/01/robot3-89631199.png\"\n" +
-                        "}";
-                sendText(session, text);
-                AdminProcessor.manager.onMessageSent(4, text.length());
                 removeSession(session);
             }
             JdbcRepository.dispose();
