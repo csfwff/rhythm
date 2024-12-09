@@ -1386,7 +1386,7 @@ border-bottom: none;
         }
         window.localStorage['robot_list'] = robotList;
         catchUsers = robotList.split(",");
-        Util.notice("success", 30000, "屏蔽 " + userName + " 成功，您可以在左侧小机器人图标中找到 TA 发送的消息，也可以在 “修改捕获用户” 中解除对 TA 的屏蔽。");
+        Util.notice("success", 10000, "屏蔽 " + userName + " 成功，您可以在左侧小机器人图标中找到 TA 发送的消息，也可以在 “修改捕获用户” 中解除对 TA 的屏蔽。");
     },
     /**
      * 一键举报
