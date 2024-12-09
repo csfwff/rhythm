@@ -1855,7 +1855,7 @@ ${result.info.msg}
             } catch (err) {
             }
             let meTag1 = "";
-            let meTag2 = "<a onclick=\"ChatRoom.shiled('" + data.userName + "')\" class=\"item\" style='color: red'>屏蔽Ta</a>\n";
+            let meTag2 = "";
             if (data.userNickname !== undefined && data.userNickname !== "") {
                 data.userNickname = data.userNickname + " (" + data.userName + ")"
             } else {
