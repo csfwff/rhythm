@@ -2066,8 +2066,8 @@ ${result.info.msg}
                     '                        <a onclick=\"ChatRoom.at(\'' + data.userName + '\', \'' + data.oId + '\', false)\" class="item">引用</a>\n' +
                     '                        <a onclick=\"ChatRoom.repeat(\'' + data.oId + '\')\" class="item">复读机</a>\n' +
                     '                        <a onclick=\"ChatRoom.remark(\'' + data.userOId + '\', \'' + data.userName + '\')\" class="item">备注</a>\n' +
-                    '                        <a onclick=\"ChatRoom.report(\'' + data.oId + '\')\" class="item"><svg><use xlink:href="#icon-report"></use></svg> 一键举报</a>\n' +
                     '                        <a onclick=\"ChatRoom.block(\'' + data.userName + '\')\" class="item">屏蔽该用户发言</a>\n' +
+                    '                        <a onclick=\"ChatRoom.report(\'' + data.oId + '\')\" class="item"><svg><use xlink:href="#icon-report"></use></svg> 一键举报</a>\n' +
                     meTag2 +
                     '                    </details-menu>\n' +
                     '                </details>\n';
