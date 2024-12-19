@@ -35,6 +35,11 @@
 
                 var anim;
                 anim = lottie.loadAnimation(params);
+                setTimeout(function () {
+                    $('#logo-animate').on('mouseenter', function(){
+                        anim.goToAndPlay(10, true)
+                    });
+                }, 1000);
             </script>
         </a>
     </h1>
