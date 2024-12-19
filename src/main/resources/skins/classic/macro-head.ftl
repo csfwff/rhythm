@@ -40,4 +40,5 @@
 <#--<link rel="stylesheet" href="${staticServePath}/css/theme/dark.css?${staticResourceVersion}" />-->
 ${siteVisitStatCode}
 <script type="text/javascript" charset="UTF-8" src="https://cdn.wwads.cn/js/makemoney.js"></script>
+<meta name="baidu-site-verification" content="codeva-wF3TNphcy6" />
 </#macro>
