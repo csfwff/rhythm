@@ -18,11 +18,24 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 -->
+<script src="${staticServePath}/js/lib/lottie.min.js"></script>
+<script src="${staticServePath}/js/lib/logo.js"></script>
 <div class="nav">
     <h1 aria-label="${symphonyLabel}" class="tooltipped tooltipped-s">
         <a href="${servePath}">
-            <svg class="swimming"><use xlink:href="#logo"></use></svg>
-            <img style="position: absolute; visibility: hidden;" src="https://file.fishpi.cn/2023/09/%E6%9C%AA%E6%A0%87%E9%A2%981-d4d954df.png" alt="${symphonyLabel}">
+            <div style="height: 60px; width: 60px" id="logo-animate"></div>
+            <script>
+                var params = {
+                    container: document.getElementById('logo-animate'),
+                    renderer: 'svg',
+                    loop: false,
+                    autoplay: true,
+                    animationData: logoData
+                };
+
+                var anim;
+                anim = lottie.loadAnimation(params);
+            </script>
         </a>
     </h1>
     <div class="nav-tabs">
