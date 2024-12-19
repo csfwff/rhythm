@@ -50,6 +50,9 @@ if (window.localStorage['catch-word-flag']) {
 $('#catch-word').prop('checked', catchWordFlag);
 var ChatRoom = {
     init: function () {
+        if (window.localStorage['robot_list'] == undefined) {
+            ChatRoom.changeCatchUser('xiaoIce,b,sevenSummer');
+        }
         // 聊天窗口高度设置
         /* if ($.ua.device.type !== 'mobile') {
           $('.list').
