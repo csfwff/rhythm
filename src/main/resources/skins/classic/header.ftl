@@ -29,12 +29,13 @@
                     container: document.getElementById('logo-animate'),
                     renderer: 'svg',
                     loop: false,
-                    autoplay: true,
+                    autoplay: false,
                     animationData: logoData
                 };
 
                 var anim;
                 anim = lottie.loadAnimation(params);
+                anim.goToAndPlay(27, true)
                 setTimeout(function () {
                     $('#logo-animate').on('mouseenter', function(){
                         anim.goToAndPlay(10, true)
