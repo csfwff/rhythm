@@ -18,12 +18,26 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 -->
+<script src="${staticServePath}/js/lib/lottie.min.js"></script>
+<script src="${staticServePath}/js/lib/logo.js"></script>
 <div class="nav">
     <div class="wrapper">
         <div class="head-fn fn-left">
             <h1>
                 <a href="${servePath}" aria-label="${symphonyLabel}">
-                    <svg><use xlink:href="#logo-white"></use></svg>
+                    <div style="width: 35px; height: auto" id="logo-animate"></div>
+                    <script>
+                        var params = {
+                            container: document.getElementById('logo-animate'),
+                            renderer: 'svg',
+                            loop: false,
+                            autoplay: true,
+                            animationData: logoData
+                        };
+
+                        var anim;
+                        anim = lottie.loadAnimation(params);
+                    </script>
                 </a>
             </h1>
         </div>
