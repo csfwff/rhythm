@@ -23,7 +23,7 @@
 <div class="nav">
     <h1 aria-label="${symphonyLabel}" class="tooltipped tooltipped-s">
         <a href="${servePath}">
-            <div style="height: 60px; width: 60px" id="logo-animate"></div>
+            <div style="height: 55px;width: 55px;padding-bottom: 6px;" id="logo-animate"></div>
             <script>
                 var params = {
                     container: document.getElementById('logo-animate'),

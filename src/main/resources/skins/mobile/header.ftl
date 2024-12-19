@@ -25,7 +25,7 @@
         <div class="head-fn fn-left">
             <h1>
                 <a href="${servePath}" aria-label="${symphonyLabel}">
-                    <div style="width: 35px; height: auto" id="logo-animate"></div>
+                    <div style="width: 39px; height: auto" id="logo-animate"></div>
                     <script>
                         var params = {
                             container: document.getElementById('logo-animate'),
