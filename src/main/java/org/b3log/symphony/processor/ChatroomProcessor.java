@@ -327,10 +327,12 @@ public class ChatroomProcessor {
                         .append(", 期望客户端数: ").append(String.format("%.2f", expectedClients))
                         .append(", 比值: ").append(String.format("%.2f", ratio)).append("\n");
 
-                // 选择比值最小的节点
-                if (selectedNode == null || ratio < selectedNode.getValue()) {
+                // 选择比值最小的节点，比值相同时，选择权重更高的节点
+                if (selectedNode == null || ratio < selectedNode.getValue() ||
+                        (ratio == selectedNode.getValue() && weight > NodeUtil.nodeWeights.get(selectedNode.getKey()))) {
                     selectedNode = new AbstractMap.SimpleEntry<>(node, ratio);
                 }
+
             }
 
             // 分配选中的节点
