@@ -303,21 +303,53 @@ public class ChatroomProcessor {
             }
             ret.put(Keys.DATA, wsScheme + "://" + wsHost + port2 + "/chat-room-channel?apiKey=" + key);
         } else {
-            Map.Entry<String, Integer> minEntry = null;
+            // 按权重分配节点
+            Map.Entry<String, Double> selectedNode = null;
+            int totalWeight = NodeUtil.nodeWeights.values().stream().mapToInt(Integer::intValue).sum();
+            int totalClients = NodeUtil.wsOnline.size();
             for (Map.Entry<String, Integer> entry : NodeUtil.wsOnline.entrySet()) {
-                if (minEntry == null || entry.getValue() < minEntry.getValue()) {
-                    minEntry = entry;
+                String node = entry.getKey();
+                int currentClients = entry.getValue();
+                int weight = NodeUtil.nodeWeights.getOrDefault(node, 1); // 默认权重为 1
+
+                // 计算期望客户端数
+                double expectedClients = (double) totalClients * weight / totalWeight;
+                // 计算实际/期望比值
+                double ratio = currentClients / Math.max(1, expectedClients);
+
+                // 选择比值最小的节点
+                if (selectedNode == null || ratio < selectedNode.getValue()) {
+                    selectedNode = new AbstractMap.SimpleEntry<>(node, ratio);
                 }
             }
-            ret.put(Keys.DATA, minEntry.getKey() + "?apiKey=" + key);
-            ret.put(Keys.MSG, NodeUtil.nodeNickNames.get(minEntry.getKey()));
+
+            // 分配选中的节点
+            if (selectedNode != null) {
+                String allocatedNode = selectedNode.getKey();
+                NodeUtil.wsOnline.put(allocatedNode, NodeUtil.wsOnline.getOrDefault(allocatedNode, 0) + 1);
+
+                // 返回节点信息
+                ret.put(Keys.DATA, allocatedNode + "?apiKey=" + key);
+                ret.put(Keys.MSG, NodeUtil.nodeNickNames.get(allocatedNode));
+            } else {
+                // 平均分配
+                Map.Entry<String, Integer> minEntry = null;
+                for (Map.Entry<String, Integer> entry : NodeUtil.wsOnline.entrySet()) {
+                    if (minEntry == null || entry.getValue() < minEntry.getValue()) {
+                        minEntry = entry;
+                    }
+                }
+                NodeUtil.wsOnline.put(minEntry.getKey(), NodeUtil.wsOnline.getOrDefault(minEntry.getKey(), 0) + 1);
+                ret.put(Keys.DATA, minEntry.getKey() + "?apiKey=" + key);
+                ret.put(Keys.MSG, NodeUtil.nodeNickNames.get(minEntry.getKey()));
+            }
         }
         JSONArray data = new JSONArray();
         for (Map.Entry<String, Integer> entry : NodeUtil.wsOnline.entrySet()) {
             JSONObject node = new JSONObject();
             node.put("node", entry.getKey());
             node.put("name", NodeUtil.nodeNickNames.get(entry.getKey()));
-            node.put("weight", NodeUtil.nodeWeight.get(entry.getKey()));
+            node.put("weight", NodeUtil.nodeWeights.get(entry.getKey()));
             node.put("online", entry.getValue());
             data.put(node);
         }
