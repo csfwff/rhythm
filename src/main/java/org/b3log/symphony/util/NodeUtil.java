@@ -64,6 +64,8 @@ public class NodeUtil {
 
     public static HashMap<String, String> nodeNickNames = new HashMap<>();
 
+    public static HashMap<String, String> nodeWeight = new HashMap<>();
+
     public static void init() {
         LOGGER.log(Level.INFO, "Loading nodes");
         for (WebSocket i : wsNodes) {
@@ -73,9 +75,11 @@ public class NodeUtil {
         wsNodes = new ArrayList<>();
         uriNodes = new ArrayList<>();
         nodeNickNames.clear();
+        nodeWeight.clear();
         String[] nodes = Symphonys.get("chatroom.node.url").split(";");
         for (String i : nodes) {
             nodeNickNames.put(i.split(",")[0], i.split(",")[1]);
+            nodeWeight.put(i.split(",")[0], i.split(",")[2]);
             i = i.split(",")[0];
             String serverUri = i + "?apiKey=" + Symphonys.get("chatroom.node.adminKey");
             try {

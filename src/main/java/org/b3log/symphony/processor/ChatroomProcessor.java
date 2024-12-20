@@ -317,6 +317,7 @@ public class ChatroomProcessor {
             JSONObject node = new JSONObject();
             node.put("node", entry.getKey());
             node.put("name", NodeUtil.nodeNickNames.get(entry.getKey()));
+            node.put("weight", NodeUtil.nodeWeight.get(entry.getKey()));
             node.put("online", entry.getValue());
             data.put(node);
         }
