@@ -339,6 +339,7 @@ public class ChatroomProcessor {
                 NodeUtil.wsOnline.put(allocatedNode, NodeUtil.wsOnline.getOrDefault(allocatedNode, 0) + 1);
                 logBuilder.append("选中节点: ").append(allocatedNode).append("\n");
                 logBuilder.append("=== 分配日志结束 ===\n");
+                System.out.println(logBuilder);
                 // 返回节点信息
                 ret.put(Keys.DATA, allocatedNode + "?apiKey=" + key);
                 ret.put(Keys.MSG, NodeUtil.nodeNickNames.get(allocatedNode));
