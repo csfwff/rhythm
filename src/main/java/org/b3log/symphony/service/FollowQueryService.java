@@ -29,6 +29,7 @@ import org.b3log.latke.model.Pagination;
 import org.b3log.latke.repository.*;
 import org.b3log.latke.service.annotation.Service;
 import org.b3log.latke.util.Stopwatchs;
+import org.b3log.symphony.cache.FollowingCountCache;
 import org.b3log.symphony.model.Follow;
 import org.b3log.symphony.repository.ArticleRepository;
 import org.b3log.symphony.repository.FollowRepository;
@@ -395,9 +396,23 @@ public class FollowQueryService {
             final List<Filter> filters = new ArrayList<>();
             filters.add(new PropertyFilter(Follow.FOLLOWER_ID, FilterOperator.EQUAL, followerId));
             filters.add(new PropertyFilter(Follow.FOLLOWING_TYPE, FilterOperator.EQUAL, followingType));
+            JSONObject cacheJSON = new JSONObject();
+            cacheJSON.put(Follow.FOLLOWER_ID, followerId);
+            cacheJSON.put(Follow.FOLLOWING_TYPE, followingType);
+            JSONObject result = FollowingCountCache.COUNT_CACHE.get(cacheJSON.toString());
+            if (result != null) {
+                if (result.optLong("time") > System.currentTimeMillis() - FIVE_MINUTES_IN_MILLIS) {
+                    return result.optLong("count");
+                }
+            }
             final Query query = new Query().setFilter(new CompositeFilter(CompositeFilterOperator.AND, filters));
             try {
-                return followRepository.count(query);
+                long count = followRepository.count(query);
+                JSONObject json = new JSONObject();
+                json.put("count", count);
+                json.put("time", System.currentTimeMillis());
+                FollowingCountCache.COUNT_CACHE.put(cacheJSON.toString(), json);
+                return count;
             } catch (final RepositoryException e) {
                 LOGGER.log(Level.ERROR, "Counts following count failed", e);
                 return 0;
@@ -406,6 +421,8 @@ public class FollowQueryService {
             Stopwatchs.end();
         }
     }
+
+    private static final long FIVE_MINUTES_IN_MILLIS = 1000 * 60 * 5;
 
     /**
      * Gets the follower count of a following specified by the given following id and following type.
@@ -418,9 +435,23 @@ public class FollowQueryService {
         final List<Filter> filters = new ArrayList<>();
         filters.add(new PropertyFilter(Follow.FOLLOWING_ID, FilterOperator.EQUAL, followingId));
         filters.add(new PropertyFilter(Follow.FOLLOWING_TYPE, FilterOperator.EQUAL, followingType));
+        JSONObject cacheJSON = new JSONObject();
+        cacheJSON.put(Follow.FOLLOWING_ID, followingId);
+        cacheJSON.put(Follow.FOLLOWING_TYPE, followingType);
+        JSONObject result = FollowingCountCache.COUNT_CACHE.get(cacheJSON.toString());
+        if (result != null) {
+            if (result.optLong("time") > System.currentTimeMillis() - FIVE_MINUTES_IN_MILLIS) {
+                return result.optLong("count");
+            }
+        }
         final Query query = new Query().setFilter(new CompositeFilter(CompositeFilterOperator.AND, filters));
         try {
-            return followRepository.count(query);
+            long count = followRepository.count(query);
+            JSONObject json = new JSONObject();
+            json.put("count", count);
+            json.put("time", System.currentTimeMillis());
+            FollowingCountCache.COUNT_CACHE.put(cacheJSON.toString(), json);
+            return count;
         } catch (final RepositoryException e) {
             LOGGER.log(Level.ERROR, "Counts follower count failed", e);
             return 0;
