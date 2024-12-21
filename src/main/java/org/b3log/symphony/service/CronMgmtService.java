@@ -299,23 +299,13 @@ public class CronMgmtService {
         Symphonys.SCHEDULED_EXECUTOR_SERVICE.scheduleAtFixedRate(() -> {
             try {
                 NodeUtil.init();
-            } catch (final Exception e) {
-                LOGGER.log(Level.ERROR, "Executes cron failed", e);
-            } finally {
-                Stopwatchs.release();
-            }
-        }, delay, 1 * 60 * 1000, TimeUnit.MILLISECONDS);
-        delay += 2000;
-
-        Symphonys.SCHEDULED_EXECUTOR_SERVICE.scheduleAtFixedRate(() -> {
-            try {
                 NodeUtil.initOnline();
             } catch (final Exception e) {
                 LOGGER.log(Level.ERROR, "Executes cron failed", e);
             } finally {
                 Stopwatchs.release();
             }
-        }, delay, 3 * 60 * 1000, TimeUnit.MILLISECONDS);
+        }, delay, 1 * 60 * 1000, TimeUnit.MILLISECONDS);
         delay += 2000;
     }
 
