@@ -68,10 +68,6 @@ public class NodeUtil {
 
     public static void init() {
         LOGGER.log(Level.INFO, "Loading nodes");
-        for (WebSocket i : wsNodes) {
-            i.sendClose(1000, "Nornal Closure");
-
-        }
         List<WebSocket> tmp_wsNodes = new ArrayList<>();
         List<String> tmp_uriNodes = new ArrayList<>();
         HashMap<String, String> tmp_nodeNickNames = new HashMap<>();
@@ -101,6 +97,10 @@ public class NodeUtil {
             } catch (Exception e) {
                 LOGGER.log(Level.ERROR, "Failed to connect to node: " + serverUri, e);
             }
+        }
+
+        for (WebSocket i : wsNodes) {
+            i.sendClose(1000, "Nornal Closure");
         }
         wsNodes.clear();
         uriNodes.clear();
