@@ -263,6 +263,8 @@ public class ChatroomProcessor {
                 }
                 break;
         }
+        context.renderJSON(StatusCodes.SUCC);
+        context.renderMsg("数据上传成功！");
     }
 
     public void getNode(final RequestContext context) {
