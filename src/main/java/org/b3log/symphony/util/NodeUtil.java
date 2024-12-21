@@ -72,14 +72,14 @@ public class NodeUtil {
             i.sendClose(1000, "Nornal Closure");
 
         }
-        wsNodes = new ArrayList<>();
-        uriNodes = new ArrayList<>();
-        nodeNickNames.clear();
-        nodeWeights.clear();
+        List<WebSocket> tmp_wsNodes = new ArrayList<>();
+        List<String> tmp_uriNodes = new ArrayList<>();
+        HashMap<String, String> tmp_nodeNickNames = new HashMap<>();
+        Map<String, Integer> tmp_nodeWeights = new HashMap<>();
         String[] nodes = Symphonys.get("chatroom.node.url").split(";");
         for (String i : nodes) {
-            nodeNickNames.put(i.split(",")[0], i.split(",")[1]);
-            nodeWeights.put(i.split(",")[0], Integer.parseInt(i.split(",")[2]));
+            tmp_nodeNickNames.put(i.split(",")[0], i.split(",")[1]);
+            tmp_nodeWeights.put(i.split(",")[0], Integer.parseInt(i.split(",")[2]));
             i = i.split(",")[0];
             String serverUri = i + "?apiKey=" + Symphonys.get("chatroom.node.adminKey");
             try {
@@ -95,13 +95,22 @@ public class NodeUtil {
 
                 webSocket.sendText(Symphonys.get("chatroom.node.adminKey") + ":::hello", true);
                 future.get(10, TimeUnit.SECONDS);
-                wsNodes.add(webSocket);
-                uriNodes.add(i);
+                tmp_wsNodes.add(webSocket);
+                tmp_uriNodes.add(i);
                 LOGGER.log(Level.INFO, "Connected to node: " + serverUri);
             } catch (Exception e) {
                 LOGGER.log(Level.ERROR, "Failed to connect to node: " + serverUri, e);
             }
         }
+        wsNodes.clear();
+        uriNodes.clear();
+        nodeNickNames.clear();
+        nodeWeights.clear();
+
+        wsNodes.addAll(tmp_wsNodes);
+        uriNodes.addAll(tmp_uriNodes);
+        nodeNickNames.putAll(tmp_nodeNickNames);
+        nodeWeights.putAll(tmp_nodeWeights);
     }
 
     public static void notice(String text) {
@@ -202,10 +211,10 @@ public class NodeUtil {
 
     public static void initOnline() {
         JSONArray onlineList = new JSONArray();
-        wsOnline = new HashMap<>();
-        remoteUserPerNode.clear();
+        Map<String, Integer> tmp_wsOnline = new HashMap<>();
+        HashMap<String, HashMap<String, Integer>> tmp_remoteUserPerNode = new HashMap<>();
         for (String i : uriNodes) {
-            remoteUserPerNode.put(i, new HashMap<>());
+            tmp_remoteUserPerNode.put(i, new HashMap<>());
             try {
                 String serverUri = i + "?apiKey=" + Symphonys.get("chatroom.node.adminKey");
                 SSLContext sslContext = createInsecureSSLContext();
@@ -224,13 +233,13 @@ public class NodeUtil {
                         onlineList.put(jsonArray.get(j));
                         JSONObject jsonObject = jsonArray.getJSONObject(j);
                         String userName = jsonObject.optString("userName");
-                        if (remoteUserPerNode.get(i).containsKey(userName)) {
-                            remoteUserPerNode.get(i).put(userName, remoteUserPerNode.get(i).get(userName) + 1);
+                        if (tmp_remoteUserPerNode.get(i).containsKey(userName)) {
+                            tmp_remoteUserPerNode.get(i).put(userName, tmp_remoteUserPerNode.get(i).get(userName) + 1);
                         } else {
-                            remoteUserPerNode.get(i).put(userName, 1);
+                            tmp_remoteUserPerNode.get(i).put(userName, 1);
                         }
                     }
-                    wsOnline.put(i, jsonArray.length());
+                    tmp_wsOnline.put(i, jsonArray.length());
                     webSocket.sendClose(1000, "Nornal Closure");
                     LOGGER.log(Level.INFO, "Remote " + i + " online list updated. count=" + jsonArray.length());
                 } catch (Exception e) {
@@ -241,6 +250,12 @@ public class NodeUtil {
             }
         }
         remoteUsers = onlineList;
+
+        wsOnline.clear();
+        remoteUserPerNode.clear();
+
+        wsOnline.putAll(tmp_wsOnline);
+        remoteUserPerNode.putAll(tmp_remoteUserPerNode);
 
         // 推送在线信息给子节点
         final BeanManager beanManager = BeanManager.getInstance();
