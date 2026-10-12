@@ -83,6 +83,7 @@
 - 评论区交互不是单点模板：首屏评论列表由 `ArticleProcessor` + `CommentQueryService#getArticleComments` 组装，展开“原评论/回复”走 `CommentProcessor#getOriginalComment/getReplies`，实时新评论卡片由 `processor/channel/ArticleChannel` 渲染 `skins/**/common/comment.ftl`；改评论动作区时需同步评估 PC/移动模板、`article.js`/`m-article.js` 以及实时插入链路。
 - 文章代码高亮由 `src/main/resources/js/common.js` 的 `Util.parseHljs` 统一加载；`vditor/latest` 的 `.min.css` 高亮样式对应 `highlight.min.js` + `third-languages.js`，旧版样式才对应 `highlight.pack.js`。
 - RSS 订阅链路在 `FeedProcessor` + `model/feed/RSS*` 手写 XML；输出前必须保证 XML 1.0 字符合法并处理 CDATA 结束符，思绪正文不要作为普通 `articleContent` 放进 RSS description。
+- 首页摸鱼倒计时的节假日数据在 `util/Vocation`：数据源为 holiday-cn（jsDelivr/GitHub raw 年度 JSON，国务院官方公告），本地计算 type/dayName/vName/vRest/wRest；不再依赖 timor.tech；刷新失败保留上次成功数据并按周末规则兜底，字段契约与 `/api/vocation` 不变。
 - `symphony_article.articleHotScore` 是数据库生成列，只用于查询排序；文章写入统一经 `ArticleRepository` 过滤该字段，业务代码不要把它作为普通字段增改。
 - 文章历史版本链路：前端通过 `/article/{id}/revisions/list` 获取轻量版本列表，再按需调用 `/article/{id}/revisions/{revisionId}` 获取单个版本正文；旧 `/article/{id}/revisions` 已删除；两个新接口都挂 `loginCheck` + `permissionMidware` 并兼容 `apiKey`。
 - 文章上下篇链路：`ArticleProcessor` 统一填充时间、作者、热门三组导航数据及小窗口列表；PC/移动模板共用 `skins/classic/*/common/article-adjacent-nav.ftl`；“全部文章”排序选择由 `article.js`/`m-article.js` 写入 `localStorage.articleAdjacentSort`。
