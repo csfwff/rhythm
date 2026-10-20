@@ -33,14 +33,25 @@ public class ApiV3ClientRegistrationService {
         public Registered{redirectUris=List.copyOf(redirectUris);}
     }
 
-    /** The caller owns approval, authentication, idempotency and the strict root commit. */
-    public Registered createApprovedInCurrentTransaction(String name,String scope,List<String> redirectUris)throws Exception {
-        if(!clients.hasTransactionBegun()||!redirects.hasTransactionBegun())throw new IllegalStateException("registration owner transaction required");
+    /** Pure normalization shared by approved creation and administrative full replacement. */
+    public record Definition(String name,String scope,List<String> redirectUris){
+        public Definition{redirectUris=List.copyOf(redirectUris);}
+    }
+    public Definition normalizeDefinition(String name,String scope,List<String> redirectUris){
         final String display=displayName(name),permissions=permissions(scope);
         if(redirectUris==null||redirectUris.isEmpty())throw new IllegalArgumentException("registered redirect required");
         final List<String> callbacks=List.copyOf(redirectUris);
         for(String uri:callbacks)if(!ApiV3OAuthRedirects.valid(uri,development()))throw new IllegalArgumentException("invalid registered redirect");
         if(Set.copyOf(callbacks).size()!=callbacks.size())throw new IllegalArgumentException("duplicate registered redirect");
+        return new Definition(display,permissions,callbacks);
+    }
+
+    /** The caller owns approval, authentication, idempotency and the strict root commit. */
+    public Registered createApprovedInCurrentTransaction(String name,String scope,List<String> redirectUris)throws Exception {
+        if(!clients.hasTransactionBegun()||!redirects.hasTransactionBegun())throw new IllegalStateException("registration owner transaction required");
+        final Definition definition=normalizeDefinition(name,scope,redirectUris);
+        final String display=definition.name(),permissions=definition.scope();
+        final List<String> callbacks=definition.redirectUris();
         return ApiV3TransactionSavepoint.run(()->{
             final String id=clientId(),row=rowId();
             if(id==null||!id.matches("app_[A-Za-z0-9_-]{43}")||row==null||!row.matches("[1-9][0-9]{0,18}"))throw new IllegalStateException("invalid registration identity");

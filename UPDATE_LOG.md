@@ -4,6 +4,26 @@
 
 # 261020
 
+## v3 管理员 OAuth 客户端修改
+
+新增 `PUT /api/v3/admin/oauth/clients/{clientId}`，网站第一方管理员持 settings.write 与 Idempotency-Key 完整替换 name、scope、redirectUris，沿用登记上限。权限集合或回调集合变化会令全部已有令牌、旧授权码、待确认授权失效，用户需重新授权；仅名称或集合顺序变化保留授权。保留当前启用状态，不提供重新启用；同键重试不覆盖后续修改。
+
+## v3 本人匿名内容列表
+
+新增 `GET /api/v3/me/anonymous-articles` 与 `GET /api/v3/me/anonymous-comments`，需要 content.read，分页默认20条、最大50条。返回本人匿名创作概要，评论列表按所属文章当前阅读权限筛选；正文继续通过文章或评论详情接口读取。
+
+## v3 客户端停用与邀请码状态
+
+新增 `DELETE /api/v3/admin/oauth/clients/{clientId}`，仅网站第一方管理员持 settings.write 与 Idempotency-Key 使用。逻辑停用并撤销该客户端已有令牌，保留登记资料和回调，不提供重新启用；请求体可省略或空JSON，最多1024字节，同键重试恢复原结果。新增 `POST /api/v3/invitation-codes/status`，需要 activity.read，查询已知16位字母数字邀请码，返回 used/unused/stopped；请求体最多1024字节，unused仅为存储状态，不保证当前可注册。
+
+## v3 管理员 OAuth 客户端登记
+
+新增第三方客户端列表、详情及登记：`GET /api/v3/admin/oauth/clients`、`GET /api/v3/admin/oauth/clients/{clientId}`、`POST /api/v3/admin/oauth/clients`。仅管理员持网站第一方令牌及 settings.write 使用，登记需要 Idempotency-Key；每个客户端支持 1–20 个回调，每个最多 2048 字符，沿用完整地址精确匹配规则。同键重试恢复原登记结果，客户端停用与修改见本日后续记录。
+
+## v3 主职业与勋章显示设置
+
+新增 `PUT /api/v3/me/professions/primary` 与 `PUT /api/v3/me/medals/{medalId}/display`，均需要 settings.write 和 Idempotency-Key。主职业可选择当前已发布职业，无需既有经验且不收费；勋章显示使用明确布尔值设置，重复请求不会反向切换。同键同请求恢复原结果，不覆盖后续设置；同键不同内容返回 HTTP 409。原职业与勋章入口规则保持。
+
 ## v3 职业、勋章和会员读取
 
 新增职业目录 `GET /api/v3/professions` 及本人职业 `GET /api/v3/me/professions`，支持分页，本人读取需要 profile.read，返回选择状态、隐私设置及已产生的职业进度。新增 `GET /api/v3/me/medals` 与 `GET /api/v3/users/{userName}/medals`，分别返回本人有效勋章（需要 profile.read，含隐藏）和用户公开展示的有效勋章。新增 `GET /api/v3/membership/levels`（content.read）及 `GET /api/v3/me/membership`（profile.read），返回档位、已知权益和本人会员状态。职业目录、勋章列表和会员档位分页默认 20 条、最大 50 条；本批未开放对应修改、开通或收费接口。

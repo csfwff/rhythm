@@ -74,9 +74,16 @@ public class ApiV3Processor {
         ApiV3EmotionProcessor.register();
         ApiV3RedPacketProcessor.register();
         ApiV3ProfessionProcessor.register();
+        ApiV3ProfessionPrimaryProcessor.register();
         ApiV3MedalProcessor.register();
+        ApiV3MedalDisplayProcessor.register();
         ApiV3MembershipProcessor.register();
         ApiV3OAuthProcessor.register();
+        ApiV3ClientManagementProcessor.register();
+        ApiV3ClientDisableProcessor.register();
+        ApiV3ClientUpdateProcessor.register();
+        ApiV3InvitationProcessor.register();
+        ApiV3AnonymousContentProcessor.register();
         ApiV3AccountProcessor.register();
         final ApiV3AuthMidware auth = beans.getReference(ApiV3AuthMidware.class);
         final AnonymousViewCheckMidware anonymous = beans.getReference(AnonymousViewCheckMidware.class);

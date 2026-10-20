@@ -12349,6 +12349,41 @@ curl 'https://fishpi.cn/api/v3/me/professions?p=1&size=20' \
 
 > 本人可以读取隐藏的职业进度。列表只包含已有进度记录的职业；已选主职业可能尚未出现在列表中，请同时读取 state。
 
+### 设置主职业
+
+`PUT /api/v3/me/professions/primary`
+
+选择当前已发布的主职业，需要 settings.write 和 Idempotency-Key。无需已有职业经验，不收取积分。
+
+请求：
+
+| Key | 说明 | 示例 |
+| --- | --- | --- |
+| Authorization | 请求头，Bearer accessToken | Bearer YOUR_ACCESS_TOKEN |
+| Idempotency-Key | 请求头，本次操作的幂等键 | primary-001 |
+| professionId | 已发布职业 ID，字符串 | 1700000000001 |
+
+请求示例：
+
+```bash
+curl --request PUT 'https://fishpi.cn/api/v3/me/professions/primary' \
+  --header 'Authorization: Bearer YOUR_ACCESS_TOKEN' \
+  --header 'Idempotency-Key: primary-001' \
+  --header 'Content-Type: application/json' \
+  --data '{"professionId":"1700000000001"}'
+```
+
+响应：
+
+| Key | 说明 | 示例 |
+| --- | --- | --- |
+| code | 0 表示成功 | 0 |
+| data | 本次选择结果 | `{...}` |
+| - onboardingState | 选择完成状态 | SELECTED |
+| - primaryProfessionId | 主职业 ID | 1700000000001 |
+
+> 只修改职业选择，不创建经验记录或更改隐私设置。成功后可重新读取本人职业状态。同键同请求重试返回原结果，不覆盖后续选择；同键更换职业返回 HTTP 409。无效参数返回 422，职业不存在或未发布返回 404。
+
 ## API v3 勋章
 
 ### 读取本人勋章
@@ -12421,6 +12456,42 @@ curl 'https://fishpi.cn/api/v3/users/fishpi/medals?p=1&size=20'
 | - pagination | 分页信息，含 p、size、total、pageCount | `{...}` |
 
 > 隐藏或过期勋章不出现在公开结果中。用户不存在或不可访问时返回 HTTP 404。
+
+### 设置勋章显示
+
+`PUT /api/v3/me/medals/{medalId}/display`
+
+设置本人有效勋章是否展示，需要 settings.write 和 Idempotency-Key，不收取积分。
+
+请求：
+
+| Key | 说明 | 示例 |
+| --- | --- | --- |
+| Authorization | 请求头，Bearer accessToken | Bearer YOUR_ACCESS_TOKEN |
+| Idempotency-Key | 请求头，本次操作的幂等键 | medal-display-001 |
+| medalId | 路径参数，勋章定义 ID，1–128 个 UTF-16 单位；保留原值并进行 URL 编码 | 0 |
+| displayed | 布尔值，true 展示、false 隐藏 | false |
+
+请求示例：
+
+```bash
+curl --request PUT 'https://fishpi.cn/api/v3/me/medals/0/display' \
+  --header 'Authorization: Bearer YOUR_ACCESS_TOKEN' \
+  --header 'Idempotency-Key: medal-display-001' \
+  --header 'Content-Type: application/json' \
+  --data '{"displayed":false}'
+```
+
+响应：
+
+| Key | 说明 | 示例 |
+| --- | --- | --- |
+| code | 0 表示成功 | 0 |
+| data | 本次设置结果 | `{...}` |
+| - id | 勋章定义 ID | 0 |
+| - displayed | 本次设置的展示状态 | false |
+
+> 本接口是设置操作，重复设置相同值不会反向切换。成功后可重新读取本人及公开勋章列表。同键同请求返回原结果，不覆盖后续设置；同键更换目标或状态返回 HTTP 409。无持有记录、过期或目标不存在返回 404；状态异常暂不可修改时返回 409。勋章顺序保持。
 
 ## API v3 会员
 
@@ -12499,3 +12570,312 @@ curl 'https://fishpi.cn/api/v3/me/membership' \
 | -- jointVip | 联合会员权益，可选 | false |
 
 > 未开通或已过期返回 active=false、空 levelCode、expiresAt=0 和空 config。未识别或格式不合法的可选权益字段不返回。本模块暂未提供 v3 开通或配置修改接口。
+
+
+## API v3 OAuth 客户端管理
+
+### 读取客户端列表
+
+`GET /api/v3/admin/oauth/clients`
+
+管理员读取已登记的第三方客户端，需要网站第一方 Bearer accessToken 和 settings.write。
+
+请求：
+
+| Key | 说明 | 示例 |
+| --- | --- | --- |
+| Authorization | 请求头，网站第一方 Bearer accessToken | Bearer YOUR_ACCESS_TOKEN |
+| p | 页码，默认 1 | 1 |
+| size | 每页条数，默认 20，最大 50 | 20 |
+
+请求示例：
+
+```bash
+curl 'https://fishpi.cn/api/v3/admin/oauth/clients?p=1&size=20' \
+  --header 'Authorization: Bearer YOUR_ACCESS_TOKEN'
+```
+
+响应：
+
+| Key | 说明 | 示例 |
+| --- | --- | --- |
+| code | 0 表示成功 | 0 |
+| data | 分页结果 | `{...}` |
+| - list | 第三方客户端列表 | `[]` |
+| -- clientId | 客户端标识 | app_YOUR_CLIENT_ID |
+| -- name | 名称 | 示例客户端 |
+| -- scope | 已登记权限，空格分隔 | content.read profile.read |
+| -- status | 0 启用，1 停用 | 0 |
+| - pagination | 分页信息，含 p、size、total、pageCount | `{...}` |
+
+### 读取客户端详情
+
+`GET /api/v3/admin/oauth/clients/{clientId}`
+
+管理员读取一个第三方客户端及其分页回调地址，需要网站第一方 Bearer accessToken 和 settings.write。
+
+请求：
+
+| Key | 说明 | 示例 |
+| --- | --- | --- |
+| Authorization | 请求头，网站第一方 Bearer accessToken | Bearer YOUR_ACCESS_TOKEN |
+| clientId | 路径参数，客户端标识 | app_YOUR_CLIENT_ID |
+| p | 回调列表页码，默认 1 | 1 |
+| size | 回调每页条数，默认 20，最大 50 | 20 |
+
+请求示例：
+
+```bash
+curl 'https://fishpi.cn/api/v3/admin/oauth/clients/app_YOUR_CLIENT_ID?p=1&size=20' \
+  --header 'Authorization: Bearer YOUR_ACCESS_TOKEN'
+```
+
+响应：
+
+| Key | 说明 | 示例 |
+| --- | --- | --- |
+| code | 0 表示成功 | 0 |
+| data | 客户端详情 | `{...}` |
+| - clientId | 客户端标识 | app_YOUR_CLIENT_ID |
+| - name | 名称 | 示例客户端 |
+| - scope | 已登记权限，空格分隔 | content.read profile.read |
+| - status | 0 启用，1 停用 | 0 |
+| - redirects | 回调分页结果 | `{...}` |
+| -- list | 回调列表 | `[]` |
+| --- uri | 完整回调地址 | https://app.example/callback |
+| --- status | 0 启用，1 停用 | 0 |
+| -- pagination | 分页信息，含 p、size、total、pageCount | `{...}` |
+
+> 不提供网站内置客户端的管理详情。目标不存在或不属于可管理范围时返回 HTTP 404。
+
+### 登记第三方客户端
+
+`POST /api/v3/admin/oauth/clients`
+
+管理员登记已批准的第三方客户端，需要网站第一方 Bearer accessToken、settings.write 和 Idempotency-Key。
+
+请求：
+
+| Key | 说明 | 示例 |
+| --- | --- | --- |
+| Authorization | 请求头，网站第一方 Bearer accessToken | Bearer YOUR_ACCESS_TOKEN |
+| Idempotency-Key | 请求头，本次登记的幂等键 | oauth-client-001 |
+| name | 客户端名称，1–128 个 UTF-16 单位，保存时去除首尾空白 | 示例客户端 |
+| scope | 已实现的权限范围，空格分隔，最多 255 字符 | content.read profile.read |
+| redirectUris | 1–20 个完整回调地址，每个最多 2048 字符，不允许重复 | `["https://app.example/callback"]` |
+
+请求示例：
+
+```bash
+curl --request POST 'https://fishpi.cn/api/v3/admin/oauth/clients' \
+  --header 'Authorization: Bearer YOUR_ACCESS_TOKEN' \
+  --header 'Idempotency-Key: oauth-client-001' \
+  --header 'Content-Type: application/json' \
+  --data '{"name":"示例客户端","scope":"content.read profile.read","redirectUris":["https://app.example/callback"]}'
+```
+
+响应：
+
+| Key | 说明 | 示例 |
+| --- | --- | --- |
+| code | 0 表示成功 | 0 |
+| data | 登记结果 | `{...}` |
+| - clientId | 服务端分配的客户端标识 | app_YOUR_CLIENT_ID |
+| - name | 登记名称 | 示例客户端 |
+| - scope | 规范化后的权限范围 | content.read profile.read |
+| - status | 初始为启用 | 0 |
+| - redirectUris | 已登记的完整回调地址 | `["https://app.example/callback"]` |
+
+> 回调支持 HTTPS；开发环境允许 HTTP 回环地址；原生客户端可登记专用的反向域名 scheme。回调必须精确匹配登记值，禁止用户凭据、片段和预置 OAuth 响应参数。无效字段或回调返回 HTTP 422。
+>
+> 普通用户或第三方应用令牌不能管理客户端。相同幂等键和请求恢复原登记结果，不重复创建；同键更换内容返回 HTTP 409。响应中断后请使用原键和原请求重试。
+
+
+### 修改第三方客户端
+
+`PUT /api/v3/admin/oauth/clients/{clientId}`
+
+完整替换登记名称、权限和回调地址，需要网站第一方管理员 Bearer accessToken、settings.write 和 Idempotency-Key。
+
+请求：
+
+| Key | 说明 | 示例 |
+| --- | --- | --- |
+| Authorization | 请求头，网站第一方 Bearer accessToken | Bearer YOUR_ACCESS_TOKEN |
+| Idempotency-Key | 请求头，本次修改的幂等键 | oauth-update-001 |
+| clientId | 路径参数，第三方客户端标识 | app_YOUR_CLIENT_ID |
+| name | 必填，名称1–128个UTF-16单位，去除首尾空白 | 示例客户端 |
+| scope | 必填，已实现权限，空格分隔，最多255字符 | content.read profile.read |
+| redirectUris | 必填，1–20个完整回调，每个最多2048字符，禁止重复 | `["https://app.example/callback"]` |
+
+请求示例：
+
+```bash
+curl --request PUT 'https://fishpi.cn/api/v3/admin/oauth/clients/app_YOUR_CLIENT_ID' \
+  --header 'Authorization: Bearer YOUR_ACCESS_TOKEN' \
+  --header 'Idempotency-Key: oauth-update-001' \
+  --header 'Content-Type: application/json' \
+  --data '{"name":"示例客户端","scope":"content.read profile.read","redirectUris":["https://app.example/callback"]}'
+```
+
+响应：
+
+| Key | 说明 | 示例 |
+| --- | --- | --- |
+| code | 0表示成功 | 0 |
+| data | 修改结果 | `{...}` |
+| - clientId | 客户端标识 | app_YOUR_CLIENT_ID |
+| - name | 规范化后的名称 | 示例客户端 |
+| - scope | 规范化后的权限范围 | content.read profile.read |
+| - status | 保留当前状态，0启用、1停用 | 0 |
+| - redirectUris | 完整回调地址集合 | `["https://app.example/callback"]` |
+
+> 回调格式与登记接口一致。权限集合或回调地址集合改变后，该应用全部已有令牌、旧授权码和待确认授权失效，用户必须重新授权；仅名称修改、回调顺序或权限顺序变化不撤销授权。已停用客户端修改后仍停用；网站内置客户端不可修改。
+>
+> 同键同请求恢复原结果，不覆盖后续修改；同键更换内容返回409。无效字段或回调返回422，目标不存在或不可管理返回404。
+
+### 停用第三方客户端
+
+`DELETE /api/v3/admin/oauth/clients/{clientId}`
+
+管理员停用已登记第三方客户端并撤销其已有令牌，需要网站第一方 Bearer accessToken、settings.write 和 Idempotency-Key。
+
+请求：
+
+| Key | 说明 | 示例 |
+| --- | --- | --- |
+| Authorization | 请求头，网站第一方 Bearer accessToken | Bearer YOUR_ACCESS_TOKEN |
+| Idempotency-Key | 请求头，本次停用的幂等键 | oauth-disable-001 |
+| clientId | 路径参数，第三方客户端标识 | app_YOUR_CLIENT_ID |
+
+请求示例：
+
+```bash
+curl --request DELETE 'https://fishpi.cn/api/v3/admin/oauth/clients/app_YOUR_CLIENT_ID' \
+  --header 'Authorization: Bearer YOUR_ACCESS_TOKEN' \
+  --header 'Idempotency-Key: oauth-disable-001'
+```
+
+响应：
+
+| Key | 说明 | 示例 |
+| --- | --- | --- |
+| code | 0 表示成功 | 0 |
+| data | 停用结果 | `{...}` |
+| - clientId | 客户端标识 | app_YOUR_CLIENT_ID |
+| - status | 1 表示停用 | 1 |
+
+> 无需请求体，或提交 application/json 空对象 `{}`；请求体最多1024字节。超限返回413，额外字段返回422。客户端登记资料和回调保留，已有令牌失效，不能继续授权或换码；网站内置客户端不可停用。目标不存在或不可管理时返回404。
+>
+> 同键同目标恢复原结果，不重复停用；同键更换目标返回409。已停用目标使用新键仍返回成功。原键不会覆盖后续状态，如需再次执行新的停用操作请使用新键。未提供重新启用接口。
+
+## API v3 邀请码
+
+### 查询邀请码状态
+
+`POST /api/v3/invitation-codes/status`
+
+查询一个已知邀请码的存储状态，需要 activity.read。
+
+请求：
+
+| Key | 说明 | 示例 |
+| --- | --- | --- |
+| Authorization | 请求头，Bearer accessToken | Bearer YOUR_ACCESS_TOKEN |
+| code | 邀请码，去除首尾空白后16位字母或数字 | AbCdEf0123456789 |
+
+请求示例：
+
+```bash
+curl --request POST 'https://fishpi.cn/api/v3/invitation-codes/status' \
+  --header 'Authorization: Bearer YOUR_ACCESS_TOKEN' \
+  --header 'Content-Type: application/json' \
+  --data '{"code":"AbCdEf0123456789"}'
+```
+
+响应：
+
+| Key | 说明 | 示例 |
+| --- | --- | --- |
+| code | 0 表示成功 | 0 |
+| data | 查询结果 | `{...}` |
+| - status | 存储状态：unused 未使用、used 已使用、stopped 停用 | unused |
+
+> 请求体最多1024字节。unused 不保证当前可用于注册，是否可用以注册接口结果为准。不存在返回 HTTP 404，非法参数返回 422。
+
+
+## API v3 本人匿名内容
+
+### 读取本人匿名文章列表
+
+`GET /api/v3/me/anonymous-articles`
+
+分页读取当前账号的匿名文章概要，需要 content.read。
+
+请求：
+
+| Key | 说明 | 示例 |
+| --- | --- | --- |
+| Authorization | 请求头，Bearer accessToken | Bearer YOUR_ACCESS_TOKEN |
+| p | 页码，默认 1 | 1 |
+| size | 每页条数，默认 20，最大 50 | 20 |
+
+请求示例：
+
+```bash
+curl 'https://fishpi.cn/api/v3/me/anonymous-articles?p=1&size=20' \
+  --header 'Authorization: Bearer YOUR_ACCESS_TOKEN'
+```
+
+响应：
+
+| Key | 说明 | 示例 |
+| --- | --- | --- |
+| code | 0 表示成功 | 0 |
+| data | 分页结果 | `{...}` |
+| - list | 本人匿名文章概要，按创建时间、ID 降序 | `[]` |
+| -- id | 文章 ID | 1700000000001 |
+| -- title | 纯文本标题 | 我的文章 |
+| -- type | 文章类型，取值同文章接口 | 0 |
+| -- createdAt | 创建时间，毫秒时间戳 | 1700000000000 |
+| -- updatedAt | 更新时间，毫秒时间戳 | 1700000000000 |
+| - pagination | 分页信息，含 p、size、total、pageCount | `{...}` |
+
+> 仅包含当前账号的有效匿名文章；文章正文请使用文章详情接口读取。
+
+### 读取本人匿名评论列表
+
+`GET /api/v3/me/anonymous-comments`
+
+分页读取当前账号在当前可读文章中的匿名评论概要，需要 content.read。
+
+请求：
+
+| Key | 说明 | 示例 |
+| --- | --- | --- |
+| Authorization | 请求头，Bearer accessToken | Bearer YOUR_ACCESS_TOKEN |
+| p | 页码，默认 1 | 1 |
+| size | 每页条数，默认 20，最大 50 | 20 |
+
+请求示例：
+
+```bash
+curl 'https://fishpi.cn/api/v3/me/anonymous-comments?p=1&size=20' \
+  --header 'Authorization: Bearer YOUR_ACCESS_TOKEN'
+```
+
+响应：
+
+| Key | 说明 | 示例 |
+| --- | --- | --- |
+| code | 0 表示成功 | 0 |
+| data | 分页结果 | `{...}` |
+| - list | 本人匿名评论概要，按创建时间、ID 降序 | `[]` |
+| -- id | 评论 ID | 1700000000002 |
+| -- articleId | 所属文章 ID | 1700000000001 |
+| -- articleTitle | 所属文章纯文本标题 | 文章标题 |
+| -- createdAt | 评论创建时间，毫秒时间戳 | 1700000000000 |
+| -- visibility | 0 普通，1 私密 | 0 |
+| - pagination | 分页信息，含 p、size、total、pageCount | `{...}` |
+
+> 讨论帖按当前阅读权限筛选。已删除或当前无权阅读的目标不列出；评论正文请使用评论详情接口读取。暂时无法完成查询时返回 HTTP 503。

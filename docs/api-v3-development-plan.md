@@ -27,7 +27,7 @@
 
 | 优先级 | website_v3 页面能力 | v3 目标资源 | 状态 | 前置条件 |
 | --- | --- | --- | --- | --- |
-| P0 | 账号入口 | `auth/register-*`、`auth/password-reset-*`、`auth/login` | 登录已实现；OAuth授权码/同意页/换码/轮换撤销源码已接入；密码重置与注册完成入口已接入，v3找回短信/验证组件及注册短信申请已接入；应用登记已确认仅管理员登记维护，管理入口待实现 | 复用账号规则，独立 JSON 响应 |
+| P0 | 账号入口 | `auth/register-*`、`auth/password-reset-*`、`auth/login` | 登录已实现；OAuth授权码/同意页/换码/轮换撤销源码已接入；密码重置与注册完成入口已接入，v3找回短信/验证组件及注册短信申请已接入；应用登记已确认仅管理员登记维护，列表/详情/幂等登记已接入，停用/回调维护待实现 | 复用账号规则，独立 JSON 响应 |
 | P0 | 文章与评论 | `articles`、`articles/{id}`、`articles/{id}/comments` | 读取与文章创建/部分编辑/删除、本人编辑源码和评论发布/编辑/删除、回复（含段评）、感谢、采纳、文章/评论投票及文章感谢/打赏读写已接入；其他管理/互动待实现；旧打赏正文返回保护已获批接入，运行待验证 | content.read/content.write/comments.write；匿名/讨论/打赏/私密评论边界 |
 | P0 | 搜索、标签、领域 | `search`、`tags`、`domains` | 目录/详情/文章读取源码已实现，待运行验证 | 参数白名单和公开 DTO |
 | P0 | 公开主页 | `users/{userName}` 及子页 | 资料、文章、评论、清风明月、关注用户/标签/收藏、粉丝、关注动态/订阅读取源码已实现，待运行验证 | 隐私设置与用户 DTO |
@@ -2372,3 +2372,73 @@ XSS：三处账号回调错误消息改为文本；输入返回或 HTML 验证�
 用户要求先提交并推送现有成果、再开发剩余任务。提交范围为当前api_v3分支此前累计的v3接口/事务核心、用户已批准的旧入口兼容修复、SQL/Repository、PC/mobile模板与源码/生成JS、专项和文档。已执行corepack yarn run build（环境没有独立yarn命令，未自动修改packageManager），重建产物无额外CSS或依赖文件差异；生产JS版本扫描99文件、0发现。重新执行api-v3-chat-event-test、api-v3-socket-test、api-v3-private-message-test、api-v3-write-test均退出0；四组为隔离回归证据，不代替完整应用。git diff --check、JSON结构及新Repository字面名称/registry匹配检查通过，源码路由187条的既有清单保持。
 
 匿名/API认证边界、黑名单/验证码链及viewSkips已按源码和前述专项记录复核；本次未改风控例外或新增路径。静态变更仅已记录JS及生成物，PC/mobile模板同步已在既有批次记录；没有新增公网目录/下载或凭据文件。仍未验证完整Java/IoC、真实MySQL迁移/事务竞争、IDEA重启后的HTTP/WS及浏览器、全站CDN/目录/上传下载和真实黑名单解封，不将Git推送等同部署/发布验收。未执行Maven、未访问生产或真实支付。
+
+
+## 2026-10-20 已推送后第三轮：主职业、勋章显示与OAuth管理
+
+用户要求先提交推送再继续开发，已完成累计提交`6231c4f00352c9bbaeefbb7a32804c7aebea289d`并通过本机SSH推送`origin/api_v3`，分支追踪已设置。HTTPS终端缺凭据，推送使用仅本次命令的remote.origin.pushurl覆盖，没有永久改远端URL。此前累计595文件/187接口为该提交范围；本批新增内容保持未再次提交，不把它混入已推送成果。
+
+本批实际新增/修改：
+
+- `processor/ApiV3ProfessionPrimaryProcessor.java`、`service/ApiV3ProfessionPrimaryService.java`、`src/test/java/org/b3log/symphony/service/ApiV3ProfessionPrimaryTest.java`、`tools/api-v3-profession-primary-test.mjs`、`docs/api-v3-profession-primary-work.md`：PUT /api/v3/me/professions/primary，settings.write/幂等/免费/任意当前发布职业，无需经验，不插progress；当前user→profession→privacy锁，只按列改selection及userProgressVersion/时间，保留隐私。默认缺记录时建既有默认privacy。旧privacy整行写并发覆盖仍是局限，不声称新旧整体原子化。
+- `processor/ApiV3MedalDisplayProcessor.java`、`service/ApiV3MedalDisplayService.java`、`util/ApiV3MedalDisplay.java`、`src/test/java/org/b3log/symphony/service/ApiV3MedalDisplayTest.java`、`tools/api-v3-medal-display-test.mjs`、`docs/api-v3-medal-display-work.md`：PUT /api/v3/me/medals/{medalId}/display，settings.write/幂等/严格布尔/原样字符串ID含0/Unicode、128 UTF-16且拒孤立代理项；actor→定义→本人持有锁仅改display。过期/无目标404，重复定义/持有或坏存量409，不随机选择或改变顺序/积分。
+- `processor/ApiV3ClientManagementProcessor.java`、`service/ApiV3ClientManagementService.java`、`util/ApiV3ClientManagementInputs.java`、`util/ApiV3ClientManagementDto.java`、`src/test/java/org/b3log/symphony/processor/ApiV3ClientManagementTest.java`、`tools/api-v3-client-management-test.mjs`、`docs/api-v3-client-management-work.md`：管理员GET集合/详情、幂等POST登记，当前第一方Token/管理员DB重验；普通、OP、第三方管理员Token均不能进入。当前根按账号重置顺序锁客户端命名空间→website/user/token/request，重放也重验权限；复用已批准登记primitive，client/callback/receipt同提交。用户已确认20回调/2048字符并实际验证边界，存储metadata/回调仍有界白名单，不修改内置client，不开放停用/回调/权限维护。
+- `processor/ApiV3Processor.java`总接线三个模块；API.md/UPDATE_LOG.md维护5个完整新契约，AGENTS.md记录长期链路，progress与inventory-and-design及生成api-route-inventory同步最新计数。无新增Repository/SQL/配置、FTL/JS/SCSS或生成前端资源变更。
+
+实际验证：主代理最终复跑Java25 `api-v3-profession-primary-test.mjs`8组、`api-v3-medal-display-test.mjs`6组、`api-v3-client-management-test.mjs`10组均通过并退出0。生产路由/auth/write中间件/controller、查询/更新/注册SQL、严格幂等根及真实打包JdbcTransaction、保存点参与隔离测试；用户/Token查找及响应信封、SQLite方言/连接池构造为明确适配器。包含提交前拒绝、提交后确认丢失、局部回滚及回滚失败、失效账号/降权后的原key、20/2048边界，不能推广为真实MySQL并发或完整IoC验证。真实测试不是全应用Maven编译，未运行Maven。
+
+人工完整链路（先用户IDEA重新编译或重启，本轮已明确提醒，未确认）：
+
+1. A/B登录取settings.write及profile.read。职业目录GET→A PUT主职业→GET本人状态→PC/mobile职业页核对，B不受影响、无扣费或假progress。换新key选B职业，再重放旧key只回旧回执但当前选择不回退；未发布/退休/不存在404、非法字段/key/JSON422或400、缺Bearer401/缺scope403；停用后旧key也拒绝。
+2. A GET本人勋章→PUT display=false→本人GET状态false→公开GET不见→PC/mobile勋章展示核对。新key设true后重放旧key不隐藏当前勋章。B持有/过期/缺失404、重复持有或损坏状态409；异常布尔/路径/控制/孤立代理项拒绝，不扣费/不改排序，数据及回执失败一起回滚。
+3. 管理员第一方登录→客户端列表→带新key登记HTTPS/原生回调→列表/分页详情→PC/mobile OAuth同意页→S256换码→资源读取/轮换撤销。对普通/OP/第三方管理员、假Cookie/apiKey、旧scope/过期或撤销Token及降权后重放均拒绝；20/2048成功、21/2049/重复/片段/凭据/响应保留参数/非开发HTTP回环422。提交确认丢失原键恢复同clientId，不换键重复登记。
+4. 开发数据库注入数据/回执/提交失败，与账号重置、职业增长/退役、旧privacy/勋章授予/续期/排序并发验证锁和版本；这部分真实MySQL未执行。顺序注入/SQLite不能作多连接证明。
+5. 回归新接口未鉴权/越权/CSRF/XSS/SQL注入/SSRF/批量滥用/敏感字段，及原黑名单/test、匿名首访/第五次、validateCaptcha解封/开发关闭风控；全站静态/CDN版本/sourceMappingURL/目录枚举/上传下载路径另验。
+
+安全/反漏扫源码结论：5路由均显式Bearer+scope，管理再做当前管理员及第一方校验，无新匿名入口、anonymous.viewSkips或旧防扫描中间件改动；不接受Cookie/apiKey授权写入，所以无新增Cookie写CSRF路径。owner/目标严格绑定、SQL参数化、JSON/路径/条数有界、写门禁先鉴权；DTO不返凭据/IP/UA/联系方式/完整用户或raw配置，无HTML渲染/远程URL抓取/SSRF/新增静态/CDN/source map/目录/上传下载。旧Cookie/apiKey兼容入口保持，不冒称旧写入一起原子化；分布式压力、全站门禁与公网资源仍未做真实验收。
+
+最新源码可达192条（GET106/POST38/PUT28/DELETE19/WS1），与progress逐条清单完全相同且无重复；全仓库生成739路由、398浏览器引用。未验证完整Java/IoC、IDEA重启后HTTP/WS、真实MySQL迁移/并发、PC/mobile浏览器、OAuth第三方实联及全站反漏扫；未访问生产或真实支付。完整v3尚有停用/回调维护、会员/职业隐私/勋章排序等剩余任务。API.md须同步网站 https://fishpi.cn/article/1636516552191 。
+
+第三轮最终静态复核：3个新runner的node --check及tracked/untracked全部文件git diff whitespace检查通过；新增接口对应9个curl代码块bash -n通过（只解析，没有请求网络）；生产JS版本复扫99文件/0发现，未改静态产物。源码192路由与progress逐项METHOD/path无重复且全等，新5契约均存在API.md。
+
+
+## 2026-10-20 第四轮并行：匿名创作、邀请码与客户端停用
+
+本批独立分工：anonymous_content负责本人匿名列表，invitation_read负责邀请码只读状态，oauth_disable负责管理员停用与后续维护；主代理维护总注册、公开文档和交叉验证。以下四接口已接线，后续客户端PUT另记录。
+
+实际文件与行为：
+
+- `processor/ApiV3AnonymousContentProcessor.java`、`service/ApiV3AnonymousContentQueryService.java`、`util/ApiV3AnonymousContentDto.java`、`src/test/java/org/b3log/symphony/service/ApiV3AnonymousContentQueryTest.java`、`tools/api-v3-anonymous-content-test.mjs`、`docs/api-v3-anonymous-content-work.md`：本人匿名文章/评论两GET，content.read，仅元数据；按当前文章/作者/邀请可见性过滤后计数分页。讨论邀请复用共享解析，候选有界、内容hash约束，超预算503不截断；管理员例外为Java精确角色判断，避免MySQL大小写不敏感扩大权限。
+- `processor/ApiV3InvitationProcessor.java`、`service/ApiV3InvitationQueryService.java`、`util/ApiV3Invitation.java`、`src/test/java/org/b3log/symphony/service/ApiV3InvitationTest.java`、`tools/api-v3-invitation-test.mjs`、`docs/api-v3-invitation-work.md`：POST邀请码状态查询，activity.read、共享请求预算；1024字节JSON与16位字母数字码，仅返存量status，unused不保证当前可注册；不返回原码/预留/手机/用户，无写入或幂等回执。
+- `processor/ApiV3ClientDisableProcessor.java`、`service/ApiV3ClientDisableService.java`、`src/test/java/org/b3log/symphony/processor/ApiV3ClientDisableTest.java`、`tools/api-v3-client-disable-test.mjs`、`docs/api-v3-client-disable-work.md`：管理员DELETE，当前第一方管理员/settings.write/幂等；客户端逻辑停用、全部Token及回执同事务，保留登记和回调；不允许website_v3或重新启用。连接按后续当前授权检查失效，不能声称即时全球断开。
+- `processor/ApiV3Processor.java`总接线；`tools/api-route-inventory.mjs`补识别共享budget与管理员检查；旧管理专项移除“无DELETE”过时断言；API.md、UPDATE_LOG.md、AGENTS.md及三份汇总文档同步。无新表、SQL、Repository、配置、FTL、前端源码或生成资源。
+
+实际验证：主代理Java25最终重跑匿名内容10组、邀请码5组、客户端停用9组、管理回归10组，均退出0。包含生产SQL/路由/鉴权/控制器、严格事务及实际SocketTicket生命周期，依赖仍有SQLite/身份/请求适配器，不代替MySQL、IoC或真实服务。未运行Maven。
+
+人工完整链路（已提醒Java需IDEA重编译或重启，未确认用户实际执行）：
+
+1. A/B取content.read，GET本人匿名文章和评论→分页→按ID读既有详情→PC/mobile核对。仅本人元数据，无正文和匿名真实作者。撤回讨论邀请、改名/停用作者、隐藏/删除文章后重新GET，total/list同步排除不可读评论；p=0/size=51为422，坏元数据或权限扫描超预算503，数据库无修改。
+2. activity.read令牌POST已知used/unused/stopped码→只返回status；未知404，非法字符/额外字段422，超过1024字节413；缺Bearer401/缺scope403。对照注册页确认unused仅存储状态，不绕过邀请码预留或实际注册验证。
+3. 当前第一方管理员登记应用→用户OAuth同意/S256换码→获取HTTP与Socket票据→DELETE应用→管理详情status=1→旧access/refresh、授权码及待确认流程不可继续使用，已签Socket票据拒绝或既有连接后续授权检查失败。重复同key仅旧回执，新key停用已停用应用也清残余Token；普通/OP/第三方管理员、website_v3、降权后原key均拒绝。开发DB注入提交/回执失败应整笔回滚，与换码/刷新/账号重置并发另验。
+4. 对新增四入口复核无Bearer/越权、SQL注入/JSON边界、XSS客户端编码、批量请求与敏感响应；回归旧黑名单/test、匿名首访/计次、validateCaptcha解封和开发关闭盾。没有新匿名入口、viewSkips或静态/CDN/source map/目录/上传下载路径改动；全站公网资源与真实验证码链仍需另验。
+
+安全源码结论：均显式Bearer+scope，owner来自认证，管理每次及幂等重放重新核对当前第一方管理员；不引入Cookie授权写入、HTML渲染或远程抓取。SQL参数绑定、输入/输出白名单、预算有界。存量防扫描链与公开资源未改，不能把无改动当作全站反漏扫已通过。未验证完整Java/IoC、真实MySQL锁/隔离/提交不确定性、IDEA后HTTP/WS、第三方OAuth与PC/mobile浏览器；未访问生产或支付。API.md须同步网站API文章。
+
+
+### 第四轮续：客户端完整修改与授权失效
+
+用户确认修改回调或权限时全部旧授权失效并重新授权。新增`processor/ApiV3ClientUpdateProcessor.java`、`service/ApiV3ClientUpdateService.java`、`src/test/java/org/b3log/symphony/processor/ApiV3ClientUpdateTest.java`、`tools/api-v3-client-update-test.mjs`及`docs/api-v3-client-update-work.md`；修改`ApiV3ClientRegistrationService`只提取原有纯字段规范化供创建/修改共用，不改变创建规则。总注册与公开文档接入PUT /api/v3/admin/oauth/clients/{clientId}。
+
+完整替换name/scope/redirectUris，保持当前status；以权限集合和精确回调集合判断授权实质变化，同事务更新登记、替换回调、撤销全部目标Token、删除全部旧授权码和pending请求并保存回执，保留approved/denied历史。名称变化与集合重排保留授权。旧回执不会覆盖之后的修改或停用；不开放website修改、自助登记、状态或owner覆盖、重新启用。当前第一方管理员锁和重放复核沿用登记/账号重置顺序。
+
+补充人工链路：管理员GET详情→名称PUT→用户原access/refresh和已有同意流程仍可用；换新key改变scope或一项回调→GET详情为新值→旧access/refresh、旧code换码、旧pending确认均拒绝→用户重新发起同意/S256成功。再把定义改回原值，旧码/旧pending仍不可用。新key后续修改后重放第一key只能原回执，当前资料不回退；停用后PUT仍status=1。缺字段/超20回调/2049字符/重复URI/越权/降权重放不写；开发DB故障各阶段、提交确认丢失与并发换码/刷新需实库继续验证。
+
+主代理复跑共享登记10组/停用9组均退出0；PUT专项11组通过，实际Code.exchange/Consent.decide验证删除的旧证明在定义改回后仍拒绝；覆盖每阶段写入/保存点/严格提交失败与提交后确认丢失。源码总197条（GET108/POST39/PUT29/DELETE20/WS1），已逐项核对progress完全相等无重复；全仓库生成744路由/398浏览器引用。Java/IoC/MySQL/HTTP/WS和浏览器等运行限制保持，无前端/SQL新增，未运行Maven或部署；本轮修改未再次提交。
+
+第四轮最终静态检查：新runner及路由工具node语法、tracked/untracked whitespace检查通过；新增5份公开契约存在，5段curl通过bash -n（未请求网络）。主代理最终PUT11组exit0，管理10/停用9回归exit0；路由197条逐项匹配。未改公网静态资源，因此本轮未重新执行全站CDN下载或浏览器扫描；这些项目保持未验收。
+
+客户端修改专项最终补充第11组真实SocketTicket：scope变更后原live授权false、旧票消费401、新取票401。主代理再次复跑11组退出0；四功能专项为35组，另共享管理回归10组，均为隔离证据。
+
+## 2026-10-20 第二次累计提交前检查
+
+用户要求先提交推送再继续。提交范围为第三/第四轮累计10个新增入口（187→197）、严格事务与查询/DTO、专项、公开文档和进度清单；无模板、JS/SCSS生成物、新SQL/Repository表变更。git diff及40个untracked whitespace检查通过；再次JS扫描src/main/resources/js共155文件、0版本/sourceMappingURL发现。定向专项沿用前述最终退出0记录，源码之后无业务变更，不重复无理由全量编译。当前新增入口均Bearer，管理额外第一方当前管理员复核；anonymous.viewSkips和黑名单/验证码链未改，无新增上传下载/公网目录。源码权限/输入/DTO/事务反漏扫结论见上述批次，真实MySQL、完整IoC、HTTP/WS/PC/mobile和全站公网反漏扫仍未验收。未运行Maven，不把推送等同部署。

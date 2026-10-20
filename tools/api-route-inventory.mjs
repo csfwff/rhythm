@@ -48,6 +48,8 @@ function classifyMiddleware(source) {
   if (/auth::followsWrite/.test(source)) values.push('必须 Bearer（follows.write）');
   if (/auth::contentWrite/.test(source)) values.push('必须 Bearer（content.write）');
   if (/writes::handle/.test(source)) values.push('写入频控');
+  if (/budget::handle/.test(source)) values.push('共享请求预算');
+  if (/::administrator/.test(source)) values.push('当前管理员与第一方身份复核');
   if (/auth::contentRead/.test(source)) values.push('必须 Bearer（content.read）');
   if (/auth::activityWrite/.test(source)) values.push('必须 Bearer（activity.write）');
   if (/auth::settingsWrite/.test(source)) values.push('必须 Bearer（settings.write）');

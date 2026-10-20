@@ -7,15 +7,15 @@
 - **已注册源码**：`Router.requestMapping` 调用 `ApiV3Processor.register()`，后者能到达具体 Processor 的 Dispatcher 注册；不把孤立的处理方法、服务类或 API.md 条目计为接口。
 - **隔离证据**：历史批次明确记载执行过的 runner；常含 SQLite、仓储/锁/身份/外部服务适配器，不等于真实 MySQL、完整 IoC、浏览器或端到端验证。本轮定向重跑结果见下方证据表，其余历史 runner 未全量重跑。
 - **运行验收**：当前没有本次可确认的完整应用启动、迁移、真实 HTTP/Socket、PC/mobile 与第三方客户端全链路验收证据。下表所有源码接口均仍需运行验收。
-- 当前范围排除管理后台、金手指、内部回调、游戏计分和支付管理；公开支付跳转仍在范围。用户侧职业、勋章、会员能力不能仅因同模块存在后台接口就整体排除。
+- 当前范围排除管理后台、金手指、内部回调、游戏计分和支付管理；公开支付跳转仍在范围。用户侧职业、勋章、会员能力不能仅因同模块存在后台接口就整体排除。OAuth管理员登记/管理为用户明确纳入的例外，其余后台仍排除。
 
 ## 当前数量
 
-已注册 **187 条（186 HTTP + 1 WebSocket）**；HTTP按 METHOD+完整path计数；GET/PUT/DELETE共用路径仍分别计数。方法分布：DELETE 19, GET 104, POST 37, PUT 26, WEBSOCKET 1。
+已注册 **197 条（196 HTTP + 1 WebSocket）**；HTTP按 METHOD+完整path计数；GET/PUT/DELETE共用路径仍分别计数。方法分布：DELETE 20, GET 108, POST 39, PUT 29, WEBSOCKET 1。
 
 连接链路：`processor/Router.java#requestMapping` → `processor/ApiV3Processor.java#register` → 各模块 `register`。以下路径均包含完整 `/api/v3` 前缀，代码位置以生成时行号为准。
 
-注意：当前生成的“全仓库734路由、398浏览器引用”是不同口径，包含旧HTTP/WS等，不能当作v3接口数。静态注册成功也不证明完整IoC启动成功。
+注意：当前生成的“全仓库744路由、398浏览器引用”是不同口径，包含旧HTTP/WS等，不能当作v3接口数。静态注册成功也不证明完整IoC启动成功。
 
 ## 已注册接口清单
 
@@ -321,14 +321,14 @@
 
 | 方法 | 路径 | 行号 | 处理器与门禁 |
 | --- | --- | --- | --- |
-| POST | `/api/v3/auth/login` | 80 | `processor::login, anonymous::handle` |
-| POST | `/api/v3/auth/refresh` | 81 | `processor::refresh, anonymous::handle` |
-| POST | `/api/v3/auth/logout` | 82 | `processor::logout, anonymous::handle` |
-| GET | `/api/v3/me` | 83 | `processor::me, auth::handle` |
-| GET | `/api/v3/columns` | 84 | `processor::columns, anonymous::handle` |
-| GET | `/api/v3/columns/hot` | 85 | `processor::hotColumns, anonymous::handle` |
-| GET | `/api/v3/columns/{columnId}/articles` | 86 | `processor::columnArticles, anonymous::handle` |
-| GET | `/api/v3/columns/{columnId}` | 87 | `processor::column, anonymous::handle` |
+| POST | `/api/v3/auth/login` | 90 | `processor::login, anonymous::handle` |
+| POST | `/api/v3/auth/refresh` | 91 | `processor::refresh, anonymous::handle` |
+| POST | `/api/v3/auth/logout` | 92 | `processor::logout, anonymous::handle` |
+| GET | `/api/v3/me` | 93 | `processor::me, auth::handle` |
+| GET | `/api/v3/columns` | 94 | `processor::columns, anonymous::handle` |
+| GET | `/api/v3/columns/hot` | 95 | `processor::hotColumns, anonymous::handle` |
+| GET | `/api/v3/columns/{columnId}/articles` | 96 | `processor::columnArticles, anonymous::handle` |
+| GET | `/api/v3/columns/{columnId}` | 97 | `processor::column, anonymous::handle` |
 
 ### 排行榜（1）
 
@@ -446,6 +446,65 @@
 | GET | `/api/v3/me/membership` | 22 | `processor::me, auth::profileRead` |
 | GET | `/api/v3/membership/levels` | 23 | `processor::levels, auth::contentRead` |
 
+### 主职业设置（1）
+
+代码：`src/main/java/org/b3log/symphony/processor/ApiV3ProfessionPrimaryProcessor.java`。状态：已注册源码；运行未验收。
+
+| 方法 | 路径 | 行号 | 处理器与门禁 |
+| --- | --- | --- | --- |
+| PUT | `/api/v3/me/professions/primary` | 25 | `p::set, auth::settingsWrite, writes::handle` |
+
+### 勋章显示设置（1）
+
+代码：`src/main/java/org/b3log/symphony/processor/ApiV3MedalDisplayProcessor.java`。状态：已注册源码；运行未验收。
+
+| 方法 | 路径 | 行号 | 处理器与门禁 |
+| --- | --- | --- | --- |
+| PUT | `/api/v3/me/medals/{medalId}/display` | 23 | `p::display, auth::settingsWrite, writes::handle` |
+
+### OAuth客户端管理（3）
+
+代码：`src/main/java/org/b3log/symphony/processor/ApiV3ClientManagementProcessor.java`。状态：已注册源码；运行未验收。
+
+| 方法 | 路径 | 行号 | 处理器与门禁 |
+| --- | --- | --- | --- |
+| GET | `/api/v3/admin/oauth/clients` | 28 | `p::list,auth::settingsWrite,p::administrator` |
+| GET | `/api/v3/admin/oauth/clients/{clientId}` | 29 | `p::detail,auth::settingsWrite,p::administrator` |
+| POST | `/api/v3/admin/oauth/clients` | 30 | `p::create,auth::settingsWrite,p::administrator,writes::handle` |
+
+### OAuth客户端停用（1）
+
+代码：`src/main/java/org/b3log/symphony/processor/ApiV3ClientDisableProcessor.java`。状态：已注册源码；运行未验收。
+
+| 方法 | 路径 | 行号 | 处理器与门禁 |
+| --- | --- | --- | --- |
+| DELETE | `/api/v3/admin/oauth/clients/{clientId}` | 32 | `p::disable, auth::settingsWrite, p::administrator, writes::handle` |
+
+### 邀请码状态（1）
+
+代码：`src/main/java/org/b3log/symphony/processor/ApiV3InvitationProcessor.java`。状态：已注册源码；运行未验收。
+
+| 方法 | 路径 | 行号 | 处理器与门禁 |
+| --- | --- | --- | --- |
+| POST | `/api/v3/invitation-codes/status` | 28 | `p::status, auth::activityRead, budget::handle` |
+
+### 本人匿名内容（2）
+
+代码：`src/main/java/org/b3log/symphony/processor/ApiV3AnonymousContentProcessor.java`。状态：已注册源码；运行未验收。
+
+| 方法 | 路径 | 行号 | 处理器与门禁 |
+| --- | --- | --- | --- |
+| GET | `/api/v3/me/anonymous-articles` | 21 | `p::articles, auth::contentRead` |
+| GET | `/api/v3/me/anonymous-comments` | 22 | `p::comments, auth::contentRead` |
+
+### OAuth客户端修改（1）
+
+代码：`src/main/java/org/b3log/symphony/processor/ApiV3ClientUpdateProcessor.java`。状态：已注册源码；运行未验收。
+
+| 方法 | 路径 | 行号 | 处理器与门禁 |
+| --- | --- | --- | --- |
+| PUT | `/api/v3/admin/oauth/clients/{clientId}` | 30 | `p::update, auth::settingsWrite, p::administrator, writes::handle` |
+
 ## 测试证据与局限
 
 以下引用历史记录的实际结果，不把测试文件存在等同于已经执行；各runner可能重复覆盖共享代码，禁止相加宣传“全接口通过”。完整细节见 `docs/api-v3-development-plan.md` 对应日期批次。
@@ -461,11 +520,13 @@
 | 内容发现/个人/社区等读取 | 对应Java Test与`tools/api-v3-*-smoke.mjs`存在；早期部分仅记录语法解析或未运行 | 不能把有smoke文件计作HTTP已通过；需要真实数据/权限分页验证 |
 | 本轮文章热度及并行新增读取 | 主代理重跑`tools/api-v3-socket-test.mjs` 55组通过（含热度及红包实际路由/控制器/授权）；`tools/api-v3-emotion-test.mjs` 5组通过（真实SQL/Dispatcher/auth/controller、SQLite及依赖适配器）；`tools/api-v3-red-packet-test.mjs`纯目录1组通过 | 热度仅当前实例近似连接数；表情未验真实MySQL/浏览器/全局盾；红包已覆盖隔离HTTP/鉴权，不能推断实际领取/发送已实现 |
 | 第二轮职业/勋章/会员 | 主代理重跑 profession 6组、medal 4组、membership 7组通过；均包含生产SQL/路由/控制器/授权隔离执行，勋章专项另执行真实AnonymousViewCheckMidware首访/计次逻辑 | SQLite及Token/请求依赖适配器不等于应用联调；职业匿名盾为钩子适配，真实全局黑名单/解封、MySQL/IoC和PC/mobile仍未验收 |
+| 第三轮写入与客户端管理 | 主代理重跑主职业8组、勋章显示6组、OAuth管理10组 | MySQL并发、完整IoC、真实客户端与旧入口竞争 |
+| 第四轮匿名创作/邀请码/客户端维护 | 主代理重跑匿名内容10组、邀请码5组、停用9组、修改11组及管理回归10组；生产SQL/鉴权/严格提交、SocketTicket与Code/Consent核心隔离执行 | SQLite不能代替MySQL；缺HTTP/WS、两端浏览器、第三方OAuth和全站反漏扫 |
 
 ## 历史矛盾与当前更正
 
 1. 计划矩阵曾把“文章热度/在线人数”列为源码已接入，但截至本轮开始，只能查到旧 `GET /api/article/heat/{articleId}`（ArticleProcessor），v3文章订阅人数亦不能自动形成HTTP接口。本轮主代理已接入 `ApiV3ArticleHeatProcessor` / `ApiV3ArticleHeatQueryService`；当前清单已计入该GET。先按当前数据库读者授权，再相加当前节点旧文章连接计数及当前节点v3已认证文章订阅连接数；这是近似连接数、可能重复，不是去重人数或全站实时在线人数。
-2. 早期设计称“私信、账号恢复不直接搬v3”和“PKCE尚未实现”，后续已经新增独立私信/账号/OAuth协议入口与核心；这些旧句不能覆盖当前源码事实。第三方应用登记管理仍没有公共入口。
+2. 早期设计称“私信、账号恢复不直接搬v3”和“PKCE尚未实现”，后续已经新增独立私信/账号/OAuth协议入口与核心；这些旧句不能覆盖当前源码事实。管理员OAuth登记管理已按用户明确范围接入，禁止自助登记。
 3. 注册短信、私信撤回、私信实时的历史“未接线/待兼容批准”已由后续实际接线覆盖；当前不再把它们列为缺入口。仍需部署与运行验收。
 4. “有源码”“隔离测试通过”“用户确认规则”“已运行验收”分别记录；后续阶段不能反推历史整站已经安全验收。
 
@@ -475,18 +536,18 @@
 
 | 能力 | 当前可证明状态与旧来源 | 下一步与依赖 |
 | --- | --- | --- |
-| OAuth客户端登记/维护 | `ApiV3ClientRegistrationService#createApprovedInCurrentTransaction`已有已批准应用登记核心；无登记/审批/维护HTTP | 用户已确认仅管理员登记和维护；待补管理员授权/幂等/列表/登记/维护入口及停用、回调修改协调，禁止自助登记 |
+| OAuth客户端登记/维护 | `ApiV3ClientRegistrationService#createApprovedInCurrentTransaction`已有已批准应用登记核心；列表/详情/登记HTTP已接入 | 用户已确认仅管理员登记和维护及20回调/2048字符；第一方管理员授权、幂等列表/详情/登记已接入，逻辑停用及完整Token撤销已接入；回调/权限PUT已接入，实际集合变更令全部旧Token/码/待确认失效；仅改名称保留授权，禁止自助登记 |
 | OAuth token/revoke风控 | 协议入口已注册且保留anonymous门禁 | 用户确认凭据是否可作为这两个端点登录证明；未批准前不加anonymous.viewSkips；真实第三方非浏览器换码必须联调 |
 | 鱼游投稿/编辑申请 | v3仅目录/详情/评论读、投票和评论写；旧 `FishGameProcessor` `/api/fish-games` POST与`/{id}/edit` | 缺v3入口/协调核心；等待用户提供OAuth说明URL校验入口、证明与归属规则，保留待审流程 |
 | 聊天红包发送/详情/领取 | 已新增GET `/api/v3/chat/red-packet-types`；`ApiV3ChatMessageDto`只给红包摘要，旧ChatroomProcessor红包链仍存在 | 缺独立v3写核心、详情和领取入口；安全类型/猜拳扣分/心跳负积分/dice不支持等规则先确认，不能套普通消息发送 |
 | 公开支付跳转 | 旧 `/pay/wechat` 与 `/charge/point`存在；支付回调及管理排除 | 缺v3入口与受控跳转契约；需要确认提供方、支付目的/金额选项/回跳规则；不把服务端回调公开成v3 |
 | 账号敏感设置 | 旧SettingsProcessor手机/邮箱验证码与修改、密码修改、普通积分改名；MFAProcessor四条MFA能力 | 缺v3入口、证明/撤权/幂等协调与scope选择；不得输出手机/邮箱/2FA密钥至公开DTO，先明确本人敏感信息允许范围与验证规则 |
-| 邀请、转账、导出 | 旧`/invitecode/state`、`/point/buy-invitecode`、`/point/transfer`、`/export/posts` | 缺v3入口；共享积分锁、事务和幂等，定义导出下载地址/隐私与过期契约；购买邀请码不等于已实现注册申请 |
+| 邀请、转账、导出 | 旧`/invitecode/state`、`/point/buy-invitecode`、`/point/transfer`、`/export/posts` | 邀请码存储状态POST已接入（activity.read，仅used/unused/stopped）；购买、转账、导出仍缺入口/共享积分事务及下载契约，unused不保证可注册 |
 | 自定义表情与分组 | 旧EmojiProcessor13条（列表/上传/分组/成员/分享/导入/迁移）及settings/emotionList | 已新增本人表情选择/目录/分组/组内表情4条GET，profile.read且不接收他人ID；reaction目录不能替代表情库；选择修改/上传/组管理/分享/导入/迁移仍缺v3写入口及独立服务、事务、URL与所有权规则 |
 | 文章/评论版本与举报 | 旧ArticleProcessor历史版本两入口、CommentProcessor版本入口、Router `/report` | 缺v3资源；先确定作者/读者能读哪些版本、删除/私密/匿名边界与举报对象/频控；不能裸返旧历史对象 |
-| 本人匿名创作清单 | UserProcessor旧`/api/user/{userName}/comments/anonymous`及`/articles/anonymous` | 缺专门v3读取；公开主页现有过滤不能替代本人匿名创作查询，不应把真实作者泄露给第三人 |
-| 用户职业 | 已注册GET /professions及/me/professions，目录与本人状态/进度读取 | 详情/记录/排行、选择/提示/隐私写入及他人资料仍待实现；用户侧与后台分开，写入需幂等事务核心 |
-| 用户勋章 | 已注册GET /me/medals及/users/{userName}/medals，本人含隐藏、公开仅有效展示 | 排序/显示写入仍待实现；只读不触发旧过期清理，不开放后台全定义目录 |
+| 本人匿名创作清单 | GET /me/anonymous-articles及/me/anonymous-comments已接入，content.read本人元数据 | 正文经已有详情读取；讨论邀请用有界候选/共享解析/hash绑定，超技术预算503，真实MySQL与并发验收仍待做 |
+| 用户职业 | 已注册GET /professions及/me/professions，目录与本人状态/进度读取 | 主职业PUT已接入；详情/记录/排行、提示/隐私写入及他人资料仍待实现；用户侧与后台分开，写入需幂等事务核心 |
+| 用户勋章 | 已注册GET /me/medals及/users/{userName}/medals，本人含隐藏、公开仅有效展示 | 显示PUT已接入，排序写入仍待实现；只读不触发旧过期清理，不开放后台全定义目录 |
 | 用户会员 | 已注册GET /membership/levels及/me/membership，档位与本人状态/已知配置白名单 | 开通和本人配置写入、公开配置资源仍待实现；积分开通需事务/幂等，禁止直接套旧开通链 |
 | 复读机转录站 | RepeaterProcessor旧`GET /api/repeater/items`、`GET /api/repeater/next`、`POST /api/repeater`及`POST /api/repeater/{id}/like`；API.md独立公开模块 | 当前无v3入口，不能因不在原迁移矩阵就当作已完成；需有界DTO/分页及投稿/点赞事务与幂等，明确第三方迁移契约 |
 | 游戏云存档 | CloudProcessor旧`POST /api/cloud/get`和`POST /api/cloud/sync`，与游戏计分不同 | 当前无v3入口；范围需单独确认，绝不能直接开放任意gameId（cloud还含sys-bag/风控等内部记录）；若纳入须限定外部游戏命名空间与owner/体积/版本契约 |
@@ -502,7 +563,11 @@
 | 红包/支付盘点与安全目录 | chat_payments代理，类型GET已总接线，纯目录专项通过 | 专用报告及类型目录源码；未确认的经济规则不实现写入 | 规则确认、共享积分锁与事务/幂等核心；主代理总接线 |
 | 文章热度与总接线 | 主代理，热度已总接线、55组Socket专项通过 | 热度Processor/Service/专项；ApiV3Processor、API.md、UPDATE_LOG、AGENTS及共享计划由主代理维护 | 当前读者可见性、实例计数契约、专项测试；完整运行另验 |
 | 鱼游OAuth投稿/编辑 | 后续工作包，受规则依赖 | FishGame专用协调器/DTO/test可独立设计；不改共享锁顺序 | 用户提供校验入口与归属规则 |
-| 敏感账号/OAuth登记 | 后续工作包，受规则依赖 | 分别独占服务与专项，公共auth/scope/Token撤权需串行审阅 | 明确批准的规则与兼容影响 |
+| OAuth登记与维护 | 第三轮主代理登记3接口；第四轮oauth_disable完成停用/修改 | 独立Processor/Service/专项，共用原登记字段校验；公共文档与总接线由主代理维护 | 第一方当前管理员、授权失效事务与真实并发验收 |
+| 主职业/勋章显示写入 | inventory/settings起稿、主代理复核接线，8/6组专项通过 | 各自独占Processor/Service/专项，幂等operation隔离 | 隐私/排序及真实新旧竞争仍待完成 |
+| 本人匿名内容 | anonymous_content完成两GET、主代理接线并复跑10组 | 独立Query/DTO/专项，invitation_read交叉只读审查 | 当前讨论权限与MySQL验收 |
+| 邀请码状态 | invitation_read完成POST、主代理接线并复跑5组 | 只读存量状态、独立输入/DTO，不推断注册可用性 | 购买/转账/导出仍独立待实现 |
+| 敏感账号 | 后续工作包，受规则依赖 | 公共auth/scope/Token撤权需串行审阅 | 明确批准的规则与兼容影响 |
 | 职业读取 | inventory代理第二轮完成2 GET，主代理接线并复跑6组通过 | 独占ApiV3Profession*及专项/work文档 | 详情/记录/排行和选择/提示/隐私写入后续独立核心 |
 | 勋章读取 | settings代理第二轮完成2 GET，主代理接线并复跑4组通过 | 独占ApiV3Medal*及专项/work文档 | 显示/排序写入后续独立核心，不复用旧查询副作用 |
 | 会员读取 | chat_payments代理第二轮完成2 GET，主代理接线并复跑7组通过 | 独占ApiV3Membership*及专项/work文档 | 开通/配置写入后续事务和结算核心 |
@@ -525,3 +590,7 @@
 本轮盘点与新增读取接口不执行Maven，不访问8080、数据库、生产，不做Git提交；没有运行浏览器/真实HTTP/外部短信或支付。公开接口文档变更由主代理汇总后仍需同步网站API文章。
 
 第二轮对应实现、文件、完整人工链路见 [职业](api-v3-profession-work.md)、[勋章](api-v3-medal-work.md)、[会员](api-v3-membership-work.md)。主代理已完成总接线，当前187条可达注册与表内METHOD/path完全一致，无重复及漏项；仅源码口径，不作为完整应用启动证据。
+
+第三轮：累计提交6231c4f0已推送origin/api_v3后，新增主职业PUT、勋章显示PUT及管理员OAuth列表/详情/登记3接口。专项分别8/6/10组通过（隔离实际SQL/JDBC/路由，不代替运行验收）。当前192条可达注册与逐项表完全相等、无重复；新开发内容尚未再次提交。详情见 [主职业](api-v3-profession-primary-work.md)、[显示设置](api-v3-medal-display-work.md)、[客户端管理](api-v3-client-management-work.md)。
+
+第四轮：匿名本人列表两GET、邀请码状态POST、OAuth客户端DELETE/PUT共5接口接线，当前197条与逐项表全等无重复。主代理专项匿名10/邀请码5/停用9/修改11、共享管理回归10组通过；invitation_read交叉审匿名/停用未发现实质问题。实际文件与人工链见 [匿名内容](api-v3-anonymous-content-work.md)、[邀请码](api-v3-invitation-work.md)、[停用](api-v3-client-disable-work.md)、[修改](api-v3-client-update-work.md)及development-plan第四轮。源码和隔离结果不代表真实MySQL/应用/浏览器验收；当前新增仍未再次提交。
