@@ -75,7 +75,7 @@ public class ChatroomChannel implements WebSocketChannel {
     /**
      * 当前讨论话题
      */
-    public static String discussing = "暂无";
+    public static volatile String discussing = "暂无";
 
     public static final Map<String, Long> userActive = Collections.synchronizedMap(new HashMap<>());
 

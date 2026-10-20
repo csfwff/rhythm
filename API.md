@@ -1,5 +1,6755 @@
 # 摸鱼派 API 文档
 
+## API v3
+
+`/api/v3` 提供版本化 Web API，也支持已登记的第三方应用通过 OAuth 授权接入。除下文 OAuth 授权接口外，响应使用统一信封：
+
+```json
+{ "code": 0, "msg": "", "data": {} }
+```
+
+成功时 `code` 为 `0`。失败时 `data` 为 `null`，并结合 HTTP 状态码与 `code`、`msg` 处理错误。资源 ID 均为字符串，时间字段默认使用毫秒时间戳；自然日等其他格式以各接口字段说明为准。
+
+> 支持Idempotency-Key的写接口遇到连接中断或服务端错误时，应使用原键和原请求体重试，不要为同一次操作换新键。
+
+### 查询账号验证组件
+
+`GET /api/v3/auth/captcha-options`
+
+获取账号流程使用的验证组件标识，用于初始化极验4组件。
+
+请求：
+
+| Key | 说明 | 示例 |
+| --- | --- | --- |
+| apiKey | 通用密钥（可选） | xxx |
+
+请求示例：
+
+```bash
+curl 'https://fishpi.cn/api/v3/auth/captcha-options'
+```
+
+响应：
+
+| Key | 说明 | 示例 |
+| --- | --- | --- |
+| data | 验证组件信息 | {} |
+| - provider | 组件类型，固定 geetest4 | geetest4 |
+| - captchaId | 初始化组件使用的公开标识 | your-captcha-id |
+
+> 完成组件交互后，将返回的 lot_number、captcha_output、pass_token、gen_time 四个字符串组成 JSON，再序列化为 captcha 字符串传给短信申请接口。组件配置不可用时返回 HTTP 503。
+
+### 查询注册选项
+
+`GET /api/v3/auth/registration-options`
+
+查询当前注册状态、邀请码要求及注册表单的用户名长度和角色选项。
+
+请求：
+
+| Key | 说明 | 示例 |
+| --- | --- | --- |
+| apiKey | 通用密钥（可选） | xxx |
+| referral | 可选，邀请人用户名，去除首尾空白后最多64个字符 | username |
+
+请求示例：
+
+```bash
+curl --get 'https://fishpi.cn/api/v3/auth/registration-options' \
+  --data-urlencode 'referral=username'
+```
+
+响应：
+
+| Key | 说明 | 示例 |
+| --- | --- | --- |
+| data | 注册选项 | {} |
+| - mode | open 开放、invitation 邀请注册、closed 关闭 | invitation |
+| - enabled | 是否开放注册 | true |
+| - inviteCodeRequired | 是否需要邀请码；关闭注册时为 false | true |
+| - referralAccepted | 提供的邀请人是否具有邀请链接资格；关闭注册时为 false | false |
+| - username | 用户名长度要求 | {} |
+| -- minLength | 最小长度 | 1 |
+| -- maxLength | 最大长度 | 64 |
+| - appRoles | 可选注册角色 | [] |
+| -- value | 角色值：0 程序员、1 设计师 | 0 |
+| -- label | 角色名称 | 程序员 |
+
+> 邀请注册模式下，有效邀请链接可免填邀请码；关闭注册时邀请链接也不能注册。邀请人不存在或没有邀请资格时 referralAccepted 为 false，用户名格式不合法返回 HTTP 422。查询结果供表单展示，最终以提交时的状态为准。
+
+### 申请注册短信
+
+`POST /api/v3/auth/registration/request`
+
+完成账号验证组件交互后申请注册短信，收到验证码后调用完成注册接口。
+
+请求：
+
+| Key | 说明 | 示例 |
+| --- | --- | --- |
+| userName | 用户名，1–64位英文字母、数字或连字符，不允许保留名称 | Fresh-Name |
+| userPhone | 手机号，11位数字且以1开头 | 13800138000 |
+| captcha | 极验4结果的JSON字符串，最多4096个UTF-8字节；四个字段均为非空字符串 | {"lot_number":"...","captcha_output":"...","pass_token":"...","gen_time":"..."} |
+| invitecode | 可选，16位英文字母或数字；邀请注册且没有有效邀请链接时必填 | AbCdEfGh12345678 |
+| referral | 可选，已激活的其他用户的用户名，最多64字符 | username |
+
+请求示例：
+
+```bash
+curl --request POST 'https://fishpi.cn/api/v3/auth/registration/request' \
+  --header 'Content-Type: application/json' \
+  --data '{"userName":"Fresh-Name","userPhone":"13800138000","captcha":"{\"lot_number\":\"...\",\"captcha_output\":\"...\",\"pass_token\":\"...\",\"gen_time\":\"...\"}","invitecode":"AbCdEfGh12345678","referral":"username"}'
+```
+
+响应：
+
+| Key | 说明 | 示例 |
+| --- | --- | --- |
+| data | 申请结果 | {} |
+| - accepted | 申请已受理，不表示短信已经到达 | true |
+
+> 请求为JSON，最多8192字节，只接受表中字段，不接受查询参数。开放注册、邀请链接和邀请码三种方式均须提交极验结果。开放注册时忽略邀请码；邀请注册时，具有邀请链接资格的邀请人可免填邀请码，显式填写的邀请码仍须有效。显式提供的 referral 须为已激活的其他用户，是否免填邀请码仍取决于邀请链接资格。
+>
+> 验证码有效期一天；邀请码为该手机号预留一天，同手机号重发可续期，其他手机号在预留到期前不能使用。完成注册时请沿用申请时的邀请人；用户名或邀请信息变化后重新获取验证码。
+>
+> 注册关闭返回HTTP 403；字段、极验、邀请人或邀请码无效返回422；用户名已占用、手机号不可用、邀请码已被预留或注册信息变化返回409；请求过于频繁返回429；暂时无法受理返回503。发送后如果注册状态发生变化，可能收到无法用于完成注册的短信，请以接口结果为准。本接口不自动登录，也不支持 Idempotency-Key；请勿在超时后自动反复申请短信。
+
+### 完成注册
+
+`POST /api/v3/auth/registration/complete`
+
+为已申请注册短信的手机号设置密码和角色，激活账号。成功后使用登录接口获取访问令牌。
+
+请求：
+
+| Key | 说明 | 示例 |
+| --- | --- | --- |
+| userPhone | 注册短信对应的当前手机号，11位数字 | 13800138000 |
+| code | 注册短信验证码，6位数字 | 123456 |
+| userPassword | 密码的32位小写MD5 | e10adc3949ba59abbe56e057f20f883e |
+| userAppRole | 可选，0 程序员、1 设计师，默认0；使用JSON数字 | 0 |
+| mbti | 可选，最多32字符；沿用资料页格式，转为大写，不符合格式时保存为空 | INFJ-T |
+| referral | 可选，邀请人用户名，去除首尾空白后最多64字符 | username |
+
+请求示例：
+
+```bash
+curl --request POST 'https://fishpi.cn/api/v3/auth/registration/complete' \
+  --header 'Content-Type: application/json' \
+  --data '{"userPhone":"13800138000","code":"123456","userPassword":"e10adc3949ba59abbe56e057f20f883e","userAppRole":0,"mbti":"INFJ-T","referral":"username"}'
+```
+
+响应：
+
+| Key | 说明 | 示例 |
+| --- | --- | --- |
+| data | 注册结果 | {} |
+| - userId | 新注册用户ID，字符串 | 1630000000000 |
+| - registered | 注册完成 | true |
+
+> 参数仅放在 JSON 请求体中，不接受查询参数、userId 或其他未列出字段，请求体最多4096字节。referral 只能使用用户名允许的字母、数字和连字符，邀请人不存在时没有邀请链接奖励；完成时请使用申请短信时的邀请信息，名称或邀请信息变化后请重新获取验证码；MBTI支持16种类型及可选的-A、-T后缀。注册完成保留原有初始积分、邀请链接及邀请码奖励规则。已激活账号不能重复注册，验证码成功后不能重复使用。
+>
+> 注册关闭返回 HTTP 403；验证码无效、过期、用途不符或与注册资料不符返回422；用户名已被占用或注册信息变化返回409；请求过于频繁返回429；暂时无法完成返回503。本接口不自动登录，也不提供 Idempotency-Key 回执。响应丢失时先尝试登录，避免把已激活账号当成新注册再次提交。
+
+### 申请找回密码短信
+
+`POST /api/v3/auth/password-reset/request`
+
+完成账号验证组件交互后，申请找回密码短信。手机号符合账号使用条件时发送，随后调用完成密码重置接口。
+
+请求：
+
+| Key | 说明 | 示例 |
+| --- | --- | --- |
+| userPhone | 当前手机号，11位数字 | 13800138000 |
+| captcha | 极验4结果的JSON字符串，最多4096个UTF-8字节；四个字段均为非空字符串 | {"lot_number":"...","captcha_output":"...","pass_token":"...","gen_time":"..."} |
+
+请求示例：
+
+```bash
+curl --request POST 'https://fishpi.cn/api/v3/auth/password-reset/request' \
+  --header 'Content-Type: application/json' \
+  --data '{"userPhone":"13800138000","captcha":"{\"lot_number\":\"...\",\"captcha_output\":\"...\",\"pass_token\":\"...\",\"gen_time\":\"...\"}"}'
+```
+
+响应：
+
+| Key | 说明 | 示例 |
+| --- | --- | --- |
+| data | 申请结果 | {} |
+| - accepted | 申请已受理，不表示手机号一定对应可用账号或短信已到达 | true |
+
+> 请求体最多8192字节，只接受表中字段，不接受查询参数。验证失败或字段不合法返回 HTTP 422；请求过于频繁返回429；申请暂不可用返回503。受理结果不包含账号可用性或服务商发送结果；请收到短信后再提交6位验证码，验证码有效期一天。本接口不支持 Idempotency-Key；每次申请独立处理，请勿在超时后自动反复申请。
+
+### 完成密码重置
+
+`POST /api/v3/auth/password-reset/complete`
+
+使用已收到的找回密码短信验证码设置新密码。成功后请重新登录；已签发的 v3 访问令牌、刷新令牌及尚未完成的授权需要重新获取。
+
+请求：
+
+| Key | 说明 | 示例 |
+| --- | --- | --- |
+| userPhone | 接收验证码的当前手机号，11位数字 | 13800138000 |
+| code | 找回密码短信验证码，6位数字 | 123456 |
+| userPassword | 新密码的32位小写MD5 | e10adc3949ba59abbe56e057f20f883e |
+
+请求示例：
+
+```bash
+curl --request POST 'https://fishpi.cn/api/v3/auth/password-reset/complete' \
+  --header 'Content-Type: application/json' \
+  --data '{"userPhone":"13800138000","code":"123456","userPassword":"e10adc3949ba59abbe56e057f20f883e"}'
+```
+
+响应：
+
+| Key | 说明 | 示例 |
+| --- | --- | --- |
+| data | 重置结果 | {} |
+| - changed | 密码已修改 | true |
+
+> 参数放在 JSON 请求体中，不接受查询参数；请求体最多4096字节，仅接受表中字段。验证码一次有效，错误、过期或用途不符返回 HTTP 422。请求过于频繁返回 HTTP 429，暂时无法完成返回 HTTP 503。本接口不自动登录，也不提供 Idempotency-Key 回执；响应丢失时可尝试使用新密码登录，或重新获取验证码。
+
+### 登录
+
+`POST /api/v3/auth/login`
+
+用于 website_v3 登录并获取短期访问令牌。
+
+请求：
+
+| Key | 说明 | 示例 |
+| --- | --- | --- |
+| nameOrEmail | 用户名或邮箱 | username |
+| userPassword | 密码的 32 位小写 MD5 | e10adc3949ba59abbe56e057f20f883e |
+| mfaCode | 两步验证码，未启用时可不传 | 123456 |
+
+请求示例：
+
+```bash
+curl --request POST 'https://fishpi.cn/api/v3/auth/login' \
+  --header 'Content-Type: application/json' \
+  --data '{"nameOrEmail":"username","userPassword":"e10adc3949ba59abbe56e057f20f883e"}'
+```
+
+响应：
+
+| Key | 说明 |
+| --- | --- |
+| data.accessToken | Bearer 访问令牌 |
+| data.tokenType | 固定为 `Bearer` |
+| data.expiresIn | 访问令牌有效秒数 |
+| data.refreshExpiresIn | 刷新登录状态有效秒数 |
+| data.scope | 已授予权限 |
+
+> 启用两步认证的账号首次请求会返回 `mfa_required`，携带 `mfaCode` 后再次登录。
+
+### 刷新登录状态
+
+`POST /api/v3/auth/refresh`
+
+用于同域 website_v3 恢复登录状态。
+
+请求：
+
+| Key | 说明 | 示例 |
+| --- | --- | --- |
+| 无 | 浏览器自动携带登录 Cookie | - |
+
+请求示例：
+
+```bash
+curl --request POST 'https://fishpi.cn/api/v3/auth/refresh'
+```
+
+响应：
+
+| Key | 说明 |
+| --- | --- |
+| data.accessToken | 新的 Bearer 访问令牌 |
+| data.expiresIn | 访问令牌有效秒数 |
+| data.refreshExpiresIn | 刷新登录状态有效秒数 |
+
+> 刷新成功后浏览器使用新的登录 Cookie。请勿重复使用刷新前的 Cookie；重复使用会使本次登录失效，需要重新登录。
+
+### 退出登录
+
+`POST /api/v3/auth/logout`
+
+结束当前浏览器的 v3 登录状态。
+
+请求：
+
+| Key | 说明 | 示例 |
+| --- | --- | --- |
+| 无 | 浏览器自动携带登录 Cookie | - |
+
+请求示例：
+
+```bash
+curl --request POST 'https://fishpi.cn/api/v3/auth/logout'
+```
+
+响应：
+
+| Key | 说明 |
+| --- | --- |
+| data | 空对象 |
+
+> 服务端完成退出处理后，本次登录下的访问令牌不再可用；其他独立登录不受影响。
+
+### 当前用户
+
+`GET /api/v3/me`
+
+读取当前登录用户的基础资料。
+
+请求：
+
+| Key | 说明 | 示例 |
+| --- | --- | --- |
+| Authorization | Bearer 访问令牌 | Bearer TOKEN |
+
+请求示例：
+
+```bash
+curl 'https://fishpi.cn/api/v3/me' --header 'Authorization: Bearer TOKEN'
+```
+
+响应：
+
+| Key | 说明 |
+| --- | --- |
+| data.id | 用户 ID |
+| data.userName | 用户名 |
+| data.userNickname | 昵称 |
+| data.userAvatarURL | 头像地址 |
+| data.userIntro | 个人简介 |
+| data.userURL | 个人主页链接 |
+| data.userPoint | 积分 |
+| data.userGuideStep | 新手引导进度 |
+
+### 最新专栏
+
+`GET /api/v3/columns?p=1&size=12`
+
+读取最新更新的公开专栏。
+
+请求：
+
+| Key | 说明 | 示例 |
+| --- | --- | --- |
+| p | 页码，从 1 开始 | 1 |
+| size | 返回数量，最大 50 | 12 |
+
+请求示例：
+
+```bash
+curl 'https://fishpi.cn/api/v3/columns?size=12'
+```
+
+响应：
+
+| Key | 说明 |
+| --- | --- |
+| data.list | 专栏列表 |
+| data.list[].id | 专栏 ID |
+| data.list[].title | 标题 |
+| data.list[].coverURL | 封面地址 |
+| data.list[].articleCount | 章节数量 |
+| data.pagination | 分页信息 |
+
+### 热门专栏
+
+`GET /api/v3/columns/hot?p=1&size=12`
+
+读取热门公开专栏，响应字段与“最新专栏”相同。
+
+请求参数与“最新专栏”相同。
+
+### 专栏详情
+
+`GET /api/v3/columns/{columnId}`
+
+读取公开专栏和章节目录。
+
+请求：
+
+| Key | 说明 | 示例 |
+| --- | --- | --- |
+| columnId | 专栏 ID | 2026101600000000001 |
+
+请求示例：
+
+```bash
+curl 'https://fishpi.cn/api/v3/columns/2026101600000000001'
+```
+
+响应：
+
+| Key | 说明 |
+| --- | --- |
+| data.column | 专栏基础资料 |
+| data.chapters | 章节目录 |
+| data.chapters[].id | 文章 ID |
+| data.chapters[].title | 文章标题 |
+| data.chapters[].chapterNo | 章节序号 |
+
+### 专栏章节
+
+`GET /api/v3/columns/{columnId}/articles?p=1&size=20`
+
+分页读取公开专栏的章节目录。
+
+请求：
+
+| Key | 说明 | 示例 |
+| --- | --- | --- |
+| columnId | 专栏 ID | 2026101600000000001 |
+| p | 页码 | 1 |
+| size | 每页数量，最大 50 | 20 |
+
+请求示例：
+
+```bash
+curl 'https://fishpi.cn/api/v3/columns/2026101600000000001/articles?p=1&size=20'
+```
+
+响应：
+
+| Key | 说明 |
+| --- | --- |
+| data.list | 章节列表 |
+| data.list[].id | 文章 ID |
+| data.list[].title | 章节标题 |
+| data.list[].chapterNo | 章节序号 |
+| data.list[].permalink | 文章链接 |
+| data.list[].createdAt | 创建时间 |
+| data.pagination | 分页信息 |
+
+
+### 发布文章
+
+`POST /api/v3/articles`
+
+发布普通帖、讨论帖、同城广播、问答或长篇文章。
+
+请求：
+
+| Key | 说明 | 示例 |
+| --- | --- | --- |
+| Authorization | Bearer 访问令牌；需要 content.write | Bearer TOKEN |
+| Idempotency-Key | 本次发布的唯一请求键 | article-publish-20261017-001 |
+| title | 标题，必填，最多 255 字符 | 我的第一篇文章 |
+| content | Markdown 正文，必填，4–1024000 字符 | 大家好，这是我的介绍。 |
+| tags | 逗号分隔的标签，最多 255 字符，按平台标签规则整理 | 新人报道,日常 |
+| type | 默认 0；0 普通、1 讨论、2 同城广播、5 问答、6 长篇 | 0 |
+| anonymous | 是否匿名发表，布尔值，默认 false | false |
+| notifyFollowers | 是否通知关注者，布尔值，默认 false | false |
+| showInList | 是否展示在文章列表，0 否、1 是，默认 1 | 1 |
+| commentable | 是否允许评论，布尔值，默认 true | true |
+| statement | 声明，默认 0；0 无、1 AI、2 剧透、3 虚构 | 0 |
+| goodPost | 是否标记为奖励帖，布尔值，默认 false；新人报道帖不可开启 | false |
+| rewardPoint | 打赏阅读价格，非负整数，默认 0 表示关闭 | 0 |
+| rewardContent | 打赏正文，最多 102400 字符；启用时至少 4 字符，关闭时留空 | |
+| qnaOfferPoint | 问答悬赏积分，非负整数，默认 0；问答至少 20 | 0 |
+| columnId | 本人专栏 ID，仅长篇使用；留空可通过 columnTitle 新建 | 1770000000000 |
+| columnTitle | 新专栏标题，最多 64 字符，仅长篇使用 | 我的专栏 |
+| chapterNo | 正整数的字符串，最大 2147483647；不传时自动分配 | 1 |
+| columnCoverURL | 专栏封面 HTTP/HTTPS 地址或站内路径，最多 1024 字符 | /images/logo.png |
+| draftId | 可选的本人草稿 ID；发布成功后删除该草稿 | 1770000000001 |
+
+请求示例：
+
+```bash
+curl --request POST 'https://fishpi.cn/api/v3/articles' \
+  --header 'Authorization: Bearer TOKEN' \
+  --header 'Content-Type: application/json' \
+  --header 'Idempotency-Key: article-publish-20261017-001' \
+  --data '{"title":"我的第一篇文章","content":"大家好，这是我的介绍。","tags":"新人报道,日常","type":0}'
+```
+
+响应：
+
+| Key | 说明 |
+| --- | --- |
+| code / msg | 结果码 / 提示 |
+| data | 发布结果 |
+| - id | 文章 ID |
+| - permalink | 文章站内链接，例如 /article/1770000000002 |
+
+> 需要满足手机绑定、首帖标签、发帖间隔、周报及积分等平台规则；正文与打赏正文需通过内容审核。思绪新增仍关闭。长篇不提供专栏 ID 和标题时不关联专栏。
+>
+> 相同请求键和内容重试返回原文章；同键不同内容返回 HTTP 409。提供的草稿不存在或不属于当前用户时返回 HTTP 404，整次发布失败；成功时草稿与发布一并完成。
+>
+> 缺少登录凭据返回 HTTP 401，缺少权限、未绑定手机或发布思绪返回 HTTP 403；字段、审核或发布条件不满足返回 HTTP 422，操作过于频繁返回 HTTP 429。
+
+### 本人文章编辑源码
+
+`GET /api/v3/me/articles/{articleId}/source`
+
+读取本人已发布文章的原始内容和编辑选项，用于回填编辑器。
+
+请求：
+
+| Key | 说明 | 示例 |
+| --- | --- | --- |
+| Authorization | Bearer 访问令牌；需要 content.read | Bearer TOKEN |
+| articleId | 本人文章 ID，路径参数 | 1770000000002 |
+
+请求示例：
+
+```bash
+curl 'https://fishpi.cn/api/v3/me/articles/1770000000002/source' \
+  --header 'Authorization: Bearer TOKEN'
+```
+
+响应：
+
+| Key | 说明 |
+| --- | --- |
+| code / msg | 结果码 / 提示 |
+| data | 编辑源码及选项 |
+| - id | 文章 ID |
+| - title / tags | 原标题 / 逗号分隔标签 |
+| - content | 原始 Markdown 正文；思绪为原始回放记录串 |
+| - type | 文章类型 |
+| - rewardContent / rewardPoint | 本人打赏正文源码 / 打赏价格 |
+| - qnaOfferPoint | 悬赏积分 |
+| - commentable | 是否允许评论，布尔值 |
+| - showInList | 是否在列表展示，0 否、1 是 |
+| - statement | 声明，0 无、1 AI、2 剧透、3 虚构 |
+| - columnId / columnTitle | 所属本人有效专栏 ID / 标题；无有效专栏时为空串 |
+| - columnCoverURL / chapterNo | 专栏封面 / 章节号字符串；无有效专栏时为空串 |
+| - anonymous | 是否匿名，布尔值；只读 |
+| - status | 状态，0 正常、1 不可用、2 锁定；只读 |
+| - editorType | 原编辑器类型；只读 |
+| - createdAt / updatedAt | 创建 / 更新时间，毫秒时间戳；只读 |
+| - permalink | 文章站内链接；只读 |
+
+> 不存在或不属于本人的文章统一返回 HTTP 404。本人仍可读取锁定文章源码，读取成功不代表允许编辑；编辑时仍须满足权限和文章状态要求。
+>
+> content 与 rewardContent 为未渲染源码，适合填充编辑器；展示时需按格式渲染。调用编辑接口时仅提交需要修改的可写字段，不要把整个响应原样提交。
+
+### 编辑本人文章
+
+`PUT /api/v3/articles/{articleId}`
+
+部分更新本人文章，至少提交一个字段；未提交的持久化字段和章节关系保持原值。
+
+请求：
+
+| Key | 说明 | 示例 |
+| --- | --- | --- |
+| Authorization | Bearer 访问令牌；需要 content.write | Bearer TOKEN |
+| Idempotency-Key | 本次编辑的唯一请求键 | article-edit-20261017-001 |
+| articleId | 本人文章 ID，路径参数 | 1770000000002 |
+| title | 标题，最多 255 字符；周报标题不可修改 | 更新后的标题 |
+| content | Markdown 正文，4–1024000 字符；历史思绪使用原回放记录串 | 更新后的正文内容 |
+| tags | 逗号分隔标签，最多 255 字符 | 日常,分享 |
+| type | 0 普通、1 讨论、2 同城广播、5 问答、6 长篇；3 仅用于原有思绪 | 0 |
+| rewardPoint | 非负打赏价格；传 0 会保留已启用的价格和正文，不会关闭打赏 | 10 |
+| rewardContent | 新打赏正文，最多 102400 字符；启用时至少 4 字符 | 付费阅读正文 |
+| qnaOfferPoint | 悬赏积分，只能增加；问答至少 20 | 30 |
+| commentable | 是否允许评论，布尔值 | true |
+| showInList | 是否展示在列表，0 否、1 是 | 1 |
+| statement | 声明，0 无、1 AI、2 剧透、3 虚构 | 0 |
+| notifyFollowers | 本次是否通知关注者，布尔值，默认 false | false |
+| columnId | 本人专栏 ID；空串且不提供新专栏标题时取消关联 | 1770000000000 |
+| columnTitle | 新专栏标题，最多 64 字符，仅 columnId 为空时使用 | 新专栏 |
+| chapterNo | 正整数的字符串，最大 2147483647；变更专栏且不传时自动分配 | 2 |
+| columnCoverURL | 封面 HTTP/HTTPS 地址或站内路径，最多 1024 字符 | /images/logo.png |
+
+请求示例：
+
+```bash
+curl --request PUT 'https://fishpi.cn/api/v3/articles/1770000000002' \
+  --header 'Authorization: Bearer TOKEN' \
+  --header 'Content-Type: application/json' \
+  --header 'Idempotency-Key: article-edit-20261017-001' \
+  --data '{"title":"更新后的标题","content":"更新后的正文内容"}'
+```
+
+响应：
+
+| Key | 说明 |
+| --- | --- |
+| code / msg | 结果码 / 提示 |
+| data | 编辑结果 |
+| - id | 文章 ID |
+| - permalink | 文章站内链接 |
+
+> 作者、匿名状态、奖励帖标记及草稿 ID 不支持在此接口修改。编辑费用、五分钟规则、周报标题和悬赏规则沿用平台行为；正文与打赏正文需通过审核。
+>
+> 历史思绪未提交 content 时保留记录；提供 content 时必须保留原分隔记录格式。其他类型不能改成思绪，原思绪改为其他类型时必须同时提供正文。
+>
+> 不存在或不属于本人的文章返回 HTTP 404，锁定文章或缺权限返回 HTTP 403；字段、审核或编辑条件不满足返回 HTTP 422。相同请求键重试不重复编辑或扣款，重放不会覆盖后续编辑；同键不同内容返回 HTTP 409。长篇正文的段落标识无法唯一对应时同样返回 HTTP 409，编辑及关联变更一并取消。
+
+### 删除本人文章
+
+`DELETE /api/v3/articles/{articleId}`
+
+删除满足平台删除条件的本人文章。
+
+请求：
+
+| Key | 说明 | 示例 |
+| --- | --- | --- |
+| Authorization | Bearer 访问令牌；需要 content.write | Bearer TOKEN |
+| Idempotency-Key | 本次删除的唯一请求键 | article-remove-20261017-001 |
+| articleId | 本人文章 ID，路径参数 | 1770000000002 |
+
+请求示例：
+
+```bash
+curl --request DELETE 'https://fishpi.cn/api/v3/articles/1770000000002' \
+  --header 'Authorization: Bearer TOKEN' \
+  --header 'Idempotency-Key: article-remove-20261017-001'
+```
+
+响应：
+
+| Key | 说明 |
+| --- | --- |
+| code / msg | 结果码 / 提示 |
+| data | 删除结果 |
+| - id | 已删除的文章 ID |
+
+> 文章发布满 24 小时后才可删除，周报不可删除；有评论、订阅、收藏、赞踩、打赏或感谢的文章不可删除。
+>
+> 不存在或不属于本人的文章返回 HTTP 404，锁定文章或缺权限返回 HTTP 403，不满足删除条件返回 HTTP 422。相同请求键重试返回原删除结果；已删除后使用新键请求返回 HTTP 404。
+>
+> 删除文章时清理其 emoji reaction，并保留其他文章、评论、用户和标签的投票及奖励记录，同时处理可确认关联的通知；其他消息保留，请求和响应字段保持不变。
+
+### 文章列表
+
+`GET /api/v3/articles`
+
+分页读取文章摘要。`type=recent` 为普通文章列表，`type=long` 为长篇列表。
+
+请求：
+
+| Key | 说明 | 示例 |
+| --- | --- | --- |
+| Authorization | Bearer 访问令牌（可选），使用令牌时需要 content.read | Bearer TOKEN |
+| p | 页码，默认 1，最大 42949672 | 1 |
+| size | 每页数量，默认 20，最大 50 | 20 |
+| sort | latest（默认）、active（最新回复）、hot（热度）、comments（评论数） | latest |
+| type | recent（默认）、long | recent |
+
+请求示例：
+
+```bash
+curl 'https://fishpi.cn/api/v3/articles?p=1&size=20&sort=latest&type=recent'
+```
+
+响应：
+
+| Key | 说明 |
+| --- | --- |
+| code / msg | 结果码 / 提示，成功时 code 为 0 |
+| data | 列表数据 |
+| - list | 文章摘要数组 |
+| -- id | 文章 ID |
+| -- title | 标题（文本） |
+| -- preview | 摘要（文本），思绪帖为空 |
+| -- tags | 逗号分隔的标签 |
+| -- type | 文章类型，与旧接口 articleType 一致 |
+| -- anonymous | 是否匿名发表 |
+| -- author | 公开作者资料 |
+| --- id | 用户 ID，匿名发表时为空 |
+| --- userName / userNickname | 用户名 / 昵称，匿名发表时显示匿名用户 |
+| --- userAvatarURL | 头像地址，匿名发表时为空 |
+| -- permalink | 文章链接 |
+| -- createdAt / updatedAt | 创建 / 更新时间，毫秒时间戳 |
+| -- commentCount / viewCount | 评论数 / 浏览数 |
+| - pagination | 分页信息 |
+| -- p / size / total / pageCount | 页码 / 每页数量 / 总条数 / 总页数 |
+
+> 列表仅返回可列出的文章，不包含讨论帖。普通文章列表不包含长篇；超出总页数返回空数组。非法分页和筛选参数返回 HTTP 422。
+
+### 文章详情
+
+`GET /api/v3/articles/{articleId}`
+
+读取文章正文及当前阅读者可查看的打赏内容。
+
+请求：
+
+| Key | 说明 | 示例 |
+| --- | --- | --- |
+| articleId | 文章 ID | 1636516552191 |
+| Authorization | Bearer 访问令牌（可选），使用令牌时需要 content.read | Bearer TOKEN |
+
+请求示例：
+
+```bash
+curl 'https://fishpi.cn/api/v3/articles/1636516552191' \
+  --header 'Authorization: Bearer TOKEN'
+```
+
+响应：
+
+| Key | 说明 |
+| --- | --- |
+| code / msg | 结果码 / 提示 |
+| data | 文章详情，包含文章列表的摘要字段及以下字段 |
+| - content | 正文源内容；Markdown 或思绪记录字符串 |
+| - contentFormat | markdown 或 thought |
+| - contentHtml | 正文 HTML；思绪帖为空，需要由客户端播放 content 中的记录 |
+| - rewardPoint | 打赏所需积分 |
+| - rewarded | 当前阅读者是否已打赏或为文章作者 |
+| - rewardContent | 可查看的打赏内容源文本，否则为空 |
+| - rewardContentHtml | 可查看的打赏内容 HTML，否则为空 |
+
+> 不存在或不可查看的文章返回 HTTP 404。原始内容与文本字段应按文本处理，展示富文本使用 contentHtml；思绪播放器需要自行安全处理记录。此接口仅执行读取，不增加浏览数。
+
+### 文章评论列表
+
+`GET /api/v3/articles/{articleId}/comments`
+
+分页读取文章的普通评论，包含回复，不包含段评。
+
+请求：
+
+| Key | 说明 | 示例 |
+| --- | --- | --- |
+| articleId | 文章 ID | 1636516552191 |
+| Authorization | Bearer 访问令牌（可选），使用令牌时需要 content.read | Bearer TOKEN |
+| p | 页码，默认 1，最大 42949672 | 1 |
+| size | 每页数量，默认 20，最大 50 | 20 |
+| sort | oldest（默认）、latest、hot | oldest |
+
+请求示例：
+
+```bash
+curl 'https://fishpi.cn/api/v3/articles/1636516552191/comments?p=1&size=20&sort=oldest' \
+  --header 'Authorization: Bearer TOKEN'
+```
+
+响应：
+
+| Key | 说明 |
+| --- | --- |
+| code / msg | 结果码 / 提示 |
+| data | 列表数据 |
+| - list | 评论数组 |
+| -- id / articleId | 评论 / 所属文章 ID |
+| -- parentId | 被回复评论 ID，无回复目标时为空 |
+| -- content | 评论 Markdown 源文本，不可查看时为空 |
+| -- contentHtml | 评论 HTML，不可查看时为空 |
+| -- contentVisible | 当前阅读者是否可查看正文 |
+| -- createdAt | 创建时间，毫秒时间戳 |
+| -- anonymous | 是否匿名发表 |
+| -- author | 公开作者资料，字段与文章摘要 author 一致 |
+| - pagination | 分页信息 |
+| -- p / size / total / pageCount | 页码 / 每页数量 / 总条数 / 总页数 |
+
+> 文章不存在或不可查看时返回 HTTP 404。仅作者可见评论的正文只对评论作者和文章作者可见，其他阅读者会得到 contentVisible=false 的占位记录。非法 ID、分页或排序返回 HTTP 422。
+
+
+## API v3 第三方授权
+
+应用需先登记 client_id、允许的权限及完整回调地址。支持 HTTPS；开发环境支持 HTTP 回环地址；原生应用支持预登记的反向域名专用 scheme，例如 `com.example.app:/oauth2redirect`。回调地址含端口、路径和查询参数必须精确匹配，不允许片段、用户凭据及预置 OAuth 响应参数。
+
+本模块采用授权码与 PKCE S256，不接收 apiKey。授权页返回 HTML，授权决定返回 HTTP 303，令牌及撤销响应为直接 JSON，不使用 code/msg/data 信封。错误 JSON 包含 error、error_description；参数错误为 HTTP 400，凭据或来源不受支持为 401/403，媒体类型错误为 415，请求过频为 429，暂时不可用为 503。
+
+### 打开授权页面
+
+`GET /api/v3/oauth/authorize`
+
+在浏览器打开此地址，用户登录后查看应用、账号和申请权限，再明确选择允许或拒绝。
+
+请求：
+
+| Key | 说明 | 示例 |
+| --- | --- | --- |
+| response_type | 固定为 code | code |
+| client_id | 已登记应用 ID | example_app |
+| redirect_uri | 完整登记回调地址 | https://example.com/callback |
+| scope | 空格分隔的申请权限，必须在应用允许范围内 | content.read profile.read |
+| state | 可选，客户端生成并在回调中核对，最多 1024 个 UTF-8 字节 | random-state |
+| code_challenge | code_verifier 的 SHA-256 摘要，Base64URL 无填充编码 | PKCE_CHALLENGE |
+| code_challenge_method | 固定为 S256 | S256 |
+
+请求示例：
+
+```bash
+curl --get 'https://fishpi.cn/api/v3/oauth/authorize' \
+  --data-urlencode 'response_type=code' --data-urlencode 'client_id=example_app' \
+  --data-urlencode 'redirect_uri=https://example.com/callback' \
+  --data-urlencode 'scope=content.read profile.read' --data-urlencode 'state=random-state' \
+  --data-urlencode 'code_challenge=PKCE_CHALLENGE' --data-urlencode 'code_challenge_method=S256'
+```
+
+响应：
+
+| Key | 说明 | 示例 |
+| --- | --- | --- |
+| HTML | 授权页面；未登录时为登录引导，HTTP 401 | 应用名、账号与权限列表 |
+
+> 上例用于构造地址，实际授权应由用户在浏览器完成。code_verifier 应由客户端随机生成并保留，长度 43–128，仅使用字母、数字和 `-._~`。
+
+### 提交授权决定
+
+`POST /api/v3/oauth/consent`
+
+由授权页提交用户的明确选择，使用 application/x-www-form-urlencoded。
+
+请求：
+
+| Key | 说明 | 示例 |
+| --- | --- | --- |
+| request | 授权页提供的请求标识，10 分钟内有效 | REQUEST |
+| proof | 授权页提供的确认凭据 | PROOF |
+| decision | 允许 approve 或拒绝 deny | approve |
+| csrfToken | 授权页提供的表单令牌 | FORM_TOKEN |
+
+请求示例：
+
+```bash
+curl --request POST 'https://fishpi.cn/api/v3/oauth/consent' \
+  --cookie cookies.txt --header 'Origin: https://fishpi.cn' \
+  --data-urlencode 'request=REQUEST' --data-urlencode 'proof=PROOF' \
+  --data-urlencode 'decision=approve' --data-urlencode 'csrfToken=FORM_TOKEN'
+```
+
+响应：
+
+| Key | 说明 | 示例 |
+| --- | --- | --- |
+| Location | HTTP 303 回调地址；允许时带 code，拒绝时带 error=access_denied；带回非空 state | https://example.com/callback?code=CODE&state=random-state |
+
+> 此示例仅供调试表单；客户端应让用户操作授权页。决定只能提交一次，不能切换或重放。授权码有效期为 5 分钟。
+
+### 换取或刷新令牌
+
+`POST /api/v3/oauth/token`
+
+使用 application/x-www-form-urlencoded。授权码换取令牌，或使用 refresh_token 轮换令牌；不发送 Authorization 请求头。
+
+请求：
+
+| Key | 说明 | 示例 |
+| --- | --- | --- |
+| grant_type | authorization_code 或 refresh_token | authorization_code |
+| client_id | 已登记应用 ID | example_app |
+| code | 换码时必填，授权回调提供 | CODE |
+| redirect_uri | 换码时必填，与授权请求完全一致 | https://example.com/callback |
+| code_verifier | 换码时必填，生成 challenge 时保留的原串 | PKCE_VERIFIER |
+| refresh_token | 刷新时必填 | REFRESH_TOKEN |
+| scope | 仅刷新时可选，空格分隔，只能缩小已有权限 | content.read |
+
+请求示例：
+
+```bash
+curl --request POST 'https://fishpi.cn/api/v3/oauth/token' \
+  --data-urlencode 'grant_type=authorization_code' --data-urlencode 'client_id=example_app' \
+  --data-urlencode 'code=CODE' --data-urlencode 'redirect_uri=https://example.com/callback' \
+  --data-urlencode 'code_verifier=PKCE_VERIFIER'
+
+curl --request POST 'https://fishpi.cn/api/v3/oauth/token' \
+  --data-urlencode 'grant_type=refresh_token' --data-urlencode 'client_id=example_app' \
+  --data-urlencode 'refresh_token=REFRESH_TOKEN' --data-urlencode 'scope=content.read'
+```
+
+响应：
+
+| Key | 说明 | 示例 |
+| --- | --- | --- |
+| access_token | 访问令牌，业务请求使用 Authorization: Bearer | ACCESS_TOKEN |
+| token_type | 固定 Bearer | Bearer |
+| expires_in | 访问令牌有效秒数 | 900 |
+| refresh_token | 新刷新令牌，妥善保存并替换旧值 | REFRESH_TOKEN |
+| refresh_expires_in | 刷新令牌有效秒数 | 2592000 |
+| scope | 本次授予的权限 | content.read profile.read |
+
+> 授权码及刷新令牌均只能消费一次。使用正确 PKCE 重放已消费授权码，或重用已轮换刷新令牌，会使该次授权的相关令牌失效。客户端应串行刷新；丢失成功响应后重新发起授权。本模块不使用 Idempotency-Key。
+>
+> 浏览器跨域换码的 Origin 须匹配登记 HTTP(S) 回调的来源，fetch 使用 credentials: omit。表单使用 UTF-8 百分号编码，不接受重复、未知参数或 JSON；换码与刷新参数不可混用。
+
+### 撤销本次授权
+
+`POST /api/v3/oauth/revoke`
+
+使用 access_token 或 refresh_token 撤销该次授权的令牌，使用 application/x-www-form-urlencoded。
+
+请求：
+
+| Key | 说明 | 示例 |
+| --- | --- | --- |
+| client_id | 已登记应用 ID | example_app |
+| token | 本次授权的访问令牌或刷新令牌 | TOKEN |
+| token_type_hint | 可选，提示令牌类型 | refresh_token |
+
+请求示例：
+
+```bash
+curl --request POST 'https://fishpi.cn/api/v3/oauth/revoke' \
+  --data-urlencode 'client_id=example_app' --data-urlencode 'token=TOKEN' \
+  --data-urlencode 'token_type_hint=refresh_token'
+```
+
+响应：
+
+| Key | 说明 | 示例 |
+| --- | --- | --- |
+| JSON | 成功为 HTTP 200；未知或已撤销令牌也返回相同结果 | {} |
+
+## API v3 段落与评论详情
+
+### 长篇段落列表
+
+`GET /api/v3/articles/{articleId}/paragraphs`
+
+获取当前长篇正文的段落锚点、摘要和段评数量，供段评发布与定位使用。
+
+请求：
+
+| Key | 说明 | 示例 |
+| --- | --- | --- |
+| Authorization | Bearer 访问令牌（可选），使用令牌时需要 content.read | Bearer TOKEN |
+| articleId | 长篇文章 ID，路径参数 | 1770000000001 |
+| p | 页码，默认 1，最大 42949672 | 1 |
+| size | 每页数量，默认 20，最大 50 | 20 |
+| includeContent | 可选，true 时同时返回带段落锚点的正文 HTML，默认 false | true |
+
+请求示例：
+
+```bash
+curl 'https://fishpi.cn/api/v3/articles/1770000000001/paragraphs?p=1&size=20&includeContent=true' \
+  --header 'Authorization: Bearer TOKEN'
+```
+
+响应：
+
+| Key | 说明 |
+| --- | --- |
+| code / msg | 结果码 / 提示 |
+| data | 段落结果 |
+| - list | 按正文顺序排列的当前段落 |
+| -- id | 64 位小写段落锚点，用作发布时的 paragraphId |
+| -- kind | 段落类型，如 paragraph、heading、list-item、blockquote、code、table、media |
+| -- index | 在整篇正文中的位置，从 0 开始 |
+| -- snapshot | 纯文本段落摘要，按普通文本展示 |
+| -- state | 当前段落为 active |
+| -- commentCount | 此锚点下有效段评数量，包含回复 |
+| - pagination | 分页信息 |
+| -- p / size | 当前页 / 每页数量 |
+| -- total / pageCount | 段落总数 / 总页数 |
+| - contentHtml | 仅 includeContent=true 时返回；完整正文 HTML，元素带 data-long-paragraph-id、data-long-paragraph-kind 和 data-long-paragraph-index |
+
+> 锚点以本接口当前结果为准，建议与 includeContent 返回的正文共同使用。正文编辑或相关标题变化后应重新获取；分页只影响 list，contentHtml 始终为整篇正文。兼容既有段落标识；标识无法唯一对应时返回 HTTP 409，不会猜测评论归属。不存在、不可查看或非长篇文章返回 HTTP 404，非法分页或 includeContent 返回 HTTP 422。
+
+### 长篇段评列表
+
+`GET /api/v3/articles/{articleId}/paragraph-comments`
+
+读取段评及回复，也可读取已失效的段评关联。
+
+请求：
+
+| Key | 说明 | 示例 |
+| --- | --- | --- |
+| Authorization | Bearer 访问令牌（可选），使用令牌时需要 content.read | Bearer TOKEN |
+| articleId | 长篇文章 ID，路径参数 | 1770000000001 |
+| paragraphId | 可选，64 位小写段落锚点；不传则查询全文段评 | 64 位小写 SHA-256 |
+| state | active（默认）、orphaned（段落失效）、all | active |
+| sort | oldest（默认）、latest、hot | oldest |
+| p | 页码，默认 1，最大 42949672 | 1 |
+| size | 每页数量，默认 20，最大 50 | 20 |
+
+请求示例：
+
+```bash
+curl 'https://fishpi.cn/api/v3/articles/1770000000001/paragraph-comments?state=all&sort=oldest&p=1&size=20' \
+  --header 'Authorization: Bearer TOKEN'
+```
+
+响应：
+
+| Key | 说明 |
+| --- | --- |
+| code / msg | 结果码 / 提示 |
+| data | 段评结果 |
+| - list | 段评与回复的平铺列表，可通过 parentId 关联 |
+| -- id / articleId / parentId | 评论 ID / 所属文章 ID / 原评论 ID，独立段评的 parentId 为空 |
+| -- content / contentHtml | Markdown 正文 / 正文 HTML；不可读时均为空 |
+| -- contentVisible | 当前阅读者是否可读正文 |
+| -- createdAt / anonymous | 创建时间戳（毫秒） / 是否匿名 |
+| -- author | 公开作者资料 |
+| --- id / userName / userNickname / userAvatarURL | 公开 ID / 用户名 / 昵称 / 头像；匿名作者 ID 为空 |
+| -- type | 段评固定为 1 |
+| -- paragraph | 段落关联信息 |
+| --- id / kind / index / state | 锚点 / 类型 / 位置 / active 或 orphaned |
+| -- permalink | 文章内评论链接 |
+| - pagination | 分页信息 |
+| -- p / size / total / pageCount | 当前页 / 每页数量 / 总数 / 总页数 |
+
+> 仅楼主可见评论的正文仅评论者本人及楼主可读。当前段落摘要从长篇段落列表获取，评论对象不返回历史段落快照。段评与回复均参与分页；给定锚点下无匹配记录时返回空列表。不存在、不可查看或非长篇文章返回 HTTP 404，非法筛选、排序或分页返回 HTTP 422，段落标识无法唯一对应时返回 HTTP 409。
+
+### 评论详情
+
+`GET /api/v3/comments/{commentId}`
+
+读取单条普通评论或段评，也可按 parentId 读取回复目标。
+
+请求：
+
+| Key | 说明 | 示例 |
+| --- | --- | --- |
+| Authorization | Bearer 访问令牌（可选），使用令牌时需要 content.read | Bearer TOKEN |
+| commentId | 评论 ID，路径参数 | 1770000000003 |
+
+请求示例：
+
+```bash
+curl 'https://fishpi.cn/api/v3/comments/1770000000003' \
+  --header 'Authorization: Bearer TOKEN'
+```
+
+响应：
+
+| Key | 说明 |
+| --- | --- |
+| code / msg | 结果码 / 提示 |
+| data | 评论对象 |
+| - id / articleId / parentId | 评论 ID / 所属文章 ID / 原评论 ID |
+| - content / contentHtml / contentVisible | 正文 / 正文 HTML / 是否可读；不可读时正文为空 |
+| - createdAt / anonymous | 创建时间戳（毫秒） / 是否匿名 |
+| - author | 公开作者资料 |
+| -- id / userName / userNickname / userAvatarURL | 公开 ID / 用户名 / 昵称 / 头像；匿名作者 ID 为空 |
+| - type | 0 普通评论，1 段评 |
+| - paragraph | 普通评论为 null；段评为关联信息 |
+| -- id / kind / index / state | 锚点 / 类型 / 位置 / active 或 orphaned |
+| - permalink | 文章内评论链接 |
+
+> 不存在、已失效的评论或所属文章不可查看时返回 HTTP 404。仅楼主可见正文及匿名作者资料遵循段评列表的规则；有效段评标识无法唯一对应时返回 HTTP 409。
+
+## API v3 评论写入
+
+### 发表评论或回复
+
+`POST /api/v3/articles/{articleId}/comments`
+
+在可评论的文章下发表评论、回复或长篇段评。
+
+请求：
+
+| Key | 说明 | 示例 |
+| --- | --- | --- |
+| Authorization | Bearer 访问令牌；需要 comments.write | Bearer TOKEN |
+| Idempotency-Key | 本次发布的唯一请求键 | comment-post-20261017-001 |
+| articleId | 文章 ID，路径参数 | 1770000000001 |
+| content | 必填，Markdown 正文，1–4096 字符，不可全为空白 | 这篇文章写得很好 |
+| anonymous | 可选，是否匿名，布尔值，默认 false；需要匿名评论权限 | false |
+| visible | 可选，是否仅楼主可见，布尔值，默认 false；评论者本人仍可见 | false |
+| parentId | 可选，当前文章内可读的原评论 ID；不传时发表独立评论 | 1770000000003 |
+| paragraphId | 可选，v3 长篇段落列表提供的 64 位小写段落锚点；不传时发表普通评论，回复段评时自动继承原段落 | 64 位小写 SHA-256 |
+
+请求示例：
+
+```bash
+curl --request POST 'https://fishpi.cn/api/v3/articles/1770000000001/comments' \
+  --header 'Authorization: Bearer TOKEN' \
+  --header 'Content-Type: application/json' \
+  --header 'Idempotency-Key: comment-post-20261017-001' \
+  --data '{"content":"这篇文章写得很好","anonymous":false,"visible":false}'
+```
+
+响应：
+
+| Key | 说明 |
+| --- | --- |
+| code / msg | 结果码 / 提示 |
+| data | 发布结果 |
+| - id | 新评论 ID |
+| - permalink | 文章内评论链接；段评链接包含 paragraph 参数 |
+
+> 需要绑定手机、具备评论权限并通过正文审核，收费、发言间隔和匿名余额条件沿用平台规则。回复目标必须属于当前文章且可读；回复段评时可省略 paragraphId，若传入则必须与原段落一致。独立段评必须指向当前正文中存在的段落。兼容既有段落标识；无法唯一对应时返回 HTTP 409，且不发表或扣款。
+>
+> 相同请求键及相同内容重试返回原发布结果，不重复发布或扣款；同键不同内容返回 HTTP 409。文章或原评论不存在、不可查看、跨文章回复、段落不存在时返回 HTTP 404；缺少权限、未绑定手机或文章禁止评论时返回 HTTP 403；字段、审核、余额或发言间隔条件未满足时返回 HTTP 422，操作过于频繁返回 HTTP 429。
+
+
+### 编辑本人评论
+
+`PUT /api/v3/comments/{commentId}`
+
+编辑本人已有评论或段评，保留作者、匿名状态、回复目标和段落关联。
+
+请求：
+
+| Key | 说明 | 示例 |
+| --- | --- | --- |
+| Authorization | Bearer 访问令牌；需要 comments.write | Bearer TOKEN |
+| Idempotency-Key | 本次编辑的唯一请求键 | comment-edit-20261017-001 |
+| commentId | 本人评论 ID，路径参数 | 1770000000003 |
+| content | 必填，Markdown 正文，1–4096 字符，不可全为空白 | 更新后的评论 |
+| visible | 可选，是否仅楼主可见，布尔值；不传保留原值，评论者本人仍可见 | false |
+
+请求示例：
+
+```bash
+curl --request PUT 'https://fishpi.cn/api/v3/comments/1770000000003' \
+  --header 'Authorization: Bearer TOKEN' \
+  --header 'Content-Type: application/json' \
+  --header 'Idempotency-Key: comment-edit-20261017-001' \
+  --data '{"content":"更新后的评论","visible":false}'
+```
+
+响应：
+
+| Key | 说明 |
+| --- | --- |
+| code / msg | 结果码 / 提示 |
+| data | 编辑结果 |
+| - id | 评论 ID |
+| - permalink | 文章内评论链接 |
+
+> 正文需通过审核。编辑费用与五分钟规则沿用平台行为；窗口外的普通公开评论编辑即使正文未变化，也按原规则收费。相同请求键重试不重复编辑、扣款或发送提醒，重放不会覆盖后续编辑；同键不同内容返回 HTTP 409。
+>
+> 不存在、不属于本人或所属文章不可查看时返回 HTTP 404；文章锁定、评论不可编辑或缺权限返回 HTTP 403。字段、审核或余额不满足要求返回 HTTP 422，操作过于频繁返回 HTTP 429。
+
+
+### 删除本人评论
+
+`DELETE /api/v3/comments/{commentId}`
+
+删除满足平台条件的本人评论或段评，费用沿用原删除规则。
+
+请求：
+
+| Key | 说明 | 示例 |
+| --- | --- | --- |
+| Authorization | Bearer 访问令牌；需要 comments.write | Bearer TOKEN |
+| Idempotency-Key | 本次删除的唯一请求键 | comment-delete-20261018-001 |
+| commentId | 本人评论 ID，路径参数 | 1770000000003 |
+
+请求示例：
+
+```bash
+curl --request DELETE 'https://fishpi.cn/api/v3/comments/1770000000003' \
+  --header 'Authorization: Bearer TOKEN' \
+  --header 'Content-Type: application/json' \
+  --header 'Idempotency-Key: comment-delete-20261018-001' \
+  --data '{}'
+```
+
+响应：
+
+| Key | 说明 |
+| --- | --- |
+| code / msg | 结果码 / 提示 |
+| data | 删除结果 |
+| - id | 评论 ID |
+| - removed | 是否已删除，成功时为 true |
+
+> 请求体可省略或为 `{}`，不接受其他字段。已有回复、赞踩、感谢、已被采纳或积分不足时拒绝删除；匿名及私密评论仍沿用原删除费用，失败不扣款。
+>
+> 同键重试返回原结果，不重复扣费；删除后使用新键返回 HTTP 404。不存在、不属于本人或所属文章不可查看时返回 HTTP 404；缺少权限返回 HTTP 403；参数、互动或余额条件不满足时返回 HTTP 422，操作过于频繁返回 HTTP 429。
+>
+> 删除时清理该评论的 emoji reaction，处理可确认关联的评论通知，保留其他消息；成功字段与费用保持不变。
+
+### 感谢评论
+
+`POST /api/v3/comments/{commentId}/thanks`
+
+感谢可阅读的他人评论或段评，费用沿用平台规则；同一用户对同一评论仅感谢一次。
+
+请求：
+
+| Key | 说明 | 示例 |
+| --- | --- | --- |
+| Authorization | Bearer 访问令牌；需要 comments.write | Bearer TOKEN |
+| Idempotency-Key | 本次感谢的唯一请求键 | comment-thank-20261018-001 |
+| commentId | 评论 ID，路径参数 | 1770000000003 |
+
+请求示例：
+
+```bash
+curl --request POST 'https://fishpi.cn/api/v3/comments/1770000000003/thanks' \
+  --header 'Authorization: Bearer TOKEN' \
+  --header 'Content-Type: application/json' \
+  --header 'Idempotency-Key: comment-thank-20261018-001' \
+  --data '{}'
+```
+
+响应：
+
+| Key | 说明 |
+| --- | --- |
+| code / msg | 结果码 / 提示 |
+| data | 感谢结果 |
+| - id | 评论 ID |
+| - thanked | 是否已感谢，成功时为 true |
+
+> 请求体可省略或为 `{}`，不接受其他字段。相同请求键重试返回原结果；换用新键重复感谢也不重复扣费。匿名评论保留原有免转账规则。
+>
+> 评论不存在、不可阅读或作者不可用时返回 HTTP 404；缺少权限返回 HTTP 403；感谢自己、积分不足或参数不合法返回 HTTP 422，评论归属变化时返回 HTTP 409，操作过于频繁返回 HTTP 429。保存失败不扣款。
+
+### 采纳评论
+
+`POST /api/v3/comments/{commentId}/accept`
+
+文章作者采纳一条可阅读的他人评论，悬赏积分及匿名免转账规则沿用平台行为。一篇文章仅能采纳一条评论。
+
+请求：
+
+| Key | 说明 | 示例 |
+| --- | --- | --- |
+| Authorization | Bearer 访问令牌；需要 comments.write | Bearer TOKEN |
+| Idempotency-Key | 本次采纳的唯一请求键 | comment-accept-20261018-001 |
+| commentId | 评论 ID，路径参数 | 1770000000003 |
+
+请求示例：
+
+```bash
+curl --request POST 'https://fishpi.cn/api/v3/comments/1770000000003/accept' \
+  --header 'Authorization: Bearer TOKEN' \
+  --header 'Content-Type: application/json' \
+  --header 'Idempotency-Key: comment-accept-20261018-001' \
+  --data '{}'
+```
+
+响应：
+
+| Key | 说明 |
+| --- | --- |
+| code / msg | 结果码 / 提示 |
+| data | 采纳结果 |
+| - id | 被采纳评论 ID |
+| - accepted | 是否已采纳，成功时为 true |
+
+> 请求体可省略或为 `{}`，不接受其他字段。相同请求键重试返回原结果；换用新键重复采纳同一评论也不重复付款。保存失败时不扣款。
+>
+> 评论不存在、失效、不可阅读或作者不可用时返回 HTTP 404；非文章作者或缺少权限返回 HTTP 403；采纳自己、余额不足或参数不合法返回 HTTP 422；已有其他采纳或评论归属变化返回 HTTP 409；操作过于频繁返回 HTTP 429。
+
+## API v3 文章感谢与打赏
+
+### 读取文章感谢状态
+
+`GET /api/v3/articles/{articleId}/thanks`
+
+读取本人是否感谢过文章、当前感谢次数及感谢费用。
+
+请求：
+
+| Key | 说明 | 示例 |
+| --- | --- | --- |
+| Authorization | Bearer 访问令牌；需要 content.read | Bearer TOKEN |
+| articleId | 文章 ID，路径参数 | 1770000000003 |
+
+请求示例：
+
+```bash
+curl 'https://fishpi.cn/api/v3/articles/1770000000003/thanks' \
+  --header 'Authorization: Bearer TOKEN'
+```
+
+响应：
+
+| Key | 说明 |
+| --- | --- |
+| code / msg | 结果码 / 提示 |
+| data | 感谢状态 |
+| - id | 文章 ID |
+| - thanked | 本人是否已感谢 |
+| - thankCount | 当前感谢次数 |
+| - thankPoint | 当前一次感谢所需积分，匿名文章为 0；已感谢不会再次扣除 |
+
+> 文章不存在、作者不可用或不可阅读时返回 HTTP 404。锁定但仍可阅读的文章沿用原感谢规则。
+
+### 感谢文章
+
+`POST /api/v3/articles/{articleId}/thanks`
+
+感谢可阅读的他人文章，费用沿用平台当前感谢规则；匿名文章保留免转账规则。
+
+请求：
+
+| Key | 说明 | 示例 |
+| --- | --- | --- |
+| Authorization | Bearer 访问令牌；需要 content.write | Bearer TOKEN |
+| Idempotency-Key | 本次感谢的唯一请求键 | article-thank-20261018-001 |
+| articleId | 文章 ID，路径参数 | 1770000000003 |
+
+请求示例：
+
+```bash
+curl --request POST 'https://fishpi.cn/api/v3/articles/1770000000003/thanks' \
+  --header 'Authorization: Bearer TOKEN' \
+  --header 'Content-Type: application/json' \
+  --header 'Idempotency-Key: article-thank-20261018-001' \
+  --data '{}'
+```
+
+响应：
+
+| Key | 说明 |
+| --- | --- |
+| code / msg | 结果码 / 提示 |
+| data | 感谢结果 |
+| - id | 文章 ID |
+| - thanked | 成功时为 true |
+
+> 请求体可省略或为 `{}`，不接受自定义费用等字段。同键重试返回原结果，换新键重复感谢也不再次扣款、计数或提醒；保存失败不扣款。
+>
+> 感谢本人文章、余额或参数条件不满足时返回 HTTP 422；目标不可用或不可阅读返回 HTTP 404，缺少权限返回 HTTP 403，文章归属变化返回 HTTP 409，操作过于频繁返回 HTTP 429。
+
+### 读取文章打赏状态
+
+`GET /api/v3/articles/{articleId}/reward`
+
+读取本人打赏状态和文章当前打赏价格。
+
+请求：
+
+| Key | 说明 | 示例 |
+| --- | --- | --- |
+| Authorization | Bearer 访问令牌；需要 content.read | Bearer TOKEN |
+| articleId | 文章 ID，路径参数 | 1770000000003 |
+
+请求示例：
+
+```bash
+curl 'https://fishpi.cn/api/v3/articles/1770000000003/reward' \
+  --header 'Authorization: Bearer TOKEN'
+```
+
+响应：
+
+| Key | 说明 |
+| --- | --- |
+| code / msg | 结果码 / 提示 |
+| data | 打赏状态 |
+| - id | 文章 ID |
+| - rewarded | 本人已打赏或本人是文章作者时为 true |
+| - rewardPoint | 文章当前打赏积分；小于 1 表示未启用打赏 |
+
+> 正文通过文章详情接口读取，需要 content.read。文章不存在、作者不可用或不可阅读时返回 HTTP 404。
+
+### 打赏文章
+
+`POST /api/v3/articles/{articleId}/reward`
+
+按提交时文章设定的价格打赏，成功后通过文章详情读取打赏正文。匿名文章保留免转账规则。
+
+请求：
+
+| Key | 说明 | 示例 |
+| --- | --- | --- |
+| Authorization | Bearer 访问令牌；需要 content.write | Bearer TOKEN |
+| Idempotency-Key | 本次打赏的唯一请求键 | article-reward-20261018-001 |
+| articleId | 文章 ID，路径参数 | 1770000000003 |
+
+请求示例：
+
+```bash
+curl --request POST 'https://fishpi.cn/api/v3/articles/1770000000003/reward' \
+  --header 'Authorization: Bearer TOKEN' \
+  --header 'Content-Type: application/json' \
+  --header 'Idempotency-Key: article-reward-20261018-001' \
+  --data '{}'
+```
+
+响应：
+
+| Key | 说明 |
+| --- | --- |
+| code / msg | 结果码 / 提示 |
+| data | 打赏结果 |
+| - id | 文章 ID |
+| - rewarded | 成功时为 true |
+
+> 请求体可省略或为 `{}`，不接受自定义价格。同键重试返回原结果，换新键重复打赏也不再次扣款或提醒；文章价格调整后，已有打赏记录不会再次付款。保存失败不扣款。
+>
+> 打赏本人文章、文章未启用打赏、余额或参数条件不满足返回 HTTP 422；目标不可用或不可阅读返回 HTTP 404，缺少权限返回 HTTP 403，文章归属变化返回 HTTP 409，操作过于频繁返回 HTTP 429。作者可直接通过文章详情读取自己的打赏正文。
+
+## API v3 文章投票
+
+### 读取文章投票
+
+`GET /api/v3/articles/{articleId}/vote`
+
+读取本人对可阅读文章的投票，以及文章当前赞踩计数。
+
+请求：
+
+| Key | 说明 | 示例 |
+| --- | --- | --- |
+| Authorization | Bearer 访问令牌；需要 content.read | Bearer TOKEN |
+| articleId | 文章 ID，路径参数 | 1770000000003 |
+
+请求示例：
+
+```bash
+curl 'https://fishpi.cn/api/v3/articles/1770000000003/vote' \
+  --header 'Authorization: Bearer TOKEN'
+```
+
+响应：
+
+| Key | 说明 |
+| --- | --- |
+| code / msg | 结果码 / 提示 |
+| data | 投票状态 |
+| - id | 文章 ID |
+| - vote | 本人投票：up、down；未投票为 null |
+| - upCount | 当前赞数 |
+| - downCount | 当前踩数 |
+
+> 文章不存在、失效、作者不可用或不可阅读时返回 HTTP 404；缺少 content.read 返回 HTTP 403，ID 格式不合法返回 HTTP 422。
+
+### 设置文章投票
+
+`PUT /api/v3/articles/{articleId}/vote`
+
+设置赞或踩。重复设置相同值不会取消投票，从赞改为踩或从踩改为赞会同步更新计数。
+
+请求：
+
+| Key | 说明 | 示例 |
+| --- | --- | --- |
+| Authorization | Bearer 访问令牌；需要 content.write | Bearer TOKEN |
+| Idempotency-Key | 本次设置的唯一请求键 | article-vote-20261018-001 |
+| articleId | 文章 ID，路径参数 | 1770000000003 |
+| vote | 必填，只接受 up 或 down | up |
+
+请求示例：
+
+```bash
+curl --request PUT 'https://fishpi.cn/api/v3/articles/1770000000003/vote' \
+  --header 'Authorization: Bearer TOKEN' \
+  --header 'Content-Type: application/json' \
+  --header 'Idempotency-Key: article-vote-20261018-001' \
+  --data '{"vote":"up"}'
+```
+
+响应：
+
+| Key | 说明 |
+| --- | --- |
+| code / msg | 结果码 / 提示 |
+| data | 本次操作结果 |
+| - id | 文章 ID |
+| - vote | 设置后的本人投票：up 或 down |
+| - upCount | 本次操作后的赞数 |
+| - downCount | 本次操作后的踩数 |
+
+> 普通用户不能对本人文章投票。字段或自投条件不满足时返回 HTTP 422；目标不可用或不可阅读时返回 HTTP 404，缺少权限返回 HTTP 403，文章归属变化时返回 HTTP 409，操作过于频繁返回 HTTP 429。
+>
+> 相同请求键及相同 vote 重试返回原结果，不重复修改计数或发送提醒。换用新键设置相同值也不重复计数；同键改变 vote 或改为清除操作返回 HTTP 409。重放结果包含原操作时的计数，不覆盖后续投票；获取最新状态请调用读取接口。
+
+### 清除文章投票
+
+`DELETE /api/v3/articles/{articleId}/vote`
+
+清除本人的赞或踩；本来未投票时保持不变。
+
+请求：
+
+| Key | 说明 | 示例 |
+| --- | --- | --- |
+| Authorization | Bearer 访问令牌；需要 content.write | Bearer TOKEN |
+| Idempotency-Key | 本次清除的唯一请求键 | article-vote-clear-20261018-001 |
+| articleId | 文章 ID，路径参数 | 1770000000003 |
+
+请求示例：
+
+```bash
+curl --request DELETE 'https://fishpi.cn/api/v3/articles/1770000000003/vote' \
+  --header 'Authorization: Bearer TOKEN' \
+  --header 'Content-Type: application/json' \
+  --header 'Idempotency-Key: article-vote-clear-20261018-001' \
+  --data '{}'
+```
+
+响应：
+
+| Key | 说明 |
+| --- | --- |
+| code / msg | 结果码 / 提示 |
+| data | 本次操作结果 |
+| - id | 文章 ID |
+| - vote | 清除后为 null |
+| - upCount | 本次操作后的赞数 |
+| - downCount | 本次操作后的踩数 |
+
+> 请求体可省略或为 `{}`，不接受其他字段。同键重试返回原结果，换新键重复清除也不重复改变计数；重放不会覆盖后续投票。目标和权限限制与设置接口一致，保存失败不改变投票及计数。
+
+## API v3 评论投票
+
+### 读取评论投票
+
+`GET /api/v3/comments/{commentId}/vote`
+
+读取本人对可阅读评论的投票，以及评论当前赞踩计数。
+
+请求：
+
+| Key | 说明 | 示例 |
+| --- | --- | --- |
+| Authorization | Bearer 访问令牌；需要 content.read | Bearer TOKEN |
+| commentId | 评论 ID，路径参数 | 1770000000003 |
+
+请求示例：
+
+```bash
+curl 'https://fishpi.cn/api/v3/comments/1770000000003/vote' \
+  --header 'Authorization: Bearer TOKEN'
+```
+
+响应：
+
+| Key | 说明 |
+| --- | --- |
+| code / msg | 结果码 / 提示 |
+| data | 投票状态 |
+| - id | 评论 ID |
+| - vote | 本人投票：up、down；未投票为 null |
+| - upCount | 当前赞数 |
+| - downCount | 当前踩数 |
+
+> 评论不存在、失效、作者不可用或不可阅读时返回 HTTP 404；缺少 content.read 返回 HTTP 403，ID 格式不合法返回 HTTP 422。
+
+### 设置评论投票
+
+`PUT /api/v3/comments/{commentId}/vote`
+
+设置赞或踩。重复设置相同值不会取消投票，从赞改为踩或从踩改为赞会同步更新计数。
+
+请求：
+
+| Key | 说明 | 示例 |
+| --- | --- | --- |
+| Authorization | Bearer 访问令牌；需要 comments.write | Bearer TOKEN |
+| Idempotency-Key | 本次设置的唯一请求键 | comment-vote-20261018-001 |
+| commentId | 评论 ID，路径参数 | 1770000000003 |
+| vote | 必填，只接受 up 或 down | up |
+
+请求示例：
+
+```bash
+curl --request PUT 'https://fishpi.cn/api/v3/comments/1770000000003/vote' \
+  --header 'Authorization: Bearer TOKEN' \
+  --header 'Content-Type: application/json' \
+  --header 'Idempotency-Key: comment-vote-20261018-001' \
+  --data '{"vote":"up"}'
+```
+
+响应：
+
+| Key | 说明 |
+| --- | --- |
+| code / msg | 结果码 / 提示 |
+| data | 本次操作结果 |
+| - id | 评论 ID |
+| - vote | 设置后的本人投票：up 或 down |
+| - upCount | 本次操作后的赞数 |
+| - downCount | 本次操作后的踩数 |
+
+> 普通用户不能对本人评论投票。字段或自投条件不满足时返回 HTTP 422；目标不可用或不可阅读时返回 HTTP 404，缺少权限返回 HTTP 403，评论归属变化时返回 HTTP 409，操作过于频繁返回 HTTP 429。
+>
+> 相同请求键及相同 vote 重试返回原结果，不重复修改计数或发送提醒。换用新键设置相同值也不重复计数；同键改变 vote 或改为清除操作返回 HTTP 409。重放结果包含原操作时的计数，不覆盖后续投票；获取最新状态请调用读取接口。
+
+### 清除评论投票
+
+`DELETE /api/v3/comments/{commentId}/vote`
+
+清除本人的赞或踩；本来未投票时保持不变。
+
+请求：
+
+| Key | 说明 | 示例 |
+| --- | --- | --- |
+| Authorization | Bearer 访问令牌；需要 comments.write | Bearer TOKEN |
+| Idempotency-Key | 本次清除的唯一请求键 | comment-vote-clear-20261018-001 |
+| commentId | 评论 ID，路径参数 | 1770000000003 |
+
+请求示例：
+
+```bash
+curl --request DELETE 'https://fishpi.cn/api/v3/comments/1770000000003/vote' \
+  --header 'Authorization: Bearer TOKEN' \
+  --header 'Content-Type: application/json' \
+  --header 'Idempotency-Key: comment-vote-clear-20261018-001' \
+  --data '{}'
+```
+
+响应：
+
+| Key | 说明 |
+| --- | --- |
+| code / msg | 结果码 / 提示 |
+| data | 本次操作结果 |
+| - id | 评论 ID |
+| - vote | 清除后为 null |
+| - upCount | 本次操作后的赞数 |
+| - downCount | 本次操作后的踩数 |
+
+> 请求体可省略或为 `{}`，不接受其他字段。同键重试返回原结果，换新键重复清除也不重复改变计数；重放不会覆盖后续投票。目标和权限限制与设置接口一致，保存失败不改变投票及计数。
+
+## API v3 内容发现与公开主页
+
+### 搜索文章
+
+`GET /api/v3/search`
+
+按标题或正文包含的关键字查询文章。
+
+请求：
+
+| Key | 说明 | 示例 |
+| --- | --- | --- |
+| Authorization | Bearer 访问令牌（可选），使用令牌时需要 content.read | Bearer TOKEN |
+| q | 关键字，去除首尾空白后为 1–100 字符 | Java |
+| sort | latest（默认）、active、hot、comments | latest |
+| type | all（默认）、recent、long | all |
+| p | 页码，默认 1，最大 42949672 | 1 |
+| size | 每页数量，默认 20，最大 50 | 20 |
+
+请求示例：
+
+```bash
+curl 'https://fishpi.cn/api/v3/search?q=Java&p=1&size=20'
+```
+
+响应：
+
+| Key | 说明 |
+| --- | --- |
+| code / msg | 结果码 / 提示 |
+| data | 列表数据 |
+| - list | 结果数组 |
+| -- id / title | 文章 ID / 标题 |
+| -- preview / tags | 文本摘要 / 逗号分隔标签 |
+| -- type / anonymous | 文章类型 / 是否匿名发表 |
+| -- author | 公开作者资料，包含 id、userName、userNickname、userAvatarURL；匿名发表时隐藏真实身份 |
+| -- permalink | 文章链接 |
+| -- createdAt / updatedAt | 创建 / 更新时间，毫秒时间戳 |
+| -- commentCount / viewCount | 评论 / 浏览数 |
+| - pagination | 分页信息 |
+| -- p / size / total / pageCount | 页码 / 每页数量 / 总条数 / 总页数 |
+
+> 特殊字符按字面含义搜索；结果不包含讨论帖和不可列出的文章。非法参数返回 HTTP 422；请求过于频繁返回 HTTP 429。
+
+### 标签目录
+
+`GET /api/v3/tags`
+
+分页读取正在使用的标签，按关联文章数排序。
+
+请求：
+
+| Key | 说明 | 示例 |
+| --- | --- | --- |
+| Authorization | Bearer 访问令牌（可选），使用令牌时需要 content.read | Bearer TOKEN |
+| p | 页码，默认 1，最大 42949672 | 1 |
+| size | 每页数量，默认 20，最大 50 | 20 |
+
+请求示例：
+
+```bash
+curl 'https://fishpi.cn/api/v3/tags'
+```
+
+响应：
+
+| Key | 说明 |
+| --- | --- |
+| code / msg | 结果码 / 提示 |
+| data | 列表数据 |
+| - list | 结果数组 |
+| -- id | 标签 ID |
+| -- title / uri | 标签名称 / 标签路径名 |
+| -- description | 描述源文本 |
+| -- iconURL | 图标地址 |
+| -- articleCount / followerCount | 关联文章数 / 关注人数 |
+| - pagination | 分页信息 |
+| -- p / size / total / pageCount | 页码 / 每页数量 / 总条数 / 总页数 |
+
+### 标签详情
+
+`GET /api/v3/tags/{tagId}`
+
+读取标签详情。
+
+请求：
+
+| Key | 说明 | 示例 |
+| --- | --- | --- |
+| Authorization | Bearer 访问令牌（可选），使用令牌时需要 content.read | Bearer TOKEN |
+| tagId | 标签 ID | 20261016001 |
+
+请求示例：
+
+```bash
+curl 'https://fishpi.cn/api/v3/tags/20261016001'
+```
+
+响应：
+
+| Key | 说明 |
+| --- | --- |
+| code / msg | 结果码 / 提示 |
+| data | 详情对象 |
+| - id | 标签 ID |
+| - title / uri | 标签名称 / 标签路径名 |
+| - description | 描述源文本 |
+| - iconURL | 图标地址 |
+| - articleCount / followerCount | 关联文章数 / 关注人数 |
+
+> 标签不存在或不可用时返回 HTTP 404。
+
+### 标签文章
+
+`GET /api/v3/tags/{tagId}/articles`
+
+分页读取标签关联的文章。
+
+请求：
+
+| Key | 说明 | 示例 |
+| --- | --- | --- |
+| Authorization | Bearer 访问令牌（可选），使用令牌时需要 content.read | Bearer TOKEN |
+| tagId | 标签 ID | 20261016001 |
+| sort | latest（默认）、active、hot、comments | latest |
+| type | all（默认）、recent、long | all |
+| p | 页码，默认 1，最大 42949672 | 1 |
+| size | 每页数量，默认 20，最大 50 | 20 |
+
+请求示例：
+
+```bash
+curl 'https://fishpi.cn/api/v3/tags/20261016001/articles'
+```
+
+响应：
+
+| Key | 说明 |
+| --- | --- |
+| code / msg | 结果码 / 提示 |
+| data | 列表数据 |
+| - list | 结果数组 |
+| -- id / title | 文章 ID / 标题 |
+| -- preview / tags | 文本摘要 / 逗号分隔标签 |
+| -- type / anonymous | 文章类型 / 是否匿名发表 |
+| -- author | 公开作者资料，包含 id、userName、userNickname、userAvatarURL；匿名发表时隐藏真实身份 |
+| -- permalink | 文章链接 |
+| -- createdAt / updatedAt | 创建 / 更新时间，毫秒时间戳 |
+| -- commentCount / viewCount | 评论 / 浏览数 |
+| - pagination | 分页信息 |
+| -- p / size / total / pageCount | 页码 / 每页数量 / 总条数 / 总页数 |
+
+> 标签不存在或不可用时返回 HTTP 404。
+
+### 领域目录
+
+`GET /api/v3/domains`
+
+分页读取可用领域，按领域顺序排列。
+
+请求：
+
+| Key | 说明 | 示例 |
+| --- | --- | --- |
+| Authorization | Bearer 访问令牌（可选），使用令牌时需要 content.read | Bearer TOKEN |
+| p | 页码，默认 1，最大 42949672 | 1 |
+| size | 每页数量，默认 20，最大 50 | 20 |
+
+请求示例：
+
+```bash
+curl 'https://fishpi.cn/api/v3/domains'
+```
+
+响应：
+
+| Key | 说明 |
+| --- | --- |
+| code / msg | 结果码 / 提示 |
+| data | 列表数据 |
+| - list | 结果数组 |
+| -- id | 领域 ID |
+| -- title / uri | 领域名称 / 路径名 |
+| -- description | 描述源文本 |
+| -- iconURL | 图标地址 |
+| -- tagCount | 关联标签数 |
+| - pagination | 分页信息 |
+| -- p / size / total / pageCount | 页码 / 每页数量 / 总条数 / 总页数 |
+
+### 领域详情
+
+`GET /api/v3/domains/{domainId}`
+
+读取领域详情。
+
+请求：
+
+| Key | 说明 | 示例 |
+| --- | --- | --- |
+| Authorization | Bearer 访问令牌（可选），使用令牌时需要 content.read | Bearer TOKEN |
+| domainId | 领域 ID | 20261016002 |
+
+请求示例：
+
+```bash
+curl 'https://fishpi.cn/api/v3/domains/20261016002'
+```
+
+响应：
+
+| Key | 说明 |
+| --- | --- |
+| code / msg | 结果码 / 提示 |
+| data | 详情对象 |
+| - id | 领域 ID |
+| - title / uri | 领域名称 / 路径名 |
+| - description | 描述源文本 |
+| - iconURL | 图标地址 |
+| - tagCount | 关联标签数 |
+
+> 领域不存在或不可用时返回 HTTP 404。
+
+### 领域标签
+
+`GET /api/v3/domains/{domainId}/tags`
+
+分页读取领域关联的标签。
+
+请求：
+
+| Key | 说明 | 示例 |
+| --- | --- | --- |
+| Authorization | Bearer 访问令牌（可选），使用令牌时需要 content.read | Bearer TOKEN |
+| domainId | 领域 ID | 20261016002 |
+| p | 页码，默认 1，最大 42949672 | 1 |
+| size | 每页数量，默认 20，最大 50 | 20 |
+
+请求示例：
+
+```bash
+curl 'https://fishpi.cn/api/v3/domains/20261016002/tags'
+```
+
+响应：
+
+| Key | 说明 |
+| --- | --- |
+| code / msg | 结果码 / 提示 |
+| data | 列表数据 |
+| - list | 结果数组 |
+| -- id | 标签 ID |
+| -- title / uri | 标签名称 / 标签路径名 |
+| -- description | 描述源文本 |
+| -- iconURL | 图标地址 |
+| -- articleCount / followerCount | 关联文章数 / 关注人数 |
+| - pagination | 分页信息 |
+| -- p / size / total / pageCount | 页码 / 每页数量 / 总条数 / 总页数 |
+
+> 领域不存在或不可用时返回 HTTP 404。
+
+### 领域文章
+
+`GET /api/v3/domains/{domainId}/articles`
+
+分页读取领域下的文章，同一文章只出现一次。
+
+请求：
+
+| Key | 说明 | 示例 |
+| --- | --- | --- |
+| Authorization | Bearer 访问令牌（可选），使用令牌时需要 content.read | Bearer TOKEN |
+| domainId | 领域 ID | 20261016002 |
+| sort | latest（默认）、active、hot、comments | latest |
+| type | all（默认）、recent、long | all |
+| p | 页码，默认 1，最大 42949672 | 1 |
+| size | 每页数量，默认 20，最大 50 | 20 |
+
+请求示例：
+
+```bash
+curl 'https://fishpi.cn/api/v3/domains/20261016002/articles'
+```
+
+响应：
+
+| Key | 说明 |
+| --- | --- |
+| code / msg | 结果码 / 提示 |
+| data | 列表数据 |
+| - list | 结果数组 |
+| -- id / title | 文章 ID / 标题 |
+| -- preview / tags | 文本摘要 / 逗号分隔标签 |
+| -- type / anonymous | 文章类型 / 是否匿名发表 |
+| -- author | 公开作者资料，包含 id、userName、userNickname、userAvatarURL；匿名发表时隐藏真实身份 |
+| -- permalink | 文章链接 |
+| -- createdAt / updatedAt | 创建 / 更新时间，毫秒时间戳 |
+| -- commentCount / viewCount | 评论 / 浏览数 |
+| - pagination | 分页信息 |
+| -- p / size / total / pageCount | 页码 / 每页数量 / 总条数 / 总页数 |
+
+> 领域不存在或不可用时返回 HTTP 404。
+
+### 公开用户资料
+
+`GET /api/v3/users/{userName}`
+
+读取用户公开资料。
+
+请求：
+
+| Key | 说明 | 示例 |
+| --- | --- | --- |
+| Authorization | Bearer 访问令牌（可选），使用令牌时需要 profile.read | Bearer TOKEN |
+| userName | 用户名，最多 64 字符 | Vanessa |
+
+请求示例：
+
+```bash
+curl 'https://fishpi.cn/api/v3/users/Vanessa'
+```
+
+响应：
+
+| Key | 说明 |
+| --- | --- |
+| code / msg | 结果码 / 提示 |
+| data | 详情对象 |
+| - id / userName | 用户 ID / 用户名 |
+| - userNickname / userAvatarURL | 昵称 / 头像 |
+| - userIntro / userURL | 个人介绍文本 / 个人网址 |
+
+> 用户不存在或不可用时返回 HTTP 404。
+
+### 用户文章
+
+`GET /api/v3/users/{userName}/articles`
+
+分页读取用户公开发表的可列出文章。
+
+请求：
+
+| Key | 说明 | 示例 |
+| --- | --- | --- |
+| Authorization | Bearer 访问令牌（可选），使用令牌时需要 content.read | Bearer TOKEN |
+| userName | 用户名 | Vanessa |
+| sort | latest（默认）、active、hot、comments | latest |
+| type | recent（默认）、long、all | recent |
+| p | 页码，默认 1，最大 42949672 | 1 |
+| size | 每页数量，默认 20，最大 50 | 20 |
+
+请求示例：
+
+```bash
+curl 'https://fishpi.cn/api/v3/users/Vanessa/articles'
+```
+
+响应：
+
+| Key | 说明 |
+| --- | --- |
+| code / msg | 结果码 / 提示 |
+| data | 列表数据 |
+| - list | 结果数组 |
+| -- id / title | 文章 ID / 标题 |
+| -- preview / tags | 文本摘要 / 逗号分隔标签 |
+| -- type / anonymous | 文章类型 / 是否匿名发表 |
+| -- author | 公开作者资料，包含 id、userName、userNickname、userAvatarURL；匿名发表时隐藏真实身份 |
+| -- permalink | 文章链接 |
+| -- createdAt / updatedAt | 创建 / 更新时间，毫秒时间戳 |
+| -- commentCount / viewCount | 评论 / 浏览数 |
+| - pagination | 分页信息 |
+| -- p / size / total / pageCount | 页码 / 每页数量 / 总条数 / 总页数 |
+
+> 沿用用户文章列表隐私设置，无权查看返回 HTTP 403；不包含匿名发表文章和讨论帖。
+
+### 用户评论
+
+`GET /api/v3/users/{userName}/comments`
+
+读取用户公开署名、位于可列出文章下的评论，包含普通评论和段评。
+
+请求：
+
+| Key | 说明 | 示例 |
+| --- | --- | --- |
+| Authorization | Bearer 访问令牌（可选），使用令牌时需要 content.read | Bearer TOKEN |
+| userName | 用户名，URL 参数 | Vanessa |
+| p | 页码，默认 1 | 1 |
+| size | 每页条数，默认 20，最大 50 | 20 |
+
+请求示例：
+
+```bash
+curl --location --request GET 'https://fishpi.cn/api/v3/users/Vanessa/comments?p=1&size=20'
+```
+
+响应：
+
+| Key | 说明 |
+| --- | --- |
+| code / msg | 结果码 / 提示 |
+| data | 列表结果 |
+| - list | 记录数组 |
+| -- id / articleId / parentId | 评论 ID / 文章 ID / 原评论 ID |
+| -- type | 0 普通评论，1 段评 |
+| -- content / contentHtml / contentVisible | 正文 / 渲染正文 / 当前阅读者是否可见正文 |
+| -- createdAt / anonymous / author | 创建时间（毫秒） / 是否匿名 / 公开作者资料 |
+| -- article | 文章摘要，与用户文章列表的记录字段相同 |
+| - pagination | 分页信息 |
+| -- p / size / total / pageCount | 页码 / 每页数量 / 总条数 / 总页数 |
+
+> 遵循用户的评论列表公开设置；不收录匿名评论、讨论帖或当前不可访问的文章。私密评论在无权阅读时保留记录，正文为空且 contentVisible=false。
+
+### 用户关注动态
+
+`GET /api/v3/users/{userName}/watching`
+
+聚合用户关注的用户和标签的新文章，同一篇文章只出现一次。
+
+请求：
+
+| Key | 说明 | 示例 |
+| --- | --- | --- |
+| Authorization | Bearer 访问令牌（可选），使用令牌时需要 content.read | Bearer TOKEN |
+| userName | 用户名，URL 参数 | Vanessa |
+| source | all（默认）、users、tags | all |
+| sort | latest（默认）、active、hot、comments | latest |
+| type | all（默认）、recent、long | all |
+| p | 页码，默认 1 | 1 |
+| size | 每页条数，默认 20，最大 50 | 20 |
+
+请求示例：
+
+```bash
+curl --location --request GET 'https://fishpi.cn/api/v3/users/Vanessa/watching?p=1&size=20'
+```
+
+响应：
+
+| Key | 说明 |
+| --- | --- |
+| code / msg | 结果码 / 提示 |
+| data | 列表结果 |
+| - list | 记录数组 |
+| -- id / title / preview / tags / type / anonymous | 文章 ID / 标题 / 摘要 / 标签 / 类型 / 是否匿名 |
+| -- author / permalink / createdAt / updatedAt / commentCount / viewCount | 公开作者 / 链接 / 创建和更新时间 / 评论和浏览次数 |
+| - pagination | 分页信息 |
+| -- p / size / total / pageCount | 页码 / 每页数量 / 总条数 / 总页数 |
+
+> 遵循用户的关注文章列表公开设置；按关注用户查找时不收录其匿名文章。source=all 合并用户和标签两个来源，不包括文章订阅。
+
+### 用户订阅文章
+
+`GET /api/v3/users/{userName}/watching/articles`
+
+分页读取用户订阅的文章。
+
+请求：
+
+| Key | 说明 | 示例 |
+| --- | --- | --- |
+| Authorization | Bearer 访问令牌（可选），使用令牌时需要 content.read | Bearer TOKEN |
+| userName | 用户名，URL 参数 | Vanessa |
+| sort | latest（默认）、active、hot、comments | latest |
+| type | all（默认）、recent、long | all |
+| p | 页码，默认 1 | 1 |
+| size | 每页条数，默认 20，最大 50 | 20 |
+
+请求示例：
+
+```bash
+curl --location --request GET 'https://fishpi.cn/api/v3/users/Vanessa/watching/articles?p=1&size=20'
+```
+
+响应：
+
+| Key | 说明 |
+| --- | --- |
+| code / msg | 结果码 / 提示 |
+| data | 列表结果 |
+| - list | 记录数组 |
+| -- id / title / preview / tags / type / anonymous | 文章 ID / 标题 / 摘要 / 标签 / 类型 / 是否匿名 |
+| -- author / permalink / createdAt / updatedAt / commentCount / viewCount | 公开作者 / 链接 / 创建和更新时间 / 评论和浏览次数 |
+| - pagination | 分页信息 |
+| -- p / size / total / pageCount | 页码 / 每页数量 / 总条数 / 总页数 |
+
+> 遵循用户的关注文章列表公开设置；仅包含当前可列出的订阅文章，收藏文章请使用 following/articles。
+
+### 用户清风明月
+
+`GET /api/v3/users/{userName}/breezemoons`
+
+分页读取用户的清风明月。
+
+请求：
+
+| Key | 说明 | 示例 |
+| --- | --- | --- |
+| Authorization | Bearer 访问令牌（可选），使用令牌时需要 content.read | Bearer TOKEN |
+| userName | 用户名 | Vanessa |
+| p | 页码，默认 1，最大 42949672 | 1 |
+| size | 每页数量，默认 20，最大 50 | 20 |
+
+请求示例：
+
+```bash
+curl 'https://fishpi.cn/api/v3/users/Vanessa/breezemoons'
+```
+
+响应：
+
+| Key | 说明 |
+| --- | --- |
+| code / msg | 结果码 / 提示 |
+| data | 列表数据 |
+| - list | 结果数组 |
+| -- id | 清风明月 ID |
+| -- content / contentHtml | 正文 Markdown / 正文 HTML |
+| -- createdAt / updatedAt | 创建 / 更新时间，毫秒时间戳 |
+| -- author | 公开作者资料，包含 id、userName、userNickname、userAvatarURL |
+| - pagination | 分页信息 |
+| -- p / size / total / pageCount | 页码 / 每页数量 / 总条数 / 总页数 |
+
+> 沿用用户清风明月列表隐私设置，无权查看返回 HTTP 403。
+
+### 用户关注的用户
+
+`GET /api/v3/users/{userName}/following/users`
+
+分页读取用户关注的用户。
+
+请求：
+
+| Key | 说明 | 示例 |
+| --- | --- | --- |
+| Authorization | Bearer 访问令牌（可选），使用令牌时需要 profile.read | Bearer TOKEN |
+| userName | 用户名 | Vanessa |
+| p | 页码，默认 1，最大 42949672 | 1 |
+| size | 每页数量，默认 20，最大 50 | 20 |
+
+请求示例：
+
+```bash
+curl 'https://fishpi.cn/api/v3/users/Vanessa/following/users'
+```
+
+响应：
+
+| Key | 说明 |
+| --- | --- |
+| code / msg | 结果码 / 提示 |
+| data | 列表数据 |
+| - list | 结果数组 |
+| -- id / userName / userNickname / userAvatarURL | 用户 ID / 用户名 / 昵称 / 头像 |
+| - pagination | 分页信息 |
+| -- p / size / total / pageCount | 页码 / 每页数量 / 总条数 / 总页数 |
+
+> 沿用用户关注列表隐私设置，无权查看返回 HTTP 403。
+
+### 用户关注的标签
+
+`GET /api/v3/users/{userName}/following/tags`
+
+分页读取用户关注的标签。
+
+请求：
+
+| Key | 说明 | 示例 |
+| --- | --- | --- |
+| Authorization | Bearer 访问令牌（可选），使用令牌时需要 content.read | Bearer TOKEN |
+| userName | 用户名 | Vanessa |
+| p | 页码，默认 1，最大 42949672 | 1 |
+| size | 每页数量，默认 20，最大 50 | 20 |
+
+请求示例：
+
+```bash
+curl 'https://fishpi.cn/api/v3/users/Vanessa/following/tags'
+```
+
+响应：
+
+| Key | 说明 |
+| --- | --- |
+| code / msg | 结果码 / 提示 |
+| data | 列表数据 |
+| - list | 结果数组 |
+| -- id | 标签 ID |
+| -- title / uri | 标签名称 / 标签路径名 |
+| -- description | 描述源文本 |
+| -- iconURL | 图标地址 |
+| -- articleCount / followerCount | 关联文章数 / 关注人数 |
+| - pagination | 分页信息 |
+| -- p / size / total / pageCount | 页码 / 每页数量 / 总条数 / 总页数 |
+
+> 沿用用户关注标签隐私设置，无权查看返回 HTTP 403。
+
+### 用户收藏的文章
+
+`GET /api/v3/users/{userName}/following/articles`
+
+分页读取用户收藏的可列出文章。
+
+请求：
+
+| Key | 说明 | 示例 |
+| --- | --- | --- |
+| Authorization | Bearer 访问令牌（可选），使用令牌时需要 content.read | Bearer TOKEN |
+| userName | 用户名 | Vanessa |
+| sort | latest（默认）、active、hot、comments | latest |
+| type | all（默认）、recent、long | all |
+| p | 页码，默认 1，最大 42949672 | 1 |
+| size | 每页数量，默认 20，最大 50 | 20 |
+
+请求示例：
+
+```bash
+curl 'https://fishpi.cn/api/v3/users/Vanessa/following/articles'
+```
+
+响应：
+
+| Key | 说明 |
+| --- | --- |
+| code / msg | 结果码 / 提示 |
+| data | 列表数据 |
+| - list | 结果数组 |
+| -- id / title | 文章 ID / 标题 |
+| -- preview / tags | 文本摘要 / 逗号分隔标签 |
+| -- type / anonymous | 文章类型 / 是否匿名发表 |
+| -- author | 公开作者资料，包含 id、userName、userNickname、userAvatarURL；匿名发表时隐藏真实身份 |
+| -- permalink | 文章链接 |
+| -- createdAt / updatedAt | 创建 / 更新时间，毫秒时间戳 |
+| -- commentCount / viewCount | 评论 / 浏览数 |
+| - pagination | 分页信息 |
+| -- p / size / total / pageCount | 页码 / 每页数量 / 总条数 / 总页数 |
+
+> 沿用用户收藏文章隐私设置，无权查看返回 HTTP 403；文章字段与文章列表一致。
+
+### 用户粉丝
+
+`GET /api/v3/users/{userName}/followers`
+
+分页读取用户的粉丝。
+
+请求：
+
+| Key | 说明 | 示例 |
+| --- | --- | --- |
+| Authorization | Bearer 访问令牌（可选），使用令牌时需要 profile.read | Bearer TOKEN |
+| userName | 用户名 | Vanessa |
+| p | 页码，默认 1，最大 42949672 | 1 |
+| size | 每页数量，默认 20，最大 50 | 20 |
+
+请求示例：
+
+```bash
+curl 'https://fishpi.cn/api/v3/users/Vanessa/followers'
+```
+
+响应：
+
+| Key | 说明 |
+| --- | --- |
+| code / msg | 结果码 / 提示 |
+| data | 列表数据 |
+| - list | 结果数组 |
+| -- id / userName / userNickname / userAvatarURL | 用户 ID / 用户名 / 昵称 / 头像 |
+| - pagination | 分页信息 |
+| -- p / size / total / pageCount | 页码 / 每页数量 / 总条数 / 总页数 |
+
+> 沿用用户粉丝列表隐私设置，无权查看返回 HTTP 403。
+
+### 清风明月列表
+
+`GET /api/v3/breezemoons`
+
+按发布时间倒序读取清风明月。
+
+请求：
+
+| Key | 说明 | 示例 |
+| --- | --- | --- |
+| Authorization | Bearer 访问令牌（可选），使用令牌时需要 content.read | Bearer TOKEN |
+| p | 页码，默认 1，最大 42949672 | 1 |
+| size | 每页数量，默认 20，最大 50 | 20 |
+
+请求示例：
+
+```bash
+curl 'https://fishpi.cn/api/v3/breezemoons'
+```
+
+响应：
+
+| Key | 说明 |
+| --- | --- |
+| code / msg | 结果码 / 提示 |
+| data | 列表数据 |
+| - list | 结果数组 |
+| -- id | 清风明月 ID |
+| -- content / contentHtml | 正文 Markdown / 正文 HTML |
+| -- createdAt / updatedAt | 创建 / 更新时间，毫秒时间戳 |
+| -- author | 公开作者资料，包含 id、userName、userNickname、userAvatarURL |
+| - pagination | 分页信息 |
+| -- p / size / total / pageCount | 页码 / 每页数量 / 总条数 / 总页数 |
+
+
+## API v3 个人资源
+
+以下接口使用 Bearer 访问令牌读取当前账号的数据。无效或缺失令牌返回 HTTP 401，缺少所需权限返回 HTTP 403。
+
+### 读取个人设置
+
+`GET /api/v3/me/settings`
+
+读取个人资料、隐私开关和显示偏好。
+
+请求：
+
+| Key | 说明 | 示例 |
+| --- | --- | --- |
+| Authorization | Bearer 访问令牌；需要 profile.read | Bearer TOKEN |
+
+请求示例：
+
+```bash
+curl 'https://fishpi.cn/api/v3/me/settings' --header 'Authorization: Bearer TOKEN'
+```
+
+响应：
+
+| Key | 说明 |
+| --- | --- |
+| code / msg | 结果码 / 提示 |
+| data | 设置对象 |
+| - profile | 包含 userNickname、userIntro、userURL |
+| - privacy | 各列表是否公开，true 表示公开 |
+| -- articles / comments / breezemoons / points | 文章 / 评论 / 清风明月 / 积分 |
+| -- followers / followingUsers / followingTags / followingArticles | 粉丝 / 关注用户 / 关注标签 / 收藏文章 |
+| - display | 显示偏好 |
+| -- commentViewMode / avatarViewMode | 评论 / 头像模式 |
+| -- skin / mobileSkin | 桌面 / 移动皮肤 |
+
+### 读取签到状态
+
+`GET /api/v3/me/checkin`
+
+读取今日签到与活跃状态。
+
+请求：
+
+| Key | 说明 | 示例 |
+| --- | --- | --- |
+| Authorization | Bearer 访问令牌；需要 activity.read | Bearer TOKEN |
+
+请求示例：
+
+```bash
+curl 'https://fishpi.cn/api/v3/me/checkin' --header 'Authorization: Bearer TOKEN'
+```
+
+响应：
+
+| Key | 说明 |
+| --- | --- |
+| code / msg | 结果码 / 提示 |
+| data | 签到状态 |
+| - checkedIn | 今日是否已签到 |
+| - liveness | 当前活跃度百分比 |
+| - threshold | 自动签到活跃度门槛 |
+| - streak | 连续签到天数 |
+
+> 此接口只读取状态，不执行签到。
+
+### 读取背包
+
+`GET /api/v3/me/bag`
+
+读取当前用户的背包物品数量。
+
+请求：
+
+| Key | 说明 | 示例 |
+| --- | --- | --- |
+| Authorization | Bearer 访问令牌；需要 activity.read | Bearer TOKEN |
+
+请求示例：
+
+```bash
+curl 'https://fishpi.cn/api/v3/me/bag' --header 'Authorization: Bearer TOKEN'
+```
+
+响应：
+
+| Key | 说明 |
+| --- | --- |
+| code / msg | 结果码 / 提示 |
+| data | 背包数据 |
+| - list | 物品列表 |
+| -- code / count | 物品编码 / 数量 |
+
+### 读取积分流水
+
+`GET /api/v3/me/points`
+
+分页读取当前用户的积分流水。
+
+请求：
+
+| Key | 说明 | 示例 |
+| --- | --- | --- |
+| Authorization | Bearer 访问令牌；需要 activity.read | Bearer TOKEN |
+| p | 页码，默认 1，最大 42949672 | 1 |
+| size | 每页数量，默认 20，最大 50 | 20 |
+
+请求示例：
+
+```bash
+curl 'https://fishpi.cn/api/v3/me/points' --header 'Authorization: Bearer TOKEN'
+```
+
+响应：
+
+| Key | 说明 |
+| --- | --- |
+| code / msg | 结果码 / 提示 |
+| data | 流水数据 |
+| - list | 积分记录数组 |
+| -- time | 发生时间，毫秒时间戳 |
+| -- amount / operation | 变动数量 / 收支符号（+ 或 -） |
+| -- balance | 变动后的本人余额 |
+| -- type / displayType | 类型编码 / 类型名称 |
+| -- descriptionHtml | 记录说明 HTML |
+| - pagination | 分页信息 |
+| -- p / size / total / pageCount | 页码 / 每页数量 / 总条数 / 总页数 |
+
+### 读取草稿列表
+
+`GET /api/v3/me/drafts`
+
+分页读取当前用户的发帖草稿，按更新时间倒序。
+
+请求：
+
+| Key | 说明 | 示例 |
+| --- | --- | --- |
+| Authorization | Bearer 访问令牌；需要 content.read | Bearer TOKEN |
+| p | 页码，默认 1，最大 42949672 | 1 |
+| size | 每页数量，默认 20，最大 50 | 20 |
+
+请求示例：
+
+```bash
+curl 'https://fishpi.cn/api/v3/me/drafts' --header 'Authorization: Bearer TOKEN'
+```
+
+响应：
+
+| Key | 说明 |
+| --- | --- |
+| code / msg | 结果码 / 提示 |
+| data | 草稿列表数据 |
+| - list | 草稿摘要数组 |
+| -- id / title / summary | 草稿 ID / 标题 / 文本摘要 |
+| -- tags / type | 标签 / 文章类型 |
+| -- columnId / columnTitle / chapterNo | 专栏 ID / 专栏标题 / 章节号 |
+| -- createdAt / updatedAt | 创建 / 更新时间，毫秒时间戳 |
+| - pagination | 分页信息 |
+| -- p / size / total / pageCount | 页码 / 每页数量 / 总条数 / 总页数 |
+
+> 列表不包含正文、思绪记录或打赏正文。
+
+### 读取草稿详情
+
+`GET /api/v3/me/drafts/{draftId}`
+
+读取当前用户的单个草稿。
+
+请求：
+
+| Key | 说明 | 示例 |
+| --- | --- | --- |
+| Authorization | Bearer 访问令牌；需要 content.read | Bearer TOKEN |
+| draftId | 草稿 ID | 20261016003 |
+
+请求示例：
+
+```bash
+curl 'https://fishpi.cn/api/v3/me/drafts/20261016003' --header 'Authorization: Bearer TOKEN'
+```
+
+响应：
+
+| Key | 说明 |
+| --- | --- |
+| code / msg | 结果码 / 提示 |
+| data | 草稿对象，包含列表摘要字段及以下字段 |
+| - content / thoughtContent | 编辑器正文 / 思绪记录，分别保留 |
+| - rewardContent / rewardPoint | 打赏正文 / 打赏积分 |
+| - qnaOfferPoint | 悬赏积分 |
+| - commentable / anonymous / notifyFollowers | 允许评论 / 匿名发表 / 通知关注者 |
+| - showInList / statement | 列表展示选项 / 文章声明 |
+
+> 草稿不存在或不属于当前账号时返回 HTTP 404。所有正文均为编辑器源内容，按文本处理。
+
+### 读取个人专栏
+
+`GET /api/v3/me/columns`
+
+分页读取当前用户的专栏，按手动顺序排列。
+
+请求：
+
+| Key | 说明 | 示例 |
+| --- | --- | --- |
+| Authorization | Bearer 访问令牌；需要 content.read | Bearer TOKEN |
+| p | 页码，默认 1，最大 42949672 | 1 |
+| size | 每页数量，默认 20，最大 50 | 20 |
+
+请求示例：
+
+```bash
+curl 'https://fishpi.cn/api/v3/me/columns' --header 'Authorization: Bearer TOKEN'
+```
+
+响应：
+
+| Key | 说明 |
+| --- | --- |
+| code / msg | 结果码 / 提示 |
+| data | 专栏列表数据 |
+| - list | 专栏摘要数组 |
+| -- id / title | 专栏 ID / 标题 |
+| -- coverURL / order | 封面地址 / 手动排序值 |
+| -- articleCount | 文章数量 |
+| -- createdAt / updatedAt | 创建 / 更新时间，毫秒时间戳 |
+| - pagination | 分页信息 |
+| -- p / size / total / pageCount | 页码 / 每页数量 / 总条数 / 总页数 |
+
+
+## API v3 个人设置
+
+### 读取常用表情
+
+`GET /api/v3/me/settings/emotions`
+
+读取当前账号的常用表情别名，需要 profile.read。
+
+请求：
+
+| Key | 说明 | 示例 |
+| --- | --- | --- |
+| Authorization | 请求头，Bearer accessToken | Bearer YOUR_ACCESS_TOKEN |
+
+请求示例：
+
+```bash
+curl 'https://fishpi.cn/api/v3/me/settings/emotions' \
+  --header 'Authorization: Bearer YOUR_ACCESS_TOKEN'
+```
+
+响应：
+
+| Key | 说明 | 示例 |
+| --- | --- | --- |
+| code | 0 表示成功 | 0 |
+| data | 当前设置 | `{...}` |
+| - emotions | 有序的表情别名数组，未设置时返回默认列表 | `["smile","flushed","joy"]` |
+
+### 读取常用表情可选项
+
+`GET /api/v3/me/settings/emotion-options`
+
+获取表情选择器的分组别名和默认列表，需要 profile.read。
+
+请求：
+
+| Key | 说明 | 示例 |
+| --- | --- | --- |
+| Authorization | 请求头，Bearer accessToken | Bearer YOUR_ACCESS_TOKEN |
+
+请求示例：
+
+```bash
+curl 'https://fishpi.cn/api/v3/me/settings/emotion-options' \
+  --header 'Authorization: Bearer YOUR_ACCESS_TOKEN'
+```
+
+响应：
+
+| Key | 说明 | 示例 |
+| --- | --- | --- |
+| code | 0 表示成功 | 0 |
+| data | 表情可选项 | `{...}` |
+| - groups | 按展示顺序排列的二维别名数组 | `[["smile","laughing"],["+1","-1"]]` |
+| - defaults | 默认常用表情别名数组 | `["smile","flushed","joy"]` |
+
+### 读取本人图片表情分组
+
+`GET /api/v3/me/settings/emoji-groups`
+
+分页读取当前账号已有的图片表情分组，需要 profile.read。
+
+请求：
+
+| Key | 说明 | 示例 |
+| --- | --- | --- |
+| Authorization | 请求头，Bearer accessToken | Bearer YOUR_ACCESS_TOKEN |
+| p | 页码，默认 1 | 1 |
+| size | 每页数量，默认 20，最大 50 | 20 |
+
+请求示例：
+
+```bash
+curl 'https://fishpi.cn/api/v3/me/settings/emoji-groups?p=1&size=20' \
+  --header 'Authorization: Bearer YOUR_ACCESS_TOKEN'
+```
+
+响应：
+
+| Key | 说明 | 示例 |
+| --- | --- | --- |
+| code | 0 表示成功 | 0 |
+| data | 分组列表和分页 | `{...}` |
+| - list | 按排序值和 ID 升序排列的分组 | `[]` |
+| -- id | 分组 ID | 123456789 |
+| -- name | 分组名称 | 常用 |
+| -- sort | 排序值 | 0 |
+| -- type | 分组类型：0 自定义，1 全部 | 0 |
+| - pagination | 分页信息 | `{...}` |
+| -- p / size / total / pageCount | 页码 / 每页数量 / 总数 / 页数 | 1 / 20 / 0 / 0 |
+
+> 尚无分组时返回空列表。读取不会自动创建“全部”分组。
+
+### 读取本人分组图片表情
+
+`GET /api/v3/me/settings/emoji-groups/{groupId}/emojis`
+
+分页读取本人分组中可用的图片表情，需要 profile.read。
+
+请求：
+
+| Key | 说明 | 示例 |
+| --- | --- | --- |
+| Authorization | 请求头，Bearer accessToken | Bearer YOUR_ACCESS_TOKEN |
+| groupId | 路径参数，本人分组 ID | 123456789 |
+| p | 页码，默认 1 | 1 |
+| size | 每页数量，默认 20，最大 50 | 20 |
+
+请求示例：
+
+```bash
+curl 'https://fishpi.cn/api/v3/me/settings/emoji-groups/123456789/emojis?p=1&size=20' \
+  --header 'Authorization: Bearer YOUR_ACCESS_TOKEN'
+```
+
+响应：
+
+| Key | 说明 | 示例 |
+| --- | --- | --- |
+| code | 0 表示成功 | 0 |
+| data | 图片表情列表和分页 | `{...}` |
+| - list | 按排序值和条目 ID 升序排列的表情 | `[]` |
+| -- id | 分组条目 ID | 123456790 |
+| -- emojiId | 图片表情 ID | 123456791 |
+| -- name | 条目名称 | 小鱼 |
+| -- sort | 排序值 | 0 |
+| -- url | 可用的图片地址，地址不可用时为空字符串 | https://images.example/fish.png |
+| - pagination | 分页信息 | `{...}` |
+| -- p / size / total / pageCount | 页码 / 每页数量 / 总数 / 页数 | 1 / 20 / 0 / 0 |
+
+> 不存在或不属于本人的分组返回 HTTP 404。已删除或无法关联到图片的条目不计入列表。
+
+### 读取 MBTI 设置
+
+`GET /api/v3/me/settings/personality`
+
+读取当前账号的 MBTI，需要 profile.read。
+
+请求：
+
+| Key | 说明 | 示例 |
+| --- | --- | --- |
+| Authorization | 请求头，Bearer accessToken | Bearer YOUR_ACCESS_TOKEN |
+
+请求示例：
+
+```bash
+curl 'https://fishpi.cn/api/v3/me/settings/personality' \
+  --header 'Authorization: Bearer YOUR_ACCESS_TOKEN'
+```
+
+响应：
+
+| Key | 说明 | 示例 |
+| --- | --- | --- |
+| code | 0 表示成功 | 0 |
+| data | 当前设置 | `{...}` |
+| - mbti | 已保存的标准 MBTI，可带 -A/-T；未设置或不可用时为空字符串 | INTJ-A |
+
+### 修改 MBTI 设置
+
+`PUT /api/v3/me/settings/personality`
+
+修改当前账号的 MBTI，需要 settings.write。
+
+请求：
+
+| Key | 说明 | 示例 |
+| --- | --- | --- |
+| Authorization | 请求头，Bearer accessToken | Bearer YOUR_ACCESS_TOKEN |
+| Idempotency-Key | 请求头，同一次修改重试保持不变 | settings-mbti-001 |
+| mbti | 必填字符串，16 种标准类型，可选 -A/-T；忽略大小写与首尾空白，空字符串清空 | intj-a |
+
+请求示例：
+
+```bash
+curl --request PUT 'https://fishpi.cn/api/v3/me/settings/personality' \
+  --header 'Authorization: Bearer YOUR_ACCESS_TOKEN' \
+  --header 'Idempotency-Key: settings-mbti-001' \
+  --header 'Content-Type: application/json' \
+  --data '{"mbti":"intj-a"}'
+```
+
+响应：
+
+| Key | 说明 | 示例 |
+| --- | --- | --- |
+| code | 0 表示成功 | 0 |
+| data | 本次修改结果 | `{...}` |
+| - mbti | 规范为大写的 MBTI，清空时为空字符串 | INTJ-A |
+
+> 类型目录见下方可选项接口。无效类型、非字符串、额外后缀（如 INTJ-A-extra）返回 HTTP 422，保留原设置。同一幂等键对大小写与首尾空白规范化后的相同内容返回原结果，不覆盖后续修改；不同内容返回 HTTP 409。操作过于频繁时返回 HTTP 429。
+
+### 读取 MBTI 可选项
+
+`GET /api/v3/me/settings/personality-options`
+
+获取 MBTI 类型与后缀选项，需要 profile.read。
+
+请求：
+
+| Key | 说明 | 示例 |
+| --- | --- | --- |
+| Authorization | 请求头，Bearer accessToken | Bearer YOUR_ACCESS_TOKEN |
+
+请求示例：
+
+```bash
+curl 'https://fishpi.cn/api/v3/me/settings/personality-options' \
+  --header 'Authorization: Bearer YOUR_ACCESS_TOKEN'
+```
+
+响应：
+
+| Key | 说明 | 示例 |
+| --- | --- | --- |
+| code | 0 表示成功 | 0 |
+| data | 可选项 | `{...}` |
+| - types | 16 种标准类型，字符串数组 | `["INTJ","INTP","ENTJ","ENTP","INFJ","INFP","ENFJ","ENFP","ISTJ","ISFJ","ESTJ","ESFJ","ISTP","ISFP","ESTP","ESFP"]` |
+| - variants | 可选后缀，字符串数组 | `["A","T"]` |
+
+> 不带后缀也是完整的 MBTI 类型，例如 INTJ；带后缀时用连字符连接，例如 INTJ-A。
+
+### 读取头像设置
+
+`GET /api/v3/me/settings/avatar`
+
+读取当前账号保存的头像地址，需要 profile.read。
+
+请求：
+
+| Key | 说明 | 示例 |
+| --- | --- | --- |
+| Authorization | 请求头，Bearer accessToken | Bearer YOUR_ACCESS_TOKEN |
+
+请求示例：
+
+```bash
+curl 'https://fishpi.cn/api/v3/me/settings/avatar' \
+  --header 'Authorization: Bearer YOUR_ACCESS_TOKEN'
+```
+
+响应：
+
+| Key | 说明 | 示例 |
+| --- | --- | --- |
+| code | 0 表示成功 | 0 |
+| data | 当前设置 | `{...}` |
+| - avatarURL | 保存的头像地址；没有可用地址时为空字符串 | https://images.example/avatar.png |
+
+> 返回保存的地址，保留查询参数，不追加缩放或静态化参数。历史 HTTP 和站内相对地址仍可读取；客户端显示头像时应按 URL 处理。
+
+### 修改头像设置
+
+`PUT /api/v3/me/settings/avatar`
+
+设置当前账号的头像地址，需要 settings.write。
+
+请求：
+
+| Key | 说明 | 示例 |
+| --- | --- | --- |
+| Authorization | 请求头，Bearer accessToken | Bearer YOUR_ACCESS_TOKEN |
+| Idempotency-Key | 请求头，同一次修改重试保持不变 | settings-avatar-001 |
+| avatarURL | 必填字符串，去除首尾空白后 1–255 个 UTF-16 单位；合法 HTTPS 地址，允许外部图片地址，禁止用户凭据 | https://images.example/avatar.png |
+
+请求示例：
+
+```bash
+curl --request PUT 'https://fishpi.cn/api/v3/me/settings/avatar' \
+  --header 'Authorization: Bearer YOUR_ACCESS_TOKEN' \
+  --header 'Idempotency-Key: settings-avatar-001' \
+  --header 'Content-Type: application/json' \
+  --data '{"avatarURL":"https://images.example/avatar.png"}'
+```
+
+响应：
+
+| Key | 说明 | 示例 |
+| --- | --- | --- |
+| code | 0 表示成功 | 0 |
+| data | 本次修改结果 | `{...}` |
+| - avatarURL | 本次保存的头像地址 | https://images.example/avatar.png |
+
+> 可先使用上传票据上传图片，再提交公开图片 URL，也可直接使用外部 HTTPS 图片地址。接口只校验地址格式，不检查远程图片是否可访问；允许无扩展名和带查询参数的图片地址。不接受空字符串清空。重复请求返回原结果，不覆盖后来保存的新头像；同键不同内容返回 HTTP 409。旧页面的头像缩放、静态化及来源展示规则仍适用。
+
+### 读取个人资料
+
+`GET /api/v3/me/settings/profile`
+
+读取当前账号的个人资料，需要 profile.read。
+
+请求：
+
+| Key | 说明 | 示例 |
+| --- | --- | --- |
+| Authorization | 请求头，Bearer accessToken | Bearer YOUR_ACCESS_TOKEN |
+
+请求示例：
+
+```bash
+curl 'https://fishpi.cn/api/v3/me/settings/profile' \
+  --header 'Authorization: Bearer YOUR_ACCESS_TOKEN'
+```
+
+响应：
+
+| Key | 说明 | 示例 |
+| --- | --- | --- |
+| code | 0 表示成功 | 0 |
+| data | 当前设置 | `{...}` |
+| - userNickname | 昵称，最多 20 字符，可为空 | 小鱼 |
+| - userIntro | 简介，最多 255 字符，可为空并保留换行 | 喜欢摸鱼 |
+| - userURL | HTTP/HTTPS 个人网址，最多 100 字符；空字符串清空 | https://example.com/ |
+
+### 修改个人资料
+
+`PUT /api/v3/me/settings/profile`
+
+仅修改本次提交的字段，未提交字段保留，需要 settings.write。
+
+请求：
+
+| Key | 说明 | 示例 |
+| --- | --- | --- |
+| Authorization | 请求头，Bearer accessToken | Bearer YOUR_ACCESS_TOKEN |
+| Idempotency-Key | 请求头，同一次修改重试保持不变 | settings-profile-001 |
+| userNickname | 昵称，最多 20 字符，可为空 | 小鱼 |
+| userIntro | 简介，最多 255 字符，可为空并保留换行 | 喜欢摸鱼 |
+| userURL | HTTP/HTTPS 个人网址，最多 100 字符；空字符串清空 | https://example.com/ |
+
+请求示例：
+
+```bash
+curl --request PUT 'https://fishpi.cn/api/v3/me/settings/profile' \
+  --header 'Authorization: Bearer YOUR_ACCESS_TOKEN' \
+  --header 'Idempotency-Key: settings-profile-001' \
+  --header 'Content-Type: application/json' \
+  --data '{"userNickname":"小鱼"}'
+```
+
+响应：
+
+| Key | 说明 | 示例 |
+| --- | --- | --- |
+| code | 0 表示成功 | 0 |
+| data | 修改后的完整个人资料，字段同对应读取接口 | `{...}` |
+
+> 昵称和简介的特殊字符可能占用更多保存长度，超出容量返回 HTTP 422。至少提交一个字段。同键重试返回原结果，同键更改内容返回 HTTP 409；重放旧请求不会覆盖之后的新设置。
+
+### 读取隐私开关
+
+`GET /api/v3/me/settings/privacy`
+
+读取当前账号的隐私开关，需要 profile.read。
+
+请求：
+
+| Key | 说明 | 示例 |
+| --- | --- | --- |
+| Authorization | 请求头，Bearer accessToken | Bearer YOUR_ACCESS_TOKEN |
+
+请求示例：
+
+```bash
+curl 'https://fishpi.cn/api/v3/me/settings/privacy' \
+  --header 'Authorization: Bearer YOUR_ACCESS_TOKEN'
+```
+
+响应：
+
+| Key | 说明 | 示例 |
+| --- | --- | --- |
+| code | 0 表示成功 | 0 |
+| data | 当前设置 | `{...}` |
+| - articles | 文章列表公开 | true |
+| - comments | 评论列表公开 | true |
+| - breezemoons | 清风明月列表公开 | true |
+| - points | 积分记录公开 | true |
+| - followers | 粉丝列表公开 | true |
+| - followingUsers | 关注用户公开 | true |
+| - followingTags | 关注标签公开 | true |
+| - followingArticles | 文章收藏公开 | true |
+| - watchingArticles | 文章订阅公开 | true |
+| - online | 在线状态公开 | true |
+| - userAgent | 设备信息公开 | true |
+| - joinPointRank | 参加积分榜 | true |
+| - joinUsedPointRank | 参加消费积分榜 | true |
+
+### 修改隐私开关
+
+`PUT /api/v3/me/settings/privacy`
+
+仅修改本次提交的字段，未提交字段保留，需要 settings.write。
+
+请求：
+
+| Key | 说明 | 示例 |
+| --- | --- | --- |
+| Authorization | 请求头，Bearer accessToken | Bearer YOUR_ACCESS_TOKEN |
+| Idempotency-Key | 请求头，同一次修改重试保持不变 | settings-privacy-001 |
+| articles | 文章列表公开 | true |
+| comments | 评论列表公开 | true |
+| breezemoons | 清风明月列表公开 | true |
+| points | 积分记录公开 | true |
+| followers | 粉丝列表公开 | true |
+| followingUsers | 关注用户公开 | true |
+| followingTags | 关注标签公开 | true |
+| followingArticles | 文章收藏公开 | true |
+| watchingArticles | 文章订阅公开 | true |
+| online | 在线状态公开 | true |
+| userAgent | 设备信息公开 | true |
+| joinPointRank | 参加积分榜 | true |
+| joinUsedPointRank | 参加消费积分榜 | true |
+
+请求示例：
+
+```bash
+curl --request PUT 'https://fishpi.cn/api/v3/me/settings/privacy' \
+  --header 'Authorization: Bearer YOUR_ACCESS_TOKEN' \
+  --header 'Idempotency-Key: settings-privacy-001' \
+  --header 'Content-Type: application/json' \
+  --data '{"articles":false}'
+```
+
+响应：
+
+| Key | 说明 | 示例 |
+| --- | --- | --- |
+| code | 0 表示成功 | 0 |
+| data | 修改后的完整隐私开关，字段同对应读取接口 | `{...}` |
+
+> 至少提交一个字段。同键重试返回原结果，同键更改内容返回 HTTP 409；重放旧请求不会覆盖之后的新设置。
+
+### 读取显示设置
+
+`GET /api/v3/me/settings/display`
+
+读取当前账号的显示设置，需要 profile.read。
+
+请求：
+
+| Key | 说明 | 示例 |
+| --- | --- | --- |
+| Authorization | 请求头，Bearer accessToken | Bearer YOUR_ACCESS_TOKEN |
+
+请求示例：
+
+```bash
+curl 'https://fishpi.cn/api/v3/me/settings/display' \
+  --header 'Authorization: Bearer YOUR_ACCESS_TOKEN'
+```
+
+响应：
+
+| Key | 说明 | 示例 |
+| --- | --- | --- |
+| code | 0 表示成功 | 0 |
+| data | 当前设置 | `{...}` |
+| - commentViewMode | 评论模式，0 传统 / 1 实时 | 0 |
+| - avatarViewMode | 头像模式，0 原图 / 1 静态 | 1 |
+| - skin | PC 皮肤 ID，最多 32 字符，须为有效 PC 皮肤 | classic/pc |
+| - mobileSkin | 移动皮肤 ID，最多 32 字符，须为有效移动皮肤 | classic/mobile |
+
+### 修改显示设置
+
+`PUT /api/v3/me/settings/display`
+
+仅修改本次提交的字段，未提交字段保留，需要 settings.write。
+
+请求：
+
+| Key | 说明 | 示例 |
+| --- | --- | --- |
+| Authorization | 请求头，Bearer accessToken | Bearer YOUR_ACCESS_TOKEN |
+| Idempotency-Key | 请求头，同一次修改重试保持不变 | settings-display-001 |
+| commentViewMode | 评论模式，0 传统 / 1 实时 | 0 |
+| avatarViewMode | 头像模式，0 原图 / 1 静态 | 1 |
+| skin | PC 皮肤 ID，最多 32 字符，须为有效 PC 皮肤 | classic/pc |
+| mobileSkin | 移动皮肤 ID，最多 32 字符，须为有效移动皮肤 | classic/mobile |
+
+请求示例：
+
+```bash
+curl --request PUT 'https://fishpi.cn/api/v3/me/settings/display' \
+  --header 'Authorization: Bearer YOUR_ACCESS_TOKEN' \
+  --header 'Idempotency-Key: settings-display-001' \
+  --header 'Content-Type: application/json' \
+  --data '{"commentViewMode":1}'
+```
+
+响应：
+
+| Key | 说明 | 示例 |
+| --- | --- | --- |
+| code | 0 表示成功 | 0 |
+| data | 修改后的完整显示设置，字段同对应读取接口 | `{...}` |
+
+> 至少提交一个字段。同键重试返回原结果，同键更改内容返回 HTTP 409；重放旧请求不会覆盖之后的新设置。
+
+### 可用皮肤目录
+
+`GET /api/v3/me/settings/skins`
+
+读取 PC 和移动端可选皮肤，供显示设置使用，需要 profile.read。
+
+请求：
+
+| Key | 说明 | 示例 |
+| --- | --- | --- |
+| Authorization | 请求头，Bearer accessToken | Bearer YOUR_ACCESS_TOKEN |
+
+请求示例：
+
+```bash
+curl 'https://fishpi.cn/api/v3/me/settings/skins' \
+  --header 'Authorization: Bearer YOUR_ACCESS_TOKEN'
+```
+
+响应：
+
+| Key | 说明 | 示例 |
+| --- | --- | --- |
+| code | 0 表示成功 | 0 |
+| data | 皮肤目录 | `{...}` |
+| - list | 皮肤数组 | `[...]` |
+| -- id | 写入 skin/mobileSkin 的皮肤 ID | classic/pc |
+| -- device | pc / mobile | pc |
+| -- name / description | 名称 / 描述 | 经典主题 / 经典布局 |
+| -- previewURL | 预览图地址，可为空 | /images/preview.png |
+| -- order | 展示排序值 | 0 |
+
+> 皮肤必须与设备匹配。原 `GET /api/v3/me/settings` 汇总接口保持原字段不变；上述子接口提供完整隐私开关和文本资料。升级后请重新登录获取 settings.write 权限。
+
+### 读取功能设置
+
+`GET /api/v3/me/settings/functions`
+
+读取当前账号的功能设置，需要 profile.read。
+
+请求：
+
+| Key | 说明 | 示例 |
+| --- | --- | --- |
+| Authorization | 请求头，Bearer accessToken | Bearer YOUR_ACCESS_TOKEN |
+
+请求示例：
+
+```bash
+curl 'https://fishpi.cn/api/v3/me/settings/functions' \
+  --header 'Authorization: Bearer YOUR_ACCESS_TOKEN'
+```
+
+响应：
+
+| Key | 说明 | 示例 |
+| --- | --- | --- |
+| code | 0 表示成功 | 0 |
+| data | 当前设置 | `{...}` |
+| - listPageSize | 文章列表每页条数，10–96 | 20 |
+| - listViewMode | 列表显示，0 标题 / 1 标题与摘要 | 1 |
+| - notifications | 通知提示开关 | true |
+| - subscriptionEmail | 订阅邮件开关 | false |
+| - keyboardShortcuts | 键盘快捷键开关 | true |
+| - autoSubscribeOnReply | 回复后自动订阅文章 | true |
+| - externalLinkConfirmation | 站外链接跳转确认开关 | true |
+| - chatImageBlur | 聊天室图片自动模糊开关 | true |
+| - indexRedirectURL | 首页跳转地址，最多 255 字符；空字符串清空，仅可设置当前站点及部署路径内的绝对地址 | https://fishpi.cn/recent |
+
+### 修改功能设置
+
+`PUT /api/v3/me/settings/functions`
+
+仅修改提交字段，未提交字段保留，需要 settings.write。
+
+请求：
+
+| Key | 说明 | 示例 |
+| --- | --- | --- |
+| Authorization | 请求头，Bearer accessToken | Bearer YOUR_ACCESS_TOKEN |
+| Idempotency-Key | 请求头，同一次修改重试保持不变 | settings-functions-001 |
+| listPageSize | 文章列表每页条数，10–96 | 20 |
+| listViewMode | 列表显示，0 标题 / 1 标题与摘要 | 1 |
+| notifications | 通知提示开关 | true |
+| subscriptionEmail | 订阅邮件开关 | false |
+| keyboardShortcuts | 键盘快捷键开关 | true |
+| autoSubscribeOnReply | 回复后自动订阅文章 | true |
+| externalLinkConfirmation | 站外链接跳转确认开关 | true |
+| chatImageBlur | 聊天室图片自动模糊开关 | true |
+| indexRedirectURL | 首页跳转地址，最多 255 字符；空字符串清空，仅可设置当前站点及部署路径内的绝对地址 | https://fishpi.cn/recent |
+
+请求示例：
+
+```bash
+curl --request PUT 'https://fishpi.cn/api/v3/me/settings/functions' \
+  --header 'Authorization: Bearer YOUR_ACCESS_TOKEN' \
+  --header 'Idempotency-Key: settings-functions-001' \
+  --header 'Content-Type: application/json' \
+  --data '{"listPageSize":20,"notifications":true}'
+```
+
+响应：
+
+| Key | 说明 | 示例 |
+| --- | --- | --- |
+| code | 0 表示成功 | 0 |
+| data | 修改后的完整功能设置，字段同对应读取接口 | `{...}` |
+
+> 至少提交一个字段。无效枚举、错误类型或超出范围返回 HTTP 422；同键重试返回原结果，同键更换内容返回 HTTP 409。布尔开关必须使用 true/false。
+
+### 读取位置公开设置
+
+`GET /api/v3/me/settings/location`
+
+读取当前账号的位置公开设置，需要 profile.read。
+
+请求：
+
+| Key | 说明 | 示例 |
+| --- | --- | --- |
+| Authorization | 请求头，Bearer accessToken | Bearer YOUR_ACCESS_TOKEN |
+
+请求示例：
+
+```bash
+curl 'https://fishpi.cn/api/v3/me/settings/location' \
+  --header 'Authorization: Bearer YOUR_ACCESS_TOKEN'
+```
+
+响应：
+
+| Key | 说明 | 示例 |
+| --- | --- | --- |
+| code | 0 表示成功 | 0 |
+| data | 当前设置 | `{...}` |
+| - publicLocation | 是否公开位置；不提供城市或 IP 修改 | false |
+
+### 修改位置公开设置
+
+`PUT /api/v3/me/settings/location`
+
+仅修改提交字段，未提交字段保留，需要 settings.write。
+
+请求：
+
+| Key | 说明 | 示例 |
+| --- | --- | --- |
+| Authorization | 请求头，Bearer accessToken | Bearer YOUR_ACCESS_TOKEN |
+| Idempotency-Key | 请求头，同一次修改重试保持不变 | settings-location-001 |
+| publicLocation | 是否公开位置；不提供城市或 IP 修改 | false |
+
+请求示例：
+
+```bash
+curl --request PUT 'https://fishpi.cn/api/v3/me/settings/location' \
+  --header 'Authorization: Bearer YOUR_ACCESS_TOKEN' \
+  --header 'Idempotency-Key: settings-location-001' \
+  --header 'Content-Type: application/json' \
+  --data '{"publicLocation":false}'
+```
+
+响应：
+
+| Key | 说明 | 示例 |
+| --- | --- | --- |
+| code | 0 表示成功 | 0 |
+| data | 修改后的完整位置公开设置，字段同对应读取接口 | `{...}` |
+
+> 至少提交一个字段。无效枚举、错误类型或超出范围返回 HTTP 422；同键重试返回原结果，同键更换内容返回 HTTP 409。布尔开关必须使用 true/false。
+
+### 读取语言和时区
+
+`GET /api/v3/me/settings/locale`
+
+读取当前账号的语言和时区，需要 profile.read。
+
+请求：
+
+| Key | 说明 | 示例 |
+| --- | --- | --- |
+| Authorization | 请求头，Bearer accessToken | Bearer YOUR_ACCESS_TOKEN |
+
+请求示例：
+
+```bash
+curl 'https://fishpi.cn/api/v3/me/settings/locale' \
+  --header 'Authorization: Bearer YOUR_ACCESS_TOKEN'
+```
+
+响应：
+
+| Key | 说明 | 示例 |
+| --- | --- | --- |
+| code | 0 表示成功 | 0 |
+| data | 当前设置 | `{...}` |
+| - language | 语言代码，取自可选项目录 | zh_CN |
+| - timezone | 时区 ID，取自可选项目录 | Asia/Shanghai |
+
+### 修改语言和时区
+
+`PUT /api/v3/me/settings/locale`
+
+仅修改提交字段，未提交字段保留，需要 settings.write。
+
+请求：
+
+| Key | 说明 | 示例 |
+| --- | --- | --- |
+| Authorization | 请求头，Bearer accessToken | Bearer YOUR_ACCESS_TOKEN |
+| Idempotency-Key | 请求头，同一次修改重试保持不变 | settings-locale-001 |
+| language | 语言代码，取自可选项目录 | zh_CN |
+| timezone | 时区 ID，取自可选项目录 | Asia/Shanghai |
+
+请求示例：
+
+```bash
+curl --request PUT 'https://fishpi.cn/api/v3/me/settings/locale' \
+  --header 'Authorization: Bearer YOUR_ACCESS_TOKEN' \
+  --header 'Idempotency-Key: settings-locale-001' \
+  --header 'Content-Type: application/json' \
+  --data '{"language":"zh_CN","timezone":"Asia/Shanghai"}'
+```
+
+响应：
+
+| Key | 说明 | 示例 |
+| --- | --- | --- |
+| code | 0 表示成功 | 0 |
+| data | 修改后的完整语言和时区，字段同对应读取接口 | `{...}` |
+
+> 至少提交一个字段。无效枚举、错误类型或超出范围返回 HTTP 422；同键重试返回原结果，同键更换内容返回 HTTP 409。布尔开关必须使用 true/false。
+
+### 语言和时区可选项
+
+`GET /api/v3/me/settings/locale-options`
+
+读取站点支持的语言及服务器可用时区，需要 profile.read。
+
+请求：
+
+| Key | 说明 | 示例 |
+| --- | --- | --- |
+| Authorization | 请求头，Bearer accessToken | Bearer YOUR_ACCESS_TOKEN |
+
+请求示例：
+
+```bash
+curl 'https://fishpi.cn/api/v3/me/settings/locale-options' \
+  --header 'Authorization: Bearer YOUR_ACCESS_TOKEN'
+```
+
+响应：
+
+| Key | 说明 | 示例 |
+| --- | --- | --- |
+| code | 0 表示成功 | 0 |
+| data | 可选项 | `{...}` |
+| - languages | 语言代码数组 | ["en_US","zh_CN"] |
+| - timezones | 时区数组 | `[...]` |
+| -- id / name | 时区 ID / 显示名称 | Asia/Shanghai / 中国标准时间 |
+
+> 修改位置公开设置不会更改账号记录的位置。首页跳转地址必须与当前站点协议、主机和端口一致；指向站点首页的地址归一为空字符串。旧功能设置入口同样只接受当前站点及部署路径内的首页跳转地址；中文路径、锚点和正常编码文件名保持可用。
+
+## API v3 背包物品使用
+
+### 使用单日免签卡
+
+`POST /api/v3/me/bag/checkin1day/use`
+
+消耗当前账号一张单日免签卡，增加 1 天剩余免签天数，需要 activity.write。
+
+请求：
+
+| Key | 说明 | 示例 |
+| --- | --- | --- |
+| Authorization | 请求头，Bearer accessToken | Bearer YOUR_ACCESS_TOKEN |
+| Idempotency-Key | 请求头，同一次使用的重试保持不变 | card-use-001 |
+
+请求示例：
+
+```bash
+curl --request POST 'https://fishpi.cn/api/v3/me/bag/checkin1day/use' \
+  --header 'Authorization: Bearer YOUR_ACCESS_TOKEN' \
+  --header 'Idempotency-Key: card-use-001' \
+  --header 'Content-Type: application/json' \
+  --data '{}'
+```
+
+响应：
+
+| Key | 说明 | 示例 |
+| --- | --- | --- |
+| code | 0 表示成功 | 0 |
+| data | 使用结果 | `{...}` |
+| - itemCode | 消耗的物品代码 | checkin1day |
+| - remainingDays | 使用后的剩余免签天数 | 4 |
+| - bag | 使用后的背包，结构同 `GET /api/v3/me/bag` | `{...}` |
+| -- list | 物品列表 | `[...]` |
+| --- code / count | 物品代码 / 数量 | checkin1day / 1 |
+
+> 每次成功请求消耗一张卡；例如已有 3 天，用后为 4 天。同键重试返回原结果，不会再次消耗；另用一张卡须换新键。没有卡或剩余天数无法继续增加时返回 HTTP 409。不接受指定账号、数量或免签天数。
+
+### 使用两日免签卡
+
+`POST /api/v3/me/bag/checkin2days/use`
+
+消耗当前账号一张两日免签卡，增加 2 天剩余免签天数，需要 activity.write。
+
+请求：
+
+| Key | 说明 | 示例 |
+| --- | --- | --- |
+| Authorization | 请求头，Bearer accessToken | Bearer YOUR_ACCESS_TOKEN |
+| Idempotency-Key | 请求头，同一次使用的重试保持不变 | card-use-002 |
+
+请求示例：
+
+```bash
+curl --request POST 'https://fishpi.cn/api/v3/me/bag/checkin2days/use' \
+  --header 'Authorization: Bearer YOUR_ACCESS_TOKEN' \
+  --header 'Idempotency-Key: card-use-002' \
+  --header 'Content-Type: application/json' \
+  --data '{}'
+```
+
+响应：
+
+| Key | 说明 | 示例 |
+| --- | --- | --- |
+| code | 0 表示成功 | 0 |
+| data | 使用结果，结构同“使用单日免签卡” | `{...}` |
+| - itemCode | 消耗的物品代码 | checkin2days |
+| - remainingDays | 使用后的剩余免签天数 | 5 |
+| - bag | 使用后的背包 | `{...}` |
+
+> 例如已有 3 天，用后为 5 天；幂等与错误处理同单日免签卡。免签天数供系统后续自动签到使用，不代表此请求立即完成今日签到。升级后请重新登录获取 activity.write 权限。
+
+### 使用补签卡
+
+`POST /api/v3/me/bag/patchCheckinCard/use`
+
+消耗当前账号一张补签卡，按平台自然日补一天；能连接已有连续记录时接回。需要 activity.write，不额外发放签到积分。
+
+请求：
+
+| Key | 说明 | 示例 |
+| --- | --- | --- |
+| Authorization | 请求头，Bearer 访问令牌；需要 activity.write | Bearer TOKEN |
+| Idempotency-Key | 同一次补签重试时保持不变 | patch-checkin-20261018-001 |
+
+请求示例：
+
+```bash
+curl --request POST 'https://fishpi.cn/api/v3/me/bag/patchCheckinCard/use' \
+  --header 'Authorization: Bearer TOKEN' \
+  --header 'Content-Type: application/json' \
+  --header 'Idempotency-Key: patch-checkin-20261018-001' \
+  --data '{}'
+```
+
+响应：
+
+| Key | 说明 | 示例 |
+| --- | --- | --- |
+| code / msg | 结果码 / 提示 | 0 |
+| data | 使用结果 | `{...}` |
+| - itemCode | 消耗的物品代码 | patchCheckinCard |
+| - streak | 补签后的连续天数 | 29 |
+| - streakStart | 当前连续记录起始日，yyyyMMdd | 20260201 |
+| - streakEnd | 当前连续记录结束日，yyyyMMdd | 20260301 |
+| - longestStreak | 最长连续天数 | 29 |
+| - bag | 使用后的背包 | `{...}` |
+| -- list | 数量型物品列表 | `[]` |
+| --- code | 物品代码 | patchCheckinCard |
+| --- count | 剩余数量 | 1 |
+
+> 请求体可省略或为 `{}`，不接受自定义日期、数量或用户。需要卡片、可用补签记录且今天已签到；当前连续记录本身就是最长记录时不可使用。断签超过一天时只补一日。
+>
+> 同键重试返回原结果，不重复扣卡；成功后使用新键通常因无补签记录返回 HTTP 409。读取最新背包请使用 `GET /api/v3/me/bag`，读取最新签到状态请使用 `GET /api/v3/me/checkin`。
+>
+> 无卡、无可用记录、今天未签到或其他补签条件不满足返回 HTTP 409（item_unavailable、patch_unavailable、not_checked_in 或 current_longest）；失败保留卡片和补签记录。账户不可用返回 HTTP 404，缺少权限返回 HTTP 403，缺失/非法请求键或多余字段返回 HTTP 422，请求过于频繁返回 HTTP 429。此接口不会触发今日签到。
+
+### 使用改名卡
+
+`POST /api/v3/me/bag/nameCard/use`
+
+消耗当前账号一张改名卡并修改用户名，需要 activity.write 和 settings.write。
+
+请求：
+
+| Key | 说明 | 示例 |
+| --- | --- | --- |
+| Authorization | 请求头，Bearer 访问令牌；同时需要 activity.write 和 settings.write | Bearer TOKEN |
+| Idempotency-Key | 同一次改名重试时保持不变 | name-card-20261018-001 |
+| userName | 新用户名；去除首尾空白后为 1–64 位英文字母、数字或 `-`，规则同注册 | Fresh-Name |
+
+请求示例：
+
+```bash
+curl --request POST 'https://fishpi.cn/api/v3/me/bag/nameCard/use' \
+  --header 'Authorization: Bearer TOKEN' \
+  --header 'Content-Type: application/json' \
+  --header 'Idempotency-Key: name-card-20261018-001' \
+  --data '{"userName":"Fresh-Name"}'
+```
+
+响应：
+
+| Key | 说明 | 示例 |
+| --- | --- | --- |
+| code / msg | 结果码 / 提示 | 0 |
+| data | 使用结果 | `{...}` |
+| - itemCode | 消耗的物品代码 | nameCard |
+| - userName | 本次成功修改的用户名 | Fresh-Name |
+| - bag | 使用后的背包，结构同 `GET /api/v3/me/bag` | `{...}` |
+| -- list | 数量型物品列表 | `[]` |
+| --- code | 物品代码 | nameCard |
+| --- count | 剩余数量 | 1 |
+
+> 不接受保留用户名、已使用的用户名或当前用户名；不接受自定义用户、数量或其他字段。无卡返回 HTTP 409（item_unavailable），用户名已使用返回 HTTP 409（name_taken），格式错误返回 HTTP 422（invalid_name）。账户不可用返回 HTTP 404，缺少任一权限返回 HTTP 403。
+>
+> 扣卡与改名一并保存，校验或保存失败不消耗卡片。同键同内容重试返回原结果，不重复改名或扣卡；同键不同内容返回 HTTP 409。后续再次改名后重放旧请求仍返回当时的结果，当前资料与背包请重新查询。
+>
+> 遇到服务端错误或断线，操作可能已经保存，请使用原 Idempotency-Key 和原请求体重试确认结果。
+
+## API v3 实时通知
+
+### 获取实时连接票据
+
+`POST /api/v3/realtime/tickets`
+
+获取当前用户的一次性通知连接票据，需要 notifications.read。
+
+请求：
+
+| Key | 说明 | 示例 |
+| --- | --- | --- |
+| Authorization | 请求头，Bearer 访问令牌；需要 notifications.read | Bearer ACCESS_TOKEN |
+
+请求示例：
+
+```bash
+curl --request POST 'https://fishpi.cn/api/v3/realtime/tickets' \
+  --header 'Authorization: Bearer ACCESS_TOKEN' \
+  --header 'Content-Type: application/json' \
+  --data '{}'
+```
+
+响应：
+
+| Key | 说明 | 示例 |
+| --- | --- | --- |
+| code / msg | 结果码 / 提示 | 0 |
+| data | 连接凭据 | `{...}` |
+| - ticket | 一次性连接票据 | OPAQUE_TICKET |
+| - expiresIn | 可用于认证的剩余秒数，最多60秒 | 60 |
+| - path | 同一服务上的WebSocket路径，包含部署路径 | /api/v3/realtime |
+| - channel | 订阅类型 | notifications |
+
+> 请求体可省略或为 `{}`，不接受指定用户、父令牌、频道、scope或有效期。每次请求签发新票据，无需Idempotency-Key；票据最多成功使用一次。缺少权限返回HTTP 403，访问凭据不可用返回HTTP 401；实时通知服务暂不可用返回HTTP 503（realtime_unavailable）。
+
+### 连接通知通道
+
+`WS /api/v3/realtime`
+
+使用取票响应的path连接同一服务。HTTPS服务使用wss，开发环境可使用ws。收到authentication.required后，立即发送authenticate消息。
+
+请求：
+
+| Key | 说明 | 示例 |
+| --- | --- | --- |
+| type | 认证消息固定为authenticate | authenticate |
+| ticket | 上一步返回的一次性票据 | OPAQUE_TICKET |
+
+请求示例：
+
+```bash
+SOCKET_TICKET='OPAQUE_TICKET' node --input-type=module <<'JS'
+const socket = new WebSocket('wss://fishpi.cn/api/v3/realtime');
+socket.addEventListener('message', ({ data }) => {
+  const message = JSON.parse(data);
+  if (message.type === 'authentication.required') {
+    socket.send(JSON.stringify({ type: 'authenticate', ticket: process.env.SOCKET_TICKET }));
+  } else {
+    console.log(message);
+  }
+});
+JS
+```
+
+响应：
+
+| Key | 说明 | 示例 |
+| --- | --- | --- |
+| type | authentication.required、ready、pong或notifications.changed | ready |
+| data | 消息数据；除ready外为空对象 | `{...}` |
+| - channel | ready消息中的订阅类型 | notifications |
+| - expiresAt | ready消息中的连接授权到期时间，毫秒时间戳 | 1792304100000 |
+
+> 连接地址不带查询参数；认证只接受`{"type":"authenticate","ticket":"..."}`。不要在URL中放票据、accessToken或apiKey。认证成功后可发送`{"type":"ping"}`，服务端返回pong。重复认证、无效/过期/已使用票据、非法消息或失效的连接授权会关闭连接。
+>
+> notifications.changed是本账号通知刷新的提示，data为空；收到后重新调用`GET /api/v3/me/notifications/unread-count`或通知列表。提示可能合并或重复，不提供持久化重放；建立、恢复连接时应主动读取HTTP状态。
+>
+> 连接授权不超过取票时原访问令牌的有效期。刷新访问令牌不会延长已经建立的连接；到期后使用新的访问令牌重新取票并连接。本通道用于通知刷新，不发送通知正文或聊天消息。
+
+## API v3 聊天室消息
+
+### 发送普通消息
+
+`POST /api/v3/chat/messages`
+
+发送当前账号的普通聊天室正文，需要 content.write 和 Idempotency-Key。成功后可使用消息查询接口读取详情，需要 content.read。
+
+请求：
+
+| Key | 说明 | 示例 |
+| --- | --- | --- |
+| content | 消息正文，支持 Markdown，最多4096字符，不能为空 | 大家好！ |
+| client | 客户端标记，可选，格式为品牌/版本，最多128字符 | Web/MyClient |
+
+请求示例：
+
+```bash
+curl --request POST 'https://fishpi.cn/api/v3/chat/messages' \
+  --header 'Authorization: Bearer {accessToken}' \
+  --header 'Content-Type: application/json' \
+  --header 'Idempotency-Key: chat-message-001' \
+  --data '{"content":"大家好！","client":"Web/MyClient"}'
+```
+
+响应：
+
+| Key | 说明 | 示例 |
+| --- | --- | --- |
+| code | 状态码 | 0 |
+| msg | 结果说明 | |
+| data | 发送结果 | |
+| - id | 消息 ID | 1792304100000 |
+| - createdAt | 发送时间 | 1792304100000 |
+
+> 只接受普通正文；完整的红包、音乐、天气、话题、弹幕业务包装，执法/zf命令，以及红包/天气/音乐卡片 JSON 返回 HTTP 422（special_message_required）。解释性引用按普通正文发送，不执行业务命令或自动 AI 回复。
+>
+> 正文按平台规则处理并去除首尾空白。client 使用支持的品牌和格式，不能识别的标记不展示。未绑定手机或当前账号不可发言时拒绝发送；需要再次确认正文时返回 HTTP 409（confirmation_required），请使用原 Idempotency-Key 和原请求体再次发送。
+>
+> 同键同内容重试返回首次结果，不重复发送或扣分；同键不同内容返回 HTTP 409（idempotency_conflict）。服务端错误或断线后也请使用原键和原请求体重试确认结果。广播和提醒可能延迟或丢失，客户端应结合消息查询与实时提示同步记录。
+
+### 撤回本人消息
+
+`DELETE /api/v3/chat/messages/{messageId}`
+
+撤回当前账号发布的聊天室消息，需要 content.write 和 Idempotency-Key。
+
+请求：
+
+| Key | 说明 | 示例 |
+| --- | --- | --- |
+| Authorization（Header） | Bearer 访问令牌 | Bearer {accessToken} |
+| Idempotency-Key（Header） | 本次操作的幂等键 | chat-withdraw-001 |
+| messageId（Path） | 本人消息 ID | 1792304100000 |
+
+请求示例：
+
+```bash
+curl --request DELETE 'https://fishpi.cn/api/v3/chat/messages/1792304100000' \
+  --header 'Authorization: Bearer {accessToken}' \
+  --header 'Idempotency-Key: chat-withdraw-001'
+```
+
+响应：
+
+| Key | 说明 | 示例 |
+| --- | --- | --- |
+| code | 状态码 | 0 |
+| msg | 结果说明 | |
+| data | 撤回结果 | |
+| - id | 消息 ID | 1792304100000 |
+| - removed | 已撤回 | true |
+| - cost | 本次消耗积分 | 32 |
+
+> 无需请求体，也可发送空 JSON 对象。普通用户每天可撤回多次，当天费用依次为 0、32、64……积分，与旧撤回接口共享计次；改名和服务重启不重置计次，平台自然日切换后重新计算。原有管理角色的免费规则保留，本接口仅撤回本人消息。
+>
+> 不存在、已撤回或非本人消息返回 HTTP 404；红包消息返回 HTTP 409（message_not_removable），积分不足返回 HTTP 409（insufficient_points）。未提交成功的操作不会扣分或增加计次。
+>
+> 同键重试返回首次成功回执，不重复扣分。报错或断线后请保留原消息 ID 和幂等键重试确认，不要换键；成功后可用消息查询接口确认 HTTP 404，并清理本地记录及 reaction。实时提示可能延迟或丢失。
+
+### 查询当前话题
+
+`GET /api/v3/chat/topic`
+
+读取当前聊天室话题，需要 content.read。
+
+请求：
+
+| Key | 说明 | 示例 |
+| --- | --- | --- |
+| Authorization（Header） | Bearer 访问令牌 | Bearer {accessToken} |
+
+请求示例：
+
+```bash
+curl --request GET 'https://fishpi.cn/api/v3/chat/topic' \
+  --header 'Authorization: Bearer {accessToken}'
+```
+
+响应：
+
+| Key | 说明 | 示例 |
+| --- | --- | --- |
+| code | 状态码 | 0 |
+| msg | 结果说明 | |
+| data | 当前话题 | |
+| - text | 话题纯文本 | 今天摸什么鱼？ |
+
+> text 应作为纯文本展示。话题修改后会保存，重启不会清空；后续修改会更新当前值。
+
+### 修改聊天室话题
+
+`PUT /api/v3/chat/topic`
+
+设置聊天室话题，需要 content.write，每次成功修改消耗 16 积分。
+
+请求：
+
+| Key | 说明 | 示例 |
+| --- | --- | --- |
+| Authorization（Header） | Bearer 访问令牌 | Bearer {accessToken} |
+| Content-Type（Header） | JSON 请求体 | application/json |
+| Idempotency-Key（Header） | 本次操作的唯一键，重试时保持不变 | topic-20261019-1 |
+| text | 话题文本，最多 64 个 UTF-16 单位；按聊天室话题字符规则过滤并去除首尾空白，结果不能为空 | 今天摸什么鱼？ |
+
+请求示例：
+
+```bash
+curl --request PUT 'https://fishpi.cn/api/v3/chat/topic' \
+  --header 'Authorization: Bearer {accessToken}' \
+  --header 'Content-Type: application/json' \
+  --header 'Idempotency-Key: topic-20261019-1' \
+  --data '{"text":"今天摸什么鱼？"}'
+```
+
+响应：
+
+| Key | 说明 | 示例 |
+| --- | --- | --- |
+| code | 状态码 | 0 |
+| msg | 结果说明 | |
+| data | 本次修改结果 | |
+| - text | 保存后的话题纯文本 | 今天摸什么鱼？ |
+| - cost | 本次话题费用 | 16 |
+| - revision | 字符串形式的变更版本 | 123 |
+
+> 超长或无有效内容返回 HTTP 422；余额不足返回 HTTP 409（insufficient_points）。需要再次确认时返回 HTTP 409（confirmation_required），使用原键及原请求体再次发送。
+>
+> 同键同内容重试返回原结果，不重复扣费；同键换内容返回 HTTP 409（idempotency_conflict）。断线或服务端错误后也请保留原键重试。另用新键修改，即使文本相同仍按一次修改收费。原结果不代表最新话题，读取当前值请调用 GET /api/v3/chat/topic。
+>
+> 新旧话题修改均保存当前值，话题与费用未提交成功时不扣分；旧入口正常请求和成功字段保持。客户端应将话题作为纯文本展示。
+
+### 发送聊天室弹幕
+
+`POST /api/v3/chat/barrager`
+
+发送即时弹幕，需要 content.write，费用以发送时的弹幕价格为准。
+
+请求：
+
+| Key | 说明 | 示例 |
+| --- | --- | --- |
+| Authorization（Header） | Bearer 访问令牌 | Bearer {accessToken} |
+| Content-Type（Header） | JSON 请求体 | application/json |
+| Idempotency-Key（Header） | 本次发送的唯一键，重试保持不变 | barrage-20261019-1 |
+| content | 正文，原始输入最多4096个UTF-16单位；去除HTML后为1至32个UTF-16单位的纯文本，超长拒绝 | 今天也要开心 😀 |
+| color | 可选，#RRGGBB颜色，默认#FFFFFF；返回事件统一为大写 | #66CCFF |
+
+请求示例：
+
+```bash
+curl --request POST 'https://fishpi.cn/api/v3/chat/barrager' \
+  --header 'Authorization: Bearer {accessToken}' \
+  --header 'Content-Type: application/json' \
+  --header 'Idempotency-Key: barrage-20261019-1' \
+  --data '{"content":"今天也要开心 😀","color":"#66CCFF"}'
+```
+
+响应：
+
+| Key | 说明 | 示例 |
+| --- | --- | --- |
+| code | 状态码 | 0 |
+| msg | 结果说明 | |
+| data | 本次受理结果 | |
+| - id | 弹幕标识，不是聊天历史消息ID | 00000000-0000-4000-8000-000000000001 |
+| - createdAt | 受理时间，毫秒时间戳 | 1792304100000 |
+| - cost | 本次费用，积分数 | 5 |
+| - unit | 当前价格的显示单位 | 积分 |
+
+> 空白、清洗后为空、超长或颜色无效返回 HTTP 422（invalid_barrage）；余额不足返回 HTTP 409（insufficient_points）。需要再次确认时返回 HTTP 409（confirmation_required），使用原键和原请求体再次发送；发送过于频繁返回 HTTP 429。
+>
+> 同键同请求重试返回原回执，不再次扣费或播放；同键换请求返回 HTTP 409（idempotency_conflict）。发送后价格变化不改变原回执；另用新键视为另一次发送。服务端错误或断线后也请保留原键重试确认结果。
+>
+> 弹幕为即时动画，不保存到聊天历史，不支持按标识读取、撤回或离线补播。回执表示已受理及扣费成功，不保证每个在线客户端收到动画；提交后的断线或传输失败也不会因同键重试而补播。v3 的 chat.barrager 事件发送给接收请求实例上已连接的 chat 订阅，客户端必须将正文和作者资料按纯文本展示。
+
+### 查询弹幕价格
+
+`GET /api/v3/chat/barrager/price`
+
+读取当前弹幕价格，需要 content.read。
+
+请求：
+
+| Key | 说明 | 示例 |
+| --- | --- | --- |
+| Authorization（Header） | Bearer 访问令牌 | Bearer {accessToken} |
+
+请求示例：
+
+```bash
+curl --request GET 'https://fishpi.cn/api/v3/chat/barrager/price' \
+  --header 'Authorization: Bearer {accessToken}'
+```
+
+响应：
+
+| Key | 说明 | 示例 |
+| --- | --- | --- |
+| code | 状态码 | 0 |
+| msg | 结果说明 | |
+| data | 当前价格 | |
+| - amount | 当前配置的积分费用 | 5 |
+| - unit | 价格显示单位 | 积分 |
+
+> 此接口不发送弹幕或扣分。unit 为显示文本，实际使用积分；价格可能调整，消耗以发送时的规则为准。
+
+### 查询在线用户
+
+`GET /api/v3/chat/online-users`
+
+查询当前可见的聊天室在线用户，需要 content.read。按用户名升序排列，同一用户的多个连接只返回一次。
+
+请求：
+
+| Key | 说明 | 示例 |
+| --- | --- | --- |
+| p | 页码，默认1 | 1 |
+| size | 每页条数，默认20，最多50 | 20 |
+
+请求示例：
+
+```bash
+curl --request GET 'https://fishpi.cn/api/v3/chat/online-users?p=1&size=20' \
+  --header 'Authorization: Bearer {accessToken}'
+```
+
+响应：
+
+| Key | 说明 | 示例 |
+| --- | --- | --- |
+| code | 状态码 | 0 |
+| msg | 结果说明 | |
+| data | 在线用户结果 | |
+| - list | 当前页用户 | [] |
+| -- id | 用户 ID | 123456 |
+| -- userName | 用户名 | Fish |
+| -- userAvatarURL | 头像地址 | https://file.fishpi.cn/avatar.png |
+| - pagination | 分页信息 | |
+| -- p | 当前页码 | 1 |
+| -- size | 每页条数 | 20 |
+| -- total | 本次结果中对当前阅读者可见的用户数 | 42 |
+| -- pageCount | 总页数 | 3 |
+| - hasMore | 是否有下一页 | true |
+| - nodesSampledAt | 最近一次节点采样时间，尚未采样为0 | 1792304100000 |
+| - nodesComplete | 该次采样是否包含全部配置节点 | true |
+
+> 结果合并当前服务实例的聊天室连接及最近一次节点名单；v3 连接只有完成聊天室订阅认证才计入，通知或文章订阅不计入。其他服务实例独立建立的 v3 连接不在此统计范围内。人数为该范围内可见用户数，不代表全站实时总人数。
+>
+> 名单遵循在线状态公开设置；本人和管理员可查看对应用户的在线状态，停用或无效用户不展示。节点名单是采样值，nodesComplete 只描述该次采样是否完整，不保证当前仍在线；请结合 nodesSampledAt 判断时间，连接变化时分页结果可能改变。
+
+### 查询消息列表
+
+`GET /api/v3/chat/messages`
+
+查询聊天室历史消息，需要 content.read。列表按消息 ID 升序排列；不传游标时返回最近一批消息。
+
+请求：
+
+| Key | 说明 | 示例 |
+| --- | --- | --- |
+| Authorization | 请求头，Bearer 访问令牌；需要 content.read | Bearer ACCESS_TOKEN |
+| size | 条数，1–50，默认20 | 20 |
+| before | 可选，只查询此 ID 之前的消息，不含本条；不能与 after 同用 | 1792304100000 |
+| after | 可选，只查询此 ID 之后的消息，不含本条；不能与 before 同用 | 1792304100000 |
+
+请求示例：
+
+```bash
+curl --request GET 'https://fishpi.cn/api/v3/chat/messages?size=20' \
+  --header 'Authorization: Bearer ACCESS_TOKEN'
+```
+
+响应：
+
+| Key | 说明 | 示例 |
+| --- | --- | --- |
+| code / msg | 结果码 / 提示 | 0 |
+| data | 消息列表 | `{...}` |
+| - list | 消息对象列表，按 ID 升序 | `[]` |
+| -- id | 消息 ID | 1792304100000 |
+| -- createdAt | 创建时间，毫秒时间戳 | 1792304100000 |
+| -- type | text、redPacket、weather、music 或 unavailable | text |
+| -- content | 普通消息的原始 Markdown；卡片及 unavailable 为空 | 大家好 |
+| -- contentHtml | 普通消息的清洗后 HTML；其他类型为空 | `<p>大家好</p>` |
+| -- author | 消息发布时的公开作者信息 | `{...}` |
+| --- id | 作者 ID；系统机器人可能为空 | 1630399192600 |
+| --- userName | 用户名 | reader |
+| --- userNickname | 昵称 | 摸鱼中 |
+| --- userAvatarURL | 头像地址 | https://file.fishpi.cn/avatar.png |
+| -- client | 客户端标记，可能为空 | Web/PC网页端 |
+| -- card | 卡片数据；普通消息及 unavailable 为空对象，字段见下表 | `{}` |
+| - hasMore | 当前查询方向是否还有更多消息；不传游标时指更早消息 | true |
+| - nextBefore | 本批最早消息 ID，用于继续查询更早消息；空列表为空 | 1792304000000 |
+| - nextAfter | 本批最新消息 ID，用于查询之后的新消息；空列表为空 | 1792304100000 |
+
+卡片字段：
+
+| Key | 说明 | 示例 |
+| --- | --- | --- |
+| redPacket.type | random、average、specify、heartbeat、rockPaperScissors、dice 或 unknown | random |
+| redPacket.message | 红包留言，纯文本 | 一起摸鱼 |
+| redPacket.money | 红包金额 | 256 |
+| redPacket.count / got | 总份数 / 已领取份数 | 10 / 2 |
+| weather.date | 日期文本，沿用消息中的逗号分隔格式 | 2026-10-18,2026-10-19 |
+| weather.weatherCode | 天气代码文本 | CLEAR_DAY,CLOUDY |
+| weather.max / min | 最高 / 最低温文本 | 25,26 / 18,19 |
+| weather.t / st | 温度 / 体感文本 | 22 / 舒适 |
+| music.title | 音乐标题，纯文本 | 一首歌 |
+| music.source | 音乐 ID 或地址；不可用时为空 | 123456 |
+| music.coverURL | 封面地址，可能为空 | https://file.fishpi.cn/cover.png |
+| music.from | 音乐来源标记，可能为空 | netease |
+
+> card 中直接使用相应类型的字段，例如 `{"type":"random","message":"一起摸鱼","money":256,"count":10,"got":2}`。所有卡片文本按纯文本展示；content 是源文本，展示 HTML 时使用 contentHtml。
+>
+> before/after 是数字消息 ID。向前或向后翻页时保留原查询方向，并使用对应游标；空列表时保留上次非空游标。hasMore=false 表示本次查询时该方向已无更多消息，之后仍可能产生新消息。
+>
+> unavailable 表示该历史消息暂不可读取；仍返回 id 以便继续翻页。消息 emoji reaction 使用 `GET /api/v3/chat/messages/{targetId}/reactions` 查询。读取红包摘要不会领取红包。
+>
+> 缺少访问凭据返回 HTTP 401，缺少 content.read 返回 HTTP 403；非法或冲突游标、条数超限返回 HTTP 422。
+
+### 查询单条消息
+
+`GET /api/v3/chat/messages/{messageId}`
+
+查询一条聊天室消息，需要 content.read。
+
+请求：
+
+| Key | 说明 | 示例 |
+| --- | --- | --- |
+| Authorization | 请求头，Bearer 访问令牌；需要 content.read | Bearer ACCESS_TOKEN |
+| messageId | 路径参数，消息 ID | 1792304100000 |
+
+请求示例：
+
+```bash
+curl --request GET 'https://fishpi.cn/api/v3/chat/messages/1792304100000' \
+  --header 'Authorization: Bearer ACCESS_TOKEN'
+```
+
+响应：
+
+| Key | 说明 | 示例 |
+| --- | --- | --- |
+| code / msg | 结果码 / 提示 | 0 |
+| data | 消息对象，字段同消息列表 list 中的对象 | `{...}` |
+| - id | 消息 ID | 1792304100000 |
+| - type | 消息类型 | text |
+| - content / contentHtml | 原始 Markdown / 清洗后 HTML | 大家好 |
+| - author / card / client / createdAt | 作者、卡片、客户端及时间，结构同列表 | `{...}` |
+
+> 消息不存在或已撤回返回 HTTP 404；非法消息 ID 返回 HTTP 422。
+
+### 查询消息上下文
+
+`GET /api/v3/chat/messages/{messageId}/context`
+
+查询本条消息及前后相邻消息，需要 content.read。
+
+请求：
+
+| Key | 说明 | 示例 |
+| --- | --- | --- |
+| Authorization | 请求头，Bearer 访问令牌；需要 content.read | Bearer ACCESS_TOKEN |
+| messageId | 路径参数，上下文中心消息 ID | 1792304100000 |
+| radius | 前后各取的条数，1–25，默认10；最多返回51条 | 10 |
+
+请求示例：
+
+```bash
+curl --request GET 'https://fishpi.cn/api/v3/chat/messages/1792304100000/context?radius=10' \
+  --header 'Authorization: Bearer ACCESS_TOKEN'
+```
+
+响应：
+
+| Key | 说明 | 示例 |
+| --- | --- | --- |
+| code / msg | 结果码 / 提示 | 0 |
+| data | 上下文 | `{...}` |
+| - anchorId | 中心消息 ID | 1792304100000 |
+| - list | 消息对象列表，含中心消息一次，按 ID 升序；对象结构同消息列表 | `[]` |
+| - hasMoreBefore / hasMoreAfter | 前方 / 后方是否还有更多消息 | true / false |
+| - nextBefore | 本批最早消息 ID；前方无消息时为中心 ID | 1792304000000 |
+| - nextAfter | 本批最新消息 ID；后方无消息时为中心 ID | 1792304200000 |
+
+> 中心消息不存在或已撤回返回 HTTP 404；非法 ID 或 radius 超限返回 HTTP 422。位于历史边缘时，仅返回实际存在的相邻消息；可用列表接口及 before/after 继续读取。
+
+## API v3 聊天室实时订阅
+
+### 获取聊天室连接票据
+
+`POST /api/v3/chat/realtime-ticket`
+
+获取公共聊天室消息变更订阅票据，需要 content.read。
+
+请求：
+
+| Key | 说明 | 示例 |
+| --- | --- | --- |
+| Authorization | 请求头，Bearer 访问令牌；需要 content.read | Bearer ACCESS_TOKEN |
+
+请求示例：
+
+```bash
+curl --request POST 'https://fishpi.cn/api/v3/chat/realtime-ticket' \
+  --header 'Authorization: Bearer ACCESS_TOKEN' \
+  --header 'Content-Type: application/json' \
+  --data '{}'
+```
+
+响应：
+
+| Key | 说明 | 示例 |
+| --- | --- | --- |
+| code / msg | 结果码 / 提示 | 0 |
+| data | 连接凭据 | `{...}` |
+| - ticket | 一次性连接票据 | OPAQUE_TICKET |
+| - expiresIn | 可用于认证的剩余秒数，最多60秒 | 60 |
+| - path | 同一服务上的 WebSocket 路径，包含部署路径 | /api/v3/realtime |
+| - channel | 订阅类型，固定为 chat | chat |
+
+> 请求体可省略或为 {}，不接受用户、房间、频道、scope 或有效期等自定义字段。每次请求签发新票据，无需 Idempotency-Key；最多成功使用一次。
+>
+> 无访问凭据返回 HTTP 401，缺少 content.read 返回 HTTP 403，多余字段返回 HTTP 422；实时聊天室服务暂不可用返回 HTTP 503（realtime_unavailable）。
+
+### 连接聊天室通道
+
+`WS /api/v3/realtime`
+
+使用票据响应中的 path 连接，等待 authentication.required 后发送 authenticate，认证成功返回 ready。
+
+请求：
+
+| Key | 说明 | 示例 |
+| --- | --- | --- |
+| type | 认证消息固定为 authenticate | authenticate |
+| ticket | 上一步返回的一次性聊天室票据 | OPAQUE_TICKET |
+
+请求示例：
+
+```bash
+SOCKET_TICKET='OPAQUE_TICKET' node --input-type=module <<'JS'
+const socket = new WebSocket('wss://fishpi.cn/api/v3/realtime');
+socket.addEventListener('message', ({ data }) => {
+  const message = JSON.parse(data);
+  if (message.type === 'authentication.required') {
+    socket.send(JSON.stringify({ type: 'authenticate', ticket: process.env.SOCKET_TICKET }));
+  } else if (message.type === 'chat.sync_required') {
+    console.log('丢弃旧缓存并重新读取当前消息窗口');
+  } else if (message.type.startsWith('chat.message.')) {
+    console.log(message.type, message.data.messageId);
+  } else if (message.type === 'chat.topic_changed') {
+    console.log('重新读取 GET /api/v3/chat/topic');
+  }
+});
+JS
+```
+
+响应：
+
+| Key | 说明 | 示例 |
+| --- | --- | --- |
+| type | authentication.required、ready、pong、chat.sync_required、chat.topic_changed 或下列消息变更类型 | ready |
+| data | 消息数据；authentication.required、pong、chat.sync_required 为空对象 | `{...}` |
+| - channel | ready 中的订阅类型 | chat |
+| - expiresAt | ready 中的连接授权到期时间，毫秒时间戳 | 1792304100000 |
+| - messageId | chat.message.* 中的目标消息 ID | 1792304100000 |
+| - revision | chat.message.* 或 chat.topic_changed 中的变更版本，字符串 | `"123"` |
+
+> 变更类型为 chat.message.created、chat.message.updated、chat.message.deleted、chat.message.reactions，分别表示消息创建、内容/卡片更新、撤回及 emoji reaction 变化。
+>
+> 创建或更新提示到达后，用 GET /api/v3/chat/messages/{messageId} 重读消息；撤回提示后移除对应缓存，详情可能返回404；reaction 提示后重读 GET /api/v3/chat/messages/{targetId}/reactions。提示只提供消息 ID 和版本，不包含正文或领取明细。
+>
+> chat.topic_changed 的 data 仅包含 revision；收到后重新读取 GET /api/v3/chat/topic，不按消息 ID 查询。客户端应忽略无法识别的提示类型。
+>
+> 首次连接、重连后应主动读取 HTTP 状态。收到 chat.sync_required 时，清除旧消息缓存及版本去重状态，重新同步当前窗口。提示可能重复，不提供按版本断点续传；不能只依赖提示恢复历史状态。
+>
+> 地址不带查询参数，认证仅提交 type 和 ticket；成功后可发送 {"type":"ping"}，收到 pong。票据重放/过期、非法消息、令牌或账号失效时连接关闭；刷新访问令牌不会延长已有连接，需重新取票连接。
+>
+> 本订阅支持已保存消息、emoji reaction、话题变更提示及即时 chat.barrager 弹幕事件。发送仍使用 HTTP 接口；不提供在线人数事件。
+
+### 接收即时弹幕
+
+`WS /api/v3/realtime`
+
+使用 chat 票据认证后接收当前连接所在实例的 `chat.barrager` 事件。
+
+请求：
+
+| Key | 说明 | 示例 |
+| --- | --- | --- |
+| type | 首帧认证类型 | authenticate |
+| ticket | 从聊天室取票接口获得的票据 | {ticket} |
+
+请求示例：
+
+```bash
+curl --request POST 'https://fishpi.cn/api/v3/chat/realtime-ticket' \
+  --header 'Authorization: Bearer {accessToken}' \
+  --header 'Content-Type: application/json' \
+  --data '{}'
+```
+
+响应：
+
+| Key | 说明 | 示例 |
+| --- | --- | --- |
+| type | 即时弹幕类型 | chat.barrager |
+| data | 弹幕公开内容 | |
+| - id | 弹幕标识 | 00000000-0000-4000-8000-000000000001 |
+| - content | 纯文本正文 | 今天也要开心 😀 |
+| - color | #RRGGBB颜色 | #66CCFF |
+| - createdAt | 受理时间，毫秒时间戳 | 1792304100000 |
+| - author | 发送时的公开作者资料 | |
+| -- id | 作者ID | 123 |
+| -- userName | 用户名 | Fish |
+| -- userNickname | 昵称 | 摸鱼人 |
+| -- userAvatarURL | 头像地址，可为空 | https://file.fishpi.cn/avatar.png |
+
+> 沿用上节的连接及认证步骤。此事件没有 revision，不加入聊天历史游标；重连或收到 chat.sync_required 时不补播。显示昵称和正文时使用文本节点，并按 id 去重；客户端应忽略未知事件类型。
+
+## API v3 文章实时订阅
+
+### 获取文章连接票据
+
+`POST /api/v3/articles/{articleId}/realtime-ticket`
+
+订阅一篇当前可阅读文章的变更提示，需要 content.read。
+
+请求：
+
+| Key | 说明 | 示例 |
+| --- | --- | --- |
+| Authorization | 请求头，Bearer 访问令牌；需要 content.read | Bearer ACCESS_TOKEN |
+| articleId | 路径参数，文章 ID | 1636516552191 |
+
+请求示例：
+
+```bash
+curl --request POST 'https://fishpi.cn/api/v3/articles/1636516552191/realtime-ticket' \
+  --header 'Authorization: Bearer ACCESS_TOKEN' \
+  --header 'Content-Type: application/json' \
+  --data '{}'
+```
+
+响应：
+
+| Key | 说明 | 示例 |
+| --- | --- | --- |
+| code / msg | 结果码 / 提示 | 0 |
+| data | 连接凭据 | `{...}` |
+| - ticket | 一次性连接票据 | OPAQUE_TICKET |
+| - expiresIn | 可用于认证的剩余秒数，最多60秒 | 60 |
+| - path | 同一服务上的 WebSocket 路径，包含部署路径 | /api/v3/realtime |
+| - channel | 订阅类型，固定为 article | article |
+| - articleId | 本票据绑定的文章 ID | 1636516552191 |
+
+> 请求体可省略或为 `{}`，不接受自定义用户、频道、文章、scope 或有效期。每次请求签发新票据，无需 Idempotency-Key；票据最多成功使用一次，不能在连接中更换文章。
+>
+> 无访问凭据返回 HTTP 401，缺少 content.read 返回 HTTP 403，文章不存在或无权阅读返回 HTTP 404，非法文章 ID 或多余字段返回 HTTP 422；实时文章服务暂不可用返回 HTTP 503（realtime_unavailable）。
+
+### 连接文章通道
+
+`WS /api/v3/realtime`
+
+使用文章票据响应的 path 连接。收到 authentication.required 后发送 authenticate，认证成功收到 ready；后续收到 article.changed 时重新读取文章、评论或 reaction。
+
+请求：
+
+| Key | 说明 | 示例 |
+| --- | --- | --- |
+| type | 认证消息固定为 authenticate | authenticate |
+| ticket | 上一步取得的文章票据 | OPAQUE_TICKET |
+
+请求示例：
+
+```bash
+SOCKET_TICKET='OPAQUE_TICKET' node --input-type=module <<'JS'
+const socket = new WebSocket('wss://fishpi.cn/api/v3/realtime');
+socket.addEventListener('message', ({ data }) => {
+  const message = JSON.parse(data);
+  if (message.type === 'authentication.required') {
+    socket.send(JSON.stringify({ type: 'authenticate', ticket: process.env.SOCKET_TICKET }));
+  } else if (message.type === 'article.changed') {
+    console.log('请重新读取文章及评论', message.data.articleId);
+  } else {
+    console.log(message);
+  }
+});
+JS
+```
+
+响应：
+
+| Key | 说明 | 示例 |
+| --- | --- | --- |
+| type | authentication.required、ready、pong 或 article.changed | ready |
+| data | 消息数据；authentication.required 与 pong 为空对象 | `{...}` |
+| - channel | ready 中的订阅类型 | article |
+| - articleId | ready 与 article.changed 中的目标文章 ID | 1636516552191 |
+| - expiresAt | ready 中的连接授权到期时间，毫秒时间戳 | 1792304100000 |
+
+> 连接地址不带查询参数。认证成功后可发送 `{"type":"ping"}`，收到 pong。票据重放、过期、非法消息、访问令牌失效或失去文章阅读权限时连接关闭；文章删除后应重新请求 HTTP 接口确认状态。
+>
+> article.changed 提示文章、评论或 emoji reaction 已变化，不携带正文、评论作者或互动明细。请用同一访问身份重新读取相应 HTTP 接口。提示可能合并或重复，不提供持久化重放；首次连接及重连后应主动读取 HTTP 状态。
+>
+> 连接有效期不超过原访问令牌到期时间；刷新令牌不会延长已有连接，需重新取票连接。文章连接不接收通知提示或聊天消息；本接口不提供在线人数或热度事件。
+
+## API v3 文件上传
+
+### 获取上传票据
+
+`POST /api/v3/uploads/tickets`
+
+获取当前用户的短期文件上传票据，需要 uploads.write。文件随后直接上传到响应中的地址。
+
+请求：
+
+| Key | 说明 | 示例 |
+| --- | --- | --- |
+| Authorization | 请求头，Bearer 访问令牌；需要 uploads.write | Bearer ACCESS_TOKEN |
+
+请求示例：
+
+```bash
+curl --request POST 'https://fishpi.cn/api/v3/uploads/tickets' \
+  --header 'Authorization: Bearer ACCESS_TOKEN' \
+  --header 'Content-Type: application/json' \
+  --data '{}'
+```
+
+响应：
+
+| Key | 说明 | 示例 |
+| --- | --- | --- |
+| code / msg | 结果码 / 提示 | 0 |
+| data | 上传凭据 | `{...}` |
+| - ticket | 上传票据 | eyJ... |
+| - tokenType | 上传票据类型 | Bearer |
+| - uploadURL | 完整文件上传地址；使用实际响应值 | https://pic.fishpi.cn/api/v1/files |
+| - fieldName | multipart 文件字段名 | file |
+| - expiresIn | 票据有效秒数 | 180 |
+
+> 请求体可省略或为 `{}`，不接受用户、目标网址、scope、有效期等自定义字段。每次请求签发新票据，无需 Idempotency-Key。取票后尽快上传；续取票据不会延长旧票据的有效期。
+>
+> 缺少权限返回 HTTP 403，账户不可用返回 HTTP 404，上传服务未启用或暂不可用返回 HTTP 503（upload_unavailable）。已有登录令牌需重新登录获取 uploads.write；刷新已有登录状态不会增加权限。
+
+### 使用票据直传文件
+
+`POST {uploadURL}`
+
+向上一步返回的完整地址发送 multipart/form-data，请求头使用上传票据。
+
+请求：
+
+| Key | 说明 | 示例 |
+| --- | --- | --- |
+| Authorization | 请求头，Bearer 上传票据 | Bearer UPLOAD_TICKET |
+| file | 文件；必须提供文件名，多文件可重复该字段 | @example.png |
+
+请求示例：
+
+```bash
+curl --request POST 'https://pic.fishpi.cn/api/v1/files' \
+  --header 'Authorization: Bearer UPLOAD_TICKET' \
+  --form 'file=@example.png'
+```
+
+响应：
+
+| Key | 说明 | 示例 |
+| --- | --- | --- |
+| code / msg | 图床返回的结果码 / 提示 | 0 |
+| data | 上传结果 | `{...}` |
+| - succMap | 原文件名到文件网址的映射 | `{"example.png":"https://file.fishpi.cn/..."}` |
+| - errFiles | 上传失败的文件名列表 | `[]` |
+
+> 图床响应沿用其上传协议，文件格式、大小及失败响应以图床服务为准。直传请求使用 ticket，不能使用 Rhythm 的 accessToken；uploadURL 已包含 `/api/v1/files`，无需再追加路径。裸 Blob 也应提供文件名，例如 `form.append('file', blob, 'example.png')`。
+
+## API v3 活动奖励
+
+### 查询昨日活跃度奖励
+
+`GET /api/v3/me/activity/yesterday-reward`
+
+查询当前账号昨日活跃度可兑换的积分及今日领取状态，需要 activity.read。
+
+请求：
+
+| Key | 说明 | 示例 |
+| --- | --- | --- |
+| Authorization | 请求头，Bearer accessToken | Bearer YOUR_ACCESS_TOKEN |
+
+请求示例：
+
+```bash
+curl 'https://fishpi.cn/api/v3/me/activity/yesterday-reward' \
+  --header 'Authorization: Bearer YOUR_ACCESS_TOKEN'
+```
+
+响应：
+
+| Key | 说明 | 示例 |
+| --- | --- | --- |
+| code | 0 表示成功 | 0 |
+| data | 奖励状态 | `{...}` |
+| - date | 奖励对应的昨日日期，按服务端日期计算 | 20261016 |
+| - amount | 按昨日活跃度计算的奖励积分，无可用记录时为 0 | 50 |
+| - claimed | 今日是否已领取这类奖励 | false |
+| - claimable | 当前是否可领取 | true |
+
+> 查询不会领取奖励。amount 是该日计算出的奖励，即使已领取也保留此数值；请用 claimable 判断是否可领取。
+
+### 领取昨日活跃度奖励
+
+`POST /api/v3/me/activity/yesterday-reward`
+
+领取当前账号的昨日活跃度奖励，需要 activity.write。
+
+请求：
+
+| Key | 说明 | 示例 |
+| --- | --- | --- |
+| Authorization | 请求头，Bearer accessToken | Bearer YOUR_ACCESS_TOKEN |
+| Idempotency-Key | 请求头，同一次领取重试保持不变 | reward-20261017-001 |
+
+请求示例：
+
+```bash
+curl --request POST 'https://fishpi.cn/api/v3/me/activity/yesterday-reward' \
+  --header 'Authorization: Bearer YOUR_ACCESS_TOKEN' \
+  --header 'Idempotency-Key: reward-20261017-001' \
+  --header 'Content-Type: application/json' \
+  --data '{}'
+```
+
+响应：
+
+| Key | 说明 | 示例 |
+| --- | --- | --- |
+| code | 0 表示成功 | 0 |
+| data | 领取结果 | `{...}` |
+| - date | 奖励对应的昨日日期 | 20261016 |
+| - amount | 本次获得积分 | 50 |
+| - claimed | 已领取 | true |
+
+> 无可领取奖励或今日已经领取时返回 HTTP 409。成功请求同键重试返回原结果，不再发放积分；不同日期的领取请使用新的键。接口不接受指定账号、日期或积分数量。升级后请重新登录获取 activity.write 权限。日常签到仍由活跃度自动触发，可用 `GET /api/v3/me/checkin` 查询。
+
+## API v3 专栏管理
+
+### 修改专栏名称
+
+`PUT /api/v3/columns/{columnId}/title`
+
+修改当前账号的有效专栏，需要 content.write。
+
+请求：
+
+| Key | 说明 | 示例 |
+| --- | --- | --- |
+| Authorization | 请求头，Bearer accessToken | Bearer YOUR_ACCESS_TOKEN |
+| Idempotency-Key | 请求头，同一次操作重试保持不变 | column-title-001 |
+| columnId | 路径参数，专栏 ID | 20261016001 |
+| title | 新名称，去除首尾空白，1–64 字符 | 我的专栏 |
+
+请求示例：
+
+```bash
+curl --request PUT 'https://fishpi.cn/api/v3/columns/20261016001/title' \
+  --header 'Authorization: Bearer YOUR_ACCESS_TOKEN' \
+  --header 'Idempotency-Key: column-title-001' \
+  --header 'Content-Type: application/json' \
+  --data '{"title":"我的专栏"}'
+```
+
+响应：
+
+| Key | 说明 | 示例 |
+| --- | --- | --- |
+| code | 0 表示成功 | 0 |
+| data | 修改后的专栏摘要 | `{...}` |
+| - id / title | 专栏 ID / 名称 | 20261016001 / 我的专栏 |
+| - order | 手动排序位置，越小越靠前 | 0 |
+| - coverURL | 封面地址，可为空 | /images/cover.png |
+| - articleCount | 章节数 | 3 |
+| - createdAt / updatedAt | 创建 / 更新时间，毫秒 | 1792108800000 |
+
+> 专栏不存在或不属于当前账号时返回 HTTP 404；名称冲突返回 HTTP 409。写接口支持 Idempotency-Key，同键更换请求内容返回 HTTP 409。
+
+### 修改或清空专栏封面
+
+`PUT /api/v3/columns/{columnId}/cover`
+
+修改当前账号专栏封面，需要 content.write。
+
+请求：
+
+| Key | 说明 | 示例 |
+| --- | --- | --- |
+| Authorization | 请求头，Bearer accessToken | Bearer YOUR_ACCESS_TOKEN |
+| Idempotency-Key | 请求头，同一次操作重试保持不变 | column-cover-001 |
+| columnId | 路径参数，专栏 ID | 20261016001 |
+| coverURL | 必填，最多 1024 字符，HTTP/HTTPS 地址或以单个 / 开头的站内路径；空字符串清空 | /images/cover.png |
+
+请求示例：
+
+```bash
+curl --request PUT 'https://fishpi.cn/api/v3/columns/20261016001/cover' \
+  --header 'Authorization: Bearer YOUR_ACCESS_TOKEN' \
+  --header 'Idempotency-Key: column-cover-001' \
+  --header 'Content-Type: application/json' \
+  --data '{"coverURL":"/images/cover.png"}'
+```
+
+响应：
+
+| Key | 说明 | 示例 |
+| --- | --- | --- |
+| code | 0 表示成功 | 0 |
+| data | 专栏摘要，字段同“修改专栏名称” | `{...}` |
+
+> 缺少 coverURL 不等同于清空。地址格式不合法时返回 HTTP 422。
+
+### 调整个人专栏顺序
+
+`PUT /api/v3/me/columns/order`
+
+按提交顺序设置专栏位置，需要 content.write。未提交的专栏保持原排序值。
+
+请求：
+
+| Key | 说明 | 示例 |
+| --- | --- | --- |
+| Authorization | 请求头，Bearer accessToken | Bearer YOUR_ACCESS_TOKEN |
+| Idempotency-Key | 请求头，同一次操作重试保持不变 | column-order-001 |
+| columnIds | 1–200 个不重复的专栏 ID 字符串，每个为 1–19 位数字，均须属于当前账号 | ["20261016002","20261016001"] |
+
+请求示例：
+
+```bash
+curl --request PUT 'https://fishpi.cn/api/v3/me/columns/order' \
+  --header 'Authorization: Bearer YOUR_ACCESS_TOKEN' \
+  --header 'Idempotency-Key: column-order-001' \
+  --header 'Content-Type: application/json' \
+  --data '{"columnIds":["20261016002","20261016001"]}'
+```
+
+响应：
+
+| Key | 说明 | 示例 |
+| --- | --- | --- |
+| code | 0 表示成功 | 0 |
+| data | 排序结果 | `{...}` |
+| - columnIds | 本次调整的 ID 顺序，对应位置从 0 开始 | ["20261016002","20261016001"] |
+
+> 任一专栏不可操作时整次排序失败，不会部分保存。重复 ID、空数组或超出数量限制返回 HTTP 422。
+
+### 删除空专栏
+
+`DELETE /api/v3/columns/{columnId}`
+
+删除当前账号的空专栏，需要 content.write。
+
+请求：
+
+| Key | 说明 | 示例 |
+| --- | --- | --- |
+| Authorization | 请求头，Bearer accessToken | Bearer YOUR_ACCESS_TOKEN |
+| Idempotency-Key | 请求头，同一次操作重试保持不变 | column-delete-001 |
+| columnId | 路径参数，专栏 ID | 20261016001 |
+
+请求示例：
+
+```bash
+curl --request DELETE 'https://fishpi.cn/api/v3/columns/20261016001' \
+  --header 'Authorization: Bearer YOUR_ACCESS_TOKEN' \
+  --header 'Idempotency-Key: column-delete-001'
+```
+
+响应：
+
+| Key | 说明 | 示例 |
+| --- | --- | --- |
+| code | 0 表示成功 | 0 |
+| data | 删除结果 | `{...}` |
+| - id | 专栏 ID | 20261016001 |
+| - deleted | 已删除 | true |
+
+> 含有章节时返回 HTTP 409，请先移出章节。重试成功删除的原请求须保持同一 Idempotency-Key；换用新键访问已删除专栏返回 HTTP 404。
+
+## API v3 草稿写入
+
+### 创建草稿
+
+`POST /api/v3/me/drafts`
+
+保存一个新草稿，支持普通文章、长篇和思绪草稿。
+
+请求：
+
+| Key | 说明 | 示例 |
+| --- | --- | --- |
+| Authorization | Bearer 访问令牌，需要 content.write | Bearer TOKEN |
+| Idempotency-Key | 请求头；重试同一次操作保持不变，1–128 个英文字母、数字或 `._:-` | 550e8400-e29b-41d4-a716-446655440000 |
+| title | 标题，最多 255 字符，默认空 | 草稿标题 |
+| content | 编辑器正文，最多 1024000 字符，默认空 | 正文 |
+| thoughtContent | 思绪记录，最多 1024000 字符，默认空 | [] |
+| tags | 标签输入，最多 255 字符，默认空 | Java,生活 |
+| type | 文章类型，默认 0，与现有 articleType 一致 | 6 |
+| columnId | 专栏 ID，最多 19 位数字，可为空 | 20261016001 |
+| columnTitle | 专栏标题，最多 64 字符，可为空 | 我的专栏 |
+| chapterNo | 章节号输入，最多 32 字符，可为空 | 1 |
+| rewardContent | 打赏正文，最多 102400 字符，默认空 | 补充内容 |
+| rewardPoint | 非负整数打赏积分，默认 0 | 0 |
+| qnaOfferPoint | 非负整数悬赏积分，默认 0 | 0 |
+| commentable | 是否允许评论，默认 true | true |
+| anonymous | 是否匿名发表，默认 false | false |
+| notifyFollowers | 是否通知关注者，默认 false | false |
+| showInList | 列表展示选项，0 或 1，默认 1 | 1 |
+| statement | 文章声明，0 无、1 AI、2 剧透、3 虚构，默认 0 | 0 |
+
+请求示例：
+
+```bash
+curl --request POST 'https://fishpi.cn/api/v3/me/drafts' \
+  --header 'Authorization: Bearer TOKEN' \
+  --header 'Content-Type: application/json' \
+  --header 'Idempotency-Key: 550e8400-e29b-41d4-a716-446655440000' \
+  --data '{"title":"我的草稿","content":"正文","thoughtContent":"[]","type":3}'
+```
+
+响应：
+
+| Key | 说明 |
+| --- | --- |
+| code / msg | 结果码 / 提示 |
+| data | 新草稿摘要，字段与草稿列表中的单项一致 |
+| - id / title / summary | 草稿 ID / 标题 / 文本摘要 |
+| - tags / type | 标签 / 文章类型 |
+| - columnId / columnTitle / chapterNo | 专栏 ID / 标题 / 章节号 |
+| - createdAt / updatedAt | 创建 / 更新时间，毫秒时间戳 |
+
+> 使用 JSON 请求体，最大 8 MiB；仅接受表中列出的正文参数，数字和布尔字段需使用对应 JSON 类型。草稿正文是编辑器源内容，保存草稿不会发布文章。成功请求使用相同幂等键重试返回原结果；同一操作使用相同键提交不同内容返回 HTTP 409。变更内容后应使用新键。
+
+### 完整替换草稿
+
+`PUT /api/v3/me/drafts/{draftId}`
+
+完整替换当前用户的草稿。未提供的正文参数恢复创建接口中的默认值，草稿 ID 和创建时间保留。
+
+请求：
+
+| Key | 说明 | 示例 |
+| --- | --- | --- |
+| Authorization | Bearer 访问令牌，需要 content.write | Bearer TOKEN |
+| Idempotency-Key | 请求头；同一次替换的重试使用相同键 | 550e8400-e29b-41d4-a716-446655440001 |
+| draftId | 路径中的草稿 ID | 20261016003 |
+| title / content / thoughtContent / tags / type | 与创建草稿相同 | 正文 |
+| columnId / columnTitle / chapterNo | 与创建草稿相同 | 1 |
+| rewardContent / rewardPoint / qnaOfferPoint | 与创建草稿相同 | 0 |
+| commentable / anonymous / notifyFollowers / showInList / statement | 与创建草稿相同 | true |
+
+请求示例：
+
+```bash
+curl --request PUT 'https://fishpi.cn/api/v3/me/drafts/20261016003' \
+  --header 'Authorization: Bearer TOKEN' \
+  --header 'Content-Type: application/json' \
+  --header 'Idempotency-Key: 550e8400-e29b-41d4-a716-446655440001' \
+  --data '{"title":"更新后的标题","content":"完整正文","type":0}'
+```
+
+响应：
+
+| Key | 说明 |
+| --- | --- |
+| code / msg | 结果码 / 提示 |
+| data | 更新后的草稿摘要，字段与创建草稿一致 |
+| - id / createdAt / updatedAt | 原草稿 ID / 原创建时间 / 本次更新时间 |
+
+> 草稿不存在或不属于当前账号时返回 HTTP 404。此接口为完整替换，不是局部更新；请同时提交需要保留的思绪记录、专栏信息和其他选项。
+
+### 删除草稿
+
+`DELETE /api/v3/me/drafts/{draftId}`
+
+删除当前用户的草稿。
+
+请求：
+
+| Key | 说明 | 示例 |
+| --- | --- | --- |
+| Authorization | Bearer 访问令牌，需要 content.write | Bearer TOKEN |
+| Idempotency-Key | 请求头；同一次删除的重试使用相同键 | 550e8400-e29b-41d4-a716-446655440002 |
+| draftId | 草稿 ID | 20261016003 |
+
+请求示例：
+
+```bash
+curl --request DELETE 'https://fishpi.cn/api/v3/me/drafts/20261016003' \
+  --header 'Authorization: Bearer TOKEN' \
+  --header 'Idempotency-Key: 550e8400-e29b-41d4-a716-446655440002'
+```
+
+响应：
+
+| Key | 说明 |
+| --- | --- |
+| code / msg | 成功时 code 为 0 |
+| data | 空对象 |
+
+> 无需请求体。成功删除后用相同键重试仍成功；使用新键删除不存在或不属于当前账号的草稿返回 HTTP 404。原创建请求的重试不会重新创建后来已删除的草稿。
+
+
+## API v3 通知
+
+本模块使用 Bearer 访问令牌。读取需要 `notifications.read`，状态变更需要 `notifications.write`；升级后请重新登录获取包含相应权限的令牌。
+
+### 通知列表
+
+`GET /api/v3/me/notifications`
+
+按未读优先、时间倒序分页读取当前用户通知。
+
+请求：
+
+| Key | 说明 | 示例 |
+| --- | --- | --- |
+| Authorization | Bearer 访问令牌，需要 notifications.read | Bearer TOKEN |
+| type | all（默认）、commented、reply、at、following、point、broadcast、sys-announce、other | all |
+| status | all（默认）、unread、read | unread |
+| p | 页码，默认 1，最大 42949672 | 1 |
+| size | 每页数量，默认 20，最大 50 | 20 |
+
+请求示例：
+
+```bash
+curl --request GET 'https://fishpi.cn/api/v3/me/notifications?type=all&status=unread&p=1&size=20' \
+  --header 'Authorization: Bearer TOKEN'
+```
+
+响应：
+
+| Key | 说明 |
+| --- | --- |
+| code / msg | 结果码 / 提示 |
+| data | 列表数据 |
+| - list | 通知数组，单项字段与通知详情一致 |
+| - pagination | 分页信息 |
+| -- p / size / total / pageCount | 页码 / 每页数量 / 总条数 / 总页数 |
+
+> 读取不会自动标记已读。相关内容不存在或不可查看时返回 contentAvailable=false 的占位通知，不提供相关资源和跳转链接。
+
+### 通知未读计数
+
+`GET /api/v3/me/notifications/unread-count`
+
+读取当前用户的未读通知总数及分类计数。
+
+请求：
+
+| Key | 说明 | 示例 |
+| --- | --- | --- |
+| Authorization | Bearer 访问令牌，需要 notifications.read | Bearer TOKEN |
+
+请求示例：
+
+```bash
+curl --request GET 'https://fishpi.cn/api/v3/me/notifications/unread-count' \
+  --header 'Authorization: Bearer TOKEN'
+```
+
+响应：
+
+| Key | 说明 |
+| --- | --- |
+| code / msg | 结果码 / 提示 |
+| data | 计数对象 |
+| - total | 未读总数 |
+| - categories | 分类计数对象 |
+| -- commented / reply / at / following / point / broadcast / sys-announce / other | 各分类的未读数 |
+
+### 通知详情
+
+`GET /api/v3/me/notifications/{notificationId}`
+
+读取当前用户的一条通知。
+
+请求：
+
+| Key | 说明 | 示例 |
+| --- | --- | --- |
+| Authorization | Bearer 访问令牌，需要 notifications.read | Bearer TOKEN |
+| notificationId | 通知 ID | 20261016004 |
+
+请求示例：
+
+```bash
+curl --request GET 'https://fishpi.cn/api/v3/me/notifications/20261016004' \
+  --header 'Authorization: Bearer TOKEN'
+```
+
+响应：
+
+| Key | 说明 |
+| --- | --- |
+| code / msg | 结果码 / 提示 |
+| data | 通知对象 |
+| - id / type / category | 通知 ID / 数字类型 / 分类 |
+| - title | 通知标题文本 |
+| - hasRead / createdAt | 是否已读 / 创建时间（毫秒时间戳） |
+| - description / descriptionHtml | 通知说明文本 / HTML |
+| - url | 相关页面链接，无可用目标时为空 |
+| - contentAvailable | 相关内容当前是否可展示 |
+| - article / comment / actor | 可选的公开文章摘要 / 评论 / 操作用户资料；字段与对应 v3 资源一致 |
+
+> 通知不存在或不属于当前账号时返回 HTTP 404。
+
+### 标记单条通知已读
+
+`POST /api/v3/me/notifications/{notificationId}/read`
+
+将当前用户的一条通知标记已读。
+
+请求：
+
+| Key | 说明 | 示例 |
+| --- | --- | --- |
+| Authorization | Bearer 访问令牌，需要 notifications.write | Bearer TOKEN |
+| Idempotency-Key | 请求头，同一次操作重试保持不变；格式与草稿写入一致 | 550e8400-e29b-41d4-a716-446655440010 |
+| notificationId | 通知 ID | 20261016004 |
+
+请求示例：
+
+```bash
+curl --request POST 'https://fishpi.cn/api/v3/me/notifications/20261016004/read' \
+  --header 'Authorization: Bearer TOKEN' \
+  --header 'Idempotency-Key: 550e8400-e29b-41d4-a716-446655440010'
+```
+
+响应：
+
+| Key | 说明 |
+| --- | --- |
+| code / msg | 结果码 / 提示 |
+| data | 操作结果 |
+| - changed | 本次原操作变更的通知数；重试返回原结果 |
+
+> 无需请求体。通知已读时 changed=0；不存在或不属于当前账号时返回 HTTP 404。
+
+### 批量标记通知已读
+
+`POST /api/v3/me/notifications/read`
+
+标记当前用户全部或指定分类的通知已读。
+
+请求：
+
+| Key | 说明 | 示例 |
+| --- | --- | --- |
+| Authorization | Bearer 访问令牌，需要 notifications.write | Bearer TOKEN |
+| Idempotency-Key | 请求头，同一次操作重试保持不变；格式与草稿写入一致 | 550e8400-e29b-41d4-a716-446655440010 |
+| type | 通知分类，与列表一致；默认 all，可省略请求体 | commented |
+
+请求示例：
+
+```bash
+curl --request POST 'https://fishpi.cn/api/v3/me/notifications/read' \
+  --header 'Authorization: Bearer TOKEN' \
+  --header 'Idempotency-Key: 550e8400-e29b-41d4-a716-446655440010' \
+  --header 'Content-Type: application/json' \
+  --data '{"type":"commented"}'
+```
+
+响应：
+
+| Key | 说明 |
+| --- | --- |
+| code / msg | 结果码 / 提示 |
+| data | 操作结果 |
+| - changed | 本次原操作变更的通知数；重试返回原结果 |
+
+> 成功后使用原键重试返回原结果，不会标记后来新增的通知。需要处理新通知时请使用新键。
+
+### 删除单条通知
+
+`DELETE /api/v3/me/notifications/{notificationId}`
+
+删除当前用户的一条通知。
+
+请求：
+
+| Key | 说明 | 示例 |
+| --- | --- | --- |
+| Authorization | Bearer 访问令牌，需要 notifications.write | Bearer TOKEN |
+| Idempotency-Key | 请求头，同一次操作重试保持不变；格式与草稿写入一致 | 550e8400-e29b-41d4-a716-446655440010 |
+| notificationId | 通知 ID | 20261016004 |
+
+请求示例：
+
+```bash
+curl --request DELETE 'https://fishpi.cn/api/v3/me/notifications/20261016004' \
+  --header 'Authorization: Bearer TOKEN' \
+  --header 'Idempotency-Key: 550e8400-e29b-41d4-a716-446655440010'
+```
+
+响应：
+
+| Key | 说明 |
+| --- | --- |
+| code / msg | 结果码 / 提示 |
+| data | 操作结果 |
+| - changed | 本次原操作变更的通知数；重试返回原结果 |
+
+> 无需请求体。成功删除后使用原键重试仍成功；使用新键删除不存在或不属于当前账号的通知返回 HTTP 404。
+
+### 按分类删除通知
+
+`DELETE /api/v3/me/notifications`
+
+删除当前用户指定分类的通知。
+
+请求：
+
+| Key | 说明 | 示例 |
+| --- | --- | --- |
+| Authorization | Bearer 访问令牌，需要 notifications.write | Bearer TOKEN |
+| Idempotency-Key | 请求头，同一次操作重试保持不变；格式与草稿写入一致 | 550e8400-e29b-41d4-a716-446655440010 |
+| type | 必填：commented、reply、at、following、point、broadcast、sys-announce 或 other | point |
+
+请求示例：
+
+```bash
+curl --request DELETE 'https://fishpi.cn/api/v3/me/notifications' \
+  --header 'Authorization: Bearer TOKEN' \
+  --header 'Idempotency-Key: 550e8400-e29b-41d4-a716-446655440010' \
+  --header 'Content-Type: application/json' \
+  --data '{"type":"point"}'
+```
+
+响应：
+
+| Key | 说明 |
+| --- | --- |
+| code / msg | 结果码 / 提示 |
+| data | 操作结果 |
+| - changed | 本次原操作变更的通知数；重试返回原结果 |
+
+> 需要 JSON 请求体及明确分类，不支持 all。成功后的重试不删除后来新增的通知。
+
+
+## API v3 本人大事记投稿
+
+### 提交大事记
+
+`POST /api/v3/milestones`
+
+提交大事记并等待审核，需要 content.write。正文使用 Markdown，渲染为清洗后的 HTML 保存。
+
+请求：
+
+| Key | 说明 | 示例 |
+| --- | --- | --- |
+| Authorization | 请求头，Bearer accessToken | Bearer YOUR_ACCESS_TOKEN |
+| Idempotency-Key | 请求头，同一次投稿重试保持不变 | milestone-submit-001 |
+| title | 必填，去除首尾空白，最多 255 字符 | 社区活动 |
+| date | 必填，YYYY-MM-DD，有效日历日期 | 2026-10-17 |
+| endDate | 可选，空字符串表示无结束日期，不得早于 date | 2026-10-18 |
+| content | 必填，Markdown，最多 102400 字符，渲染后也需在容量内 | **活动详情** |
+| mediaURL | 可选，媒体地址，最多 1024 字符 | https://example.com/event.png |
+| mediaType | image / video；提供 mediaURL 时必填 | image |
+| mediaCaption | 可选，媒体标题，最多 255 字符 | 合影 |
+| link | 可选，相关链接，最多 1024 字符 | https://fishpi.cn/ |
+
+请求示例：
+
+```bash
+curl --request POST 'https://fishpi.cn/api/v3/milestones' \
+  --header 'Authorization: Bearer YOUR_ACCESS_TOKEN' \
+  --header 'Idempotency-Key: milestone-submit-001' \
+  --header 'Content-Type: application/json' \
+  --data '{"title":"社区活动","date":"2026-10-17","content":"**活动详情**","mediaURL":"https://example.com/event.png","mediaType":"image"}'
+```
+
+响应：
+
+| Key | 说明 | 示例 |
+| --- | --- | --- |
+| code | 0 表示成功 | 0 |
+| data | 投稿回执 | `{...}` |
+| - id | 投稿 ID | 20261017001 |
+| - status | 初始为 pending，等待审核 | pending |
+| - createdAt / updatedAt | 创建 / 更新时间，毫秒 | 1792195200000 |
+
+> 同键重试返回原回执，不重复投稿；同键更改内容返回 HTTP 409。地址支持 HTTP/HTTPS 或站内路径。可通过本人投稿接口查询审核状态；审核通过前不会进入公开时间线。
+
+### 查询本人投稿列表
+
+`GET /api/v3/me/milestones`
+
+分页查询当前账号提交的大事记，包含待审核、已通过及已拒绝记录，需要 content.read。按投稿时间倒序排列。
+
+请求：
+
+| Key | 说明 | 示例 |
+| --- | --- | --- |
+| Authorization | 请求头，Bearer accessToken | Bearer YOUR_ACCESS_TOKEN |
+| status | all / pending / approved / rejected，默认 all | pending |
+| p | 页码，默认 1 | 1 |
+| size | 每页条数，默认 20，最大 50 | 20 |
+
+请求示例：
+
+```bash
+curl 'https://fishpi.cn/api/v3/me/milestones?status=pending&p=1&size=20' \
+  --header 'Authorization: Bearer YOUR_ACCESS_TOKEN'
+```
+
+响应：
+
+| Key | 说明 | 示例 |
+| --- | --- | --- |
+| code | 0 表示成功 | 0 |
+| data | 投稿列表 | `{...}` |
+| - list | 本人投稿数组 | `[...]` |
+| -- id / title | 投稿 ID / 标题原文 | 20261017001 / 社区活动 |
+| -- date / endDate | 事件开始 / 结束日期，结束日期可为空 | 2026-10-16 / 空字符串 |
+| -- content | 保存后的正文；v3 投稿为已渲染的 HTML，历史记录也可能是纯文本 | `<p>活动详情</p>` |
+| -- media | 媒体信息 | `{...}` |
+| --- url / type / caption | 媒体地址 / image 或 video / 标题 | https://example.com/a.png / image / 合影 |
+| -- link | 相关链接，可为空 | https://fishpi.cn/ |
+| -- status | pending 待审核 / approved 已通过 / rejected 已拒绝 | pending |
+| -- createdAt / updatedAt | 投稿创建 / 更新时间，毫秒 | 1792195200000 |
+| - pagination | p / size / total / pageCount | `{...}` |
+
+> 只返回当前账号投稿；没有记录或超出总页数时 list 为空。公开时间线仍仅展示已通过的大事记。
+
+### 查询本人投稿详情
+
+`GET /api/v3/me/milestones/{milestoneId}`
+
+读取本人指定投稿及当前状态，需要 content.read。
+
+请求：
+
+| Key | 说明 | 示例 |
+| --- | --- | --- |
+| Authorization | 请求头，Bearer accessToken | Bearer YOUR_ACCESS_TOKEN |
+| milestoneId | 路径参数，投稿 ID | 20261017001 |
+
+请求示例：
+
+```bash
+curl 'https://fishpi.cn/api/v3/me/milestones/20261017001' \
+  --header 'Authorization: Bearer YOUR_ACCESS_TOKEN'
+```
+
+响应：
+
+| Key | 说明 | 示例 |
+| --- | --- | --- |
+| code | 0 表示成功 | 0 |
+| data | 投稿对象，字段同列表中的单项 | `{...}` |
+
+> 不存在或不属于当前账号的记录均返回 HTTP 404。
+
+## API v3 社区信息
+
+### 鱼游列表
+
+`GET /api/v3/fish-games`
+
+分页读取已审核的鱼游。
+
+请求：
+
+| Key | 说明 | 示例 |
+| --- | --- | --- |
+| Authorization | Bearer 访问令牌（可选），使用令牌时需要 content.read | Bearer TOKEN |
+| sort | votes（默认，总投票数优先）、likes（点赞数优先） | votes |
+| p | 页码，默认 1，最大 42949672 | 1 |
+| size | 每页数量，默认 20，最大 50 | 20 |
+
+请求示例：
+
+```bash
+curl 'https://fishpi.cn/api/v3/fish-games'
+```
+
+响应：
+
+| Key | 说明 |
+| --- | --- |
+| code / msg | 结果码 / 提示 |
+| data | 列表数据 |
+| - list | 鱼游数组 |
+| -- id / name / description | 鱼游 ID / 名称 / 描述文本 |
+| -- url / iconURL | 游戏链接 / 图标链接 |
+| -- author | 公开作者资料，包含 id、userName、userNickname、userAvatarURL |
+| -- upCount / downCount | 点赞数 / 点踩数 |
+| -- createdAt / updatedAt | 创建 / 更新时间，毫秒时间戳 |
+| -- userVote | 当前阅读者投票：like、dislike 或空字符串 |
+| - pagination | 分页信息 |
+| -- p / size / total / pageCount | 页码 / 每页数量 / 总条数 / 总页数 |
+
+> 描述为文本；需要当前投票状态时携带 Bearer。
+
+### 鱼游详情
+
+`GET /api/v3/fish-games/{gameId}`
+
+读取已审核的鱼游。
+
+请求：
+
+| Key | 说明 | 示例 |
+| --- | --- | --- |
+| Authorization | Bearer 访问令牌（可选），使用令牌时需要 content.read | Bearer TOKEN |
+| gameId | 鱼游 ID | 20261016005 |
+
+请求示例：
+
+```bash
+curl 'https://fishpi.cn/api/v3/fish-games/20261016005'
+```
+
+响应：
+
+| Key | 说明 |
+| --- | --- |
+| code / msg | 结果码 / 提示 |
+| data | 鱼游对象，字段与列表单项一致 |
+
+> 不存在或未审核通过的鱼游返回 HTTP 404。
+
+### 鱼游评论列表
+
+`GET /api/v3/fish-games/{gameId}/comments`
+
+按时间倒序分页读取鱼游评论。
+
+请求：
+
+| Key | 说明 | 示例 |
+| --- | --- | --- |
+| Authorization | Bearer 访问令牌（可选），使用令牌时需要 content.read | Bearer TOKEN |
+| gameId | 鱼游 ID | 20261016005 |
+| p | 页码，默认 1，最大 42949672 | 1 |
+| size | 每页数量，默认 20，最大 50 | 20 |
+
+请求示例：
+
+```bash
+curl 'https://fishpi.cn/api/v3/fish-games/20261016005/comments'
+```
+
+响应：
+
+| Key | 说明 |
+| --- | --- |
+| code / msg | 结果码 / 提示 |
+| data | 列表数据 |
+| - list | 评论数组 |
+| -- id / gameId | 评论 ID / 鱼游 ID |
+| -- content | 正文文本 |
+| -- contentAvailable | 正文是否可展示 |
+| -- author | 公开作者资料 |
+| -- createdAt | 创建时间，毫秒时间戳 |
+| - pagination | 分页信息 |
+| -- p / size / total / pageCount | 页码 / 每页数量 / 总条数 / 总页数 |
+
+> 父鱼游不存在或未审核通过时返回 HTTP 404。
+
+### 大事记列表
+
+`GET /api/v3/milestones`
+
+分页读取已审核的大事记，按日期倒序。
+
+请求：
+
+| Key | 说明 | 示例 |
+| --- | --- | --- |
+| Authorization | Bearer 访问令牌（可选），使用令牌时需要 content.read | Bearer TOKEN |
+| p | 页码，默认 1，最大 42949672 | 1 |
+| size | 每页数量，默认 20，最大 50 | 20 |
+
+请求示例：
+
+```bash
+curl 'https://fishpi.cn/api/v3/milestones'
+```
+
+响应：
+
+| Key | 说明 |
+| --- | --- |
+| code / msg | 结果码 / 提示 |
+| data | 列表数据 |
+| - list | 大事记数组 |
+| -- id / title | 大事记 ID / 标题文本 |
+| -- date / endDate | 开始 / 结束日期，YYYY-MM-DD；无结束日期时为空 |
+| -- content / contentHtml | 正文文本 / HTML |
+| -- link | 相关链接 |
+| -- media | 媒体对象 |
+| --- url / type / caption | 媒体链接 / 类型（image 或 video）/ 说明文本 |
+| - pagination | 分页信息 |
+| -- p / size / total / pageCount | 页码 / 每页数量 / 总条数 / 总页数 |
+
+### 大事记详情
+
+`GET /api/v3/milestones/{milestoneId}`
+
+读取已审核的大事记。
+
+请求：
+
+| Key | 说明 | 示例 |
+| --- | --- | --- |
+| Authorization | Bearer 访问令牌（可选），使用令牌时需要 content.read | Bearer TOKEN |
+| milestoneId | 大事记 ID | 20261016006 |
+
+请求示例：
+
+```bash
+curl 'https://fishpi.cn/api/v3/milestones/20261016006'
+```
+
+响应：
+
+| Key | 说明 |
+| --- | --- |
+| code / msg | 结果码 / 提示 |
+| data | 大事记对象，字段与列表单项一致 |
+
+> 不存在或未审核通过时返回 HTTP 404。
+
+### 社区统计
+
+`GET /api/v3/statistics`
+
+读取社区公开统计。
+
+请求：
+
+| Key | 说明 | 示例 |
+| --- | --- | --- |
+| Authorization | Bearer 访问令牌（可选），使用令牌时需要 content.read | Bearer TOKEN |
+
+请求示例：
+
+```bash
+curl 'https://fishpi.cn/api/v3/statistics'
+```
+
+响应：
+
+| Key | 说明 |
+| --- | --- |
+| code / msg | 结果码 / 提示 |
+| data | 统计对象 |
+| - memberCount / articleCount / commentCount | 用户 / 文章 / 评论数 |
+| - domainCount / tagCount / linkCount | 领域 / 标签 / 链接数 |
+| - onlineVisitorCount / onlineMemberCount | 当前在线总数 / 在线成员数 |
+| - peakOnlineVisitorCount | 历史最高在线总数 |
+
+### 同城用户
+
+`GET /api/v3/cities/{cityName}/users`
+
+分页读取公开位置的同城用户。
+
+请求：
+
+| Key | 说明 | 示例 |
+| --- | --- | --- |
+| Authorization | Bearer 访问令牌（可选），使用令牌时需要 profile.read | Bearer TOKEN |
+| cityName | 城市名，最多 64 字符，路径需 URL 编码 | 上海 |
+| p | 页码，默认 1，最大 42949672 | 1 |
+| size | 每页数量，默认 20，最大 50 | 20 |
+
+请求示例：
+
+```bash
+curl 'https://fishpi.cn/api/v3/cities/%E4%B8%8A%E6%B5%B7/users'
+```
+
+响应：
+
+| Key | 说明 |
+| --- | --- |
+| code / msg | 结果码 / 提示 |
+| data | 列表数据 |
+| - list | 用户数组 |
+| -- id / userName / userNickname / userAvatarURL | 用户 ID / 用户名 / 昵称 / 头像 |
+| -- userIntro | 个人介绍文本 |
+| - pagination | 分页信息 |
+| -- p / size / total / pageCount | 页码 / 每页数量 / 总条数 / 总页数 |
+
+### 同城文章
+
+`GET /api/v3/cities/{cityName}/articles`
+
+分页读取同城公开署名文章，包含长篇。
+
+请求：
+
+| Key | 说明 | 示例 |
+| --- | --- | --- |
+| Authorization | Bearer 访问令牌（可选），使用令牌时需要 content.read | Bearer TOKEN |
+| cityName | 城市名，最多 64 字符，路径需 URL 编码 | 上海 |
+| sort | latest（默认）、active、hot、comments | latest |
+| p | 页码，默认 1，最大 42949672 | 1 |
+| size | 每页数量，默认 20，最大 50 | 20 |
+
+请求示例：
+
+```bash
+curl 'https://fishpi.cn/api/v3/cities/%E4%B8%8A%E6%B5%B7/articles'
+```
+
+响应：
+
+| Key | 说明 |
+| --- | --- |
+| code / msg | 结果码 / 提示 |
+| data | 列表数据 |
+| - list | 文章摘要数组，字段与文章列表一致 |
+| - pagination | 分页信息 |
+| -- p / size / total / pageCount | 页码 / 每页数量 / 总条数 / 总页数 |
+
+> 只包含作者公开位置的文章，不包含匿名发表、讨论帖或不可列出的文章。
+
+
+### 设置鱼游投票
+
+`PUT /api/v3/fish-games/{gameId}/vote`
+
+设置当前账号对已公开鱼游的投票，需要 reactions.write。
+
+请求：
+
+| Key | 说明 | 示例 |
+| --- | --- | --- |
+| Authorization | Bearer 访问令牌 | Bearer TOKEN |
+| Idempotency-Key | 幂等键，1–128 位字母、数字或 . _ : - | game-vote-1 |
+| gameId | URL 参数，鱼游 ID | 1770000000000 |
+| value | like 点赞、dislike 点踩 | like |
+
+请求示例：
+
+```bash
+curl --location --request PUT 'https://fishpi.cn/api/v3/fish-games/1770000000000/vote' \
+  --header 'Authorization: Bearer TOKEN' --header 'Idempotency-Key: game-vote-1' \
+  --header 'Content-Type: application/json' --data '{"value":"like"}'
+```
+
+响应：
+
+| Key | 说明 |
+| --- | --- |
+| code / msg | 结果码 / 提示 |
+| data | 投票结果 |
+| - upCount / downCount | 当前点赞数 / 点踩数 |
+| - userVote | 当前账号投票，like、dislike 或空字符串 |
+| - changed | 本次首次执行是否改变投票状态 |
+
+> 同值重复设置不会取消投票，changed=false；设置另一值会换票。同键重试返回原结果，不改变后续投票状态；同键使用不同值返回 HTTP 409。鱼游不存在或尚未公开返回 HTTP 404。
+
+### 清除鱼游投票
+
+`DELETE /api/v3/fish-games/{gameId}/vote`
+
+清除当前账号的投票，需要 reactions.write。
+
+请求：
+
+| Key | 说明 | 示例 |
+| --- | --- | --- |
+| Authorization | Bearer 访问令牌 | Bearer TOKEN |
+| Idempotency-Key | 幂等键，1–128 位字母、数字或 . _ : - | game-vote-clear-1 |
+| gameId | URL 参数，鱼游 ID | 1770000000000 |
+
+请求示例：
+
+```bash
+curl --location --request DELETE 'https://fishpi.cn/api/v3/fish-games/1770000000000/vote' \
+  --header 'Authorization: Bearer TOKEN' --header 'Idempotency-Key: game-vote-clear-1'
+```
+
+响应：
+
+| Key | 说明 |
+| --- | --- |
+| code / msg | 结果码 / 提示 |
+| data | 投票结果 |
+| - upCount / downCount | 当前点赞数 / 点踩数 |
+| - userVote | 空字符串 |
+| - changed | 是否清除了已有投票 |
+
+> 请求体可省略或为 {}。没有投票时成功返回 changed=false；设置与清除请使用不同幂等键，否则返回 HTTP 409。目标必须已经公开。
+
+### 发表鱼游评论
+
+`POST /api/v3/fish-games/{gameId}/comments`
+
+对已公开鱼游发表评论，需要 comments.write。
+
+请求：
+
+| Key | 说明 | 示例 |
+| --- | --- | --- |
+| Authorization | Bearer 访问令牌 | Bearer TOKEN |
+| Idempotency-Key | 幂等键，1–128 位字母、数字或 . _ : - | game-comment-1 |
+| gameId | URL 参数，鱼游 ID | 1770000000000 |
+| content | 评论正文；去除 HTML 标签和首尾空白后 1–500 字符 | 很有趣 |
+
+请求示例：
+
+```bash
+curl --location --request POST 'https://fishpi.cn/api/v3/fish-games/1770000000000/comments' \
+  --header 'Authorization: Bearer TOKEN' --header 'Idempotency-Key: game-comment-1' \
+  --header 'Content-Type: application/json' --data '{"content":"很有趣"}'
+```
+
+响应：
+
+| Key | 说明 |
+| --- | --- |
+| code / msg | 结果码 / 提示 |
+| data | 已创建的评论 |
+| - id / gameId | 评论 ID / 鱼游 ID |
+| - content / contentAvailable | 评论文本 / 当前是否可展示 |
+| - author | 公开作者资料 |
+| -- id / userName / userNickname / userAvatarURL | 用户 ID / 用户名 / 昵称 / 头像 |
+| - createdAt | 创建时间，毫秒时间戳 |
+
+> 同键重试返回原评论，不会重复发布；同键提交不同正文返回 HTTP 409。目标不存在或尚未公开返回 HTTP 404；非法内容返回 HTTP 422。
+
+## API v3 表态
+
+### 可用表情
+
+`GET /api/v3/reactions/emojis`
+
+读取可用于表态的 value 与 emoji 对照。可携带 Bearer 访问令牌（content.read）。
+
+请求：
+
+| Key | 说明 | 示例 |
+| --- | --- | --- |
+| Authorization | Bearer 访问令牌（可选） | Bearer TOKEN |
+
+请求示例：
+
+```bash
+curl --location --request GET 'https://fishpi.cn/api/v3/reactions/emojis'
+```
+
+响应：
+
+| Key | 说明 |
+| --- | --- |
+| code / msg | 结果码 / 提示 |
+| data | 结果 |
+| - list | 可用表情数组 |
+| -- value / emoji | 提交值 / 对应表情，如 heart / ❤️ |
+
+### 读取文章表态
+
+`GET /api/v3/articles/{targetId}/reactions`
+
+读取当前可访问文章的表态汇总。可携带 Bearer 访问令牌（content.read）。
+
+请求：
+
+| Key | 说明 | 示例 |
+| --- | --- | --- |
+| Authorization | Bearer 访问令牌（可选） | Bearer TOKEN |
+| targetId | URL 参数，目标 ID | 1770000000000 |
+
+请求示例：
+
+```bash
+curl --location --request GET 'https://fishpi.cn/api/v3/articles/1770000000000/reactions'
+```
+
+响应：
+
+| Key | 说明 |
+| --- | --- |
+| code / msg | 结果码 / 提示 |
+| data | 表态结果 |
+| - targetId / targetType / groupType | 目标 ID / article、comment 或 chat / 固定 emoji |
+| - currentUserReaction | 当前账号的 value，无表态为空字符串；匿名读取为空字符串 |
+| - summary | 表情汇总数组，仅包含数量大于零的表情 |
+| -- value / emoji / count / selected | 提交值 / 表情 / 数量 / 当前账号是否选择 |
+| -- users | 展示名称数组 |
+| -- userDetails | 公开用户展示资料数组，仅含 userName、displayName、avatarURL |
+
+> 目标不存在或当前不可访问时返回 HTTP 404。
+
+### 设置文章表态
+
+`PUT /api/v3/articles/{targetId}/reactions`
+
+设置当前账号对该文章的表情，需要 reactions.write。同一账号、同一目标同时保留一个表情。
+
+请求：
+
+| Key | 说明 | 示例 |
+| --- | --- | --- |
+| Authorization | Bearer 访问令牌 | Bearer TOKEN |
+| Idempotency-Key | 幂等键，1–128 位字母、数字或 . _ : - | reaction-example-1 |
+| targetId | URL 参数，目标 ID | 1770000000000 |
+| value | 可用表情的 value，见可用表情接口 | heart |
+
+请求示例：
+
+```bash
+curl --location --request PUT 'https://fishpi.cn/api/v3/articles/1770000000000/reactions' \
+  --header 'Authorization: Bearer TOKEN' \
+  --header 'Idempotency-Key: reaction-example-1' \
+  --header 'Content-Type: application/json' --data '{"value":"heart"}'
+```
+
+响应：
+
+| Key | 说明 |
+| --- | --- |
+| code / msg | 结果码 / 提示 |
+| data | 表态结果 |
+| - targetId / targetType / groupType | 目标 ID / article、comment 或 chat / 固定 emoji |
+| - currentUserReaction | 当前账号的 value，无表态为空字符串；匿名读取为空字符串 |
+| - summary | 表情汇总数组，仅包含数量大于零的表情 |
+| -- value / emoji / count / selected | 提交值 / 表情 / 数量 / 当前账号是否选择 |
+| -- users | 展示名称数组 |
+| -- userDetails | 公开用户展示资料数组，仅含 userName、displayName、avatarURL |
+| - changed | 本次首次执行是否改变表态状态 |
+
+> 目标不存在或当前不可访问时返回 HTTP 404。相同幂等键重试返回原结果，不会覆盖后来更改的状态；同一目标设置与清除请使用不同键，否则返回 HTTP 409。重复设置相同 value 不会取消表态，changed=false；设置其他 value 会替换原表情。
+
+### 清除文章表态
+
+`DELETE /api/v3/articles/{targetId}/reactions`
+
+清除当前账号对该文章的表情，需要 reactions.write。同一账号、同一目标同时保留一个表情。
+
+请求：
+
+| Key | 说明 | 示例 |
+| --- | --- | --- |
+| Authorization | Bearer 访问令牌 | Bearer TOKEN |
+| Idempotency-Key | 幂等键，1–128 位字母、数字或 . _ : - | reaction-example-1 |
+| targetId | URL 参数，目标 ID | 1770000000000 |
+
+请求示例：
+
+```bash
+curl --location --request DELETE 'https://fishpi.cn/api/v3/articles/1770000000000/reactions' \
+  --header 'Authorization: Bearer TOKEN' \
+  --header 'Idempotency-Key: reaction-example-1'
+```
+
+响应：
+
+| Key | 说明 |
+| --- | --- |
+| code / msg | 结果码 / 提示 |
+| data | 表态结果 |
+| - targetId / targetType / groupType | 目标 ID / article、comment 或 chat / 固定 emoji |
+| - currentUserReaction | 当前账号的 value，无表态为空字符串；匿名读取为空字符串 |
+| - summary | 表情汇总数组，仅包含数量大于零的表情 |
+| -- value / emoji / count / selected | 提交值 / 表情 / 数量 / 当前账号是否选择 |
+| -- users | 展示名称数组 |
+| -- userDetails | 公开用户展示资料数组，仅含 userName、displayName、avatarURL |
+| - changed | 本次首次执行是否改变表态状态 |
+
+> 目标不存在或当前不可访问时返回 HTTP 404。相同幂等键重试返回原结果，不会覆盖后来更改的状态；同一目标设置与清除请使用不同键，否则返回 HTTP 409。请求体可省略或为 {}；没有表态时成功返回 changed=false。
+
+### 读取评论表态
+
+`GET /api/v3/comments/{targetId}/reactions`
+
+读取当前可访问评论的表态汇总。可携带 Bearer 访问令牌（content.read）。
+
+请求：
+
+| Key | 说明 | 示例 |
+| --- | --- | --- |
+| Authorization | Bearer 访问令牌（可选） | Bearer TOKEN |
+| targetId | URL 参数，目标 ID | 1770000000000 |
+
+请求示例：
+
+```bash
+curl --location --request GET 'https://fishpi.cn/api/v3/comments/1770000000000/reactions'
+```
+
+响应：
+
+| Key | 说明 |
+| --- | --- |
+| code / msg | 结果码 / 提示 |
+| data | 表态结果 |
+| - targetId / targetType / groupType | 目标 ID / article、comment 或 chat / 固定 emoji |
+| - currentUserReaction | 当前账号的 value，无表态为空字符串；匿名读取为空字符串 |
+| - summary | 表情汇总数组，仅包含数量大于零的表情 |
+| -- value / emoji / count / selected | 提交值 / 表情 / 数量 / 当前账号是否选择 |
+| -- users | 展示名称数组 |
+| -- userDetails | 公开用户展示资料数组，仅含 userName、displayName、avatarURL |
+
+> 目标不存在或当前不可访问时返回 HTTP 404。评论表态同样遵循目标文章的阅读权限，私密评论仅有权阅读正文的账号可访问。
+
+### 设置评论表态
+
+`PUT /api/v3/comments/{targetId}/reactions`
+
+设置当前账号对该评论的表情，需要 reactions.write。同一账号、同一目标同时保留一个表情。
+
+请求：
+
+| Key | 说明 | 示例 |
+| --- | --- | --- |
+| Authorization | Bearer 访问令牌 | Bearer TOKEN |
+| Idempotency-Key | 幂等键，1–128 位字母、数字或 . _ : - | reaction-example-1 |
+| targetId | URL 参数，目标 ID | 1770000000000 |
+| value | 可用表情的 value，见可用表情接口 | heart |
+
+请求示例：
+
+```bash
+curl --location --request PUT 'https://fishpi.cn/api/v3/comments/1770000000000/reactions' \
+  --header 'Authorization: Bearer TOKEN' \
+  --header 'Idempotency-Key: reaction-example-1' \
+  --header 'Content-Type: application/json' --data '{"value":"heart"}'
+```
+
+响应：
+
+| Key | 说明 |
+| --- | --- |
+| code / msg | 结果码 / 提示 |
+| data | 表态结果 |
+| - targetId / targetType / groupType | 目标 ID / article、comment 或 chat / 固定 emoji |
+| - currentUserReaction | 当前账号的 value，无表态为空字符串；匿名读取为空字符串 |
+| - summary | 表情汇总数组，仅包含数量大于零的表情 |
+| -- value / emoji / count / selected | 提交值 / 表情 / 数量 / 当前账号是否选择 |
+| -- users | 展示名称数组 |
+| -- userDetails | 公开用户展示资料数组，仅含 userName、displayName、avatarURL |
+| - changed | 本次首次执行是否改变表态状态 |
+
+> 目标不存在或当前不可访问时返回 HTTP 404。评论表态同样遵循目标文章的阅读权限，私密评论仅有权阅读正文的账号可访问。相同幂等键重试返回原结果，不会覆盖后来更改的状态；同一目标设置与清除请使用不同键，否则返回 HTTP 409。重复设置相同 value 不会取消表态，changed=false；设置其他 value 会替换原表情。
+
+### 清除评论表态
+
+`DELETE /api/v3/comments/{targetId}/reactions`
+
+清除当前账号对该评论的表情，需要 reactions.write。同一账号、同一目标同时保留一个表情。
+
+请求：
+
+| Key | 说明 | 示例 |
+| --- | --- | --- |
+| Authorization | Bearer 访问令牌 | Bearer TOKEN |
+| Idempotency-Key | 幂等键，1–128 位字母、数字或 . _ : - | reaction-example-1 |
+| targetId | URL 参数，目标 ID | 1770000000000 |
+
+请求示例：
+
+```bash
+curl --location --request DELETE 'https://fishpi.cn/api/v3/comments/1770000000000/reactions' \
+  --header 'Authorization: Bearer TOKEN' \
+  --header 'Idempotency-Key: reaction-example-1'
+```
+
+响应：
+
+| Key | 说明 |
+| --- | --- |
+| code / msg | 结果码 / 提示 |
+| data | 表态结果 |
+| - targetId / targetType / groupType | 目标 ID / article、comment 或 chat / 固定 emoji |
+| - currentUserReaction | 当前账号的 value，无表态为空字符串；匿名读取为空字符串 |
+| - summary | 表情汇总数组，仅包含数量大于零的表情 |
+| -- value / emoji / count / selected | 提交值 / 表情 / 数量 / 当前账号是否选择 |
+| -- users | 展示名称数组 |
+| -- userDetails | 公开用户展示资料数组，仅含 userName、displayName、avatarURL |
+| - changed | 本次首次执行是否改变表态状态 |
+
+> 目标不存在或当前不可访问时返回 HTTP 404。评论表态同样遵循目标文章的阅读权限，私密评论仅有权阅读正文的账号可访问。相同幂等键重试返回原结果，不会覆盖后来更改的状态；同一目标设置与清除请使用不同键，否则返回 HTTP 409。请求体可省略或为 {}；没有表态时成功返回 changed=false。
+
+### 读取聊天室消息表态
+
+`GET /api/v3/chat/messages/{targetId}/reactions`
+
+读取当前可访问聊天室消息的表态汇总。需要 content.read。
+
+请求：
+
+| Key | 说明 | 示例 |
+| --- | --- | --- |
+| Authorization | Bearer 访问令牌 | Bearer TOKEN |
+| targetId | URL 参数，目标 ID | 1770000000000 |
+
+请求示例：
+
+```bash
+curl --location --request GET 'https://fishpi.cn/api/v3/chat/messages/1770000000000/reactions' \
+  --header 'Authorization: Bearer TOKEN'
+```
+
+响应：
+
+| Key | 说明 |
+| --- | --- |
+| code / msg | 结果码 / 提示 |
+| data | 表态结果 |
+| - targetId / targetType / groupType | 目标 ID / article、comment 或 chat / 固定 emoji |
+| - currentUserReaction | 当前账号的 value，无表态为空字符串；匿名读取为空字符串 |
+| - summary | 表情汇总数组，仅包含数量大于零的表情 |
+| -- value / emoji / count / selected | 提交值 / 表情 / 数量 / 当前账号是否选择 |
+| -- users | 展示名称数组 |
+| -- userDetails | 公开用户展示资料数组，仅含 userName、displayName、avatarURL |
+
+> 目标不存在或当前不可访问时返回 HTTP 404。
+
+### 设置聊天室消息表态
+
+`PUT /api/v3/chat/messages/{targetId}/reactions`
+
+设置当前账号对该聊天室消息的表情，需要 reactions.write。同一账号、同一目标同时保留一个表情。
+
+请求：
+
+| Key | 说明 | 示例 |
+| --- | --- | --- |
+| Authorization | Bearer 访问令牌 | Bearer TOKEN |
+| Idempotency-Key | 幂等键，1–128 位字母、数字或 . _ : - | reaction-example-1 |
+| targetId | URL 参数，目标 ID | 1770000000000 |
+| value | 可用表情的 value，见可用表情接口 | heart |
+
+请求示例：
+
+```bash
+curl --location --request PUT 'https://fishpi.cn/api/v3/chat/messages/1770000000000/reactions' \
+  --header 'Authorization: Bearer TOKEN' \
+  --header 'Idempotency-Key: reaction-example-1' \
+  --header 'Content-Type: application/json' --data '{"value":"heart"}'
+```
+
+响应：
+
+| Key | 说明 |
+| --- | --- |
+| code / msg | 结果码 / 提示 |
+| data | 表态结果 |
+| - targetId / targetType / groupType | 目标 ID / article、comment 或 chat / 固定 emoji |
+| - currentUserReaction | 当前账号的 value，无表态为空字符串；匿名读取为空字符串 |
+| - summary | 表情汇总数组，仅包含数量大于零的表情 |
+| -- value / emoji / count / selected | 提交值 / 表情 / 数量 / 当前账号是否选择 |
+| -- users | 展示名称数组 |
+| -- userDetails | 公开用户展示资料数组，仅含 userName、displayName、avatarURL |
+| - changed | 本次首次执行是否改变表态状态 |
+
+> 目标不存在或当前不可访问时返回 HTTP 404。相同幂等键重试返回原结果，不会覆盖后来更改的状态；同一目标设置与清除请使用不同键，否则返回 HTTP 409。重复设置相同 value 不会取消表态，changed=false；设置其他 value 会替换原表情。
+
+### 清除聊天室消息表态
+
+`DELETE /api/v3/chat/messages/{targetId}/reactions`
+
+清除当前账号对该聊天室消息的表情，需要 reactions.write。同一账号、同一目标同时保留一个表情。
+
+请求：
+
+| Key | 说明 | 示例 |
+| --- | --- | --- |
+| Authorization | Bearer 访问令牌 | Bearer TOKEN |
+| Idempotency-Key | 幂等键，1–128 位字母、数字或 . _ : - | reaction-example-1 |
+| targetId | URL 参数，目标 ID | 1770000000000 |
+
+请求示例：
+
+```bash
+curl --location --request DELETE 'https://fishpi.cn/api/v3/chat/messages/1770000000000/reactions' \
+  --header 'Authorization: Bearer TOKEN' \
+  --header 'Idempotency-Key: reaction-example-1'
+```
+
+响应：
+
+| Key | 说明 |
+| --- | --- |
+| code / msg | 结果码 / 提示 |
+| data | 表态结果 |
+| - targetId / targetType / groupType | 目标 ID / article、comment 或 chat / 固定 emoji |
+| - currentUserReaction | 当前账号的 value，无表态为空字符串；匿名读取为空字符串 |
+| - summary | 表情汇总数组，仅包含数量大于零的表情 |
+| -- value / emoji / count / selected | 提交值 / 表情 / 数量 / 当前账号是否选择 |
+| -- users | 展示名称数组 |
+| -- userDetails | 公开用户展示资料数组，仅含 userName、displayName、avatarURL |
+| - changed | 本次首次执行是否改变表态状态 |
+
+> 目标不存在或当前不可访问时返回 HTTP 404。相同幂等键重试返回原结果，不会覆盖后来更改的状态；同一目标设置与清除请使用不同键，否则返回 HTTP 409。请求体可省略或为 {}；没有表态时成功返回 changed=false。
+
+## API v3 清风明月写入与详情
+
+### 发布清风明月
+
+`POST /api/v3/breezemoons`
+
+发布一条清风明月，需要 `content.write`、账号具备发布权限且已绑定手机号码。
+
+请求：
+
+| Key | 说明 | 示例 |
+| --- | --- | --- |
+| Authorization | Bearer 访问令牌 | Bearer TOKEN |
+| Idempotency-Key | 幂等键，1–128 位字母、数字或 . _ : - | breezemoon-create-1 |
+| content | 正文，去除首尾空白后 1–512 字符；HTML 标签会被移除 | 今日晴，适合摸鱼 |
+
+请求示例：
+
+```bash
+curl --location --request POST 'https://fishpi.cn/api/v3/breezemoons' \
+  --header 'Authorization: Bearer TOKEN' --header 'Idempotency-Key: breezemoon-create-1' \
+  --header 'Content-Type: application/json' --data '{"content":"今日晴，适合摸鱼"}'
+```
+
+响应：
+
+| Key | 说明 |
+| --- | --- |
+| code / msg | 结果码 / 提示 |
+| data | 已发布记录 |
+| - id / content / contentHtml | ID / 正文 / 渲染正文 |
+| - createdAt / updatedAt | 创建 / 更新时间，毫秒时间戳 |
+| - author | 公开作者资料 |
+| -- id / userName / userNickname / userAvatarURL | 用户 ID / 用户名 / 昵称 / 头像 |
+
+> 审核未通过返回 HTTP 422，未绑定手机返回 HTTP 403，操作过于频繁返回 HTTP 429。相同幂等键与正文重试返回原记录，不会重复发布；同键使用不同正文返回 HTTP 409。清风明月列表设为不公开时仍可发布，但不会进入全站公开列表。
+
+### 清风明月详情
+
+`GET /api/v3/breezemoons/{breezemoonId}`
+
+读取一条当前可访问的清风明月。可携带 Bearer 访问令牌（`content.read`）。
+
+请求：
+
+| Key | 说明 | 示例 |
+| --- | --- | --- |
+| breezemoonId | URL 参数，清风明月 ID | 1770000000000 |
+
+请求示例：
+
+```bash
+curl --location --request GET 'https://fishpi.cn/api/v3/breezemoons/1770000000000'
+```
+
+响应：
+
+| Key | 说明 |
+| --- | --- |
+| code / msg | 结果码 / 提示 |
+| data | 清风明月记录 |
+| - id / content / contentHtml | ID / 正文 / 渲染正文 |
+| - createdAt / updatedAt | 创建 / 更新时间，毫秒时间戳 |
+| - author | 公开作者资料 |
+| -- id / userName / userNickname / userAvatarURL | 用户 ID / 用户名 / 昵称 / 头像 |
+
+> 遵循作者的清风明月列表公开设置；本人或具备相应权限的账号可读取私密列表记录。不存在、不可访问或已失效的记录返回 HTTP 404。
+
+### 编辑本人的清风明月
+
+`PUT /api/v3/breezemoons/{breezemoonId}`
+
+替换本人清风明月的正文，需要 `content.write` 和编辑权限。
+
+请求：
+
+| Key | 说明 | 示例 |
+| --- | --- | --- |
+| Authorization | Bearer 访问令牌 | Bearer TOKEN |
+| Idempotency-Key | 幂等键，1–128 位字母、数字或 . _ : - | breezemoon-edit-1 |
+| breezemoonId | URL 参数，清风明月 ID | 1770000000000 |
+| content | 正文，去除首尾空白后 1–512 字符 | 更新后的正文 |
+
+请求示例：
+
+```bash
+curl --location --request PUT 'https://fishpi.cn/api/v3/breezemoons/1770000000000' \
+  --header 'Authorization: Bearer TOKEN' --header 'Idempotency-Key: breezemoon-edit-1' \
+  --header 'Content-Type: application/json' --data '{"content":"更新后的正文"}'
+```
+
+响应：
+
+| Key | 说明 |
+| --- | --- |
+| code / msg | 结果码 / 提示 |
+| data | 更新后的记录 |
+| - id / content / contentHtml | ID / 正文源文本 / 清洗后的渲染正文 |
+| - createdAt / updatedAt | 创建 / 更新时间，毫秒时间戳 |
+| - author | 公开作者资料 |
+| -- id / userName / userNickname / userAvatarURL | 用户 ID / 用户名 / 昵称 / 头像 |
+
+> 沿用原编辑规则，保留正文源标记；页面展示请使用清洗后的 contentHtml，或把 content 当作文本。审核未通过返回 HTTP 422；不存在、非本人或失效记录返回 HTTP 404。编辑不改变作者和创建时间。同键重试返回原编辑结果，不会覆盖后续编辑；同键提交不同正文返回 HTTP 409。
+
+### 本人的清风明月关注流
+
+`GET /api/v3/me/watching/breezemoons`
+
+分页读取当前账号关注用户的公开清风明月，需要 `content.read`。
+
+请求：
+
+| Key | 说明 | 示例 |
+| --- | --- | --- |
+| Authorization | Bearer 访问令牌 | Bearer TOKEN |
+| p | 页码，默认 1 | 1 |
+| size | 每页条数，默认 20，最大 50 | 20 |
+
+请求示例：
+
+```bash
+curl --location --request GET 'https://fishpi.cn/api/v3/me/watching/breezemoons?p=1&size=20' --header 'Authorization: Bearer TOKEN'
+```
+
+响应：
+
+| Key | 说明 |
+| --- | --- |
+| code / msg | 结果码 / 提示 |
+| data | 列表结果 |
+| - list | 清风明月记录，按发布时间倒序 |
+| -- id / content / contentHtml | ID / 正文 / 渲染正文 |
+| -- createdAt / updatedAt | 创建 / 更新时间，毫秒时间戳 |
+| -- author | 公开作者资料 |
+| --- id / userName / userNickname / userAvatarURL | 用户 ID / 用户名 / 昵称 / 头像 |
+| - pagination | 分页信息 |
+| -- p / size / total / pageCount | 页码 / 每页数量 / 总条数 / 总页数 |
+
+> 只包含关注用户公开且有效的内容。没有关注用户或没有可展示内容时返回空列表，不回退为全站列表。
+
+### 删除本人的清风明月
+
+`DELETE /api/v3/breezemoons/{breezemoonId}`
+
+删除当前账号发布的记录，需要 `content.write` 和删除权限。
+
+请求：
+
+| Key | 说明 | 示例 |
+| --- | --- | --- |
+| Authorization | Bearer 访问令牌 | Bearer TOKEN |
+| Idempotency-Key | 幂等键，1–128 位字母、数字或 . _ : - | breezemoon-delete-1 |
+| breezemoonId | URL 参数，清风明月 ID | 1770000000000 |
+
+请求示例：
+
+```bash
+curl --location --request DELETE 'https://fishpi.cn/api/v3/breezemoons/1770000000000' \
+  --header 'Authorization: Bearer TOKEN' --header 'Idempotency-Key: breezemoon-delete-1'
+```
+
+响应：
+
+| Key | 说明 | 示例 |
+| --- | --- | --- |
+| code / msg | 结果码 / 提示 | 0 / 空字符串 |
+| data | 空对象 | `{}` |
+
+> 请求体可省略或为 `{}`。其他账号的记录、记录不存在时返回 HTTP 404；成功后使用原幂等键重试仍成功。删除后重试原发布请求不会重新创建内容。
+
+## API v3 关注、收藏与订阅
+
+### 本人的关注用户列表
+
+`GET /api/v3/me/follows/users`
+
+读取当前账号的关注用户列表，需要 `profile.read`。
+
+请求：
+
+| Key | 说明 | 示例 |
+| --- | --- | --- |
+| Authorization | Bearer 访问令牌 | Bearer TOKEN |
+| p | 页码，默认 1 | 1 |
+| size | 每页条数，默认 20，最大 50 | 20 |
+
+请求示例：
+
+```bash
+curl --location --request GET 'https://fishpi.cn/api/v3/me/follows/users?p=1&size=20' --header 'Authorization: Bearer TOKEN'
+```
+
+响应：
+
+| Key | 说明 |
+| --- | --- |
+| code / msg | 结果码 / 提示 |
+| data | 列表结果 |
+| - list | 用户公开资料：id、userName、userNickname、userAvatarURL、userIntro |
+| - pagination | 分页信息 |
+| -- p / size / total / pageCount | 页码 / 每页数量 / 总条数 / 总页数 |
+
+### 添加关注用户
+
+`PUT /api/v3/me/follows/users/{targetId}`
+
+添加当前账号与目标的关系，需要 `follows.write`。
+
+请求：
+
+| Key | 说明 | 示例 |
+| --- | --- | --- |
+| Authorization | Bearer 访问令牌 | Bearer TOKEN |
+| Idempotency-Key | 幂等键，1–128 位字母、数字或 . _ : - | follow-example-1 |
+| targetId | URL 参数，目标 ID | 1770000000000 |
+
+请求示例：
+
+```bash
+curl --location --request PUT 'https://fishpi.cn/api/v3/me/follows/users/1770000000000' \
+  --header 'Authorization: Bearer TOKEN' \
+  --header 'Idempotency-Key: follow-example-1' \
+  --header 'Content-Type: application/json' --data '{}'
+```
+
+响应：
+
+| Key | 说明 | 示例 |
+| --- | --- | --- |
+| code / msg | 结果码 / 提示 | 0 / 空字符串 |
+| data | 操作结果 | `{...}` |
+| - following | 本次操作要求的关系状态 | true |
+| - changed | 本次首次执行是否改变关系 | true |
+
+> 请求体可省略或为 `{}`。重复设置相同状态成功返回，`changed=false`。使用相同幂等键重试返回原操作结果，不代表当前状态；同一关系的添加与取消请使用不同键，否则返回 HTTP 409。
+
+> 目标不存在或不可访问时返回 HTTP 404；添加收藏、订阅还需账号具备相应功能权限。
+
+### 取消关注用户
+
+`DELETE /api/v3/me/follows/users/{targetId}`
+
+取消当前账号与目标的关系，需要 `follows.write`。
+
+请求：
+
+| Key | 说明 | 示例 |
+| --- | --- | --- |
+| Authorization | Bearer 访问令牌 | Bearer TOKEN |
+| Idempotency-Key | 幂等键，1–128 位字母、数字或 . _ : - | follow-example-1 |
+| targetId | URL 参数，目标 ID | 1770000000000 |
+
+请求示例：
+
+```bash
+curl --location --request DELETE 'https://fishpi.cn/api/v3/me/follows/users/1770000000000' \
+  --header 'Authorization: Bearer TOKEN' \
+  --header 'Idempotency-Key: follow-example-1' \
+  --header 'Content-Type: application/json' --data '{}'
+```
+
+响应：
+
+| Key | 说明 | 示例 |
+| --- | --- | --- |
+| code / msg | 结果码 / 提示 | 0 / 空字符串 |
+| data | 操作结果 | `{...}` |
+| - following | 本次操作要求的关系状态 | false |
+| - changed | 本次首次执行是否改变关系 | true |
+
+> 请求体可省略或为 `{}`。重复设置相同状态成功返回，`changed=false`。使用相同幂等键重试返回原操作结果，不代表当前状态；同一关系的添加与取消请使用不同键，否则返回 HTTP 409。
+
+> 可以清理已删除或当前不可访问目标的关系。关系不存在时成功返回 `changed=false`。
+
+### 本人的关注标签列表
+
+`GET /api/v3/me/follows/tags`
+
+读取当前账号的关注标签列表，需要 `content.read`。
+
+请求：
+
+| Key | 说明 | 示例 |
+| --- | --- | --- |
+| Authorization | Bearer 访问令牌 | Bearer TOKEN |
+| p | 页码，默认 1 | 1 |
+| size | 每页条数，默认 20，最大 50 | 20 |
+
+请求示例：
+
+```bash
+curl --location --request GET 'https://fishpi.cn/api/v3/me/follows/tags?p=1&size=20' --header 'Authorization: Bearer TOKEN'
+```
+
+响应：
+
+| Key | 说明 |
+| --- | --- |
+| code / msg | 结果码 / 提示 |
+| data | 列表结果 |
+| - list | 标签公开资料，与标签列表一致 |
+| - pagination | 分页信息 |
+| -- p / size / total / pageCount | 页码 / 每页数量 / 总条数 / 总页数 |
+
+### 添加关注标签
+
+`PUT /api/v3/me/follows/tags/{targetId}`
+
+添加当前账号与目标的关系，需要 `follows.write`。
+
+请求：
+
+| Key | 说明 | 示例 |
+| --- | --- | --- |
+| Authorization | Bearer 访问令牌 | Bearer TOKEN |
+| Idempotency-Key | 幂等键，1–128 位字母、数字或 . _ : - | follow-example-1 |
+| targetId | URL 参数，目标 ID | 1770000000000 |
+
+请求示例：
+
+```bash
+curl --location --request PUT 'https://fishpi.cn/api/v3/me/follows/tags/1770000000000' \
+  --header 'Authorization: Bearer TOKEN' \
+  --header 'Idempotency-Key: follow-example-1' \
+  --header 'Content-Type: application/json' --data '{}'
+```
+
+响应：
+
+| Key | 说明 | 示例 |
+| --- | --- | --- |
+| code / msg | 结果码 / 提示 | 0 / 空字符串 |
+| data | 操作结果 | `{...}` |
+| - following | 本次操作要求的关系状态 | true |
+| - changed | 本次首次执行是否改变关系 | true |
+
+> 请求体可省略或为 `{}`。重复设置相同状态成功返回，`changed=false`。使用相同幂等键重试返回原操作结果，不代表当前状态；同一关系的添加与取消请使用不同键，否则返回 HTTP 409。
+
+> 目标不存在或不可访问时返回 HTTP 404；添加收藏、订阅还需账号具备相应功能权限。
+
+### 取消关注标签
+
+`DELETE /api/v3/me/follows/tags/{targetId}`
+
+取消当前账号与目标的关系，需要 `follows.write`。
+
+请求：
+
+| Key | 说明 | 示例 |
+| --- | --- | --- |
+| Authorization | Bearer 访问令牌 | Bearer TOKEN |
+| Idempotency-Key | 幂等键，1–128 位字母、数字或 . _ : - | follow-example-1 |
+| targetId | URL 参数，目标 ID | 1770000000000 |
+
+请求示例：
+
+```bash
+curl --location --request DELETE 'https://fishpi.cn/api/v3/me/follows/tags/1770000000000' \
+  --header 'Authorization: Bearer TOKEN' \
+  --header 'Idempotency-Key: follow-example-1' \
+  --header 'Content-Type: application/json' --data '{}'
+```
+
+响应：
+
+| Key | 说明 | 示例 |
+| --- | --- | --- |
+| code / msg | 结果码 / 提示 | 0 / 空字符串 |
+| data | 操作结果 | `{...}` |
+| - following | 本次操作要求的关系状态 | false |
+| - changed | 本次首次执行是否改变关系 | true |
+
+> 请求体可省略或为 `{}`。重复设置相同状态成功返回，`changed=false`。使用相同幂等键重试返回原操作结果，不代表当前状态；同一关系的添加与取消请使用不同键，否则返回 HTTP 409。
+
+> 可以清理已删除或当前不可访问目标的关系。关系不存在时成功返回 `changed=false`。
+
+### 本人的收藏文章列表
+
+`GET /api/v3/me/collections`
+
+读取当前账号的收藏文章列表，需要 `content.read`。
+
+请求：
+
+| Key | 说明 | 示例 |
+| --- | --- | --- |
+| Authorization | Bearer 访问令牌 | Bearer TOKEN |
+| p | 页码，默认 1 | 1 |
+| size | 每页条数，默认 20，最大 50 | 20 |
+
+请求示例：
+
+```bash
+curl --location --request GET 'https://fishpi.cn/api/v3/me/collections?p=1&size=20' --header 'Authorization: Bearer TOKEN'
+```
+
+响应：
+
+| Key | 说明 |
+| --- | --- |
+| code / msg | 结果码 / 提示 |
+| data | 列表结果 |
+| - list | 文章摘要，与用户文章列表一致；另含 available |
+| - pagination | 分页信息 |
+| -- p / size / total / pageCount | 页码 / 每页数量 / 总条数 / 总页数 |
+
+> 按添加关系的先后倒序。当前不可阅读或已删除的目标仅返回 `id` 与 `available=false`，仍可取消该关系；允许阅读的讨论帖正常返回。
+
+### 添加收藏文章
+
+`PUT /api/v3/me/collections/{targetId}`
+
+添加当前账号与目标的关系，需要 `follows.write`。
+
+请求：
+
+| Key | 说明 | 示例 |
+| --- | --- | --- |
+| Authorization | Bearer 访问令牌 | Bearer TOKEN |
+| Idempotency-Key | 幂等键，1–128 位字母、数字或 . _ : - | follow-example-1 |
+| targetId | URL 参数，目标 ID | 1770000000000 |
+
+请求示例：
+
+```bash
+curl --location --request PUT 'https://fishpi.cn/api/v3/me/collections/1770000000000' \
+  --header 'Authorization: Bearer TOKEN' \
+  --header 'Idempotency-Key: follow-example-1' \
+  --header 'Content-Type: application/json' --data '{}'
+```
+
+响应：
+
+| Key | 说明 | 示例 |
+| --- | --- | --- |
+| code / msg | 结果码 / 提示 | 0 / 空字符串 |
+| data | 操作结果 | `{...}` |
+| - following | 本次操作要求的关系状态 | true |
+| - changed | 本次首次执行是否改变关系 | true |
+
+> 请求体可省略或为 `{}`。重复设置相同状态成功返回，`changed=false`。使用相同幂等键重试返回原操作结果，不代表当前状态；同一关系的添加与取消请使用不同键，否则返回 HTTP 409。
+
+> 目标不存在或不可访问时返回 HTTP 404；添加收藏、订阅还需账号具备相应功能权限。
+
+### 取消收藏文章
+
+`DELETE /api/v3/me/collections/{targetId}`
+
+取消当前账号与目标的关系，需要 `follows.write`。
+
+请求：
+
+| Key | 说明 | 示例 |
+| --- | --- | --- |
+| Authorization | Bearer 访问令牌 | Bearer TOKEN |
+| Idempotency-Key | 幂等键，1–128 位字母、数字或 . _ : - | follow-example-1 |
+| targetId | URL 参数，目标 ID | 1770000000000 |
+
+请求示例：
+
+```bash
+curl --location --request DELETE 'https://fishpi.cn/api/v3/me/collections/1770000000000' \
+  --header 'Authorization: Bearer TOKEN' \
+  --header 'Idempotency-Key: follow-example-1' \
+  --header 'Content-Type: application/json' --data '{}'
+```
+
+响应：
+
+| Key | 说明 | 示例 |
+| --- | --- | --- |
+| code / msg | 结果码 / 提示 | 0 / 空字符串 |
+| data | 操作结果 | `{...}` |
+| - following | 本次操作要求的关系状态 | false |
+| - changed | 本次首次执行是否改变关系 | true |
+
+> 请求体可省略或为 `{}`。重复设置相同状态成功返回，`changed=false`。使用相同幂等键重试返回原操作结果，不代表当前状态；同一关系的添加与取消请使用不同键，否则返回 HTTP 409。
+
+> 可以清理已删除或当前不可访问目标的关系。关系不存在时成功返回 `changed=false`。
+
+### 本人的订阅文章列表
+
+`GET /api/v3/me/subscriptions`
+
+读取当前账号的订阅文章列表，需要 `content.read`。
+
+请求：
+
+| Key | 说明 | 示例 |
+| --- | --- | --- |
+| Authorization | Bearer 访问令牌 | Bearer TOKEN |
+| p | 页码，默认 1 | 1 |
+| size | 每页条数，默认 20，最大 50 | 20 |
+
+请求示例：
+
+```bash
+curl --location --request GET 'https://fishpi.cn/api/v3/me/subscriptions?p=1&size=20' --header 'Authorization: Bearer TOKEN'
+```
+
+响应：
+
+| Key | 说明 |
+| --- | --- |
+| code / msg | 结果码 / 提示 |
+| data | 列表结果 |
+| - list | 文章摘要，与用户文章列表一致；另含 available |
+| - pagination | 分页信息 |
+| -- p / size / total / pageCount | 页码 / 每页数量 / 总条数 / 总页数 |
+
+> 按添加关系的先后倒序。当前不可阅读或已删除的目标仅返回 `id` 与 `available=false`，仍可取消该关系；允许阅读的讨论帖正常返回。
+
+### 添加订阅文章
+
+`PUT /api/v3/me/subscriptions/{targetId}`
+
+添加当前账号与目标的关系，需要 `follows.write`。
+
+请求：
+
+| Key | 说明 | 示例 |
+| --- | --- | --- |
+| Authorization | Bearer 访问令牌 | Bearer TOKEN |
+| Idempotency-Key | 幂等键，1–128 位字母、数字或 . _ : - | follow-example-1 |
+| targetId | URL 参数，目标 ID | 1770000000000 |
+
+请求示例：
+
+```bash
+curl --location --request PUT 'https://fishpi.cn/api/v3/me/subscriptions/1770000000000' \
+  --header 'Authorization: Bearer TOKEN' \
+  --header 'Idempotency-Key: follow-example-1' \
+  --header 'Content-Type: application/json' --data '{}'
+```
+
+响应：
+
+| Key | 说明 | 示例 |
+| --- | --- | --- |
+| code / msg | 结果码 / 提示 | 0 / 空字符串 |
+| data | 操作结果 | `{...}` |
+| - following | 本次操作要求的关系状态 | true |
+| - changed | 本次首次执行是否改变关系 | true |
+
+> 请求体可省略或为 `{}`。重复设置相同状态成功返回，`changed=false`。使用相同幂等键重试返回原操作结果，不代表当前状态；同一关系的添加与取消请使用不同键，否则返回 HTTP 409。
+
+> 目标不存在或不可访问时返回 HTTP 404；添加收藏、订阅还需账号具备相应功能权限。
+
+### 取消订阅文章
+
+`DELETE /api/v3/me/subscriptions/{targetId}`
+
+取消当前账号与目标的关系，需要 `follows.write`。
+
+请求：
+
+| Key | 说明 | 示例 |
+| --- | --- | --- |
+| Authorization | Bearer 访问令牌 | Bearer TOKEN |
+| Idempotency-Key | 幂等键，1–128 位字母、数字或 . _ : - | follow-example-1 |
+| targetId | URL 参数，目标 ID | 1770000000000 |
+
+请求示例：
+
+```bash
+curl --location --request DELETE 'https://fishpi.cn/api/v3/me/subscriptions/1770000000000' \
+  --header 'Authorization: Bearer TOKEN' \
+  --header 'Idempotency-Key: follow-example-1' \
+  --header 'Content-Type: application/json' --data '{}'
+```
+
+响应：
+
+| Key | 说明 | 示例 |
+| --- | --- | --- |
+| code / msg | 结果码 / 提示 | 0 / 空字符串 |
+| data | 操作结果 | `{...}` |
+| - following | 本次操作要求的关系状态 | false |
+| - changed | 本次首次执行是否改变关系 | true |
+
+> 请求体可省略或为 `{}`。重复设置相同状态成功返回，`changed=false`。使用相同幂等键重试返回原操作结果，不代表当前状态；同一关系的添加与取消请使用不同键，否则返回 HTTP 409。
+
+> 可以清理已删除或当前不可访问目标的关系。关系不存在时成功返回 `changed=false`。
+
+## API v3 排行榜
+
+### 获取排行榜
+
+`GET /api/v3/rankings/{type}`
+
+返回站点现有榜单的公开排名，按榜单快照分页。可携带 Bearer 访问令牌（`content.read`）。
+
+请求：
+
+| Key | 说明 | 示例 |
+| --- | --- | --- |
+| type | URL 参数；links、balance、consumption、checkin、online、adr、mofish、smallmofish、lifeRestart、evolve、emoji、xiaoice、invite、donate、perfect | balance |
+| subType | evolve 支持 achievement（默认）、know、reset、days；xiaoice 支持 0（默认）、1、2、3；其他榜单省略 | achievement |
+| p | 页码，默认 1 | 1 |
+| size | 每页条数，默认 20，最大 50 | 20 |
+
+请求示例：
+
+```bash
+curl --location --request GET 'https://fishpi.cn/api/v3/rankings/evolve?subType=achievement&p=1&size=20'
+```
+
+响应：
+
+| Key | 说明 | 示例 |
+| --- | --- | --- |
+| code / msg | 结果码 / 提示信息 | 0 / 空字符串 |
+| data | 榜单结果 | `{...}` |
+| - type / subType | 榜单类型 / 子榜单；无子榜单为空字符串 | evolve / achievement |
+| - list | 排名记录 | `[...]` |
+| -- rank | 当前榜单中的名次，从 1 开始，跨页连续 | 1 |
+| -- score | 当前排序指标的数值 | 100 |
+| -- metrics | 该榜单的公开指标，见下表 | `{...}` |
+| -- user | 用户榜单的公开资料 | `{...}` |
+| --- id / userName / userNickname / userAvatarURL | 用户 ID / 用户名 / 昵称 / 头像 | 123 / user / 昵称 / URL |
+| -- link | links 榜单的链接资料，此类记录没有 user | `{...}` |
+| --- id / title / url | 链接 ID / 标题 / 链接地址 | 123 / 标题 / URL |
+| - summary | 仅 donate 返回全站赞助汇总 | `{...}` |
+| -- amount / supportedDays | 总赞助金额 / 支持运营天数 | 100 / 20 |
+| - pagination | 分页信息 | `{...}` |
+| -- p / size / total / pageCount | 页码 / 每页数量 / 当前榜单总条数 / 总页数 | 1 / 20 / 64 / 4 |
+
+| type | score 对应指标 | metrics 字段 |
+| --- | --- | --- |
+| links | 点击次数 | clickCount |
+| balance / consumption | 积分余额 / 累计消费积分 | points |
+| checkin | 今日连续签到天数 | streak |
+| online | 累计在线分钟 | minutes |
+| adr / mofish / smallmofish / emoji | 游戏得分 | points |
+| lifeRestart | 重开次数 | times、achievement（成就数量） |
+| evolve | subType 选中的历史最高指标 | achievement、know、reset、days、currentKnow、currentDays |
+| xiaoice | 0 经验 / 1 死亡次数 / 2 历练次数 / 3 吐纳次数 | 对应 exp / dieTimes / allExTimes / allBsTimes；0 另有 ancestry、gongfa |
+| invite | 邀请次数 | count |
+| donate | 赞助金额 | amount、count（赞助次数） |
+| perfect | 优选文章数量 | count |
+
+> 这是现有有限榜单的分页，`total` 表示本次可展示的榜单条数，不代表全站用户数量。Evolve 与人生重开沿用现有最近 100 份游戏记录的排名范围。未知类型或子榜单返回 HTTP 422；小冰榜上游暂不可用时返回 HTTP 503，可稍后重试。
+
+## 私信（API v3）
+
+读取接口需要 `messages.read`，发送、撤回与标记已读接口需要 `messages.write`。已有登录令牌须重新登录取得新增权限；第三方应用须先获准申请对应权限，再让用户重新授权。刷新已有令牌不会增加权限。读取不会自动标记已读。
+
+### 发送私信
+
+`POST /api/v3/me/conversations/{peerId}/messages`
+
+向指定用户发送 Markdown 私信，需要 messages.write 和 Idempotency-Key。
+
+请求：
+
+| Key | 说明 | 示例 |
+| --- | --- | --- |
+| Authorization（Header） | Bearer 访问令牌 | Bearer xxx |
+| Idempotency-Key（Header） | 本次发送的唯一键，重试保持不变 | private-send-20261020-1 |
+| peerId（Path） | 接收用户ID；文件传输助手为1000000000086 | 1630000000001 |
+| content | Markdown正文，最多10240个UTF-16单元，去除首尾空白后不能为空 | **你好** |
+
+请求示例：
+
+```bash
+curl --request POST 'https://fishpi.cn/api/v3/me/conversations/1630000000001/messages' \
+  --header 'Authorization: Bearer YOUR_ACCESS_TOKEN' \
+  --header 'Idempotency-Key: private-send-20261020-1' \
+  --header 'Content-Type: application/json' \
+  --data '{"content":"**你好**"}'
+```
+
+响应：
+
+| Key | 说明 | 示例 |
+| --- | --- | --- |
+| data | 已发送回执 | {} |
+| - id | 消息ID | 1792450000000 |
+| - peerId | 接收用户ID | 1630000000001 |
+| - sentAt | 服务器当地时间，yyyy-MM-dd HH:mm:ss | 2026-10-20 12:34:56 |
+
+> 仅允许向当前已激活的其他用户或文件传输助手发送，不允许给自己发信。正文沿用现有保留词处理和长度规则；JSON请求体最多65536字节，只接受 content，不接受查询参数。发送者与时间由服务端确定。
+>
+> 同键同内容重试返回原回执，不会重复发送；同键不同内容返回HTTP 409。请求中断或暂不可用时应沿用原键和原正文重试，已保存的消息会返回原回执，不要换新键重复发送。正文不合法返回422，目标不存在或不可用返回404，暂时无法完成返回503。收到成功回执后，可用消息详情或会话历史读取正文，需要 messages.read；客户端应继续查询历史与未读数，本次回执不保证实时推送。
+
+### 撤回本人私信
+
+`DELETE /api/v3/me/messages/{messageId}`
+
+撤回当前账号发送的私信，需要 messages.write 和 Idempotency-Key。
+
+请求：
+
+| Key | 说明 | 示例 |
+| --- | --- | --- |
+| Authorization（Header） | Bearer访问令牌 | Bearer xxx |
+| Idempotency-Key（Header） | 本次撤回的唯一键，重试保持不变 | private-withdraw-20261020-1 |
+| messageId（Path） | 本人发送的私信消息ID | 1792450000000 |
+
+请求示例：
+
+```bash
+curl --request DELETE 'https://fishpi.cn/api/v3/me/messages/1792450000000' \
+  --header 'Authorization: Bearer YOUR_ACCESS_TOKEN' \
+  --header 'Idempotency-Key: private-withdraw-20261020-1'
+```
+
+响应：
+
+| Key | 说明 | 示例 |
+| --- | --- | --- |
+| data | 撤回回执 | {} |
+| - id | 已撤回的消息ID | 1792450000000 |
+| - peerId | 原接收用户ID | 1630000000001 |
+| - removed | 已撤回 | true |
+
+> 无需请求体，也可发送空JSON对象，最多1024字节，不接受查询参数或其他字段。只能撤回本人发送的消息，接收者不能代为撤回；原接收者已删除或停用时仍可撤回本人历史消息，文件传输助手消息同样支持。
+>
+> 仅清理能准确关联到本条消息的未读记录，不清除同一发送者的其他未读。无法归属的历史未读可能保留，可由接收方使用标记已读接口处理。回执不提供接收者是否已读或剩余未读数。
+>
+> 同键重试返回原回执，不重复删除；使用新键撤回不存在、已撤回或非本人消息返回HTTP 404；非法消息ID、缺少幂等键或字段不合法返回422；消息状态变化返回409；暂时无法完成返回503。撤回后详情不再可读，会话最新消息相应回退，没有剩余历史时会话不再出现在列表。客户端应重新查询历史及列表刷新显示，本次不保证实时撤回推送。
+
+### 标记指定会话已读
+
+`POST /api/v3/me/conversations/{peerId}/read`
+
+清除本人来自指定用户的未读记录，需要 messages.write 和 Idempotency-Key，不删除历史消息。
+
+请求：
+
+| Key | 说明 | 示例 |
+| --- | --- | --- |
+| Authorization（Header） | Bearer 访问令牌 | Bearer xxx |
+| Idempotency-Key（Header） | 本次操作的唯一键，重试保持不变 | private-read-20261020-1 |
+| peerId（Path） | 对方用户ID；允许处理已有的失效或删除账号会话 | 1630000000001 |
+
+请求示例：
+
+```bash
+curl --request POST 'https://fishpi.cn/api/v3/me/conversations/1630000000001/read' \
+  --header 'Authorization: Bearer YOUR_ACCESS_TOKEN' \
+  --header 'Idempotency-Key: private-read-20261020-1'
+```
+
+响应：
+
+| Key | 说明 | 示例 |
+| --- | --- | --- |
+| data | 操作结果 | {} |
+| - changed | 本次清除的未读记录数，没有未读时为0 | 2 |
+
+> 无需请求体，也可发送空JSON对象，最多1024字节，不接受查询参数或其他字段。非法用户ID或本人ID返回HTTP 422；合法ID没有未读记录时成功返回0。changed 是本次操作回执中的记录数，不是当前未读总数，也不表示逐条消息的已读状态。同键重试不会再次清除后来产生的未读记录；需要再次标记时使用新的操作键。
+
+### 标记全部私信已读
+
+`POST /api/v3/me/conversations/read`
+
+清除本人收到的全部未读记录，需要 messages.write 和 Idempotency-Key，不删除会话或历史消息。
+
+请求：
+
+| Key | 说明 | 示例 |
+| --- | --- | --- |
+| Authorization（Header） | Bearer 访问令牌 | Bearer xxx |
+| Idempotency-Key（Header） | 本次操作的唯一键，重试保持不变 | private-read-all-20261020-1 |
+
+请求示例：
+
+```bash
+curl --request POST 'https://fishpi.cn/api/v3/me/conversations/read' \
+  --header 'Authorization: Bearer YOUR_ACCESS_TOKEN' \
+  --header 'Idempotency-Key: private-read-all-20261020-1'
+```
+
+响应：
+
+| Key | 说明 | 示例 |
+| --- | --- | --- |
+| data | 操作结果 | {} |
+| - changed | 本次清除的本人未读记录数 | 5 |
+
+> 请求体和重试规则同标记指定会话已读。并发到达的新消息仍可能产生未读，请以未读数查询结果为准；如需继续标记，应发起新的操作。
+
+### 查询本人私信会话
+
+`GET /api/v3/me/conversations`
+
+按最新消息 ID 倒序分页返回当前用户已有的私信会话。
+
+请求：
+
+| Key | 说明 | 示例 |
+| --- | --- | --- |
+| Authorization | 请求头，Bearer 访问令牌；需要 messages.read | Bearer ACCESS_TOKEN |
+| p | 页码，默认 1 | 1 |
+| size | 每页条数，默认 20，最大 50 | 20 |
+
+请求示例：
+
+```bash
+curl 'https://fishpi.cn/api/v3/me/conversations?p=1&size=20' -H 'Authorization: Bearer ACCESS_TOKEN'
+```
+
+响应：
+
+| Key | 说明 | 示例 |
+| --- | --- | --- |
+| data | 会话分页 | {} |
+| - list | 当前页会话 | [] |
+| -- peerId | 对方用户 ID | 1480000000000 |
+| -- peer | 对方公开资料，字段见下表 | {} |
+| -- lastMessage | 最新消息，字段见消息表 | {} |
+| -- unreadCount | 来自该用户的未读记录数 | 2 |
+| - pagination | 分页信息 | {} |
+| -- p | 当前页 | 1 |
+| -- size | 每页条数 | 20 |
+| -- total | 会话总数 | 3 |
+| -- pageCount | 总页数 | 1 |
+
+对方资料字段：
+
+| Key | 说明 | 示例 |
+| --- | --- | --- |
+| id | 用户 ID | 1480000000000 |
+| userName | 当前用户名；不可用时为空 | Alice |
+| userNickname | 当前昵称；不可用时为空 | 小鱼 |
+| userAvatarURL | 头像网址；不可用时为空 | https://example.com/avatar.png |
+| available | 对方账号资料是否可用 | true |
+| builtin | 是否为内置文件传输助手 | false |
+
+消息字段：
+
+| Key | 说明 | 示例 |
+| --- | --- | --- |
+| id | 消息 ID | 1792390000000 |
+| fromId | 发送者用户 ID | 1480000000000 |
+| toId | 接收者用户 ID | 1490000000000 |
+| fromMe | 是否由当前用户发送 | false |
+| sentAt | 既有消息的服务器当地时间，格式 yyyy-MM-dd HH:mm:ss；无法识别时为空 | 2026-10-19 12:34:56 |
+| content | 原始 Markdown | 你好 |
+| contentHtml | 清洗后的 HTML；渲染不可用时为空 | <p>你好</p> |
+| preview | 纯文本摘要，最多 120 个 Unicode 字符 | 你好 |
+| available | 消息正文是否可用；不可用时正文及摘要为空 | true |
+
+> 用户名与昵称按文本展示。自行渲染 content 时须清洗 HTML。已删除或停用的对方保留会话及本人有权阅读的消息，其 peer.available 为 false；文件传输助手的 peerId 固定为 1000000000086。未读数是现有未读记录数量，不表示每条消息的已读状态。
+
+### 查询本人指定私信会话
+
+`GET /api/v3/me/conversations/{peerId}`
+
+返回与指定用户已有会话的公开资料、最新消息和未读数。
+
+请求：
+
+| Key | 说明 | 示例 |
+| --- | --- | --- |
+| Authorization | 请求头，Bearer 访问令牌；需要 messages.read | Bearer ACCESS_TOKEN |
+| peerId | 路径参数，对方用户 ID | 1480000000000 |
+
+请求示例：
+
+```bash
+curl 'https://fishpi.cn/api/v3/me/conversations/1480000000000' -H 'Authorization: Bearer ACCESS_TOKEN'
+```
+
+响应：
+
+| Key | 说明 | 示例 |
+| --- | --- | --- |
+| data | 会话信息 | {} |
+| - peerId | 对方用户 ID | 1480000000000 |
+| - peer | 对方公开资料，同会话列表 | {} |
+| - lastMessage | 最新消息，同消息字段表 | {} |
+| - unreadCount | 来自该用户的未读记录数 | 2 |
+
+> 不存在本人参与的会话时返回 HTTP 404。peerId 使用用户 ID，不使用用户名或会话字符串；不能指定本人。
+
+### 查询本人私信历史
+
+`GET /api/v3/me/conversations/{peerId}/messages`
+
+初次获取最新一页，后续使用消息 ID 游标向前或向后读取；每页消息始终按 ID 升序返回。
+
+请求：
+
+| Key | 说明 | 示例 |
+| --- | --- | --- |
+| Authorization | 请求头，Bearer 访问令牌；需要 messages.read | Bearer ACCESS_TOKEN |
+| peerId | 路径参数，对方用户 ID | 1480000000000 |
+| size | 每页条数，默认 20，最大 50 | 20 |
+| before | 可选，只取小于此消息 ID 的记录；与 after 互斥 | 1792390000000 |
+| after | 可选，只取大于此消息 ID 的记录；与 before 互斥 | 1792380000000 |
+
+请求示例：
+
+```bash
+curl 'https://fishpi.cn/api/v3/me/conversations/1480000000000/messages?size=20&before=1792390000000' -H 'Authorization: Bearer ACCESS_TOKEN'
+```
+
+响应：
+
+| Key | 说明 | 示例 |
+| --- | --- | --- |
+| data | 消息页 | {} |
+| - peerId | 对方用户 ID | 1480000000000 |
+| - peer | 对方公开资料，同会话列表 | {} |
+| - list | 消息列表，同消息字段表 | [] |
+| - hasMore | 本次查询方向是否还有记录 | true |
+| - nextBefore | 本页最小消息 ID，供 before 使用；空页为空 | 1792380000000 |
+| - nextAfter | 本页最大消息 ID，供 after 使用；空页为空 | 1792390000000 |
+
+> 已有会话翻到尽头返回空列表；不存在本人参与的会话返回 HTTP 404。游标不包含边界记录。ID 必须是无前导零的正整数字符串，最多 19 位；非法 ID、同时传 before 与 after、超出分页范围返回 HTTP 422。
+
+### 查询本人私信消息详情
+
+`GET /api/v3/me/messages/{messageId}`
+
+读取当前用户作为发送者或接收者的一条消息。
+
+请求：
+
+| Key | 说明 | 示例 |
+| --- | --- | --- |
+| Authorization | 请求头，Bearer 访问令牌；需要 messages.read | Bearer ACCESS_TOKEN |
+| messageId | 路径参数，消息 ID | 1792390000000 |
+
+请求示例：
+
+```bash
+curl 'https://fishpi.cn/api/v3/me/messages/1792390000000' -H 'Authorization: Bearer ACCESS_TOKEN'
+```
+
+响应：
+
+| Key | 说明 | 示例 |
+| --- | --- | --- |
+| data | 消息详情 | {} |
+| - peerId | 对方用户 ID | 1480000000000 |
+| - peer | 对方公开资料，同会话列表 | {} |
+| - message | 消息，同消息字段表 | {} |
+
+> 消息不存在或不属于当前用户时返回 HTTP 404。
+
+### 查询本人私信未读数
+
+`GET /api/v3/me/messages/unread-count`
+
+返回当前用户收到的未读记录总数。
+
+请求：
+
+| Key | 说明 | 示例 |
+| --- | --- | --- |
+| Authorization | 请求头，Bearer 访问令牌；需要 messages.read | Bearer ACCESS_TOKEN |
+
+请求示例：
+
+```bash
+curl 'https://fishpi.cn/api/v3/me/messages/unread-count' -H 'Authorization: Bearer ACCESS_TOKEN'
+```
+
+响应：
+
+| Key | 说明 | 示例 |
+| --- | --- | --- |
+| data | 未读统计 | {} |
+| - count | 未读记录数 | 2 |
+
+> 以上读取接口凭据无效返回 HTTP 401，缺少 messages.read 返回 HTTP 403，当前账号不可用返回 HTTP 404，服务暂不可用返回 HTTP 503。发送、已读和撤回见本模块前文；实时订阅见本模块的私信连接票据与通道说明。
+
+### 获取私信连接票据
+
+`POST /api/v3/me/messages/realtime-ticket`
+
+订阅本人私信状态变更，需要 messages.read。
+
+请求：
+
+| Key | 说明 | 示例 |
+| --- | --- | --- |
+| Authorization | 请求头，Bearer 访问令牌；需要 messages.read | Bearer ACCESS_TOKEN |
+
+请求示例：
+
+```bash
+curl --request POST 'https://fishpi.cn/api/v3/me/messages/realtime-ticket' \
+  --header 'Authorization: Bearer ACCESS_TOKEN' \
+  --header 'Content-Type: application/json' \
+  --data '{}'
+```
+
+响应：
+
+| Key | 说明 | 示例 |
+| --- | --- | --- |
+| code / msg | 结果码 / 提示 | 0 |
+| data | 连接凭据 | `{...}` |
+| - ticket | 一次性连接票据 | OPAQUE_TICKET |
+| - expiresIn | 可用于认证的剩余秒数，最多60秒 | 60 |
+| - path | 同一服务上的 WebSocket 路径，包含部署路径 | /api/v3/realtime |
+| - channel | 订阅类型，固定为 messages | messages |
+
+> 请求体可省略或为 {}，不接受 userId、peerId、channel、scope 等自定义字段。每次请求签发新票据，无需 Idempotency-Key；最多成功使用一次。
+>
+> 无访问凭据返回 HTTP 401，缺少 messages.read 返回 HTTP 403，多余字段返回 HTTP 422；实时私信服务暂不可用返回 HTTP 503（realtime_unavailable）。
+
+### 连接私信通道
+
+`WS /api/v3/realtime`
+
+使用票据响应中的 path 连接，等待 authentication.required 后发送 authenticate，认证成功返回 ready。
+
+请求：
+
+| Key | 说明 | 示例 |
+| --- | --- | --- |
+| type | 认证消息固定为 authenticate | authenticate |
+| ticket | 上一步返回的一次性私信票据 | OPAQUE_TICKET |
+
+请求示例：
+
+```bash
+SOCKET_TICKET='OPAQUE_TICKET' node --input-type=module <<'JS'
+const socket = new WebSocket('wss://fishpi.cn/api/v3/realtime');
+socket.addEventListener('message', ({ data }) => {
+  const message = JSON.parse(data);
+  if (message.type === 'authentication.required') {
+    socket.send(JSON.stringify({ type: 'authenticate', ticket: process.env.SOCKET_TICKET }));
+  } else if (message.type === 'ready' || message.type === 'messages.changed') {
+    console.log('重新读取本人会话、历史及未读数');
+  }
+});
+JS
+```
+
+响应：
+
+| Key | 说明 | 示例 |
+| --- | --- | --- |
+| type | authentication.required、ready、pong 或 messages.changed | messages.changed |
+| data | 消息数据；authentication.required、pong、messages.changed 为空对象 | `{}` |
+| - channel | ready 中的订阅类型 | messages |
+| - expiresAt | ready 中的连接授权到期时间，毫秒时间戳 | 1792304100000 |
+
+> 本人发送、收到消息、已读、撤回或会话列表变化可能触发 messages.changed。提示不含消息 ID、正文、对方身份或未读数量；收到后使用本人会话、历史及未读数接口读取当前状态，读取历史不会自动标记已读。
+>
+> 首次 ready 和重连 ready 后必须主动查询当前状态。提示可能合并、重复或在断开时丢失，不提供逐条消息事件、可靠送达或断点续传；不要将提示数量当作消息数，也不要只依赖提示恢复历史。
+>
+> 地址不带查询参数，认证仅提交 type 和 ticket；成功后可发送 {"type":"ping"}，收到 pong。票据重放/过期、非法消息、令牌或账号失效时连接关闭；刷新访问令牌不会延长已有连接，需重新取票连接。发送、已读和撤回继续使用对应 HTTP 接口。
+
+## 私信（兼容接口）
+
+> 旧私信发送、已读的请求和正常响应字段保持。发生存储错误或响应中断时，先查询当前历史及未读状态，再决定是否重试。
+
+### 撤回本人私信
+
+`GET /chat/revoke`
+
+撤回本人发送的私信，需要 apiKey。
+
+请求：
+
+| Key | 说明 | 示例 |
+| --- | --- | --- |
+| apiKey | 通用密钥，可放在query或JSON请求体中 | YOUR_API_KEY |
+| oId | query中的消息ID | 1792450000000 |
+
+请求示例：
+
+```bash
+curl --get 'https://fishpi.cn/chat/revoke' \
+  --data-urlencode 'apiKey=YOUR_API_KEY' \
+  --data-urlencode 'oId=1792450000000'
+```
+
+响应：
+
+| Key | 说明 | 示例 |
+| --- | --- | --- |
+| result | 0成功、-1失败；未鉴权为Unauthorized | 0 |
+| msg | 失败时的提示 | 撤回暂不可用，请稍后重试 |
+
+> 请求字段与正常成功格式保持。撤回只清理准确关联的本条消息未读，保留其他消息和无法归属的历史未读，不再清空该发送者的全部未读；依赖旧清理行为的客户端应改为明确调用已读接口。消息、相关未读及会话最新消息共同更新，未完成时不部分删除；撤回推送失败不会把已完成的撤回改报为失败。本接口没有幂等回执，响应中断时先查询消息是否仍存在，再决定是否重试。
+
 ## 注意事项
 
 * 请一定要在请求时带上 UA，推荐使用 Chrome 的 UA，空 UA 将返回 500 状态码
@@ -127,6 +6877,38 @@ curl --location --request GET 'https://fishpi.cn/api/reset-pwd/meta?code=xxxx'
 | - userId     | 用户 Id                          | 1630000000000         |
 | -- code      | 重置码                           | xxxx                  |
 
+### 提交新密码
+
+`POST /reset-pwd`
+
+使用重置密码元数据返回的用户 ID 和找回密码短信验证码提交新密码，成功后建立登录状态。
+
+请求：
+
+| Key | 说明 | 示例 |
+| --- | --- | --- |
+| userId | 元数据返回的用户 ID | 1630000000000 |
+| code | 当前手机号收到的找回密码验证码，6位数字 | 123456 |
+| userPassword | 新密码的 MD5 | e10adc3949ba59abbe56e057f20f883e |
+
+请求示例：
+
+```bash
+curl --request POST 'https://fishpi.cn/reset-pwd' \
+  --header 'Content-Type: application/json' \
+  --cookie-jar cookies.txt \
+  --data '{"userId":"1630000000000","code":"123456","userPassword":"e10adc3949ba59abbe56e057f20f883e"}'
+```
+
+响应：
+
+| Key | 说明 | 示例 |
+| --- | --- | --- |
+| code | 0 成功，-1 失败 | 0 |
+| msg | 失败原因 | 验证码无效或已失效 |
+
+> 验证码须属于该用户的当前手机号及找回密码用途，并在有效期内；仅成功后失效，不能重复使用。如收到HTTP 302，请按Location完成页面交互，再向原接口重新提交请求。成功请求字段及登录行为保持，已有 v3 访问令牌、刷新令牌及尚未完成的授权需要重新获取。
+
 ### 注册用户
 
 以下关于注册用户接口的内容我以提供注册思路为导向进行编写，方便大家对接。
@@ -147,6 +6929,8 @@ curl --location --request GET 'https://fishpi.cn/api/reset-pwd/meta?code=xxxx'
 | userPhone  | 手机号                                                                                                                                           | 13261327290 |
 | invitecode | 邀请码（选填，无则留空，必须提供让用户填写邀请人的输入框，如果用户留空，可以将作者作为邀请人，但如果用户主动填写了邀请人，则必须按用户输入请求） | 000000      |
 | captcha    | 第一步的验证码（大小写不敏感）                                                                                                                   | abcd        |
+
+> 邀请码为当前手机号预留一天；同手机号可重发，其他手机号在有效预留期间申请将返回原JSON错误格式。正常字段及成功响应保持。如收到HTTP 302，请按Location完成页面交互后返回原入口重试；不要自动反复发送短信。
 
 **第三步** 验证短信验证码是否正确
 
@@ -171,9 +6955,12 @@ curl --location --request GET 'https://fishpi.cn/api/reset-pwd/meta?code=xxxx'
 | userAppRole  | 角色（0为黑客，1为画家）               | 0                                |
 | userPassword | 使用 MD5 加密后的密码 *                | e10adc3949ba59abbe56e057f20f883e |
 | userId       | 请填写第三步返回的userId               | 1652062402334                    |
+| code         | 必填，第三步验证的6位注册短信验证码；须仍在有效期内 | 123456 |
 | r            | 邀请人的用户名（选填，无邀请人则留空） | csfwff                           |
 
 code 返回 0 则注册成功！
+
+> 旧客户端第四步必须新增 code 字段。如收到HTTP 302，请按Location完成页面交互，再向原接口重新提交请求。验证码须绑定该用户的当前手机号和注册用途，成功后一次消费。正常角色、奖励、成功字段及成功后登录保持；错误、过期或其他用途的验证码不能激活账号，失败不消费有效验证码。
 
 ## 通用
 
@@ -416,7 +7203,13 @@ curl --location --request GET 'https://fishpi.cn/api/user/bag?apiKey=YOUR_API_KE
 
 通过 API 使用背包道具。需要 apiKey。
 
+> 补签卡按平台自然日补一天，今天已签到且补签条件满足时使用；能连接已有连续记录时接回。校验或保存失败保留卡片和补签记录，不额外发放签到积分。
+
 `POST /api/bag/nameCard` 请求：
+
+> 改名与消耗一张改名卡一并保存，校验或保存失败不扣卡。正常成功字段保持；apiKey 支持 query 参数或 JSON body。
+>
+> 若返回“操作结果暂未确认”或连接中断，请先重新读取资料与背包确认结果；不要更换用户名后直接重试，以免再次消耗卡片。
 
 | Key      | 说明                                     | 示例         |
 | -------- | ---------------------------------------- | ------------ |
@@ -1361,6 +8154,8 @@ curl --location --request GET 'https://fishpi.cn/chat-room/more?page=1&apiKey=YO
 
 发送聊天室消息
 
+> 普通消息确认保存成功后才返回成功；保存出错或连接中断时，请先刷新聊天记录确认结果，避免直接重发造成重复消息。
+
 请求：
 
 > <sup>*</sup> 如果是发送红包，则需要发送 `[redpacket]{...}[/redpacket]`的格式
@@ -1387,7 +8182,11 @@ curl --location --request GET 'https://fishpi.cn/chat-room/more?page=1&apiKey=YO
 
 `DELETE /chat-room/revoke/<oId>`
 
-撤回聊天室消息（限制用户每24小时一次，管理员无限次）
+撤回聊天室消息，需要 apiKey。普通用户每天可撤回多次，当天费用依次为 0、32、64……积分。红包消息不可撤回；本次费用与结果以服务端提示为准。
+
+> 与 v3 撤回接口共享每日计次，首次启用共享计次时从零开始，之后改名或服务重启不再清零。归属按消息作者 ID 判断，改名后仍可撤回本人历史消息，不能因用户名相同而撤回他人的历史消息。原有管理角色的撤回权限与免费规则保留。
+>
+> 未提交成功的撤回不扣款、不增加计次；撤回后该消息的 emoji reaction 一并移除。操作报错或连接中断时，请先刷新记录并核对积分后再决定是否重试。
 
 请求：
 
@@ -1411,7 +8210,7 @@ curl --location --request DELETE 'https://fishpi.cn/chat-room/revoke/16400784074
 
 | Key  | 说明                              | 示例       |
 | ---- | --------------------------------- | ---------- |
-| code | 为 0 则密钥有效，为 -1 则密钥无效 | 0          |
+| code | 0 为成功，-1 为失败 | 0          |
 | msg  | 错误消息                          | 撤回成功。 |
 
 ### 获取消息 Markdown
@@ -2213,11 +9012,19 @@ curl --location --request DELETE 'https://fishpi.cn/api/article-drafts/177000000
 >
 > `articleBypassCensor=true` 时跳过内容审核和敏感词过滤；服务端按用户分组校验，未授权用户传入该字段会返回失败。
 
+> 发布或编辑返回操作过于频繁时，请稍后重试，避免并发重复提交。
+
+> 发布时会核对余额是否同时满足发帖条件和全部实际费用。正文保存或扣款失败时，不会保留部分发帖扣款；匿名发布仍沿用原积分门槛与费用规则。请求参数及成功响应字段保持不变。
+
+> 符合周报规则的奖励随帖子发布成功后生效；发布失败不会保留该次周报奖励。周报日期、发布时间和正文要求保持不变。
+
 ### 更新贴子
 
 `PUT /article/<id>`
 
 更新帖子
+
+> 编辑内容与对应费用一并保存；任一步失败时，不会保留部分编辑扣款。原五分钟编辑规则、打赏启用费用、悬赏只能增加及匿名规则保持不变。
 
 请求：
 
@@ -2690,6 +9497,8 @@ curl --location --request POST 'https://fishpi.cn/api/article/stick' \
 
 `POST /vote/up/article`
 
+给文章点赞，再次点赞会取消。需要 apiKey；切换赞踩时同步更新计数，保存失败不改变投票结果。
+
 请求：
 
 | Key    | 说明      | 示例                             |
@@ -2697,18 +9506,56 @@ curl --location --request POST 'https://fishpi.cn/api/article/stick' \
 | apiKey | 通用密钥  | YOUR_API_KEY |
 | dataId | 文章的oId | 1645002736006                    |
 
+请求示例：
+
+```bash
+curl --request POST 'https://fishpi.cn/vote/up/article' \
+  --header 'Content-Type: application/json' \
+  --data '{"apiKey":"YOUR_API_KEY","dataId":"1645002736006"}'
+```
+
 响应：
 
 | Key  | 说明                                                | 示例 |
 | ---- | --------------------------------------------------- | ---- |
 | code | 为0则成功                                           | 0    |
-| type | -1为点赞成功，0代表已经点过赞了，所以帮你取消了点赞 | -1   |
+| type | 操作前的投票：-1 为未投票，0 为赞，1 为踩；原为赞时此次取消，原为踩时改赞 | -1 |
+
+### 给文章点踩
+
+`POST /vote/down/article`
+
+给文章点踩，再次点踩会取消。需要 apiKey；切换赞踩时同步更新计数，保存失败不改变投票结果。
+
+请求：
+
+| Key | 说明 | 示例 |
+| --- | --- | --- |
+| apiKey | 通用密钥 | YOUR_API_KEY |
+| dataId | 文章 ID | 1645002736006 |
+
+请求示例：
+
+```bash
+curl --request POST 'https://fishpi.cn/vote/down/article' \
+  --header 'Content-Type: application/json' \
+  --data '{"apiKey":"YOUR_API_KEY","dataId":"1645002736006"}'
+```
+
+响应：
+
+| Key | 说明 | 示例 |
+| --- | --- | --- |
+| code | 为 0 则成功 | 0 |
+| type | 操作前的投票：-1 为未投票，0 为赞，1 为踩；原为踩时此次取消，原为赞时改踩 | -1 |
 
 ### 感谢文章
 
 `POST /article/thank?articleId={文章oId}`
 
-**注意**：文章oId在URL上传参，apiKey还是通过POST进行哦。
+> articleId 在 URL 中传入，apiKey 可放在 JSON 请求体或 URL 查询参数。
+
+感谢他人文章，需要 apiKey，亦支持 URL 查询参数 apiKey。重复感谢不会再次扣费或增加次数，保存失败不扣款；费用和匿名免转账规则保持。
 
 请求：
 
@@ -2716,11 +9563,50 @@ curl --location --request POST 'https://fishpi.cn/api/article/stick' \
 | ------ | -------- | -------------------------------- |
 | apiKey | 通用密钥 | YOUR_API_KEY |
 
+请求示例：
+
+```bash
+curl --request POST 'https://fishpi.cn/article/thank?articleId=1645002736006' \
+  --header 'Content-Type: application/json' \
+  --data '{"apiKey":"YOUR_API_KEY"}'
+```
+
 响应：
 
 | Key  | 说明      | 示例 |
 | ---- | --------- | ---- |
 | code | 为0则成功 | 0    |
+
+### 打赏文章（旧）
+
+`POST /article/reward?articleId={文章oId}`
+
+需要 apiKey，按文章当前设定的价格打赏并返回打赏正文 HTML。已有购买记录或本人读取时不再次扣款；匿名文章沿用免转账规则。
+
+请求：
+
+| Key | 说明 | 示例 |
+| --- | --- | --- |
+| articleId | 文章 ID，URL 查询参数，1～32 位数字 | 1645002736006 |
+| apiKey | 通用密钥，支持 JSON 请求体或 URL 查询参数 | YOUR_API_KEY |
+
+请求示例：
+
+```bash
+curl --request POST 'https://fishpi.cn/article/reward?articleId=1645002736006' \
+  --header 'Content-Type: application/json' \
+  --data '{"apiKey":"YOUR_API_KEY"}'
+```
+
+响应：
+
+| Key | 说明 |
+| --- | --- |
+| code | 为 0 则成功 |
+| msg | 失败提示 |
+| articleRewardContent | 成功时返回打赏正文 HTML |
+
+> 仅文章当前可阅读、已启用打赏，且本次购买成功、已有购买记录或本人读取时返回正文。账户或作者不可用、未受邀讨论、余额不足等失败不返回正文；未完成的购买不扣款。正常成功字段与费用保持不变。需要编辑本人未启用打赏的原始内容时，请使用本人文章编辑源码接口。
 
 ### 获取帖子的评论列表（旧）
 
@@ -2878,7 +9764,11 @@ curl --location --request POST 'https://fishpi.cn/comment/thread/replies' \
 
 ### 评论/回复
 
+> 实时新增评论消息中，匿名评论的 commentAuthorId 保留为空字符串；本人状态使用 commentIsCurrentUser，楼主状态使用 commentIsArticleAuthor。有权阅读私密正文的规则不变。
+
 `POST /comment`
+
+发表评论或回复，需要 apiKey；apiKey 可放在 JSON 请求体或 URL 查询参数中。
 
 请求：
 
@@ -2890,6 +9780,23 @@ curl --location --request POST 'https://fishpi.cn/comment/thread/replies' \
 | commentVisible           | 是否仅楼主可见，是填写true，否填写false                           | false                            |
 | commentContent           | 评论原文（Markdown格式）                                          | hello world                      |
 | commentOriginalCommentId | （选填）如果是回复某个评论，传递此参数并填写值为要回复的评论的oId | 1646216549324                    |
+
+请求示例：
+
+```bash
+curl --request POST 'https://fishpi.cn/comment' \
+  --header 'Content-Type: application/json' \
+  --data '{"apiKey":"YOUR_API_KEY","articleId":"1645002736006","commentContent":"评论正文","commentAnonymous":false,"commentVisible":false}'
+```
+
+响应：
+
+| Key | 说明 |
+| --- | --- |
+| code | 0 表示成功 |
+| msg | 操作提示；失败时说明原因 |
+
+> 正文、积分、回复通知已读状态和自动订阅随发布结果一并处理；保存失败会撤销本次数据库变更。积分规则及自动订阅偏好保持不变。
 
 ### 长篇段评
 
@@ -2996,6 +9903,8 @@ curl -X POST "https://fishpi.cn/comment/paragraph/thread/parents" \
 
 `PUT /comment/{评论oId}`
 
+修改本人评论，需要 apiKey；apiKey 可放在 JSON 请求体或 URL 查询参数中。
+
 请求：
 
 | Key              | 说明                                    | 示例                             |
@@ -3005,6 +9914,14 @@ curl -X POST "https://fishpi.cn/comment/paragraph/thread/parents" \
 | commentAnonymous | 是否匿名评论，是填写true，否填写false   | false                            |
 | commentVisible   | 是否仅楼主可见，是填写true，否填写false | false                            |
 | commentContent   | 评论原文（Markdown格式）                | hello world                      |
+
+请求示例：
+
+```bash
+curl --request PUT 'https://fishpi.cn/comment/1646216549324' \
+  --header 'Content-Type: application/json' \
+  --data '{"apiKey":"YOUR_API_KEY","commentContent":"更新后的评论正文","commentVisible":false}'
+```
 
 响应：
 
@@ -3018,6 +9935,8 @@ curl -X POST "https://fishpi.cn/comment/paragraph/thread/parents" \
 
 `POST /vote/up/comment`
 
+给评论点赞，再次点赞会取消。需要 apiKey；切换赞踩时同步更新计数，保存失败不改变投票结果。
+
 请求：
 
 | Key    | 说明      | 示例                             |
@@ -3025,12 +9944,48 @@ curl -X POST "https://fishpi.cn/comment/paragraph/thread/parents" \
 | apiKey | 通用密钥  | YOUR_API_KEY |
 | dataId | 评论的oId | 1645002736006                    |
 
+请求示例：
+
+```bash
+curl --request POST 'https://fishpi.cn/vote/up/comment' \
+  --header 'Content-Type: application/json' \
+  --data '{"apiKey":"YOUR_API_KEY","dataId":"1645002736006"}'
+```
+
 响应：
 
 | Key  | 说明                                                | 示例 |
 | ---- | --------------------------------------------------- | ---- |
 | code | 为0则成功                                           | 0    |
-| type | -1为点赞成功，0代表已经点过赞了，所以帮你取消了点赞 | -1   |
+| type | 操作前的投票：-1 为未投票，0 为赞，1 为踩；原为赞时此次取消，原为踩时改赞 | -1 |
+
+### 给评论点踩
+
+`POST /vote/down/comment`
+
+给评论点踩，再次点踩会取消。需要 apiKey；切换赞踩时同步更新计数，保存失败不改变投票结果。
+
+请求：
+
+| Key | 说明 | 示例 |
+| --- | --- | --- |
+| apiKey | 通用密钥 | YOUR_API_KEY |
+| dataId | 评论 ID | 1645002736006 |
+
+请求示例：
+
+```bash
+curl --request POST 'https://fishpi.cn/vote/down/comment' \
+  --header 'Content-Type: application/json' \
+  --data '{"apiKey":"YOUR_API_KEY","dataId":"1645002736006"}'
+```
+
+响应：
+
+| Key | 说明 | 示例 |
+| --- | --- | --- |
+| code | 为 0 则成功 | 0 |
+| type | 操作前的投票：-1 为未投票，0 为赞，1 为踩；原为踩时此次取消，原为赞时改踩 | -1 |
 
 ### 感谢评论
 
@@ -3038,7 +9993,7 @@ curl -X POST "https://fishpi.cn/comment/paragraph/thread/parents" \
 
 **注意**：不能给自己点感谢！会报错，记得做处理哦。
 
-另外，感谢是不能取消的，会扣除15积分送给对方。
+感谢不能取消。普通评论会扣除15积分送给对方，匿名评论保留免转账规则；重复感谢不重复扣费，保存失败时不扣款。
 
 请求：
 
@@ -3046,6 +10001,14 @@ curl -X POST "https://fishpi.cn/comment/paragraph/thread/parents" \
 | --------- | --------- | -------------------------------- |
 | apiKey    | 通用密钥  | YOUR_API_KEY |
 | commentId | 评论的oId | 1645002736006                    |
+
+请求示例：
+
+```bash
+curl --request POST 'https://fishpi.cn/comment/thank' \
+  --header 'Content-Type: application/json' \
+  --data '{"apiKey":"YOUR_API_KEY","commentId":"1645002736006"}'
+```
 
 响应：
 
@@ -3057,17 +10020,30 @@ curl -X POST "https://fishpi.cn/comment/paragraph/thread/parents" \
 
 `POST /comment/{评论的oId}/remove`
 
+删除满足条件的本人评论，需要 apiKey。成功时收取原有删除费用；删除被拒绝或保存失败时不扣款。
+
 请求：
 
 | Key    | 说明     | 示例                             |
 | ------ | -------- | -------------------------------- |
 | apiKey | 通用密钥 | YOUR_API_KEY |
 
+请求示例：
+
+```bash
+curl -X POST 'https://fishpi.cn/comment/1636516552191/remove' \
+  -H 'Content-Type: application/json' \
+  -d '{"apiKey":"YOUR_API_KEY"}'
+```
+
 响应：
 
 | Key  | 说明      | 示例 |
 | ---- | --------- | ---- |
 | code | 为0则成功 | 0    |
+| commentId | 成功删除的评论 ID | 1636516552191 |
+
+> 存在回复、赞踩、感谢或已被采纳的评论不能自行删除，积分不足时也会拒绝删除。
 
 ### 获取帖子当前正在阅读的人数
 
@@ -5211,3 +12187,315 @@ curl --location --request GET 'https://fishpi.cn/api/city/%E5%8C%97%E4%BA%AC?p=1
 `GET /api/statistic`
 
 返回站点统计：`statisticMemberCount`（用户数）、`statisticArticleCount`（帖子数）、`statisticCmtCount`（评论数）、`statisticDomainCount`、`statisticTagCount`、`statisticLinkCount`、`statisticMaxOnlineVisitorCount`（历史最高在线）、`onlineVisitorCnt`（当前在线访客）、`onlineMemberCnt`（当前在线会员）等。可携带 `apiKey`（可选）。
+
+
+## API v3 文章热度
+
+### 读取文章当前热度
+
+`GET /api/v3/articles/{articleId}/heat`
+
+读取可访问文章的当前连接热度，需要 content.read。
+
+请求：
+
+| Key | 说明 | 示例 |
+| --- | --- | --- |
+| Authorization | 请求头，Bearer accessToken | Bearer YOUR_ACCESS_TOKEN |
+| articleId | 路径参数，文章 ID | 123456789 |
+
+请求示例：
+
+```bash
+curl 'https://fishpi.cn/api/v3/articles/123456789/heat' \
+  --header 'Authorization: Bearer YOUR_ACCESS_TOKEN'
+```
+
+响应：
+
+| Key | 说明 | 示例 |
+| --- | --- | --- |
+| code | 0 表示成功 | 0 |
+| data | 当前热度 | `{...}` |
+| - articleId | 文章 ID | 123456789 |
+| - heat | 当前节点的文章连接数近似值，无连接时为 0 | 3 |
+
+> 多个标签页或设备分别计数；该值不是去重人数、累计浏览量或全站在线人数。重新查询会得到当前值，不提供历史游标。文章不存在或不可访问时返回 HTTP 404。
+
+## API v3 聊天室红包
+
+### 读取红包类型目录
+
+`GET /api/v3/chat/red-packet-types`
+
+获取红包类型及积分风险提示，需要 content.read。
+
+请求：
+
+| Key | 说明 | 示例 |
+| --- | --- | --- |
+| Authorization | 请求头，Bearer accessToken | Bearer YOUR_ACCESS_TOKEN |
+
+请求示例：
+
+```bash
+curl 'https://fishpi.cn/api/v3/chat/red-packet-types' \
+  --header 'Authorization: Bearer YOUR_ACCESS_TOKEN'
+```
+
+响应：
+
+| Key | 说明 | 示例 |
+| --- | --- | --- |
+| code | 0 表示成功 | 0 |
+| data | 类型目录 | `{...}` |
+| - types | 类型列表 | `[]` |
+| -- id | 类型标识：random、average、specify、heartbeat、rockPaperScissors | random |
+| -- name | 类型名称 | 拼手气红包 |
+| -- mayLosePoints | 领取该类型是否可能损失积分，心跳和猜拳为 true | false |
+| - creationSupported | 当前是否提供 v3 创建接口 | false |
+| - claimSupported | 当前是否提供 v3 领取接口 | false |
+
+> 该目录不表示已经开放 v3 创建或领取。当前未列入骰子红包。
+
+## API v3 职业
+
+### 读取职业目录
+
+`GET /api/v3/professions`
+
+分页读取已发布职业的名称和说明。
+
+请求：
+
+| Key | 说明 | 示例 |
+| --- | --- | --- |
+| apiKey | 通用密钥（可选） | YOUR_API_KEY |
+| Authorization | 请求头，Bearer accessToken（可选）；提供时需要 profile.read | Bearer YOUR_ACCESS_TOKEN |
+| p | 页码，默认 1 | 1 |
+| size | 每页条数，默认 20，最大 50 | 20 |
+
+请求示例：
+
+```bash
+curl 'https://fishpi.cn/api/v3/professions?p=1&size=20'
+```
+
+响应：
+
+| Key | 说明 | 示例 |
+| --- | --- | --- |
+| code | 0 表示成功 | 0 |
+| data | 分页结果 | `{...}` |
+| - list | 职业列表 | `[]` |
+| -- professionId | 职业 ID | 1700000000001 |
+| -- professionCode | 职业代码 | writer |
+| -- displayName | 名称 | 创作者 |
+| -- shortName | 简称 | 创作 |
+| -- description | 说明 | 参与内容创作 |
+| - pagination | 分页信息，含 p、size、total、pageCount | `{...}` |
+
+### 读取本人职业
+
+`GET /api/v3/me/professions`
+
+读取当前账号的职业选择、隐私设置和分页进度，需要 profile.read。
+
+请求：
+
+| Key | 说明 | 示例 |
+| --- | --- | --- |
+| Authorization | 请求头，Bearer accessToken | Bearer YOUR_ACCESS_TOKEN |
+| p | 页码，默认 1 | 1 |
+| size | 每页条数，默认 20，最大 50 | 20 |
+
+请求示例：
+
+```bash
+curl 'https://fishpi.cn/api/v3/me/professions?p=1&size=20' \
+  --header 'Authorization: Bearer YOUR_ACCESS_TOKEN'
+```
+
+响应：
+
+| Key | 说明 | 示例 |
+| --- | --- | --- |
+| code | 0 表示成功 | 0 |
+| data | 本人职业结果 | `{...}` |
+| - state | 选择与隐私状态 | `{...}` |
+| -- onboardingState | UNDECIDED、SKIPPED 或 SELECTED | SELECTED |
+| -- primaryProfessionId | 主职业 ID，未选择为空 | 1700000000001 |
+| -- primaryProfessionState | NONE、ACTIVE、RETIRED 或 DELETED | ACTIVE |
+| -- privacyPreset | ALL_PUBLIC、LEVEL_ONLY、PRIMARY_ONLY、SELF_ONLY、FULLY_HIDDEN 或 CUSTOM | SELF_ONLY |
+| -- moduleVisibility | 各模块可见性，值为 PUBLIC、LOGGED_IN、SELF 或 HIDDEN | `{...}` |
+| --- primaryProfession | 主职业模块 | PUBLIC |
+| --- allProfessions | 全部职业模块 | SELF |
+| --- experience | 经验模块 | SELF |
+| --- rarity | 稀有度模块 | PUBLIC |
+| --- majorContributions | 主要贡献模块 | PUBLIC |
+| --- contributionStats | 贡献统计模块 | PUBLIC |
+| --- activityFeed | 活动模块 | SELF |
+| --- levelHistory | 等级历史模块 | SELF |
+| --- rewards | 奖励模块 | SELF |
+| --- ranking | 排行模块 | HIDDEN |
+| - list | 已产生进度的职业，含目录中的名称与说明字段 | `[]` |
+| -- state | ACTIVE 或 RETIRED | ACTIVE |
+| -- totalExperience | 总经验 | 120 |
+| -- levelCode | 当前等级代码 | novice |
+| -- levelName | 当前等级名称 | 初学者 |
+| -- levelDescription | 等级说明 | 开始积累经验 |
+| -- requiredExperience | 当前等级所需经验 | 100 |
+| - pagination | 分页信息，含 p、size、total、pageCount | `{...}` |
+
+> 本人可以读取隐藏的职业进度。列表只包含已有进度记录的职业；已选主职业可能尚未出现在列表中，请同时读取 state。
+
+## API v3 勋章
+
+### 读取本人勋章
+
+`GET /api/v3/me/medals`
+
+分页读取本人有效勋章，包含隐藏勋章，需要 profile.read。
+
+请求：
+
+| Key | 说明 | 示例 |
+| --- | --- | --- |
+| Authorization | 请求头，Bearer accessToken | Bearer YOUR_ACCESS_TOKEN |
+| p | 页码，默认 1 | 1 |
+| size | 每页条数，默认 20，最大 50 | 20 |
+
+请求示例：
+
+```bash
+curl 'https://fishpi.cn/api/v3/me/medals?p=1&size=20' \
+  --header 'Authorization: Bearer YOUR_ACCESS_TOKEN'
+```
+
+响应：
+
+| Key | 说明 | 示例 |
+| --- | --- | --- |
+| code | 0 表示成功 | 0 |
+| data | 分页结果 | `{...}` |
+| - list | 勋章列表，按显示顺序排列 | `[]` |
+| -- id | 勋章定义 ID | annual |
+| -- name | 名称，纯文本 | 年度勋章 |
+| -- type | 类型 | special |
+| -- description | 说明，纯文本 | 感谢参与 |
+| -- order | 显示顺序 | 0 |
+| -- expiresAt | 到期时间，毫秒时间戳；本人记录中小于等于 0 表示永久 | 0 |
+| -- displayed | 是否展示 | false |
+| - pagination | 分页信息，含 p、size、total、pageCount | `{...}` |
+
+### 读取用户公开勋章
+
+`GET /api/v3/users/{userName}/medals`
+
+分页读取指定用户当前公开展示的有效勋章。
+
+请求：
+
+| Key | 说明 | 示例 |
+| --- | --- | --- |
+| apiKey | 通用密钥（可选） | YOUR_API_KEY |
+| Authorization | 请求头，Bearer accessToken（可选）；提供时需要 profile.read | Bearer YOUR_ACCESS_TOKEN |
+| userName | 路径参数，用户名 | fishpi |
+| p | 页码，默认 1 | 1 |
+| size | 每页条数，默认 20，最大 50 | 20 |
+
+请求示例：
+
+```bash
+curl 'https://fishpi.cn/api/v3/users/fishpi/medals?p=1&size=20'
+```
+
+响应：
+
+| Key | 说明 | 示例 |
+| --- | --- | --- |
+| code | 0 表示成功 | 0 |
+| data | 分页结果 | `{...}` |
+| - list | 公开勋章列表，字段同本人读取，不含 displayed | `[]` |
+| -- expiresAt | 到期时间，毫秒时间戳；0 表示永久 | 0 |
+| - pagination | 分页信息，含 p、size、total、pageCount | `{...}` |
+
+> 隐藏或过期勋章不出现在公开结果中。用户不存在或不可访问时返回 HTTP 404。
+
+## API v3 会员
+
+### 读取会员档位
+
+`GET /api/v3/membership/levels`
+
+分页读取会员档位及已知权益，需要 content.read。
+
+请求：
+
+| Key | 说明 | 示例 |
+| --- | --- | --- |
+| Authorization | 请求头，Bearer accessToken | Bearer YOUR_ACCESS_TOKEN |
+| p | 页码，默认 1 | 1 |
+| size | 每页条数，默认 20，最大 50 | 20 |
+
+请求示例：
+
+```bash
+curl 'https://fishpi.cn/api/v3/membership/levels?p=1&size=20' \
+  --header 'Authorization: Bearer YOUR_ACCESS_TOKEN'
+```
+
+响应：
+
+| Key | 说明 | 示例 |
+| --- | --- | --- |
+| code | 0 表示成功 | 0 |
+| data | 分页结果 | `{...}` |
+| - list | 档位列表 | `[]` |
+| -- id | 档位 ID | 1700000000001 |
+| -- code | 档位代码 | vip |
+| -- name | 档位名称 | 会员 |
+| -- price | 积分价格 | 1000 |
+| -- durationType | 时长类型 | month |
+| -- durationValue | 周期值，单位天 | 30 |
+| -- benefits | 已知权益，字段同本人会员 config | `{...}` |
+| - pagination | 分页信息，含 p、size、total、pageCount | `{...}` |
+
+### 读取本人会员状态
+
+`GET /api/v3/me/membership`
+
+读取本人当前会员状态与已知配置，需要 profile.read。
+
+请求：
+
+| Key | 说明 | 示例 |
+| --- | --- | --- |
+| Authorization | 请求头，Bearer accessToken | Bearer YOUR_ACCESS_TOKEN |
+
+请求示例：
+
+```bash
+curl 'https://fishpi.cn/api/v3/me/membership' \
+  --header 'Authorization: Bearer YOUR_ACCESS_TOKEN'
+```
+
+响应：
+
+| Key | 说明 | 示例 |
+| --- | --- | --- |
+| code | 0 表示成功 | 0 |
+| data | 本人状态 | `{...}` |
+| - active | 当前是否有效 | true |
+| - levelCode | 当前档位代码，无有效会员时为空 | vip |
+| - expiresAt | 到期时间，毫秒时间戳；有效会员的 0 表示永久 | 0 |
+| - config | 已知配置；未设置或无有效会员时为空对象 | `{...}` |
+| -- bold | 昵称加粗，可选 | true |
+| -- underline | 昵称下划线，可选 | false |
+| -- color | 昵称颜色或预设名称，可选 | #FF8800 |
+| -- autoCheckin | 自动签到，可选 | true |
+| -- checkinCard | 签到卡数量，可选 | 1 |
+| -- metal | 勋章权益，可选 | true |
+| -- jointVip | 联合会员权益，可选 | false |
+
+> 未开通或已过期返回 active=false、空 levelCode、expiresAt=0 和空 config。未识别或格式不合法的可选权益字段不返回。本模块暂未提供 v3 开通或配置修改接口。

@@ -25,6 +25,9 @@ import org.b3log.latke.repository.annotation.Repository;
 import org.b3log.symphony.cache.ArticleCache;
 import org.b3log.symphony.model.Article;
 import org.b3log.symphony.util.JSONs;
+import org.b3log.symphony.util.ArticleSubmissionPolicy;
+import org.b3log.symphony.util.ArticlePublicationCaches;
+import org.b3log.symphony.util.ApiV3ArticleEditorDto;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
@@ -47,6 +50,8 @@ public class ArticleRepository extends AbstractRepository {
     @Inject
     private ArticleCache articleCache;
 
+    @Inject private ApiV3ArticleRevisionRepository realtimeRevisions;
+
     /**
      * Public constructor.
      */
@@ -56,18 +61,34 @@ public class ArticleRepository extends AbstractRepository {
 
     @Override
     public String add(final JSONObject article) throws RepositoryException {
-        return super.add(toWritableArticle(article));
+        requireWriteTransaction();
+        final String id = insertArticle(toWritableArticle(article));
+        realtimeRevisions.touchInCurrentTransaction(id);
+        return id;
     }
+    protected String insertArticle(final JSONObject row) throws RepositoryException { return super.add(row); }
+    protected void updateArticle(final String id, final JSONObject row, final String... fields) throws RepositoryException { super.update(id,row,fields); }
+    protected void removeArticle(final String id) throws RepositoryException { super.remove(id); }
+    private void requireWriteTransaction() { if (!hasTransactionBegun()) throw new IllegalStateException("article transaction required"); }
 
     @Override
     public void remove(final String id) throws RepositoryException {
-        super.remove(id);
-
+        requireWriteTransaction();
+        if (ArticlePublicationCaches.active()) {
+            if (!hasTransactionBegun()) throw new IllegalStateException("removal transaction required");
+            ArticlePublicationCaches.afterTransaction("article:" + id, () -> articleCache.removeArticle(id));
+            removeArticle(id);
+            realtimeRevisions.touchInCurrentTransaction(id);
+            return;
+        }
+        removeArticle(id);
+        realtimeRevisions.touchInCurrentTransaction(id);
         articleCache.removeArticle(id);
     }
 
     @Override
     public JSONObject get(final String id) throws RepositoryException {
+        if (ArticlePublicationCaches.active()) return getForUpdate(id);
         JSONObject ret = articleCache.getArticle(id);
         if (null != ret) {
             return ret;
@@ -85,9 +106,21 @@ public class ArticleRepository extends AbstractRepository {
 
     @Override
     public void update(final String id, final JSONObject article, final String... propertyNames) throws RepositoryException {
+        requireWriteTransaction();
         ensureWritableProperties(propertyNames);
         final JSONObject writableArticle = toWritableArticle(article);
-        super.update(id, writableArticle, propertyNames);
+        if (ArticlePublicationCaches.active()) {
+            if (!hasTransactionBegun()) throw new IllegalStateException("article transaction required");
+            ArticlePublicationCaches.afterTransaction("article:" + id, () -> {
+                articleCache.removeArticle(id);
+                try { get(id); } catch (final RepositoryException e) { /* Refill on a later read. */ }
+            });
+            updateArticle(id, writableArticle, propertyNames);
+            realtimeRevisions.touchInCurrentTransaction(id);
+            return;
+        }
+        updateArticle(id, writableArticle, propertyNames);
+        realtimeRevisions.touchInCurrentTransaction(id);
 
         writableArticle.put(Keys.OBJECT_ID, id);
         articleCache.putArticle(writableArticle);
@@ -156,5 +189,42 @@ public class ArticleRepository extends AbstractRepository {
         final Query query = new Query().setFilter(new PropertyFilter(Article.ARTICLE_TITLE,
                 FilterOperator.EQUAL, articleTitle)).setPageCount(1);
         return getFirst(query);
+    }
+
+    public JSONObject getByTitleForUpdate(final String articleTitle) throws RepositoryException {
+        if (!hasTransactionBegun()) throw new IllegalStateException("article transaction required");
+        final var rows = select("SELECT * FROM `" + getName() + "` WHERE articleTitle=? LIMIT 1 FOR UPDATE", articleTitle);
+        return rows.isEmpty() ? null : rows.getFirst();
+    }
+
+    /** Read only the trusted payment destination before acquiring the account pair locks. */
+    public String getCommentPublicationAuthor(final String id) throws RepositoryException {
+        final var rows = select("SELECT articleAuthorId FROM `" + getName() + "` WHERE oId=? LIMIT 1", id);
+        return rows.isEmpty() ? "" : rows.getFirst().optString(Article.ARTICLE_AUTHOR_ID);
+    }
+
+    public JSONObject getForUpdate(final String id) throws RepositoryException {
+        if (!hasTransactionBegun()) throw new IllegalStateException("article transaction required");
+        final var rows = select("SELECT * FROM `" + getName() + "` WHERE oId=? FOR UPDATE", id);
+        return rows.isEmpty() ? null : rows.getFirst();
+    }
+
+    /** Projection bypasses the public article cache and binds owner with ID in the same query. */
+    public JSONObject getOwnedEditorSource(final String id, final String author, final String chapterTable, final String columnTable) throws RepositoryException {
+        final var rows = select(ApiV3ArticleEditorDto.sql(getName(), chapterTable, columnTable), id, author);
+        return rows.isEmpty() ? null : rows.getFirst();
+    }
+
+    public JSONObject getOwnedForUpdate(final String id, final String author) throws RepositoryException {
+        if (!hasTransactionBegun()) throw new IllegalStateException("article transaction required");
+        final var rows = select("SELECT * FROM `" + getName() + "` WHERE oId=? AND articleAuthorId=? FOR UPDATE", id, author);
+        return rows.isEmpty() ? null : rows.getFirst();
+    }
+
+    public Long latestPublicArticleIdForUpdate(final String authorId) throws RepositoryException {
+        if (!hasTransactionBegun()) throw new IllegalStateException("article transaction required");
+        final var rows = select(ArticleSubmissionPolicy.latestPublicSql(getName(), true), authorId,
+                Article.ARTICLE_ANONYMOUS_C_PUBLIC, Article.ARTICLE_STATUS_C_INVALID);
+        return rows.isEmpty() ? null : rows.getFirst().getLong(Keys.OBJECT_ID);
     }
 }

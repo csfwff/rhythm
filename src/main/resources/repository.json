@@ -10,6 +10,250 @@
   "since": "0.2.0",
   "repositories": [
     {
+      "name": "api_v3_authorization_request",
+      "description": "Server-owned one-use explicit OAuth consent requests",
+      "keys": [
+        {
+          "name": "oId",
+          "type": "String",
+          "length": 64
+        },
+        {
+          "name": "userId",
+          "type": "String",
+          "length": 19
+        },
+        {
+          "name": "clientId",
+          "type": "String",
+          "length": 64
+        },
+        {
+          "name": "redirectUri",
+          "type": "String",
+          "length": 2048
+        },
+        {
+          "name": "scope",
+          "type": "String",
+          "length": 255
+        },
+        {
+          "name": "state",
+          "type": "String",
+          "length": 1024
+        },
+        {
+          "name": "codeChallenge",
+          "type": "String",
+          "length": 43
+        },
+        {
+          "name": "consentHash",
+          "type": "String",
+          "length": 64
+        },
+        {
+          "name": "createdAt",
+          "type": "long"
+        },
+        {
+          "name": "expiresAt",
+          "type": "long"
+        },
+        {
+          "name": "decidedAt",
+          "type": "long"
+        },
+        {
+          "name": "decision",
+          "type": "String",
+          "length": 16
+        }
+      ]
+    },
+    {
+      "name": "api_v3_client_redirect",
+      "description": "Exact OAuth client callback registrations",
+      "keys": [
+        {
+          "name": "oId",
+          "type": "String",
+          "length": 64
+        },
+        {
+          "name": "clientId",
+          "type": "String",
+          "length": 64
+        },
+        {
+          "name": "redirectUri",
+          "type": "String",
+          "length": 2048
+        },
+        {
+          "name": "status",
+          "type": "int"
+        }
+      ]
+    },
+    {
+      "name": "api_v3_authorization_code",
+      "description": "Hash-only one-use OAuth S256 authorization grants",
+      "keys": [
+        {
+          "name": "oId",
+          "type": "String",
+          "length": 64
+        },
+        {
+          "name": "clientId",
+          "type": "String",
+          "length": 64
+        },
+        {
+          "name": "userId",
+          "type": "String",
+          "length": 19
+        },
+        {
+          "name": "redirectUri",
+          "type": "String",
+          "length": 2048
+        },
+        {
+          "name": "scope",
+          "type": "String",
+          "length": 255
+        },
+        {
+          "name": "codeChallenge",
+          "type": "String",
+          "length": 43
+        },
+        {
+          "name": "createdAt",
+          "type": "long"
+        },
+        {
+          "name": "expiresAt",
+          "type": "long"
+        },
+        {
+          "name": "consumedAt",
+          "type": "long"
+        },
+        {
+          "name": "familyId",
+          "type": "String",
+          "length": 64
+        }
+      ]
+    },
+    {
+      "name": "api_v3_chat_state",
+      "description": "Committed public-room change sequence",
+      "keys": [
+        { "name": "oId", "type": "String", "length": 19, "description": "Room key" },
+        { "name": "revision", "type": "long", "description": "Committed room revision" },
+        { "name": "updatedAt", "type": "long", "description": "Last change time" }
+      ]
+    },
+    {
+      "name": "api_v3_chat_event",
+      "description": "Committed chat changes without message payloads",
+      "keys": [
+        { "name": "oId", "type": "String", "length": 19, "description": "Revision key" },
+        { "name": "revision", "type": "long", "description": "Commit-serialized room revision" },
+        { "name": "messageId", "type": "String", "length": 32, "description": "Changed message ID" },
+        { "name": "kind", "type": "String", "length": 16, "description": "Change kind" },
+        { "name": "createdAt", "type": "long", "description": "Change time" }
+      ]
+    },
+    {
+      "name": "api_v3_article_revision",
+      "description": "Committed article and interaction invalidation per article",
+      "keys": [
+        { "name": "oId", "type": "String", "length": 19, "description": "Article ID" },
+        { "name": "revision", "type": "String", "length": 32, "description": "Opaque change marker" },
+        { "name": "updatedAt", "type": "long", "description": "Last change time" }
+      ]
+    },
+    {
+      "name": "api_v3_notification_revision",
+      "description": "Committed notification invalidation per owner",
+      "keys": [
+        { "name": "oId", "type": "String", "length": 19, "description": "Notification owner" },
+        { "name": "revision", "type": "String", "length": 32, "description": "Opaque change marker" },
+        { "name": "updatedAt", "type": "long", "description": "Last change time" }
+      ]
+    },
+    {
+      "name": "api_v3_private_revision",
+      "description": "Committed private-message invalidation per owner",
+      "keys": [
+        { "name": "oId", "type": "String", "length": 19, "description": "Private-message owner" },
+        { "name": "revision", "type": "String", "length": 32, "description": "Opaque change marker" },
+        { "name": "updatedAt", "type": "long", "description": "Last change time" }
+      ]
+    },
+    {
+      "name": "api_v3_socket_ticket",
+      "description": "API v3 one-use socket grants; only credential hashes are stored",
+      "keys": [
+        { "name": "oId", "type": "String", "length": 64, "description": "Ticket hash" },
+        { "name": "userId", "type": "String", "length": 19, "description": "Owner" },
+        { "name": "parentTokenId", "type": "String", "length": 19, "description": "Authorizing access token row" },
+        { "name": "channel", "type": "String", "length": 32, "description": "Authorized channel" },
+        { "name": "targetId", "type": "String", "length": 32, "description": "Authorized resource or empty for owner notifications" },
+        { "name": "createdAt", "type": "long", "description": "Issue time" },
+        { "name": "expiresAt", "type": "long", "description": "Authentication deadline" },
+        { "name": "consumedAt", "type": "long", "description": "Zero until consumed" }
+      ]
+    },
+    {
+      "name": "api_v3_request",
+      "description": "API v3 committed idempotent mutation results",
+      "keys": [
+        { "name": "oId", "type": "String", "length": 64, "description": "Hashed user/operation/idempotency key" },
+        { "name": "userId", "type": "String", "length": 19, "description": "Owner" },
+        { "name": "operation", "type": "String", "length": 128, "description": "Mutation operation" },
+        { "name": "requestHash", "type": "String", "length": 64, "description": "Normalized request hash" },
+        { "name": "responseJson", "type": "String", "length": 65536, "description": "Successful response data" },
+        { "name": "createdAt", "type": "long", "description": "Committed request time" }
+      ]
+    },
+    {
+      "name": "api_v3_client",
+      "description": "API v3 client registrations",
+      "keys": [
+        { "name": "oId", "type": "String", "length": 19, "description": "Primary key" },
+        { "name": "clientId", "type": "String", "length": 64, "description": "Client identifier" },
+        { "name": "name", "type": "String", "length": 128, "description": "Display name" },
+        { "name": "scope", "type": "String", "length": 255, "description": "Allowed scopes" },
+        { "name": "status", "type": "int", "description": "0 active" }
+      ]
+    },
+    {
+      "name": "api_v3_token",
+      "description": "API v3 access and refresh token hashes",
+      "keys": [
+        { "name": "oId", "type": "String", "length": 19, "description": "Primary key" },
+        { "name": "tokenHash", "type": "String", "length": 128, "description": "Token hash" },
+        { "name": "tokenType", "type": "String", "length": 16, "description": "access or refresh" },
+        { "name": "userId", "type": "String", "length": 19, "description": "User ID" },
+        { "name": "clientId", "type": "String", "length": 64, "description": "Client identifier" },
+        { "name": "scope", "type": "String", "length": 255, "description": "Granted scopes" },
+        { "name": "familyId", "type": "String", "length": 64, "description": "Rotation family" },
+        { "name": "parentId", "type": "String", "length": 19, "description": "Prior refresh token" },
+        { "name": "state", "type": "int", "description": "0 active, 1 rotated, 2 revoked, 3 expired" },
+        { "name": "createdAt", "type": "long", "description": "Created time" },
+        { "name": "updatedAt", "type": "long", "description": "Updated time" },
+        { "name": "lastUsedAt", "type": "long", "description": "Last used time" },
+        { "name": "expiresAt", "type": "long", "description": "Expiration time" }
+      ]
+    },
+    {
       "name": "openid_refresh_token",
       "description": "OpenID refresh token sessions",
       "keys": [
@@ -899,6 +1143,12 @@
           "name": "expired",
           "type": "long",
           "description": "过期时间"
+        },
+        {
+          "name": "accountContext",
+          "type": "String",
+          "length": 512,
+          "description": "服务端注册短信的名称与邀请绑定"
         }
       ]
     },
@@ -2463,7 +2713,7 @@
         {
           "name": "content",
           "type": "String",
-          "length": 512,
+          "length": 10240,
           "description": "私聊消息内容"
         }
       ]
@@ -2525,6 +2775,12 @@
           "type": "String",
           "length": 64,
           "description": "两个用户的Hash"
+        },
+        {
+          "name": "messageId",
+          "type": "String",
+          "length": 19,
+          "description": "关联私信消息，历史记录为空"
         }
       ]
     },

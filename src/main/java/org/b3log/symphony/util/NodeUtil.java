@@ -230,6 +230,14 @@ public class NodeUtil {
         }
         remoteUsers = onlineList;
 
+        final var names = new java.util.HashSet<String>();
+        for (final String node : tmp_wsOnline.keySet()) names.addAll(tmp_remoteUserPerNode.get(node).keySet());
+        final var expected = new java.util.HashSet<String>();
+        for (final String configured : Symphonys.get("chatroom.node.url").split(";")) {
+            if (!configured.isBlank()) expected.add(configured.split(",", 2)[0]);
+        }
+        ChatOnlineSnapshot.publish(new ArrayList<>(names), System.currentTimeMillis(), tmp_wsOnline.keySet().containsAll(expected));
+
         wsOnline.clear();
         remoteUserPerNode.clear();
 

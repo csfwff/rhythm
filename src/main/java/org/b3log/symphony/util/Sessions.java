@@ -275,7 +275,11 @@ public final class Sessions {
      * @return CSRF token, returns {@code ""} if not found
      */
     public static String getCSRFToken(final RequestContext context) {
-        final JSONObject user = Sessions.getUser();
+        return getCSRFTokenForUser(Sessions.getUser());
+    }
+
+    /** Explicit authenticated principal for Cookie-only consent; no thread-local apiKey identity fallback. */
+    public static String getCSRFTokenForUser(final JSONObject user) {
         if (null == user) {
             return "";
         }
@@ -395,6 +399,11 @@ public final class Sessions {
             return null;
         }
 
+        return currentCookieUser(request);
+    }
+
+    /** Existing Cookie validation branch, callable without the legacy apiKey-first resolver. */
+    public static JSONObject currentCookieUser(final Request request) {
         final Set<Cookie> cookies = request.getCookies();
         if (cookies.isEmpty()) {
             return null;

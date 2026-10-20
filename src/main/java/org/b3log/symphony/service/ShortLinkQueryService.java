@@ -73,6 +73,11 @@ public class ShortLinkQueryService {
      * @return processed content
      */
     public String linkArticle(final String content) {
+        return linkArticle(content, null);
+    }
+
+    /** A non-null lookup supplies only titles the caller is authorized to expose; null leaves the URL intact. */
+    public String linkArticle(final String content, final java.util.function.Function<String, String> titleLookup) {
         Stopwatchs.start("Link article");
 
         StringBuffer contentBuilder = new StringBuffer();
@@ -110,14 +115,16 @@ public class ShortLinkQueryService {
                         anchor = StringUtils.substringAfter(url, "#");
                     }
 
-                    final Query query = new Query().select(Article.ARTICLE_TITLE).setFilter(new PropertyFilter(Keys.OBJECT_ID, FilterOperator.EQUAL, linkId));
-                    final List<JSONObject> results = articleRepository.getList(query);
-                    if (results.isEmpty()) {
-                        continue;
+                    final String linkTitle;
+                    if (null == titleLookup) {
+                        final Query query = new Query().select(Article.ARTICLE_TITLE).setFilter(new PropertyFilter(Keys.OBJECT_ID, FilterOperator.EQUAL, linkId));
+                        final List<JSONObject> results = articleRepository.getList(query);
+                        if (results.isEmpty()) continue;
+                        linkTitle = results.getFirst().optString(Article.ARTICLE_TITLE);
+                    } else {
+                        linkTitle = titleLookup.apply(linkId);
+                        if (null == linkTitle) continue;
                     }
-
-                    final JSONObject linkArticle = results.get(0);
-                    final String linkTitle = linkArticle.optString(Article.ARTICLE_TITLE);
                     String link = " [" + linkTitle + "](" + Latkes.getServePath() + "/article/" + linkId;
                     if (StringUtils.isNotBlank(queryStr)) {
                         link += "?" + queryStr;
@@ -127,7 +134,7 @@ public class ShortLinkQueryService {
                     }
                     link += ") ";
 
-                    matcher.appendReplacement(contentBuilder, link);
+                    matcher.appendReplacement(contentBuilder, Matcher.quoteReplacement(link));
                 }
 
                 matcher.appendTail(contentBuilder);
